@@ -56,6 +56,10 @@ export default {
         "ocean-light": "hsl(var(--ocean-light))",
         sunset: "hsl(var(--sunset))",
         dune: "hsl(var(--dune))",
+        whatsapp: {
+          DEFAULT: "hsl(var(--whatsapp))",
+          hover: "hsl(var(--whatsapp-hover))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
