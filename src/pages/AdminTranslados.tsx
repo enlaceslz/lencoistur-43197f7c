@@ -26,7 +26,7 @@ const AdminTranslados = () => {
           <CardContent className="p-5 flex items-center gap-4">
             <div className="p-3 rounded-xl bg-muted text-green-600"><MapPin size={22} /></div>
             <div>
-              <p className="text-2xl font-bold text-foreground">{new Set(transfers.flatMap(t => [t.from, t.to])).size}</p>
+              <p className="text-2xl font-bold text-foreground">{new Set(transfers.flatMap(t => [t.origin, t.destination])).size}</p>
               <p className="text-xs text-muted-foreground">Destinos</p>
             </div>
           </CardContent>
@@ -35,7 +35,7 @@ const AdminTranslados = () => {
           <CardContent className="p-5 flex items-center gap-4">
             <div className="p-3 rounded-xl bg-muted text-amber-600"><Clock size={22} /></div>
             <div>
-              <p className="text-2xl font-bold text-foreground">{transfers.reduce((a, t) => a + t.departureTimes.length, 0)}</p>
+              <p className="text-2xl font-bold text-foreground">{transfers.reduce((a, t) => a + t.departures.length, 0)}</p>
               <p className="text-xs text-muted-foreground">Horários</p>
             </div>
           </CardContent>
@@ -44,7 +44,7 @@ const AdminTranslados = () => {
           <CardContent className="p-5 flex items-center gap-4">
             <div className="p-3 rounded-xl bg-muted text-blue-600"><Users size={22} /></div>
             <div>
-              <p className="text-2xl font-bold text-foreground">{new Set(transfers.flatMap(t => t.vehicles.map(v => v.type))).size}</p>
+              <p className="text-2xl font-bold text-foreground">{new Set(transfers.map(t => t.vehicleType)).size}</p>
               <p className="text-xs text-muted-foreground">Tipos de Veículo</p>
             </div>
           </CardContent>
@@ -66,18 +66,14 @@ const AdminTranslados = () => {
             {transfers.map((t) => (
               <TableRow key={t.id}>
                 <TableCell>
-                  <p className="font-semibold text-foreground">{t.from} → {t.to}</p>
+                  <p className="font-semibold text-foreground">{t.origin} → {t.destination}</p>
                 </TableCell>
                 <TableCell className="text-muted-foreground">{t.duration}</TableCell>
                 <TableCell>
-                  <div className="flex gap-1 flex-wrap">
-                    {t.vehicles.map((v) => (
-                      <Badge key={v.type} variant="outline">{v.type}</Badge>
-                    ))}
-                  </div>
+                  <Badge variant="outline">{t.vehicleType}</Badge>
                 </TableCell>
-                <TableCell className="text-muted-foreground">{t.departureTimes.join(", ")}</TableCell>
-                <TableCell className="font-medium text-foreground">{fmt(Math.min(...t.vehicles.map(v => v.price)))}</TableCell>
+                <TableCell className="text-muted-foreground">{t.departures.join(", ")}</TableCell>
+                <TableCell className="font-medium text-foreground">{fmt(t.price)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
