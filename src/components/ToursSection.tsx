@@ -1,51 +1,6 @@
 import { Star, Clock, MapPin } from "lucide-react";
-import destGreece from "@/assets/dest-greece.jpg";
-import destPeru from "@/assets/dest-peru.jpg";
-import destMaldives from "@/assets/dest-maldives.jpg";
-import destSafari from "@/assets/dest-safari.jpg";
-
-const tours = [
-  {
-    name: "Lagoa Azul",
-    image: destMaldives,
-    location: "Lençóis Maranhenses",
-    duration: "1 dia",
-    rating: 4.9,
-    reviews: 234,
-    price: 180,
-    tag: "Mais Vendido",
-  },
-  {
-    name: "Lagoa Bonita",
-    image: destGreece,
-    location: "Lençóis Maranhenses",
-    duration: "1 dia",
-    rating: 4.8,
-    reviews: 189,
-    price: 160,
-    tag: "Imperdível",
-  },
-  {
-    name: "Atins & Caburé",
-    image: destSafari,
-    location: "Atins, Maranhão",
-    duration: "1 dia",
-    rating: 4.7,
-    reviews: 156,
-    price: 220,
-    tag: null,
-  },
-  {
-    name: "Santo Amaro",
-    image: destPeru,
-    location: "Santo Amaro, Maranhão",
-    duration: "2 dias",
-    rating: 4.9,
-    reviews: 98,
-    price: 380,
-    tag: "Aventura",
-  },
-];
+import { Link } from "react-router-dom";
+import { tours } from "@/data/tours";
 
 const ToursSection = () => {
   return (
@@ -63,10 +18,14 @@ const ToursSection = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {tours.map((tour) => (
-            <div key={tour.name} className="group bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+            <Link
+              to={`/passeios/${tour.slug}`}
+              key={tour.id}
+              className="group bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+            >
               <div className="relative h-64 overflow-hidden">
                 <img
-                  src={tour.image}
+                  src={tour.images[0]}
                   alt={tour.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   loading="lazy"
@@ -95,13 +54,22 @@ const ToursSection = () => {
                     <span className="text-xs text-muted-foreground">a partir de</span>
                     <p className="text-xl font-bold text-primary">R$ {tour.price}</p>
                   </div>
-                  <button className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors">
+                  <span className="bg-primary text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-semibold">
                     Reservar
-                  </button>
+                  </span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
+        </div>
+
+        <div className="text-center mt-10">
+          <Link
+            to="/passeios"
+            className="inline-block border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-3 rounded-xl font-semibold transition-colors"
+          >
+            Ver Todos os Passeios
+          </Link>
         </div>
       </div>
     </section>
