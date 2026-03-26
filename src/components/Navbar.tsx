@@ -1,4 +1,4 @@
-import { MapPin, Phone, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -16,14 +16,12 @@ const Navbar = () => {
 
         <div className={`hidden md:flex items-center gap-8 text-sm font-medium ${isHome ? "text-primary-foreground/90" : "text-foreground/80"}`}>
           <Link to="/passeios" className="hover:text-secondary transition-colors">Passeios</Link>
-          {isHome ? (
+          <Link to="/translados" className="hover:text-secondary transition-colors">Translados</Link>
+          {isHome && (
             <>
               <a href="#como-funciona" className="hover:text-secondary transition-colors">Como Funciona</a>
               <a href="#parceiros" className="hover:text-secondary transition-colors">Parceiros</a>
-              <a href="#contato" className="hover:text-secondary transition-colors">Contato</a>
             </>
-          ) : (
-            <Link to="/" className="hover:text-secondary transition-colors">Início</Link>
           )}
           <Link to="/passeios" className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-5 py-2.5 rounded-lg font-semibold transition-colors">
             Reservar Agora
@@ -38,6 +36,7 @@ const Navbar = () => {
       {open && (
         <div className={`md:hidden ${isHome ? "bg-foreground/95 text-primary-foreground" : "bg-card text-foreground"} backdrop-blur-lg border-t border-border px-6 py-6 flex flex-col gap-4`}>
           <Link to="/passeios" onClick={() => setOpen(false)} className="py-2">Passeios</Link>
+          <Link to="/translados" onClick={() => setOpen(false)} className="py-2">Translados</Link>
           <Link to="/" onClick={() => setOpen(false)} className="py-2">Início</Link>
           <Link to="/passeios" onClick={() => setOpen(false)} className="bg-secondary text-secondary-foreground px-5 py-3 rounded-lg font-semibold mt-2 text-center">
             Reservar Agora
