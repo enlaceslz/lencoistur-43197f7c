@@ -5,7 +5,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Car, MapPin, Clock, Users } from "lucide-react";
-import { transfers } from "@/data/transfers";
+import { transferRoutes as transfers } from "@/data/transfers";
 
 const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR")}`;
 

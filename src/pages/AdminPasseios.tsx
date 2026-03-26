@@ -36,7 +36,7 @@ const AdminPasseios = () => {
   }));
 
   const filtered = tourList.filter((t) =>
-    t.title.toLowerCase().includes(search.toLowerCase())
+    t.name.toLowerCase().includes(search.toLowerCase())
   );
 
   const totalRevenue = tourList.reduce((acc, t) => acc + t.revenue, 0);
@@ -121,9 +121,9 @@ const AdminPasseios = () => {
                 <TableRow key={t.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <img src={t.image} alt={t.title} className="w-12 h-12 rounded-lg object-cover" />
+                      <img src={t.images[0]} alt={t.name} className="w-12 h-12 rounded-lg object-cover" />
                       <div>
-                        <p className="font-semibold text-foreground text-sm">{t.title}</p>
+                        <p className="font-semibold text-foreground text-sm">{t.name}</p>
                         <p className="text-xs text-muted-foreground">{t.location}</p>
                       </div>
                     </div>
