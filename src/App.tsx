@@ -10,6 +10,12 @@ import TransfersPage from "./pages/TransfersPage.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import AdminCRM from "./pages/AdminCRM.tsx";
 import AdminFinanceiro from "./pages/AdminFinanceiro.tsx";
+import AdminParceiros from "./pages/AdminParceiros.tsx";
+import AdminPasseios from "./pages/AdminPasseios.tsx";
+import AdminReservas from "./pages/AdminReservas.tsx";
+import AdminTranslados from "./pages/AdminTranslados.tsx";
+import AdminAvaliacoes from "./pages/AdminAvaliacoes.tsx";
+import AdminConfig from "./pages/AdminConfig.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -28,6 +34,12 @@ const App = () => (
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/crm" element={<AdminCRM />} />
           <Route path="/admin/financeiro" element={<AdminFinanceiro />} />
+          <Route path="/admin/parceiros" element={<AdminParceiros />} />
+          <Route path="/admin/passeios" element={<AdminPasseios />} />
+          <Route path="/admin/reservas" element={<AdminReservas />} />
+          <Route path="/admin/translados" element={<AdminTranslados />} />
+          <Route path="/admin/avaliacoes" element={<AdminAvaliacoes />} />
+          <Route path="/admin/config" element={<AdminConfig />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
