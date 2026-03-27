@@ -16,6 +16,8 @@ import AdminReservas from "./pages/AdminReservas.tsx";
 import AdminTranslados from "./pages/AdminTranslados.tsx";
 import AdminAvaliacoes from "./pages/AdminAvaliacoes.tsx";
 import AdminConfig from "./pages/AdminConfig.tsx";
+import AdminLogin from "./pages/AdminLogin.tsx";
+import CheckoutPage from "./pages/CheckoutPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
