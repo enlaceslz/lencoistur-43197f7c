@@ -35,6 +35,7 @@ const App = () => (
           <Route path="/passeios/:slug" element={<TourDetail />} />
           <Route path="/translados" element={<TransfersPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/minhas-reservas" element={<MinhasReservas />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/crm" element={<AdminCRM />} />
