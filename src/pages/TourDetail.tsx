@@ -241,9 +241,12 @@ const TourDetail = () => {
                 </div>
               </div>
 
-              <button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-xl font-semibold text-lg transition-colors">
+              <Link
+                to={`/checkout?tour=${tour.slug}&pax=${guests}&date=${selectedDate}`}
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-xl font-semibold text-lg transition-colors block text-center"
+              >
                 Reservar Agora
-              </button>
+              </Link>
 
               <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">
                 <Shield size={14} />
