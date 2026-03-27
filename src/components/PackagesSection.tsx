@@ -1,0 +1,169 @@
+import { Link } from "react-router-dom";
+import { Star, Clock, Users, MapPin, Sparkles, ArrowRight } from "lucide-react";
+import { tours } from "@/data/tours";
+
+interface Package {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  tourIds: string[];
+  days: number;
+  originalPrice: number;
+  discountPrice: number;
+  tag: string;
+  highlights: string[];
+}
+
+const packages: Package[] = [
+  {
+    id: "pkg-1",
+    name: "Pacote Essencial Lençóis",
+    slug: "essencial",
+    description: "O melhor dos Lençóis Maranhenses em 3 dias. Ideal para quem tem pouco tempo mas quer viver as experiências mais icônicas.",
+    tourIds: ["1", "2", "4"],
+    days: 3,
+    originalPrice: 570,
+    discountPrice: 459,
+    tag: "Mais Vendido",
+    highlights: ["Lagoas Azuis", "Rio Preguiças", "Gastronomia local", "Transfer incluso"],
+  },
+  {
+    id: "pkg-2",
+    name: "Pacote Aventura Total",
+    slug: "aventura",
+    description: "Para quem busca adrenalina! Caiaque, quadriciclo e trekking nas dunas mais impressionantes do Brasil.",
+    tourIds: ["6", "7", "8"],
+    days: 4,
+    originalPrice: 720,
+    discountPrice: 579,
+    tag: "Aventura",
+    highlights: ["Caiaque nos rios", "Trekking nas dunas", "Quadriciclo", "Lagoas remotas"],
+  },
+  {
+    id: "pkg-3",
+    name: "Pacote Imersão Completa",
+    slug: "imersao",
+    description: "A experiência definitiva: 5 dias explorando todos os cantos dos Lençóis Maranhenses com roteiros exclusivos.",
+    tourIds: ["1", "2", "3", "5", "6"],
+    days: 5,
+    originalPrice: 1060,
+    discountPrice: 799,
+    tag: "Premium",
+    highlights: ["5 passeios completos", "Roteiro ecológico", "Cultural + gastronômico", "Guia exclusivo"],
+  },
+];
+
+const PackagesSection = () => {
+  return (
+    <section className="py-20 md:py-28 bg-background">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-14">
+          <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-3">
+            Pacotes Especiais
+          </p>
+          <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
+            Combos com Desconto
+          </h2>
+          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+            Economize até 25% combinando passeios em pacotes exclusivos.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {packages.map((pkg) => {
+            const discount = Math.round(((pkg.originalPrice - pkg.discountPrice) / pkg.originalPrice) * 100);
+            const pkgTours = pkg.tourIds.map((id) => tours.find((t) => t.id === id)).filter(Boolean);
+
+            return (
+              <div
+                key={pkg.id}
+                className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl transition-shadow group"
+              >
+                {/* Tour images strip */}
+                <div className="relative h-48 flex">
+                  {pkgTours.slice(0, 3).map((tour, i) => (
+                    <div
+                      key={tour!.id}
+                      className="flex-1 overflow-hidden"
+                    >
+                      <img
+                        src={tour!.images[0]}
+                        alt={tour!.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    </div>
+                  ))}
+                  <div className="absolute top-3 left-3 flex gap-2">
+                    <span className="bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1.5 rounded-full">
+                      {pkg.tag}
+                    </span>
+                    <span className="bg-destructive text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full">
+                      -{discount}%
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-6 space-y-4">
+                  <div>
+                    <h3 className="font-display text-xl font-bold text-foreground mb-1">{pkg.name}</h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed">{pkg.description}</p>
+                  </div>
+
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Clock size={14} className="text-primary" /> {pkg.days} dias
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Sparkles size={14} className="text-primary" /> {pkg.tourIds.length} passeios
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {pkg.highlights.map((h) => (
+                      <div key={h} className="flex items-center gap-2 text-sm text-foreground">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                        {h}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="border-t border-border pt-4 flex items-end justify-between">
+                    <div>
+                      <span className="text-sm text-muted-foreground line-through">R$ {pkg.originalPrice}</span>
+                      <div className="flex items-baseline gap-1">
+                        <span className="font-display text-2xl font-bold text-primary">R$ {pkg.discountPrice}</span>
+                        <span className="text-xs text-muted-foreground">/ pessoa</span>
+                      </div>
+                    </div>
+                    <Link
+                      to={`/passeios`}
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2"
+                    >
+                      Ver <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* WhatsApp CTA */}
+        <div className="mt-12 text-center">
+          <a
+            href="https://wa.me/5598985880954?text=Olá! Gostaria de saber mais sobre os pacotes de passeios."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 bg-[hsl(var(--whatsapp))] hover:bg-[hsl(var(--whatsapp-hover))] text-primary-foreground px-8 py-4 rounded-xl font-semibold text-lg transition-colors"
+          >
+            Monte seu Pacote Personalizado no WhatsApp
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default PackagesSection;
