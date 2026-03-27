@@ -18,6 +18,7 @@ import AdminAvaliacoes from "./pages/AdminAvaliacoes.tsx";
 import AdminConfig from "./pages/AdminConfig.tsx";
 import AdminLogin from "./pages/AdminLogin.tsx";
 import CheckoutPage from "./pages/CheckoutPage.tsx";
+import MinhasReservas from "./pages/MinhasReservas.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/passeios/:slug" element={<TourDetail />} />
           <Route path="/translados" element={<TransfersPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/minhas-reservas" element={<MinhasReservas />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/crm" element={<AdminCRM />} />
