@@ -2,37 +2,27 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Search, Calendar, MapPin, Users, Eye, Filter, ChevronDown } from "lucide-react";
+import { Calendar, Users, Copy, QrCode, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { useBookings } from "@/hooks/useBookings";
+import { toast } from "@/hooks/use-toast";
 
-interface Booking {
-  id: string;
-  tour: string;
-  date: string;
-  guests: number;
-  total: number;
-  status: "confirmada" | "pendente" | "cancelada" | "concluida";
-  paymentStatus: "pago" | "pendente";
-  createdAt: string;
-}
-
-const mockBookings: Booking[] = [
-  { id: "RES-2026-001", tour: "Lagoas Azuis", date: "2026-04-05", guests: 2, total: 300, status: "confirmada", paymentStatus: "pago", createdAt: "2026-03-25" },
-  { id: "RES-2026-002", tour: "Passeio de Barco - Rio Preguiças", date: "2026-04-06", guests: 3, total: 660, status: "pendente", paymentStatus: "pendente", createdAt: "2026-03-26" },
-  { id: "RES-2026-003", tour: "Descida de Caiaque", date: "2026-03-20", guests: 2, total: 500, status: "concluida", paymentStatus: "pago", createdAt: "2026-03-15" },
-  { id: "RES-2026-004", tour: "Passeio de Quadriciclo", date: "2026-03-15", guests: 1, total: 280, status: "cancelada", paymentStatus: "pendente", createdAt: "2026-03-10" },
-];
-
-const statusConfig: Record<string, { label: string; className: string }> = {
-  confirmada: { label: "Confirmada", className: "bg-primary/10 text-primary" },
-  pendente: { label: "Pendente", className: "bg-secondary/10 text-secondary" },
-  cancelada: { label: "Cancelada", className: "bg-destructive/10 text-destructive" },
-  concluida: { label: "Concluída", className: "bg-muted text-muted-foreground" },
+const statusConfig: Record<string, { label: string; className: string; icon: typeof CheckCircle }> = {
+  confirmada: { label: "Confirmada", className: "bg-primary/10 text-primary", icon: CheckCircle },
+  pendente: { label: "Aguardando Pagamento", className: "bg-secondary/10 text-secondary", icon: Clock },
+  cancelada: { label: "Cancelada", className: "bg-destructive/10 text-destructive", icon: XCircle },
+  concluida: { label: "Concluída", className: "bg-muted text-muted-foreground", icon: CheckCircle },
 };
 
 const MinhasReservas = () => {
+  const { bookings, confirmPayment, cancelBooking } = useBookings();
   const [filter, setFilter] = useState("todas");
 
-  const filtered = filter === "todas" ? mockBookings : mockBookings.filter((b) => b.status === filter);
+  const filtered = filter === "todas" ? bookings : bookings.filter((b) => b.status === filter);
+
+  const copyPix = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast({ title: "Código PIX copiado!", description: "Cole no app do seu banco." });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,7 +42,7 @@ const MinhasReservas = () => {
                   filter === s ? "bg-primary text-primary-foreground" : "bg-card border border-border text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {s === "todas" ? "Todas" : statusConfig[s]?.label || s}
+                {s === "todas" ? `Todas (${bookings.length})` : statusConfig[s]?.label || s}
               </button>
             ))}
           </div>
@@ -61,20 +51,22 @@ const MinhasReservas = () => {
           <div className="space-y-4">
             {filtered.map((b) => {
               const st = statusConfig[b.status];
+              const StatusIcon = st.icon;
               return (
                 <div key={b.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-shadow">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-display text-lg font-bold text-foreground">{b.tour}</h3>
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${st.className}`}>
+                        <h3 className="font-display text-lg font-bold text-foreground">{b.itemName}</h3>
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${st.className}`}>
+                          <StatusIcon size={12} />
                           {st.label}
                         </span>
                       </div>
                       <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Calendar size={14} className="text-primary" />
-                          {new Date(b.date + "T12:00").toLocaleDateString("pt-BR")}
+                          {b.date ? new Date(b.date + "T12:00").toLocaleDateString("pt-BR") : "A definir"}
                         </span>
                         <span className="flex items-center gap-1">
                           <Users size={14} className="text-primary" />
@@ -84,29 +76,79 @@ const MinhasReservas = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-display text-xl font-bold text-primary">R$ {b.total}</p>
+                      <p className="font-display text-xl font-bold text-primary">R$ {b.finalTotal}</p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {b.paymentStatus === "pago" ? "✓ Pago" : "Aguardando pagamento"}
+                        {b.paymentStatus === "pago" ? (
+                          <span className="text-green-600 font-medium">✓ Pago</span>
+                        ) : (
+                          <span className="text-secondary font-medium">Aguardando pagamento</span>
+                        )}
                       </p>
                     </div>
                   </div>
 
-                  {b.status === "pendente" && (
+                  {/* PIX pending payment */}
+                  {b.status === "pendente" && b.pixCode && (
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <div className="bg-muted rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <QrCode size={20} className="text-primary shrink-0" />
+                          <div>
+                            <p className="text-sm font-semibold text-foreground">Pagamento PIX pendente</p>
+                            <p className="text-xs text-muted-foreground">Pague para confirmar sua reserva</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 sm:ml-auto">
+                          <button
+                            onClick={() => copyPix(b.pixCode!)}
+                            className="bg-card border border-border text-foreground px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-1 hover:bg-muted transition-colors"
+                          >
+                            <Copy size={14} /> Copiar PIX
+                          </button>
+                          <button
+                            onClick={() => confirmPayment(b.id)}
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-xl text-sm font-semibold transition-colors"
+                          >
+                            Simular Pagamento
+                          </button>
+                        </div>
+                      </div>
+                      <div className="mt-3 flex gap-3">
+                        <button
+                          onClick={() => cancelBooking(b.id)}
+                          className="text-destructive text-sm font-semibold hover:underline"
+                        >
+                          Cancelar Reserva
+                        </button>
+                        <a
+                          href={`https://wa.me/5598985880954?text=${encodeURIComponent(`Olá! Preciso de ajuda com minha reserva ${b.id}`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary text-sm font-semibold hover:underline"
+                        >
+                          Falar no WhatsApp
+                        </a>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Confirmed - show actions */}
+                  {b.status === "confirmada" && (
                     <div className="mt-4 pt-4 border-t border-border flex flex-wrap gap-3">
-                      <button className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-xl text-sm font-semibold transition-colors">
-                        Pagar Agora
-                      </button>
-                      <button className="border border-border text-foreground px-5 py-2 rounded-xl text-sm font-semibold hover:bg-muted transition-colors">
-                        Cancelar Reserva
-                      </button>
                       <a
-                        href={`https://wa.me/5598985880954?text=Olá! Preciso de ajuda com minha reserva ${b.id}`}
+                        href={`https://wa.me/5598985880954?text=${encodeURIComponent(`Olá! Tenho a reserva ${b.id} confirmada para ${b.itemName}.`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary text-sm font-semibold hover:underline flex items-center gap-1"
                       >
-                        Falar no WhatsApp
+                        📱 Falar no WhatsApp
                       </a>
+                      <button
+                        onClick={() => cancelBooking(b.id)}
+                        className="text-destructive text-sm font-semibold hover:underline"
+                      >
+                        Cancelar
+                      </button>
                     </div>
                   )}
 
@@ -122,10 +164,13 @@ const MinhasReservas = () => {
             })}
 
             {filtered.length === 0 && (
-              <div className="text-center py-16 text-muted-foreground">
-                <p className="text-lg mb-4">Nenhuma reserva encontrada</p>
-                <Link to="/passeios" className="text-primary hover:underline font-semibold">
-                  Explorar passeios →
+              <div className="text-center py-16">
+                <AlertCircle size={48} className="mx-auto text-muted-foreground/40 mb-4" />
+                <p className="text-lg text-muted-foreground mb-4">
+                  {bookings.length === 0 ? "Você ainda não tem reservas" : "Nenhuma reserva neste filtro"}
+                </p>
+                <Link to="/passeios" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors inline-block">
+                  Explorar Passeios
                 </Link>
               </div>
             )}
