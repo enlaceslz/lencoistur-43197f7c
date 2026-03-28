@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { transferRoutes } from "@/data/transfers";
 import { ArrowRight, Clock, MapPin, Users, Car, Ship, ChevronDown } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -133,9 +134,12 @@ const TransfersPage = () => {
                       <p className="font-display text-2xl font-bold text-primary">R$ {route.price}</p>
                       <p className="text-xs text-muted-foreground">por pessoa</p>
                     </div>
-                    <button className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors whitespace-nowrap">
+                    <Link
+                      to={`/checkout?type=transfer&transfer=${route.id}&pax=${passengers}&date=${date}`}
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors whitespace-nowrap"
+                    >
                       Reservar
-                    </button>
+                    </Link>
                   </div>
                 </div>
 
