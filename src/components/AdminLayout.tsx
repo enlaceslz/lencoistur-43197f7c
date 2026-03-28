@@ -27,7 +27,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
       <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="p-6 border-b border-border">
           <Link to="/" className="font-display text-xl font-bold text-foreground">
-            Lençóis<span className="text-secondary">Experience</span>
+            Lençóis<span className="text-secondary">Tour</span>
           </Link>
           <p className="text-xs text-muted-foreground mt-1">Painel Administrativo</p>
         </div>
