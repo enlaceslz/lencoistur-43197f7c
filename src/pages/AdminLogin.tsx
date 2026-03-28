@@ -38,7 +38,7 @@ const AdminLogin = () => {
             </div>
           </div>
           <h1 className="font-display text-3xl font-bold text-primary-foreground">
-            Lençóis<span className="text-secondary">Experience</span>
+            Lençóis<span className="text-secondary">Tour</span>
           </h1>
           <p className="text-primary-foreground/60 text-sm mt-2">Painel Administrativo</p>
         </div>
@@ -107,7 +107,7 @@ const AdminLogin = () => {
         </div>
 
         <p className="text-center text-primary-foreground/40 text-xs mt-6">
-          © 2026 Lençóis Experience. Todos os direitos reservados.
+          © 2026 LençóisTour. Todos os direitos reservados.
         </p>
       </div>
     </div>

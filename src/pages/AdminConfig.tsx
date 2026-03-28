@@ -30,7 +30,7 @@ const AdminConfig = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Nome da Empresa</Label>
-                  <Input defaultValue="Lençóis Experience" />
+                  <Input defaultValue="<Input defaultValue="LençóisTour" /> />
                 </div>
                 <div className="space-y-2">
                   <Label>CNPJ</Label>
@@ -61,7 +61,7 @@ const AdminConfig = () => {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Título do Site</Label>
-                  <Input defaultValue="Lençóis Experience - Passeios nos Lençóis Maranhenses" />
+                  <Input defaultValue="<Input defaultValue="LençóisTour - Passeios nos Lençóis Maranhenses" /> />
                 </div>
                 <div className="space-y-2">
                   <Label>Meta Descrição</Label>

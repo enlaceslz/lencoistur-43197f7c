@@ -7,7 +7,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="md:col-span-1">
             <h3 className="font-display text-2xl font-bold mb-4">
-              Lençóis<span className="text-secondary">Experience</span>
+              Lençóis<span className="text-secondary">Tour</span>
             </h3>
             <p className="text-primary-foreground/60 text-sm leading-relaxed mb-4">
               A plataforma líder em turismo nos Lençóis Maranhenses. Passeios, translados e experiências únicas em Santo Amaro do Maranhão.
@@ -66,7 +66,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-primary-foreground/10 mt-12 pt-8 text-center text-primary-foreground/40 text-sm">
-          © 2026 Lençóis Experience. Todos os direitos reservados. Inspirado na operação da Lençóis Tour.
+          © 2026 LençóisTour. Todos os direitos reservados.
         </div>
       </div>
     </footer>
