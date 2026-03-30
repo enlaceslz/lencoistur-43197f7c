@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Home, Compass, Car, Users, UserCheck, CreditCard, Settings,
-  LogOut, Star, ShoppingCart, Menu, X, Bell
+  LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone
 } from "lucide-react";
 
 const sidebarItems = [
@@ -14,6 +14,7 @@ const sidebarItems = [
   { icon: UserCheck, label: "Parceiros", path: "/admin/parceiros" },
   { icon: CreditCard, label: "Financeiro", path: "/admin/financeiro" },
   { icon: Star, label: "Avaliações", path: "/admin/avaliacoes" },
+  { icon: Megaphone, label: "Marketing", path: "/admin/marketing" },
   { icon: Settings, label: "Configurações", path: "/admin/config" },
 ];
 
