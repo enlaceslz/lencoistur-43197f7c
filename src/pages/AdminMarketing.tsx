@@ -70,7 +70,7 @@ const AdminMarketing = () => {
   ];
 
   return (
-    <AdminLayout title="Marketing & WhatsApp" subtitle="Campanhas, leads e automações de marketing">
+    <AdminLayout title="Marketing & WhatsApp">
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {stats.map((s) => (
