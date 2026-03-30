@@ -14,6 +14,7 @@ const sidebarItems = [
   { icon: UserCheck, label: "Parceiros", path: "/admin/parceiros" },
   { icon: CreditCard, label: "Financeiro", path: "/admin/financeiro" },
   { icon: Star, label: "Avaliações", path: "/admin/avaliacoes" },
+  { icon: Megaphone, label: "Marketing", path: "/admin/marketing" },
   { icon: Settings, label: "Configurações", path: "/admin/config" },
 ];
 
