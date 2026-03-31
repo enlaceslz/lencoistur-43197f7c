@@ -17,6 +17,7 @@ import AdminTranslados from "./pages/AdminTranslados.tsx";
 import AdminAvaliacoes from "./pages/AdminAvaliacoes.tsx";
 import AdminConfig from "./pages/AdminConfig.tsx";
 import AdminMarketing from "./pages/AdminMarketing.tsx";
+import AdminIA from "./pages/AdminIA.tsx";
 import AdminLogin from "./pages/AdminLogin.tsx";
 import CheckoutPage from "./pages/CheckoutPage.tsx";
 import MinhasReservas from "./pages/MinhasReservas.tsx";
@@ -48,6 +49,7 @@ const App = () => (
           <Route path="/admin/avaliacoes" element={<AdminAvaliacoes />} />
           <Route path="/admin/config" element={<AdminConfig />} />
           <Route path="/admin/marketing" element={<AdminMarketing />} />
+          <Route path="/admin/ia" element={<AdminIA />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
