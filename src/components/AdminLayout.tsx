@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Home, Compass, Car, Users, UserCheck, CreditCard, Settings,
-  LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone
+  LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot
 } from "lucide-react";
 
 const sidebarItems = [
