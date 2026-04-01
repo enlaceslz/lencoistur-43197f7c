@@ -1,0 +1,168 @@
+{
+  "nav": {
+    "tours": "Paseos",
+    "transfers": "Traslados",
+    "howItWorks": "Cómo Funciona",
+    "partners": "Socios",
+    "bookNow": "Reservar Ahora",
+    "home": "Inicio"
+  },
+  "hero": {
+    "location": "Santo Amaro do Maranhão",
+    "title1": "La Puerta de Entrada Más Rápida",
+    "title2": "a los Lençóis Maranhenses",
+    "subtitle": "¡En menos de 7 minutos sales de la ciudad y llegas a las famosas Lagunas Azules! Vehículos 4x4 acreditados, guías locales especializados y 8 rutas exclusivas de ecoturismo y aventura.",
+    "categories": {
+      "boat": "Paseo en Barco",
+      "eco": "Ruta Ecológica",
+      "gastro": "Tour Gastronómico",
+      "cultural": "Ruta Cultural",
+      "kayak": "Descenso en Kayak",
+      "trekking": "Trekking en Dunas"
+    },
+    "searchWhere": "¿A dónde quieres ir?",
+    "searchWhen": "¿Cuándo?",
+    "search": "Buscar",
+    "whatsapp": "📱 Reservar por WhatsApp"
+  },
+  "about": {
+    "label": "Sobre el Destino",
+    "title": "Santo Amaro do Maranhão",
+    "p1": "Descubre Santo Amaro do Maranhão, la ruta turística más buscada y la puerta de entrada más cercana al Parque Nacional de los Lençóis Maranhenses.",
+    "p2": "Los Lençóis Maranhenses son un tesoro natural de valor incalculable, reconocido como <strong>Patrimonio Mundial de la Humanidad</strong>. En Santo Amaro encuentras la esencia rústica y acogedora del interior, con una estructura completa de posadas y restaurantes.",
+    "p3": "Ofrecemos <strong>8 rutas exclusivas</strong> de ecoturismo, aventura y experiencia, incluyendo trekking, kayak y el famoso paseo en cuatrimoto. Disfruta de la rica gastronomía maranhense, con platos típicos como el famoso <strong>camarón de Malasia</strong>.",
+    "stats": {
+      "routes": "Rutas Exclusivas",
+      "time": "Hasta las Lagunas",
+      "satisfaction": "Satisfacción",
+      "season": "Mejor Época"
+    }
+  },
+  "tours": {
+    "label": "Nuestros Paseos",
+    "title": "Experiencias Inolvidables",
+    "subtitle": "Descubre los mejores paseos de los Lençóis Maranhenses con guías experimentados.",
+    "reviews": "reseñas",
+    "from": "desde",
+    "book": "Reservar",
+    "viewAll": "Ver Todos los Paseos"
+  },
+  "packages": {
+    "label": "Paquetes Especiales",
+    "title": "Combos con Descuento",
+    "subtitle": "Ahorra hasta un 25% combinando paseos en paquetes exclusivos.",
+    "days": "días",
+    "toursCount": "paseos",
+    "perPerson": "/ persona",
+    "view": "Ver",
+    "whatsappCta": "Arma tu Paquete Personalizado en WhatsApp"
+  },
+  "whyUs": {
+    "label": "Diferenciales",
+    "title1": "¿Por Qué Lençóis Tour es",
+    "title2": "Tu Mejor Elección?",
+    "items": {
+      "safety": {
+        "title": "Seguridad y Confort 4x4",
+        "desc": "Nuestros vehículos están acreditados y revisados, garantizando que explores el Parque Nacional de los Lençóis Maranhenses con total tranquilidad y máximo confort."
+      },
+      "access": {
+        "title": "Acceso Inmediato al Paraíso",
+        "desc": "Ubicados en Santo Amaro, la base más cercana, te llevamos a las lagunas en menos de 7 minutos. Más tiempo para disfrutar, menos tiempo en desplazamiento."
+      },
+      "guides": {
+        "title": "Guías Locales Especializados",
+        "desc": "Nuestros guías nacieron y crecieron en la región. Conocen los mejores horarios, los secretos de las dunas y los puntos perfectos para fotos inolvidables."
+      },
+      "satisfaction": {
+        "title": "100% de Satisfacción Comprobada",
+        "desc": "Nuestra reputación se construye con experiencias reales. Ve los testimonios de quienes ya viajaron y comprueba la calidad y el cariño de nuestro servicio."
+      }
+    },
+    "whatsappCta": "📱 Reservar mi paseo por WhatsApp"
+  },
+  "howItWorks": {
+    "label": "Simple y Rápido",
+    "title": "Cómo Funciona",
+    "steps": {
+      "choose": { "title": "Elige tu Paseo", "desc": "Explora nuestro catálogo de experiencias en los Lençóis Maranhenses." },
+      "book": { "title": "Reserva Online", "desc": "Pago seguro por PIX, tarjeta o boleto. Confirmación instantánea." },
+      "enjoy": { "title": "Vive la Experiencia", "desc": "Nuestros guías te recogen en el hotel. ¡Solo disfruta!" },
+      "review": { "title": "Evalúa", "desc": "Comparte tu experiencia y ayuda a otros viajeros." }
+    }
+  },
+  "testimonials": {
+    "label": "Testimonios",
+    "title": "Lo que dicen nuestros clientes"
+  },
+  "gallery": {
+    "label": "Galería",
+    "title": "Momentos Inolvidables",
+    "subtitle": "Conoce algunos de los paisajes que te esperan."
+  },
+  "partners": {
+    "label": "Para Socios",
+    "title1": "Vende tus paseos",
+    "title2": "en la mayor plataforma",
+    "title3": "de los Lençóis",
+    "subtitle": "Registra tu agencia, tus paseos y empieza a vender automáticamente. Gestión completa de reservas, comisiones e informes.",
+    "cta": "Sé un Socio",
+    "types": {
+      "hotels": "Hoteles y Posadas",
+      "guides": "Guías Turísticos",
+      "drivers": "Conductores",
+      "agencies": "Agencias"
+    }
+  },
+  "faq": {
+    "label": "Preguntas Frecuentes",
+    "title": "Preguntas y Respuestas",
+    "subtitle": "Todo lo que necesitas saber antes de tu aventura.",
+    "notFound": "¿No encontraste tu respuesta?",
+    "whatsappCta": "📱 Háblanos por WhatsApp",
+    "items": [
+      { "q": "¿Cuál es la mejor época para visitar los Lençóis Maranhenses?", "a": "La mejor época es entre junio y agosto, cuando las lagunas están llenas después de la temporada de lluvias (enero a mayo). Sin embargo, se pueden encontrar lagunas de mayo a noviembre, dependiendo del volumen de lluvias." },
+      { "q": "¿Cómo llegar a Santo Amaro do Maranhão?", "a": "El acceso más común es por São Luís (MA). Desde allí puedes tomar un transfer en van (4h30 de viaje) o alquilar un auto. También puedes llegar por Barreirinhas y seguir a Santo Amaro en Toyota 4x4 (3h)." },
+      { "q": "¿Necesito preparación física para los paseos?", "a": "Depende de la ruta. Los paseos en 4x4 a las lagunas son accesibles para todas las edades. El trekking en las dunas requiere preparación moderada, con caminatas de 2h a 4h bajo el sol. ¡Tenemos rutas para todos los perfiles!" },
+      { "q": "¿Los paseos incluyen transporte del hotel?", "a": "¡Sí! Todos nuestros paseos incluyen recogida y regreso a tu posada u hotel en Santo Amaro. Solo informa la dirección al momento de la reserva." },
+      { "q": "¿Puedo cancelar mi reserva?", "a": "Sí. Ofrecemos cancelación gratuita hasta 24 horas antes del paseo. Después, se cobra una tarifa del 50%. En caso de mal tiempo, reprogramamos sin costo adicional." },
+      { "q": "¿Qué formas de pago aceptan?", "a": "Aceptamos PIX (con 5% de descuento), tarjetas de crédito (hasta 3 cuotas sin interés), transferencia bancaria y efectivo. El pago puede realizarse online al reservar o presencialmente." },
+      { "q": "¿Es seguro nadar en las lagunas?", "a": "¡Sí! Las lagunas de los Lençóis son de agua dulce, poco profundas (hasta 3m) y sin corrientes. La temperatura del agua es agradable (25°C a 30°C). Nuestros guías conocen las lagunas más seguras y hermosas." },
+      { "q": "¿Los niños pueden participar en los paseos?", "a": "¡Sí! Tenemos rutas familiares ideales para niños. Los paseos en 4x4 y las lagunas son perfectos para familias. Para trekking y cuatrimoto, recomendamos edad mínima de 12 años." }
+    ]
+  },
+  "footer": {
+    "desc": "La plataforma líder en turismo en los Lençóis Maranhenses. Paseos, traslados y experiencias únicas en Santo Amaro do Maranhão.",
+    "toursTitle": "Paseos",
+    "tourLinks": ["Lagunas Azules", "Paseo en Barco", "Ruta Ecológica", "Descenso en Kayak", "Tour Gastronómico", "Trekking en Dunas"],
+    "companyTitle": "Empresa",
+    "companyLinks": { "about": "Sobre Nosotros", "partner": "Sé un Socio", "transfers": "Traslados", "terms": "Términos de Uso", "privacy": "Política de Privacidad" },
+    "contactTitle": "Contacto",
+    "seals": "Sellos y Certificaciones",
+    "copyright": "© 2026 LençóisTour. Todos los derechos reservados."
+  },
+  "chatbot": {
+    "greeting": "¡Hola! 👋 Soy la asistente virtual de **LençóisTour**! ¿Cómo puedo ayudarte a planificar tu aventura en los Lençóis Maranhenses? 🏖️",
+    "title": "Asistente LençóisTour",
+    "powered": "Powered by IA • En línea ahora",
+    "placeholder": "Escribe tu mensaje...",
+    "error": "Lo siento, tuve un problema. ¡Intenta de nuevo o contáctanos por WhatsApp! 📱",
+    "suggested": "Preguntas frecuentes:",
+    "questions": [
+      "¿Qué paseos ofrecen?",
+      "¿Cuál es la mejor época para visitar?",
+      "¿Cómo llego a Barreirinhas?",
+      "¡Quiero un paquete completo!"
+    ],
+    "open": "Abrir chat IA"
+  },
+  "whatsappFloat": {
+    "messages": [
+      "🏖️ ¡Descubre los Lençóis Maranhenses!",
+      "🔥 ¡Paseos con hasta 15% OFF!",
+      "📸 ¡Reserva tu paseo ahora!",
+      "⭐ ¡Calificación 4.9 en Google!"
+    ],
+    "talkNow": "Hablar ahora"
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "nav": {
+    "tours": "Tours",
+    "transfers": "Transfers",
+    "howItWorks": "How It Works",
+    "partners": "Partners",
+    "bookNow": "Book Now",
+    "home": "Home"
+  },
+  "hero": {
+    "location": "Santo Amaro do Maranhão",
+    "title1": "The Fastest Gateway",
+    "title2": "to the Lençóis Maranhenses",
+    "subtitle": "In less than 7 minutes, you leave town and arrive at the famous Blue Lagoons! Licensed 4x4 vehicles, specialized local guides and 8 exclusive ecotourism and adventure routes.",
+    "categories": {
+      "boat": "Boat Tour",
+      "eco": "Eco Route",
+      "gastro": "Food Tour",
+      "cultural": "Cultural Route",
+      "kayak": "Kayak Descent",
+      "trekking": "Dune Trekking"
+    },
+    "searchWhere": "Where do you want to go?",
+    "searchWhen": "When?",
+    "search": "Search",
+    "whatsapp": "📱 Book via WhatsApp"
+  },
+  "about": {
+    "label": "About the Destination",
+    "title": "Santo Amaro do Maranhão",
+    "p1": "Discover Santo Amaro do Maranhão, the most sought-after tourist route and the closest gateway to the Lençóis Maranhenses National Park.",
+    "p2": "The Lençóis Maranhenses are a priceless natural treasure, recognized as a <strong>UNESCO World Heritage Site</strong>. In Santo Amaro, you find the rustic and cozy essence of the countryside, with a full range of inns and restaurants.",
+    "p3": "We offer <strong>8 exclusive routes</strong> of ecotourism, adventure and experience, including trekking, kayaking and the famous ATV ride. Enjoy the rich Maranhão cuisine, with typical dishes like the famous <strong>Malaysian shrimp</strong>.",
+    "stats": {
+      "routes": "Exclusive Routes",
+      "time": "To the Lagoons",
+      "satisfaction": "Satisfaction",
+      "season": "Best Season"
+    }
+  },
+  "tours": {
+    "label": "Our Tours",
+    "title": "Unforgettable Experiences",
+    "subtitle": "Discover the best tours in the Lençóis Maranhenses with experienced guides.",
+    "reviews": "reviews",
+    "from": "from",
+    "book": "Book",
+    "viewAll": "View All Tours"
+  },
+  "packages": {
+    "label": "Special Packages",
+    "title": "Combo Deals",
+    "subtitle": "Save up to 25% by combining tours in exclusive packages.",
+    "days": "days",
+    "toursCount": "tours",
+    "perPerson": "/ person",
+    "view": "View",
+    "whatsappCta": "Build Your Custom Package on WhatsApp"
+  },
+  "whyUs": {
+    "label": "Why Choose Us",
+    "title1": "Why Lençóis Tour is",
+    "title2": "Your Best Choice?",
+    "items": {
+      "safety": {
+        "title": "Safety & 4x4 Comfort",
+        "desc": "Our vehicles are licensed and inspected, ensuring you explore the Lençóis Maranhenses National Park with total peace of mind and maximum comfort."
+      },
+      "access": {
+        "title": "Immediate Access to Paradise",
+        "desc": "Located in Santo Amaro, the nearest base, we take you to the lagoons in less than 7 minutes. More time to enjoy, less time traveling."
+      },
+      "guides": {
+        "title": "Specialized Local Guides",
+        "desc": "Our guides were born and raised in the region. They know the best times, the secrets of the dunes and the perfect spots for unforgettable photos."
+      },
+      "satisfaction": {
+        "title": "100% Proven Satisfaction",
+        "desc": "Our reputation is built on real experiences. See the testimonials from those who have traveled and verify the quality and care of our service."
+      }
+    },
+    "whatsappCta": "📱 Book my tour via WhatsApp"
+  },
+  "howItWorks": {
+    "label": "Simple & Fast",
+    "title": "How It Works",
+    "steps": {
+      "choose": { "title": "Choose Your Tour", "desc": "Explore our catalog of experiences in the Lençóis Maranhenses." },
+      "book": { "title": "Book Online", "desc": "Secure payment via PIX, card or bank slip. Instant confirmation." },
+      "enjoy": { "title": "Live the Experience", "desc": "Our guides pick you up at the hotel. Just enjoy!" },
+      "review": { "title": "Rate Us", "desc": "Share your experience and help other travelers." }
+    }
+  },
+  "testimonials": {
+    "label": "Testimonials",
+    "title": "What Our Clients Say"
+  },
+  "gallery": {
+    "label": "Gallery",
+    "title": "Unforgettable Moments",
+    "subtitle": "Check out some of the landscapes waiting for you."
+  },
+  "partners": {
+    "label": "For Partners",
+    "title1": "Sell your tours",
+    "title2": "on the largest platform",
+    "title3": "in Lençóis",
+    "subtitle": "Register your agency, your tours and start selling automatically. Complete management of bookings, commissions and reports.",
+    "cta": "Become a Partner",
+    "types": {
+      "hotels": "Hotels & Inns",
+      "guides": "Tour Guides",
+      "drivers": "Drivers",
+      "agencies": "Agencies"
+    }
+  },
+  "faq": {
+    "label": "FAQ",
+    "title": "Questions & Answers",
+    "subtitle": "Everything you need to know before your adventure.",
+    "notFound": "Didn't find your answer?",
+    "whatsappCta": "📱 Contact Us on WhatsApp",
+    "items": [
+      { "q": "What is the best time to visit the Lençóis Maranhenses?", "a": "The best time is between June and August, when the lagoons are full after the rainy season (January to May). However, you can find lagoons from May to November, depending on rainfall." },
+      { "q": "How to get to Santo Amaro do Maranhão?", "a": "The most common access is via São Luís (MA). From there, you can take a van transfer (4h30 trip) or rent a car. You can also arrive via Barreirinhas and then go to Santo Amaro by Toyota 4x4 (3h)." },
+      { "q": "Do I need to be physically fit for the tours?", "a": "It depends on the route. 4x4 tours to the lagoons are accessible for all ages. Dune trekking requires moderate fitness, with 2h to 4h walks under the sun. We have routes for all profiles!" },
+      { "q": "Do tours include hotel pickup?", "a": "Yes! All our tours include pickup and return to your inn or hotel in Santo Amaro. Just provide the address when booking." },
+      { "q": "Can I cancel my booking?", "a": "Yes. We offer free cancellation up to 24 hours before the tour. After that, a 50% fee applies. In case of bad weather, we reschedule at no extra cost." },
+      { "q": "What payment methods are accepted?", "a": "We accept PIX (5% discount), credit cards (up to 3 interest-free installments), bank transfer and cash. Payment can be made online at booking or in person." },
+      { "q": "Is it safe to swim in the lagoons?", "a": "Yes! The Lençóis lagoons are freshwater, shallow (usually up to 3m) and without currents. Water temperature is pleasant (25°C to 30°C). Our guides know the safest and most beautiful lagoons." },
+      { "q": "Can children participate in the tours?", "a": "Yes! We have family routes ideal for children. 4x4 tours and lagoons are perfect for families. For trekking and ATV, we recommend a minimum age of 12." }
+    ]
+  },
+  "footer": {
+    "desc": "The leading tourism platform in the Lençóis Maranhenses. Tours, transfers and unique experiences in Santo Amaro do Maranhão.",
+    "toursTitle": "Tours",
+    "tourLinks": ["Blue Lagoons", "Boat Tour", "Eco Route", "Kayak Descent", "Food Tour", "Dune Trekking"],
+    "companyTitle": "Company",
+    "companyLinks": { "about": "About Us", "partner": "Become a Partner", "transfers": "Transfers", "terms": "Terms of Use", "privacy": "Privacy Policy" },
+    "contactTitle": "Contact",
+    "seals": "Certifications",
+    "copyright": "© 2026 LençóisTour. All rights reserved."
+  },
+  "chatbot": {
+    "greeting": "Hello! 👋 I'm the **LençóisTour** virtual assistant! How can I help you plan your adventure in the Lençóis Maranhenses? 🏖️",
+    "title": "LençóisTour Assistant",
+    "powered": "Powered by AI • Online now",
+    "placeholder": "Type your message...",
+    "error": "Sorry, I had a problem. Try again or contact us via WhatsApp! 📱",
+    "suggested": "Frequently asked:",
+    "questions": [
+      "What tours do you offer?",
+      "When is the best time to visit?",
+      "How do I get to Barreirinhas?",
+      "I want a complete package!"
+    ],
+    "open": "Open AI chat"
+  },
+  "whatsappFloat": {
+    "messages": [
+      "🏖️ Discover the Lençóis Maranhenses!",
+      "🔥 Tours up to 15% OFF!",
+      "📸 Book your tour now!",
+      "⭐ 4.9 rating on Google!"
+    ],
+    "talkNow": "Talk now"
+  }
+}
