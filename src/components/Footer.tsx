@@ -1,6 +1,10 @@
 import { MapPin, Phone, Mail, Instagram } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+  const { t } = useTranslation();
+  const tourLinks = t("footer.tourLinks", { returnObjects: true }) as string[];
+
   return (
     <footer id="contato" className="bg-foreground text-primary-foreground border-t border-primary-foreground/10">
       <div className="container mx-auto px-4 py-16">
@@ -10,7 +14,7 @@ const Footer = () => {
               Lençóis<span className="text-secondary">Tour</span>
             </h3>
             <p className="text-primary-foreground/60 text-sm leading-relaxed mb-4">
-              A plataforma líder em turismo nos Lençóis Maranhenses. Passeios, translados e experiências únicas em Santo Amaro do Maranhão.
+              {t("footer.desc")}
             </p>
             <a
               href="https://wa.me/5598985880954"
@@ -23,30 +27,27 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-display font-bold text-lg mb-4">Passeios</h4>
+            <h4 className="font-display font-bold text-lg mb-4">{t("footer.toursTitle")}</h4>
             <ul className="space-y-2 text-primary-foreground/60 text-sm">
-              <li><a href="/passeios" className="hover:text-secondary transition-colors">Lagoas Azuis</a></li>
-              <li><a href="/passeios" className="hover:text-secondary transition-colors">Passeio de Barco</a></li>
-              <li><a href="/passeios" className="hover:text-secondary transition-colors">Roteiro Ecológico</a></li>
-              <li><a href="/passeios" className="hover:text-secondary transition-colors">Descida de Caiaque</a></li>
-              <li><a href="/passeios" className="hover:text-secondary transition-colors">Passeio Gastronômico</a></li>
-              <li><a href="/passeios" className="hover:text-secondary transition-colors">Trekking nas Dunas</a></li>
+              {tourLinks.map((link) => (
+                <li key={link}><a href="/passeios" className="hover:text-secondary transition-colors">{link}</a></li>
+              ))}
             </ul>
           </div>
 
           <div>
-            <h4 className="font-display font-bold text-lg mb-4">Empresa</h4>
+            <h4 className="font-display font-bold text-lg mb-4">{t("footer.companyTitle")}</h4>
             <ul className="space-y-2 text-primary-foreground/60 text-sm">
-              <li><a href="#" className="hover:text-secondary transition-colors">Sobre Nós</a></li>
-              <li><a href="#" className="hover:text-secondary transition-colors">Seja Parceiro</a></li>
-              <li><a href="/translados" className="hover:text-secondary transition-colors">Translados</a></li>
-              <li><a href="#" className="hover:text-secondary transition-colors">Termos de Uso</a></li>
-              <li><a href="#" className="hover:text-secondary transition-colors">Política de Privacidade</a></li>
+              <li><a href="#" className="hover:text-secondary transition-colors">{t("footer.companyLinks.about")}</a></li>
+              <li><a href="#" className="hover:text-secondary transition-colors">{t("footer.companyLinks.partner")}</a></li>
+              <li><a href="/translados" className="hover:text-secondary transition-colors">{t("footer.companyLinks.transfers")}</a></li>
+              <li><a href="#" className="hover:text-secondary transition-colors">{t("footer.companyLinks.terms")}</a></li>
+              <li><a href="#" className="hover:text-secondary transition-colors">{t("footer.companyLinks.privacy")}</a></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-display font-bold text-lg mb-4">Contato</h4>
+            <h4 className="font-display font-bold text-lg mb-4">{t("footer.contactTitle")}</h4>
             <ul className="space-y-3 text-primary-foreground/60 text-sm">
               <li className="flex items-center gap-2"><MapPin size={16} className="text-secondary" />Santo Amaro do Maranhão, MA</li>
               <li className="flex items-center gap-2"><Phone size={16} className="text-secondary" />(98) 98588-0954</li>
@@ -55,7 +56,7 @@ const Footer = () => {
             </ul>
 
             <div className="mt-6">
-              <p className="text-xs text-primary-foreground/40 mb-2">Selos e Certificações</p>
+              <p className="text-xs text-primary-foreground/40 mb-2">{t("footer.seals")}</p>
               <div className="flex gap-3 text-xs text-primary-foreground/50">
                 <span className="border border-primary-foreground/20 px-3 py-1.5 rounded-lg">CADASTUR</span>
                 <span className="border border-primary-foreground/20 px-3 py-1.5 rounded-lg">ICMBio</span>
@@ -66,7 +67,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-primary-foreground/10 mt-12 pt-8 text-center text-primary-foreground/40 text-sm">
-          © 2026 LençóisTour. Todos os direitos reservados.
+          {t("footer.copyright")}
         </div>
       </div>
     </footer>

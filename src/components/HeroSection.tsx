@@ -1,17 +1,13 @@
 import heroImg from "@/assets/hero-travel.jpg";
 import { Search, MapPin, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-const tourCategories = [
-  { label: "Passeio de Barco", href: "/passeios" },
-  { label: "Roteiro Ecológico", href: "/passeios" },
-  { label: "Passeio Gastronômico", href: "/passeios" },
-  { label: "Roteiro Cultural", href: "/passeios" },
-  { label: "Descida de Caiaque", href: "/passeios" },
-  { label: "Trekking nas Dunas", href: "/passeios" },
-];
+const categoryKeys = ["boat", "eco", "gastro", "cultural", "kayak", "trekking"] as const;
 
 const HeroSection = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
       <img
@@ -25,46 +21,43 @@ const HeroSection = () => {
 
       <div className="relative z-10 container mx-auto px-4 text-center">
         <p className="text-secondary font-semibold tracking-[0.3em] uppercase text-sm mb-4 animate-fade-up">
-          Santo Amaro do Maranhão
+          {t("hero.location")}
         </p>
         <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-primary-foreground leading-tight mb-6 animate-fade-up" style={{ animationDelay: "0.1s" }}>
-          A Porta de Entrada Mais Rápida<br />
-          <span className="italic font-normal">para os Lençóis Maranhenses</span>
+          {t("hero.title1")}<br />
+          <span className="italic font-normal">{t("hero.title2")}</span>
         </h1>
         <p className="text-primary-foreground/80 text-lg md:text-xl max-w-2xl mx-auto mb-8 animate-fade-up" style={{ animationDelay: "0.2s" }}>
-          Em menos de 7 minutos, você sai da cidade e já está nas famosas Lagoas Azuis! Veículos 4x4 credenciados, guias locais especializados e 8 roteiros exclusivos de ecoturismo e aventura.
+          {t("hero.subtitle")}
         </p>
 
-        {/* Category Buttons */}
         <div className="animate-fade-up flex flex-wrap justify-center gap-3 mb-10 max-w-3xl mx-auto" style={{ animationDelay: "0.25s" }}>
-          {tourCategories.map((cat) => (
+          {categoryKeys.map((key) => (
             <Link
-              key={cat.label}
-              to={cat.href}
+              key={key}
+              to="/passeios"
               className="bg-card/90 backdrop-blur-sm text-foreground hover:bg-secondary hover:text-secondary-foreground px-5 py-3 rounded-xl font-semibold text-sm transition-colors"
             >
-              {cat.label}
+              {t(`hero.categories.${key}`)}
             </Link>
           ))}
         </div>
 
-        {/* Search Bar */}
         <div className="animate-fade-up max-w-3xl mx-auto bg-card/95 backdrop-blur-sm rounded-2xl p-3 flex flex-col md:flex-row gap-3 shadow-2xl" style={{ animationDelay: "0.3s" }}>
           <div className="flex items-center gap-3 flex-1 px-4 py-3 bg-muted rounded-xl">
             <MapPin size={20} className="text-primary shrink-0" />
-            <input type="text" placeholder="Para onde você quer ir?" className="bg-transparent w-full outline-none text-foreground placeholder:text-muted-foreground" />
+            <input type="text" placeholder={t("hero.searchWhere")} className="bg-transparent w-full outline-none text-foreground placeholder:text-muted-foreground" />
           </div>
           <div className="flex items-center gap-3 flex-1 px-4 py-3 bg-muted rounded-xl">
             <Calendar size={20} className="text-primary shrink-0" />
-            <input type="text" placeholder="Quando?" className="bg-transparent w-full outline-none text-foreground placeholder:text-muted-foreground" />
+            <input type="text" placeholder={t("hero.searchWhen")} className="bg-transparent w-full outline-none text-foreground placeholder:text-muted-foreground" />
           </div>
           <button className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors">
             <Search size={18} />
-            Buscar
+            {t("hero.search")}
           </button>
         </div>
 
-        {/* WhatsApp CTA */}
         <div className="animate-fade-up mt-6" style={{ animationDelay: "0.4s" }}>
           <a
             href="https://wa.me/5598985880954"
@@ -72,7 +65,7 @@ const HeroSection = () => {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-whatsapp hover:bg-whatsapp-hover text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors"
           >
-            📱 Agendar via WhatsApp
+            {t("hero.whatsapp")}
           </a>
         </div>
       </div>
