@@ -1,18 +1,21 @@
 import { Star, Clock, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { tours } from "@/data/tours";
+import { useTranslation } from "react-i18next";
 
 const ToursSection = () => {
+  const { t } = useTranslation();
+
   return (
     <section id="passeios" className="py-20 md:py-28 bg-gradient-sand">
       <div className="container mx-auto px-4">
         <div className="text-center mb-14">
-          <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-3">Nossos Passeios</p>
+          <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-3">{t("tours.label")}</p>
           <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
-            Experiências Inesquecíveis
+            {t("tours.title")}
           </h2>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            Descubra os melhores passeios dos Lençóis Maranhenses com guias experientes.
+            {t("tours.subtitle")}
           </p>
         </div>
 
@@ -42,7 +45,7 @@ const ToursSection = () => {
                 <div className="flex items-center gap-1 text-secondary mb-2">
                   <Star size={14} fill="currentColor" />
                   <span className="text-sm font-semibold">{tour.rating}</span>
-                  <span className="text-muted-foreground text-xs">({tour.reviews} avaliações)</span>
+                  <span className="text-muted-foreground text-xs">({tour.reviews} {t("tours.reviews")})</span>
                 </div>
                 <h3 className="font-display text-xl font-bold text-foreground mb-2">{tour.name}</h3>
                 <div className="flex items-center gap-4 text-muted-foreground text-sm mb-4">
@@ -51,11 +54,11 @@ const ToursSection = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-xs text-muted-foreground">a partir de</span>
+                    <span className="text-xs text-muted-foreground">{t("tours.from")}</span>
                     <p className="text-xl font-bold text-primary">R$ {tour.price}</p>
                   </div>
                   <span className="bg-primary text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-semibold">
-                    Reservar
+                    {t("tours.book")}
                   </span>
                 </div>
               </div>
@@ -68,7 +71,7 @@ const ToursSection = () => {
             to="/passeios"
             className="inline-block border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-3 rounded-xl font-semibold transition-colors"
           >
-            Ver Todos os Passeios
+            {t("tours.viewAll")}
           </Link>
         </div>
       </div>
