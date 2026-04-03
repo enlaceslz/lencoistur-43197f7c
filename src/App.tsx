@@ -21,6 +21,13 @@ import AdminIA from "./pages/AdminIA.tsx";
 import AdminLogin from "./pages/AdminLogin.tsx";
 import CheckoutPage from "./pages/CheckoutPage.tsx";
 import MinhasReservas from "./pages/MinhasReservas.tsx";
+import AdminSGSDashboard from "./pages/AdminSGSDashboard.tsx";
+import AdminSGSRiscos from "./pages/AdminSGSRiscos.tsx";
+import AdminSGSIncidentes from "./pages/AdminSGSIncidentes.tsx";
+import AdminSGSAcoes from "./pages/AdminSGSAcoes.tsx";
+import AdminSGSEquipe from "./pages/AdminSGSEquipe.tsx";
+import AdminSGSAuditorias from "./pages/AdminSGSAuditorias.tsx";
+import AdminSGSFornecedores from "./pages/AdminSGSFornecedores.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -50,6 +57,13 @@ const App = () => (
           <Route path="/admin/config" element={<AdminConfig />} />
           <Route path="/admin/marketing" element={<AdminMarketing />} />
           <Route path="/admin/ia" element={<AdminIA />} />
+          <Route path="/admin/sgs" element={<AdminSGSDashboard />} />
+          <Route path="/admin/sgs/riscos" element={<AdminSGSRiscos />} />
+          <Route path="/admin/sgs/incidentes" element={<AdminSGSIncidentes />} />
+          <Route path="/admin/sgs/acoes" element={<AdminSGSAcoes />} />
+          <Route path="/admin/sgs/equipe" element={<AdminSGSEquipe />} />
+          <Route path="/admin/sgs/auditorias" element={<AdminSGSAuditorias />} />
+          <Route path="/admin/sgs/fornecedores" element={<AdminSGSFornecedores />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

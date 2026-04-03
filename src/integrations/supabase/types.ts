@@ -195,6 +195,590 @@ export type Database = {
           },
         ]
       }
+      sgs_audit_items: {
+        Row: {
+          audit_id: string
+          category: string
+          compliant: boolean
+          created_at: string
+          id: string
+          item_name: string
+          observation: string | null
+        }
+        Insert: {
+          audit_id: string
+          category: string
+          compliant?: boolean
+          created_at?: string
+          id?: string
+          item_name: string
+          observation?: string | null
+        }
+        Update: {
+          audit_id?: string
+          category?: string
+          compliant?: boolean
+          created_at?: string
+          id?: string
+          item_name?: string
+          observation?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sgs_audit_items_audit_id_fkey"
+            columns: ["audit_id"]
+            isOneToOne: false
+            referencedRelation: "sgs_audits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sgs_audits: {
+        Row: {
+          audit_code: string
+          auditor: string
+          created_at: string
+          date: string
+          id: string
+          improvement_plan: string | null
+          observations: string | null
+          score: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          audit_code: string
+          auditor: string
+          created_at?: string
+          date?: string
+          id?: string
+          improvement_plan?: string | null
+          observations?: string | null
+          score?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          audit_code?: string
+          auditor?: string
+          created_at?: string
+          date?: string
+          id?: string
+          improvement_plan?: string | null
+          observations?: string | null
+          score?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sgs_briefings: {
+        Row: {
+          booking_id: string | null
+          completed: boolean
+          created_at: string
+          date: string
+          emergency_orientation: boolean
+          group_distance: boolean
+          guide_name: string
+          id: string
+          lagoon_behavior: boolean
+          language: string
+          notes: string | null
+          safety_rules: boolean
+          tour_id: string | null
+          tour_risks: boolean
+        }
+        Insert: {
+          booking_id?: string | null
+          completed?: boolean
+          created_at?: string
+          date?: string
+          emergency_orientation?: boolean
+          group_distance?: boolean
+          guide_name: string
+          id?: string
+          lagoon_behavior?: boolean
+          language?: string
+          notes?: string | null
+          safety_rules?: boolean
+          tour_id?: string | null
+          tour_risks?: boolean
+        }
+        Update: {
+          booking_id?: string | null
+          completed?: boolean
+          created_at?: string
+          date?: string
+          emergency_orientation?: boolean
+          group_distance?: boolean
+          guide_name?: string
+          id?: string
+          lagoon_behavior?: boolean
+          language?: string
+          notes?: string | null
+          safety_rules?: boolean
+          tour_id?: string | null
+          tour_risks?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sgs_briefings_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sgs_briefings_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sgs_corrective_actions: {
+        Row: {
+          action_code: string
+          comments: string | null
+          completed_date: string | null
+          created_at: string
+          description: string
+          due_date: string | null
+          evidence: string | null
+          id: string
+          incident_id: string | null
+          responsible: string
+          risk_id: string | null
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          action_code: string
+          comments?: string | null
+          completed_date?: string | null
+          created_at?: string
+          description: string
+          due_date?: string | null
+          evidence?: string | null
+          id?: string
+          incident_id?: string | null
+          responsible: string
+          risk_id?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          action_code?: string
+          comments?: string | null
+          completed_date?: string | null
+          created_at?: string
+          description?: string
+          due_date?: string | null
+          evidence?: string | null
+          id?: string
+          incident_id?: string | null
+          responsible?: string
+          risk_id?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_incident"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "sgs_incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sgs_corrective_actions_risk_id_fkey"
+            columns: ["risk_id"]
+            isOneToOne: false
+            referencedRelation: "sgs_risks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sgs_incidents: {
+        Row: {
+          action_taken: string | null
+          created_at: string
+          date: string
+          description: string
+          guide_name: string | null
+          id: string
+          incident_code: string
+          location: string
+          people_involved: string | null
+          photos: string[] | null
+          severity: string
+          status: string
+          tour_id: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          action_taken?: string | null
+          created_at?: string
+          date?: string
+          description: string
+          guide_name?: string | null
+          id?: string
+          incident_code: string
+          location: string
+          people_involved?: string | null
+          photos?: string[] | null
+          severity: string
+          status?: string
+          tour_id?: string | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          action_taken?: string | null
+          created_at?: string
+          date?: string
+          description?: string
+          guide_name?: string | null
+          id?: string
+          incident_code?: string
+          location?: string
+          people_involved?: string | null
+          photos?: string[] | null
+          severity?: string
+          status?: string
+          tour_id?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sgs_incidents_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sgs_risk_terms: {
+        Row: {
+          accepted: boolean
+          booking_id: string | null
+          cancellation_policy: string | null
+          created_at: string
+          customer_name: string
+          id: string
+          nationality: string | null
+          pdf_url: string | null
+          phone: string | null
+          risks_informed: string[]
+          signature_data: string | null
+          signed_at: string | null
+          tour_name: string
+        }
+        Insert: {
+          accepted?: boolean
+          booking_id?: string | null
+          cancellation_policy?: string | null
+          created_at?: string
+          customer_name: string
+          id?: string
+          nationality?: string | null
+          pdf_url?: string | null
+          phone?: string | null
+          risks_informed?: string[]
+          signature_data?: string | null
+          signed_at?: string | null
+          tour_name: string
+        }
+        Update: {
+          accepted?: boolean
+          booking_id?: string | null
+          cancellation_policy?: string | null
+          created_at?: string
+          customer_name?: string
+          id?: string
+          nationality?: string | null
+          pdf_url?: string | null
+          phone?: string | null
+          risks_informed?: string[]
+          signature_data?: string | null
+          signed_at?: string | null
+          tour_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sgs_risk_terms_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sgs_risks: {
+        Row: {
+          activity: string
+          control_measures: string | null
+          created_at: string
+          hazard: string
+          id: string
+          impact: number
+          probability: number
+          responsible: string
+          risk_code: string
+          risk_level: number | null
+          stage: string
+          status: string
+          tour_id: string | null
+          treatment_measures: string | null
+          updated_at: string
+        }
+        Insert: {
+          activity: string
+          control_measures?: string | null
+          created_at?: string
+          hazard: string
+          id?: string
+          impact: number
+          probability: number
+          responsible: string
+          risk_code: string
+          risk_level?: number | null
+          stage: string
+          status?: string
+          tour_id?: string | null
+          treatment_measures?: string | null
+          updated_at?: string
+        }
+        Update: {
+          activity?: string
+          control_measures?: string | null
+          created_at?: string
+          hazard?: string
+          id?: string
+          impact?: number
+          probability?: number
+          responsible?: string
+          risk_code?: string
+          risk_level?: number | null
+          stage?: string
+          status?: string
+          tour_id?: string | null
+          treatment_measures?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sgs_risks_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sgs_safety_surveys: {
+        Row: {
+          booking_id: string | null
+          comments: string | null
+          created_at: string
+          danger_description: string | null
+          danger_situations: boolean | null
+          felt_safe: number | null
+          guide_explained_risks: boolean | null
+          id: string
+          overall_rating: number | null
+        }
+        Insert: {
+          booking_id?: string | null
+          comments?: string | null
+          created_at?: string
+          danger_description?: string | null
+          danger_situations?: boolean | null
+          felt_safe?: number | null
+          guide_explained_risks?: boolean | null
+          id?: string
+          overall_rating?: number | null
+        }
+        Update: {
+          booking_id?: string | null
+          comments?: string | null
+          created_at?: string
+          danger_description?: string | null
+          danger_situations?: boolean | null
+          felt_safe?: number | null
+          guide_explained_risks?: boolean | null
+          id?: string
+          overall_rating?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sgs_safety_surveys_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sgs_staff: {
+        Row: {
+          active: boolean
+          block_reason: string | null
+          blocked: boolean
+          certifications: string[] | null
+          created_at: string
+          document: string | null
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          photo_url: string | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          block_reason?: string | null
+          blocked?: boolean
+          certifications?: string[] | null
+          created_at?: string
+          document?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          photo_url?: string | null
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          block_reason?: string | null
+          blocked?: boolean
+          certifications?: string[] | null
+          created_at?: string
+          document?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          photo_url?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sgs_staff_trainings: {
+        Row: {
+          certificate_url: string | null
+          completed_date: string
+          created_at: string
+          expiry_date: string | null
+          id: string
+          staff_id: string
+          status: string
+          training_name: string
+          training_type: string
+        }
+        Insert: {
+          certificate_url?: string | null
+          completed_date: string
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          staff_id: string
+          status?: string
+          training_name: string
+          training_type: string
+        }
+        Update: {
+          certificate_url?: string | null
+          completed_date?: string
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          staff_id?: string
+          status?: string
+          training_name?: string
+          training_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sgs_staff_trainings_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "sgs_staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sgs_supplier_compliance: {
+        Row: {
+          block_reason: string | null
+          blocked: boolean
+          certification_expiry: string | null
+          certifications: string[] | null
+          created_at: string
+          documentation_ok: boolean
+          id: string
+          partner_id: string | null
+          status: string
+          supplier_name: string
+          supplier_type: string
+          updated_at: string
+          vehicle_inspection_date: string | null
+          vehicle_inspection_ok: boolean | null
+        }
+        Insert: {
+          block_reason?: string | null
+          blocked?: boolean
+          certification_expiry?: string | null
+          certifications?: string[] | null
+          created_at?: string
+          documentation_ok?: boolean
+          id?: string
+          partner_id?: string | null
+          status?: string
+          supplier_name: string
+          supplier_type: string
+          updated_at?: string
+          vehicle_inspection_date?: string | null
+          vehicle_inspection_ok?: boolean | null
+        }
+        Update: {
+          block_reason?: string | null
+          blocked?: boolean
+          certification_expiry?: string | null
+          certifications?: string[] | null
+          created_at?: string
+          documentation_ok?: boolean
+          id?: string
+          partner_id?: string | null
+          status?: string
+          supplier_name?: string
+          supplier_type?: string
+          updated_at?: string
+          vehicle_inspection_date?: string | null
+          vehicle_inspection_ok?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sgs_supplier_compliance_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tours: {
         Row: {
           active: boolean

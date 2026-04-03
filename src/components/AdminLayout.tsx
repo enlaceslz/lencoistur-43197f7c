@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Home, Compass, Car, Users, UserCheck, CreditCard, Settings,
-  LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot
+  LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot,
+  Shield, AlertTriangle, Activity, ClipboardCheck, Truck, UserCheck2
 } from "lucide-react";
 
 const sidebarItems = [
@@ -16,6 +17,13 @@ const sidebarItems = [
   { icon: Star, label: "Avaliações", path: "/admin/avaliacoes" },
   { icon: Megaphone, label: "Marketing", path: "/admin/marketing" },
   { icon: Bot, label: "Inteligência Artificial", path: "/admin/ia" },
+  { icon: Shield, label: "SGS - Dashboard", path: "/admin/sgs" },
+  { icon: AlertTriangle, label: "SGS - Riscos", path: "/admin/sgs/riscos" },
+  { icon: Activity, label: "SGS - Incidentes", path: "/admin/sgs/incidentes" },
+  { icon: ClipboardCheck, label: "SGS - Ações", path: "/admin/sgs/acoes" },
+  { icon: UserCheck2, label: "SGS - Equipe", path: "/admin/sgs/equipe" },
+  { icon: ClipboardCheck, label: "SGS - Auditorias", path: "/admin/sgs/auditorias" },
+  { icon: Truck, label: "SGS - Fornecedores", path: "/admin/sgs/fornecedores" },
   { icon: Settings, label: "Configurações", path: "/admin/config" },
 ];
 
