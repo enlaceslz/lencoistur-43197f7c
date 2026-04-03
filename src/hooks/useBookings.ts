@@ -1,7 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface BookingItem {
   id: string;
+  bookingCode: string;
   type: "tour" | "transfer";
   itemName: string;
   date: string;
@@ -18,11 +20,11 @@ export interface BookingItem {
   customerPhone: string;
   createdAt: string;
   pixCode?: string;
+  notes?: string;
+  customerId?: string;
 }
 
-const STORAGE_KEY = "lencois_bookings";
-
-function generateId(): string {
+function generateBookingCode(): string {
   const year = new Date().getFullYear();
   const num = String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0");
   return `RES-${year}-${num}`;
@@ -36,54 +38,134 @@ function generatePixCode(): string {
   return code;
 }
 
-function loadBookings(): BookingItem[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveBookings(bookings: BookingItem[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
+function mapDbToBooking(row: any, customer?: any): BookingItem {
+  return {
+    id: row.id,
+    bookingCode: row.booking_code,
+    type: row.type,
+    itemName: row.item_name,
+    date: row.date || "",
+    guests: row.guests,
+    unitPrice: row.unit_price,
+    total: row.total,
+    discount: row.discount,
+    finalTotal: row.final_total,
+    payMethod: row.pay_method,
+    status: row.status,
+    paymentStatus: row.payment_status,
+    customerName: customer?.name || "",
+    customerEmail: customer?.email || "",
+    customerPhone: customer?.phone || "",
+    createdAt: row.created_at,
+    pixCode: row.pix_code || undefined,
+    notes: row.notes || undefined,
+    customerId: row.customer_id,
+  };
 }
 
 export function useBookings() {
-  const [bookings, setBookings] = useState<BookingItem[]>(loadBookings);
+  const [bookings, setBookings] = useState<BookingItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const addBooking = useCallback((data: Omit<BookingItem, "id" | "createdAt" | "pixCode" | "status" | "paymentStatus">): BookingItem => {
-    const booking: BookingItem = {
-      ...data,
-      id: generateId(),
-      createdAt: new Date().toISOString(),
-      status: data.payMethod === "pix" ? "pendente" : "confirmada",
-      paymentStatus: data.payMethod === "pix" ? "pendente" : "pago",
-      pixCode: data.payMethod === "pix" ? generatePixCode() : undefined,
+  const fetchBookings = useCallback(async () => {
+    setLoading(true);
+    const { data: bookingsData } = await supabase
+      .from("bookings")
+      .select("*, customers(*)")
+      .order("created_at", { ascending: false });
+
+    if (bookingsData) {
+      setBookings(
+        bookingsData.map((row: any) => mapDbToBooking(row, row.customers))
+      );
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchBookings();
+
+    // Realtime subscription
+    const channel = supabase
+      .channel("bookings-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, () => {
+        fetchBookings();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
     };
-    const updated = [booking, ...loadBookings()];
-    saveBookings(updated);
-    setBookings(updated);
-    return booking;
+  }, [fetchBookings]);
+
+  const addBooking = useCallback(
+    async (
+      data: Omit<BookingItem, "id" | "bookingCode" | "createdAt" | "pixCode" | "status" | "paymentStatus" | "customerId">
+    ): Promise<BookingItem> => {
+      // Create or find customer
+      const { data: customer, error: customerError } = await supabase
+        .from("customers")
+        .insert({
+          name: data.customerName,
+          email: data.customerEmail,
+          phone: data.customerPhone,
+        })
+        .select()
+        .single();
+
+      if (customerError || !customer) {
+        throw new Error("Erro ao cadastrar cliente");
+      }
+
+      const bookingCode = generateBookingCode();
+      const pixCode = data.payMethod === "pix" ? generatePixCode() : null;
+
+      const { data: booking, error: bookingError } = await supabase
+        .from("bookings")
+        .insert({
+          booking_code: bookingCode,
+          customer_id: customer.id,
+          type: data.type,
+          item_name: data.itemName,
+          date: data.date || null,
+          guests: data.guests,
+          unit_price: data.unitPrice,
+          total: data.total,
+          discount: data.discount,
+          final_total: data.finalTotal,
+          pay_method: data.payMethod,
+          status: data.payMethod === "pix" ? "pendente" : "confirmada",
+          payment_status: data.payMethod === "pix" ? "pendente" : "pago",
+          pix_code: pixCode,
+          notes: data.notes || null,
+        })
+        .select("*, customers(*)")
+        .single();
+
+      if (bookingError || !booking) {
+        throw new Error("Erro ao criar reserva");
+      }
+
+      const mapped = mapDbToBooking(booking, booking.customers);
+      setBookings((prev) => [mapped, ...prev]);
+      return mapped;
+    },
+    []
+  );
+
+  const confirmPayment = useCallback(async (id: string) => {
+    await supabase
+      .from("bookings")
+      .update({ status: "confirmada", payment_status: "pago" })
+      .eq("id", id);
   }, []);
 
-  const confirmPayment = useCallback((id: string) => {
-    const all = loadBookings().map((b) =>
-      b.id === id ? { ...b, status: "confirmada" as const, paymentStatus: "pago" as const } : b
-    );
-    saveBookings(all);
-    setBookings(all);
+  const cancelBooking = useCallback(async (id: string) => {
+    await supabase
+      .from("bookings")
+      .update({ status: "cancelada" })
+      .eq("id", id);
   }, []);
 
-  const cancelBooking = useCallback((id: string) => {
-    const all = loadBookings().map((b) =>
-      b.id === id ? { ...b, status: "cancelada" as const } : b
-    );
-    saveBookings(all);
-    setBookings(all);
-  }, []);
-
-  const refresh = useCallback(() => setBookings(loadBookings()), []);
-
-  return { bookings, addBooking, confirmPayment, cancelBooking, refresh };
+  return { bookings, loading, addBooking, confirmPayment, cancelBooking, refresh: fetchBookings };
 }
