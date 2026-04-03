@@ -72,7 +72,7 @@ const MinhasReservas = () => {
                           <Users size={14} className="text-primary" />
                           {b.guests} pessoa{b.guests > 1 ? "s" : ""}
                         </span>
-                        <span className="font-mono text-xs">{b.id}</span>
+                        <span className="font-mono text-xs">{b.bookingCode}</span>
                       </div>
                     </div>
                     <div className="text-right">
