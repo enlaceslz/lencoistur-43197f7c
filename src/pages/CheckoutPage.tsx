@@ -52,8 +52,6 @@ const CheckoutPage = () => {
   const discount = payMethod === "pix" ? Math.round(total * 0.05) : 0;
   const finalTotal = total - discount;
 
-  const [submitting, setSubmitting] = useState(false);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
