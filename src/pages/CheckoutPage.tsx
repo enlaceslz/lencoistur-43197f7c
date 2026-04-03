@@ -35,6 +35,7 @@ const CheckoutPage = () => {
   const [notes, setNotes] = useState("");
   const [confirmedBooking, setConfirmedBooking] = useState<BookingItem | null>(null);
   const [pixCopied, setPixCopied] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   if (!tour && !transfer) {
     return (
