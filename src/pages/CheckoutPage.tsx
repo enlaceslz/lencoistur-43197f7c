@@ -188,7 +188,7 @@ const CheckoutPage = () => {
               Ver Minhas Reservas
             </Link>
             <a
-              href={`https://wa.me/5598985880954?text=Olá! Acabei de fazer a reserva ${confirmedBooking.id} - ${confirmedBooking.itemName} para ${guests} pessoas.`}
+              href={`https://wa.me/5598985880954?text=Olá! Acabei de fazer a reserva ${confirmedBooking.bookingCode} - ${confirmedBooking.itemName} para ${guests} pessoas.`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-whatsapp hover:bg-whatsapp-hover text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors text-center"

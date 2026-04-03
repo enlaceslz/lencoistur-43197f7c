@@ -136,7 +136,7 @@ const MinhasReservas = () => {
                   {b.status === "confirmada" && (
                     <div className="mt-4 pt-4 border-t border-border flex flex-wrap gap-3">
                       <a
-                        href={`https://wa.me/5598985880954?text=${encodeURIComponent(`Olá! Tenho a reserva ${b.id} confirmada para ${b.itemName}.`)}`}
+                        href={`https://wa.me/5598985880954?text=${encodeURIComponent(`Olá! Tenho a reserva ${b.bookingCode} confirmada para ${b.itemName}.`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary text-sm font-semibold hover:underline flex items-center gap-1"
