@@ -35,6 +35,7 @@ const CheckoutPage = () => {
   const [notes, setNotes] = useState("");
   const [confirmedBooking, setConfirmedBooking] = useState<BookingItem | null>(null);
   const [pixCopied, setPixCopied] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   if (!tour && !transfer) {
     return (
@@ -51,23 +52,30 @@ const CheckoutPage = () => {
   const discount = payMethod === "pix" ? Math.round(total * 0.05) : 0;
   const finalTotal = total - discount;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const booking = addBooking({
-      type,
-      itemName,
-      date,
-      guests,
-      unitPrice,
-      total,
-      discount,
-      finalTotal,
-      payMethod,
-      customerName: name,
-      customerEmail: email,
-      customerPhone: phone,
-    });
-    setConfirmedBooking(booking);
+    setSubmitting(true);
+    try {
+      const booking = await addBooking({
+        type,
+        itemName,
+        date,
+        guests,
+        unitPrice,
+        total,
+        discount,
+        finalTotal,
+        payMethod,
+        customerName: name,
+        customerEmail: email,
+        customerPhone: phone,
+      });
+      setConfirmedBooking(booking);
+    } catch (error) {
+      toast({ title: "Erro ao criar reserva", description: "Tente novamente.", variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const copyPix = () => {
@@ -93,7 +101,7 @@ const CheckoutPage = () => {
               {confirmedBooking.payMethod === "pix" ? "Reserva Registrada!" : "Reserva Confirmada!"}
             </h1>
             <p className="text-muted-foreground">
-              Código da reserva: <strong className="text-foreground font-mono">{confirmedBooking.id}</strong>
+              Código da reserva: <strong className="text-foreground font-mono">{confirmedBooking.bookingCode}</strong>
             </p>
           </div>
 
@@ -180,7 +188,7 @@ const CheckoutPage = () => {
               Ver Minhas Reservas
             </Link>
             <a
-              href={`https://wa.me/5598985880954?text=Olá! Acabei de fazer a reserva ${confirmedBooking.id} - ${confirmedBooking.itemName} para ${guests} pessoas.`}
+              href={`https://wa.me/5598985880954?text=Olá! Acabei de fazer a reserva ${confirmedBooking.bookingCode} - ${confirmedBooking.itemName} para ${guests} pessoas.`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-whatsapp hover:bg-whatsapp-hover text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors text-center"

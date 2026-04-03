@@ -72,7 +72,7 @@ const MinhasReservas = () => {
                           <Users size={14} className="text-primary" />
                           {b.guests} pessoa{b.guests > 1 ? "s" : ""}
                         </span>
-                        <span className="font-mono text-xs">{b.id}</span>
+                        <span className="font-mono text-xs">{b.bookingCode}</span>
                       </div>
                     </div>
                     <div className="text-right">
@@ -121,7 +121,7 @@ const MinhasReservas = () => {
                           Cancelar Reserva
                         </button>
                         <a
-                          href={`https://wa.me/5598985880954?text=${encodeURIComponent(`Olá! Preciso de ajuda com minha reserva ${b.id}`)}`}
+                          href={`https://wa.me/5598985880954?text=${encodeURIComponent(`Olá! Preciso de ajuda com minha reserva ${b.bookingCode}`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-primary text-sm font-semibold hover:underline"
@@ -136,7 +136,7 @@ const MinhasReservas = () => {
                   {b.status === "confirmada" && (
                     <div className="mt-4 pt-4 border-t border-border flex flex-wrap gap-3">
                       <a
-                        href={`https://wa.me/5598985880954?text=${encodeURIComponent(`Olá! Tenho a reserva ${b.id} confirmada para ${b.itemName}.`)}`}
+                        href={`https://wa.me/5598985880954?text=${encodeURIComponent(`Olá! Tenho a reserva ${b.bookingCode} confirmada para ${b.itemName}.`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary text-sm font-semibold hover:underline flex items-center gap-1"
