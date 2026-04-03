@@ -101,7 +101,7 @@ const CheckoutPage = () => {
               {confirmedBooking.payMethod === "pix" ? "Reserva Registrada!" : "Reserva Confirmada!"}
             </h1>
             <p className="text-muted-foreground">
-              Código da reserva: <strong className="text-foreground font-mono">{confirmedBooking.id}</strong>
+              Código da reserva: <strong className="text-foreground font-mono">{confirmedBooking.bookingCode}</strong>
             </p>
           </div>
 
