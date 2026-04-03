@@ -51,23 +51,32 @@ const CheckoutPage = () => {
   const discount = payMethod === "pix" ? Math.round(total * 0.05) : 0;
   const finalTotal = total - discount;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const booking = addBooking({
-      type,
-      itemName,
-      date,
-      guests,
-      unitPrice,
-      total,
-      discount,
-      finalTotal,
-      payMethod,
-      customerName: name,
-      customerEmail: email,
-      customerPhone: phone,
-    });
-    setConfirmedBooking(booking);
+    setSubmitting(true);
+    try {
+      const booking = await addBooking({
+        type,
+        itemName,
+        date,
+        guests,
+        unitPrice,
+        total,
+        discount,
+        finalTotal,
+        payMethod,
+        customerName: name,
+        customerEmail: email,
+        customerPhone: phone,
+      });
+      setConfirmedBooking(booking);
+    } catch (error) {
+      toast({ title: "Erro ao criar reserva", description: "Tente novamente.", variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const copyPix = () => {
