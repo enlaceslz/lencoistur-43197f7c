@@ -121,7 +121,7 @@ const MinhasReservas = () => {
                           Cancelar Reserva
                         </button>
                         <a
-                          href={`https://wa.me/5598985880954?text=${encodeURIComponent(`Olá! Preciso de ajuda com minha reserva ${b.id}`)}`}
+                          href={`https://wa.me/5598985880954?text=${encodeURIComponent(`Olá! Preciso de ajuda com minha reserva ${b.bookingCode}`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-primary text-sm font-semibold hover:underline"
