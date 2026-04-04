@@ -67,6 +67,9 @@ const App = () => (
           <Route path="/admin/sgs/equipe" element={<AdminSGSEquipe />} />
           <Route path="/admin/sgs/auditorias" element={<AdminSGSAuditorias />} />
           <Route path="/admin/sgs/fornecedores" element={<AdminSGSFornecedores />} />
+          <Route path="/admin/sgs/termos" element={<AdminSGSTermos />} />
+          <Route path="/admin/sgs/briefings" element={<AdminSGSBriefings />} />
+          <Route path="/admin/sgs/pesquisas" element={<AdminSGSPesquisas />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
