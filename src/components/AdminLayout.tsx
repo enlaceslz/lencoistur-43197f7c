@@ -4,7 +4,7 @@ import {
   Home, Compass, Car, Users, UserCheck, CreditCard, Settings,
   LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot,
   Shield, AlertTriangle, Activity, ClipboardCheck, Truck, UserCheck2,
-  ChevronDown
+  ChevronDown, FileText
 } from "lucide-react";
 
 const mainItems = [
@@ -22,12 +22,15 @@ const mainItems = [
 
 const sgsItems = [
   { icon: Shield, label: "Dashboard", path: "/admin/sgs" },
-  { icon: AlertTriangle, label: "Riscos", path: "/admin/sgs/riscos" },
+  { icon: AlertTriangle, label: "Matriz de Riscos", path: "/admin/sgs/riscos" },
   { icon: Activity, label: "Incidentes", path: "/admin/sgs/incidentes" },
   { icon: ClipboardCheck, label: "Ações Corretivas", path: "/admin/sgs/acoes" },
-  { icon: UserCheck2, label: "Equipe", path: "/admin/sgs/equipe" },
+  { icon: UserCheck2, label: "Equipe (ISO 21102)", path: "/admin/sgs/equipe" },
   { icon: ClipboardCheck, label: "Auditorias", path: "/admin/sgs/auditorias" },
   { icon: Truck, label: "Fornecedores", path: "/admin/sgs/fornecedores" },
+  { icon: FileText, label: "Termos de Risco", path: "/admin/sgs/termos" },
+  { icon: Shield, label: "Briefings", path: "/admin/sgs/briefings" },
+  { icon: Star, label: "Pesquisas", path: "/admin/sgs/pesquisas" },
 ];
 
 const AdminLayout = ({ children, title }: { children: React.ReactNode; title: string }) => {

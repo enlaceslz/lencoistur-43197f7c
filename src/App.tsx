@@ -28,6 +28,9 @@ import AdminSGSAcoes from "./pages/AdminSGSAcoes.tsx";
 import AdminSGSEquipe from "./pages/AdminSGSEquipe.tsx";
 import AdminSGSAuditorias from "./pages/AdminSGSAuditorias.tsx";
 import AdminSGSFornecedores from "./pages/AdminSGSFornecedores.tsx";
+import AdminSGSTermos from "./pages/AdminSGSTermos.tsx";
+import AdminSGSBriefings from "./pages/AdminSGSBriefings.tsx";
+import AdminSGSPesquisas from "./pages/AdminSGSPesquisas.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -64,6 +67,9 @@ const App = () => (
           <Route path="/admin/sgs/equipe" element={<AdminSGSEquipe />} />
           <Route path="/admin/sgs/auditorias" element={<AdminSGSAuditorias />} />
           <Route path="/admin/sgs/fornecedores" element={<AdminSGSFornecedores />} />
+          <Route path="/admin/sgs/termos" element={<AdminSGSTermos />} />
+          <Route path="/admin/sgs/briefings" element={<AdminSGSBriefings />} />
+          <Route path="/admin/sgs/pesquisas" element={<AdminSGSPesquisas />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
