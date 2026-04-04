@@ -4,7 +4,7 @@ import {
   Home, Compass, Car, Users, UserCheck, CreditCard, Settings,
   LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot,
   Shield, AlertTriangle, Activity, ClipboardCheck, Truck, UserCheck2,
-  ChevronDown
+  ChevronDown, FileText, Star
 } from "lucide-react";
 
 const mainItems = [
