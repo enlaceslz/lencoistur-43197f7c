@@ -28,6 +28,9 @@ import AdminSGSAcoes from "./pages/AdminSGSAcoes.tsx";
 import AdminSGSEquipe from "./pages/AdminSGSEquipe.tsx";
 import AdminSGSAuditorias from "./pages/AdminSGSAuditorias.tsx";
 import AdminSGSFornecedores from "./pages/AdminSGSFornecedores.tsx";
+import AdminSGSTermos from "./pages/AdminSGSTermos.tsx";
+import AdminSGSBriefings from "./pages/AdminSGSBriefings.tsx";
+import AdminSGSPesquisas from "./pages/AdminSGSPesquisas.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
