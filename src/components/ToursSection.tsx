@@ -1,10 +1,17 @@
 import { Star, Clock, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
-import { tours } from "@/data/tours";
 import { useTranslation } from "react-i18next";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const ToursSection = () => {
   const { t } = useTranslation();
+  const [tours, setTours] = useState<any[]>([]);
+
+  useEffect(() => {
+    supabase.from("tours").select("*").eq("active", true).order("reviews_count", { ascending: false }).limit(8)
+      .then(({ data }) => setTours(data || []));
+  }, []);
 
   return (
     <section id="passeios" className="py-20 md:py-28 bg-gradient-sand">
@@ -21,20 +28,16 @@ const ToursSection = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {tours.map((tour) => (
-            <Link
-              to={`/passeios/${tour.slug}`}
-              key={tour.id}
-              className="group bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
-            >
+            <Link to={`/passeios/${tour.slug}`} key={tour.id}
+              className="group bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
               <div className="relative h-64 overflow-hidden">
-                <img
-                  src={tour.images[0]}
-                  alt={tour.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  loading="lazy"
-                  width={640}
-                  height={800}
-                />
+                {tour.images?.[0] ? (
+                  <img src={tour.images[0]} alt={tour.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    loading="lazy" />
+                ) : (
+                  <div className="w-full h-full bg-muted" />
+                )}
                 {tour.tag && (
                   <span className="absolute top-4 left-4 bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1.5 rounded-full">
                     {tour.tag}
@@ -44,8 +47,8 @@ const ToursSection = () => {
               <div className="p-5">
                 <div className="flex items-center gap-1 text-secondary mb-2">
                   <Star size={14} fill="currentColor" />
-                  <span className="text-sm font-semibold">{tour.rating}</span>
-                  <span className="text-muted-foreground text-xs">({tour.reviews} {t("tours.reviews")})</span>
+                  <span className="text-sm font-semibold">{Number(tour.rating || 0).toFixed(1)}</span>
+                  <span className="text-muted-foreground text-xs">({tour.reviews_count || 0} {t("tours.reviews")})</span>
                 </div>
                 <h3 className="font-display text-xl font-bold text-foreground mb-2">{tour.name}</h3>
                 <div className="flex items-center gap-4 text-muted-foreground text-sm mb-4">
@@ -67,10 +70,8 @@ const ToursSection = () => {
         </div>
 
         <div className="text-center mt-10">
-          <Link
-            to="/passeios"
-            className="inline-block border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-3 rounded-xl font-semibold transition-colors"
-          >
+          <Link to="/passeios"
+            className="inline-block border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-3 rounded-xl font-semibold transition-colors">
             {t("tours.viewAll")}
           </Link>
         </div>
