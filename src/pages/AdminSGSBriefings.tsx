@@ -40,9 +40,9 @@ const AdminSGSBriefings = () => {
       ...form, completed: allChecked,
     });
     if (error) {
-      toast({ title: "Erro ao registrar briefing", variant: "destructive" });
+      toast({ title: "Erro ao registrar resumo", variant: "destructive" });
     } else {
-      toast({ title: allChecked ? "Briefing completo registrado!" : "⚠️ Briefing registrado com itens pendentes" });
+      toast({ title: allChecked ? "Resumo completo registrado!" : "⚠️ Resumo registrado com itens pendentes" });
       setShowForm(false);
       setForm({ guide_name: "", language: "pt", safety_rules: false, tour_risks: false, lagoon_behavior: false, group_distance: false, emergency_orientation: false, notes: "" });
       load();
@@ -52,19 +52,19 @@ const AdminSGSBriefings = () => {
   const completedCount = (b: any) => CHECKLIST_ITEMS.filter(i => b[i.key]).length;
 
   return (
-    <AdminLayout title="SGS - Briefings de Segurança">
+    <AdminLayout title="SGS - Resumos de Segurança">
       <div className="space-y-6">
         <div className="flex justify-between gap-4">
           <p className="text-sm text-muted-foreground">Checklist obrigatório do guia antes de cada passeio (ISO 21103)</p>
           <button onClick={() => setShowForm(!showForm)}
             className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-            <Plus size={16} /> Novo Briefing
+            <Plus size={16} /> Novo Resumo
           </button>
         </div>
 
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
-            <h3 className="font-display font-bold text-foreground">Registrar Briefing de Segurança</h3>
+            <h3 className="font-display font-bold text-foreground">Registrar Resumo de Segurança</h3>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Guia Responsável *</label>
@@ -72,7 +72,7 @@ const AdminSGSBriefings = () => {
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
               </div>
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Idioma do Briefing *</label>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Idioma do Resumo *</label>
                 <select value={form.language} onChange={e => setForm({ ...form, language: e.target.value })}
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
                   {Object.entries(LANGUAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
@@ -100,7 +100,7 @@ const AdminSGSBriefings = () => {
             </div>
 
             <div className="flex gap-3">
-              <button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">Salvar Briefing</button>
+              <button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">Salvar Resumo</button>
               <button type="button" onClick={() => setShowForm(false)} className="bg-muted text-muted-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">Cancelar</button>
             </div>
           </form>
@@ -110,7 +110,7 @@ const AdminSGSBriefings = () => {
           {loading ? (
             <p className="text-center text-muted-foreground py-8">Carregando...</p>
           ) : briefings.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">Nenhum briefing registrado</p>
+            <p className="text-center text-muted-foreground py-8">Nenhum resumo registrado</p>
           ) : briefings.map(b => (
             <div key={b.id} className={`bg-card border rounded-2xl p-5 ${b.completed ? "border-border" : "border-secondary"}`}>
               <div className="flex justify-between items-center">
