@@ -1,36 +1,34 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail, MapPin } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    // Placeholder — will be replaced with real auth via Lovable Cloud
-    setTimeout(() => {
-      if (email && password.length >= 4) {
-        sessionStorage.setItem("admin_logged", "true");
-        navigate("/admin");
-      } else {
-        setError("Credenciais inválidas. Verifique email e senha.");
-      }
-      setLoading(false);
-    }, 800);
+    const { error } = await signIn(email, password);
+    if (error) {
+      setError("Credenciais inválidas. Verifique email e senha.");
+    } else {
+      navigate("/admin");
+    }
+    setLoading(false);
   };
 
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
             <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center">
@@ -43,7 +41,6 @@ const AdminLogin = () => {
           <p className="text-primary-foreground/60 text-sm mt-2">Painel Administrativo</p>
         </div>
 
-        {/* Card */}
         <div className="bg-card border border-border rounded-2xl p-8 shadow-2xl">
           <div className="text-center mb-6">
             <h2 className="font-display text-xl font-bold text-foreground">Bem-vindo de volta</h2>
@@ -77,6 +74,7 @@ const AdminLogin = () => {
                   placeholder="••••••••"
                   className="w-full bg-muted border border-border rounded-xl pl-11 pr-12 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground/50"
                   required
+                  minLength={6}
                 />
                 <button
                   type="button"
@@ -100,10 +98,6 @@ const AdminLogin = () => {
               {loading ? "Entrando..." : "Entrar"}
             </button>
           </form>
-
-          <div className="mt-6 text-center">
-            <a href="#" className="text-primary text-sm hover:underline">Esqueceu a senha?</a>
-          </div>
         </div>
 
         <p className="text-center text-primary-foreground/40 text-xs mt-6">
