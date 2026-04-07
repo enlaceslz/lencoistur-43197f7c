@@ -1,6 +1,5 @@
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
-import { getTourBySlug } from "@/data/tours";
-import { transferRoutes } from "@/data/transfers";
+import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Shield, CreditCard, QrCode, Banknote, Users, CalendarDays, MapPin, CheckCircle, Copy, Clock } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
