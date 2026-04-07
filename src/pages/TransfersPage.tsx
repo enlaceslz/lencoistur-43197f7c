@@ -1,29 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { transferRoutes } from "@/data/transfers";
+import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Clock, MapPin, Users, Car, Ship, ChevronDown } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 const TransfersPage = () => {
+  const [routes, setRoutes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [date, setDate] = useState("");
   const [passengers, setPassengers] = useState(1);
 
-  const origins = [...new Set(transferRoutes.map((r) => r.origin))];
-  const destinations = origin
-    ? [...new Set(transferRoutes.filter((r) => r.origin === origin).map((r) => r.destination))]
-    : [...new Set(transferRoutes.map((r) => r.destination))];
+  useEffect(() => {
+    supabase.from("transfer_routes").select("*").eq("active", true).order("origin")
+      .then(({ data }) => { setRoutes(data || []); setLoading(false); });
+  }, []);
 
-  const filtered = transferRoutes.filter((r) => {
+  const origins = [...new Set(routes.map((r) => r.origin))];
+  const destinations = origin
+    ? [...new Set(routes.filter((r) => r.origin === origin).map((r) => r.destination))]
+    : [...new Set(routes.map((r) => r.destination))];
+
+  const filtered = routes.filter((r) => {
     if (origin && r.origin !== origin) return false;
     if (destination && r.destination !== destination) return false;
     return true;
   });
 
   const getIcon = (vehicle: string) => {
-    if (vehicle.toLowerCase().includes("lancha") || vehicle.toLowerCase().includes("voadeira") || vehicle.toLowerCase().includes("barco"))
+    if (vehicle?.toLowerCase().includes("lancha") || vehicle?.toLowerCase().includes("voadeira") || vehicle?.toLowerCase().includes("barco"))
       return Ship;
     return Car;
   };
@@ -40,15 +47,11 @@ const TransfersPage = () => {
       </div>
 
       <div className="container mx-auto px-4 py-10">
-        {/* Search */}
         <div className="bg-card border border-border rounded-2xl p-5 mb-10 grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="relative">
             <label className="text-xs font-semibold text-muted-foreground mb-1 block">Origem</label>
-            <select
-              value={origin}
-              onChange={(e) => { setOrigin(e.target.value); setDestination(""); }}
-              className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none appearance-none"
-            >
+            <select value={origin} onChange={(e) => { setOrigin(e.target.value); setDestination(""); }}
+              className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none appearance-none">
               <option value="">Todas</option>
               {origins.map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
@@ -56,11 +59,8 @@ const TransfersPage = () => {
           </div>
           <div className="relative">
             <label className="text-xs font-semibold text-muted-foreground mb-1 block">Destino</label>
-            <select
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
-              className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none appearance-none"
-            >
+            <select value={destination} onChange={(e) => setDestination(e.target.value)}
+              className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none appearance-none">
               <option value="">Todos</option>
               {destinations.map((d) => <option key={d} value={d}>{d}</option>)}
             </select>
@@ -68,23 +68,13 @@ const TransfersPage = () => {
           </div>
           <div>
             <label className="text-xs font-semibold text-muted-foreground mb-1 block">Data</label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none"
-            />
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
+              className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none" />
           </div>
           <div>
             <label className="text-xs font-semibold text-muted-foreground mb-1 block">Passageiros</label>
-            <input
-              type="number"
-              min={1}
-              max={20}
-              value={passengers}
-              onChange={(e) => setPassengers(Number(e.target.value))}
-              className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none"
-            />
+            <input type="number" min={1} max={20} value={passengers} onChange={(e) => setPassengers(Number(e.target.value))}
+              className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none" />
           </div>
           <div className="flex items-end">
             <button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-xl font-semibold transition-colors">
@@ -93,16 +83,16 @@ const TransfersPage = () => {
           </div>
         </div>
 
-        {/* Results */}
-        <p className="text-muted-foreground text-sm mb-6">{filtered.length} rota(s) disponível(is)</p>
+        <p className="text-muted-foreground text-sm mb-6">
+          {loading ? "Carregando..." : `${filtered.length} rota(s) disponível(is)`}
+        </p>
 
         <div className="space-y-4">
           {filtered.map((route) => {
-            const Icon = getIcon(route.vehicleType);
+            const Icon = getIcon(route.vehicle_type);
             return (
               <div key={route.id} className="bg-card border border-border rounded-2xl p-6 hover:shadow-lg transition-shadow">
                 <div className="flex flex-col md:flex-row md:items-center gap-6">
-                  {/* Route */}
                   <div className="flex items-center gap-4 flex-1">
                     <div className="w-12 h-12 rounded-xl bg-ocean-light flex items-center justify-center shrink-0">
                       <Icon size={24} className="text-primary" />
@@ -120,17 +110,15 @@ const TransfersPage = () => {
                     </div>
                   </div>
 
-                  {/* Info */}
                   <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1.5"><Clock size={14} className="text-primary" />{route.duration}</span>
                     <span className="flex items-center gap-1.5"><MapPin size={14} className="text-primary" />{route.distance}</span>
                     <span className="flex items-center gap-1.5"><Users size={14} className="text-primary" />{route.seats} vagas</span>
                   </div>
 
-                  {/* Price & Book */}
                   <div className="flex items-center gap-6">
                     <div className="text-right">
-                      <p className="text-xs text-muted-foreground">{route.vehicleType}</p>
+                      <p className="text-xs text-muted-foreground">{route.vehicle_type}</p>
                       <p className="font-display text-2xl font-bold text-primary">R$ {route.price}</p>
                       <p className="text-xs text-muted-foreground">por pessoa</p>
                     </div>
@@ -143,13 +131,10 @@ const TransfersPage = () => {
                   </div>
                 </div>
 
-                {/* Departures */}
                 <div className="mt-4 pt-4 border-t border-border flex flex-wrap gap-2">
                   <span className="text-xs text-muted-foreground mr-2">Horários:</span>
-                  {route.departures.map((dep) => (
-                    <span key={dep} className="text-xs bg-muted text-foreground px-3 py-1.5 rounded-full font-medium">
-                      {dep}
-                    </span>
+                  {(route.departures || []).map((dep: string) => (
+                    <span key={dep} className="text-xs bg-muted text-foreground px-3 py-1.5 rounded-full font-medium">{dep}</span>
                   ))}
                 </div>
               </div>
