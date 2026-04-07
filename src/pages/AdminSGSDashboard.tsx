@@ -175,7 +175,7 @@ const AdminSGSDashboard = () => {
             {[
               { norm: "ISO 21101", desc: "Sistema de Gestão de Segurança", items: ["Matriz de riscos", "Ações corretivas", "Auditorias"] },
               { norm: "ISO 21102", desc: "Competência dos Líderes", items: ["Certificações da equipe", "Treinamentos", "Reciclagens"] },
-              { norm: "ISO 21103", desc: "Informações aos Participantes", items: ["Termo de risco", "Briefing", "Pesquisa pós-passeio"] },
+              { norm: "ISO 21103", desc: "Informações aos Participantes", items: ["Termo de risco", "Resumo", "Pesquisa pós-passeio"] },
             ].map((n) => (
               <div key={n.norm} className="bg-muted rounded-xl p-4">
                 <p className="font-bold text-foreground text-sm">{n.norm}</p>
