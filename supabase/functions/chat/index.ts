@@ -40,17 +40,53 @@ Regras:
 - Se não souber algo, diga que vai verificar com a equipe
 - Não invente informações sobre preços ou disponibilidade além do fornecido`;
 
+const MAX_MESSAGES = 20;
+const MAX_MESSAGE_LENGTH = 2000;
+const VALID_ROLES = ["user", "assistant"];
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages } = await req.json();
-    
+    const body = await req.json();
+    const { messages } = body;
+
     if (!messages || !Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: "messages array is required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Input validation
+    if (messages.length > MAX_MESSAGES) {
+      return new Response(JSON.stringify({ error: `Máximo de ${MAX_MESSAGES} mensagens permitidas.` }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const sanitizedMessages = [];
+    for (const msg of messages) {
+      if (!msg || typeof msg.content !== "string" || typeof msg.role !== "string") {
+        return new Response(JSON.stringify({ error: "Formato de mensagem inválido." }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (!VALID_ROLES.includes(msg.role)) {
+        return new Response(JSON.stringify({ error: "Role de mensagem inválido." }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (msg.content.length > MAX_MESSAGE_LENGTH) {
+        return new Response(JSON.stringify({ error: `Mensagem excede ${MAX_MESSAGE_LENGTH} caracteres.` }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      sanitizedMessages.push({ role: msg.role, content: msg.content.trim() });
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -66,7 +102,7 @@ serve(async (req) => {
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          ...messages,
+          ...sanitizedMessages,
         ],
         stream: true,
       }),
@@ -98,7 +134,7 @@ serve(async (req) => {
     });
   } catch (e) {
     console.error("chat error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }), {
+    return new Response(JSON.stringify({ error: "Erro interno do servidor" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

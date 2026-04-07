@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import AdminRoute from "@/components/AdminRoute";
 import Index from "./pages/Index.tsx";
 import ToursPage from "./pages/ToursPage.tsx";
 import TourDetail from "./pages/TourDetail.tsx";
@@ -49,27 +50,27 @@ const App = () => (
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/minhas-reservas" element={<MinhasReservas />} />
           <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/crm" element={<AdminCRM />} />
-          <Route path="/admin/financeiro" element={<AdminFinanceiro />} />
-          <Route path="/admin/parceiros" element={<AdminParceiros />} />
-          <Route path="/admin/passeios" element={<AdminPasseios />} />
-          <Route path="/admin/reservas" element={<AdminReservas />} />
-          <Route path="/admin/translados" element={<AdminTranslados />} />
-          <Route path="/admin/avaliacoes" element={<AdminAvaliacoes />} />
-          <Route path="/admin/config" element={<AdminConfig />} />
-          <Route path="/admin/marketing" element={<AdminMarketing />} />
-          <Route path="/admin/ia" element={<AdminIA />} />
-          <Route path="/admin/sgs" element={<AdminSGSDashboard />} />
-          <Route path="/admin/sgs/riscos" element={<AdminSGSRiscos />} />
-          <Route path="/admin/sgs/incidentes" element={<AdminSGSIncidentes />} />
-          <Route path="/admin/sgs/acoes" element={<AdminSGSAcoes />} />
-          <Route path="/admin/sgs/equipe" element={<AdminSGSEquipe />} />
-          <Route path="/admin/sgs/auditorias" element={<AdminSGSAuditorias />} />
-          <Route path="/admin/sgs/fornecedores" element={<AdminSGSFornecedores />} />
-          <Route path="/admin/sgs/termos" element={<AdminSGSTermos />} />
-          <Route path="/admin/sgs/briefings" element={<AdminSGSBriefings />} />
-          <Route path="/admin/sgs/pesquisas" element={<AdminSGSPesquisas />} />
+          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="/admin/crm" element={<AdminRoute><AdminCRM /></AdminRoute>} />
+          <Route path="/admin/financeiro" element={<AdminRoute><AdminFinanceiro /></AdminRoute>} />
+          <Route path="/admin/parceiros" element={<AdminRoute><AdminParceiros /></AdminRoute>} />
+          <Route path="/admin/passeios" element={<AdminRoute><AdminPasseios /></AdminRoute>} />
+          <Route path="/admin/reservas" element={<AdminRoute><AdminReservas /></AdminRoute>} />
+          <Route path="/admin/translados" element={<AdminRoute><AdminTranslados /></AdminRoute>} />
+          <Route path="/admin/avaliacoes" element={<AdminRoute><AdminAvaliacoes /></AdminRoute>} />
+          <Route path="/admin/config" element={<AdminRoute><AdminConfig /></AdminRoute>} />
+          <Route path="/admin/marketing" element={<AdminRoute><AdminMarketing /></AdminRoute>} />
+          <Route path="/admin/ia" element={<AdminRoute><AdminIA /></AdminRoute>} />
+          <Route path="/admin/sgs" element={<AdminRoute><AdminSGSDashboard /></AdminRoute>} />
+          <Route path="/admin/sgs/riscos" element={<AdminRoute><AdminSGSRiscos /></AdminRoute>} />
+          <Route path="/admin/sgs/incidentes" element={<AdminRoute><AdminSGSIncidentes /></AdminRoute>} />
+          <Route path="/admin/sgs/acoes" element={<AdminRoute><AdminSGSAcoes /></AdminRoute>} />
+          <Route path="/admin/sgs/equipe" element={<AdminRoute><AdminSGSEquipe /></AdminRoute>} />
+          <Route path="/admin/sgs/auditorias" element={<AdminRoute><AdminSGSAuditorias /></AdminRoute>} />
+          <Route path="/admin/sgs/fornecedores" element={<AdminRoute><AdminSGSFornecedores /></AdminRoute>} />
+          <Route path="/admin/sgs/termos" element={<AdminRoute><AdminSGSTermos /></AdminRoute>} />
+          <Route path="/admin/sgs/briefings" element={<AdminRoute><AdminSGSBriefings /></AdminRoute>} />
+          <Route path="/admin/sgs/pesquisas" element={<AdminRoute><AdminSGSPesquisas /></AdminRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
