@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Shield, CreditCard, QrCode, Banknote, Users, CalendarDays, MapPin, CheckCircle, Copy, Clock } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useBookings, type BookingItem } from "@/hooks/useBookings";
 import { toast } from "@/hooks/use-toast";
 
@@ -18,12 +18,27 @@ const CheckoutPage = () => {
   const guests = Number(params.get("pax")) || 2;
   const date = params.get("date") || "";
 
-  const tour = type === "tour" ? getTourBySlug(slug) : null;
-  const transfer = type === "transfer" ? transferRoutes.find((t) => t.id === transferId) : null;
+  const [tour, setTour] = useState<any>(null);
+  const [transfer, setTransfer] = useState<any>(null);
+  const [loadingItem, setLoadingItem] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      if (type === "tour" && slug) {
+        const { data } = await supabase.from("tours").select("*").eq("slug", slug).single();
+        setTour(data);
+      } else if (type === "transfer" && transferId) {
+        const { data } = await supabase.from("transfer_routes").select("*").eq("id", transferId).single();
+        setTransfer(data);
+      }
+      setLoadingItem(false);
+    };
+    load();
+  }, [type, slug, transferId]);
 
   const itemName = tour?.name || (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
   const unitPrice = tour?.price || transfer?.price || 0;
-  const image = tour?.images[0] || "";
+  const image = tour?.images?.[0] || "";
   const location = tour?.location || (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
 
   const [payMethod, setPayMethod] = useState<"pix" | "card">("pix");
