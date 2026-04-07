@@ -6,7 +6,7 @@ import { toast } from "@/hooks/use-toast";
 
 const CATEGORIES: Record<string, string> = {
   veiculo: "Veículos Revisados", epi: "EPIs Disponíveis", resgate: "Equipamentos de Resgate",
-  documentacao: "Documentação do Guia", briefing: "Briefing Realizado", termo_risco: "Termo de Risco Assinado", outro: "Outro",
+  documentacao: "Documentação do Guia", briefing: "Resumo Realizado", termo_risco: "Termo de Risco Assinado", outro: "Outro",
 };
 
 const AdminSGSAuditorias = () => {
