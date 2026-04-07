@@ -43,20 +43,21 @@ const AdminSGSDashboard = () => {
       surveyAvg: Number(avgSafety),
     });
 
-    // Riscos por nível
+    // Riscos por nível (DEVOLUTIVA VATI criteria)
     const acceptable = risks.filter((r: any) => r.risk_level < 6).length;
-    const temporary = risks.filter((r: any) => r.risk_level >= 6 && r.risk_level <= 10).length;
-    const unacceptable = risks.filter((r: any) => r.risk_level > 10).length;
+    const temporary = risks.filter((r: any) => r.risk_level >= 6 && r.risk_level < 12).length;
+    const unacceptable = risks.filter((r: any) => r.risk_level >= 12).length;
     setRisksByLevel([
       { name: "Aceitável (<6)", value: acceptable, fill: "hsl(var(--primary))" },
-      { name: "Temporário (6-10)", value: temporary, fill: "hsl(var(--secondary))" },
-      { name: "Inaceitável (>10)", value: unacceptable, fill: "hsl(var(--destructive))" },
+      { name: "Temporário (6-11)", value: temporary, fill: "hsl(var(--secondary))" },
+      { name: "Inaceitável (≥12)", value: unacceptable, fill: "hsl(var(--destructive))" },
     ]);
 
     // Riscos por etapa
     const stageLabels: Record<string, string> = {
       venda_recepcao: "Venda", trajeto_ida: "Trajeto Ida",
-      passeio_dunas: "Dunas", retorno: "Retorno", pos_passeio: "Pós",
+      passeio_dunas: "Dunas", banho_lagoas: "Lagoas", passeio_barco: "Barco",
+      trilhas: "Trilhas", trajeto_volta: "Volta", retorno: "Retorno", pos_passeio: "Pós",
     };
     const stageMap = new Map<string, number>();
     risks.forEach((r: any) => {
