@@ -1,14 +1,19 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, AlertTriangle, Search, Filter } from "lucide-react";
+import { Plus, AlertTriangle, Search, Info } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
+// P2 - All operational stages per DEVOLUTIVA VATI
 const STAGES: Record<string, string> = {
   venda_recepcao: "Venda / Recepção",
   trajeto_ida: "Trajeto de Ida",
   passeio_dunas: "Passeio nas Dunas",
-  retorno: "Retorno",
+  banho_lagoas: "Banho nas Lagoas",
+  passeio_barco: "Passeio de Barco",
+  trilhas: "Trilhas / Caminhadas",
+  trajeto_volta: "Trajeto de Volta",
+  retorno: "Retorno / Desembarque",
   pos_passeio: "Pós Passeio",
 };
 
@@ -19,10 +24,11 @@ const STATUS_COLORS: Record<string, string> = {
   resolvido: "bg-muted text-muted-foreground",
 };
 
+// NR classification per DEVOLUTIVA VATI criteria
 const riskClass = (level: number) => {
-  if (level > 10) return { label: "Inaceitável", color: "bg-destructive text-destructive-foreground" };
-  if (level >= 6) return { label: "Temporário", color: "bg-secondary text-secondary-foreground" };
-  return { label: "Aceitável", color: "bg-primary text-primary-foreground" };
+  if (level >= 12) return { label: "Inaceitável", color: "bg-destructive text-destructive-foreground", action: "Tratar o mais breve possível" };
+  if (level >= 6) return { label: "Temporariamente Aceitável", color: "bg-secondary text-secondary-foreground", action: "Tratar assim que possível" };
+  return { label: "Aceitável", color: "bg-primary text-primary-foreground", action: "Monitorar o risco" };
 };
 
 interface Risk {
@@ -37,14 +43,13 @@ const AdminSGSRiscos = () => {
   const [search, setSearch] = useState("");
   const [filterStage, setFilterStage] = useState("todas");
   const [showForm, setShowForm] = useState(false);
+  const [showLegend, setShowLegend] = useState(false);
   const [form, setForm] = useState({
     stage: "venda_recepcao", activity: "", hazard: "", probability: 1, impact: 1,
     control_measures: "", treatment_measures: "", responsible: "",
   });
 
-  useEffect(() => {
-    loadRisks();
-  }, []);
+  useEffect(() => { loadRisks(); }, []);
 
   const loadRisks = async () => {
     setLoading(true);
@@ -57,8 +62,9 @@ const AdminSGSRiscos = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const level = form.probability * form.impact;
     const { error } = await supabase.from("sgs_risks").insert({
-      risk_code: generateCode(), ...form,
+      risk_code: generateCode(), ...form, risk_level: level,
     });
     if (error) {
       toast({ title: "Erro ao cadastrar risco", variant: "destructive" });
@@ -68,16 +74,19 @@ const AdminSGSRiscos = () => {
       setForm({ stage: "venda_recepcao", activity: "", hazard: "", probability: 1, impact: 1, control_measures: "", treatment_measures: "", responsible: "" });
       loadRisks();
 
-      // Auto-create corrective action if risk > 10
-      const level = form.probability * form.impact;
-      if (level > 10) {
+      // P3: Auto-create corrective action if NR >= 6 (temporariamente aceitável ou pior)
+      if (level >= 6) {
+        const rc = riskClass(level);
         await supabase.from("sgs_corrective_actions").insert({
           action_code: `AC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`,
-          description: `Ação urgente para risco: ${form.hazard}`,
+          description: `Ação ${level >= 12 ? "URGENTE" : "corretiva"} para risco: ${form.hazard} (NR=${level})`,
           responsible: form.responsible,
-          due_date: new Date(Date.now() + 7 * 86400000).toISOString().split("T")[0],
+          due_date: new Date(Date.now() + (level >= 12 ? 3 : 14) * 86400000).toISOString().split("T")[0],
         });
-        toast({ title: "⚠️ Ação corretiva criada automaticamente", description: "Risco inaceitável detectado (NR > 10)" });
+        toast({
+          title: level >= 12 ? "🚨 Ação URGENTE criada automaticamente" : "⚠️ Ação corretiva criada automaticamente",
+          description: `Risco ${rc.label} detectado (NR = ${level}). ${rc.action}.`,
+        });
       }
     }
   };
@@ -88,9 +97,36 @@ const AdminSGSRiscos = () => {
     return matchSearch && matchStage;
   });
 
+  const summary = {
+    total: risks.length,
+    acceptable: risks.filter(r => r.risk_level < 6).length,
+    temporary: risks.filter(r => r.risk_level >= 6 && r.risk_level < 12).length,
+    unacceptable: risks.filter(r => r.risk_level >= 12).length,
+  };
+
   return (
-    <AdminLayout title="SGS - Matriz de Riscos">
+    <AdminLayout title="SGS - Matriz de Riscos (P2)">
       <div className="space-y-6">
+        {/* Summary cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-card border border-border rounded-2xl p-4">
+            <p className="text-xs text-muted-foreground">Total de Riscos</p>
+            <p className="text-2xl font-bold text-foreground">{summary.total}</p>
+          </div>
+          <div className="bg-card border border-border rounded-2xl p-4">
+            <p className="text-xs text-primary">Aceitável (NR &lt; 6)</p>
+            <p className="text-2xl font-bold text-primary">{summary.acceptable}</p>
+          </div>
+          <div className="bg-card border border-border rounded-2xl p-4">
+            <p className="text-xs text-secondary">Temporário (6-11)</p>
+            <p className="text-2xl font-bold text-secondary">{summary.temporary}</p>
+          </div>
+          <div className="bg-card border border-border rounded-2xl p-4">
+            <p className="text-xs text-destructive">Inaceitável (NR ≥ 12)</p>
+            <p className="text-2xl font-bold text-destructive">{summary.unacceptable}</p>
+          </div>
+        </div>
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between gap-4">
           <div className="flex gap-2 flex-1">
@@ -105,11 +141,39 @@ const AdminSGSRiscos = () => {
               {Object.entries(STAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </div>
-          <button onClick={() => setShowForm(!showForm)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-            <Plus size={16} /> Novo Risco
-          </button>
+          <div className="flex gap-2">
+            <button onClick={() => setShowLegend(!showLegend)}
+              className="bg-muted text-muted-foreground px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-1">
+              <Info size={16} /> Critérios NR
+            </button>
+            <button onClick={() => setShowForm(!showForm)}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
+              <Plus size={16} /> Novo Risco
+            </button>
+          </div>
         </div>
+
+        {/* NR Legend */}
+        {showLegend && (
+          <div className="bg-card border border-border rounded-2xl p-6">
+            <h3 className="font-display font-bold text-foreground mb-3">Critérios de Classificação do Nível de Risco (NR)</h3>
+            <p className="text-xs text-muted-foreground mb-4">NR = Probabilidade × Impacto (escala 1-5 cada)</p>
+            <div className="grid sm:grid-cols-3 gap-3">
+              <div className="bg-primary/10 rounded-xl p-4">
+                <p className="font-bold text-primary text-sm">NR &lt; 6 — Aceitável</p>
+                <p className="text-xs text-muted-foreground mt-1">Monitorar o risco. Manter medidas de controle implementadas.</p>
+              </div>
+              <div className="bg-secondary/10 rounded-xl p-4">
+                <p className="font-bold text-secondary text-sm">6 ≤ NR &lt; 12 — Temporariamente Aceitável</p>
+                <p className="text-xs text-muted-foreground mt-1">Tratar o risco assim que possível. Ação corretiva automática na P3.</p>
+              </div>
+              <div className="bg-destructive/10 rounded-xl p-4">
+                <p className="font-bold text-destructive text-sm">NR ≥ 12 — Inaceitável</p>
+                <p className="text-xs text-muted-foreground mt-1">Tratar o risco o mais breve possível. Ação URGENTE na P3.</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Form */}
         {showForm && (
@@ -117,7 +181,7 @@ const AdminSGSRiscos = () => {
             <h3 className="font-display font-bold text-foreground">Registrar Novo Risco</h3>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Etapa *</label>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Etapa do Passeio *</label>
                 <select value={form.stage} onChange={(e) => setForm({ ...form, stage: e.target.value })}
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
                   {Object.entries(STAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
@@ -149,15 +213,17 @@ const AdminSGSRiscos = () => {
                   {form.probability * form.impact} — {riskClass(form.probability * form.impact).label}
                 </div>
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Medidas de Controle</label>
-                <input value={form.control_measures} onChange={(e) => setForm({ ...form, control_measures: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Medidas implementadas" />
+              <div className="sm:col-span-2 lg:col-span-3">
+                <label className="text-sm font-semibold text-foreground mb-1 block">Medidas de Controle Implementadas</label>
+                <textarea value={form.control_measures} onChange={(e) => setForm({ ...form, control_measures: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-16 resize-none" placeholder="Medidas que já estão em execução atualmente" />
+                <p className="text-xs text-muted-foreground mt-1">Descreva as medidas que já estão sendo executadas para controlar este risco.</p>
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Medidas de Tratamento</label>
-                <input value={form.treatment_measures} onChange={(e) => setForm({ ...form, treatment_measures: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Ações de tratamento" />
+              <div className="sm:col-span-2 lg:col-span-3">
+                <label className="text-sm font-semibold text-foreground mb-1 block">Medidas de Tratamento (Planejadas)</label>
+                <textarea value={form.treatment_measures} onChange={(e) => setForm({ ...form, treatment_measures: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-16 resize-none" placeholder="Ações planejadas para serem implementadas no futuro" />
+                <p className="text-xs text-muted-foreground mt-1">Ações futuras para reduzir ou eliminar o risco. Serão vinculadas à P3 automaticamente se NR ≥ 6.</p>
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Responsável *</label>
@@ -184,30 +250,34 @@ const AdminSGSRiscos = () => {
                   <th className="text-center px-4 py-3 font-semibold text-muted-foreground">P</th>
                   <th className="text-center px-4 py-3 font-semibold text-muted-foreground">I</th>
                   <th className="text-center px-4 py-3 font-semibold text-muted-foreground">NR</th>
+                  <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Classificação</th>
                   <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Responsável</th>
                   <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={8} className="text-center py-8 text-muted-foreground">Carregando...</td></tr>
+                  <tr><td colSpan={9} className="text-center py-8 text-muted-foreground">Carregando...</td></tr>
                 ) : filtered.length === 0 ? (
-                  <tr><td colSpan={8} className="text-center py-8 text-muted-foreground">Nenhum risco encontrado</td></tr>
+                  <tr><td colSpan={9} className="text-center py-8 text-muted-foreground">Nenhum risco encontrado</td></tr>
                 ) : filtered.map((r) => {
                   const rc = riskClass(r.risk_level);
                   return (
                     <tr key={r.id} className="border-t border-border hover:bg-muted/50">
                       <td className="px-4 py-3 font-mono text-xs text-foreground">{r.risk_code}</td>
-                      <td className="px-4 py-3 text-foreground">{STAGES[r.stage]}</td>
+                      <td className="px-4 py-3 text-foreground">{STAGES[r.stage] || r.stage}</td>
                       <td className="px-4 py-3 text-foreground font-medium">{r.hazard}</td>
                       <td className="px-4 py-3 text-center text-foreground">{r.probability}</td>
                       <td className="px-4 py-3 text-center text-foreground">{r.impact}</td>
                       <td className="px-4 py-3 text-center">
                         <span className={`px-2 py-1 rounded-lg text-xs font-bold ${rc.color}`}>{r.risk_level}</span>
                       </td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 rounded-lg text-xs font-semibold ${rc.color}`}>{rc.label}</span>
+                      </td>
                       <td className="px-4 py-3 text-foreground">{r.responsible}</td>
                       <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${STATUS_COLORS[r.status]}`}>{r.status}</span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${STATUS_COLORS[r.status] || ""}`}>{r.status}</span>
                       </td>
                     </tr>
                   );

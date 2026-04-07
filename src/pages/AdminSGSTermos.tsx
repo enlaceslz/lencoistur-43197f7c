@@ -1,16 +1,27 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, FileText, CheckCircle, XCircle } from "lucide-react";
+import { Plus, CheckCircle, XCircle, Shield } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const RISKS_OPTIONS = [
-  "Exposição solar intensa",
-  "Terreno irregular nas dunas",
+  "Exposição solar intensa e risco de insolação",
+  "Terreno irregular nas dunas (risco de torção/queda)",
   "Possibilidade de afogamento nas lagoas",
   "Chuvas e mudanças climáticas repentinas",
-  "Contato com fauna local",
+  "Contato com fauna local (insetos, animais silvestres)",
   "Esforço físico moderado a intenso",
+  "Risco de colisão veicular no trajeto",
+  "Condições de maré e correntes aquáticas",
+];
+
+const SAFETY_CONTROLS = [
+  "Capacitação constante da equipe de condutores",
+  "Cabo de resgate disponível em todas as operações",
+  "Orientações de segurança aos clientes antes e durante",
+  "Equipe capacitada em primeiros socorros",
+  "Equipe preparada para realizar resgates",
+  "Plano de Resposta a Emergências (PRE) implementado",
 ];
 
 const AdminSGSTermos = () => {
@@ -20,7 +31,8 @@ const AdminSGSTermos = () => {
   const [search, setSearch] = useState("");
   const [form, setForm] = useState({
     customer_name: "", nationality: "", phone: "", tour_name: "",
-    risks_informed: [] as string[], cancellation_policy: "Cancelamento gratuito até 24h antes. Após esse prazo, retenção de 50% do valor.",
+    risks_informed: [] as string[],
+    cancellation_policy: "Cancelamento gratuito até 24h antes do passeio. Após esse prazo, retenção de 50% do valor. No-show: sem reembolso.",
   });
 
   useEffect(() => { load(); }, []);
@@ -65,7 +77,7 @@ const AdminSGSTermos = () => {
   );
 
   return (
-    <AdminLayout title="SGS - Termos de Ciência de Risco">
+    <AdminLayout title="SGS - Termos de Ciência de Risco (P6)">
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between gap-4">
           <div className="relative flex-1 max-w-md">
@@ -79,8 +91,17 @@ const AdminSGSTermos = () => {
         </div>
 
         {showForm && (
-          <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
-            <h3 className="font-display font-bold text-foreground">Termo de Ciência de Risco</h3>
+          <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-5">
+            {/* Company header */}
+            <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
+              <div className="flex items-center gap-3 mb-2">
+                <Shield size={20} className="text-primary" />
+                <h3 className="font-display font-bold text-foreground">Termo de Ciência e Aceitação de Riscos</h3>
+              </div>
+              <p className="text-xs text-muted-foreground">LENÇÓIS TOUR — Operadora de Turismo de Aventura • Rota das Emoções — Lençóis Maranhenses</p>
+              <p className="text-xs text-muted-foreground">Conforme ABNT NBR ISO 21103:2014 — Informações aos Participantes</p>
+            </div>
+
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Nome do Cliente *</label>
@@ -105,8 +126,8 @@ const AdminSGSTermos = () => {
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-foreground mb-2 block">Riscos Informados *</label>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              <label className="text-sm font-semibold text-foreground mb-2 block">Riscos Informados ao Participante *</label>
+              <div className="grid sm:grid-cols-2 gap-2">
                 {RISKS_OPTIONS.map(risk => (
                   <label key={risk} className="flex items-center gap-2 text-sm text-foreground bg-muted rounded-xl px-3 py-2 cursor-pointer hover:bg-muted/80">
                     <input type="checkbox" checked={form.risks_informed.includes(risk)} onChange={() => toggleRisk(risk)} className="rounded" />
@@ -116,15 +137,32 @@ const AdminSGSTermos = () => {
               </div>
             </div>
 
+            {/* Safety controls per P6 */}
+            <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
+              <p className="font-semibold text-sm text-foreground mb-2">Controles Operacionais Adotados pela Empresa:</p>
+              <ul className="space-y-1">
+                {SAFETY_CONTROLS.map(ctrl => (
+                  <li key={ctrl} className="flex items-center gap-2 text-xs text-foreground">
+                    <CheckCircle size={12} className="text-primary flex-shrink-0" /> {ctrl}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Política de Cancelamento</label>
               <textarea value={form.cancellation_policy} onChange={e => setForm({ ...form, cancellation_policy: e.target.value })}
                 className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-20" />
             </div>
 
-            <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 text-sm text-foreground">
-              <p className="font-semibold mb-2">Declaração de Ciência:</p>
-              <p>A empresa adota controles operacionais como capacitação da equipe, orientações aos clientes, procedimentos de resgate e atendimento de primeiros socorros. O cliente confirma estar ciente dos riscos da atividade.</p>
+            <div className="bg-secondary/5 border border-secondary/20 rounded-xl p-4 text-sm text-foreground">
+              <p className="font-semibold mb-2">Declaração de Ciência e Aceitação:</p>
+              <p className="text-xs text-muted-foreground">
+                Declaro que fui informado(a) sobre os riscos inerentes à atividade contratada e sobre os controles operacionais 
+                adotados pela empresa LENÇÓIS TOUR, incluindo capacitação da equipe, equipamentos de resgate e orientações de segurança.
+                A equipe está capacitada para agir em emergências e está preparada para realizar resgates e atendimento de primeiros socorros, 
+                condizentes com o Plano de Resposta a Emergências (PRE). Declaro que aceito participar de forma consciente e voluntária.
+              </p>
             </div>
 
             <div className="flex gap-3">
@@ -148,7 +186,7 @@ const AdminSGSTermos = () => {
                   </div>
                   <div>
                     <h4 className="font-bold text-foreground">{t.customer_name}</h4>
-                    <p className="text-xs text-muted-foreground">{t.tour_name} • {t.nationality || "BR"}</p>
+                    <p className="text-xs text-muted-foreground">{t.tour_name} • {t.nationality || "BR"} • {t.phone || "—"}</p>
                   </div>
                 </div>
                 <div className="text-right">
