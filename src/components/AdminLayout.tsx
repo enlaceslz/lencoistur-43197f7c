@@ -30,7 +30,7 @@ const sgsItems = [
   { icon: ClipboardCheck, label: "Auditorias", path: "/admin/sgs/auditorias" },
   { icon: Truck, label: "Fornecedores", path: "/admin/sgs/fornecedores" },
   { icon: FileText, label: "Termos de Risco", path: "/admin/sgs/termos" },
-  { icon: Shield, label: "Briefings", path: "/admin/sgs/briefings" },
+  { icon: Shield, label: "Resumos", path: "/admin/sgs/briefings" },
   { icon: Star, label: "Pesquisas", path: "/admin/sgs/pesquisas" },
 ];
 
