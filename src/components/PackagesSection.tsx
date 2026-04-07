@@ -1,14 +1,15 @@
 import { Link } from "react-router-dom";
 import { Clock, Sparkles, ArrowRight } from "lucide-react";
-import { tours } from "@/data/tours";
 import { useTranslation } from "react-i18next";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Package {
   id: string;
   name: string;
   slug: string;
   description: string;
-  tourIds: string[];
+  tourSlugs: string[];
   days: number;
   originalPrice: number;
   discountPrice: number;
@@ -20,25 +21,31 @@ const packages: Package[] = [
   {
     id: "pkg-1", name: "Pacote Essencial Lençóis", slug: "essencial",
     description: "O melhor dos Lençóis Maranhenses em 3 dias. Ideal para quem tem pouco tempo mas quer viver as experiências mais icônicas.",
-    tourIds: ["1", "2", "4"], days: 3, originalPrice: 570, discountPrice: 459, tag: "Mais Vendido",
+    tourSlugs: ["lagoas-azuis", "passeio-de-barco", "passeio-gastronomico"], days: 3, originalPrice: 570, discountPrice: 459, tag: "Mais Vendido",
     highlights: ["Lagoas Azuis", "Rio Preguiças", "Gastronomia local", "Transfer incluso"],
   },
   {
     id: "pkg-2", name: "Pacote Aventura Total", slug: "aventura",
     description: "Para quem busca adrenalina! Caiaque, quadriciclo e trekking nas dunas mais impressionantes do Brasil.",
-    tourIds: ["6", "7", "8"], days: 4, originalPrice: 720, discountPrice: 579, tag: "Aventura",
+    tourSlugs: ["descida-de-caiaque", "trekking-nas-dunas", "passeio-de-quadriciclo"], days: 4, originalPrice: 720, discountPrice: 579, tag: "Aventura",
     highlights: ["Caiaque nos rios", "Trekking nas dunas", "Quadriciclo", "Lagoas remotas"],
   },
   {
     id: "pkg-3", name: "Pacote Imersão Completa", slug: "imersao",
     description: "A experiência definitiva: 5 dias explorando todos os cantos dos Lençóis Maranhenses com roteiros exclusivos.",
-    tourIds: ["1", "2", "3", "5", "6"], days: 5, originalPrice: 1060, discountPrice: 799, tag: "Premium",
+    tourSlugs: ["lagoas-azuis", "passeio-de-barco", "roteiro-ecologico", "roteiro-cultural", "descida-de-caiaque"], days: 5, originalPrice: 1060, discountPrice: 799, tag: "Premium",
     highlights: ["5 passeios completos", "Roteiro ecológico", "Cultural + gastronômico", "Guia exclusivo"],
   },
 ];
 
 const PackagesSection = () => {
   const { t } = useTranslation();
+  const [tours, setTours] = useState<any[]>([]);
+
+  useEffect(() => {
+    supabase.from("tours").select("id,slug,name,images").eq("active", true)
+      .then(({ data }) => setTours(data || []));
+  }, []);
 
   return (
     <section className="py-20 md:py-28 bg-background">
@@ -58,14 +65,18 @@ const PackagesSection = () => {
         <div className="grid md:grid-cols-3 gap-6">
           {packages.map((pkg) => {
             const discount = Math.round(((pkg.originalPrice - pkg.discountPrice) / pkg.originalPrice) * 100);
-            const pkgTours = pkg.tourIds.map((id) => tours.find((t) => t.id === id)).filter(Boolean);
+            const pkgTours = pkg.tourSlugs.map((s) => tours.find((t) => t.slug === s)).filter(Boolean);
 
             return (
               <div key={pkg.id} className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl transition-shadow group">
                 <div className="relative h-48 flex">
-                  {pkgTours.slice(0, 3).map((tour) => (
-                    <div key={tour!.id} className="flex-1 overflow-hidden">
-                      <img src={tour!.images[0]} alt={tour!.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                  {pkgTours.slice(0, 3).map((tour: any) => (
+                    <div key={tour.id} className="flex-1 overflow-hidden">
+                      {tour.images?.[0] ? (
+                        <img src={tour.images[0]} alt={tour.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                      ) : (
+                        <div className="w-full h-full bg-muted" />
+                      )}
                     </div>
                   ))}
                   <div className="absolute top-3 left-3 flex gap-2">
@@ -82,7 +93,7 @@ const PackagesSection = () => {
 
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1"><Clock size={14} className="text-primary" /> {pkg.days} {t("packages.days")}</span>
-                    <span className="flex items-center gap-1"><Sparkles size={14} className="text-primary" /> {pkg.tourIds.length} {t("packages.toursCount")}</span>
+                    <span className="flex items-center gap-1"><Sparkles size={14} className="text-primary" /> {pkg.tourSlugs.length} {t("packages.toursCount")}</span>
                   </div>
 
                   <div className="space-y-2">
@@ -113,12 +124,9 @@ const PackagesSection = () => {
         </div>
 
         <div className="mt-12 text-center">
-          <a
-            href="https://wa.me/5598985880954?text=Olá! Gostaria de saber mais sobre os pacotes de passeios."
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 bg-[hsl(var(--whatsapp))] hover:bg-[hsl(var(--whatsapp-hover))] text-primary-foreground px-8 py-4 rounded-xl font-semibold text-lg transition-colors"
-          >
+          <a href="https://wa.me/5598985880954?text=Olá! Gostaria de saber mais sobre os pacotes de passeios."
+            target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 bg-[hsl(var(--whatsapp))] hover:bg-[hsl(var(--whatsapp-hover))] text-primary-foreground px-8 py-4 rounded-xl font-semibold text-lg transition-colors">
             {t("packages.whatsappCta")}
           </a>
         </div>
