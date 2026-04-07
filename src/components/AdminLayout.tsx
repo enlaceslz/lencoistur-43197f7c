@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Home, Compass, Car, Users, UserCheck, CreditCard, Settings,
   LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot,
@@ -37,6 +38,8 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sgsOpen, setSgsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut, user } = useAuth();
 
   const isSgsActive = location.pathname.startsWith("/admin/sgs");
 
@@ -112,7 +115,10 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           </Link>
         </nav>
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border bg-card">
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+          <button
+            onClick={async () => { await signOut(); navigate("/admin/login"); }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          >
             <LogOut size={18} />
             Sair
           </button>
