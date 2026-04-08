@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,7 +6,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Search, Plus, Pencil, Trash2, Eye, EyeOff, Compass, Users, Clock, Star, X,
+  Search, Plus, Pencil, Trash2, Eye, EyeOff, Compass, Users, Clock, Star, X, Upload, Link as LinkIcon, Image as ImageIcon, GripVertical,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -21,7 +21,7 @@ const emptyForm = {
   name: "", slug: "", location: "", duration: "", price: 0,
   tag: "", description: "", category: "Ecoturismo", difficulty: "Fácil",
   group_size: "Até 10 pessoas", departure: "Santo Amaro do Maranhão",
-  operator: "Lençóis Tour", includes: "", highlights: "", images: "", active: true,
+  operator: "Lençóis Tour", includes: "", highlights: "", active: true,
 };
 
 const AdminPasseios = () => {
@@ -31,6 +31,10 @@ const AdminPasseios = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [newUrlInput, setNewUrlInput] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { load(); }, []);
 
@@ -48,6 +52,8 @@ const AdminPasseios = () => {
   const openNew = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setImageUrls([]);
+    setNewUrlInput("");
     setShowForm(true);
   };
 
@@ -60,9 +66,85 @@ const AdminPasseios = () => {
       difficulty: t.difficulty || "Fácil", group_size: t.group_size || "",
       departure: t.departure || "", operator: t.operator || "Lençóis Tour",
       includes: (t.includes || []).join(", "), highlights: (t.highlights || []).join(", "),
-      images: (t.images || []).join(", "), active: t.active,
+      active: t.active,
     });
+    setImageUrls(t.images || []);
+    setNewUrlInput("");
     setShowForm(true);
+  };
+
+  const addUrlImage = () => {
+    const url = newUrlInput.trim();
+    if (!url) return;
+    try {
+      new URL(url);
+    } catch {
+      toast({ title: "URL inválida", variant: "destructive" });
+      return;
+    }
+    if (imageUrls.includes(url)) {
+      toast({ title: "Imagem já adicionada", variant: "destructive" });
+      return;
+    }
+    setImageUrls(prev => [...prev, url]);
+    setNewUrlInput("");
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    const newUrls: string[] = [];
+
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith("image/")) {
+        toast({ title: `${file.name} não é uma imagem`, variant: "destructive" });
+        continue;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast({ title: `${file.name} excede 5MB`, variant: "destructive" });
+        continue;
+      }
+
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+      const { error } = await supabase.storage.from("tour-images").upload(path, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+      if (error) {
+        toast({ title: `Erro no upload de ${file.name}`, description: error.message, variant: "destructive" });
+        continue;
+      }
+
+      const { data: urlData } = supabase.storage.from("tour-images").getPublicUrl(path);
+      newUrls.push(urlData.publicUrl);
+    }
+
+    if (newUrls.length > 0) {
+      setImageUrls(prev => [...prev, ...newUrls]);
+      toast({ title: `${newUrls.length} imagem(ns) enviada(s)!` });
+    }
+
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const removeImage = (index: number) => {
+    setImageUrls(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const moveImage = (from: number, to: number) => {
+    if (to < 0 || to >= imageUrls.length) return;
+    setImageUrls(prev => {
+      const arr = [...prev];
+      const [item] = arr.splice(from, 1);
+      arr.splice(to, 0, item);
+      return arr;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,7 +159,7 @@ const AdminPasseios = () => {
       departure: form.departure.trim(), operator: form.operator.trim(),
       includes: form.includes.split(",").map(s => s.trim()).filter(Boolean),
       highlights: form.highlights.split(",").map(s => s.trim()).filter(Boolean),
-      images: form.images.split(",").map(s => s.trim()).filter(Boolean),
+      images: imageUrls,
       active: form.active,
     };
 
@@ -260,11 +342,91 @@ const AdminPasseios = () => {
                 className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
             </div>
           </div>
-          <div>
-            <label className="text-sm font-semibold text-foreground mb-1 block">URLs de Imagens (separadas por vírgula)</label>
-            <input value={form.images} onChange={e => setForm({ ...form, images: e.target.value })}
-              className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+
+          {/* Image Management Section */}
+          <div className="space-y-3">
+            <label className="text-sm font-semibold text-foreground block">Imagens do Passeio</label>
+
+            {/* Current images preview */}
+            {imageUrls.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                {imageUrls.map((url, index) => (
+                  <div key={index} className="relative group rounded-xl overflow-hidden border border-border bg-muted aspect-square">
+                    <img src={url} alt={`Imagem ${index + 1}`} className="w-full h-full object-cover" 
+                      onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                      {index > 0 && (
+                        <button type="button" onClick={() => moveImage(index, index - 1)}
+                          className="p-1.5 bg-white/20 rounded-lg hover:bg-white/40 text-white text-xs" title="Mover para esquerda">
+                          ←
+                        </button>
+                      )}
+                      <button type="button" onClick={() => removeImage(index)}
+                        className="p-1.5 bg-red-500/80 rounded-lg hover:bg-red-600 text-white" title="Remover">
+                        <X size={14} />
+                      </button>
+                      {index < imageUrls.length - 1 && (
+                        <button type="button" onClick={() => moveImage(index, index + 1)}
+                          className="p-1.5 bg-white/20 rounded-lg hover:bg-white/40 text-white text-xs" title="Mover para direita">
+                          →
+                        </button>
+                      )}
+                    </div>
+                    {index === 0 && (
+                      <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded">
+                        Capa
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add by URL */}
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+                <input
+                  value={newUrlInput}
+                  onChange={e => setNewUrlInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addUrlImage(); } }}
+                  placeholder="Cole a URL da imagem aqui..."
+                  className="w-full bg-muted border border-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-foreground outline-none"
+                />
+              </div>
+              <button type="button" onClick={addUrlImage}
+                className="bg-muted hover:bg-accent text-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border border-border whitespace-nowrap">
+                <LinkIcon size={14} /> Adicionar URL
+              </button>
+            </div>
+
+            {/* Upload file */}
+            <div className="flex gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
+                className="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border border-primary/20 disabled:opacity-50">
+                <Upload size={14} />
+                {uploading ? "Enviando..." : "Upload de Imagens"}
+              </button>
+              <span className="text-xs text-muted-foreground self-center">JPG, PNG, WebP • Máx 5MB cada</span>
+            </div>
+
+            {imageUrls.length === 0 && (
+              <div className="border-2 border-dashed border-border rounded-xl p-8 text-center text-muted-foreground">
+                <ImageIcon size={32} className="mx-auto mb-2 opacity-50" />
+                <p className="text-sm">Nenhuma imagem adicionada</p>
+                <p className="text-xs mt-1">Use URL ou faça upload de arquivos</p>
+              </div>
+            )}
           </div>
+
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} className="rounded w-5 h-5" />
