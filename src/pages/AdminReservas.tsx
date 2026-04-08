@@ -8,66 +8,100 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Search, ShoppingCart, CheckCircle, Clock, XCircle, AlertCircle, Eye,
+  DollarSign, Ban, Loader2, Users, Calendar, CreditCard, FileText,
+  MapPin, Phone, Mail,
 } from "lucide-react";
-
-interface Booking {
-  id: string;
-  client: string;
-  tour: string;
-  date: string;
-  pax: number;
-  total: number;
-  status: "confirmada" | "pendente" | "cancelada" | "concluida";
-  paymentStatus: "pago" | "pendente" | "reembolsado";
-  channel: string;
-}
-
-const bookings: Booking[] = [
-  { id: "RES-001", client: "João Silva", tour: "Lagoas Azul e Bonita", date: "2024-03-15", pax: 4, total: 600, status: "confirmada", paymentStatus: "pago", channel: "Site" },
-  { id: "RES-002", client: "Maria Santos", tour: "Rio Preguiças (Caburé)", date: "2024-03-16", pax: 2, total: 400, status: "confirmada", paymentStatus: "pago", channel: "WhatsApp" },
-  { id: "RES-003", client: "John Smith", tour: "Trekking Lençóis", date: "2024-03-17", pax: 1, total: 350, status: "pendente", paymentStatus: "pendente", channel: "Booking" },
-  { id: "RES-004", client: "Ana Costa", tour: "Quadriciclo (Lagoa Azul)", date: "2024-03-18", pax: 6, total: 1500, status: "confirmada", paymentStatus: "pago", channel: "Site" },
-  { id: "RES-005", client: "Pedro Lima", tour: "Passeio de Lancha", date: "2024-03-19", pax: 3, total: 750, status: "cancelada", paymentStatus: "reembolsado", channel: "Parceiro" },
-  { id: "RES-006", client: "Fernanda Reis", tour: "Circuito Lagoas + Rio", date: "2024-03-20", pax: 2, total: 500, status: "concluida", paymentStatus: "pago", channel: "Site" },
-  { id: "RES-007", client: "Carlos Oliveira", tour: "Santo Amaro Completo", date: "2024-03-21", pax: 5, total: 1250, status: "pendente", paymentStatus: "pendente", channel: "WhatsApp" },
-  { id: "RES-008", client: "Sophie Martin", tour: "Lagoas Azul e Bonita", date: "2024-03-22", pax: 2, total: 300, status: "confirmada", paymentStatus: "pago", channel: "Site" },
-];
+import { useBookings, BookingItem } from "@/hooks/useBookings";
+import { toast } from "sonner";
 
 const statusConfig: Record<string, { label: string; className: string; icon: typeof CheckCircle }> = {
-  confirmada: { label: "Confirmada", className: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300", icon: CheckCircle },
-  pendente: { label: "Pendente", className: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300", icon: Clock },
-  cancelada: { label: "Cancelada", className: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300", icon: XCircle },
-  concluida: { label: "Concluída", className: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300", icon: CheckCircle },
+  confirmada: { label: "Confirmada", className: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300", icon: CheckCircle },
+  pendente: { label: "Pendente", className: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300", icon: Clock },
+  cancelada: { label: "Cancelada", className: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300", icon: XCircle },
+  concluida: { label: "Concluída", className: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300", icon: CheckCircle },
 };
 
-const paymentConfig: Record<string, string> = {
-  pago: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-  pendente: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
-  reembolsado: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
+const paymentConfig: Record<string, { label: string; className: string }> = {
+  pago: { label: "Pago", className: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300" },
+  pendente: { label: "Pendente", className: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300" },
+  reembolsado: { label: "Reembolsado", className: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300" },
 };
 
-const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR")}`;
+const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+const fmtDate = (d: string) => {
+  if (!d) return "—";
+  try { return new Date(d).toLocaleDateString("pt-BR"); } catch { return d; }
+};
 
 const AdminReservas = () => {
+  const { bookings, loading, confirmPayment, cancelBooking } = useBookings();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
+  const [selected, setSelected] = useState<BookingItem | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
   const filtered = bookings.filter((b) => {
-    const matchSearch = b.client.toLowerCase().includes(search.toLowerCase()) || b.tour.toLowerCase().includes(search.toLowerCase()) || b.id.toLowerCase().includes(search.toLowerCase());
+    const q = search.toLowerCase();
+    const matchSearch =
+      b.customerName.toLowerCase().includes(q) ||
+      b.itemName.toLowerCase().includes(q) ||
+      b.bookingCode.toLowerCase().includes(q);
     const matchStatus = statusFilter === "todos" || b.status === statusFilter;
     return matchSearch && matchStatus;
   });
+
+  const totalPago = bookings
+    .filter((b) => b.paymentStatus === "pago")
+    .reduce((a, b) => a + b.finalTotal, 0);
 
   const stats = [
     { icon: ShoppingCart, label: "Total Reservas", value: bookings.length, color: "text-primary" },
     { icon: CheckCircle, label: "Confirmadas", value: bookings.filter((b) => b.status === "confirmada").length, color: "text-green-600" },
     { icon: Clock, label: "Pendentes", value: bookings.filter((b) => b.status === "pendente").length, color: "text-amber-600" },
-    { icon: AlertCircle, label: "Receita Total", value: fmt(bookings.filter((b) => b.paymentStatus === "pago").reduce((a, b2) => a + b2.total, 0)), color: "text-blue-600" },
+    { icon: DollarSign, label: "Receita Total", value: fmt(totalPago), color: "text-blue-600" },
   ];
+
+  const handleConfirm = async (id: string) => {
+    setActionLoading(true);
+    try {
+      await confirmPayment(id);
+      toast.success("Pagamento confirmado!");
+      setSelected(null);
+    } catch {
+      toast.error("Erro ao confirmar pagamento.");
+    }
+    setActionLoading(false);
+  };
+
+  const handleCancel = async (id: string) => {
+    setActionLoading(true);
+    try {
+      await cancelBooking(id);
+      toast.success("Reserva cancelada.");
+      setSelected(null);
+    } catch {
+      toast.error("Erro ao cancelar reserva.");
+    }
+    setActionLoading(false);
+  };
+
+  if (loading) {
+    return (
+      <AdminLayout title="Reservas">
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="animate-spin text-primary" size={32} />
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout title="Reservas">
+      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {stats.map((s) => (
           <Card key={s.label}>
@@ -82,6 +116,7 @@ const AdminReservas = () => {
         ))}
       </div>
 
+      {/* Filters */}
       <Card className="mb-6">
         <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center">
           <div className="relative flex-1 w-full">
@@ -98,51 +133,163 @@ const AdminReservas = () => {
         </CardContent>
       </Card>
 
+      {/* Table */}
       <Card>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Código</TableHead>
-              <TableHead>Cliente</TableHead>
-              <TableHead>Passeio</TableHead>
-              <TableHead>Data</TableHead>
-              <TableHead>Pax</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Pagamento</TableHead>
-              <TableHead>Canal</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-12"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((b) => {
-              const sc = statusConfig[b.status];
-              return (
-                <TableRow key={b.id}>
-                  <TableCell className="font-mono text-sm text-foreground">{b.id}</TableCell>
-                  <TableCell className="font-medium text-foreground">{b.client}</TableCell>
-                  <TableCell className="text-muted-foreground">{b.tour}</TableCell>
-                  <TableCell className="text-muted-foreground">{new Date(b.date).toLocaleDateString("pt-BR")}</TableCell>
-                  <TableCell className="text-foreground">{b.pax}</TableCell>
-                  <TableCell className="font-medium text-foreground">{fmt(b.total)}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className={paymentConfig[b.paymentStatus]}>{b.paymentStatus}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{b.channel}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className={sc.className}>{sc.label}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon"><Eye size={14} /></Button>
-                  </TableCell>
+        {filtered.length === 0 ? (
+          <div className="p-12 text-center text-muted-foreground">
+            <ShoppingCart className="mx-auto mb-3 opacity-40" size={40} />
+            <p className="font-medium">Nenhuma reserva encontrada</p>
+            <p className="text-sm mt-1">As reservas feitas pelo site aparecerão aqui automaticamente.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Código</TableHead>
+                  <TableHead>Cliente</TableHead>
+                  <TableHead>Passeio/Translado</TableHead>
+                  <TableHead>Data</TableHead>
+                  <TableHead>Pax</TableHead>
+                  <TableHead>Total</TableHead>
+                  <TableHead>Pagamento</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="w-12"></TableHead>
                 </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((b) => {
+                  const sc = statusConfig[b.status] || statusConfig.pendente;
+                  const pc = paymentConfig[b.paymentStatus] || paymentConfig.pendente;
+                  return (
+                    <TableRow key={b.id} className="cursor-pointer hover:bg-muted/50" onClick={() => setSelected(b)}>
+                      <TableCell className="font-mono text-sm text-foreground">{b.bookingCode}</TableCell>
+                      <TableCell className="font-medium text-foreground">{b.customerName}</TableCell>
+                      <TableCell className="text-muted-foreground max-w-[200px] truncate">{b.itemName}</TableCell>
+                      <TableCell className="text-muted-foreground">{fmtDate(b.date)}</TableCell>
+                      <TableCell className="text-foreground">{b.guests}</TableCell>
+                      <TableCell className="font-medium text-foreground">{fmt(b.finalTotal)}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className={pc.className}>{pc.label}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className={sc.className}>{sc.label}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setSelected(b); }}>
+                          <Eye size={14} />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </Card>
+
+      {/* Detail Modal */}
+      <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText size={20} />
+              Reserva {selected?.bookingCode}
+            </DialogTitle>
+          </DialogHeader>
+          {selected && (
+            <div className="space-y-4">
+              {/* Customer */}
+              <div className="bg-muted rounded-xl p-4 space-y-2">
+                <h4 className="font-semibold text-sm text-foreground">Cliente</h4>
+                <div className="grid grid-cols-1 gap-1.5 text-sm">
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <Users size={14} /> {selected.customerName}
+                  </span>
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <Mail size={14} /> {selected.customerEmail}
+                  </span>
+                  {selected.customerPhone && (
+                    <span className="flex items-center gap-2 text-muted-foreground">
+                      <Phone size={14} /> {selected.customerPhone}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Booking details */}
+              <div className="bg-muted rounded-xl p-4 space-y-2">
+                <h4 className="font-semibold text-sm text-foreground">Detalhes</h4>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <MapPin size={14} /> {selected.itemName}
+                  </span>
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <Calendar size={14} /> {fmtDate(selected.date)}
+                  </span>
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <Users size={14} /> {selected.guests} pessoa(s)
+                  </span>
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <CreditCard size={14} /> {selected.payMethod === "pix" ? "PIX" : "Cartão"}
+                  </span>
+                </div>
+                {selected.notes && (
+                  <p className="text-sm text-muted-foreground mt-2 border-t border-border pt-2">
+                    <strong>Obs:</strong> {selected.notes}
+                  </p>
+                )}
+              </div>
+
+              {/* Financials */}
+              <div className="bg-muted rounded-xl p-4">
+                <h4 className="font-semibold text-sm text-foreground mb-2">Financeiro</h4>
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>Subtotal ({selected.guests}x {fmt(selected.unitPrice)})</span>
+                  <span>{fmt(selected.total)}</span>
+                </div>
+                {selected.discount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Desconto</span>
+                    <span>-{fmt(selected.discount)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between font-bold text-foreground border-t border-border mt-2 pt-2">
+                  <span>Total</span>
+                  <span>{fmt(selected.finalTotal)}</span>
+                </div>
+              </div>
+
+              {/* Status badges */}
+              <div className="flex gap-2">
+                <Badge className={statusConfig[selected.status]?.className}>
+                  {statusConfig[selected.status]?.label || selected.status}
+                </Badge>
+                <Badge className={paymentConfig[selected.paymentStatus]?.className}>
+                  {paymentConfig[selected.paymentStatus]?.label || selected.paymentStatus}
+                </Badge>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                {selected.status === "pendente" && selected.paymentStatus === "pendente" && (
+                  <Button onClick={() => handleConfirm(selected.id)} disabled={actionLoading} className="flex-1">
+                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle size={16} className="mr-2" />}
+                    Confirmar Pagamento
+                  </Button>
+                )}
+                {selected.status !== "cancelada" && selected.status !== "concluida" && (
+                  <Button variant="destructive" onClick={() => handleCancel(selected.id)} disabled={actionLoading} className="flex-1">
+                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
+                    Cancelar Reserva
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
