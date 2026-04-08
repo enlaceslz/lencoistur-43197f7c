@@ -139,7 +139,7 @@ export function useBookings() {
           status: "pendente",
           payment_status: "pendente",
           pix_code: pixCode,
-          notes: data.notes || null,
+          notes: null,
         })
         .select("*, customers(*)")
         .single();
