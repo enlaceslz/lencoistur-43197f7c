@@ -120,22 +120,24 @@ export function useBookings() {
       const bookingCode = generateBookingCode();
       const pixCode = data.payMethod === "pix" ? generatePixCode() : null;
 
+      // RLS enforces: discount=0, final_total=total, status/payment_status='pendente'
+      const total = data.unitPrice * data.guests;
       const { data: booking, error: bookingError } = await supabase
         .from("bookings")
         .insert({
           booking_code: bookingCode,
           customer_id: customer.id,
-          type: data.type,
+          type: data.type === "transfer" ? "translado" : "passeio",
           item_name: data.itemName,
           date: data.date || null,
           guests: data.guests,
           unit_price: data.unitPrice,
-          total: data.total,
-          discount: data.discount,
-          final_total: data.finalTotal,
+          total: total,
+          discount: 0,
+          final_total: total,
           pay_method: data.payMethod,
-          status: data.payMethod === "pix" ? "pendente" : "confirmada",
-          payment_status: data.payMethod === "pix" ? "pendente" : "pago",
+          status: "pendente",
+          payment_status: "pendente",
           pix_code: pixCode,
           notes: data.notes || null,
         })

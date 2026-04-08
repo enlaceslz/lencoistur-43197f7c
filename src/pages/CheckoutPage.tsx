@@ -63,8 +63,9 @@ const CheckoutPage = () => {
   }
 
   const total = unitPrice * guests;
-  const discount = payMethod === "pix" ? Math.round(total * 0.05) : 0;
-  const finalTotal = total - discount;
+  // Discount is display-only; DB enforces discount=0 and final_total=total
+  const displayDiscount = payMethod === "pix" ? Math.round(total * 0.05) : 0;
+  const finalTotal = total;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
