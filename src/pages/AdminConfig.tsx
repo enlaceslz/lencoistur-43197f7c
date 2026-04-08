@@ -255,7 +255,6 @@ const AdminConfig = () => {
                   </div>
                 </div>
               </div>
-              </div>
               <Button onClick={() => handleSave("Site")} disabled={saving} className="rounded-xl">
                 {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
                 Salvar
