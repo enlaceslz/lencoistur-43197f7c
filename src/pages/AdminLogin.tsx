@@ -12,7 +12,6 @@ const AdminLogin = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Redirect if already logged in as admin
   useEffect(() => {
     if (!authLoading && user && isAdmin) {
       navigate("/admin", { replace: true });
@@ -29,19 +28,21 @@ const AdminLogin = () => {
       setError("Credenciais inválidas. Verifique email e senha.");
       setLoading(false);
     }
-    // Navigation will happen via useEffect when auth state updates
   };
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-primary">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(135deg, hsl(174, 62%, 28%), hsl(195, 80%, 35%))" }}>
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-primary flex items-center justify-center px-4">
+    <div
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{ background: "linear-gradient(135deg, hsl(174, 62%, 28%), hsl(195, 80%, 35%))" }}
+    >
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
@@ -49,10 +50,10 @@ const AdminLogin = () => {
               <MapPin size={24} className="text-secondary-foreground" />
             </div>
           </div>
-          <h1 className="font-display text-3xl font-bold text-primary-foreground">
+          <h1 className="font-display text-3xl font-bold text-white">
             Lençóis<span className="text-secondary">Tour</span>
           </h1>
-          <p className="text-primary-foreground/60 text-sm mt-2">Painel Administrativo</p>
+          <p className="text-white/60 text-sm mt-2">Painel Administrativo</p>
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-8 shadow-2xl">
@@ -107,14 +108,14 @@ const AdminLogin = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3.5 rounded-xl font-semibold transition-colors disabled:opacity-60"
+              className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground py-3.5 rounded-xl font-semibold transition-colors disabled:opacity-60"
             >
               {loading ? "Entrando..." : "Entrar"}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-primary-foreground/40 text-xs mt-6">
+        <p className="text-center text-white/40 text-xs mt-6">
           © 2026 LençóisTour. Todos os direitos reservados.
         </p>
       </div>
