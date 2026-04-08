@@ -63,8 +63,9 @@ const CheckoutPage = () => {
   }
 
   const total = unitPrice * guests;
-  const discount = payMethod === "pix" ? Math.round(total * 0.05) : 0;
-  const finalTotal = total - discount;
+  // displayDiscount is display-only; DB enforces displayDiscount=0 and final_total=total
+  const displayDiscount = payMethod === "pix" ? Math.round(total * 0.05) : 0;
+  const finalTotal = total;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,8 +78,8 @@ const CheckoutPage = () => {
         guests,
         unitPrice,
         total,
-        discount,
-        finalTotal,
+        discount: 0,
+        finalTotal: total,
         payMethod,
         customerName: name,
         customerEmail: email,
@@ -178,10 +179,10 @@ const CheckoutPage = () => {
               <span className="text-muted-foreground">Pagamento</span>
               <span className="font-semibold text-foreground">{payMethod === "pix" ? "PIX" : "Cartão de Crédito"}</span>
             </div>
-            {discount > 0 && (
+            {displayDiscount > 0 && (
               <div className="flex justify-between text-sm text-green-600">
                 <span>Desconto PIX (5%)</span>
-                <span className="font-semibold">-R$ {discount}</span>
+                <span className="font-semibold">-R$ {displayDiscount}</span>
               </div>
             )}
             <div className="flex justify-between font-bold text-lg border-t border-border pt-3">
@@ -313,7 +314,7 @@ const CheckoutPage = () => {
                 <div className="bg-muted rounded-xl p-4 flex items-center gap-3">
                   <Banknote size={20} className="text-green-600 shrink-0" />
                   <p className="text-sm text-muted-foreground">
-                    Ao confirmar, você receberá o QR Code PIX para pagamento imediato. Economia de <strong className="text-green-600">R$ {discount}</strong>!
+                    Ao confirmar, você receberá o QR Code PIX para pagamento imediato. Economia de <strong className="text-green-600">R$ {displayDiscount}</strong>!
                   </p>
                 </div>
               )}
@@ -399,10 +400,10 @@ const CheckoutPage = () => {
                     <span className="text-muted-foreground">R$ {unitPrice} × {guests}</span>
                     <span className="text-foreground font-semibold">R$ {total}</span>
                   </div>
-                  {discount > 0 && (
+                  {displayDiscount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Desconto PIX (5%)</span>
-                      <span className="font-semibold">-R$ {discount}</span>
+                      <span className="font-semibold">-R$ {displayDiscount}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-bold text-lg border-t border-border pt-3">
