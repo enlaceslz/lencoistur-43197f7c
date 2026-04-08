@@ -6,15 +6,24 @@ import WhatsAppTab from "@/components/marketing/WhatsAppTab";
 import EmailTab from "@/components/marketing/EmailTab";
 import LeadsTab from "@/components/marketing/LeadsTab";
 import RemarketingTab from "@/components/marketing/RemarketingTab";
-import { whatsappCampaigns, emailCampaigns, leads, remarketingRules } from "@/components/marketing/marketingData";
+import {
+  whatsappCampaigns as initialWhatsapp,
+  emailCampaigns as initialEmail,
+  leads as initialLeads,
+  remarketingRules as initialRemarketing,
+} from "@/components/marketing/marketingData";
 
 type Tab = "whatsapp" | "email" | "leads" | "remarketing";
 
 const AdminMarketing = () => {
   const [tab, setTab] = useState<Tab>("whatsapp");
+  const [whatsappCampaigns, setWhatsappCampaigns] = useState(initialWhatsapp);
+  const [emailCampaigns, setEmailCampaigns] = useState(initialEmail);
+  const [leadsList, setLeadsList] = useState(initialLeads);
+  const [remarketingRules, setRemarketingRules] = useState(initialRemarketing);
 
   const stats = [
-    { label: "Leads Ativos", value: leads.filter(l => l.status !== "frio").length, icon: Users, color: "text-primary" },
+    { label: "Leads Ativos", value: leadsList.filter(l => l.status !== "frio").length, icon: Users, color: "text-primary" },
     { label: "Campanhas Ativas", value: whatsappCampaigns.filter(c => c.status === "ativa" || c.status === "automática").length + emailCampaigns.filter(c => c.status === "automática").length, icon: Megaphone, color: "text-secondary" },
     { label: "Taxa de Conversão", value: "12.8%", icon: TrendingUp, color: "text-green-600" },
     { label: "Recuperações (mês)", value: remarketingRules.reduce((a, r) => a + r.conversions, 0), icon: RefreshCw, color: "text-blue-600" },
@@ -45,10 +54,10 @@ const AdminMarketing = () => {
         ))}
       </div>
 
-      {tab === "whatsapp" && <WhatsAppTab campaigns={whatsappCampaigns} />}
-      {tab === "email" && <EmailTab campaigns={emailCampaigns} />}
-      {tab === "leads" && <LeadsTab leads={leads} />}
-      {tab === "remarketing" && <RemarketingTab rules={remarketingRules} />}
+      {tab === "whatsapp" && <WhatsAppTab campaigns={whatsappCampaigns} onAdd={setWhatsappCampaigns} />}
+      {tab === "email" && <EmailTab campaigns={emailCampaigns} onAdd={setEmailCampaigns} />}
+      {tab === "leads" && <LeadsTab leads={leadsList} onAdd={setLeadsList} />}
+      {tab === "remarketing" && <RemarketingTab rules={remarketingRules} onUpdate={setRemarketingRules} />}
     </AdminLayout>
   );
 };

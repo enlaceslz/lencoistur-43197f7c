@@ -23,9 +23,10 @@ interface RemarketingRule {
 
 interface RemarketingTabProps {
   rules: RemarketingRule[];
+  onUpdate?: React.Dispatch<React.SetStateAction<RemarketingRule[]>>;
 }
 
-const RemarketingTab = ({ rules }: RemarketingTabProps) => {
+const RemarketingTab = ({ rules, onUpdate }: RemarketingTabProps) => {
   const [open, setOpen] = useState(false);
   const [trigger, setTrigger] = useState("");
   const [delay, setDelay] = useState("");
@@ -37,12 +38,34 @@ const RemarketingTab = ({ rules }: RemarketingTabProps) => {
       toast.error("Preencha o gatilho e a mensagem da automação.");
       return;
     }
+    const newRule: RemarketingRule = {
+      id: Date.now(),
+      trigger: trigger.trim(),
+      delay: delay.trim() || "1h",
+      channel: channel || "WhatsApp",
+      message: message.trim(),
+      active: true,
+      conversions: 0,
+    };
+    onUpdate?.((prev) => [newRule, ...prev]);
     toast.success(`Automação "${trigger}" criada com sucesso!`);
     setOpen(false);
     setTrigger("");
     setDelay("");
     setChannel("");
     setMessage("");
+  };
+
+  const handleToggle = (id: number) => {
+    onUpdate?.((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, active: !r.active } : r))
+    );
+  };
+
+  const handleDuplicate = (rule: RemarketingRule) => {
+    const dup: RemarketingRule = { ...rule, id: Date.now(), conversions: 0 };
+    onUpdate?.((prev) => [dup, ...prev]);
+    toast.success(`Automação "${rule.trigger}" duplicada!`);
   };
 
   return (
@@ -63,9 +86,7 @@ const RemarketingTab = ({ rules }: RemarketingTabProps) => {
               <div className="space-y-2">
                 <Label>Gatilho</Label>
                 <Select value={trigger} onValueChange={setTrigger}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o gatilho" />
-                  </SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Selecione o gatilho" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Carrinho abandonado">Carrinho abandonado</SelectItem>
                     <SelectItem value="Visitou passeio 2x sem reservar">Visitou passeio 2x sem reservar</SelectItem>
@@ -79,14 +100,12 @@ const RemarketingTab = ({ rules }: RemarketingTabProps) => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="rm-delay">Delay</Label>
-                  <Input id="rm-delay" placeholder="Ex: 30 min, 24h, 7 dias" value={delay} onChange={(e) => setDelay(e.target.value)} />
+                  <Input id="rm-delay" placeholder="Ex: 30 min, 24h" value={delay} onChange={(e) => setDelay(e.target.value)} maxLength={20} />
                 </div>
                 <div className="space-y-2">
                   <Label>Canal</Label>
                   <Select value={channel} onValueChange={setChannel}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Canal" />
-                    </SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Canal" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="WhatsApp">WhatsApp</SelectItem>
                       <SelectItem value="E-mail">E-mail</SelectItem>
@@ -97,14 +116,12 @@ const RemarketingTab = ({ rules }: RemarketingTabProps) => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="rm-message">Mensagem</Label>
-                <Textarea id="rm-message" rows={4} placeholder="Olá {nome}! ..." value={message} onChange={(e) => setMessage(e.target.value)} />
+                <Textarea id="rm-message" rows={4} placeholder="Olá {nome}! ..." value={message} onChange={(e) => setMessage(e.target.value)} maxLength={1000} />
                 <p className="text-xs text-muted-foreground">Use {"{nome}"}, {"{passeio}"}, {"{link}"} como variáveis.</p>
               </div>
             </div>
             <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancelar</Button>
-              </DialogClose>
+              <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
               <Button onClick={handleCreate}>Criar Automação</Button>
             </DialogFooter>
           </DialogContent>
@@ -122,27 +139,22 @@ const RemarketingTab = ({ rules }: RemarketingTabProps) => {
                     <Badge variant="outline" className={r.active ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-muted text-muted-foreground"}>
                       {r.active ? "Ativa" : "Inativa"}
                     </Badge>
-                    <Badge variant="outline" className="bg-muted text-muted-foreground">
-                      {r.channel}
-                    </Badge>
+                    <Badge variant="outline" className="bg-muted text-muted-foreground">{r.channel}</Badge>
                   </div>
-
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1"><Clock size={14} /> Delay: {r.delay}</span>
                     <span className="flex items-center gap-1"><TrendingUp size={14} /> {r.conversions} conversões</span>
                   </div>
-
                   <div className="bg-muted rounded-xl p-3">
                     <p className="text-sm text-foreground italic">"{r.message}"</p>
                   </div>
                 </div>
-
                 <div className="flex flex-col gap-2 shrink-0 items-center">
-                  <Switch checked={r.active} />
+                  <Switch checked={r.active} onCheckedChange={() => handleToggle(r.id)} />
                   <Button variant="ghost" size="icon" className="h-8 w-8" title="Métricas">
                     <BarChart3 size={16} className="text-muted-foreground" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" title="Duplicar">
+                  <Button variant="ghost" size="icon" className="h-8 w-8" title="Duplicar" onClick={() => handleDuplicate(r)}>
                     <Copy size={16} className="text-muted-foreground" />
                   </Button>
                 </div>
@@ -150,6 +162,9 @@ const RemarketingTab = ({ rules }: RemarketingTabProps) => {
             </CardContent>
           </Card>
         ))}
+        {rules.length === 0 && (
+          <Card className="border-border"><CardContent className="p-8 text-center text-muted-foreground">Nenhuma automação cadastrada.</CardContent></Card>
+        )}
       </div>
     </div>
   );

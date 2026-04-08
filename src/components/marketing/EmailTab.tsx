@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus } from "lucide-react";
+import { Plus, Mail, MousePointer, AlertTriangle } from "lucide-react";
 import { statusColors } from "./statusColors";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -25,20 +25,37 @@ interface EmailCampaign {
 
 interface EmailTabProps {
   campaigns: EmailCampaign[];
+  onAdd?: React.Dispatch<React.SetStateAction<EmailCampaign[]>>;
 }
 
-const EmailTab = ({ campaigns }: EmailTabProps) => {
+const EmailTab = ({ campaigns, onAdd }: EmailTabProps) => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [subject, setSubject] = useState("");
   const [audience, setAudience] = useState("");
   const [body, setBody] = useState("");
 
+  const totalRecipients = campaigns.reduce((a, c) => a + c.recipients, 0);
+  const totalOpens = campaigns.reduce((a, c) => a + c.opens, 0);
+  const totalClicks = campaigns.reduce((a, c) => a + c.clicks, 0);
+  const totalBounces = campaigns.reduce((a, c) => a + c.bounces, 0);
+
   const handleCreate = () => {
     if (!name.trim() || !subject.trim()) {
       toast.error("Preencha o nome e o assunto da campanha.");
       return;
     }
+    const newCampaign: EmailCampaign = {
+      id: Date.now(),
+      name: name.trim(),
+      status: "rascunho",
+      recipients: 0,
+      opens: 0,
+      clicks: 0,
+      bounces: 0,
+      date: new Date().toISOString().split("T")[0],
+    };
+    onAdd?.((prev) => [newCampaign, ...prev]);
     toast.success(`Campanha de e-mail "${name}" criada com sucesso!`);
     setOpen(false);
     setName("");
@@ -64,18 +81,16 @@ const EmailTab = ({ campaigns }: EmailTabProps) => {
             <div className="space-y-4 py-2">
               <div className="space-y-2">
                 <Label htmlFor="email-name">Nome da campanha</Label>
-                <Input id="email-name" placeholder="Ex: Newsletter Abril" value={name} onChange={(e) => setName(e.target.value)} />
+                <Input id="email-name" placeholder="Ex: Newsletter Abril" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email-subject">Assunto do e-mail</Label>
-                <Input id="email-subject" placeholder="Ex: Novidades da Rota das Emoções 🌊" value={subject} onChange={(e) => setSubject(e.target.value)} />
+                <Input id="email-subject" placeholder="Ex: Novidades da Rota das Emoções 🌊" value={subject} onChange={(e) => setSubject(e.target.value)} maxLength={200} />
               </div>
               <div className="space-y-2">
                 <Label>Audiência</Label>
                 <Select value={audience} onValueChange={setAudience}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione a audiência" />
-                  </SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Selecione a audiência" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todos os assinantes</SelectItem>
                     <SelectItem value="clientes">Clientes anteriores</SelectItem>
@@ -86,13 +101,11 @@ const EmailTab = ({ campaigns }: EmailTabProps) => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email-body">Corpo do e-mail</Label>
-                <Textarea id="email-body" rows={5} placeholder="Conteúdo do e-mail..." value={body} onChange={(e) => setBody(e.target.value)} />
+                <Textarea id="email-body" rows={5} placeholder="Conteúdo do e-mail..." value={body} onChange={(e) => setBody(e.target.value)} maxLength={5000} />
               </div>
             </div>
             <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancelar</Button>
-              </DialogClose>
+              <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
               <Button onClick={handleCreate}>Criar Campanha</Button>
             </DialogFooter>
           </DialogContent>
@@ -132,9 +145,51 @@ const EmailTab = ({ campaigns }: EmailTabProps) => {
                 </TableCell>
               </TableRow>
             ))}
+            {campaigns.length === 0 && (
+              <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">Nenhuma campanha cadastrada.</TableCell></TableRow>
+            )}
           </TableBody>
         </Table>
       </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="border-border">
+          <CardContent className="p-4 flex items-center gap-3">
+            <Mail className="text-primary" size={24} />
+            <div>
+              <p className="text-sm text-muted-foreground">Total Enviados</p>
+              <p className="text-xl font-bold text-foreground">{totalRecipients.toLocaleString("pt-BR")}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-border">
+          <CardContent className="p-4 flex items-center gap-3">
+            <Mail className="text-green-600" size={24} />
+            <div>
+              <p className="text-sm text-muted-foreground">Taxa Abertura</p>
+              <p className="text-xl font-bold text-foreground">{totalRecipients > 0 ? `${((totalOpens / totalRecipients) * 100).toFixed(1)}%` : "—"}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-border">
+          <CardContent className="p-4 flex items-center gap-3">
+            <MousePointer className="text-blue-600" size={24} />
+            <div>
+              <p className="text-sm text-muted-foreground">Taxa Clique</p>
+              <p className="text-xl font-bold text-foreground">{totalRecipients > 0 ? `${((totalClicks / totalRecipients) * 100).toFixed(1)}%` : "—"}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-border">
+          <CardContent className="p-4 flex items-center gap-3">
+            <AlertTriangle className="text-destructive" size={24} />
+            <div>
+              <p className="text-sm text-muted-foreground">Bounces</p>
+              <p className="text-xl font-bold text-foreground">{totalBounces}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
