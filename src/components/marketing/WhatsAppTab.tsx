@@ -25,9 +25,10 @@ interface Campaign {
 
 interface WhatsAppTabProps {
   campaigns: Campaign[];
+  onAdd?: React.Dispatch<React.SetStateAction<Campaign[]>>;
 }
 
-const WhatsAppTab = ({ campaigns }: WhatsAppTabProps) => {
+const WhatsAppTab = ({ campaigns, onAdd }: WhatsAppTabProps) => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [audience, setAudience] = useState("");

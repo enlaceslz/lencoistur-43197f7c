@@ -25,6 +25,7 @@ interface Lead {
 
 interface LeadsTabProps {
   leads: Lead[];
+  onAdd?: React.Dispatch<React.SetStateAction<Lead[]>>;
 }
 
 const getScoreColor = (score: number) => {
