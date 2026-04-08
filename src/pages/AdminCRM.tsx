@@ -26,7 +26,7 @@ interface BookingRow {
   created_at: string;
 }
 
-const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR")}`;
 
 const AdminCRM = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
