@@ -3,13 +3,13 @@ import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const galleryImages = [
-  { src: "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/15babd7b9c95115530233e97a0c511c22d1b5b121ba8085dad67bd2bcbfe1771.jpg", alt: "Vista aérea dos Lençóis Maranhenses - Santo Amaro" },
-  { src: "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/1aa3423f5c22c613cc6496fea87a24984bcaaa0f88c4b7f9b8b0f9a26fe933f3.jpg", alt: "Lagoas cristalinas entre dunas brancas" },
-  { src: "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/95e5091826ba9da491908baf1a99f833508cfde59c8fc0dda66a1d463e387d4d.jpg", alt: "Passeio de barco no Lago da Jangada" },
-  { src: "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/4409e081a4e41c4d5542a5423322b643e4d2661cb79b5af26ba6d155cdc889cb.jpg", alt: "Roteiro Ecológico nas dunas" },
-  { src: "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/d48e2e91d3bad66962e7a55a3bd5e6d83a1d9ae980ee62e11435dacc7c53cc8d.jpg", alt: "Circuito Ponta Verde - Lagoa do Reflexo" },
-  { src: "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/c343feaa64286847d8cac53e1ae0d22ed3ad549cc8fd20e651c0c1dbbd65722f.jpg", alt: "Descida de caiaque no Rio Alegre" },
-  { src: "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/fa678fa8f5c51b5099f77844243a54902337a97cb8ecfbe37b4a166b2f57498a.jpg", alt: "Trekking nas dunas dos Lençóis" },
+  { src: "https://images.unsplash.com/photo-1650623598032-4fddce25b34f?w=1200&q=80&auto=format&fit=crop", alt: "Vista aérea dos Lençóis Maranhenses - Santo Amaro" },
+  { src: "https://images.unsplash.com/photo-1561916108-2d4d48d132c8?w=1200&q=80&auto=format&fit=crop", alt: "Lagoas cristalinas entre dunas brancas" },
+  { src: "https://images.unsplash.com/photo-1704644411334-f6ca48963d6c?w=1200&q=80&auto=format&fit=crop", alt: "Grupo nas dunas dos Lençóis Maranhenses" },
+  { src: "https://images.unsplash.com/photo-1680323535239-25b4b65eee75?w=1200&q=80&auto=format&fit=crop", alt: "Dunas e lagoas dos Lençóis" },
+  { src: "https://images.unsplash.com/photo-1672271688662-3a03bbb75ec9?w=1200&q=80&auto=format&fit=crop", alt: "Lagoa cercada por dunas brancas" },
+  { src: "https://images.unsplash.com/photo-1671385054651-f017771dea4a?w=1200&q=80&auto=format&fit=crop", alt: "Lagoa cristalina no meio das dunas" },
+  { src: "https://images.unsplash.com/photo-1679095007377-e6c8e13f9178?w=1200&q=80&auto=format&fit=crop", alt: "Farol de Mandacaru - Lençóis Maranhenses" },
 ];
 
 const GallerySection = () => {
