@@ -25,9 +25,10 @@ interface Campaign {
 
 interface WhatsAppTabProps {
   campaigns: Campaign[];
+  onAdd?: React.Dispatch<React.SetStateAction<Campaign[]>>;
 }
 
-const WhatsAppTab = ({ campaigns }: WhatsAppTabProps) => {
+const WhatsAppTab = ({ campaigns, onAdd }: WhatsAppTabProps) => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [audience, setAudience] = useState("");
@@ -43,6 +44,14 @@ const WhatsAppTab = ({ campaigns }: WhatsAppTabProps) => {
       toast.error("Preencha o nome e a mensagem da campanha.");
       return;
     }
+    const newCampaign: Campaign = {
+      id: Date.now(),
+      name: name.trim(),
+      status: scheduleType === "scheduled" ? "agendada" : "ativa",
+      sent: 0, delivered: 0, read: 0, clicked: 0,
+      date: new Date().toISOString().split("T")[0],
+    };
+    onAdd?.((prev) => [newCampaign, ...prev]);
     toast.success(`Campanha "${name}" criada com sucesso!`);
     setOpen(false);
     setName("");
