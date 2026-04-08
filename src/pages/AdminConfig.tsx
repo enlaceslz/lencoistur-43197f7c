@@ -58,6 +58,39 @@ const AdminConfig = () => {
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione um arquivo de imagem válido.");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("A imagem deve ter no máximo 2MB.");
+      return;
+    }
+
+    setUploadingLogo(true);
+    const ext = file.name.split(".").pop() || "png";
+    const path = `logo/logo-${Date.now()}.${ext}`;
+
+    const { error } = await supabase.storage.from("tour-images").upload(path, file, { upsert: true });
+    if (error) {
+      toast.error("Erro ao enviar logo: " + error.message);
+      setUploadingLogo(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage.from("tour-images").getPublicUrl(path);
+    setLogoUrl(urlData.publicUrl);
+    setUploadingLogo(false);
+    toast.success("Logo enviada com sucesso!");
+  };
 
   const handleSave = (section: string) => {
     setSaving(true);
