@@ -1,7 +1,8 @@
-import heroImg from "@/assets/hero-travel.jpg";
 import { Search, MapPin, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+
+const HERO_IMG = "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/1aa3423f5c22c613cc6496fea87a24984bcaaa0f88c4b7f9b8b0f9a26fe933f3.jpg";
 
 const categoryKeys = ["boat", "eco", "gastro", "cultural", "kayak", "trekking"] as const;
 
@@ -11,8 +12,8 @@ const HeroSection = () => {
   return (
     <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
       <img
-        src={heroImg}
-        alt="Vista aérea dos Lençóis Maranhenses com lagoas azuis e dunas brancas"
+        src={HERO_IMG}
+        alt="Vista aérea dos Lençóis Maranhenses com lagoas azuis e dunas brancas - Santo Amaro MA"
         className="absolute inset-0 w-full h-full object-cover"
         width={1920}
         height={1080}
