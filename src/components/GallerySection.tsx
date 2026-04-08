@@ -1,22 +1,15 @@
 import { useState } from "react";
-import destMaldives from "@/assets/dest-maldives.jpg";
-import destGreece from "@/assets/dest-greece.jpg";
-import destSafari from "@/assets/dest-safari.jpg";
-import destPeru from "@/assets/dest-peru.jpg";
-import tourLagoaAzul2 from "@/assets/tour-lagoa-azul-2.jpg";
-import tourLagoaAzul3 from "@/assets/tour-lagoa-azul-3.jpg";
-import heroTravel from "@/assets/hero-travel.jpg";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const galleryImages = [
-  { src: heroTravel, alt: "Vista aérea dos Lençóis Maranhenses ao pôr do sol" },
-  { src: destMaldives, alt: "Lagoa cristalina entre dunas brancas" },
-  { src: destGreece, alt: "Passeio de barco no Rio Preguiças" },
-  { src: destSafari, alt: "Trekking nas dunas dos Lençóis" },
-  { src: destPeru, alt: "Aventura de quadriciclo nas dunas" },
-  { src: tourLagoaAzul2, alt: "Lagoa Azul vista de cima" },
-  { src: tourLagoaAzul3, alt: "Pôr do sol nas dunas" },
+  { src: "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/15babd7b9c95115530233e97a0c511c22d1b5b121ba8085dad67bd2bcbfe1771.jpg", alt: "Vista aérea dos Lençóis Maranhenses - Santo Amaro" },
+  { src: "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/1aa3423f5c22c613cc6496fea87a24984bcaaa0f88c4b7f9b8b0f9a26fe933f3.jpg", alt: "Lagoas cristalinas entre dunas brancas" },
+  { src: "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/95e5091826ba9da491908baf1a99f833508cfde59c8fc0dda66a1d463e387d4d.jpg", alt: "Passeio de barco no Lago da Jangada" },
+  { src: "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/4409e081a4e41c4d5542a5423322b643e4d2661cb79b5af26ba6d155cdc889cb.jpg", alt: "Roteiro Ecológico nas dunas" },
+  { src: "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/d48e2e91d3bad66962e7a55a3bd5e6d83a1d9ae980ee62e11435dacc7c53cc8d.jpg", alt: "Circuito Ponta Verde - Lagoa do Reflexo" },
+  { src: "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/c343feaa64286847d8cac53e1ae0d22ed3ad549cc8fd20e651c0c1dbbd65722f.jpg", alt: "Descida de caiaque no Rio Alegre" },
+  { src: "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/fa678fa8f5c51b5099f77844243a54902337a97cb8ecfbe37b4a166b2f57498a.jpg", alt: "Trekking nas dunas dos Lençóis" },
 ];
 
 const GallerySection = () => {
