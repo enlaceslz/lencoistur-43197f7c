@@ -71,6 +71,10 @@
   }
 }
 
+#lovable-badge {
+  display: none !important;
+}
+
 @layer utilities {
   .text-gradient-primary {
     @apply bg-clip-text text-transparent;
