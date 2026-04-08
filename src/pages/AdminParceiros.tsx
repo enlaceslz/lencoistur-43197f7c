@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,85 +10,137 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Phone, Mail, MapPin, Star, MoreHorizontal,
+  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Phone, Mail, MapPin, MoreHorizontal, Loader2, Check, X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Partner {
   id: string;
   name: string;
-  type: "hotel" | "guia" | "motorista" | "agencia";
-  contact: string;
-  phone: string;
-  email: string;
-  city: string;
-  commission: number;
-  rating: number;
-  status: "ativo" | "inativo" | "pendente";
-  totalBookings: number;
-  revenue: number;
+  type: string;
+  contact_name: string | null;
+  phone: string | null;
+  email: string | null;
+  commission_rate: number | null;
+  active: boolean;
 }
 
-const partners: Partner[] = [
-  { id: "1", name: "Pousada Jurará", type: "hotel", contact: "Maria Silva", phone: "(98) 99111-2233", email: "contato@jurara.com", city: "Santo Amaro", commission: 15, rating: 4.8, status: "ativo", totalBookings: 234, revenue: 45600 },
-  { id: "2", name: "José Santos", type: "guia", contact: "José Santos", phone: "(98) 99222-3344", email: "jose@guia.com", city: "Barreirinhas", commission: 20, rating: 4.9, status: "ativo", totalBookings: 567, revenue: 89200 },
-  { id: "3", name: "Trans Lençóis", type: "motorista", contact: "Carlos Oliveira", phone: "(98) 99333-4455", email: "carlos@trans.com", city: "São Luís", commission: 10, rating: 4.5, status: "ativo", totalBookings: 189, revenue: 34100 },
-  { id: "4", name: "Aventura MA", type: "agencia", contact: "Ana Costa", phone: "(98) 99444-5566", email: "ana@aventura.com", city: "Barreirinhas", commission: 12, rating: 4.7, status: "ativo", totalBookings: 345, revenue: 67800 },
-  { id: "5", name: "Pousada Rancho", type: "hotel", contact: "Pedro Lima", phone: "(98) 99555-6677", email: "rancho@pousada.com", city: "Atins", commission: 15, rating: 4.6, status: "pendente", totalBookings: 0, revenue: 0 },
-  { id: "6", name: "Maria Guia", type: "guia", contact: "Maria Ferreira", phone: "(98) 99666-7788", email: "maria@guia.com", city: "Santo Amaro", commission: 20, rating: 4.3, status: "inativo", totalBookings: 78, revenue: 12300 },
-  { id: "7", name: "4x4 Lençóis", type: "motorista", contact: "Raimundo Souza", phone: "(98) 99777-8899", email: "rai@4x4.com", city: "Barreirinhas", commission: 10, rating: 4.8, status: "ativo", totalBookings: 412, revenue: 56700 },
-  { id: "8", name: "Eco Tours MA", type: "agencia", contact: "Fernanda Reis", phone: "(98) 99888-9900", email: "fer@ecotours.com", city: "São Luís", commission: 12, rating: 4.4, status: "ativo", totalBookings: 156, revenue: 28900 },
-];
-
-const typeConfig = {
-  hotel: { icon: Building2, label: "Hotel / Pousada", color: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300" },
-  guia: { icon: Compass, label: "Guia Turístico", color: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" },
-  motorista: { icon: Car, label: "Motorista", color: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300" },
-  agencia: { icon: Users, label: "Agência", color: "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300" },
+const typeConfig: Record<string, { icon: typeof Building2; label: string; color: string }> = {
+  hotel: { icon: Building2, label: "Hotel / Pousada", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300" },
+  guia: { icon: Compass, label: "Guia Turístico", color: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300" },
+  motorista: { icon: Car, label: "Motorista", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300" },
+  agencia: { icon: Users, label: "Agência", color: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300" },
 };
-
-const statusConfig: Record<string, string> = {
-  ativo: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300",
-  inativo: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
-  pendente: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
-};
-
-const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR")}`;
 
 const AdminParceiros = () => {
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState<string>("todos");
-  const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
+  const [typeFilter, setTypeFilter] = useState("todos");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editPartner, setEditPartner] = useState<Partner | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  const types = ["todos", ...Object.keys(typeConfig)] as const;
+  // Form state
+  const [form, setForm] = useState({ name: "", type: "hotel", contact_name: "", phone: "", email: "", commission_rate: "10" });
+
+  const types = ["todos", ...Object.keys(typeConfig)];
+
+  useEffect(() => { fetchPartners(); }, []);
+
+  const fetchPartners = async () => {
+    setLoading(true);
+    const { data } = await supabase.from("partners").select("*").order("created_at", { ascending: false });
+    if (data) setPartners(data);
+    setLoading(false);
+  };
+
+  const openNew = () => {
+    setEditPartner(null);
+    setForm({ name: "", type: "hotel", contact_name: "", phone: "", email: "", commission_rate: "10" });
+    setDialogOpen(true);
+  };
+
+  const openEdit = (p: Partner) => {
+    setEditPartner(p);
+    setForm({
+      name: p.name,
+      type: p.type,
+      contact_name: p.contact_name || "",
+      phone: p.phone || "",
+      email: p.email || "",
+      commission_rate: String(p.commission_rate || 0),
+    });
+    setDialogOpen(true);
+  };
+
+  const handleSave = async () => {
+    if (!form.name.trim()) { toast.error("Nome é obrigatório."); return; }
+    setSaving(true);
+    const payload = {
+      name: form.name,
+      type: form.type,
+      contact_name: form.contact_name || null,
+      phone: form.phone || null,
+      email: form.email || null,
+      commission_rate: Number(form.commission_rate) || 0,
+    };
+
+    if (editPartner) {
+      const { error } = await supabase.from("partners").update(payload).eq("id", editPartner.id);
+      if (error) { toast.error("Erro ao atualizar."); } else { toast.success("Parceiro atualizado!"); }
+    } else {
+      const { error } = await supabase.from("partners").insert(payload);
+      if (error) { toast.error("Erro ao cadastrar."); } else { toast.success("Parceiro cadastrado!"); }
+    }
+    setSaving(false);
+    setDialogOpen(false);
+    fetchPartners();
+  };
+
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase.from("partners").delete().eq("id", id);
+    if (error) { toast.error("Erro ao remover."); } else { toast.success("Parceiro removido."); fetchPartners(); }
+  };
+
+  const toggleActive = async (p: Partner) => {
+    await supabase.from("partners").update({ active: !p.active }).eq("id", p.id);
+    fetchPartners();
+  };
 
   const filtered = partners.filter((p) => {
-    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.contact.toLowerCase().includes(search.toLowerCase());
+    const q = search.toLowerCase();
+    const matchSearch = p.name.toLowerCase().includes(q) || (p.contact_name || "").toLowerCase().includes(q);
     const matchType = typeFilter === "todos" || p.type === typeFilter;
     return matchSearch && matchType;
   });
 
   const stats = [
-    { icon: Building2, label: "Hotéis / Pousadas", value: partners.filter((p) => p.type === "hotel").length, color: "text-blue-600" },
+    { icon: Building2, label: "Hotéis", value: partners.filter((p) => p.type === "hotel").length, color: "text-blue-600" },
     { icon: Compass, label: "Guias", value: partners.filter((p) => p.type === "guia").length, color: "text-green-600" },
     { icon: Car, label: "Motoristas", value: partners.filter((p) => p.type === "motorista").length, color: "text-amber-600" },
     { icon: Users, label: "Agências", value: partners.filter((p) => p.type === "agencia").length, color: "text-purple-600" },
   ];
 
-  const totalRevenue = partners.reduce((acc, p) => acc + p.revenue, 0);
-  const totalBookings = partners.reduce((acc, p) => acc + p.totalBookings, 0);
+  if (loading) {
+    return (
+      <AdminLayout title="Parceiros">
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="animate-spin text-primary" size={32} />
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout title="Parceiros">
-      {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {stats.map((s) => (
           <Card key={s.label}>
             <CardContent className="p-5 flex items-center gap-4">
-              <div className={`p-3 rounded-xl bg-muted ${s.color}`}>
-                <s.icon size={22} />
-              </div>
+              <div className={`p-3 rounded-xl bg-muted ${s.color}`}><s.icon size={22} /></div>
               <div>
                 <p className="text-2xl font-bold text-foreground">{s.value}</p>
                 <p className="text-xs text-muted-foreground">{s.label}</p>
@@ -98,168 +150,120 @@ const AdminParceiros = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <Card>
-          <CardContent className="p-5">
-            <p className="text-xs text-muted-foreground mb-1">Receita Total Parceiros</p>
-            <p className="text-2xl font-bold text-foreground">{fmt(totalRevenue)}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5">
-            <p className="text-xs text-muted-foreground mb-1">Reservas via Parceiros</p>
-            <p className="text-2xl font-bold text-foreground">{totalBookings.toLocaleString("pt-BR")}</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filters */}
       <Card className="mb-6">
         <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <Input
-              placeholder="Buscar parceiro..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10"
-            />
+            <Input placeholder="Buscar parceiro..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
           </div>
           <div className="flex gap-2 flex-wrap">
             {types.map((t) => (
-              <Button
-                key={t}
-                variant={typeFilter === t ? "default" : "outline"}
-                size="sm"
-                onClick={() => setTypeFilter(t)}
-                className="capitalize"
-              >
-                {t === "todos" ? "Todos" : typeConfig[t as keyof typeof typeConfig].label}
+              <Button key={t} variant={typeFilter === t ? "default" : "outline"} size="sm" onClick={() => setTypeFilter(t)} className="capitalize">
+                {t === "todos" ? "Todos" : typeConfig[t]?.label || t}
               </Button>
             ))}
           </div>
-          <Button onClick={() => setDialogOpen(true)}>
-            <Plus size={16} className="mr-1" /> Novo Parceiro
-          </Button>
+          <Button onClick={openNew}><Plus size={16} className="mr-1" /> Novo Parceiro</Button>
         </CardContent>
       </Card>
 
-      {/* Table */}
       <Card>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Parceiro</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Cidade</TableHead>
-              <TableHead>Comissão</TableHead>
-              <TableHead>Avaliação</TableHead>
-              <TableHead>Reservas</TableHead>
-              <TableHead>Receita</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-12"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((p) => {
-              const tc = typeConfig[p.type];
-              return (
-                <TableRow key={p.id} className="cursor-pointer hover:bg-muted/50" onClick={() => setSelectedPartner(p)}>
-                  <TableCell>
-                    <div>
-                      <p className="font-semibold text-foreground">{p.name}</p>
-                      <p className="text-xs text-muted-foreground">{p.contact}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className={tc.color}>
-                      <tc.icon size={12} className="mr-1" />
-                      {tc.label}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">{p.city}</TableCell>
-                  <TableCell className="font-medium text-foreground">{p.commission}%</TableCell>
-                  <TableCell>
-                    <span className="flex items-center gap-1 text-foreground">
-                      <Star size={14} className="text-amber-500 fill-amber-500" />
-                      {p.rating}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-foreground">{p.totalBookings}</TableCell>
-                  <TableCell className="font-medium text-foreground">{fmt(p.revenue)}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className={statusConfig[p.status]}>
-                      {p.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); }}>
-                      <MoreHorizontal size={16} />
-                    </Button>
-                  </TableCell>
+        {filtered.length === 0 ? (
+          <div className="p-12 text-center text-muted-foreground">
+            <Users className="mx-auto mb-3 opacity-40" size={40} />
+            <p className="font-medium">Nenhum parceiro encontrado</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Parceiro</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead>Contato</TableHead>
+                  <TableHead>Comissão</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="w-24">Ações</TableHead>
                 </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((p) => {
+                  const tc = typeConfig[p.type] || typeConfig.hotel;
+                  return (
+                    <TableRow key={p.id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-semibold text-foreground">{p.name}</p>
+                          {p.email && <p className="text-xs text-muted-foreground">{p.email}</p>}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className={tc.color}>
+                          <tc.icon size={12} className="mr-1" />{tc.label}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {p.contact_name && <span className="block">{p.contact_name}</span>}
+                        {p.phone && <span className="block">{p.phone}</span>}
+                      </TableCell>
+                      <TableCell className="font-medium text-foreground">{p.commission_rate || 0}%</TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="secondary"
+                          className={p.active
+                            ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 cursor-pointer"
+                            : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 cursor-pointer"
+                          }
+                          onClick={() => toggleActive(p)}
+                        >
+                          {p.active ? "Ativo" : "Inativo"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => openEdit(p)}><Edit size={14} /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => handleDelete(p.id)}><Trash2 size={14} className="text-destructive" /></Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </Card>
 
-      {/* Detail Panel */}
-      {selectedPartner && (
-        <Card className="mt-6">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-xl font-bold text-foreground">{selectedPartner.name}</h3>
-                <Badge variant="secondary" className={typeConfig[selectedPartner.type].color}>
-                  {typeConfig[selectedPartner.type].label}
-                </Badge>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm"><Edit size={14} className="mr-1" /> Editar</Button>
-                <Button variant="destructive" size="sm"><Trash2 size={14} className="mr-1" /> Remover</Button>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Phone size={14} /> {selectedPartner.phone}
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Mail size={14} /> {selectedPartner.email}
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin size={14} /> {selectedPartner.city}
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Star size={14} className="text-amber-500" /> {selectedPartner.rating} ({selectedPartner.totalBookings} reservas)
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* New Partner Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Novo Parceiro</DialogTitle>
-            <DialogDescription>Preencha os dados do novo parceiro para cadastrá-lo na plataforma.</DialogDescription>
+            <DialogTitle>{editPartner ? "Editar Parceiro" : "Novo Parceiro"}</DialogTitle>
+            <DialogDescription>Preencha os dados do parceiro.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <Input placeholder="Nome / Razão Social" />
+            <Input placeholder="Nome / Razão Social" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <select
+              value={form.type}
+              onChange={(e) => setForm({ ...form, type: e.target.value })}
+              className="w-full bg-muted border border-border rounded-xl px-4 py-2.5 text-sm text-foreground outline-none"
+            >
+              {Object.entries(typeConfig).map(([k, v]) => (
+                <option key={k} value={k}>{v.label}</option>
+              ))}
+            </select>
             <div className="grid grid-cols-2 gap-4">
-              <Input placeholder="Contato" />
-              <Input placeholder="Telefone" />
+              <Input placeholder="Nome do contato" value={form.contact_name} onChange={(e) => setForm({ ...form, contact_name: e.target.value })} />
+              <Input placeholder="Telefone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             </div>
-            <Input placeholder="Email" type="email" />
-            <div className="grid grid-cols-2 gap-4">
-              <Input placeholder="Cidade" />
-              <Input placeholder="Comissão (%)" type="number" />
-            </div>
+            <Input placeholder="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            <Input placeholder="Comissão (%)" type="number" value={form.commission_rate} onChange={(e) => setForm({ ...form, commission_rate: e.target.value })} />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
-            <Button onClick={() => setDialogOpen(false)}>Cadastrar</Button>
+            <Button onClick={handleSave} disabled={saving}>
+              {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
+              {editPartner ? "Salvar" : "Cadastrar"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
