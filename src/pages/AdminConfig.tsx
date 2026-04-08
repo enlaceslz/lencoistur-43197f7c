@@ -184,6 +184,56 @@ const AdminConfig = () => {
           <Card className="border-border">
             <CardContent className="p-6 space-y-5">
               <h3 className="font-display font-bold text-foreground text-lg">Configurações do Site</h3>
+              
+              {/* Logo Upload */}
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold">Logo da Empresa</Label>
+                <div className="flex items-center gap-4">
+                  <div className="w-24 h-24 rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-muted overflow-hidden">
+                    {logoUrl ? (
+                      <img src={logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
+                    ) : (
+                      <Image size={32} className="text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleLogoUpload}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => logoInputRef.current?.click()}
+                      disabled={uploadingLogo}
+                      className="rounded-lg"
+                    >
+                      {uploadingLogo ? <Loader2 size={14} className="animate-spin mr-1" /> : <Upload size={14} className="mr-1" />}
+                      {logoUrl ? "Trocar Logo" : "Enviar Logo"}
+                    </Button>
+                    {logoUrl && (
+                      <Button type="button" variant="ghost" size="sm" onClick={() => setLogoUrl(null)} className="text-destructive rounded-lg">
+                        <X size={14} className="mr-1" /> Remover
+                      </Button>
+                    )}
+                    <p className="text-xs text-muted-foreground">PNG, JPG ou SVG. Máx. 2MB.</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Ou cole a URL da logo</Label>
+                  <Input
+                    placeholder="https://exemplo.com/logo.png"
+                    value={logoUrl || ""}
+                    onChange={(e) => setLogoUrl(e.target.value || null)}
+                    maxLength={500}
+                  />
+                </div>
+              </div>
+
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Título do Site (SEO)</Label>
@@ -204,6 +254,7 @@ const AdminConfig = () => {
                     <Input value={site.instagram} onChange={(e) => setSite({ ...site, instagram: e.target.value })} maxLength={100} />
                   </div>
                 </div>
+              </div>
               </div>
               <Button onClick={() => handleSave("Site")} disabled={saving} className="rounded-xl">
                 {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
