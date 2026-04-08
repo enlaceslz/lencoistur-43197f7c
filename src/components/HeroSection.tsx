@@ -2,7 +2,7 @@ import { Search, MapPin, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-const HERO_IMG = "https://rmetppilvfrxosvxzhgj.supabase.co/storage/v1/object/public/message-attachments/60888f4c-003c-49d2-ac08-29d093ab51ba/images/1aa3423f5c22c613cc6496fea87a24984bcaaa0f88c4b7f9b8b0f9a26fe933f3.jpg";
+const HERO_IMG = "https://images.unsplash.com/photo-1650623598032-4fddce25b34f?w=1920&q=80&auto=format&fit=crop";
 
 const categoryKeys = ["boat", "eco", "gastro", "cultural", "kayak", "trekking"] as const;
 
