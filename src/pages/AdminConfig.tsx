@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff } from "lucide-react";
+import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -58,6 +58,39 @@ const AdminConfig = () => {
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione um arquivo de imagem válido.");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("A imagem deve ter no máximo 2MB.");
+      return;
+    }
+
+    setUploadingLogo(true);
+    const ext = file.name.split(".").pop() || "png";
+    const path = `logo/logo-${Date.now()}.${ext}`;
+
+    const { error } = await supabase.storage.from("tour-images").upload(path, file, { upsert: true });
+    if (error) {
+      toast.error("Erro ao enviar logo: " + error.message);
+      setUploadingLogo(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage.from("tour-images").getPublicUrl(path);
+    setLogoUrl(urlData.publicUrl);
+    setUploadingLogo(false);
+    toast.success("Logo enviada com sucesso!");
+  };
 
   const handleSave = (section: string) => {
     setSaving(true);
@@ -151,6 +184,56 @@ const AdminConfig = () => {
           <Card className="border-border">
             <CardContent className="p-6 space-y-5">
               <h3 className="font-display font-bold text-foreground text-lg">Configurações do Site</h3>
+              
+              {/* Logo Upload */}
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold">Logo da Empresa</Label>
+                <div className="flex items-center gap-4">
+                  <div className="w-24 h-24 rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-muted overflow-hidden">
+                    {logoUrl ? (
+                      <img src={logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
+                    ) : (
+                      <Image size={32} className="text-muted-foreground" />
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleLogoUpload}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => logoInputRef.current?.click()}
+                      disabled={uploadingLogo}
+                      className="rounded-lg"
+                    >
+                      {uploadingLogo ? <Loader2 size={14} className="animate-spin mr-1" /> : <Upload size={14} className="mr-1" />}
+                      {logoUrl ? "Trocar Logo" : "Enviar Logo"}
+                    </Button>
+                    {logoUrl && (
+                      <Button type="button" variant="ghost" size="sm" onClick={() => setLogoUrl(null)} className="text-destructive rounded-lg">
+                        <X size={14} className="mr-1" /> Remover
+                      </Button>
+                    )}
+                    <p className="text-xs text-muted-foreground">PNG, JPG ou SVG. Máx. 2MB.</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Ou cole a URL da logo</Label>
+                  <Input
+                    placeholder="https://exemplo.com/logo.png"
+                    value={logoUrl || ""}
+                    onChange={(e) => setLogoUrl(e.target.value || null)}
+                    maxLength={500}
+                  />
+                </div>
+              </div>
+
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Título do Site (SEO)</Label>
