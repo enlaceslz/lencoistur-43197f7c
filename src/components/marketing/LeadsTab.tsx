@@ -34,7 +34,7 @@ const getScoreColor = (score: number) => {
   return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400";
 };
 
-const LeadsTab = ({ leads }: LeadsTabProps) => {
+const LeadsTab = ({ leads, onAdd }: LeadsTabProps) => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -47,6 +47,18 @@ const LeadsTab = ({ leads }: LeadsTabProps) => {
       toast.error("Preencha o nome e ao menos um contato (telefone ou e-mail).");
       return;
     }
+    const newLead: Lead = {
+      id: Date.now(),
+      name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim(),
+      source: source || "Manual",
+      interest: interest.trim(),
+      status: "morno",
+      lastContact: new Date().toISOString().split("T")[0],
+      score: 50,
+    };
+    onAdd?.((prev) => [newLead, ...prev]);
     toast.success(`Lead "${name}" adicionado com sucesso!`);
     setOpen(false);
     setName("");
