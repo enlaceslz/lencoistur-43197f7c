@@ -91,7 +91,7 @@ const AdminParceiros = () => {
 
   const openNew = () => {
     setEditPartner(null);
-    setForm({ name: "", type: "hotel", contact_name: "", phone: "", email: "", commission_rate: "10", cpf_cnpj: "", address: "" });
+    setForm({ name: "", type: "hotel", contact_name: "", phone: "", email: "", commission_rate: "10", cpf_cnpj: "", address: "", cnh: "", cnh_validade: "", cadastur: "" });
     setDialogOpen(true);
   };
 
