@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import { Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, DollarSign, MapPin, Smartphone, RefreshCw, Calendar } from "lucide-react";
+import { Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, Pencil, Trash2, X, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 interface Customer {
@@ -30,12 +33,37 @@ interface BookingRow {
   created_at: string;
 }
 
+interface CustomerForm {
+  name: string;
+  email: string;
+  phone: string;
+  cpf: string;
+}
+
+const emptyForm: CustomerForm = { name: "", email: "", phone: "", cpf: "" };
+
 const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR")}`;
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   pendente: { label: "Pendente", className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" },
   confirmada: { label: "Confirmada", className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" },
   cancelada: { label: "Cancelada", className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
+};
+
+const validateForm = (form: CustomerForm): string | null => {
+  const name = form.name.trim();
+  if (!name || name.length < 2 || name.length > 120) return "Nome deve ter entre 2 e 120 caracteres.";
+  const email = form.email.trim().toLowerCase();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) return "E-mail inválido.";
+  if (form.phone) {
+    const digits = form.phone.replace(/\D/g, "");
+    if (digits.length < 10 || digits.length > 11) return "Telefone deve ter 10 ou 11 dígitos.";
+  }
+  if (form.cpf) {
+    const cpfDigits = form.cpf.replace(/\D/g, "");
+    if (cpfDigits.length !== 11) return "CPF deve ter 11 dígitos.";
+  }
+  return null;
 };
 
 const AdminCRM = () => {
@@ -45,6 +73,13 @@ const AdminCRM = () => {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [customerBookings, setCustomerBookings] = useState<BookingRow[]>([]);
   const [filter, setFilter] = useState<"all" | "with_bookings" | "no_bookings">("all");
+
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+  const [form, setForm] = useState<CustomerForm>(emptyForm);
+  const [saving, setSaving] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCustomers();
@@ -105,6 +140,78 @@ const AdminCRM = () => {
       .eq("customer_id", c.id)
       .order("created_at", { ascending: false });
     setCustomerBookings(data || []);
+  };
+
+  const openCreateModal = () => {
+    setEditingCustomer(null);
+    setForm(emptyForm);
+    setModalOpen(true);
+  };
+
+  const openEditModal = (c: Customer) => {
+    setEditingCustomer(c);
+    setForm({ name: c.name, email: c.email, phone: c.phone || "", cpf: c.cpf || "" });
+    setModalOpen(true);
+  };
+
+  const handleSave = async () => {
+    const validationError = validateForm(form);
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+
+    setSaving(true);
+    const payload = {
+      name: form.name.trim(),
+      email: form.email.trim().toLowerCase(),
+      phone: form.phone.replace(/\D/g, "") || null,
+      cpf: form.cpf.replace(/\D/g, "") || null,
+    };
+
+    if (editingCustomer) {
+      const { error } = await supabase
+        .from("customers")
+        .update(payload)
+        .eq("id", editingCustomer.id);
+      if (error) {
+        toast.error(error.message.includes("customers_email_unique") ? "E-mail já cadastrado." : "Erro ao atualizar cliente.");
+        setSaving(false);
+        return;
+      }
+      toast.success("Cliente atualizado!");
+      if (selectedCustomer?.id === editingCustomer.id) {
+        setSelectedCustomer({ ...selectedCustomer, ...payload, phone: payload.phone, cpf: payload.cpf });
+      }
+    } else {
+      const { error } = await supabase.from("customers").insert(payload);
+      if (error) {
+        toast.error(error.message.includes("customers_email_unique") ? "E-mail já cadastrado." : "Erro ao cadastrar cliente.");
+        setSaving(false);
+        return;
+      }
+      toast.success("Cliente cadastrado!");
+    }
+
+    setSaving(false);
+    setModalOpen(false);
+    fetchCustomers();
+  };
+
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase.from("customers").delete().eq("id", id);
+    if (error) {
+      toast.error("Erro ao excluir. Pode ter reservas vinculadas.");
+      setDeleteConfirm(null);
+      return;
+    }
+    toast.success("Cliente excluído!");
+    setDeleteConfirm(null);
+    if (selectedCustomer?.id === id) {
+      setSelectedCustomer(null);
+      setCustomerBookings([]);
+    }
+    fetchCustomers();
   };
 
   const exportCSV = () => {
@@ -187,6 +294,9 @@ const AdminCRM = () => {
                 />
               </div>
               <div className="flex gap-2">
+                <Button size="sm" className="rounded-xl" onClick={openCreateModal}>
+                  <Plus size={14} /> Novo Cliente
+                </Button>
                 <Button variant="outline" size="sm" className="rounded-xl" onClick={() => fetchCustomers()}>
                   <RefreshCw size={14} />
                 </Button>
@@ -221,7 +331,7 @@ const AdminCRM = () => {
               <div className="text-center py-12 text-muted-foreground">
                 <Users className="mx-auto mb-3 opacity-40" size={40} />
                 <p className="font-medium">Nenhum cliente encontrado</p>
-                <p className="text-sm mt-1">Clientes cadastrados pelo checkout aparecerão aqui.</p>
+                <p className="text-sm mt-1">Clique em "Novo Cliente" para cadastrar.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -270,8 +380,11 @@ const AdminCRM = () => {
                                 </Button>
                               </a>
                             )}
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); selectCustomer(c); }}>
-                              <Eye size={14} className="text-muted-foreground" />
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); openEditModal(c); }}>
+                              <Pencil size={14} className="text-muted-foreground" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10" onClick={(e) => { e.stopPropagation(); setDeleteConfirm(c.id); }}>
+                              <Trash2 size={14} className="text-destructive" />
                             </Button>
                           </div>
                         </td>
@@ -296,6 +409,11 @@ const AdminCRM = () => {
                   <p className="text-xs text-muted-foreground mt-1">
                     Cliente desde {new Date(selectedCustomer.created_at).toLocaleDateString("pt-BR")}
                   </p>
+                  <div className="flex gap-2 justify-center mt-3">
+                    <Button variant="outline" size="sm" className="rounded-xl" onClick={() => openEditModal(selectedCustomer)}>
+                      <Pencil size={12} /> Editar
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="space-y-3">
@@ -381,6 +499,89 @@ const AdminCRM = () => {
           </div>
         </div>
       </div>
+
+      {/* Create/Edit Modal */}
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editingCustomer ? "Editar Cliente" : "Novo Cliente"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label htmlFor="customer-name">Nome *</Label>
+              <Input
+                id="customer-name"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="Nome completo"
+                maxLength={120}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="customer-email">E-mail *</Label>
+              <Input
+                id="customer-email"
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                placeholder="email@exemplo.com"
+                maxLength={255}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="customer-phone">Telefone</Label>
+              <Input
+                id="customer-phone"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                placeholder="(99) 99999-9999"
+                maxLength={15}
+              />
+            </div>
+            <div>
+              <Label htmlFor="customer-cpf">CPF</Label>
+              <Input
+                id="customer-cpf"
+                value={form.cpf}
+                onChange={(e) => setForm({ ...form, cpf: e.target.value })}
+                placeholder="000.000.000-00"
+                maxLength={14}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setModalOpen(false)} disabled={saving}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSave} disabled={saving}>
+              {saving ? <Loader2 size={14} className="animate-spin mr-1" /> : <Save size={14} className="mr-1" />}
+              {editingCustomer ? "Salvar" : "Cadastrar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <Dialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Excluir Cliente</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita. Clientes com reservas vinculadas não podem ser excluídos.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={() => deleteConfirm && handleDelete(deleteConfirm)}>
+              <Trash2 size={14} className="mr-1" /> Excluir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
