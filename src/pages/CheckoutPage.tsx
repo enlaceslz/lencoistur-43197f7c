@@ -184,7 +184,7 @@ const CheckoutPage = () => {
             </div>
             {displayDiscount > 0 && (
               <div className="flex justify-between text-sm text-green-600">
-                <span>Desconto PIX (5%)</span>
+                <span>Desconto PIX ({pixDiscountPercent}%)</span>
                 <span className="font-semibold">-R$ {displayDiscount}</span>
               </div>
             )}
