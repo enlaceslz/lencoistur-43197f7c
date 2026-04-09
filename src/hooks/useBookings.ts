@@ -140,5 +140,19 @@ export function useBookings() {
       .eq("id", id);
   }, []);
 
-  return { bookings, loading, addBooking, confirmPayment, cancelBooking, refresh: fetchBookings };
+  const completeBooking = useCallback(async (id: string) => {
+    await supabase
+      .from("bookings")
+      .update({ status: "concluida" })
+      .eq("id", id);
+  }, []);
+
+  const updateBookingNotes = useCallback(async (id: string, notes: string) => {
+    await supabase
+      .from("bookings")
+      .update({ notes })
+      .eq("id", id);
+  }, []);
+
+  return { bookings, loading, addBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes, refresh: fetchBookings };
 }
