@@ -294,6 +294,12 @@ const AdminParceiros = () => {
                       <TableCell className="text-muted-foreground text-sm">
                         {p.contact_name && <span className="block">{p.contact_name}</span>}
                         {p.phone && <span className="block">{p.phone}</span>}
+                        {p.type === "motorista" && p.cnh && (
+                          <span className="block text-xs text-amber-600 dark:text-amber-400">CNH: {p.cnh}{p.cnh_validade ? ` (val. ${new Date(p.cnh_validade + "T12:00:00").toLocaleDateString("pt-BR")})` : ""}</span>
+                        )}
+                        {p.type === "guia" && p.cadastur && (
+                          <span className="block text-xs text-green-600 dark:text-green-400">Cadastur: {p.cadastur}</span>
+                        )}
                       </TableCell>
                       <TableCell className="font-medium text-foreground">{p.commission_rate || 0}%</TableCell>
                       <TableCell>
