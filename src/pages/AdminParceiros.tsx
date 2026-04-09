@@ -7,12 +7,17 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Phone, Mail, MapPin, MoreHorizontal, Loader2, Check, X,
+  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Loader2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -42,8 +47,7 @@ const AdminParceiros = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editPartner, setEditPartner] = useState<Partner | null>(null);
   const [saving, setSaving] = useState(false);
-
-  // Form state
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", type: "hotel", contact_name: "", phone: "", email: "", commission_rate: "10" });
 
   const types = ["todos", ...Object.keys(typeConfig)];
@@ -66,12 +70,9 @@ const AdminParceiros = () => {
   const openEdit = (p: Partner) => {
     setEditPartner(p);
     setForm({
-      name: p.name,
-      type: p.type,
-      contact_name: p.contact_name || "",
-      phone: p.phone || "",
-      email: p.email || "",
-      commission_rate: String(p.commission_rate || 0),
+      name: p.name, type: p.type,
+      contact_name: p.contact_name || "", phone: p.phone || "",
+      email: p.email || "", commission_rate: String(p.commission_rate || 0),
     });
     setDialogOpen(true);
   };
@@ -80,43 +81,44 @@ const AdminParceiros = () => {
     if (!form.name.trim()) { toast.error("Nome é obrigatório."); return; }
     setSaving(true);
     const payload = {
-      name: form.name,
-      type: form.type,
-      contact_name: form.contact_name || null,
-      phone: form.phone || null,
-      email: form.email || null,
-      commission_rate: Number(form.commission_rate) || 0,
+      name: form.name.trim(), type: form.type,
+      contact_name: form.contact_name.trim() || null, phone: form.phone.trim() || null,
+      email: form.email.trim() || null, commission_rate: Number(form.commission_rate) || 0,
     };
 
     if (editPartner) {
       const { error } = await supabase.from("partners").update(payload).eq("id", editPartner.id);
-      if (error) { toast.error("Erro ao atualizar."); } else { toast.success("Parceiro atualizado!"); }
+      if (error) toast.error("Erro ao atualizar."); else toast.success("Parceiro atualizado!");
     } else {
       const { error } = await supabase.from("partners").insert(payload);
-      if (error) { toast.error("Erro ao cadastrar."); } else { toast.success("Parceiro cadastrado!"); }
+      if (error) toast.error("Erro ao cadastrar."); else toast.success("Parceiro cadastrado!");
     }
     setSaving(false);
     setDialogOpen(false);
     fetchPartners();
   };
 
-  const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("partners").delete().eq("id", id);
-    if (error) { toast.error("Erro ao remover."); } else { toast.success("Parceiro removido."); fetchPartners(); }
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await supabase.from("partners").delete().eq("id", deleteId);
+    if (error) toast.error("Erro ao remover."); else { toast.success("Parceiro removido."); fetchPartners(); }
+    setDeleteId(null);
   };
 
   const toggleActive = async (p: Partner) => {
-    await supabase.from("partners").update({ active: !p.active }).eq("id", p.id);
-    fetchPartners();
+    const { error } = await supabase.from("partners").update({ active: !p.active }).eq("id", p.id);
+    if (error) toast.error("Erro ao alterar status.");
+    else { toast.success(p.active ? "Parceiro desativado." : "Parceiro ativado."); fetchPartners(); }
   };
 
   const filtered = partners.filter((p) => {
     const q = search.toLowerCase();
-    const matchSearch = p.name.toLowerCase().includes(q) || (p.contact_name || "").toLowerCase().includes(q);
+    const matchSearch = p.name.toLowerCase().includes(q) || (p.contact_name || "").toLowerCase().includes(q) || (p.email || "").toLowerCase().includes(q);
     const matchType = typeFilter === "todos" || p.type === typeFilter;
     return matchSearch && matchType;
   });
 
+  const activeCount = partners.filter((p) => p.active).length;
   const stats = [
     { icon: Building2, label: "Hotéis", value: partners.filter((p) => p.type === "hotel").length, color: "text-blue-600" },
     { icon: Compass, label: "Guias", value: partners.filter((p) => p.type === "guia").length, color: "text-green-600" },
@@ -136,6 +138,13 @@ const AdminParceiros = () => {
 
   return (
     <AdminLayout title="Parceiros">
+      {/* Summary */}
+      <div className="flex items-center gap-3 mb-6">
+        <p className="text-sm text-muted-foreground">
+          <span className="font-semibold text-foreground">{partners.length}</span> parceiros cadastrados · <span className="font-semibold text-green-600">{activeCount}</span> ativos
+        </p>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {stats.map((s) => (
           <Card key={s.label}>
@@ -154,7 +163,7 @@ const AdminParceiros = () => {
         <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <Input placeholder="Buscar parceiro..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+            <Input placeholder="Buscar por nome, contato ou email..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
           </div>
           <div className="flex gap-2 flex-wrap">
             {types.map((t) => (
@@ -172,6 +181,7 @@ const AdminParceiros = () => {
           <div className="p-12 text-center text-muted-foreground">
             <Users className="mx-auto mb-3 opacity-40" size={40} />
             <p className="font-medium">Nenhum parceiro encontrado</p>
+            <p className="text-sm mt-1">Cadastre um novo parceiro para começar.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -222,7 +232,7 @@ const AdminParceiros = () => {
                       <TableCell>
                         <div className="flex gap-1">
                           <Button variant="ghost" size="icon" onClick={() => openEdit(p)}><Edit size={14} /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(p.id)}><Trash2 size={14} className="text-destructive" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(p.id)}><Trash2 size={14} className="text-destructive" /></Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -234,6 +244,7 @@ const AdminParceiros = () => {
         )}
       </Card>
 
+      {/* Form Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -241,32 +252,65 @@ const AdminParceiros = () => {
             <DialogDescription>Preencha os dados do parceiro.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <Input placeholder="Nome / Razão Social" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-            <select
-              value={form.type}
-              onChange={(e) => setForm({ ...form, type: e.target.value })}
-              className="w-full bg-muted border border-border rounded-xl px-4 py-2.5 text-sm text-foreground outline-none"
-            >
-              {Object.entries(typeConfig).map(([k, v]) => (
-                <option key={k} value={k}>{v.label}</option>
-              ))}
-            </select>
-            <div className="grid grid-cols-2 gap-4">
-              <Input placeholder="Nome do contato" value={form.contact_name} onChange={(e) => setForm({ ...form, contact_name: e.target.value })} />
-              <Input placeholder="Telefone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+            <div>
+              <Label className="mb-1.5 block">Nome / Razão Social *</Label>
+              <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             </div>
-            <Input placeholder="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-            <Input placeholder="Comissão (%)" type="number" value={form.commission_rate} onChange={(e) => setForm({ ...form, commission_rate: e.target.value })} />
+            <div>
+              <Label className="mb-1.5 block">Tipo *</Label>
+              <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}
+                className="w-full bg-muted border border-border rounded-xl px-4 py-2.5 text-sm text-foreground outline-none">
+                {Object.entries(typeConfig).map(([k, v]) => (
+                  <option key={k} value={k}>{v.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="mb-1.5 block">Nome do contato</Label>
+                <Input value={form.contact_name} onChange={(e) => setForm({ ...form, contact_name: e.target.value })} />
+              </div>
+              <div>
+                <Label className="mb-1.5 block">Telefone</Label>
+                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              </div>
+            </div>
+            <div>
+              <Label className="mb-1.5 block">Email</Label>
+              <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            </div>
+            <div>
+              <Label className="mb-1.5 block">Comissão (%)</Label>
+              <Input type="number" min="0" max="100" value={form.commission_rate} onChange={(e) => setForm({ ...form, commission_rate: e.target.value })} />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
             <Button onClick={handleSave} disabled={saving}>
-              {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
+              {saving && <Loader2 className="animate-spin mr-2" size={16} />}
               {editPartner ? "Salvar" : "Cadastrar"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja remover este parceiro? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 };
