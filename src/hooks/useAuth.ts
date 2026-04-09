@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
@@ -7,6 +7,7 @@ export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const mountedRef = useRef(true);
 
   const checkAdminRole = useCallback(async (userId: string): Promise<boolean> => {
     try {
@@ -26,51 +27,58 @@ export function useAuth() {
   }, []);
 
   useEffect(() => {
-    let mounted = true;
-    let initialResolved = false;
+    mountedRef.current = true;
 
-    // 1. Set up auth state listener FIRST (per Supabase docs)
+    // 1. Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, newSession) => {
-        if (!mounted) return;
+      (_event, newSession) => {
+        if (!mountedRef.current) return;
+        
+        // Synchronously update session/user state only
         setSession(newSession);
         setUser(newSession?.user ?? null);
 
-        if (newSession?.user) {
-          const admin = await checkAdminRole(newSession.user.id);
-          if (mounted) setIsAdmin(admin);
-        } else {
+        if (!newSession?.user) {
           setIsAdmin(false);
-        }
-        if (mounted) {
-          initialResolved = true;
           setLoading(false);
+          return;
         }
+
+        // IMPORTANT: Defer Supabase API calls to avoid deadlock
+        // per Supabase docs - don't make sync calls in onAuthStateChange
+        setTimeout(async () => {
+          if (!mountedRef.current) return;
+          const admin = await checkAdminRole(newSession.user.id);
+          if (mountedRef.current) {
+            setIsAdmin(admin);
+            setLoading(false);
+          }
+        }, 0);
       }
     );
 
-    // 2. Then check for existing session (fallback)
+    // 2. Then check for existing session
     supabase.auth.getSession().then(async ({ data: { session: existingSession } }) => {
-      if (!mounted || initialResolved) return;
+      if (!mountedRef.current) return;
       setSession(existingSession);
       setUser(existingSession?.user ?? null);
 
       if (existingSession?.user) {
         const admin = await checkAdminRole(existingSession.user.id);
-        if (mounted) setIsAdmin(admin);
+        if (mountedRef.current) setIsAdmin(admin);
       }
-      if (mounted) setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }).catch(() => {
-      if (mounted && !initialResolved) setLoading(false);
+      if (mountedRef.current) setLoading(false);
     });
 
     // 3. Safety timeout
     const timeout = setTimeout(() => {
-      if (mounted && !initialResolved) setLoading(false);
+      if (mountedRef.current) setLoading(false);
     }, 5000);
 
     return () => {
-      mounted = false;
+      mountedRef.current = false;
       clearTimeout(timeout);
       subscription.unsubscribe();
     };
