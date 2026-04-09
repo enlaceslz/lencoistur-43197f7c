@@ -75,7 +75,7 @@ const AdminParceiros = () => {
   const [cnpjLoading, setCnpjLoading] = useState(false);
   const [form, setForm] = useState({
     name: "", type: "hotel", contact_name: "", phone: "", email: "",
-    commission_rate: "10", cpf_cnpj: "", address: "",
+    commission_rate: "10", cpf_cnpj: "", address: "", cnh: "", cnh_validade: "", cadastur: "",
   });
 
   const types = ["todos", ...Object.keys(typeConfig)];
