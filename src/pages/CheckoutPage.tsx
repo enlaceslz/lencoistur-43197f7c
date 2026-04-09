@@ -318,8 +318,9 @@ const CheckoutPage = () => {
               {payMethod === "pix" && (
                 <div className="bg-muted rounded-xl p-4 flex items-center gap-3">
                   <Banknote size={20} className="text-green-600 shrink-0" />
-                  <p className="text-sm text-muted-foreground">
-                    Ao confirmar, você receberá o QR Code PIX para pagamento imediato. Economia de <strong className="text-green-600">R$ {displayDiscount}</strong>!
+                   <p className="text-sm text-muted-foreground">
+                    Ao confirmar, você receberá o QR Code PIX para pagamento imediato.
+                    {displayDiscount > 0 && <> Economia de <strong className="text-green-600">R$ {displayDiscount}</strong>!</>}
                   </p>
                 </div>
               )}
