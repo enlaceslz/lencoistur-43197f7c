@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import { Search, Phone, Mail, Globe, Eye, Download, ChevronDown, Loader2, Users, DollarSign, MapPin } from "lucide-react";
+import { Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, DollarSign, MapPin, Smartphone, RefreshCw, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface Customer {
   id: string;
@@ -23,10 +26,17 @@ interface BookingRow {
   guests: number;
   final_total: number;
   status: string;
+  payment_status: string;
   created_at: string;
 }
 
 const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR")}`;
+
+const statusConfig: Record<string, { label: string; className: string }> = {
+  pendente: { label: "Pendente", className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" },
+  confirmada: { label: "Confirmada", className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" },
+  cancelada: { label: "Cancelada", className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
+};
 
 const AdminCRM = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -34,6 +44,7 @@ const AdminCRM = () => {
   const [search, setSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [customerBookings, setCustomerBookings] = useState<BookingRow[]>([]);
+  const [filter, setFilter] = useState<"all" | "with_bookings" | "no_bookings">("all");
 
   useEffect(() => {
     fetchCustomers();
@@ -41,13 +52,18 @@ const AdminCRM = () => {
 
   const fetchCustomers = async () => {
     setLoading(true);
-    const { data: customersData } = await supabase
+    const { data: customersData, error } = await supabase
       .from("customers")
       .select("*")
       .order("created_at", { ascending: false });
 
+    if (error) {
+      toast.error("Erro ao carregar clientes.");
+      setLoading(false);
+      return;
+    }
+
     if (customersData) {
-      // Fetch booking stats for each customer
       const { data: bookingsData } = await supabase
         .from("bookings")
         .select("customer_id, final_total, status, created_at");
@@ -85,24 +101,47 @@ const AdminCRM = () => {
     setSelectedCustomer(c);
     const { data } = await supabase
       .from("bookings")
-      .select("id, item_name, date, guests, final_total, status, created_at")
+      .select("id, item_name, date, guests, final_total, status, payment_status, created_at")
       .eq("customer_id", c.id)
       .order("created_at", { ascending: false });
     setCustomerBookings(data || []);
   };
 
+  const exportCSV = () => {
+    if (filtered.length === 0) {
+      toast.error("Nenhum cliente para exportar.");
+      return;
+    }
+    const header = "Nome,Email,Telefone,CPF,Reservas,Total Gasto,Cadastro\n";
+    const rows = filtered.map(c =>
+      `"${c.name}","${c.email}","${c.phone || ""}","${c.cpf || ""}",${c.totalBookings},"${fmt(c.totalSpent)}","${new Date(c.created_at).toLocaleDateString("pt-BR")}"`
+    ).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `clientes_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`${filtered.length} clientes exportados!`);
+  };
+
   const filtered = customers.filter((c) => {
     const q = search.toLowerCase();
-    return c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || (c.phone || "").includes(q);
+    const matchesSearch = c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || (c.phone || "").includes(q) || (c.cpf || "").includes(q);
+    if (filter === "with_bookings") return matchesSearch && c.totalBookings > 0;
+    if (filter === "no_bookings") return matchesSearch && c.totalBookings === 0;
+    return matchesSearch;
   });
 
   const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0);
+  const withBookings = customers.filter((c) => c.totalBookings > 0).length;
 
   const clientStats = [
     { label: "Total de Clientes", value: customers.length.toString(), icon: Users, color: "text-primary" },
-    { label: "Com Reservas", value: customers.filter((c) => c.totalBookings > 0).length.toString(), icon: MapPin, color: "text-green-600" },
+    { label: "Com Reservas", value: withBookings.toString(), icon: MapPin, color: "text-green-600" },
     { label: "Receita Total", value: fmt(totalRevenue), icon: DollarSign, color: "text-blue-600" },
-    { label: "Ticket Médio", value: customers.length > 0 ? fmt(Math.round(totalRevenue / Math.max(customers.filter(c => c.totalBookings > 0).length, 1))) : "R$ 0", icon: DollarSign, color: "text-amber-600" },
+    { label: "Ticket Médio", value: withBookings > 0 ? fmt(Math.round(totalRevenue / withBookings)) : "R$ 0", icon: DollarSign, color: "text-amber-600" },
   ];
 
   if (loading) {
@@ -136,17 +175,46 @@ const AdminCRM = () => {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Client List */}
           <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-6">
-            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <div className="flex items-center gap-2 flex-1 bg-muted rounded-xl px-4 py-2.5">
                 <Search size={16} className="text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder="Buscar cliente..."
+                  placeholder="Buscar por nome, email, telefone ou CPF..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="bg-transparent w-full outline-none text-foreground text-sm placeholder:text-muted-foreground"
                 />
               </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" className="rounded-xl" onClick={() => fetchCustomers()}>
+                  <RefreshCw size={14} />
+                </Button>
+                <Button variant="outline" size="sm" className="rounded-xl" onClick={exportCSV}>
+                  <Download size={14} /> CSV
+                </Button>
+              </div>
+            </div>
+
+            {/* Filter tabs */}
+            <div className="flex gap-2 mb-4">
+              {([
+                { key: "all" as const, label: "Todos", count: customers.length },
+                { key: "with_bookings" as const, label: "Com Reservas", count: withBookings },
+                { key: "no_bookings" as const, label: "Sem Reservas", count: customers.length - withBookings },
+              ]).map((f) => (
+                <button
+                  key={f.key}
+                  onClick={() => setFilter(f.key)}
+                  className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                    filter === f.key
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {f.label} ({f.count})
+                </button>
+              ))}
             </div>
 
             {filtered.length === 0 ? (
@@ -161,9 +229,9 @@ const AdminCRM = () => {
                   <thead>
                     <tr className="border-b border-border text-muted-foreground">
                       <th className="text-left py-3 font-medium">Cliente</th>
-                      <th className="text-left py-3 font-medium">Telefone</th>
+                      <th className="text-left py-3 font-medium hidden sm:table-cell">Telefone</th>
                       <th className="text-right py-3 font-medium">Reservas</th>
-                      <th className="text-right py-3 font-medium">Total Gasto</th>
+                      <th className="text-right py-3 font-medium hidden sm:table-cell">Total Gasto</th>
                       <th className="text-right py-3 font-medium">Ações</th>
                     </tr>
                   </thead>
@@ -176,27 +244,42 @@ const AdminCRM = () => {
                       >
                         <td className="py-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">
-                              {c.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                            <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">
+                              {c.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
                             </div>
-                            <div>
-                              <p className="font-semibold text-foreground">{c.name}</p>
-                              <p className="text-xs text-muted-foreground">{c.email}</p>
+                            <div className="min-w-0">
+                              <p className="font-semibold text-foreground truncate">{c.name}</p>
+                              <p className="text-xs text-muted-foreground truncate">{c.email}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 text-muted-foreground">{c.phone || "—"}</td>
+                        <td className="py-3 text-muted-foreground hidden sm:table-cell">{c.phone || "—"}</td>
                         <td className="py-3 text-right text-foreground font-medium">{c.totalBookings}</td>
-                        <td className="py-3 text-right font-semibold text-foreground">{fmt(c.totalSpent)}</td>
+                        <td className="py-3 text-right font-semibold text-foreground hidden sm:table-cell">{fmt(c.totalSpent)}</td>
                         <td className="py-3 text-right">
-                          <button className="text-primary hover:text-primary/80 transition-colors">
-                            <Eye size={16} />
-                          </button>
+                          <div className="flex gap-1 justify-end">
+                            {c.phone && (
+                              <a
+                                href={`https://wa.me/55${c.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${c.name.split(" ")[0]}! Tudo bem?`)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-green-100 dark:hover:bg-green-900/30">
+                                  <Smartphone size={14} className="text-green-600" />
+                                </Button>
+                              </a>
+                            )}
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); selectCustomer(c); }}>
+                              <Eye size={14} className="text-muted-foreground" />
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+                <p className="text-xs text-muted-foreground mt-3 text-right">{filtered.length} cliente(s)</p>
               </div>
             )}
           </div>
@@ -207,7 +290,7 @@ const AdminCRM = () => {
               <div className="space-y-6">
                 <div className="text-center">
                   <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xl font-bold mx-auto mb-3">
-                    {selectedCustomer.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                    {selectedCustomer.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
                   </div>
                   <h3 className="font-display text-lg font-bold text-foreground">{selectedCustomer.name}</h3>
                   <p className="text-xs text-muted-foreground mt-1">
@@ -218,7 +301,7 @@ const AdminCRM = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-sm">
                     <Mail size={16} className="text-primary shrink-0" />
-                    <span className="text-muted-foreground">{selectedCustomer.email}</span>
+                    <span className="text-muted-foreground truncate">{selectedCustomer.email}</span>
                   </div>
                   {selectedCustomer.phone && (
                     <div className="flex items-center gap-3 text-sm">
@@ -230,6 +313,12 @@ const AdminCRM = () => {
                     <div className="flex items-center gap-3 text-sm">
                       <Globe size={16} className="text-primary shrink-0" />
                       <span className="text-muted-foreground">CPF: {selectedCustomer.cpf}</span>
+                    </div>
+                  )}
+                  {selectedCustomer.lastBooking && (
+                    <div className="flex items-center gap-3 text-sm">
+                      <Calendar size={16} className="text-primary shrink-0" />
+                      <span className="text-muted-foreground">Última reserva: {new Date(selectedCustomer.lastBooking).toLocaleDateString("pt-BR")}</span>
                     </div>
                   )}
                 </div>
@@ -245,6 +334,18 @@ const AdminCRM = () => {
                   </div>
                 </div>
 
+                {selectedCustomer.phone && (
+                  <a
+                    href={`https://wa.me/55${selectedCustomer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selectedCustomer.name.split(" ")[0]}! Tudo bem?`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button className="w-full rounded-xl bg-green-600 hover:bg-green-700 text-white">
+                      <Smartphone size={16} /> WhatsApp
+                    </Button>
+                  </a>
+                )}
+
                 <div>
                   <h4 className="font-display font-bold text-foreground mb-3">Histórico de Reservas</h4>
                   {customerBookings.length === 0 ? (
@@ -252,14 +353,19 @@ const AdminCRM = () => {
                   ) : (
                     <div className="space-y-2">
                       {customerBookings.map((b) => (
-                        <div key={b.id} className="flex items-center justify-between bg-muted rounded-xl px-4 py-3">
-                          <div>
-                            <p className="text-sm font-semibold text-foreground">{b.item_name}</p>
+                        <div key={b.id} className="bg-muted rounded-xl px-4 py-3">
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="text-sm font-semibold text-foreground truncate flex-1">{b.item_name}</p>
+                            <p className="text-sm font-bold text-primary ml-2">{fmt(b.final_total)}</p>
+                          </div>
+                          <div className="flex items-center justify-between">
                             <p className="text-xs text-muted-foreground">
                               {b.date || new Date(b.created_at).toLocaleDateString("pt-BR")} · {b.guests} pessoa(s)
                             </p>
+                            <Badge variant="outline" className={`text-[10px] ${statusConfig[b.status]?.className || ""}`}>
+                              {statusConfig[b.status]?.label || b.status}
+                            </Badge>
                           </div>
-                          <p className="text-sm font-bold text-primary">{fmt(b.final_total)}</p>
                         </div>
                       ))}
                     </div>
@@ -267,7 +373,8 @@ const AdminCRM = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-center h-64 text-muted-foreground text-sm">
+              <div className="flex flex-col items-center justify-center h-64 text-muted-foreground text-sm">
+                <Users className="mb-3 opacity-30" size={40} />
                 Selecione um cliente para ver detalhes
               </div>
             )}
