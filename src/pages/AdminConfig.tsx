@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,123 +11,113 @@ import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff,
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
+const DEFAULTS = {
+  empresa: { nome: "LençóisTour", cnpj: "12.345.678/0001-90", telefone: "(98) 99999-0000", whatsapp: "(98) 99999-0000", endereco: "Santo Amaro do Maranhão, MA", email: "contato@lencoistour.com" },
+  site: { titulo: "LençóisTour - Passeios nos Lençóis Maranhenses", metaDescricao: "Descubra os Lençóis Maranhenses com a melhor experiência turística.", whatsappUrl: "https://wa.me/5598999990000", instagram: "https://instagram.com/lencoistour", corPrimaria: "#2563eb", logoUrl: null as string | null },
+  pagamentos: { pix: true, cartao: true, boleto: false, pixChave: "12.345.678/0001-90", pixTipo: "CNPJ" },
+  notificacoes: { email: true, whatsapp: true, push: false, novaReserva: true, cancelamento: true, pagamento: true },
+};
+
 const AdminConfig = () => {
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [empresa, setEmpresa] = useState(DEFAULTS.empresa);
+  const [site, setSite] = useState(DEFAULTS.site);
+  const [pagamentos, setPagamentos] = useState(DEFAULTS.pagamentos);
+  const [notifications, setNotifications] = useState(DEFAULTS.notificacoes);
 
-  // Empresa
-  const [empresa, setEmpresa] = useState({
-    nome: "LençóisTour",
-    cnpj: "12.345.678/0001-90",
-    telefone: "(98) 99999-0000",
-    whatsapp: "(98) 99999-0000",
-    endereco: "Santo Amaro do Maranhão, MA",
-    email: "contato@lencoistour.com",
-  });
-
-  // Site
-  const [site, setSite] = useState({
-    titulo: "LençóisTour - Passeios nos Lençóis Maranhenses",
-    metaDescricao: "Descubra os Lençóis Maranhenses com a melhor experiência turística. Passeios, translados e aventuras inesquecíveis.",
-    whatsappUrl: "https://wa.me/5598999990000",
-    instagram: "https://instagram.com/lencoistour",
-    corPrimaria: "#2563eb",
-  });
-
-  // Pagamentos
-  const [pagamentos, setPagamentos] = useState({
-    pix: true,
-    cartao: true,
-    boleto: false,
-    pixChave: "12.345.678/0001-90",
-    pixTipo: "CNPJ",
-  });
-
-  // Notificações
-  const [notifications, setNotifications] = useState({
-    email: true,
-    whatsapp: true,
-    push: false,
-    novaReserva: true,
-    cancelamento: true,
-    pagamento: true,
-  });
-
-  // Segurança
-  const [senhaAtual, setSenhaAtual] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
+
+  const loadSettings = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("key, value");
+      if (error) throw error;
+      if (data) {
+        for (const row of data) {
+          const val = row.value as Record<string, unknown>;
+          if (row.key === "empresa") setEmpresa({ ...DEFAULTS.empresa, ...val });
+          if (row.key === "site") setSite({ ...DEFAULTS.site, ...val });
+          if (row.key === "pagamentos") setPagamentos({ ...DEFAULTS.pagamentos, ...val });
+          if (row.key === "notificacoes") setNotifications({ ...DEFAULTS.notificacoes, ...val });
+        }
+      }
+    } catch (err) {
+      console.error("Error loading settings:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadSettings(); }, [loadSettings]);
+
+  const saveSetting = async (key: string, value: Record<string, unknown>, label: string) => {
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("site_settings")
+        .update({ value: value as any, updated_at: new Date().toISOString() })
+        .eq("key", key);
+      if (error) throw error;
+      toast.success(`Configurações de ${label} salvas com sucesso!`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Erro desconhecido";
+      toast.error("Erro ao salvar: " + msg);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
-    if (!file.type.startsWith("image/")) {
-      toast.error("Selecione um arquivo de imagem válido.");
-      return;
-    }
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("A imagem deve ter no máximo 2MB.");
-      return;
-    }
+    if (!file.type.startsWith("image/")) { toast.error("Selecione um arquivo de imagem válido."); return; }
+    if (file.size > 2 * 1024 * 1024) { toast.error("A imagem deve ter no máximo 2MB."); return; }
 
     setUploadingLogo(true);
     const ext = file.name.split(".").pop() || "png";
     const path = `logo/logo-${Date.now()}.${ext}`;
 
     const { error } = await supabase.storage.from("tour-images").upload(path, file, { upsert: true });
-    if (error) {
-      toast.error("Erro ao enviar logo: " + error.message);
-      setUploadingLogo(false);
-      return;
-    }
+    if (error) { toast.error("Erro ao enviar logo: " + error.message); setUploadingLogo(false); return; }
 
     const { data: urlData } = supabase.storage.from("tour-images").getPublicUrl(path);
-    setLogoUrl(urlData.publicUrl);
+    setSite((prev) => ({ ...prev, logoUrl: urlData.publicUrl }));
     setUploadingLogo(false);
     toast.success("Logo enviada com sucesso!");
   };
 
-  const handleSave = (section: string) => {
-    setSaving(true);
-    setTimeout(() => {
-      setSaving(false);
-      toast.success(`Configurações de ${section} salvas com sucesso!`);
-    }, 600);
-  };
-
   const handleChangePassword = async () => {
-    if (!novaSenha || !confirmarSenha) {
-      toast.error("Preencha a nova senha e a confirmação.");
-      return;
-    }
-    if (novaSenha.length < 8) {
-      toast.error("A nova senha deve ter pelo menos 8 caracteres.");
-      return;
-    }
-    if (novaSenha !== confirmarSenha) {
-      toast.error("As senhas não conferem.");
-      return;
-    }
+    if (!novaSenha || !confirmarSenha) { toast.error("Preencha a nova senha e a confirmação."); return; }
+    if (novaSenha.length < 8) { toast.error("A nova senha deve ter pelo menos 8 caracteres."); return; }
+    if (novaSenha !== confirmarSenha) { toast.error("As senhas não conferem."); return; }
 
     setChangingPassword(true);
     const { error } = await supabase.auth.updateUser({ password: novaSenha });
     setChangingPassword(false);
 
-    if (error) {
-      toast.error("Erro ao alterar senha: " + error.message);
-      return;
-    }
-
+    if (error) { toast.error("Erro ao alterar senha: " + error.message); return; }
     toast.success("Senha alterada com sucesso!");
-    setSenhaAtual("");
     setNovaSenha("");
     setConfirmarSenha("");
   };
+
+  if (loading) {
+    return (
+      <AdminLayout title="Configurações">
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="animate-spin text-primary" size={32} />
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout title="Configurações">
@@ -171,7 +161,7 @@ const AdminConfig = () => {
                   <Input value={empresa.endereco} onChange={(e) => setEmpresa({ ...empresa, endereco: e.target.value })} maxLength={200} />
                 </div>
               </div>
-              <Button onClick={() => handleSave("Empresa")} disabled={saving} className="rounded-xl">
+              <Button onClick={() => saveSetting("empresa", empresa, "Empresa")} disabled={saving} className="rounded-xl">
                 {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
                 Salvar Alterações
               </Button>
@@ -184,39 +174,24 @@ const AdminConfig = () => {
           <Card className="border-border">
             <CardContent className="p-6 space-y-5">
               <h3 className="font-display font-bold text-foreground text-lg">Configurações do Site</h3>
-              
-              {/* Logo Upload */}
               <div className="space-y-3">
                 <Label className="text-sm font-semibold">Logo da Empresa</Label>
                 <div className="flex items-center gap-4">
                   <div className="w-24 h-24 rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-muted overflow-hidden">
-                    {logoUrl ? (
-                      <img src={logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
+                    {site.logoUrl ? (
+                      <img src={site.logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
                     ) : (
                       <Image size={32} className="text-muted-foreground" />
                     )}
                   </div>
                   <div className="space-y-2">
-                    <input
-                      ref={logoInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleLogoUpload}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => logoInputRef.current?.click()}
-                      disabled={uploadingLogo}
-                      className="rounded-lg"
-                    >
+                    <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                    <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo} className="rounded-lg">
                       {uploadingLogo ? <Loader2 size={14} className="animate-spin mr-1" /> : <Upload size={14} className="mr-1" />}
-                      {logoUrl ? "Trocar Logo" : "Enviar Logo"}
+                      {site.logoUrl ? "Trocar Logo" : "Enviar Logo"}
                     </Button>
-                    {logoUrl && (
-                      <Button type="button" variant="ghost" size="sm" onClick={() => setLogoUrl(null)} className="text-destructive rounded-lg">
+                    {site.logoUrl && (
+                      <Button type="button" variant="ghost" size="sm" onClick={() => setSite({ ...site, logoUrl: null })} className="text-destructive rounded-lg">
                         <X size={14} className="mr-1" /> Remover
                       </Button>
                     )}
@@ -225,15 +200,9 @@ const AdminConfig = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>Ou cole a URL da logo</Label>
-                  <Input
-                    placeholder="https://exemplo.com/logo.png"
-                    value={logoUrl || ""}
-                    onChange={(e) => setLogoUrl(e.target.value || null)}
-                    maxLength={500}
-                  />
+                  <Input placeholder="https://exemplo.com/logo.png" value={site.logoUrl || ""} onChange={(e) => setSite({ ...site, logoUrl: e.target.value || null })} maxLength={500} />
                 </div>
               </div>
-
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Título do Site (SEO)</Label>
@@ -255,7 +224,7 @@ const AdminConfig = () => {
                   </div>
                 </div>
               </div>
-              <Button onClick={() => handleSave("Site")} disabled={saving} className="rounded-xl">
+              <Button onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Site")} disabled={saving} className="rounded-xl">
                 {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
                 Salvar
               </Button>
@@ -303,7 +272,7 @@ const AdminConfig = () => {
                   <Switch checked={pagamentos.boleto} onCheckedChange={(v) => setPagamentos({ ...pagamentos, boleto: v })} />
                 </div>
               </div>
-              <Button onClick={() => handleSave("Pagamento")} disabled={saving} className="rounded-xl">
+              <Button onClick={() => saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Pagamento")} disabled={saving} className="rounded-xl">
                 {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
                 Salvar
               </Button>
@@ -317,11 +286,11 @@ const AdminConfig = () => {
             <CardContent className="p-6 space-y-5">
               <h3 className="font-display font-bold text-foreground text-lg">Canais de Notificação</h3>
               <div className="space-y-3">
-                {[
+                {([
                   { key: "email" as const, label: "E-mail", desc: "Receber notificações por e-mail" },
                   { key: "whatsapp" as const, label: "WhatsApp", desc: "Alertas de reservas via WhatsApp" },
                   { key: "push" as const, label: "Push Notifications", desc: "Notificações no navegador" },
-                ].map((item) => (
+                ] as const).map((item) => (
                   <div key={item.key} className="flex items-center justify-between p-4 border border-border rounded-xl">
                     <div>
                       <p className="font-medium text-foreground">{item.label}</p>
@@ -331,14 +300,13 @@ const AdminConfig = () => {
                   </div>
                 ))}
               </div>
-
               <h3 className="font-display font-bold text-foreground text-lg pt-4">Eventos</h3>
               <div className="space-y-3">
-                {[
+                {([
                   { key: "novaReserva" as const, label: "Nova Reserva", desc: "Notificar quando uma nova reserva é criada" },
                   { key: "cancelamento" as const, label: "Cancelamento", desc: "Notificar quando uma reserva é cancelada" },
                   { key: "pagamento" as const, label: "Pagamento Confirmado", desc: "Notificar quando um pagamento é confirmado" },
-                ].map((item) => (
+                ] as const).map((item) => (
                   <div key={item.key} className="flex items-center justify-between p-4 border border-border rounded-xl">
                     <div>
                       <p className="font-medium text-foreground">{item.label}</p>
@@ -348,7 +316,7 @@ const AdminConfig = () => {
                   </div>
                 ))}
               </div>
-              <Button onClick={() => handleSave("Notificações")} disabled={saving} className="rounded-xl">
+              <Button onClick={() => saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações")} disabled={saving} className="rounded-xl">
                 {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
                 Salvar
               </Button>
@@ -372,33 +340,17 @@ const AdminConfig = () => {
                       placeholder="Mínimo 8 caracteres"
                       maxLength={72}
                     />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
+                    <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" onClick={() => setShowPassword(!showPassword)}>
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </Button>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Confirmar Nova Senha</Label>
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    value={confirmarSenha}
-                    onChange={(e) => setConfirmarSenha(e.target.value)}
-                    placeholder="Repita a nova senha"
-                    maxLength={72}
-                  />
+                  <Input type={showPassword ? "text" : "password"} value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} placeholder="Repita a nova senha" maxLength={72} />
                 </div>
-                {novaSenha && novaSenha.length < 8 && (
-                  <p className="text-xs text-destructive">A senha deve ter pelo menos 8 caracteres.</p>
-                )}
-                {confirmarSenha && novaSenha !== confirmarSenha && (
-                  <p className="text-xs text-destructive">As senhas não conferem.</p>
-                )}
+                {novaSenha && novaSenha.length < 8 && <p className="text-xs text-destructive">A senha deve ter pelo menos 8 caracteres.</p>}
+                {confirmarSenha && novaSenha !== confirmarSenha && <p className="text-xs text-destructive">As senhas não conferem.</p>}
               </div>
               <Button onClick={handleChangePassword} disabled={changingPassword} className="rounded-xl">
                 {changingPassword ? <Loader2 size={16} className="animate-spin mr-1" /> : <Shield size={16} className="mr-1" />}
