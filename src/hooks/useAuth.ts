@@ -8,20 +8,26 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const checkAdminRole = useCallback(async (userId: string) => {
+  const checkAdminRole = useCallback(async (userId: string): Promise<boolean> => {
     try {
-      const { data } = await supabase.rpc("has_role", {
+      const { data, error } = await supabase.rpc("has_role", {
         _user_id: userId,
         _role: "admin",
       });
-      setIsAdmin(!!data);
-    } catch {
-      setIsAdmin(false);
+      if (error) {
+        console.error("has_role RPC error:", error.message);
+        return false;
+      }
+      return !!data;
+    } catch (err) {
+      console.error("has_role exception:", err);
+      return false;
     }
   }, []);
 
   useEffect(() => {
     let mounted = true;
+    let initialResolved = false;
 
     // 1. Set up auth state listener FIRST (per Supabase docs)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -31,31 +37,36 @@ export function useAuth() {
         setUser(newSession?.user ?? null);
 
         if (newSession?.user) {
-          await checkAdminRole(newSession.user.id);
+          const admin = await checkAdminRole(newSession.user.id);
+          if (mounted) setIsAdmin(admin);
         } else {
           setIsAdmin(false);
         }
-        setLoading(false);
+        if (mounted) {
+          initialResolved = true;
+          setLoading(false);
+        }
       }
     );
 
-    // 2. Then check for existing session
+    // 2. Then check for existing session (fallback)
     supabase.auth.getSession().then(async ({ data: { session: existingSession } }) => {
-      if (!mounted) return;
+      if (!mounted || initialResolved) return;
       setSession(existingSession);
       setUser(existingSession?.user ?? null);
 
       if (existingSession?.user) {
-        await checkAdminRole(existingSession.user.id);
+        const admin = await checkAdminRole(existingSession.user.id);
+        if (mounted) setIsAdmin(admin);
       }
-      setLoading(false);
-    }).catch(() => {
       if (mounted) setLoading(false);
+    }).catch(() => {
+      if (mounted && !initialResolved) setLoading(false);
     });
 
-    // 3. Safety timeout - never stay loading forever
+    // 3. Safety timeout
     const timeout = setTimeout(() => {
-      if (mounted) setLoading(false);
+      if (mounted && !initialResolved) setLoading(false);
     }, 5000);
 
     return () => {
