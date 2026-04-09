@@ -1,6 +1,10 @@
-# Lençóis Tour - Sistema de Gestão de Turismo de Aventura
+# 🏖️ LençóisTour – Sistema de Gestão de Turismo de Aventura
 
-Sistema completo para operação de turismo de aventura na **Rota das Emoções – Lençóis Maranhenses**, desenvolvido para a empresa **LENÇÓIS TOUR**.
+Sistema completo para operação de turismo de aventura na **Rota das Emoções – Lençóis Maranhenses, Santo Amaro – MA**, desenvolvido para a empresa **LENÇÓIS TOUR**.
+
+> **URL de produção:** [lencoistur.lovable.app](https://lencoistur.lovable.app)
+
+---
 
 ## 🌐 Idiomas Suportados
 
@@ -8,64 +12,82 @@ Sistema completo para operação de turismo de aventura na **Rota das Emoções 
 - 🇺🇸 Inglês
 - 🇪🇸 Espanhol
 
+---
+
 ## 📦 Módulos do Sistema
 
 ### Frontend (Site Público)
-- **Landing Page** com hero, galeria, depoimentos, FAQ
-- **Catálogo de Passeios** com filtros e detalhes
-- **Translados** com rotas e preços
-- **Motor de Reservas** com checkout e pagamento PIX
-- **Chatbot IA** assistente virtual multilíngue
-- **WhatsApp Float** para contato rápido
-- **Minhas Reservas** consulta por código/email
+
+| Funcionalidade | Descrição |
+|----------------|-----------|
+| Landing Page | Hero, galeria HD dos Lençóis Maranhenses, depoimentos, FAQ, parceiros |
+| Catálogo de Passeios | Listagem com filtros, detalhes, imagens em alta resolução |
+| Translados | Rotas com preços, veículo, distância e horários |
+| Motor de Reservas | Checkout completo com geração de código PIX |
+| Chatbot IA | Assistente virtual multilíngue (Lovable AI) |
+| WhatsApp Float | Botão flutuante para contato rápido |
+| Minhas Reservas | Consulta por código de reserva e e-mail |
 
 ### Painel Administrativo (`/admin`)
 
 | Módulo | Rota | Descrição |
 |--------|------|-----------|
-| Dashboard | `/admin` | Visão geral com KPIs e gráficos |
-| CRM | `/admin/crm` | Gestão de clientes |
-| Reservas | `/admin/reservas` | Gestão de reservas e pagamentos |
-| Passeios | `/admin/passeios` | Cadastro e gestão de passeios |
-| Translados | `/admin/translados` | Rotas de transfer |
-| Financeiro | `/admin/financeiro` | Relatórios financeiros |
-| Parceiros | `/admin/parceiros` | Gestão de parceiros |
+| Dashboard | `/admin` | KPIs em tempo real, gráficos de receita e reservas |
+| CRM – Clientes | `/admin/crm` | Gestão de clientes com filtros, exportação CSV, WhatsApp integrado |
+| Reservas | `/admin/reservas` | Gestão de reservas, confirmação/cancelamento, status de pagamento |
+| Passeios | `/admin/passeios` | CRUD com upload de imagens (URL ou arquivo, alta resolução) |
+| Translados | `/admin/translados` | Gestão de rotas de transfer |
+| Financeiro | `/admin/financeiro` | Relatórios financeiros e métricas |
+| Parceiros | `/admin/parceiros` | CRUD de parceiros por tipo, ativação/desativação, busca avançada |
 | Avaliações | `/admin/avaliacoes` | Reviews dos clientes |
-| Marketing | `/admin/marketing` | Campanhas e analytics |
+| Marketing | `/admin/marketing` | Campanhas WhatsApp/E-mail, gestão de leads, remarketing |
 | IA | `/admin/ia` | Configurações do chatbot IA |
-| Configurações | `/admin/config` | Configurações gerais |
+| Configurações | `/admin/config` | Senha admin, upload de logo, configurações do site |
 
 ### SGS – Sistema de Gestão de Segurança (`/admin/sgs`)
 
-Módulo de segurança conforme normas **ABNT NBR ISO 21101, 21102 e 21103**.
+Módulo de segurança em conformidade com **ABNT NBR ISO 21101, 21102, 21103** e exigências da **Devolutiva VATI**.
 
 | Submódulo | Rota | Descrição |
 |-----------|------|-----------|
-| Dashboard | `/admin/sgs` | Indicadores de segurança e gráficos |
-| Riscos | `/admin/sgs/riscos` | Matriz de risco operacional (P×I=NR) |
-| Incidentes | `/admin/sgs/incidentes` | Registro de incidentes e quase-acidentes |
-| Ações Corretivas | `/admin/sgs/acoes` | Tratamento de riscos identificados |
-| Equipe | `/admin/sgs/equipe` | Competência e treinamentos (ISO 21102) |
-| Auditorias | `/admin/sgs/auditorias` | Auditorias internas de segurança |
-| Fornecedores | `/admin/sgs/fornecedores` | Conformidade de fornecedores |
+| Dashboard | `/admin/sgs` | Indicadores de segurança, gráficos e alertas |
+| Matriz de Riscos | `/admin/sgs/riscos` | Risco operacional (P×I=NR) – 9 etapas, 3 níveis |
+| Incidentes | `/admin/sgs/incidentes` | Registro com fotos, severidade e ações tomadas |
+| Ações Corretivas | `/admin/sgs/acoes` | Tratamento e acompanhamento de riscos |
+| Equipe | `/admin/sgs/equipe` | Competência, treinamentos e certificações (ISO 21102) |
+| Auditorias | `/admin/sgs/auditorias` | Auditorias internas com checklist e plano de melhoria |
+| Fornecedores | `/admin/sgs/fornecedores` | Conformidade documental e veicular |
+| Termos de Ciência | `/admin/sgs/termos` | Termos de risco com assinatura digital (P6) |
+| Resumo/Briefings | `/admin/sgs/briefings` | Briefings de segurança pré-passeio |
+| Pesquisas | `/admin/sgs/pesquisas` | Pesquisas de satisfação e segurança pós-passeio |
 
 #### Automações SGS
-- Risco NR > 10 → ação corretiva automática
+- Risco NR ≥ 6 → ação corretiva automática
 - Incidente grave → ação corretiva automática
 - Fornecedor irregular → bloqueio automático
 
-## 🗄️ Banco de Dados (Supabase/PostgreSQL)
+#### Classificação de Risco (NR = P × I)
+| Nível | Faixa | Ação |
+|-------|-------|------|
+| 🟢 Aceitável | NR < 6 | Monitorar |
+| 🟡 Temporário | 6 ≤ NR ≤ 11 | Ação corretiva obrigatória |
+| 🔴 Inaceitável | NR ≥ 12 | Suspender atividade |
 
-### Tabelas Principais
+---
+
+## 🗄️ Banco de Dados
+
+### Tabelas Principais (17 tabelas com RLS ativo)
 
 | Tabela | Descrição |
 |--------|-----------|
-| `customers` | Clientes cadastrados |
-| `bookings` | Reservas de passeios e translados |
-| `tours` | Catálogo de passeios |
+| `customers` | Clientes (validação de email, nome, telefone, CPF) |
+| `bookings` | Reservas com validação server-side (preço, quantidade, status) |
+| `tours` | Catálogo de passeios com imagens e metadados |
 | `transfer_routes` | Rotas de translado |
 | `partners` | Parceiros e fornecedores |
-| `reviews` | Avaliações dos clientes |
+| `reviews` | Avaliações dos clientes (leitura pública) |
+| `user_roles` | Controle de acesso RBAC (admin/moderator/user) |
 
 ### Tabelas SGS (Segurança)
 
@@ -83,15 +105,43 @@ Módulo de segurança conforme normas **ABNT NBR ISO 21101, 21102 e 21103**.
 | `sgs_supplier_compliance` | Conformidade de fornecedores |
 | `sgs_safety_surveys` | Pesquisas de segurança pós-passeio |
 
+---
+
+## 🔒 Segurança
+
+| Camada | Implementação |
+|--------|---------------|
+| Autenticação | Supabase Auth (email/senha) |
+| Autorização | RBAC via tabela `user_roles` + função `has_role()` (SECURITY DEFINER) |
+| RLS | Ativo em todas as 17 tabelas |
+| Proteção de Rotas | Componente `AdminRoute` no frontend |
+| Validação de Dados | Server-side via RLS policies (preço, status, formato) |
+| Booking Code | Gerado por trigger (`LT-YYYYMMDD-XXXX`) anti-enumeração |
+| Escalação de Privilégios | INSERT/UPDATE/DELETE bloqueados na tabela `user_roles` |
+| Storage | Bucket `tour-images` público para leitura, upload restrito |
+
+### Edge Functions
+| Função | Descrição |
+|--------|-----------|
+| `chat` | Chatbot IA com Lovable AI Gateway |
+
+---
+
 ## 🛠️ Tecnologias
 
-- **Frontend:** React 18 + TypeScript + Vite + Tailwind CSS
-- **UI:** shadcn/ui + Radix UI + Lucide Icons
-- **Backend:** Supabase (PostgreSQL + Auth + Edge Functions + Storage)
-- **IA:** Lovable AI (Gemini) para chatbot
-- **i18n:** i18next (PT/EN/ES)
-- **Gráficos:** Recharts
-- **State:** TanStack React Query
+| Categoria | Stack |
+|-----------|-------|
+| Frontend | React 18, TypeScript 5, Vite 5, Tailwind CSS 3 |
+| UI | shadcn/ui, Radix UI, Lucide Icons |
+| Backend | Lovable Cloud (PostgreSQL, Auth, Edge Functions, Storage) |
+| IA | Lovable AI (modelos Google/OpenAI) |
+| i18n | i18next (PT/EN/ES) |
+| Gráficos | Recharts |
+| State | TanStack React Query |
+| Validação | Zod |
+| Formulários | React Hook Form |
+
+---
 
 ## 🚀 Como Executar
 
@@ -102,8 +152,17 @@ npm run dev
 
 Acesse: `http://localhost:8080`
 
+---
+
 ## 📋 Normas de Referência
 
 - **ABNT NBR ISO 21101** – Sistema de Gestão de Segurança para Turismo de Aventura
 - **ABNT NBR ISO 21102** – Competência dos Líderes de Turismo de Aventura
 - **ABNT NBR ISO 21103** – Informações aos Participantes de Turismo de Aventura
+- **Devolutiva VATI** – Plano de Ação para Segurança Turística
+
+---
+
+## 📄 Licença
+
+Projeto proprietário – **LENÇÓIS TOUR** © 2026. Todos os direitos reservados.
