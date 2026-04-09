@@ -3,13 +3,13 @@ import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const galleryImages = [
-  { src: "https://images.unsplash.com/photo-1650623598032-4fddce25b34f?w=1200&q=80&auto=format&fit=crop", alt: "Vista aérea dos Lençóis Maranhenses - Santo Amaro" },
-  { src: "https://images.unsplash.com/photo-1561916108-2d4d48d132c8?w=1200&q=80&auto=format&fit=crop", alt: "Lagoas cristalinas entre dunas brancas" },
-  { src: "https://images.unsplash.com/photo-1704644411334-f6ca48963d6c?w=1200&q=80&auto=format&fit=crop", alt: "Grupo nas dunas dos Lençóis Maranhenses" },
-  { src: "https://images.unsplash.com/photo-1680323535239-25b4b65eee75?w=1200&q=80&auto=format&fit=crop", alt: "Dunas e lagoas dos Lençóis" },
-  { src: "https://images.unsplash.com/photo-1672271688662-3a03bbb75ec9?w=1200&q=80&auto=format&fit=crop", alt: "Lagoa cercada por dunas brancas" },
-  { src: "https://images.unsplash.com/photo-1671385054651-f017771dea4a?w=1200&q=80&auto=format&fit=crop", alt: "Lagoa cristalina no meio das dunas" },
-  { src: "https://images.unsplash.com/photo-1679095007377-e6c8e13f9178?w=1200&q=80&auto=format&fit=crop", alt: "Farol de Mandacaru - Lençóis Maranhenses" },
+  { src: "https://images.unsplash.com/photo-1704644411334-f6ca48963d6c?w=1200&q=90&auto=format&fit=crop", alt: "Dunas brancas e lagoas azuis dos Lençóis Maranhenses - Santo Amaro" },
+  { src: "https://images.unsplash.com/photo-1650623598032-4fddce25b34f?w=1200&q=90&auto=format&fit=crop", alt: "Vista aérea das lagoas cristalinas entre dunas" },
+  { src: "https://images.unsplash.com/photo-1680323535239-25b4b65eee75?w=1200&q=90&auto=format&fit=crop", alt: "Panorama das dunas e lagoas dos Lençóis Maranhenses" },
+  { src: "https://images.unsplash.com/photo-1672271688662-3a03bbb75ec9?w=1200&q=90&auto=format&fit=crop", alt: "Lagoa cercada por dunas brancas em Santo Amaro" },
+  { src: "https://images.unsplash.com/photo-1671385054651-f017771dea4a?w=1200&q=90&auto=format&fit=crop", alt: "Lagoa cristalina no coração dos Lençóis" },
+  { src: "https://images.unsplash.com/photo-1679095007377-e6c8e13f9178?w=1200&q=90&auto=format&fit=crop", alt: "Farol de Mandacaru - Lençóis Maranhenses" },
+  { src: "https://images.unsplash.com/photo-1561916108-2d4d48d132c8?w=1200&q=90&auto=format&fit=crop", alt: "Turistas nas lagoas dos Lençóis Maranhenses" },
 ];
 
 const GallerySection = () => {

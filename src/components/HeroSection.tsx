@@ -2,7 +2,7 @@ import { Search, MapPin, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-const HERO_IMG = "https://images.unsplash.com/photo-1650623598032-4fddce25b34f?w=1920&q=80&auto=format&fit=crop";
+const HERO_IMG = "https://images.unsplash.com/photo-1704644411334-f6ca48963d6c?w=1920&q=90&auto=format&fit=crop";
 
 const categoryKeys = ["boat", "eco", "gastro", "cultural", "kayak", "trekking"] as const;
 
