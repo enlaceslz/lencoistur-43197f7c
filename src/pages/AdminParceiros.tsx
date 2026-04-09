@@ -153,11 +153,14 @@ const AdminParceiros = () => {
   const handleSave = async () => {
     if (!form.name.trim()) { toast.error("Nome é obrigatório."); return; }
     setSaving(true);
-    const payload = {
+    const payload: Record<string, unknown> = {
       name: form.name.trim(), type: form.type,
       contact_name: form.contact_name.trim() || null, phone: form.phone.trim() || null,
       email: form.email.trim() || null, commission_rate: Number(form.commission_rate) || 0,
       cpf_cnpj: form.cpf_cnpj.trim() || null, address: form.address.trim() || null,
+      cnh: form.type === "motorista" ? (form.cnh.trim() || null) : null,
+      cnh_validade: form.type === "motorista" && form.cnh_validade ? form.cnh_validade : null,
+      cadastur: form.type === "guia" ? (form.cadastur.trim() || null) : null,
     };
 
     if (editPartner) {
