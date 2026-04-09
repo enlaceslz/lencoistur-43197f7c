@@ -32,6 +32,9 @@ interface Partner {
   active: boolean;
   cpf_cnpj: string | null;
   address: string | null;
+  cnh: string | null;
+  cnh_validade: string | null;
+  cadastur: string | null;
 }
 
 const typeConfig: Record<string, { icon: typeof Building2; label: string; color: string }> = {
