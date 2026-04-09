@@ -32,6 +32,9 @@ interface Partner {
   active: boolean;
   cpf_cnpj: string | null;
   address: string | null;
+  cnh: string | null;
+  cnh_validade: string | null;
+  cadastur: string | null;
 }
 
 const typeConfig: Record<string, { icon: typeof Building2; label: string; color: string }> = {
@@ -72,7 +75,7 @@ const AdminParceiros = () => {
   const [cnpjLoading, setCnpjLoading] = useState(false);
   const [form, setForm] = useState({
     name: "", type: "hotel", contact_name: "", phone: "", email: "",
-    commission_rate: "10", cpf_cnpj: "", address: "",
+    commission_rate: "10", cpf_cnpj: "", address: "", cnh: "", cnh_validade: "", cadastur: "",
   });
 
   const types = ["todos", ...Object.keys(typeConfig)];
@@ -88,7 +91,7 @@ const AdminParceiros = () => {
 
   const openNew = () => {
     setEditPartner(null);
-    setForm({ name: "", type: "hotel", contact_name: "", phone: "", email: "", commission_rate: "10", cpf_cnpj: "", address: "" });
+    setForm({ name: "", type: "hotel", contact_name: "", phone: "", email: "", commission_rate: "10", cpf_cnpj: "", address: "", cnh: "", cnh_validade: "", cadastur: "" });
     setDialogOpen(true);
   };
 
@@ -99,6 +102,7 @@ const AdminParceiros = () => {
       contact_name: p.contact_name || "", phone: p.phone || "",
       email: p.email || "", commission_rate: String(p.commission_rate || 0),
       cpf_cnpj: p.cpf_cnpj || "", address: p.address || "",
+      cnh: p.cnh || "", cnh_validade: p.cnh_validade || "", cadastur: p.cadastur || "",
     });
     setDialogOpen(true);
   };
@@ -154,6 +158,9 @@ const AdminParceiros = () => {
       contact_name: form.contact_name.trim() || null, phone: form.phone.trim() || null,
       email: form.email.trim() || null, commission_rate: Number(form.commission_rate) || 0,
       cpf_cnpj: form.cpf_cnpj.trim() || null, address: form.address.trim() || null,
+      cnh: form.type === "motorista" ? (form.cnh.trim() || null) : null,
+      cnh_validade: form.type === "motorista" && form.cnh_validade ? form.cnh_validade : null,
+      cadastur: form.type === "guia" ? (form.cadastur.trim() || null) : null,
     };
 
     if (editPartner) {
@@ -287,6 +294,12 @@ const AdminParceiros = () => {
                       <TableCell className="text-muted-foreground text-sm">
                         {p.contact_name && <span className="block">{p.contact_name}</span>}
                         {p.phone && <span className="block">{p.phone}</span>}
+                        {p.type === "motorista" && p.cnh && (
+                          <span className="block text-xs text-amber-600 dark:text-amber-400">CNH: {p.cnh}{p.cnh_validade ? ` (val. ${new Date(p.cnh_validade + "T12:00:00").toLocaleDateString("pt-BR")})` : ""}</span>
+                        )}
+                        {p.type === "guia" && p.cadastur && (
+                          <span className="block text-xs text-green-600 dark:text-green-400">Cadastur: {p.cadastur}</span>
+                        )}
                       </TableCell>
                       <TableCell className="font-medium text-foreground">{p.commission_rate || 0}%</TableCell>
                       <TableCell>
@@ -374,6 +387,34 @@ const AdminParceiros = () => {
               <Label className="mb-1.5 block">Comissão (%)</Label>
               <Input type="number" min="0" max="100" value={form.commission_rate} onChange={(e) => setForm({ ...form, commission_rate: e.target.value })} />
             </div>
+
+            {/* Motorista: CNH fields */}
+            {form.type === "motorista" && (
+              <div className="space-y-4 p-4 border border-amber-200 dark:border-amber-800 rounded-xl bg-amber-50/50 dark:bg-amber-900/10">
+                <p className="text-sm font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1"><Car size={14} /> Dados do Motorista</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="mb-1.5 block">Nº da CNH</Label>
+                    <Input value={form.cnh} onChange={(e) => setForm({ ...form, cnh: e.target.value })} placeholder="00000000000" maxLength={20} />
+                  </div>
+                  <div>
+                    <Label className="mb-1.5 block">Validade da CNH</Label>
+                    <Input type="date" value={form.cnh_validade} onChange={(e) => setForm({ ...form, cnh_validade: e.target.value })} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Guia: Cadastur field */}
+            {form.type === "guia" && (
+              <div className="space-y-4 p-4 border border-green-200 dark:border-green-800 rounded-xl bg-green-50/50 dark:bg-green-900/10">
+                <p className="text-sm font-semibold text-green-700 dark:text-green-400 flex items-center gap-1"><Compass size={14} /> Dados do Guia</p>
+                <div>
+                  <Label className="mb-1.5 block">Nº Cadastur (Autorização)</Label>
+                  <Input value={form.cadastur} onChange={(e) => setForm({ ...form, cadastur: e.target.value })} placeholder="Número de registro no Cadastur" maxLength={30} />
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
