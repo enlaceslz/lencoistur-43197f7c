@@ -796,6 +796,7 @@ export type Database = {
           location: string | null
           name: string
           operator: string | null
+          pix_discount: number
           price: number
           rating: number | null
           reviews_count: number | null
@@ -819,6 +820,7 @@ export type Database = {
           location?: string | null
           name: string
           operator?: string | null
+          pix_discount?: number
           price: number
           rating?: number | null
           reviews_count?: number | null
@@ -842,6 +844,7 @@ export type Database = {
           location?: string | null
           name?: string
           operator?: string | null
+          pix_discount?: number
           price?: number
           rating?: number | null
           reviews_count?: number | null
@@ -861,6 +864,7 @@ export type Database = {
           duration: string | null
           id: string
           origin: string
+          pix_discount: number
           price: number
           seats: number | null
           updated_at: string
@@ -875,6 +879,7 @@ export type Database = {
           duration?: string | null
           id?: string
           origin: string
+          pix_discount?: number
           price: number
           seats?: number | null
           updated_at?: string
@@ -889,6 +894,7 @@ export type Database = {
           duration?: string | null
           id?: string
           origin?: string
+          pix_discount?: number
           price?: number
           seats?: number | null
           updated_at?: string
