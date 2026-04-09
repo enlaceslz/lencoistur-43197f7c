@@ -38,6 +38,7 @@ const CheckoutPage = () => {
 
   const itemName = tour?.name || (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
   const unitPrice = tour?.price || transfer?.price || 0;
+  const pixDiscountPercent = tour?.pix_discount || transfer?.pix_discount || 0;
   const image = tour?.images?.[0] || "";
   const location = tour?.location || (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
 
@@ -63,9 +64,11 @@ const CheckoutPage = () => {
   }
 
   const total = unitPrice * guests;
-  // displayDiscount is display-only; DB enforces displayDiscount=0 and final_total=total
-  const displayDiscount = payMethod === "pix" ? Math.round(total * 0.05) : 0;
-  const finalTotal = total;
+  // PIX discount is calculated server-side; display only for UI feedback
+  const displayDiscount = payMethod === "pix" && pixDiscountPercent > 0
+    ? Math.round(total * pixDiscountPercent / 100)
+    : 0;
+  const finalTotal = total - displayDiscount;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
