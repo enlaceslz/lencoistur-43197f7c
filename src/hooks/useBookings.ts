@@ -102,53 +102,24 @@ export function useBookings() {
     async (
       data: Omit<BookingItem, "id" | "bookingCode" | "createdAt" | "pixCode" | "status" | "paymentStatus" | "customerId">
     ): Promise<BookingItem> => {
-      // Create or find customer
-      const { data: customer, error: customerError } = await supabase
-        .from("customers")
-        .insert({
-          name: data.customerName,
-          email: data.customerEmail,
-          phone: data.customerPhone,
-        })
-        .select()
-        .single();
-
-      if (customerError || !customer) {
-        throw new Error("Erro ao cadastrar cliente");
-      }
-
-      const bookingCode = generateBookingCode();
-      const pixCode = data.payMethod === "pix" ? generatePixCode() : null;
-
-      // RLS enforces: discount=0, final_total=total, status/payment_status='pendente'
-      const total = data.unitPrice * data.guests;
-      const { data: booking, error: bookingError } = await supabase
-        .from("bookings")
-        .insert({
-          booking_code: bookingCode,
-          customer_id: customer.id,
+      const { data: result, error } = await supabase.functions.invoke("create-booking", {
+        body: {
           type: data.type === "transfer" ? "translado" : "passeio",
-          item_name: data.itemName,
+          itemName: data.itemName,
           date: data.date || null,
           guests: data.guests,
-          unit_price: data.unitPrice,
-          total: total,
-          discount: 0,
-          final_total: total,
-          pay_method: data.payMethod,
-          status: "pendente",
-          payment_status: "pendente",
-          pix_code: pixCode,
-          notes: null,
-        })
-        .select("*, customers(*)")
-        .single();
+          payMethod: data.payMethod,
+          customerName: data.customerName,
+          customerEmail: data.customerEmail,
+          customerPhone: data.customerPhone,
+        },
+      });
 
-      if (bookingError || !booking) {
-        throw new Error("Erro ao criar reserva");
+      if (error || !result) {
+        throw new Error(result?.error || "Erro ao criar reserva");
       }
 
-      const mapped = mapDbToBooking(booking, booking.customers);
+      const mapped = mapDbToBooking(result, result.customers);
       setBookings((prev) => [mapped, ...prev]);
       return mapped;
     },
