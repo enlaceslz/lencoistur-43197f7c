@@ -19,6 +19,7 @@ import AdminAvaliacoes from "./pages/AdminAvaliacoes.tsx";
 import AdminConfig from "./pages/AdminConfig.tsx";
 import AdminMarketing from "./pages/AdminMarketing.tsx";
 import AdminIA from "./pages/AdminIA.tsx";
+import AdminDocumentos from "./pages/AdminDocumentos.tsx";
 import AdminLogin from "./pages/AdminLogin.tsx";
 import CheckoutPage from "./pages/CheckoutPage.tsx";
 import MinhasReservas from "./pages/MinhasReservas.tsx";
@@ -61,6 +62,7 @@ const App = () => (
           <Route path="/admin/config" element={<AdminRoute><AdminConfig /></AdminRoute>} />
           <Route path="/admin/marketing" element={<AdminRoute><AdminMarketing /></AdminRoute>} />
           <Route path="/admin/ia" element={<AdminRoute><AdminIA /></AdminRoute>} />
+          <Route path="/admin/documentos" element={<AdminRoute><AdminDocumentos /></AdminRoute>} />
           <Route path="/admin/sgs" element={<AdminRoute><AdminSGSDashboard /></AdminRoute>} />
           <Route path="/admin/sgs/riscos" element={<AdminRoute><AdminSGSRiscos /></AdminRoute>} />
           <Route path="/admin/sgs/incidentes" element={<AdminRoute><AdminSGSIncidentes /></AdminRoute>} />

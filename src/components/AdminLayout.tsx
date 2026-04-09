@@ -19,6 +19,7 @@ const mainItems = [
   { icon: Star, label: "Avaliações", path: "/admin/avaliacoes" },
   { icon: Megaphone, label: "Marketing", path: "/admin/marketing" },
   { icon: Bot, label: "Inteligência Artificial", path: "/admin/ia" },
+  { icon: FileText, label: "Documentação", path: "/admin/documentos" },
 ];
 
 const sgsItems = [
