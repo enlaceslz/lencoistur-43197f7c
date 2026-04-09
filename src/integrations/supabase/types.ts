@@ -85,6 +85,101 @@ export type Database = {
           },
         ]
       }
+      contas_pagar: {
+        Row: {
+          categoria: string
+          created_at: string
+          descricao: string
+          fornecedor: string | null
+          id: string
+          observacoes: string | null
+          pago_em: string | null
+          status: string
+          updated_at: string
+          valor: number
+          vencimento: string
+        }
+        Insert: {
+          categoria?: string
+          created_at?: string
+          descricao: string
+          fornecedor?: string | null
+          id?: string
+          observacoes?: string | null
+          pago_em?: string | null
+          status?: string
+          updated_at?: string
+          valor?: number
+          vencimento: string
+        }
+        Update: {
+          categoria?: string
+          created_at?: string
+          descricao?: string
+          fornecedor?: string | null
+          id?: string
+          observacoes?: string | null
+          pago_em?: string | null
+          status?: string
+          updated_at?: string
+          valor?: number
+          vencimento?: string
+        }
+        Relationships: []
+      }
+      contas_receber: {
+        Row: {
+          booking_id: string | null
+          categoria: string
+          cliente: string | null
+          created_at: string
+          descricao: string
+          id: string
+          observacoes: string | null
+          recebido_em: string | null
+          status: string
+          updated_at: string
+          valor: number
+          vencimento: string
+        }
+        Insert: {
+          booking_id?: string | null
+          categoria?: string
+          cliente?: string | null
+          created_at?: string
+          descricao: string
+          id?: string
+          observacoes?: string | null
+          recebido_em?: string | null
+          status?: string
+          updated_at?: string
+          valor?: number
+          vencimento: string
+        }
+        Update: {
+          booking_id?: string | null
+          categoria?: string
+          cliente?: string | null
+          created_at?: string
+          descricao?: string
+          id?: string
+          observacoes?: string | null
+          recebido_em?: string | null
+          status?: string
+          updated_at?: string
+          valor?: number
+          vencimento?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contas_receber_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           cpf: string | null
