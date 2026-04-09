@@ -1,27 +1,43 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, CheckCircle, XCircle, Shield } from "lucide-react";
+import { Plus, CheckCircle, XCircle, Shield, FileText } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
+// Riscos inerentes conforme P6 VATTI
 const RISKS_OPTIONS = [
-  "Exposição solar intensa e risco de insolação",
-  "Terreno irregular nas dunas (risco de torção/queda)",
-  "Possibilidade de afogamento nas lagoas",
-  "Chuvas e mudanças climáticas repentinas",
-  "Contato com fauna local (insetos, animais silvestres)",
-  "Esforço físico moderado a intenso",
-  "Risco de colisão veicular no trajeto",
-  "Condições de maré e correntes aquáticas",
+  "Insolação e hipotermia",
+  "Picadas de insetos e animais peçonhentos",
+  "Mau tempo e mudanças climáticas repentinas",
+  "Perda de objetos pessoais",
+  "Capotamento ou tombamento do veículo",
+  "Colisão com outro veículo",
+  "Quedas na água",
+  "Ingestão ou respiração de água",
+  "Afogamento",
+  "Lesões graves ou gravíssimas (traumatismos, escoriações)",
+  "Queimadura solar",
+  "Desidratação",
 ];
 
+// Controles operacionais VATTI
 const SAFETY_CONTROLS = [
   "Capacitação constante da equipe de condutores",
   "Cabo de resgate disponível em todas as operações",
-  "Orientações de segurança aos clientes antes e durante",
-  "Equipe capacitada em primeiros socorros",
+  "Orientações de segurança por escrito e verbalmente",
+  "Equipe capacitada pelo Corpo de Bombeiros em primeiros socorros",
   "Equipe preparada para realizar resgates",
   "Plano de Resposta a Emergências (PRE) implementado",
+  "Veículos equipados: extintor, kit primeiros socorros, GPS, cinta de reboque, pá",
+  "Checklist operacional verificado antes de cada passeio",
+];
+
+// Questões de saúde P6 VATTI
+const HEALTH_QUESTIONS = [
+  "Alergia", "Diabetes", "Desmaios e/ou convulsões", "Obeso(a)",
+  "Cirurgia recente", "Sedentário(a)", "Parte do corpo imobilizada",
+  "Portador de necessidades especiais", "Fobia a água",
+  "Sob efeito de álcool e/ou entorpecentes",
 ];
 
 const AdminSGSTermos = () => {
@@ -32,7 +48,7 @@ const AdminSGSTermos = () => {
   const [form, setForm] = useState({
     customer_name: "", nationality: "", phone: "", tour_name: "",
     risks_informed: [] as string[],
-    cancellation_policy: "Cancelamento gratuito até 24h antes do passeio. Após esse prazo, retenção de 50% do valor. No-show: sem reembolso.",
+    cancellation_policy: "Cancelamento com reembolso integral até 30 dias antes do passeio. Prazo inferior a 30 dias: sem reembolso. No-show: sem reembolso. Em caso de cancelamento por segurança/motivos alheios ao comprador: remarcação ou reembolso integral.",
   });
 
   useEffect(() => { load(); }, []);
@@ -53,6 +69,10 @@ const AdminSGSTermos = () => {
     }));
   };
 
+  const selectAllRisks = () => {
+    setForm(f => ({ ...f, risks_informed: f.risks_informed.length === RISKS_OPTIONS.length ? [] : [...RISKS_OPTIONS] }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.risks_informed.length === 0) {
@@ -67,7 +87,7 @@ const AdminSGSTermos = () => {
     } else {
       toast({ title: "Termo de ciência registrado com sucesso!" });
       setShowForm(false);
-      setForm({ customer_name: "", nationality: "", phone: "", tour_name: "", risks_informed: [], cancellation_policy: form.cancellation_policy });
+      setForm({ ...form, customer_name: "", nationality: "", phone: "", tour_name: "", risks_informed: [] });
       load();
     }
   };
@@ -92,19 +112,29 @@ const AdminSGSTermos = () => {
 
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-5">
-            {/* Company header */}
+            {/* Company header P6 VATTI */}
             <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
               <div className="flex items-center gap-3 mb-2">
                 <Shield size={20} className="text-primary" />
-                <h3 className="font-display font-bold text-foreground">Termo de Ciência e Aceitação de Riscos</h3>
+                <h3 className="font-display font-bold text-foreground">Termo de Conhecimento de Risco e Corresponsabilidade</h3>
               </div>
-              <p className="text-xs text-muted-foreground">LENÇÓIS TOUR — Operadora de Turismo de Aventura • Rota das Emoções — Lençóis Maranhenses</p>
-              <p className="text-xs text-muted-foreground">Conforme ABNT NBR ISO 21103:2014 — Informações aos Participantes</p>
+              <p className="text-xs text-muted-foreground">LENÇÓIS TOUR — CNPJ: 11.622.667/0001-42</p>
+              <p className="text-xs text-muted-foreground">Pça Nsa Sra Conceição, s/n, Centro, Santo Amaro-MA • Tel: (98) 98588-0954</p>
+              <p className="text-xs text-muted-foreground mt-1">Operadora de Turismo Fora de Estrada — Rota das Emoções, Lençóis Maranhenses</p>
+              <p className="text-xs text-muted-foreground">Conforme ABNT NBR ISO 21103 — Informações aos Participantes</p>
+            </div>
+
+            {/* Activity description VATTI */}
+            <div className="bg-muted rounded-xl p-4 text-xs text-muted-foreground space-y-2">
+              <p className="font-semibold text-foreground text-sm flex items-center gap-2"><FileText size={14} /> Descrição da Atividade</p>
+              <p>Passeio em veículo 4x4 na Rota das Emoções — duração aprox. 8h. Saída às 9h com visita às dunas, três paradas para banho nas lagoas e retorno ao ponto de embarque às 17h. Veículos comportam de 4 a 9 pessoas.</p>
+              <p>Idade mínima recomendada: 2 anos. Peso corporal máximo: 110kg.</p>
+              <p><strong>Recomendações:</strong> saber nadar, traje de banho, roupas e calçados confortáveis, toalha, chapéu/boné, óculos de sol, repelente, protetor solar. Não usar acessórios. Levar água e lanche.</p>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Nome do Cliente *</label>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Nome Completo *</label>
                 <input required value={form.customer_name} onChange={e => setForm({ ...form, customer_name: e.target.value })}
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
               </div>
@@ -114,7 +144,7 @@ const AdminSGSTermos = () => {
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
               </div>
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Telefone</label>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Telefone / WhatsApp</label>
                 <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })}
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
               </div>
@@ -125,8 +155,27 @@ const AdminSGSTermos = () => {
               </div>
             </div>
 
+            {/* Health questions P6 VATTI */}
             <div>
-              <label className="text-sm font-semibold text-foreground mb-2 block">Riscos Informados ao Participante *</label>
+              <label className="text-sm font-semibold text-foreground mb-2 block">Informações de Saúde (conforme P6 VATTI)</label>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {HEALTH_QUESTIONS.map(q => (
+                  <div key={q} className="flex items-center gap-2 text-xs text-foreground bg-muted rounded-xl px-3 py-2">
+                    <span className="text-muted-foreground">( )</span> {q}
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground mt-2 italic">Obs.: preenchido pelo cliente no momento da assinatura presencial.</p>
+            </div>
+
+            {/* Risks */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-semibold text-foreground">Riscos Informados ao Participante *</label>
+                <button type="button" onClick={selectAllRisks} className="text-xs text-primary hover:underline">
+                  {form.risks_informed.length === RISKS_OPTIONS.length ? "Desmarcar todos" : "Selecionar todos"}
+                </button>
+              </div>
               <div className="grid sm:grid-cols-2 gap-2">
                 {RISKS_OPTIONS.map(risk => (
                   <label key={risk} className="flex items-center gap-2 text-sm text-foreground bg-muted rounded-xl px-3 py-2 cursor-pointer hover:bg-muted/80">
@@ -137,9 +186,9 @@ const AdminSGSTermos = () => {
               </div>
             </div>
 
-            {/* Safety controls per P6 */}
+            {/* Safety controls */}
             <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
-              <p className="font-semibold text-sm text-foreground mb-2">Controles Operacionais Adotados pela Empresa:</p>
+              <p className="font-semibold text-sm text-foreground mb-2">Controles Operacionais Adotados (conforme VATTI):</p>
               <ul className="space-y-1">
                 {SAFETY_CONTROLS.map(ctrl => (
                   <li key={ctrl} className="flex items-center gap-2 text-xs text-foreground">
@@ -149,19 +198,22 @@ const AdminSGSTermos = () => {
               </ul>
             </div>
 
+            {/* Cancellation policy VATTI */}
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Política de Cancelamento</label>
               <textarea value={form.cancellation_policy} onChange={e => setForm({ ...form, cancellation_policy: e.target.value })}
                 className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-20" />
             </div>
 
+            {/* Declaration P6 VATTI */}
             <div className="bg-secondary/5 border border-secondary/20 rounded-xl p-4 text-sm text-foreground">
               <p className="font-semibold mb-2">Declaração de Ciência e Aceitação:</p>
               <p className="text-xs text-muted-foreground">
-                Declaro que fui informado(a) sobre os riscos inerentes à atividade contratada e sobre os controles operacionais 
-                adotados pela empresa LENÇÓIS TOUR, incluindo capacitação da equipe, equipamentos de resgate e orientações de segurança.
-                A equipe está capacitada para agir em emergências e está preparada para realizar resgates e atendimento de primeiros socorros, 
-                condizentes com o Plano de Resposta a Emergências (PRE). Declaro que aceito participar de forma consciente e voluntária.
+                Declaro que li todas as informações e recomendações acima para a participação do passeio fora de estrada em veículo 4x4 na Rota das Emoções,
+                que respondi as questões com veracidade, que minhas dúvidas foram sanadas durante o briefing. Comprometo-me a cumprir com os procedimentos
+                e seguir as orientações passadas pela equipe de profissionais, comportando-me adequadamente para manter a saúde e segurança de todos.
+                Tenho ciência de que qualquer ato meu, contrário às informações recebidas e orientações da equipe da CONTRATADA, podem causar danos à minha
+                integridade física, ao meio ambiente e a terceiros, os quais assumo integralmente.
               </p>
             </div>
 
