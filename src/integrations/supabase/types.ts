@@ -115,6 +115,102 @@ export type Database = {
         }
         Relationships: []
       }
+      marketing_campaigns: {
+        Row: {
+          audience: string | null
+          bounces: number
+          clicks: number
+          created_at: string
+          delivered: number
+          id: string
+          message: string | null
+          name: string
+          read_count: number
+          scheduled_at: string | null
+          sent: number
+          status: string
+          subject: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          audience?: string | null
+          bounces?: number
+          clicks?: number
+          created_at?: string
+          delivered?: number
+          id?: string
+          message?: string | null
+          name: string
+          read_count?: number
+          scheduled_at?: string | null
+          sent?: number
+          status?: string
+          subject?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string | null
+          bounces?: number
+          clicks?: number
+          created_at?: string
+          delivered?: number
+          id?: string
+          message?: string | null
+          name?: string
+          read_count?: number
+          scheduled_at?: string | null
+          sent?: number
+          status?: string
+          subject?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      marketing_leads: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          interest: string | null
+          last_contact: string | null
+          name: string
+          phone: string | null
+          score: number
+          source: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          interest?: string | null
+          last_contact?: string | null
+          name: string
+          phone?: string | null
+          score?: number
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          interest?: string | null
+          last_contact?: string | null
+          name?: string
+          phone?: string | null
+          score?: number
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       partners: {
         Row: {
           active: boolean
@@ -156,6 +252,42 @@ export type Database = {
           name?: string
           phone?: string | null
           type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      remarketing_rules: {
+        Row: {
+          active: boolean
+          channel: string
+          conversions: number
+          created_at: string
+          delay: string
+          id: string
+          message: string
+          trigger_name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          channel?: string
+          conversions?: number
+          created_at?: string
+          delay?: string
+          id?: string
+          message: string
+          trigger_name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          channel?: string
+          conversions?: number
+          created_at?: string
+          delay?: string
+          id?: string
+          message?: string
+          trigger_name?: string
           updated_at?: string
         }
         Relationships: []
