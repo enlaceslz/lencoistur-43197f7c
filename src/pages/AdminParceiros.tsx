@@ -102,6 +102,7 @@ const AdminParceiros = () => {
       contact_name: p.contact_name || "", phone: p.phone || "",
       email: p.email || "", commission_rate: String(p.commission_rate || 0),
       cpf_cnpj: p.cpf_cnpj || "", address: p.address || "",
+      cnh: p.cnh || "", cnh_validade: p.cnh_validade || "", cadastur: p.cadastur || "",
     });
     setDialogOpen(true);
   };
