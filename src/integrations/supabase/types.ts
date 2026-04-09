@@ -210,6 +210,45 @@ export type Database = {
         }
         Relationships: []
       }
+      documents: {
+        Row: {
+          created_at: string
+          description: string | null
+          expiry_date: string | null
+          file_name: string | null
+          file_url: string | null
+          id: string
+          name: string
+          status: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          expiry_date?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          name: string
+          status?: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          expiry_date?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          name?: string
+          status?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       marketing_campaigns: {
         Row: {
           audience: string | null
