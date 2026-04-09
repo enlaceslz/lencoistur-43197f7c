@@ -82,13 +82,14 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Look up the actual price from the database
+    // Look up the actual price and pix_discount from the database
     let unitPrice: number;
+    let pixDiscountPercent = 0;
 
     if (type === "passeio") {
       const { data: tour, error: tourErr } = await supabaseAdmin
         .from("tours")
-        .select("price, name")
+        .select("price, name, pix_discount")
         .eq("name", itemName)
         .eq("active", true)
         .single();
@@ -100,6 +101,7 @@ Deno.serve(async (req) => {
         );
       }
       unitPrice = tour.price;
+      pixDiscountPercent = tour.pix_discount || 0;
     } else {
       // translado - itemName format: "origin → destination"
       const parts = itemName.split(" → ");
@@ -111,7 +113,7 @@ Deno.serve(async (req) => {
       }
       const { data: route, error: routeErr } = await supabaseAdmin
         .from("transfer_routes")
-        .select("price")
+        .select("price, pix_discount")
         .eq("origin", parts[0])
         .eq("destination", parts[1])
         .eq("active", true)
@@ -124,10 +126,48 @@ Deno.serve(async (req) => {
         );
       }
       unitPrice = route.price;
+      pixDiscountPercent = route.pix_discount || 0;
     }
 
     const total = unitPrice * guestsNum;
+    
+    // Apply PIX discount server-side (only for PIX payments, capped 0-50%)
+    const validPixDiscount = Math.max(0, Math.min(50, pixDiscountPercent));
+    const discount = payMethod === "pix" && validPixDiscount > 0
+      ? Math.round(total * validPixDiscount / 100)
+      : 0;
+    const finalTotal = total - discount;
+    
     const pixCode = payMethod === "pix" ? generatePixCode() : null;
+
+    // Helper to create booking
+    const createBooking = async (customerId: string) => {
+      const { data: booking, error: bookingErr } = await supabaseAdmin
+        .from("bookings")
+        .insert({
+          customer_id: customerId,
+          type,
+          item_name: itemName,
+          date: date || null,
+          guests: guestsNum,
+          unit_price: unitPrice,
+          total,
+          discount,
+          final_total: finalTotal,
+          pay_method: payMethod,
+          status: "pendente",
+          payment_status: "pendente",
+          pix_code: pixCode,
+          booking_code: "TEMP",
+        })
+        .select("*, customers(*)")
+        .single();
+
+      if (bookingErr || !booking) {
+        return null;
+      }
+      return booking;
+    };
 
     // Create customer atomically
     const { data: customer, error: customerErr } = await supabaseAdmin
@@ -154,29 +194,9 @@ Deno.serve(async (req) => {
             { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
-        // Use existing customer
-        const { data: booking, error: bookingErr } = await supabaseAdmin
-          .from("bookings")
-          .insert({
-            customer_id: existing.id,
-            type,
-            item_name: itemName,
-            date: date || null,
-            guests: guestsNum,
-            unit_price: unitPrice,
-            total,
-            discount: 0,
-            final_total: total,
-            pay_method: payMethod,
-            status: "pendente",
-            payment_status: "pendente",
-            pix_code: pixCode,
-            booking_code: "TEMP",
-          })
-          .select("*, customers(*)")
-          .single();
 
-        if (bookingErr || !booking) {
+        const booking = await createBooking(existing.id);
+        if (!booking) {
           return new Response(
             JSON.stringify({ error: "Erro ao criar reserva" }),
             { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -195,29 +215,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Create booking with server-validated price
-    const { data: booking, error: bookingErr } = await supabaseAdmin
-      .from("bookings")
-      .insert({
-        customer_id: customer.id,
-        type,
-        item_name: itemName,
-        date: date || null,
-        guests: guestsNum,
-        unit_price: unitPrice,
-        total,
-        discount: 0,
-        final_total: total,
-        pay_method: payMethod,
-        status: "pendente",
-        payment_status: "pendente",
-        pix_code: pixCode,
-        booking_code: "TEMP",
-      })
-      .select("*, customers(*)")
-      .single();
-
-    if (bookingErr || !booking) {
+    // Create booking with server-validated price and discount
+    const booking = await createBooking(customer.id);
+    if (!booking) {
       return new Response(
         JSON.stringify({ error: "Erro ao criar reserva" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

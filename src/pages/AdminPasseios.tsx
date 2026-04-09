@@ -6,7 +6,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Search, Plus, Pencil, Trash2, Eye, EyeOff, Compass, Users, Clock, Star, X, Upload, Link as LinkIcon, Image as ImageIcon, GripVertical,
+  Search, Plus, Pencil, Trash2, Eye, EyeOff, Compass, Users, Clock, Star, X, Upload, Link as LinkIcon, Image as ImageIcon, GripVertical, Percent,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -19,6 +19,7 @@ const DIFFICULTIES = ["Fácil", "Moderada", "Moderada a Difícil", "Difícil"];
 
 const emptyForm = {
   name: "", slug: "", location: "", duration: "", price: 0,
+  pix_discount: 0,
   tag: "", description: "", category: "Ecoturismo", difficulty: "Fácil",
   group_size: "Até 10 pessoas", departure: "Santo Amaro do Maranhão",
   operator: "Lençóis Tour", includes: "", highlights: "", active: true,
@@ -61,7 +62,8 @@ const AdminPasseios = () => {
     setEditingId(t.id);
     setForm({
       name: t.name, slug: t.slug, location: t.location || "",
-      duration: t.duration || "", price: t.price, tag: t.tag || "",
+      duration: t.duration || "", price: t.price, pix_discount: t.pix_discount || 0,
+      tag: t.tag || "",
       description: t.description || "", category: t.category || "Ecoturismo",
       difficulty: t.difficulty || "Fácil", group_size: t.group_size || "",
       departure: t.departure || "", operator: t.operator || "Lençóis Tour",
@@ -150,10 +152,12 @@ const AdminPasseios = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const slug = form.slug || generateSlug(form.name);
+    const pixDiscount = Math.max(0, Math.min(50, Number(form.pix_discount) || 0));
     const payload = {
       name: form.name.trim(), slug,
       location: form.location.trim(), duration: form.duration.trim(),
-      price: Number(form.price), tag: form.tag.trim() || null,
+      price: Number(form.price), pix_discount: pixDiscount,
+      tag: form.tag.trim() || null,
       description: form.description.trim(), category: form.category,
       difficulty: form.difficulty, group_size: form.group_size.trim(),
       departure: form.departure.trim(), operator: form.operator.trim(),
@@ -268,27 +272,49 @@ const AdminPasseios = () => {
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Nome *</label>
               <input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: generateSlug(e.target.value) })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={200} />
             </div>
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Slug</label>
               <input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={200} />
             </div>
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Preço (R$) *</label>
-              <input required type="number" min={0} value={form.price} onChange={e => setForm({ ...form, price: Number(e.target.value) })}
+              <input required type="number" min={0} max={99999} value={form.price} onChange={e => setForm({ ...form, price: Number(e.target.value) })}
                 className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1 block flex items-center gap-1.5">
+                <Percent size={14} className="text-green-600" /> Desconto PIX (%)
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  min={0}
+                  max={50}
+                  value={form.pix_discount}
+                  onChange={e => setForm({ ...form, pix_discount: Number(e.target.value) })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none pr-8"
+                  placeholder="0"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                {form.pix_discount > 0 && form.price > 0
+                  ? `PIX: ${fmt(Math.round(form.price * (1 - form.pix_discount / 100)))} por pessoa`
+                  : "Sem desconto para PIX"}
+              </p>
             </div>
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Localização</label>
               <input value={form.location} onChange={e => setForm({ ...form, location: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={200} />
             </div>
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Duração</label>
               <input value={form.duration} onChange={e => setForm({ ...form, duration: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Meio dia" />
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Meio dia" maxLength={100} />
             </div>
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Categoria</label>
@@ -307,39 +333,39 @@ const AdminPasseios = () => {
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Tag</label>
               <input value={form.tag} onChange={e => setForm({ ...form, tag: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Mais Vendido" />
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Mais Vendido" maxLength={50} />
             </div>
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Grupo</label>
               <input value={form.group_size} onChange={e => setForm({ ...form, group_size: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Até 10 pessoas" />
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Até 10 pessoas" maxLength={50} />
             </div>
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Saída</label>
               <input value={form.departure} onChange={e => setForm({ ...form, departure: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={200} />
             </div>
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Operador</label>
               <input value={form.operator} onChange={e => setForm({ ...form, operator: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={100} />
             </div>
           </div>
           <div>
             <label className="text-sm font-semibold text-foreground mb-1 block">Descrição</label>
             <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-              className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-20" />
+              className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-20" maxLength={2000} />
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Inclui (separados por vírgula)</label>
               <input value={form.includes} onChange={e => setForm({ ...form, includes: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={500} />
             </div>
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Destaques (separados por vírgula)</label>
               <input value={form.highlights} onChange={e => setForm({ ...form, highlights: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={500} />
             </div>
           </div>
 
@@ -347,7 +373,6 @@ const AdminPasseios = () => {
           <div className="space-y-3">
             <label className="text-sm font-semibold text-foreground block">Imagens do Passeio</label>
 
-            {/* Current images preview */}
             {imageUrls.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                 {imageUrls.map((url, index) => (
@@ -362,7 +387,7 @@ const AdminPasseios = () => {
                         </button>
                       )}
                       <button type="button" onClick={() => removeImage(index)}
-                        className="p-1.5 bg-red-500/80 rounded-lg hover:bg-red-600 text-white" title="Remover">
+                        className="p-1.5 bg-destructive/80 rounded-lg hover:bg-destructive text-white" title="Remover">
                         <X size={14} />
                       </button>
                       {index < imageUrls.length - 1 && (
@@ -450,6 +475,7 @@ const AdminPasseios = () => {
               <TableHead>Categoria</TableHead>
               <TableHead>Duração</TableHead>
               <TableHead>Preço</TableHead>
+              <TableHead>Desc. PIX</TableHead>
               <TableHead>Avaliação</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
@@ -457,9 +483,9 @@ const AdminPasseios = () => {
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Carregando...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={8} className="text-center py-8 text-muted-foreground">Carregando...</TableCell></TableRow>
             ) : filtered.length === 0 ? (
-              <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Nenhum passeio encontrado</TableCell></TableRow>
+              <TableRow><TableCell colSpan={8} className="text-center py-8 text-muted-foreground">Nenhum passeio encontrado</TableCell></TableRow>
             ) : filtered.map((t) => (
               <TableRow key={t.id} className={!t.active ? "opacity-50" : ""}>
                 <TableCell>
@@ -480,6 +506,15 @@ const AdminPasseios = () => {
                   <span className="flex items-center gap-1"><Clock size={13} /> {t.duration}</span>
                 </TableCell>
                 <TableCell className="font-medium text-foreground">{fmt(t.price)}</TableCell>
+                <TableCell>
+                  {t.pix_discount > 0 ? (
+                    <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                      {t.pix_discount}%
+                    </Badge>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">—</span>
+                  )}
+                </TableCell>
                 <TableCell>
                   <span className="flex items-center gap-1 text-foreground">
                     <Star size={13} className="text-amber-500 fill-amber-500" /> {Number(t.rating).toFixed(1)}
