@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -11,9 +12,9 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Search, ShoppingCart, CheckCircle, Clock, XCircle, AlertCircle, Eye,
+  Search, ShoppingCart, CheckCircle, Clock, XCircle, Eye,
   DollarSign, Ban, Loader2, Users, Calendar, CreditCard, FileText,
-  MapPin, Phone, Mail,
+  MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download,
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { toast } from "sonner";
@@ -22,7 +23,7 @@ const statusConfig: Record<string, { label: string; className: string; icon: typ
   confirmada: { label: "Confirmada", className: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300", icon: CheckCircle },
   pendente: { label: "Pendente", className: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300", icon: Clock },
   cancelada: { label: "Cancelada", className: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300", icon: XCircle },
-  concluida: { label: "Concluída", className: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300", icon: CheckCircle },
+  concluida: { label: "Concluída", className: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300", icon: CheckCircle2 },
 };
 
 const paymentConfig: Record<string, { label: string; className: string }> = {
@@ -34,22 +35,29 @@ const paymentConfig: Record<string, { label: string; className: string }> = {
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
 const fmtDate = (d: string) => {
   if (!d) return "—";
-  try { return new Date(d).toLocaleDateString("pt-BR"); } catch { return d; }
+  try { return new Date(d + "T12:00").toLocaleDateString("pt-BR"); } catch { return d; }
+};
+const fmtDateTime = (d: string) => {
+  if (!d) return "—";
+  try { return new Date(d).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }); } catch { return d; }
 };
 
 const AdminReservas = () => {
-  const { bookings, loading, confirmPayment, cancelBooking } = useBookings();
+  const { bookings, loading, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
   const [selected, setSelected] = useState<BookingItem | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [editNotes, setEditNotes] = useState("");
+  const [showNotes, setShowNotes] = useState(false);
 
   const filtered = bookings.filter((b) => {
     const q = search.toLowerCase();
     const matchSearch =
       b.customerName.toLowerCase().includes(q) ||
       b.itemName.toLowerCase().includes(q) ||
-      b.bookingCode.toLowerCase().includes(q);
+      b.bookingCode.toLowerCase().includes(q) ||
+      b.customerEmail.toLowerCase().includes(q);
     const matchStatus = statusFilter === "todos" || b.status === statusFilter;
     return matchSearch && matchStatus;
   });
@@ -65,28 +73,43 @@ const AdminReservas = () => {
     { icon: DollarSign, label: "Receita Total", value: fmt(totalPago), color: "text-blue-600" },
   ];
 
-  const handleConfirm = async (id: string) => {
+  const handleAction = async (action: () => Promise<void>, successMsg: string) => {
     setActionLoading(true);
     try {
-      await confirmPayment(id);
-      toast.success("Pagamento confirmado!");
+      await action();
+      toast.success(successMsg);
       setSelected(null);
     } catch {
-      toast.error("Erro ao confirmar pagamento.");
+      toast.error("Erro ao executar ação.");
     }
     setActionLoading(false);
   };
 
-  const handleCancel = async (id: string) => {
+  const handleSaveNotes = async () => {
+    if (!selected) return;
     setActionLoading(true);
     try {
-      await cancelBooking(id);
-      toast.success("Reserva cancelada.");
-      setSelected(null);
+      await updateBookingNotes(selected.id, editNotes);
+      toast.success("Observações salvas!");
+      setShowNotes(false);
     } catch {
-      toast.error("Erro ao cancelar reserva.");
+      toast.error("Erro ao salvar observações.");
     }
     setActionLoading(false);
+  };
+
+  const exportCSV = () => {
+    const header = "Código,Cliente,Email,Telefone,Passeio,Data,Pax,Subtotal,Desconto,Total,Pagamento,Status,Criado em\n";
+    const rows = filtered.map((b) =>
+      `"${b.bookingCode}","${b.customerName}","${b.customerEmail}","${b.customerPhone}","${b.itemName}","${fmtDate(b.date)}",${b.guests},${(b.total / 100).toFixed(2)},${(b.discount / 100).toFixed(2)},${(b.finalTotal / 100).toFixed(2)},"${paymentConfig[b.paymentStatus]?.label || b.paymentStatus}","${statusConfig[b.status]?.label || b.status}","${fmtDateTime(b.createdAt)}"`
+    ).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `reservas_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   if (loading) {
@@ -121,15 +144,18 @@ const AdminReservas = () => {
         <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <Input placeholder="Buscar por cliente, passeio ou código..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+            <Input placeholder="Buscar por cliente, passeio, email ou código..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
           </div>
           <div className="flex gap-2 flex-wrap">
             {["todos", "confirmada", "pendente", "cancelada", "concluida"].map((s) => (
               <Button key={s} variant={statusFilter === s ? "default" : "outline"} size="sm" onClick={() => setStatusFilter(s)} className="capitalize">
-                {s === "todos" ? "Todos" : statusConfig[s]?.label || s}
+                {s === "todos" ? `Todos (${bookings.length})` : `${statusConfig[s]?.label} (${bookings.filter(b => b.status === s).length})`}
               </Button>
             ))}
           </div>
+          <Button variant="outline" size="sm" onClick={exportCSV} className="shrink-0">
+            <Download size={14} className="mr-1" /> CSV
+          </Button>
         </CardContent>
       </Card>
 
@@ -154,6 +180,7 @@ const AdminReservas = () => {
                   <TableHead>Total</TableHead>
                   <TableHead>Pagamento</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Criado em</TableHead>
                   <TableHead className="w-12"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -162,9 +189,14 @@ const AdminReservas = () => {
                   const sc = statusConfig[b.status] || statusConfig.pendente;
                   const pc = paymentConfig[b.paymentStatus] || paymentConfig.pendente;
                   return (
-                    <TableRow key={b.id} className="cursor-pointer hover:bg-muted/50" onClick={() => setSelected(b)}>
+                    <TableRow key={b.id} className="cursor-pointer hover:bg-muted/50" onClick={() => { setSelected(b); setEditNotes(b.notes || ""); setShowNotes(false); }}>
                       <TableCell className="font-mono text-sm text-foreground">{b.bookingCode}</TableCell>
-                      <TableCell className="font-medium text-foreground">{b.customerName}</TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium text-foreground">{b.customerName}</p>
+                          <p className="text-xs text-muted-foreground">{b.customerEmail}</p>
+                        </div>
+                      </TableCell>
                       <TableCell className="text-muted-foreground max-w-[200px] truncate">{b.itemName}</TableCell>
                       <TableCell className="text-muted-foreground">{fmtDate(b.date)}</TableCell>
                       <TableCell className="text-foreground">{b.guests}</TableCell>
@@ -175,8 +207,9 @@ const AdminReservas = () => {
                       <TableCell>
                         <Badge variant="secondary" className={sc.className}>{sc.label}</Badge>
                       </TableCell>
+                      <TableCell className="text-xs text-muted-foreground whitespace-nowrap">{fmtDateTime(b.createdAt)}</TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setSelected(b); }}>
+                        <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setSelected(b); setEditNotes(b.notes || ""); setShowNotes(false); }}>
                           <Eye size={14} />
                         </Button>
                       </TableCell>
@@ -191,7 +224,7 @@ const AdminReservas = () => {
 
       {/* Detail Modal */}
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText size={20} />
@@ -232,14 +265,12 @@ const AdminReservas = () => {
                     <Users size={14} /> {selected.guests} pessoa(s)
                   </span>
                   <span className="flex items-center gap-2 text-muted-foreground">
-                    <CreditCard size={14} /> {selected.payMethod === "pix" ? "PIX" : "Cartão"}
+                    <CreditCard size={14} /> {selected.payMethod === "pix" ? "PIX" : selected.payMethod === "card" ? "Cartão" : selected.payMethod}
                   </span>
                 </div>
-                {selected.notes && (
-                  <p className="text-sm text-muted-foreground mt-2 border-t border-border pt-2">
-                    <strong>Obs:</strong> {selected.notes}
-                  </p>
-                )}
+                <p className="text-xs text-muted-foreground mt-1">
+                  Criado em: {fmtDateTime(selected.createdAt)}
+                </p>
               </div>
 
               {/* Financials */}
@@ -251,7 +282,7 @@ const AdminReservas = () => {
                 </div>
                 {selected.discount > 0 && (
                   <div className="flex justify-between text-sm text-green-600">
-                    <span>Desconto</span>
+                    <span>Desconto PIX</span>
                     <span>-{fmt(selected.discount)}</span>
                   </div>
                 )}
@@ -259,6 +290,33 @@ const AdminReservas = () => {
                   <span>Total</span>
                   <span>{fmt(selected.finalTotal)}</span>
                 </div>
+              </div>
+
+              {/* Notes */}
+              <div className="bg-muted rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold text-sm text-foreground flex items-center gap-1">
+                    <MessageSquare size={14} /> Observações
+                  </h4>
+                  {!showNotes && (
+                    <Button variant="ghost" size="sm" onClick={() => setShowNotes(true)} className="text-xs h-7">
+                      Editar
+                    </Button>
+                  )}
+                </div>
+                {showNotes ? (
+                  <div className="space-y-2">
+                    <Textarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)} placeholder="Adicionar observações..." rows={3} />
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={handleSaveNotes} disabled={actionLoading}>
+                        {actionLoading ? <Loader2 className="animate-spin mr-1" size={14} /> : null} Salvar
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => setShowNotes(false)}>Cancelar</Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{selected.notes || "Nenhuma observação."}</p>
+                )}
               </div>
 
               {/* Status badges */}
@@ -272,18 +330,37 @@ const AdminReservas = () => {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-3 pt-2 flex-wrap">
                 {selected.status === "pendente" && selected.paymentStatus === "pendente" && (
-                  <Button onClick={() => handleConfirm(selected.id)} disabled={actionLoading} className="flex-1">
+                  <Button onClick={() => handleAction(() => confirmPayment(selected.id), "Pagamento confirmado!")} disabled={actionLoading} className="flex-1 min-w-[140px]">
                     {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle size={16} className="mr-2" />}
                     Confirmar Pagamento
                   </Button>
                 )}
+                {selected.status === "confirmada" && (
+                  <Button variant="secondary" onClick={() => handleAction(() => completeBooking(selected.id), "Reserva concluída!")} disabled={actionLoading} className="flex-1 min-w-[140px]">
+                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
+                    Marcar Concluída
+                  </Button>
+                )}
                 {selected.status !== "cancelada" && selected.status !== "concluida" && (
-                  <Button variant="destructive" onClick={() => handleCancel(selected.id)} disabled={actionLoading} className="flex-1">
+                  <Button variant="destructive" onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada.")} disabled={actionLoading} className="flex-1 min-w-[140px]">
                     {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
                     Cancelar Reserva
                   </Button>
+                )}
+                {/* WhatsApp */}
+                {selected.customerPhone && (
+                  <a
+                    href={`https://wa.me/${selected.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}! Sobre sua reserva ${selected.bookingCode} - ${selected.itemName}.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex"
+                  >
+                    <Button variant="outline" size="sm" className="text-green-600">
+                      📱 WhatsApp
+                    </Button>
+                  </a>
                 )}
               </div>
             </div>
