@@ -38,6 +38,7 @@ const CheckoutPage = () => {
 
   const itemName = tour?.name || (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
   const unitPrice = tour?.price || transfer?.price || 0;
+  const pixDiscountPercent = tour?.pix_discount || transfer?.pix_discount || 0;
   const image = tour?.images?.[0] || "";
   const location = tour?.location || (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
 
@@ -63,9 +64,11 @@ const CheckoutPage = () => {
   }
 
   const total = unitPrice * guests;
-  // displayDiscount is display-only; DB enforces displayDiscount=0 and final_total=total
-  const displayDiscount = payMethod === "pix" ? Math.round(total * 0.05) : 0;
-  const finalTotal = total;
+  // PIX discount is calculated server-side; display only for UI feedback
+  const displayDiscount = payMethod === "pix" && pixDiscountPercent > 0
+    ? Math.round(total * pixDiscountPercent / 100)
+    : 0;
+  const finalTotal = total - displayDiscount;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,8 +81,8 @@ const CheckoutPage = () => {
         guests,
         unitPrice,
         total,
-        discount: 0,
-        finalTotal: total,
+        discount: displayDiscount,
+        finalTotal,
         payMethod,
         customerName: name,
         customerEmail: email,
@@ -181,7 +184,7 @@ const CheckoutPage = () => {
             </div>
             {displayDiscount > 0 && (
               <div className="flex justify-between text-sm text-green-600">
-                <span>Desconto PIX (5%)</span>
+                <span>Desconto PIX ({pixDiscountPercent}%)</span>
                 <span className="font-semibold">-R$ {displayDiscount}</span>
               </div>
             )}
@@ -292,9 +295,11 @@ const CheckoutPage = () => {
                   className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-colors ${payMethod === "pix" ? "border-primary bg-primary/5" : "border-border"}`}
                 >
                   <QrCode size={24} className={payMethod === "pix" ? "text-primary" : "text-muted-foreground"} />
-                  <div className="text-left">
+                   <div className="text-left">
                     <p className="font-semibold text-foreground text-sm">PIX</p>
-                    <p className="text-xs text-green-600 font-medium">5% de desconto</p>
+                    <p className="text-xs text-green-600 font-medium">
+                      {pixDiscountPercent > 0 ? `${pixDiscountPercent}% de desconto` : "Pagamento instantâneo"}
+                    </p>
                   </div>
                 </button>
                 <button
@@ -313,8 +318,9 @@ const CheckoutPage = () => {
               {payMethod === "pix" && (
                 <div className="bg-muted rounded-xl p-4 flex items-center gap-3">
                   <Banknote size={20} className="text-green-600 shrink-0" />
-                  <p className="text-sm text-muted-foreground">
-                    Ao confirmar, você receberá o QR Code PIX para pagamento imediato. Economia de <strong className="text-green-600">R$ {displayDiscount}</strong>!
+                   <p className="text-sm text-muted-foreground">
+                    Ao confirmar, você receberá o QR Code PIX para pagamento imediato.
+                    {displayDiscount > 0 && <> Economia de <strong className="text-green-600">R$ {displayDiscount}</strong>!</>}
                   </p>
                 </div>
               )}
@@ -402,7 +408,7 @@ const CheckoutPage = () => {
                   </div>
                   {displayDiscount > 0 && (
                     <div className="flex justify-between text-green-600">
-                      <span>Desconto PIX (5%)</span>
+                      <span>Desconto PIX ({pixDiscountPercent}%)</span>
                       <span className="font-semibold">-R$ {displayDiscount}</span>
                     </div>
                   )}
