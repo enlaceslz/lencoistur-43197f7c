@@ -25,7 +25,7 @@ const statusMap: Record<string, { label: string; className: string }> = {
   concluida: { label: "Concluída", className: "bg-primary/10 text-primary" },
 };
 
-const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR")}`;
+const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
 
 interface BookingRow {
   id: string;
@@ -194,7 +194,7 @@ const AdminDashboard = () => {
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="month" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => `R$${v / 1000}k`} />
+                <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => `R$${(v / 100).toFixed(0)}`} />
                 <Tooltip formatter={(value: number) => [fmt(value), "Faturamento"]} />
                 <Area type="monotone" dataKey="revenue" stroke="hsl(174, 62%, 38%)" fill="url(#colorRevenue)" strokeWidth={2} />
               </AreaChart>
