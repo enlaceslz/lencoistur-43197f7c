@@ -77,8 +77,9 @@ const AdminDocumentos = () => {
       const path = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
       const { error: upErr } = await supabase.storage.from("company-documents").upload(path, selectedFile);
       if (upErr) { toast.error("Erro no upload: " + upErr.message); setUploading(false); return; }
-      const { data: urlData } = supabase.storage.from("company-documents").getPublicUrl(path);
-      file_url = urlData.publicUrl;
+      // Store the storage path, not a public URL (bucket is private)
+      file_url = path;
+      file_name = selectedFile.name;
       file_name = selectedFile.name;
     }
 
