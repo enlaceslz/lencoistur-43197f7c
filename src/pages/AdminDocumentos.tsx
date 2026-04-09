@@ -51,6 +51,27 @@ const AdminDocumentos = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [editId, setEditId] = useState<string | null>(null);
 
+  const getSignedUrl = async (storagePath: string) => {
+    const { data, error } = await supabase.storage.from("company-documents").createSignedUrl(storagePath, 3600);
+    if (error || !data?.signedUrl) { toast.error("Erro ao gerar link do arquivo"); return null; }
+    return data.signedUrl;
+  };
+
+  const handleViewFile = async (storagePath: string) => {
+    const url = await getSignedUrl(storagePath);
+    if (url) window.open(url, "_blank");
+  };
+
+  const handleDownloadFile = async (storagePath: string, fileName: string) => {
+    const url = await getSignedUrl(storagePath);
+    if (url) {
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      a.click();
+    }
+  };
+
   const load = async () => {
     setLoading(true);
     const { data } = await supabase.from("documents").select("*").order("created_at", { ascending: false });
@@ -77,8 +98,9 @@ const AdminDocumentos = () => {
       const path = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
       const { error: upErr } = await supabase.storage.from("company-documents").upload(path, selectedFile);
       if (upErr) { toast.error("Erro no upload: " + upErr.message); setUploading(false); return; }
-      const { data: urlData } = supabase.storage.from("company-documents").getPublicUrl(path);
-      file_url = urlData.publicUrl;
+      // Store the storage path, not a public URL (bucket is private)
+      file_url = path;
+      file_name = selectedFile.name;
       file_name = selectedFile.name;
     }
 
@@ -220,8 +242,8 @@ const AdminDocumentos = () => {
                     <td className="p-3">{statusBadge(doc.status)}</td>
                     <td className="p-3">{doc.file_url ? (
                       <div className="flex gap-1">
-                        <a href={doc.file_url} target="_blank" rel="noopener noreferrer"><Button variant="ghost" size="sm"><Eye size={14} /></Button></a>
-                        <a href={doc.file_url} download={doc.file_name || "documento"}><Button variant="ghost" size="sm"><Download size={14} /></Button></a>
+                        <Button variant="ghost" size="sm" onClick={() => handleViewFile(doc.file_url!)}><Eye size={14} /></Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDownloadFile(doc.file_url!, doc.file_name || "documento")}><Download size={14} /></Button>
                       </div>
                     ) : <span className="text-muted-foreground">—</span>}</td>
                     <td className="p-3 text-right">
