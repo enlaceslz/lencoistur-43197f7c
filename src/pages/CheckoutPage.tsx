@@ -295,9 +295,11 @@ const CheckoutPage = () => {
                   className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-colors ${payMethod === "pix" ? "border-primary bg-primary/5" : "border-border"}`}
                 >
                   <QrCode size={24} className={payMethod === "pix" ? "text-primary" : "text-muted-foreground"} />
-                  <div className="text-left">
+                   <div className="text-left">
                     <p className="font-semibold text-foreground text-sm">PIX</p>
-                    <p className="text-xs text-green-600 font-medium">5% de desconto</p>
+                    <p className="text-xs text-green-600 font-medium">
+                      {pixDiscountPercent > 0 ? `${pixDiscountPercent}% de desconto` : "Pagamento instantâneo"}
+                    </p>
                   </div>
                 </button>
                 <button
