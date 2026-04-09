@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
@@ -7,43 +7,82 @@ export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const mountedRef = useRef(true);
+
+  const checkAdminRole = useCallback(async (userId: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase.rpc("has_role", {
+        _user_id: userId,
+        _role: "admin",
+      });
+      if (error) {
+        console.error("has_role RPC error:", error.message);
+        return false;
+      }
+      return !!data;
+    } catch (err) {
+      console.error("has_role exception:", err);
+      return false;
+    }
+  }, []);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+    mountedRef.current = true;
 
-        if (session?.user) {
-          // Check admin role via has_role RPC
-          const { data } = await supabase.rpc("has_role", {
-            _user_id: session.user.id,
-            _role: "admin",
-          });
-          setIsAdmin(!!data);
-        } else {
+    // 1. Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, newSession) => {
+        if (!mountedRef.current) return;
+        
+        // Synchronously update session/user state only
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
+
+        if (!newSession?.user) {
           setIsAdmin(false);
+          setLoading(false);
+          return;
         }
-        setLoading(false);
+
+        // IMPORTANT: Defer Supabase API calls to avoid deadlock
+        // per Supabase docs - don't make sync calls in onAuthStateChange
+        setTimeout(async () => {
+          if (!mountedRef.current) return;
+          const admin = await checkAdminRole(newSession.user.id);
+          if (mountedRef.current) {
+            setIsAdmin(admin);
+            setLoading(false);
+          }
+        }, 0);
       }
     );
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    // 2. Then check for existing session
+    supabase.auth.getSession().then(async ({ data: { session: existingSession } }) => {
+      if (!mountedRef.current) return;
+      setSession(existingSession);
+      setUser(existingSession?.user ?? null);
 
-      if (session?.user) {
-        const { data } = await supabase.rpc("has_role", {
-          _user_id: session.user.id,
-          _role: "admin",
-        });
-        setIsAdmin(!!data);
+      if (existingSession?.user) {
+        const admin = await checkAdminRole(existingSession.user.id);
+        if (mountedRef.current) setIsAdmin(admin);
       }
-      setLoading(false);
+      if (mountedRef.current) setLoading(false);
+    }).catch(() => {
+      if (mountedRef.current) setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    // 3. Safety timeout
+    const timeout = setTimeout(() => {
+      if (mountedRef.current) setLoading(false);
+    }, 5000);
+
+    return () => {
+      mountedRef.current = false;
+      clearTimeout(timeout);
+      subscription.unsubscribe();
+    };
+  }, [checkAdminRole]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
