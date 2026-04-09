@@ -381,6 +381,34 @@ const AdminParceiros = () => {
               <Label className="mb-1.5 block">Comissão (%)</Label>
               <Input type="number" min="0" max="100" value={form.commission_rate} onChange={(e) => setForm({ ...form, commission_rate: e.target.value })} />
             </div>
+
+            {/* Motorista: CNH fields */}
+            {form.type === "motorista" && (
+              <div className="space-y-4 p-4 border border-amber-200 dark:border-amber-800 rounded-xl bg-amber-50/50 dark:bg-amber-900/10">
+                <p className="text-sm font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1"><Car size={14} /> Dados do Motorista</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="mb-1.5 block">Nº da CNH</Label>
+                    <Input value={form.cnh} onChange={(e) => setForm({ ...form, cnh: e.target.value })} placeholder="00000000000" maxLength={20} />
+                  </div>
+                  <div>
+                    <Label className="mb-1.5 block">Validade da CNH</Label>
+                    <Input type="date" value={form.cnh_validade} onChange={(e) => setForm({ ...form, cnh_validade: e.target.value })} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Guia: Cadastur field */}
+            {form.type === "guia" && (
+              <div className="space-y-4 p-4 border border-green-200 dark:border-green-800 rounded-xl bg-green-50/50 dark:bg-green-900/10">
+                <p className="text-sm font-semibold text-green-700 dark:text-green-400 flex items-center gap-1"><Compass size={14} /> Dados do Guia</p>
+                <div>
+                  <Label className="mb-1.5 block">Nº Cadastur (Autorização)</Label>
+                  <Input value={form.cadastur} onChange={(e) => setForm({ ...form, cadastur: e.target.value })} placeholder="Número de registro no Cadastur" maxLength={30} />
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
