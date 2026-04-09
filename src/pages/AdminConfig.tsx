@@ -63,7 +63,7 @@ const AdminConfig = () => {
     try {
       const { error } = await supabase
         .from("site_settings")
-        .update({ value: value as unknown as Record<string, unknown>, updated_at: new Date().toISOString() })
+        .update({ value: value as any, updated_at: new Date().toISOString() })
         .eq("key", key);
       if (error) throw error;
       toast.success(`Configurações de ${label} salvas com sucesso!`);
