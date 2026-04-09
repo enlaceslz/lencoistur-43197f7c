@@ -14,7 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Loader2,
+  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Loader2, MapPin,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -30,6 +30,8 @@ interface Partner {
   email: string | null;
   commission_rate: number | null;
   active: boolean;
+  cpf_cnpj: string | null;
+  address: string | null;
 }
 
 const typeConfig: Record<string, { icon: typeof Building2; label: string; color: string }> = {
@@ -38,6 +40,25 @@ const typeConfig: Record<string, { icon: typeof Building2; label: string; color:
   motorista: { icon: Car, label: "Motorista", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300" },
   agencia: { icon: Users, label: "Agência", color: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300" },
 };
+
+function formatCpfCnpj(value: string): string {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length <= 11) {
+    return digits
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+  }
+  return digits
+    .replace(/^(\d{2})(\d)/, "$1.$2")
+    .replace(/^(\d{2}\.\d{3})(\d)/, "$1.$2")
+    .replace(/\.(\d{3})(\d)/, ".$1/$2")
+    .replace(/(\d{4})(\d{1,2})$/, "$1-$2");
+}
+
+function isCnpj(value: string): boolean {
+  return value.replace(/\D/g, "").length >= 14;
+}
 
 const AdminParceiros = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -48,7 +69,11 @@ const AdminParceiros = () => {
   const [editPartner, setEditPartner] = useState<Partner | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", type: "hotel", contact_name: "", phone: "", email: "", commission_rate: "10" });
+  const [cnpjLoading, setCnpjLoading] = useState(false);
+  const [form, setForm] = useState({
+    name: "", type: "hotel", contact_name: "", phone: "", email: "",
+    commission_rate: "10", cpf_cnpj: "", address: "",
+  });
 
   const types = ["todos", ...Object.keys(typeConfig)];
 
@@ -57,13 +82,13 @@ const AdminParceiros = () => {
   const fetchPartners = async () => {
     setLoading(true);
     const { data } = await supabase.from("partners").select("*").order("created_at", { ascending: false });
-    if (data) setPartners(data);
+    if (data) setPartners(data as Partner[]);
     setLoading(false);
   };
 
   const openNew = () => {
     setEditPartner(null);
-    setForm({ name: "", type: "hotel", contact_name: "", phone: "", email: "", commission_rate: "10" });
+    setForm({ name: "", type: "hotel", contact_name: "", phone: "", email: "", commission_rate: "10", cpf_cnpj: "", address: "" });
     setDialogOpen(true);
   };
 
@@ -73,17 +98,62 @@ const AdminParceiros = () => {
       name: p.name, type: p.type,
       contact_name: p.contact_name || "", phone: p.phone || "",
       email: p.email || "", commission_rate: String(p.commission_rate || 0),
+      cpf_cnpj: p.cpf_cnpj || "", address: p.address || "",
     });
     setDialogOpen(true);
+  };
+
+  const lookupCnpj = async (cnpj: string) => {
+    const digits = cnpj.replace(/\D/g, "");
+    if (digits.length !== 14) return;
+    setCnpjLoading(true);
+    try {
+      const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${digits}`);
+      if (!res.ok) throw new Error("CNPJ não encontrado");
+      const data = await res.json();
+      const addr = [
+        data.descricao_tipo_de_logradouro,
+        data.logradouro,
+        data.numero,
+        data.complemento,
+        data.bairro,
+        `${data.municipio}/${data.uf}`,
+        data.cep ? `CEP ${data.cep}` : "",
+      ].filter(Boolean).join(", ");
+
+      setForm((prev) => ({
+        ...prev,
+        name: prev.name || data.razao_social || "",
+        address: addr,
+        email: prev.email || data.email || "",
+        phone: prev.phone || data.ddd_telefone_1 || "",
+      }));
+      toast.success("Dados do CNPJ carregados!");
+    } catch {
+      toast.error("CNPJ não encontrado na base da Receita Federal.");
+    }
+    setCnpjLoading(false);
+  };
+
+  const handleCpfCnpjChange = (value: string) => {
+    const formatted = formatCpfCnpj(value);
+    setForm((prev) => ({ ...prev, cpf_cnpj: formatted }));
+    if (isCnpj(formatted)) {
+      const digits = formatted.replace(/\D/g, "");
+      if (digits.length === 14) {
+        lookupCnpj(digits);
+      }
+    }
   };
 
   const handleSave = async () => {
     if (!form.name.trim()) { toast.error("Nome é obrigatório."); return; }
     setSaving(true);
-    const payload = {
+    const payload: Record<string, any> = {
       name: form.name.trim(), type: form.type,
       contact_name: form.contact_name.trim() || null, phone: form.phone.trim() || null,
       email: form.email.trim() || null, commission_rate: Number(form.commission_rate) || 0,
+      cpf_cnpj: form.cpf_cnpj.trim() || null, address: form.address.trim() || null,
     };
 
     if (editPartner) {
@@ -113,7 +183,7 @@ const AdminParceiros = () => {
 
   const filtered = partners.filter((p) => {
     const q = search.toLowerCase();
-    const matchSearch = p.name.toLowerCase().includes(q) || (p.contact_name || "").toLowerCase().includes(q) || (p.email || "").toLowerCase().includes(q);
+    const matchSearch = p.name.toLowerCase().includes(q) || (p.contact_name || "").toLowerCase().includes(q) || (p.email || "").toLowerCase().includes(q) || (p.cpf_cnpj || "").includes(q);
     const matchType = typeFilter === "todos" || p.type === typeFilter;
     return matchSearch && matchType;
   });
@@ -138,7 +208,6 @@ const AdminParceiros = () => {
 
   return (
     <AdminLayout title="Parceiros">
-      {/* Summary */}
       <div className="flex items-center gap-3 mb-6">
         <p className="text-sm text-muted-foreground">
           <span className="font-semibold text-foreground">{partners.length}</span> parceiros cadastrados · <span className="font-semibold text-green-600">{activeCount}</span> ativos
@@ -163,7 +232,7 @@ const AdminParceiros = () => {
         <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <Input placeholder="Buscar por nome, contato ou email..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+            <Input placeholder="Buscar por nome, contato, email ou CPF/CNPJ..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
           </div>
           <div className="flex gap-2 flex-wrap">
             {types.map((t) => (
@@ -190,6 +259,7 @@ const AdminParceiros = () => {
                 <TableRow>
                   <TableHead>Parceiro</TableHead>
                   <TableHead>Tipo</TableHead>
+                  <TableHead>CPF/CNPJ</TableHead>
                   <TableHead>Contato</TableHead>
                   <TableHead>Comissão</TableHead>
                   <TableHead>Status</TableHead>
@@ -205,6 +275,7 @@ const AdminParceiros = () => {
                         <div>
                           <p className="font-semibold text-foreground">{p.name}</p>
                           {p.email && <p className="text-xs text-muted-foreground">{p.email}</p>}
+                          {p.address && <p className="text-xs text-muted-foreground flex items-center gap-1"><MapPin size={10} />{p.address.length > 40 ? p.address.slice(0, 40) + "..." : p.address}</p>}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -212,6 +283,7 @@ const AdminParceiros = () => {
                           <tc.icon size={12} className="mr-1" />{tc.label}
                         </Badge>
                       </TableCell>
+                      <TableCell className="text-muted-foreground text-sm font-mono">{p.cpf_cnpj || "—"}</TableCell>
                       <TableCell className="text-muted-foreground text-sm">
                         {p.contact_name && <span className="block">{p.contact_name}</span>}
                         {p.phone && <span className="block">{p.phone}</span>}
@@ -246,12 +318,27 @@ const AdminParceiros = () => {
 
       {/* Form Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editPartner ? "Editar Parceiro" : "Novo Parceiro"}</DialogTitle>
-            <DialogDescription>Preencha os dados do parceiro.</DialogDescription>
+            <DialogDescription>Preencha os dados do parceiro. Ao digitar um CNPJ válido, os dados serão preenchidos automaticamente.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
+            <div>
+              <Label className="mb-1.5 block">CPF / CNPJ</Label>
+              <div className="relative">
+                <Input
+                  value={form.cpf_cnpj}
+                  onChange={(e) => handleCpfCnpjChange(e.target.value)}
+                  placeholder="000.000.000-00 ou 00.000.000/0000-00"
+                  maxLength={18}
+                />
+                {cnpjLoading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-primary" size={16} />}
+              </div>
+              {isCnpj(form.cpf_cnpj) && (
+                <p className="text-xs text-muted-foreground mt-1">CNPJ detectado — dados serão preenchidos automaticamente via Receita Federal.</p>
+              )}
+            </div>
             <div>
               <Label className="mb-1.5 block">Nome / Razão Social *</Label>
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
@@ -264,6 +351,10 @@ const AdminParceiros = () => {
                   <option key={k} value={k}>{v.label}</option>
                 ))}
               </select>
+            </div>
+            <div>
+              <Label className="mb-1.5 block flex items-center gap-1"><MapPin size={14} /> Endereço</Label>
+              <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Rua, número, bairro, cidade/UF" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
