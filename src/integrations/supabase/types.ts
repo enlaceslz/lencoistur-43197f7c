@@ -118,8 +118,10 @@ export type Database = {
       partners: {
         Row: {
           active: boolean
+          address: string | null
           commission_rate: number | null
           contact_name: string | null
+          cpf_cnpj: string | null
           created_at: string
           email: string | null
           id: string
@@ -130,8 +132,10 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          address?: string | null
           commission_rate?: number | null
           contact_name?: string | null
+          cpf_cnpj?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -142,8 +146,10 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          address?: string | null
           commission_rate?: number | null
           contact_name?: string | null
+          cpf_cnpj?: string | null
           created_at?: string
           email?: string | null
           id?: string
