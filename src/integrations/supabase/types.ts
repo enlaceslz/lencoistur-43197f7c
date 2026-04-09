@@ -215,6 +215,9 @@ export type Database = {
         Row: {
           active: boolean
           address: string | null
+          cadastur: string | null
+          cnh: string | null
+          cnh_validade: string | null
           commission_rate: number | null
           contact_name: string | null
           cpf_cnpj: string | null
@@ -229,6 +232,9 @@ export type Database = {
         Insert: {
           active?: boolean
           address?: string | null
+          cadastur?: string | null
+          cnh?: string | null
+          cnh_validade?: string | null
           commission_rate?: number | null
           contact_name?: string | null
           cpf_cnpj?: string | null
@@ -243,6 +249,9 @@ export type Database = {
         Update: {
           active?: boolean
           address?: string | null
+          cadastur?: string | null
+          cnh?: string | null
+          cnh_validade?: string | null
           commission_rate?: number | null
           contact_name?: string | null
           cpf_cnpj?: string | null
