@@ -644,6 +644,106 @@ const AdminConfig = () => {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* BACKUP & RESTAURAÇÃO */}
+        <TabsContent value="backup">
+          <div className="space-y-6">
+            <Card className="border-border">
+              <CardContent className="p-6 space-y-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <HardDrive size={20} className="text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-bold text-foreground text-lg">Backup do Sistema</h3>
+                    <p className="text-sm text-muted-foreground">Exporte todos os dados do sistema em formato JSON</p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-muted rounded-xl space-y-2">
+                  <p className="text-sm text-foreground font-medium">O backup inclui:</p>
+                  <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Configurações do sistema e site</li>
+                    <li>Passeios, translados e reservas</li>
+                    <li>Clientes, parceiros e avaliações</li>
+                    <li>Dados financeiros (contas a pagar/receber)</li>
+                    <li>Marketing (campanhas, leads, remarketing)</li>
+                    <li>SGS (riscos, incidentes, auditorias, equipe, termos)</li>
+                    <li>Documentação da empresa</li>
+                  </ul>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <Button onClick={handleBackup} disabled={backupLoading} className="rounded-xl">
+                    {backupLoading ? <Loader2 size={16} className="animate-spin mr-1" /> : <Download size={16} className="mr-1" />}
+                    {backupLoading ? "Gerando backup..." : "Gerar Backup Completo"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border">
+              <CardContent className="p-6 space-y-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                    <RefreshCw size={20} className="text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-bold text-foreground text-lg">Restaurar Backup</h3>
+                    <p className="text-sm text-muted-foreground">Importe um arquivo de backup para restaurar os dados</p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-destructive/5 border border-destructive/20 rounded-xl space-y-2">
+                  <p className="text-sm font-medium text-destructive">⚠️ Atenção</p>
+                  <p className="text-sm text-muted-foreground">
+                    A restauração <strong>substituirá todos os dados atuais</strong> pelos dados do backup selecionado. 
+                    Recomendamos realizar um backup antes de restaurar.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <input ref={restoreInputRef} type="file" accept=".json" className="hidden" onChange={handleRestore} />
+                  <Button
+                    variant="outline"
+                    onClick={() => restoreInputRef.current?.click()}
+                    disabled={restoreLoading}
+                    className="rounded-xl"
+                  >
+                    {restoreLoading ? <Loader2 size={16} className="animate-spin mr-1" /> : <UploadCloud size={16} className="mr-1" />}
+                    {restoreLoading ? "Restaurando..." : "Selecionar Arquivo de Backup"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {backupHistory.length > 0 && (
+              <Card className="border-border">
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Clock size={20} className="text-muted-foreground" />
+                    <h3 className="font-display font-bold text-foreground text-lg">Histórico de Backups (sessão atual)</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {backupHistory.map((b, i) => (
+                      <div key={i} className="flex items-center justify-between p-3 bg-muted rounded-lg text-sm">
+                        <div className="flex items-center gap-3">
+                          <Database size={14} className="text-primary" />
+                          <span className="font-medium text-foreground">{format(new Date(b.date), "dd/MM/yyyy 'às' HH:mm:ss")}</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-muted-foreground">
+                          <span>{b.tables} tabelas</span>
+                          <span>{b.records} registros</span>
+                          <span>{b.size}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </TabsContent>
       </Tabs>
     </AdminLayout>
   );
