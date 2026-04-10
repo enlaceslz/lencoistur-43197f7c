@@ -319,6 +319,7 @@ const AdminConfig = () => {
           <TabsTrigger value="pagamento"><CreditCard size={14} className="mr-1" /> Pagamento</TabsTrigger>
           <TabsTrigger value="notificacoes"><Bell size={14} className="mr-1" /> Notificações</TabsTrigger>
           <TabsTrigger value="seguranca"><Shield size={14} className="mr-1" /> Segurança</TabsTrigger>
+          <TabsTrigger value="backup"><Database size={14} className="mr-1" /> Backup</TabsTrigger>
         </TabsList>
 
         {/* EMPRESA */}
