@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X } from "lucide-react";
+import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -100,7 +100,7 @@ const AdminConfig = () => {
           const val = row.value as Record<string, unknown>;
           if (row.key === "empresa") setEmpresa({ ...DEFAULTS.empresa, ...val });
           if (row.key === "site") setSite({ ...DEFAULTS.site, ...val });
-          if (row.key === "pagamentos") setPagamentos({ ...DEFAULTS.pagamentos, ...val });
+          if (row.key === "pagamentos") setPagamentos({ ...DEFAULTS.pagamentos, ...val, pixTipo: (val as any).pixTipo && PIX_KEY_TYPES.some(t => t.value === (val as any).pixTipo) ? (val as any).pixTipo : DEFAULTS.pagamentos.pixTipo });
           if (row.key === "notificacoes") setNotifications({ ...DEFAULTS.notificacoes, ...val });
         }
       }
@@ -293,41 +293,134 @@ const AdminConfig = () => {
             <CardContent className="p-6 space-y-5">
               <h3 className="font-display font-bold text-foreground text-lg">Métodos de Pagamento</h3>
               <div className="space-y-4">
+                {/* PIX */}
                 <div className="flex items-center justify-between p-4 border border-border rounded-xl">
-                  <div>
-                    <p className="font-medium text-foreground">PIX</p>
-                    <p className="text-sm text-muted-foreground">Pagamento instantâneo via PIX</p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center"><Banknote size={20} className="text-emerald-600" /></div>
+                    <div>
+                      <p className="font-medium text-foreground">PIX</p>
+                      <p className="text-sm text-muted-foreground">Pagamento instantâneo via PIX</p>
+                    </div>
                   </div>
                   <Switch checked={pagamentos.pix} onCheckedChange={(v) => setPagamentos({ ...pagamentos, pix: v })} />
                 </div>
-                {pagamentos.pix && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-4 border-l-2 border-primary/20 ml-2">
-                    <div className="space-y-2">
-                      <Label>Chave PIX</Label>
-                      <Input value={pagamentos.pixChave} onChange={(e) => setPagamentos({ ...pagamentos, pixChave: e.target.value })} maxLength={50} />
+                {pagamentos.pix && (() => {
+                  const validation = validatePixKey(pagamentos.pixChave, pagamentos.pixTipo);
+                  const selectedType = PIX_KEY_TYPES.find(t => t.value === pagamentos.pixTipo);
+                  return (
+                    <div className="space-y-4 pl-4 border-l-2 border-emerald-500/30 ml-5">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-semibold">Tipo da Chave PIX</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {PIX_KEY_TYPES.map((t) => (
+                            <button
+                              key={t.value}
+                              type="button"
+                              onClick={() => setPagamentos({ ...pagamentos, pixTipo: t.value, pixChave: "" })}
+                              className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
+                                pagamentos.pixTipo === t.value
+                                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                                  : "bg-muted text-muted-foreground border-border hover:bg-accent"
+                              }`}
+                            >
+                              {t.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Chave PIX ({selectedType?.label})</Label>
+                        <div className="relative">
+                          <Input
+                            value={pagamentos.pixChave}
+                            onChange={(e) => setPagamentos({ ...pagamentos, pixChave: e.target.value })}
+                            maxLength={selectedType?.maxLength || 50}
+                            placeholder={
+                              pagamentos.pixTipo === "cpf" ? "000.000.000-00" :
+                              pagamentos.pixTipo === "cnpj" ? "00.000.000/0000-00" :
+                              pagamentos.pixTipo === "email" ? "email@exemplo.com" :
+                              pagamentos.pixTipo === "telefone" ? "+55 (00) 00000-0000" :
+                              "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                            }
+                            className={pagamentos.pixChave ? (validation.valid ? "border-emerald-500 pr-10" : "border-destructive pr-10") : ""}
+                          />
+                          {pagamentos.pixChave && (
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                              {validation.valid
+                                ? <CheckCircle size={16} className="text-emerald-500" />
+                                : <AlertCircle size={16} className="text-destructive" />}
+                            </span>
+                          )}
+                        </div>
+                        {pagamentos.pixChave && (
+                          <p className={`text-xs ${validation.valid ? "text-emerald-600" : "text-destructive"}`}>
+                            {validation.message}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label>Tipo da Chave</Label>
-                      <Input value={pagamentos.pixTipo} onChange={(e) => setPagamentos({ ...pagamentos, pixTipo: e.target.value })} maxLength={20} />
-                    </div>
-                  </div>
-                )}
+                  );
+                })()}
+
+                {/* Cartão */}
                 <div className="flex items-center justify-between p-4 border border-border rounded-xl">
-                  <div>
-                    <p className="font-medium text-foreground">Cartão de Crédito</p>
-                    <p className="text-sm text-muted-foreground">Visa, Mastercard, Elo</p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center"><CreditCard size={20} className="text-blue-600" /></div>
+                    <div>
+                      <p className="font-medium text-foreground">Cartão de Crédito/Débito</p>
+                      <p className="text-sm text-muted-foreground">Visa, Mastercard, Elo</p>
+                    </div>
                   </div>
                   <Switch checked={pagamentos.cartao} onCheckedChange={(v) => setPagamentos({ ...pagamentos, cartao: v })} />
                 </div>
+
+                {/* Boleto */}
                 <div className="flex items-center justify-between p-4 border border-border rounded-xl">
-                  <div>
-                    <p className="font-medium text-foreground">Boleto Bancário</p>
-                    <p className="text-sm text-muted-foreground">Compensação em até 3 dias</p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center"><Landmark size={20} className="text-orange-600" /></div>
+                    <div>
+                      <p className="font-medium text-foreground">Boleto Bancário</p>
+                      <p className="text-sm text-muted-foreground">Compensação em até 3 dias úteis</p>
+                    </div>
                   </div>
                   <Switch checked={pagamentos.boleto} onCheckedChange={(v) => setPagamentos({ ...pagamentos, boleto: v })} />
                 </div>
+
+                {/* Dinheiro */}
+                <div className="flex items-center justify-between p-4 border border-border rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center"><Banknote size={20} className="text-green-600" /></div>
+                    <div>
+                      <p className="font-medium text-foreground">Dinheiro</p>
+                      <p className="text-sm text-muted-foreground">Pagamento em espécie no local</p>
+                    </div>
+                  </div>
+                  <Switch checked={pagamentos.dinheiro} onCheckedChange={(v) => setPagamentos({ ...pagamentos, dinheiro: v })} />
+                </div>
+
+                {/* Transferência */}
+                <div className="flex items-center justify-between p-4 border border-border rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center"><Landmark size={20} className="text-purple-600" /></div>
+                    <div>
+                      <p className="font-medium text-foreground">Transferência Bancária</p>
+                      <p className="text-sm text-muted-foreground">TED/DOC entre contas</p>
+                    </div>
+                  </div>
+                  <Switch checked={pagamentos.transferencia} onCheckedChange={(v) => setPagamentos({ ...pagamentos, transferencia: v })} />
+                </div>
               </div>
-              <Button onClick={() => saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Pagamento")} disabled={saving} className="rounded-xl">
+              <Button
+                onClick={() => {
+                  if (pagamentos.pix) {
+                    const v = validatePixKey(pagamentos.pixChave, pagamentos.pixTipo);
+                    if (!v.valid) { toast.error("Chave PIX inválida: " + v.message); return; }
+                  }
+                  saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Pagamento");
+                }}
+                disabled={saving}
+                className="rounded-xl"
+              >
                 {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
                 Salvar
               </Button>
