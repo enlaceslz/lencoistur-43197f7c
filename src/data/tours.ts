@@ -1,9 +1,16 @@
-import destMaldives from "@/assets/dest-maldives.jpg";
-import destGreece from "@/assets/dest-greece.jpg";
-import destSafari from "@/assets/dest-safari.jpg";
-import destPeru from "@/assets/dest-peru.jpg";
-import tourLagoaAzul2 from "@/assets/tour-lagoa-azul-2.jpg";
-import tourLagoaAzul3 from "@/assets/tour-lagoa-azul-3.jpg";
+import tourLagoasAzuis from "@/assets/tour-lagoas-azuis-hero.jpg";
+import tourRioPreguicas from "@/assets/tour-rio-preguicas.jpg";
+import tourEcologico from "@/assets/tour-roteiro-ecologico.jpg";
+import tourGastronomico from "@/assets/tour-gastronomico.jpg";
+import tourCultural from "@/assets/tour-cultural.jpg";
+import tourCaiaque from "@/assets/tour-caiaque.jpg";
+import tourTrekking from "@/assets/tour-trekking.jpg";
+import tourQuadriciclo from "@/assets/tour-quadriciclo.jpg";
+import galleryBanho from "@/assets/gallery-banho-lagoa.jpg";
+import galleryPanorama from "@/assets/gallery-panorama-dunas.jpg";
+import galleryFarol from "@/assets/gallery-farol-mandacaru.jpg";
+import gallery4x4 from "@/assets/gallery-4x4-dunas.jpg";
+import galleryPorDoSol from "@/assets/gallery-por-do-sol.jpg";
 
 export interface Tour {
   id: string;
@@ -42,7 +49,7 @@ export const tours: Tour[] = [
     id: "1",
     name: "Lagoas Azuis",
     slug: "lagoas-azuis",
-    images: [tourLagoaAzul2, destMaldives, tourLagoaAzul3],
+    images: [tourLagoasAzuis, galleryBanho, galleryPanorama],
     location: "Santo Amaro, Maranhão",
     duration: "Meio dia",
     rating: 4.9,
@@ -62,7 +69,7 @@ export const tours: Tour[] = [
     id: "2",
     name: "Passeio de Barco - Rio Preguiças",
     slug: "passeio-de-barco",
-    images: [destSafari, tourLagoaAzul3, destGreece],
+    images: [tourRioPreguicas, galleryFarol, galleryPorDoSol],
     location: "Santo Amaro / Barreirinhas",
     duration: "1 dia",
     rating: 4.8,
@@ -82,7 +89,7 @@ export const tours: Tour[] = [
     id: "3",
     name: "Roteiro Ecológico",
     slug: "roteiro-ecologico",
-    images: [destGreece, tourLagoaAzul2, destMaldives],
+    images: [tourEcologico, tourLagoasAzuis, galleryPanorama],
     location: "Santo Amaro, Maranhão",
     duration: "1 dia",
     rating: 4.7,
@@ -102,7 +109,7 @@ export const tours: Tour[] = [
     id: "4",
     name: "Passeio Gastronômico",
     slug: "passeio-gastronomico",
-    images: [destPeru, destSafari, tourLagoaAzul3],
+    images: [tourGastronomico, tourCultural, tourRioPreguicas],
     location: "Santo Amaro, Maranhão",
     duration: "Meio dia",
     rating: 4.9,
@@ -122,7 +129,7 @@ export const tours: Tour[] = [
     id: "5",
     name: "Roteiro Cultural",
     slug: "roteiro-cultural",
-    images: [destGreece, destPeru, tourLagoaAzul2],
+    images: [tourCultural, tourGastronomico, galleryBanho],
     location: "Santo Amaro, Maranhão",
     duration: "Meio dia",
     rating: 4.6,
@@ -142,7 +149,7 @@ export const tours: Tour[] = [
     id: "6",
     name: "Descida de Caiaque",
     slug: "descida-de-caiaque",
-    images: [destMaldives, tourLagoaAzul3, destSafari],
+    images: [tourCaiaque, tourRioPreguicas, galleryPorDoSol],
     location: "Santo Amaro, Maranhão",
     duration: "3-4 horas",
     rating: 4.8,
@@ -162,7 +169,7 @@ export const tours: Tour[] = [
     id: "7",
     name: "Trekking nas Dunas",
     slug: "trekking-nas-dunas",
-    images: [tourLagoaAzul3, tourLagoaAzul2, destPeru],
+    images: [tourTrekking, tourEcologico, galleryPanorama],
     location: "Santo Amaro, Maranhão",
     duration: "1 dia",
     rating: 4.9,
@@ -182,7 +189,7 @@ export const tours: Tour[] = [
     id: "8",
     name: "Passeio de Quadriciclo",
     slug: "passeio-de-quadriciclo",
-    images: [destSafari, destMaldives, tourLagoaAzul2],
+    images: [tourQuadriciclo, gallery4x4, tourLagoasAzuis],
     location: "Santo Amaro, Maranhão",
     duration: "2-3 horas",
     rating: 4.7,
