@@ -88,6 +88,10 @@ const AdminConfig = () => {
   const [changingPassword, setChangingPassword] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const restoreInputRef = useRef<HTMLInputElement>(null);
+  const [backupLoading, setBackupLoading] = useState(false);
+  const [restoreLoading, setRestoreLoading] = useState(false);
+  const [backupHistory, setBackupHistory] = useState<Array<{ date: string; tables: number; records: number; size: string }>>([]);
 
   const loadSettings = useCallback(async () => {
     setLoading(true);
