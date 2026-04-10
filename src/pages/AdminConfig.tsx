@@ -11,10 +11,65 @@ import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff,
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
+const PIX_KEY_TYPES = [
+  { value: "cpf", label: "CPF", mask: "###.###.###-##", maxLength: 14 },
+  { value: "cnpj", label: "CNPJ", mask: "##.###.###/####-##", maxLength: 18 },
+  { value: "email", label: "E-mail", mask: "", maxLength: 100 },
+  { value: "telefone", label: "Telefone", mask: "+## (##) #####-####", maxLength: 20 },
+  { value: "aleatoria", label: "Chave Aleatória", mask: "", maxLength: 36 },
+] as const;
+
+type PixKeyType = typeof PIX_KEY_TYPES[number]["value"];
+
+const validatePixKey = (key: string, type: PixKeyType): { valid: boolean; message: string } => {
+  if (!key.trim()) return { valid: false, message: "Chave PIX é obrigatória." };
+  const cleaned = key.replace(/[.\-/() +]/g, "");
+  switch (type) {
+    case "cpf":
+      if (!/^\d{11}$/.test(cleaned)) return { valid: false, message: "CPF deve conter 11 dígitos." };
+      if (/^(\d)\1{10}$/.test(cleaned)) return { valid: false, message: "CPF inválido." };
+      { const digits = cleaned.split("").map(Number);
+        let sum = 0; for (let i = 0; i < 9; i++) sum += digits[i] * (10 - i);
+        let rem = (sum * 10) % 11; if (rem === 10) rem = 0;
+        if (rem !== digits[9]) return { valid: false, message: "CPF inválido (dígito verificador)." };
+        sum = 0; for (let i = 0; i < 10; i++) sum += digits[i] * (11 - i);
+        rem = (sum * 10) % 11; if (rem === 10) rem = 0;
+        if (rem !== digits[10]) return { valid: false, message: "CPF inválido (dígito verificador)." };
+      }
+      return { valid: true, message: "CPF válido ✓" };
+    case "cnpj":
+      if (!/^\d{14}$/.test(cleaned)) return { valid: false, message: "CNPJ deve conter 14 dígitos." };
+      if (/^(\d)\1{13}$/.test(cleaned)) return { valid: false, message: "CNPJ inválido." };
+      { const digits = cleaned.split("").map(Number);
+        const w1 = [5,4,3,2,9,8,7,6,5,4,3,2]; let sum = 0;
+        for (let i = 0; i < 12; i++) sum += digits[i] * w1[i];
+        let rem = sum % 11; const d1 = rem < 2 ? 0 : 11 - rem;
+        if (d1 !== digits[12]) return { valid: false, message: "CNPJ inválido (dígito verificador)." };
+        const w2 = [6,5,4,3,2,9,8,7,6,5,4,3,2]; sum = 0;
+        for (let i = 0; i < 13; i++) sum += digits[i] * w2[i];
+        rem = sum % 11; const d2 = rem < 2 ? 0 : 11 - rem;
+        if (d2 !== digits[13]) return { valid: false, message: "CNPJ inválido (dígito verificador)." };
+      }
+      return { valid: true, message: "CNPJ válido ✓" };
+    case "email":
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(key.trim())) return { valid: false, message: "E-mail inválido." };
+      return { valid: true, message: "E-mail válido ✓" };
+    case "telefone":
+      if (!/^\d{10,13}$/.test(cleaned)) return { valid: false, message: "Telefone deve ter 10 a 13 dígitos (com DDD e código do país)." };
+      return { valid: true, message: "Telefone válido ✓" };
+    case "aleatoria":
+      if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(key.trim()))
+        return { valid: false, message: "Chave aleatória deve estar no formato UUID." };
+      return { valid: true, message: "Chave aleatória válida ✓" };
+    default:
+      return { valid: false, message: "Tipo de chave inválido." };
+  }
+};
+
 const DEFAULTS = {
   empresa: { nome: "LençóisTour", cnpj: "12.345.678/0001-90", telefone: "(98) 99999-0000", whatsapp: "(98) 99999-0000", endereco: "Santo Amaro do Maranhão, MA", email: "contato@lencoistour.com" },
   site: { titulo: "LençóisTour - Passeios nos Lençóis Maranhenses", metaDescricao: "Descubra os Lençóis Maranhenses com a melhor experiência turística.", whatsappUrl: "https://wa.me/5598999990000", instagram: "https://instagram.com/lencoistour", corPrimaria: "#2563eb", logoUrl: null as string | null },
-  pagamentos: { pix: true, cartao: true, boleto: false, pixChave: "12.345.678/0001-90", pixTipo: "CNPJ" },
+  pagamentos: { pix: true, cartao: true, boleto: false, dinheiro: true, transferencia: false, pixChave: "12.345.678/0001-90", pixTipo: "cnpj" as PixKeyType },
   notificacoes: { email: true, whatsapp: true, push: false, novaReserva: true, cancelamento: true, pagamento: true },
 };
 
