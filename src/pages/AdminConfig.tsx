@@ -7,7 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark } from "lucide-react";
+import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, RefreshCw, Trash2 } from "lucide-react";
+import { format } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -87,6 +88,10 @@ const AdminConfig = () => {
   const [changingPassword, setChangingPassword] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const restoreInputRef = useRef<HTMLInputElement>(null);
+  const [backupLoading, setBackupLoading] = useState(false);
+  const [restoreLoading, setRestoreLoading] = useState(false);
+  const [backupHistory, setBackupHistory] = useState<Array<{ date: string; tables: number; records: number; size: string }>>([]);
 
   const loadSettings = useCallback(async () => {
     setLoading(true);
@@ -164,6 +169,137 @@ const AdminConfig = () => {
     setConfirmarSenha("");
   };
 
+  const BACKUP_TABLES = [
+    "site_settings", "tours", "transfer_routes", "customers", "bookings",
+    "partners", "contas_pagar", "contas_receber", "reviews", "documents",
+    "marketing_campaigns", "marketing_leads", "remarketing_rules",
+    "sgs_risks", "sgs_incidents", "sgs_corrective_actions", "sgs_staff",
+    "sgs_staff_trainings", "sgs_audits", "sgs_audit_items", "sgs_briefings",
+    "sgs_risk_terms", "sgs_safety_surveys", "sgs_supplier_compliance",
+  ] as const;
+
+  const handleBackup = async () => {
+    setBackupLoading(true);
+    try {
+      const backup: Record<string, unknown[]> = {};
+      let totalRecords = 0;
+
+      for (const table of BACKUP_TABLES) {
+        const { data, error } = await supabase.from(table).select("*");
+        if (error) {
+          console.error(`Erro ao exportar ${table}:`, error.message);
+          backup[table] = [];
+        } else {
+          backup[table] = data || [];
+          totalRecords += (data || []).length;
+        }
+      }
+
+      const now = new Date();
+      const exportData = {
+        metadata: {
+          version: "1.0",
+          created_at: now.toISOString(),
+          tables_count: BACKUP_TABLES.length,
+          total_records: totalRecords,
+          app: "LençóisTour ERP",
+        },
+        data: backup,
+      };
+
+      const json = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const sizeKB = (blob.size / 1024).toFixed(1);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `backup-lencoistour-${format(now, "yyyy-MM-dd-HHmmss")}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      setBackupHistory((prev) => [
+        { date: now.toISOString(), tables: BACKUP_TABLES.length, records: totalRecords, size: `${sizeKB} KB` },
+        ...prev.slice(0, 9),
+      ]);
+
+      toast.success(`Backup realizado com sucesso! ${totalRecords} registros em ${BACKUP_TABLES.length} tabelas.`);
+    } catch (err) {
+      toast.error("Erro ao gerar backup: " + (err instanceof Error ? err.message : "Erro desconhecido"));
+    } finally {
+      setBackupLoading(false);
+    }
+  };
+
+  const handleRestore = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith(".json")) { toast.error("Selecione um arquivo .json de backup válido."); return; }
+
+    const confirmRestore = window.confirm(
+      "⚠️ ATENÇÃO: A restauração irá SUBSTITUIR todos os dados atuais pelos dados do backup.\n\nEssa ação não pode ser desfeita.\n\nDeseja continuar?"
+    );
+    if (!confirmRestore) { e.target.value = ""; return; }
+
+    setRestoreLoading(true);
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+
+      if (!parsed.metadata || !parsed.data) {
+        toast.error("Arquivo de backup inválido. Formato não reconhecido.");
+        return;
+      }
+
+      const backupDate = parsed.metadata.created_at
+        ? format(new Date(parsed.metadata.created_at), "dd/MM/yyyy 'às' HH:mm:ss")
+        : "Data desconhecida";
+
+      const confirmFinal = window.confirm(
+        `Backup de: ${backupDate}\n${parsed.metadata.total_records || "?"} registros em ${parsed.metadata.tables_count || "?"} tabelas.\n\nConfirmar restauração?`
+      );
+      if (!confirmFinal) return;
+
+      let restored = 0;
+      let errors = 0;
+
+      for (const table of BACKUP_TABLES) {
+        const rows = parsed.data[table];
+        if (!rows || !Array.isArray(rows) || rows.length === 0) continue;
+
+        // Delete existing data
+        const { error: delError } = await supabase.from(table).delete().neq("id", "00000000-0000-0000-0000-000000000000");
+        if (delError) {
+          console.error(`Erro ao limpar ${table}:`, delError.message);
+          errors++;
+          continue;
+        }
+
+        // Insert backup data in batches of 100
+        for (let i = 0; i < rows.length; i += 100) {
+          const batch = rows.slice(i, i + 100);
+          const { error: insError } = await supabase.from(table).insert(batch);
+          if (insError) {
+            console.error(`Erro ao restaurar ${table}:`, insError.message);
+            errors++;
+          } else {
+            restored += batch.length;
+          }
+        }
+      }
+
+      if (errors > 0) {
+        toast.warning(`Restauração parcial: ${restored} registros restaurados com ${errors} erro(s). Verifique o console.`);
+      } else {
+        toast.success(`Restauração completa! ${restored} registros restaurados com sucesso.`);
+      }
+    } catch (err) {
+      toast.error("Erro ao processar arquivo: " + (err instanceof Error ? err.message : "Formato inválido"));
+    } finally {
+      setRestoreLoading(false);
+      e.target.value = "";
+    }
+  };
+
   if (loading) {
     return (
       <AdminLayout title="Configurações">
@@ -183,6 +319,7 @@ const AdminConfig = () => {
           <TabsTrigger value="pagamento"><CreditCard size={14} className="mr-1" /> Pagamento</TabsTrigger>
           <TabsTrigger value="notificacoes"><Bell size={14} className="mr-1" /> Notificações</TabsTrigger>
           <TabsTrigger value="seguranca"><Shield size={14} className="mr-1" /> Segurança</TabsTrigger>
+          <TabsTrigger value="backup"><Database size={14} className="mr-1" /> Backup</TabsTrigger>
         </TabsList>
 
         {/* EMPRESA */}
@@ -506,6 +643,106 @@ const AdminConfig = () => {
               </Button>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* BACKUP & RESTAURAÇÃO */}
+        <TabsContent value="backup">
+          <div className="space-y-6">
+            <Card className="border-border">
+              <CardContent className="p-6 space-y-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <HardDrive size={20} className="text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-bold text-foreground text-lg">Backup do Sistema</h3>
+                    <p className="text-sm text-muted-foreground">Exporte todos os dados do sistema em formato JSON</p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-muted rounded-xl space-y-2">
+                  <p className="text-sm text-foreground font-medium">O backup inclui:</p>
+                  <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Configurações do sistema e site</li>
+                    <li>Passeios, translados e reservas</li>
+                    <li>Clientes, parceiros e avaliações</li>
+                    <li>Dados financeiros (contas a pagar/receber)</li>
+                    <li>Marketing (campanhas, leads, remarketing)</li>
+                    <li>SGS (riscos, incidentes, auditorias, equipe, termos)</li>
+                    <li>Documentação da empresa</li>
+                  </ul>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <Button onClick={handleBackup} disabled={backupLoading} className="rounded-xl">
+                    {backupLoading ? <Loader2 size={16} className="animate-spin mr-1" /> : <Download size={16} className="mr-1" />}
+                    {backupLoading ? "Gerando backup..." : "Gerar Backup Completo"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border">
+              <CardContent className="p-6 space-y-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                    <RefreshCw size={20} className="text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-bold text-foreground text-lg">Restaurar Backup</h3>
+                    <p className="text-sm text-muted-foreground">Importe um arquivo de backup para restaurar os dados</p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-destructive/5 border border-destructive/20 rounded-xl space-y-2">
+                  <p className="text-sm font-medium text-destructive">⚠️ Atenção</p>
+                  <p className="text-sm text-muted-foreground">
+                    A restauração <strong>substituirá todos os dados atuais</strong> pelos dados do backup selecionado. 
+                    Recomendamos realizar um backup antes de restaurar.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <input ref={restoreInputRef} type="file" accept=".json" className="hidden" onChange={handleRestore} />
+                  <Button
+                    variant="outline"
+                    onClick={() => restoreInputRef.current?.click()}
+                    disabled={restoreLoading}
+                    className="rounded-xl"
+                  >
+                    {restoreLoading ? <Loader2 size={16} className="animate-spin mr-1" /> : <UploadCloud size={16} className="mr-1" />}
+                    {restoreLoading ? "Restaurando..." : "Selecionar Arquivo de Backup"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {backupHistory.length > 0 && (
+              <Card className="border-border">
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Clock size={20} className="text-muted-foreground" />
+                    <h3 className="font-display font-bold text-foreground text-lg">Histórico de Backups (sessão atual)</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {backupHistory.map((b, i) => (
+                      <div key={i} className="flex items-center justify-between p-3 bg-muted rounded-lg text-sm">
+                        <div className="flex items-center gap-3">
+                          <Database size={14} className="text-primary" />
+                          <span className="font-medium text-foreground">{format(new Date(b.date), "dd/MM/yyyy 'às' HH:mm:ss")}</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-muted-foreground">
+                          <span>{b.tables} tabelas</span>
+                          <span>{b.records} registros</span>
+                          <span>{b.size}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </TabsContent>
       </Tabs>
     </AdminLayout>
