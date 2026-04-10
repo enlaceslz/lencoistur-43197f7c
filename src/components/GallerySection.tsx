@@ -1,15 +1,22 @@
 import { useState } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import galleryLagoasAzuis from "@/assets/tour-lagoas-azuis-hero.jpg";
+import galleryBanho from "@/assets/gallery-banho-lagoa.jpg";
+import galleryPanorama from "@/assets/gallery-panorama-dunas.jpg";
+import galleryFarol from "@/assets/gallery-farol-mandacaru.jpg";
+import gallery4x4 from "@/assets/gallery-4x4-dunas.jpg";
+import galleryPorDoSol from "@/assets/gallery-por-do-sol.jpg";
+import galleryCaiaque from "@/assets/tour-caiaque.jpg";
 
 const galleryImages = [
-  { src: "https://images.unsplash.com/photo-1704644411334-f6ca48963d6c?w=1200&q=90&auto=format&fit=crop", alt: "Dunas brancas e lagoas azuis dos Lençóis Maranhenses - Santo Amaro" },
-  { src: "https://images.unsplash.com/photo-1650623598032-4fddce25b34f?w=1200&q=90&auto=format&fit=crop", alt: "Vista aérea das lagoas cristalinas entre dunas" },
-  { src: "https://images.unsplash.com/photo-1680323535239-25b4b65eee75?w=1200&q=90&auto=format&fit=crop", alt: "Panorama das dunas e lagoas dos Lençóis Maranhenses" },
-  { src: "https://images.unsplash.com/photo-1672271688662-3a03bbb75ec9?w=1200&q=90&auto=format&fit=crop", alt: "Lagoa cercada por dunas brancas em Santo Amaro" },
-  { src: "https://images.unsplash.com/photo-1671385054651-f017771dea4a?w=1200&q=90&auto=format&fit=crop", alt: "Lagoa cristalina no coração dos Lençóis" },
-  { src: "https://images.unsplash.com/photo-1679095007377-e6c8e13f9178?w=1200&q=90&auto=format&fit=crop", alt: "Farol de Mandacaru - Lençóis Maranhenses" },
-  { src: "https://images.unsplash.com/photo-1561916108-2d4d48d132c8?w=1200&q=90&auto=format&fit=crop", alt: "Turistas nas lagoas dos Lençóis Maranhenses" },
+  { src: galleryLagoasAzuis, alt: "Dunas brancas e lagoas azuis dos Lençóis Maranhenses - Santo Amaro" },
+  { src: galleryBanho, alt: "Turistas nadando nas lagoas cristalinas dos Lençóis Maranhenses" },
+  { src: galleryPanorama, alt: "Panorama das dunas e lagoas ao pôr do sol" },
+  { src: galleryFarol, alt: "Farol de Mandacaru - Lençóis Maranhenses" },
+  { src: gallery4x4, alt: "Passeio de 4x4 nas dunas dos Lençóis Maranhenses" },
+  { src: galleryPorDoSol, alt: "Pôr do sol deslumbrante nos Lençóis Maranhenses" },
+  { src: galleryCaiaque, alt: "Caiaque nas lagoas cristalinas dos Lençóis" },
 ];
 
 const GallerySection = () => {
