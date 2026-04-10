@@ -169,7 +169,138 @@ const AdminConfig = () => {
     setConfirmarSenha("");
   };
 
-  if (loading) {
+  const BACKUP_TABLES = [
+    "site_settings", "tours", "transfer_routes", "customers", "bookings",
+    "partners", "contas_pagar", "contas_receber", "reviews", "documents",
+    "marketing_campaigns", "marketing_leads", "remarketing_rules",
+    "sgs_risks", "sgs_incidents", "sgs_corrective_actions", "sgs_staff",
+    "sgs_staff_trainings", "sgs_audits", "sgs_audit_items", "sgs_briefings",
+    "sgs_risk_terms", "sgs_safety_surveys", "sgs_supplier_compliance",
+  ] as const;
+
+  const handleBackup = async () => {
+    setBackupLoading(true);
+    try {
+      const backup: Record<string, unknown[]> = {};
+      let totalRecords = 0;
+
+      for (const table of BACKUP_TABLES) {
+        const { data, error } = await supabase.from(table).select("*");
+        if (error) {
+          console.error(`Erro ao exportar ${table}:`, error.message);
+          backup[table] = [];
+        } else {
+          backup[table] = data || [];
+          totalRecords += (data || []).length;
+        }
+      }
+
+      const now = new Date();
+      const exportData = {
+        metadata: {
+          version: "1.0",
+          created_at: now.toISOString(),
+          tables_count: BACKUP_TABLES.length,
+          total_records: totalRecords,
+          app: "LençóisTour ERP",
+        },
+        data: backup,
+      };
+
+      const json = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const sizeKB = (blob.size / 1024).toFixed(1);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `backup-lencoistour-${format(now, "yyyy-MM-dd-HHmmss")}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      setBackupHistory((prev) => [
+        { date: now.toISOString(), tables: BACKUP_TABLES.length, records: totalRecords, size: `${sizeKB} KB` },
+        ...prev.slice(0, 9),
+      ]);
+
+      toast.success(`Backup realizado com sucesso! ${totalRecords} registros em ${BACKUP_TABLES.length} tabelas.`);
+    } catch (err) {
+      toast.error("Erro ao gerar backup: " + (err instanceof Error ? err.message : "Erro desconhecido"));
+    } finally {
+      setBackupLoading(false);
+    }
+  };
+
+  const handleRestore = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith(".json")) { toast.error("Selecione um arquivo .json de backup válido."); return; }
+
+    const confirmRestore = window.confirm(
+      "⚠️ ATENÇÃO: A restauração irá SUBSTITUIR todos os dados atuais pelos dados do backup.\n\nEssa ação não pode ser desfeita.\n\nDeseja continuar?"
+    );
+    if (!confirmRestore) { e.target.value = ""; return; }
+
+    setRestoreLoading(true);
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+
+      if (!parsed.metadata || !parsed.data) {
+        toast.error("Arquivo de backup inválido. Formato não reconhecido.");
+        return;
+      }
+
+      const backupDate = parsed.metadata.created_at
+        ? format(new Date(parsed.metadata.created_at), "dd/MM/yyyy 'às' HH:mm:ss")
+        : "Data desconhecida";
+
+      const confirmFinal = window.confirm(
+        `Backup de: ${backupDate}\n${parsed.metadata.total_records || "?"} registros em ${parsed.metadata.tables_count || "?"} tabelas.\n\nConfirmar restauração?`
+      );
+      if (!confirmFinal) return;
+
+      let restored = 0;
+      let errors = 0;
+
+      for (const table of BACKUP_TABLES) {
+        const rows = parsed.data[table];
+        if (!rows || !Array.isArray(rows) || rows.length === 0) continue;
+
+        // Delete existing data
+        const { error: delError } = await supabase.from(table).delete().neq("id", "00000000-0000-0000-0000-000000000000");
+        if (delError) {
+          console.error(`Erro ao limpar ${table}:`, delError.message);
+          errors++;
+          continue;
+        }
+
+        // Insert backup data in batches of 100
+        for (let i = 0; i < rows.length; i += 100) {
+          const batch = rows.slice(i, i + 100);
+          const { error: insError } = await supabase.from(table).insert(batch);
+          if (insError) {
+            console.error(`Erro ao restaurar ${table}:`, insError.message);
+            errors++;
+          } else {
+            restored += batch.length;
+          }
+        }
+      }
+
+      if (errors > 0) {
+        toast.warning(`Restauração parcial: ${restored} registros restaurados com ${errors} erro(s). Verifique o console.`);
+      } else {
+        toast.success(`Restauração completa! ${restored} registros restaurados com sucesso.`);
+      }
+    } catch (err) {
+      toast.error("Erro ao processar arquivo: " + (err instanceof Error ? err.message : "Formato inválido"));
+    } finally {
+      setRestoreLoading(false);
+      e.target.value = "";
+    }
+  };
+
+
     return (
       <AdminLayout title="Configurações">
         <div className="flex items-center justify-center py-20">
