@@ -5,6 +5,31 @@ import { Star, MapPin, Clock, Search, SlidersHorizontal } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+import tourLagoasAzuis from "@/assets/tour-lagoas-azuis-hero.jpg";
+import tourRioPreguicas from "@/assets/tour-rio-preguicas.jpg";
+import tourEcologico from "@/assets/tour-roteiro-ecologico.jpg";
+import tourGastronomico from "@/assets/tour-gastronomico.jpg";
+import tourCultural from "@/assets/tour-cultural.jpg";
+import tourCaiaque from "@/assets/tour-caiaque.jpg";
+import tourTrekking from "@/assets/tour-trekking.jpg";
+import tourQuadriciclo from "@/assets/tour-quadriciclo.jpg";
+
+const localImageMap: Record<string, string> = {
+  "lagoas-azuis": tourLagoasAzuis,
+  "passeio-de-barco": tourRioPreguicas,
+  "roteiro-ecologico": tourEcologico,
+  "passeio-gastronomico": tourGastronomico,
+  "roteiro-cultural": tourCultural,
+  "descida-de-caiaque": tourCaiaque,
+  "trekking-nas-dunas": tourTrekking,
+  "passeio-de-quadriciclo": tourQuadriciclo,
+};
+
+const getTourImage = (tour: any): string | null => {
+  if (tour.images?.[0]) return tour.images[0];
+  return localImageMap[tour.slug] || null;
+};
+
 const sortOptions = [
   { value: "popular", label: "Mais Popular" },
   { value: "price-asc", label: "Menor Preço" },
@@ -79,8 +104,8 @@ const ToursPage = () => {
             <Link to={`/passeios/${tour.slug}`} key={tour.id}
               className="group bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
               <div className="relative h-56 overflow-hidden">
-                {tour.images?.[0] ? (
-                  <img src={tour.images[0]} alt={tour.name}
+                {getTourImage(tour) ? (
+                  <img src={getTourImage(tour)!} alt={tour.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     loading="lazy" />
                 ) : (
