@@ -14,10 +14,11 @@ import {
 import {
   Search, ShoppingCart, CheckCircle, Clock, XCircle, Eye,
   DollarSign, Ban, Loader2, Users, Calendar, CreditCard, FileText,
-  MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download,
+  MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { toast } from "sonner";
+import { PrintReceiptButton, type ReceiptData } from "@/components/BookingReceipt";
 
 const statusConfig: Record<string, { label: string; className: string; icon: typeof CheckCircle }> = {
   confirmada: { label: "Confirmada", className: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300", icon: CheckCircle },
@@ -349,6 +350,31 @@ const AdminReservas = () => {
                     Cancelar Reserva
                   </Button>
                 )}
+                {/* Print Receipt */}
+                <PrintReceiptButton
+                  data={{
+                    bookingCode: selected.bookingCode,
+                    customerName: selected.customerName,
+                    customerEmail: selected.customerEmail,
+                    customerPhone: selected.customerPhone,
+                    itemName: selected.itemName,
+                    type: selected.type,
+                    date: selected.date,
+                    guests: selected.guests,
+                    unitPrice: selected.unitPrice,
+                    total: selected.total,
+                    discount: selected.discount,
+                    finalTotal: selected.finalTotal,
+                    payMethod: selected.payMethod,
+                    paymentStatus: selected.paymentStatus,
+                    status: selected.status,
+                    pixCode: selected.pixCode,
+                    createdAt: selected.createdAt,
+                    notes: selected.notes,
+                  }}
+                  className="flex-1 min-w-[140px]"
+                  label="Imprimir Recibo"
+                />
                 {/* WhatsApp */}
                 {selected.customerPhone && (
                   <a
