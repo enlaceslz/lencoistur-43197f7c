@@ -619,6 +619,221 @@ export type Database = {
           },
         ]
       }
+      sgs_checklist_items: {
+        Row: {
+          categoria: string
+          checklist_id: string
+          conforme: boolean | null
+          created_at: string
+          id: string
+          item_nome: string
+          observacao: string | null
+        }
+        Insert: {
+          categoria?: string
+          checklist_id: string
+          conforme?: boolean | null
+          created_at?: string
+          id?: string
+          item_nome: string
+          observacao?: string | null
+        }
+        Update: {
+          categoria?: string
+          checklist_id?: string
+          conforme?: boolean | null
+          created_at?: string
+          id?: string
+          item_nome?: string
+          observacao?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sgs_checklist_items_checklist_id_fkey"
+            columns: ["checklist_id"]
+            isOneToOne: false
+            referencedRelation: "sgs_checklists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sgs_checklists: {
+        Row: {
+          condutor_id: string | null
+          created_at: string
+          data: string
+          id: string
+          observacoes: string | null
+          responsavel: string | null
+          status: string
+          tipo: string
+          titulo: string
+          updated_at: string
+          veiculo_id: string | null
+        }
+        Insert: {
+          condutor_id?: string | null
+          created_at?: string
+          data?: string
+          id?: string
+          observacoes?: string | null
+          responsavel?: string | null
+          status?: string
+          tipo?: string
+          titulo: string
+          updated_at?: string
+          veiculo_id?: string | null
+        }
+        Update: {
+          condutor_id?: string | null
+          created_at?: string
+          data?: string
+          id?: string
+          observacoes?: string | null
+          responsavel?: string | null
+          status?: string
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+          veiculo_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sgs_checklists_condutor_id_fkey"
+            columns: ["condutor_id"]
+            isOneToOne: false
+            referencedRelation: "sgs_condutores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sgs_checklists_veiculo_id_fkey"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "sgs_veiculos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sgs_condutores: {
+        Row: {
+          assinatura_url: string | null
+          cnh_categoria: string | null
+          cnh_numero: string | null
+          cnh_validade: string | null
+          cpf: string | null
+          created_at: string
+          email: string | null
+          foto_url: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          off_road: boolean | null
+          primeiros_socorros: boolean | null
+          status: string
+          telefone: string | null
+          treinamentos: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          assinatura_url?: string | null
+          cnh_categoria?: string | null
+          cnh_numero?: string | null
+          cnh_validade?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          foto_url?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          off_road?: boolean | null
+          primeiros_socorros?: boolean | null
+          status?: string
+          telefone?: string | null
+          treinamentos?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          assinatura_url?: string | null
+          cnh_categoria?: string | null
+          cnh_numero?: string | null
+          cnh_validade?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          foto_url?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          off_road?: boolean | null
+          primeiros_socorros?: boolean | null
+          status?: string
+          telefone?: string | null
+          treinamentos?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sgs_condutores_visitantes: {
+        Row: {
+          cnh_categoria: string | null
+          cnh_numero: string | null
+          cnh_validade: string | null
+          cpf: string | null
+          created_at: string
+          data_entrada: string
+          data_saida: string | null
+          destino_uc: string | null
+          empresa_instituicao: string | null
+          id: string
+          motivo: string | null
+          nome: string
+          observacoes: string | null
+          status: string
+          updated_at: string
+          veiculo_descricao: string | null
+          veiculo_placa: string | null
+        }
+        Insert: {
+          cnh_categoria?: string | null
+          cnh_numero?: string | null
+          cnh_validade?: string | null
+          cpf?: string | null
+          created_at?: string
+          data_entrada?: string
+          data_saida?: string | null
+          destino_uc?: string | null
+          empresa_instituicao?: string | null
+          id?: string
+          motivo?: string | null
+          nome: string
+          observacoes?: string | null
+          status?: string
+          updated_at?: string
+          veiculo_descricao?: string | null
+          veiculo_placa?: string | null
+        }
+        Update: {
+          cnh_categoria?: string | null
+          cnh_numero?: string | null
+          cnh_validade?: string | null
+          cpf?: string | null
+          created_at?: string
+          data_entrada?: string
+          data_saida?: string | null
+          destino_uc?: string | null
+          empresa_instituicao?: string | null
+          id?: string
+          motivo?: string | null
+          nome?: string
+          observacoes?: string | null
+          status?: string
+          updated_at?: string
+          veiculo_descricao?: string | null
+          veiculo_placa?: string | null
+        }
+        Relationships: []
+      }
       sgs_corrective_actions: {
         Row: {
           action_code: string
@@ -685,6 +900,78 @@ export type Database = {
           },
         ]
       }
+      sgs_empresa: {
+        Row: {
+          cadastur: string | null
+          cidade: string | null
+          cnpj: string | null
+          created_at: string
+          email: string | null
+          endereco: string | null
+          estado: string | null
+          icmbio_autorizacao: string | null
+          icmbio_validade: string | null
+          id: string
+          logo_url: string | null
+          nome_fantasia: string | null
+          observacoes: string | null
+          razao_social: string
+          responsavel_cargo: string | null
+          responsavel_nome: string | null
+          responsavel_tecnico: string | null
+          telefone: string | null
+          uc_nome: string | null
+          uc_tipo: string | null
+          updated_at: string
+        }
+        Insert: {
+          cadastur?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          created_at?: string
+          email?: string | null
+          endereco?: string | null
+          estado?: string | null
+          icmbio_autorizacao?: string | null
+          icmbio_validade?: string | null
+          id?: string
+          logo_url?: string | null
+          nome_fantasia?: string | null
+          observacoes?: string | null
+          razao_social: string
+          responsavel_cargo?: string | null
+          responsavel_nome?: string | null
+          responsavel_tecnico?: string | null
+          telefone?: string | null
+          uc_nome?: string | null
+          uc_tipo?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cadastur?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          created_at?: string
+          email?: string | null
+          endereco?: string | null
+          estado?: string | null
+          icmbio_autorizacao?: string | null
+          icmbio_validade?: string | null
+          id?: string
+          logo_url?: string | null
+          nome_fantasia?: string | null
+          observacoes?: string | null
+          razao_social?: string
+          responsavel_cargo?: string | null
+          responsavel_nome?: string | null
+          responsavel_tecnico?: string | null
+          telefone?: string | null
+          uc_nome?: string | null
+          uc_tipo?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sgs_incidents: {
         Row: {
           action_taken: string | null
@@ -746,6 +1033,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sgs_pgsat: {
+        Row: {
+          conteudo_json: Json | null
+          created_at: string
+          data_emissao: string | null
+          data_validade: string | null
+          id: string
+          observacoes: string | null
+          pdf_url: string | null
+          responsavel: string | null
+          status: string
+          titulo: string
+          updated_at: string
+          versao: string
+        }
+        Insert: {
+          conteudo_json?: Json | null
+          created_at?: string
+          data_emissao?: string | null
+          data_validade?: string | null
+          id?: string
+          observacoes?: string | null
+          pdf_url?: string | null
+          responsavel?: string | null
+          status?: string
+          titulo?: string
+          updated_at?: string
+          versao?: string
+        }
+        Update: {
+          conteudo_json?: Json | null
+          created_at?: string
+          data_emissao?: string | null
+          data_validade?: string | null
+          id?: string
+          observacoes?: string | null
+          pdf_url?: string | null
+          responsavel?: string | null
+          status?: string
+          titulo?: string
+          updated_at?: string
+          versao?: string
+        }
+        Relationships: []
       }
       sgs_risk_terms: {
         Row: {
@@ -864,6 +1196,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sgs_rotas: {
+        Row: {
+          capacidade_maxima: number | null
+          created_at: string
+          descricao: string | null
+          dificuldade: string | null
+          distancia_km: number | null
+          duracao_estimada: string | null
+          id: string
+          mapa_url: string | null
+          nome: string
+          observacoes: string | null
+          pontos_interesse: string[] | null
+          riscos_conhecidos: string[] | null
+          status: string
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          capacidade_maxima?: number | null
+          created_at?: string
+          descricao?: string | null
+          dificuldade?: string | null
+          distancia_km?: number | null
+          duracao_estimada?: string | null
+          id?: string
+          mapa_url?: string | null
+          nome: string
+          observacoes?: string | null
+          pontos_interesse?: string[] | null
+          riscos_conhecidos?: string[] | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Update: {
+          capacidade_maxima?: number | null
+          created_at?: string
+          descricao?: string | null
+          dificuldade?: string | null
+          distancia_km?: number | null
+          duracao_estimada?: string | null
+          id?: string
+          mapa_url?: string | null
+          nome?: string
+          observacoes?: string | null
+          pontos_interesse?: string[] | null
+          riscos_conhecidos?: string[] | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       sgs_safety_surveys: {
         Row: {
@@ -1059,6 +1445,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sgs_veiculos: {
+        Row: {
+          ano: number | null
+          capacidade: number | null
+          chassi: string | null
+          combustivel: string | null
+          cor: string | null
+          created_at: string
+          foto_url: string | null
+          id: string
+          licenciamento_validade: string | null
+          marca: string
+          modelo: string
+          observacoes: string | null
+          placa: string
+          quilometragem: number | null
+          renavam: string | null
+          seguradora: string | null
+          seguro_validade: string | null
+          status: string
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          ano?: number | null
+          capacidade?: number | null
+          chassi?: string | null
+          combustivel?: string | null
+          cor?: string | null
+          created_at?: string
+          foto_url?: string | null
+          id?: string
+          licenciamento_validade?: string | null
+          marca: string
+          modelo: string
+          observacoes?: string | null
+          placa: string
+          quilometragem?: number | null
+          renavam?: string | null
+          seguradora?: string | null
+          seguro_validade?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Update: {
+          ano?: number | null
+          capacidade?: number | null
+          chassi?: string | null
+          combustivel?: string | null
+          cor?: string | null
+          created_at?: string
+          foto_url?: string | null
+          id?: string
+          licenciamento_validade?: string | null
+          marca?: string
+          modelo?: string
+          observacoes?: string | null
+          placa?: string
+          quilometragem?: number | null
+          renavam?: string | null
+          seguradora?: string | null
+          seguro_validade?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       site_settings: {
         Row: {
