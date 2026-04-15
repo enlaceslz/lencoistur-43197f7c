@@ -14,10 +14,11 @@ import {
 import {
   Search, ShoppingCart, CheckCircle, Clock, XCircle, Eye,
   DollarSign, Ban, Loader2, Users, Calendar, CreditCard, FileText,
-  MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download,
+  MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { toast } from "sonner";
+import { PrintReceiptButton, type ReceiptData } from "@/components/BookingReceipt";
 
 const statusConfig: Record<string, { label: string; className: string; icon: typeof CheckCircle }> = {
   confirmada: { label: "Confirmada", className: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300", icon: CheckCircle },
