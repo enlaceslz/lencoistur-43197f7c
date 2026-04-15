@@ -33,6 +33,13 @@ import AdminSGSFornecedores from "./pages/AdminSGSFornecedores.tsx";
 import AdminSGSTermos from "./pages/AdminSGSTermos.tsx";
 import AdminSGSBriefings from "./pages/AdminSGSBriefings.tsx";
 import AdminSGSPesquisas from "./pages/AdminSGSPesquisas.tsx";
+import AdminSGSEmpresa from "./pages/AdminSGSEmpresa.tsx";
+import AdminSGSVeiculos from "./pages/AdminSGSVeiculos.tsx";
+import AdminSGSCondutores from "./pages/AdminSGSCondutores.tsx";
+import AdminSGSCondutoresVisitantes from "./pages/AdminSGSCondutoresVisitantes.tsx";
+import AdminSGSChecklists from "./pages/AdminSGSChecklists.tsx";
+import AdminSGSRotas from "./pages/AdminSGSRotas.tsx";
+import AdminSGSPGSAT from "./pages/AdminSGSPGSAT.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -64,12 +71,19 @@ const App = () => (
           <Route path="/admin/ia" element={<AdminRoute><AdminIA /></AdminRoute>} />
           <Route path="/admin/documentos" element={<AdminRoute><AdminDocumentos /></AdminRoute>} />
           <Route path="/admin/sgs" element={<AdminRoute><AdminSGSDashboard /></AdminRoute>} />
+          <Route path="/admin/sgs/empresa" element={<AdminRoute><AdminSGSEmpresa /></AdminRoute>} />
+          <Route path="/admin/sgs/veiculos" element={<AdminRoute><AdminSGSVeiculos /></AdminRoute>} />
+          <Route path="/admin/sgs/condutores" element={<AdminRoute><AdminSGSCondutores /></AdminRoute>} />
+          <Route path="/admin/sgs/condutores-visitantes" element={<AdminRoute><AdminSGSCondutoresVisitantes /></AdminRoute>} />
           <Route path="/admin/sgs/riscos" element={<AdminRoute><AdminSGSRiscos /></AdminRoute>} />
+          <Route path="/admin/sgs/checklists" element={<AdminRoute><AdminSGSChecklists /></AdminRoute>} />
           <Route path="/admin/sgs/incidentes" element={<AdminRoute><AdminSGSIncidentes /></AdminRoute>} />
           <Route path="/admin/sgs/acoes" element={<AdminRoute><AdminSGSAcoes /></AdminRoute>} />
           <Route path="/admin/sgs/equipe" element={<AdminRoute><AdminSGSEquipe /></AdminRoute>} />
           <Route path="/admin/sgs/auditorias" element={<AdminRoute><AdminSGSAuditorias /></AdminRoute>} />
           <Route path="/admin/sgs/fornecedores" element={<AdminRoute><AdminSGSFornecedores /></AdminRoute>} />
+          <Route path="/admin/sgs/rotas" element={<AdminRoute><AdminSGSRotas /></AdminRoute>} />
+          <Route path="/admin/sgs/pgsat" element={<AdminRoute><AdminSGSPGSAT /></AdminRoute>} />
           <Route path="/admin/sgs/termos" element={<AdminRoute><AdminSGSTermos /></AdminRoute>} />
           <Route path="/admin/sgs/briefings" element={<AdminRoute><AdminSGSBriefings /></AdminRoute>} />
           <Route path="/admin/sgs/pesquisas" element={<AdminRoute><AdminSGSPesquisas /></AdminRoute>} />
