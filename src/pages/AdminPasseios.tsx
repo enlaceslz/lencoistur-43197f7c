@@ -38,6 +38,7 @@ const AdminPasseios = () => {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [newUrlInput, setNewUrlInput] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [detailTour, setDetailTour] = useState<any | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { load(); }, []);
