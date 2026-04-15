@@ -549,6 +549,126 @@ const AdminPasseios = () => {
           </TableBody>
         </Table>
       </Card>
+
+      {/* Tour Detail Dialog */}
+      <Dialog open={!!detailTour} onOpenChange={(open) => !open && setDetailTour(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          {detailTour && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="font-display text-xl">{detailTour.name}</DialogTitle>
+              </DialogHeader>
+
+              {/* Images */}
+              {detailTour.images?.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  {detailTour.images.slice(0, 6).map((img: string, i: number) => (
+                    <img key={i} src={img} alt={`${detailTour.name} ${i + 1}`}
+                      className={`rounded-xl object-cover w-full ${i === 0 ? "col-span-2 row-span-2 h-48" : "h-24"}`}
+                      onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
+                  ))}
+                </div>
+              )}
+
+              {/* Info Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+                <div className="bg-muted rounded-xl p-3">
+                  <p className="text-xs text-muted-foreground flex items-center gap-1"><MapPin size={12} /> Localização</p>
+                  <p className="text-sm font-semibold text-foreground mt-1">{detailTour.location || "—"}</p>
+                </div>
+                <div className="bg-muted rounded-xl p-3">
+                  <p className="text-xs text-muted-foreground flex items-center gap-1"><Clock size={12} /> Duração</p>
+                  <p className="text-sm font-semibold text-foreground mt-1">{detailTour.duration || "—"}</p>
+                </div>
+                <div className="bg-muted rounded-xl p-3">
+                  <p className="text-xs text-muted-foreground flex items-center gap-1"><Users size={12} /> Grupo</p>
+                  <p className="text-sm font-semibold text-foreground mt-1">{detailTour.group_size || "—"}</p>
+                </div>
+                <div className="bg-muted rounded-xl p-3">
+                  <p className="text-xs text-muted-foreground">Preço</p>
+                  <p className="text-sm font-bold text-primary mt-1">{fmt(detailTour.price)}</p>
+                </div>
+                <div className="bg-muted rounded-xl p-3">
+                  <p className="text-xs text-muted-foreground flex items-center gap-1"><Star size={12} /> Avaliação</p>
+                  <p className="text-sm font-semibold text-foreground mt-1">{Number(detailTour.rating || 0).toFixed(1)} ({detailTour.reviews_count || 0})</p>
+                </div>
+                <div className="bg-muted rounded-xl p-3">
+                  <p className="text-xs text-muted-foreground">Status</p>
+                  <Badge variant={detailTour.active ? "default" : "secondary"} className="mt-1">
+                    {detailTour.active ? "Ativo" : "Inativo"}
+                  </Badge>
+                </div>
+              </div>
+
+              {detailTour.pix_discount > 0 && (
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-3 mt-2">
+                  <p className="text-sm font-semibold text-green-700 dark:text-green-400">
+                    💰 Desconto PIX: {detailTour.pix_discount}% → {fmt(Math.round(detailTour.price * (1 - detailTour.pix_discount / 100)))} por pessoa
+                  </p>
+                </div>
+              )}
+
+              {/* Description */}
+              {detailTour.description && (
+                <div className="mt-3">
+                  <h4 className="text-sm font-semibold text-foreground mb-1">Descrição</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{detailTour.description}</p>
+                </div>
+              )}
+
+              {/* Includes */}
+              {detailTour.includes?.length > 0 && (
+                <div className="mt-3">
+                  <h4 className="text-sm font-semibold text-foreground mb-2">O que inclui</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {detailTour.includes.map((item: string, i: number) => (
+                      <span key={i} className="flex items-center gap-1 text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full">
+                        <CheckCircle size={12} /> {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Highlights */}
+              {detailTour.highlights?.length > 0 && (
+                <div className="mt-3">
+                  <h4 className="text-sm font-semibold text-foreground mb-2">Destaques</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {detailTour.highlights.map((item: string, i: number) => (
+                      <span key={i} className="flex items-center gap-1 text-xs bg-secondary/20 text-secondary-foreground px-2.5 py-1 rounded-full">
+                        <Sparkles size={12} /> {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Meta */}
+              <div className="grid grid-cols-2 gap-3 mt-4 text-xs text-muted-foreground">
+                <div><span className="font-medium">Categoria:</span> {detailTour.category || "—"}</div>
+                <div><span className="font-medium">Dificuldade:</span> {detailTour.difficulty || "—"}</div>
+                <div><span className="font-medium">Saída:</span> {detailTour.departure || "—"}</div>
+                <div><span className="font-medium">Operador:</span> {detailTour.operator || "—"}</div>
+                <div><span className="font-medium">Slug:</span> {detailTour.slug}</div>
+                <div><span className="font-medium">Tag:</span> {detailTour.tag || "—"}</div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 mt-4 pt-4 border-t border-border">
+                <button onClick={() => { setDetailTour(null); openEdit(detailTour); }}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-xl text-sm font-semibold flex items-center gap-2">
+                  <Pencil size={14} /> Editar
+                </button>
+                <button onClick={() => setDetailTour(null)}
+                  className="bg-muted text-muted-foreground px-5 py-2 rounded-xl text-sm font-semibold">
+                  Fechar
+                </button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
