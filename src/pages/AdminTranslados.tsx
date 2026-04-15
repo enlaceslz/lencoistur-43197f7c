@@ -10,7 +10,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { Car, MapPin, Clock, Users, Plus, Pencil, Trash2, X, Check, Search, Loader2, Percent } from "lucide-react";
+import { Car, MapPin, Clock, Users, Plus, Pencil, Trash2, X, Check, Search, Loader2, Percent, Eye, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -31,6 +31,7 @@ const AdminTranslados = () => {
   const [search, setSearch] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [detailRoute, setDetailRoute] = useState<any | null>(null);
 
   useEffect(() => { load(); }, []);
 
@@ -235,6 +236,88 @@ const AdminTranslados = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Detail Dialog */}
+      <Dialog open={!!detailRoute} onOpenChange={() => setDetailRoute(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Car size={20} className="text-primary" /> Detalhes da Rota
+            </DialogTitle>
+          </DialogHeader>
+          {detailRoute && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 bg-muted rounded-xl p-4">
+                <div className="text-center">
+                  <p className="font-display font-bold text-foreground text-lg">{detailRoute.origin}</p>
+                  <p className="text-xs text-muted-foreground">Origem</p>
+                </div>
+                <ArrowRight size={20} className="text-primary shrink-0" />
+                <div className="text-center">
+                  <p className="font-display font-bold text-foreground text-lg">{detailRoute.destination}</p>
+                  <p className="text-xs text-muted-foreground">Destino</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-muted/50 rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Clock size={12} /> Duração</p>
+                  <p className="font-semibold text-foreground">{detailRoute.duration || "—"}</p>
+                </div>
+                <div className="bg-muted/50 rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><MapPin size={12} /> Distância</p>
+                  <p className="font-semibold text-foreground">{detailRoute.distance || "—"}</p>
+                </div>
+                <div className="bg-muted/50 rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Car size={12} /> Veículo</p>
+                  <p className="font-semibold text-foreground">{detailRoute.vehicle_type || "—"}</p>
+                </div>
+                <div className="bg-muted/50 rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1"><Users size={12} /> Vagas</p>
+                  <p className="font-semibold text-foreground">{detailRoute.seats}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between bg-primary/5 rounded-xl p-4">
+                <div>
+                  <p className="text-xs text-muted-foreground">Preço por pessoa</p>
+                  <p className="font-display text-2xl font-bold text-primary">{fmt(detailRoute.price)}</p>
+                </div>
+                {detailRoute.pix_discount > 0 && (
+                  <div className="text-right">
+                    <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 mb-1">
+                      -{detailRoute.pix_discount}% PIX
+                    </Badge>
+                    <p className="text-sm font-bold text-green-600">
+                      {fmt(Math.round(detailRoute.price * (1 - detailRoute.pix_discount / 100)))}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {(detailRoute.departures || []).length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground mb-2">Horários de Partida</p>
+                  <div className="flex flex-wrap gap-2">
+                    {detailRoute.departures.map((dep: string) => (
+                      <span key={dep} className="text-sm bg-muted text-foreground px-3 py-1.5 rounded-full font-medium">{dep}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center gap-2 pt-2">
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${detailRoute.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                  {detailRoute.active ? "Ativa" : "Inativa"}
+                </span>
+                <span className="text-xs text-muted-foreground ml-auto">
+                  Criada em {new Date(detailRoute.created_at).toLocaleDateString("pt-BR")}
+                </span>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Table */}
       <Card>
         {loading ? (
@@ -264,8 +347,10 @@ const AdminTranslados = () => {
                 {filtered.map((t) => (
                   <TableRow key={t.id} className={!t.active ? "opacity-50" : ""}>
                     <TableCell>
-                      <p className="font-semibold text-foreground">{t.origin} → {t.destination}</p>
-                      <p className="text-xs text-muted-foreground">{t.distance}</p>
+                      <button onClick={() => setDetailRoute(t)} className="text-left hover:underline">
+                        <p className="font-semibold text-foreground">{t.origin} → {t.destination}</p>
+                        <p className="text-xs text-muted-foreground">{t.distance}</p>
+                      </button>
                     </TableCell>
                     <TableCell className="text-muted-foreground">{t.duration || "—"}</TableCell>
                     <TableCell><Badge variant="outline">{t.vehicle_type || "—"}</Badge></TableCell>
@@ -287,6 +372,7 @@ const AdminTranslados = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => setDetailRoute(t)} title="Ver detalhes"><Eye size={16} /></Button>
                         <Button variant="ghost" size="icon" onClick={() => openEdit(t)}><Pencil size={16} /></Button>
                         <Button variant="ghost" size="icon" onClick={() => setDeleteId(t.id)} className="hover:text-destructive"><Trash2 size={16} /></Button>
                       </div>
