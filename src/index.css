@@ -55,6 +55,19 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Admin theme tokens */
+    --admin-sidebar-bg: 220 25% 14%;
+    --admin-sidebar-fg: 220 15% 75%;
+    --admin-sidebar-active: 217 91% 60%;
+    --admin-sidebar-hover: 220 20% 20%;
+    --admin-header-bg: 0 0% 100%;
+    --admin-accent: 217 91% 60%;
+    --admin-accent-soft: 217 91% 96%;
+    --admin-success: 152 60% 42%;
+    --admin-success-soft: 152 60% 94%;
+    --admin-warn: 38 92% 50%;
+    --admin-warn-soft: 38 92% 94%;
   }
 }
 
@@ -85,5 +98,13 @@
   }
   .bg-gradient-sand {
     background: linear-gradient(180deg, hsl(var(--background)), hsl(var(--sand)));
+  }
+  /* Admin-specific utilities */
+  .admin-sidebar {
+    background: linear-gradient(180deg, hsl(220 25% 14%), hsl(220 30% 10%));
+  }
+  .admin-sidebar-item-active {
+    background: linear-gradient(90deg, hsl(217 91% 60% / 0.15), transparent);
+    border-left: 3px solid hsl(217 91% 60%);
   }
 }

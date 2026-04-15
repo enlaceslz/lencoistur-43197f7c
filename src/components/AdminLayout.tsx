@@ -6,7 +6,7 @@ import {
   Home, Compass, Car, Users, UserCheck, CreditCard, Settings,
   LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot,
   Shield, AlertTriangle, Activity, ClipboardCheck, Truck, UserCheck2,
-  ChevronDown, FileText, Check, Building2, Map
+  ChevronDown, FileText, Check, Building2, Map, ChevronRight
 } from "lucide-react";
 
 interface Notification {
@@ -52,6 +52,25 @@ const sgsItems = [
   { icon: Star, label: "Pesquisas", path: "/admin/sgs/pesquisas" },
 ];
 
+// Breadcrumb helper
+const getBreadcrumbs = (pathname: string) => {
+  const parts = pathname.split("/").filter(Boolean);
+  const crumbs: { label: string; path: string }[] = [];
+  if (parts[0] === "admin") {
+    crumbs.push({ label: "Admin", path: "/admin" });
+    if (parts[1] === "sgs") {
+      crumbs.push({ label: "SGS", path: "/admin/sgs" });
+      const sgsItem = sgsItems.find(i => i.path === pathname);
+      if (sgsItem && sgsItem.path !== "/admin/sgs") crumbs.push({ label: sgsItem.label, path: sgsItem.path });
+    } else if (parts[1]) {
+      const mainItem = mainItems.find(i => i.path === pathname);
+      if (mainItem) crumbs.push({ label: mainItem.label, path: mainItem.path });
+      else if (parts[1] === "config") crumbs.push({ label: "Configurações", path: "/admin/config" });
+    }
+  }
+  return crumbs;
+};
+
 const AdminLayout = ({ children, title }: { children: React.ReactNode; title: string }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sgsOpen, setSgsOpen] = useState(false);
@@ -64,8 +83,9 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   const { signOut, user } = useAuth();
 
   const isSgsActive = location.pathname.startsWith("/admin/sgs");
+  const breadcrumbs = getBreadcrumbs(location.pathname);
 
-  // Load notifications from real data
+  // Load notifications
   useEffect(() => {
     const loadNotifications = async () => {
       const notifs: Notification[] = [];
@@ -74,145 +94,42 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
       soon.setDate(soon.getDate() + 30);
 
       try {
-        // 1. Pending bookings
-        const { data: pendingBookings } = await supabase
-          .from("bookings")
-          .select("id, booking_code, created_at")
-          .eq("status", "pendente")
-          .eq("payment_status", "pendente")
-          .order("created_at", { ascending: false })
-          .limit(5);
+        const [pendingBookings, overdueActions, expiringDocs, expiredTrainings, openIncidents, blockedSuppliers] = await Promise.all([
+          supabase.from("bookings").select("id").eq("status", "pendente").eq("payment_status", "pendente").limit(5),
+          supabase.from("sgs_corrective_actions").select("id").in("status", ["pendente", "em_andamento"]).lt("due_date", now.toISOString().split("T")[0]),
+          supabase.from("documents").select("id, name, expiry_date").not("expiry_date", "is", null).lte("expiry_date", soon.toISOString().split("T")[0]).eq("status", "vigente"),
+          supabase.from("sgs_staff_trainings").select("id").eq("status", "vencido"),
+          supabase.from("sgs_incidents").select("id").eq("status", "aberto"),
+          supabase.from("sgs_supplier_compliance").select("id").eq("blocked", true),
+        ]);
 
-        if (pendingBookings?.length) {
-          notifs.push({
-            id: "pending_bookings",
-            type: "warning",
-            title: "Reservas Pendentes",
-            message: `${pendingBookings.length} reserva(s) aguardando confirmação de pagamento.`,
-            link: "/admin/reservas",
-            time: "Agora",
-          });
+        if (pendingBookings.data?.length) notifs.push({ id: "pending_bookings", type: "warning", title: "Reservas Pendentes", message: `${pendingBookings.data.length} reserva(s) aguardando pagamento.`, link: "/admin/reservas", time: "Agora" });
+        if (overdueActions.data?.length) notifs.push({ id: "overdue_actions", type: "error", title: "Ações Atrasadas", message: `${overdueActions.data.length} ação(ões) com prazo vencido.`, link: "/admin/sgs/acoes", time: "Urgente" });
+
+        if (expiringDocs.data?.length) {
+          const expired = expiringDocs.data.filter(d => new Date(d.expiry_date!) < now);
+          const expiring = expiringDocs.data.filter(d => new Date(d.expiry_date!) >= now);
+          if (expired.length) notifs.push({ id: "expired_docs", type: "error", title: "Documentos Vencidos", message: `${expired.length} documento(s) expirado(s).`, link: "/admin/documentos", time: "Urgente" });
+          if (expiring.length) notifs.push({ id: "expiring_docs", type: "warning", title: "Documentos Vencendo", message: `${expiring.length} documento(s) vencem em 30 dias.`, link: "/admin/documentos", time: "Atenção" });
         }
 
-        // 2. Overdue corrective actions
-        const { data: overdueActions } = await supabase
-          .from("sgs_corrective_actions")
-          .select("id, action_code, due_date")
-          .in("status", ["pendente", "em_andamento"])
-          .lt("due_date", now.toISOString().split("T")[0]);
-
-        if (overdueActions?.length) {
-          notifs.push({
-            id: "overdue_actions",
-            type: "error",
-            title: "Ações Corretivas Atrasadas",
-            message: `${overdueActions.length} ação(ões) com prazo vencido.`,
-            link: "/admin/sgs/acoes",
-            time: "Urgente",
-          });
-        }
-
-        // 3. Expiring documents
-        const { data: expiringDocs } = await supabase
-          .from("documents")
-          .select("id, name, expiry_date")
-          .not("expiry_date", "is", null)
-          .lte("expiry_date", soon.toISOString().split("T")[0])
-          .eq("status", "vigente");
-
-        if (expiringDocs?.length) {
-          const expired = expiringDocs.filter(d => new Date(d.expiry_date!) < now);
-          const expiring = expiringDocs.filter(d => new Date(d.expiry_date!) >= now);
-          if (expired.length) {
-            notifs.push({
-              id: "expired_docs",
-              type: "error",
-              title: "Documentos Vencidos",
-              message: `${expired.length} documento(s) com validade expirada.`,
-              link: "/admin/documentos",
-              time: "Urgente",
-            });
-          }
-          if (expiring.length) {
-            notifs.push({
-              id: "expiring_docs",
-              type: "warning",
-              title: "Documentos Vencendo",
-              message: `${expiring.length} documento(s) vencem nos próximos 30 dias.`,
-              link: "/admin/documentos",
-              time: "Atenção",
-            });
-          }
-        }
-
-        // 4. Expired staff trainings
-        const { data: expiredTrainings } = await supabase
-          .from("sgs_staff_trainings")
-          .select("id, training_name")
-          .eq("status", "vencido");
-
-        if (expiredTrainings?.length) {
-          notifs.push({
-            id: "expired_trainings",
-            type: "warning",
-            title: "Treinamentos Vencidos",
-            message: `${expiredTrainings.length} treinamento(s) de equipe vencido(s).`,
-            link: "/admin/sgs/equipe",
-            time: "Atenção",
-          });
-        }
-
-        // 5. Open incidents
-        const { data: openIncidents } = await supabase
-          .from("sgs_incidents")
-          .select("id")
-          .eq("status", "aberto");
-
-        if (openIncidents?.length) {
-          notifs.push({
-            id: "open_incidents",
-            type: "info",
-            title: "Incidentes Abertos",
-            message: `${openIncidents.length} incidente(s) em aberto.`,
-            link: "/admin/sgs/incidentes",
-            time: "Info",
-          });
-        }
-
-        // 6. Blocked suppliers
-        const { data: blockedSuppliers } = await supabase
-          .from("sgs_supplier_compliance")
-          .select("id")
-          .eq("blocked", true);
-
-        if (blockedSuppliers?.length) {
-          notifs.push({
-            id: "blocked_suppliers",
-            type: "error",
-            title: "Fornecedores Bloqueados",
-            message: `${blockedSuppliers.length} fornecedor(es) bloqueado(s).`,
-            link: "/admin/sgs/fornecedores",
-            time: "Alerta",
-          });
-        }
+        if (expiredTrainings.data?.length) notifs.push({ id: "expired_trainings", type: "warning", title: "Treinamentos Vencidos", message: `${expiredTrainings.data.length} treinamento(s) vencido(s).`, link: "/admin/sgs/equipe", time: "Atenção" });
+        if (openIncidents.data?.length) notifs.push({ id: "open_incidents", type: "info", title: "Incidentes Abertos", message: `${openIncidents.data.length} incidente(s) em aberto.`, link: "/admin/sgs/incidentes", time: "Info" });
+        if (blockedSuppliers.data?.length) notifs.push({ id: "blocked_suppliers", type: "error", title: "Fornecedores Bloqueados", message: `${blockedSuppliers.data.length} fornecedor(es) bloqueado(s).`, link: "/admin/sgs/fornecedores", time: "Alerta" });
       } catch (err) {
         console.error("Error loading notifications:", err);
       }
-
       setNotifications(notifs);
     };
 
     loadNotifications();
-    const interval = setInterval(loadNotifications, 60000); // refresh every minute
+    const interval = setInterval(loadNotifications, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
-        setNotifOpen(false);
-      }
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -220,159 +137,164 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
 
   const activeNotifs = notifications.filter(n => !dismissed.has(n.id));
   const errorCount = activeNotifs.filter(n => n.type === "error").length;
-  const warningCount = activeNotifs.filter(n => n.type === "warning").length;
 
-  const dismissNotif = (id: string) => {
-    setDismissed(prev => new Set(prev).add(id));
-  };
+  const dismissNotif = (id: string) => setDismissed(prev => new Set(prev).add(id));
+  const dismissAll = () => { setDismissed(new Set(notifications.map(n => n.id))); setNotifOpen(false); };
 
-  const dismissAll = () => {
-    setDismissed(new Set(notifications.map(n => n.id)));
-    setNotifOpen(false);
-  };
-
-  const typeStyles: Record<string, { bg: string; border: string; icon: typeof AlertTriangle }> = {
-    error: { bg: "bg-destructive/10", border: "border-l-destructive", icon: AlertTriangle },
-    warning: { bg: "bg-secondary/10", border: "border-l-secondary", icon: Bell },
-    info: { bg: "bg-primary/10", border: "border-l-primary", icon: Activity },
+  const typeStyles: Record<string, { bg: string; border: string; icon: typeof AlertTriangle; dot: string }> = {
+    error: { bg: "bg-red-50", border: "border-l-red-500", icon: AlertTriangle, dot: "bg-red-500" },
+    warning: { bg: "bg-amber-50", border: "border-l-amber-500", icon: Bell, dot: "bg-amber-500" },
+    info: { bg: "bg-blue-50", border: "border-l-blue-500", icon: Activity, dot: "bg-blue-500" },
   };
 
   const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : "AD";
 
+  const SidebarLink = ({ icon: Icon, label, path, indent = false }: { icon: any; label: string; path: string; indent?: boolean }) => {
+    const active = location.pathname === path;
+    return (
+      <Link
+        to={path}
+        onClick={() => setSidebarOpen(false)}
+        className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 ${
+          active
+            ? "admin-sidebar-item-active text-white bg-white/[0.08]"
+            : "text-[hsl(220,15%,65%)] hover:text-white hover:bg-white/[0.06]"
+        } ${indent ? "ml-3 pl-4" : ""}`}
+      >
+        <Icon size={indent ? 15 : 17} className={active ? "text-[hsl(217,91%,60%)]" : ""} />
+        <span className="truncate">{label}</span>
+      </Link>
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-muted flex">
-      {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
-        <div className="p-6 border-b border-border">
-          <Link to="/" className="font-display text-xl font-bold text-foreground">
-            Lençóis<span className="text-secondary">Tour</span>
-          </Link>
-          <p className="text-xs text-muted-foreground mt-1">Painel Administrativo</p>
-        </div>
-        <nav className="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-10rem)]">
-          {mainItems.map((item) => {
-            const active = location.pathname === item.path;
-            return (
-              <Link
-                key={item.label}
-                to={item.path}
-                onClick={() => setSidebarOpen(false)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                  active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
-              >
-                <item.icon size={18} />
-                {item.label}
-              </Link>
-            );
-          })}
-
-          {/* SGS Module */}
-          <button
-            onClick={() => setSgsOpen(!sgsOpen)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-              isSgsActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
-          >
-            <Shield size={18} />
-            <span className="flex-1 text-left">SGS - Segurança</span>
-            <ChevronDown size={16} className={`transition-transform ${sgsOpen || isSgsActive ? "rotate-180" : ""}`} />
-          </button>
-          {(sgsOpen || isSgsActive) && (
-            <div className="ml-4 pl-4 border-l border-border space-y-0.5">
-              {sgsItems.map((item) => {
-                const active = location.pathname === item.path;
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setSidebarOpen(false)}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                      active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }`}
-                  >
-                    <item.icon size={16} />
-                    {item.label}
-                  </Link>
-                );
-              })}
+    <div className="min-h-screen bg-[hsl(220,20%,96%)] flex">
+      {/* === SIDEBAR === */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-[260px] admin-sidebar transform transition-transform duration-200 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
+        {/* Brand */}
+        <div className="px-5 py-5 border-b border-white/[0.08]">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-[hsl(217,91%,60%)] flex items-center justify-center">
+              <span className="text-white font-bold text-sm">LT</span>
             </div>
-          )}
-
-          <Link
-            to="/admin/config"
-            onClick={() => setSidebarOpen(false)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-              location.pathname === "/admin/config" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
-          >
-            <Settings size={18} />
-            Configurações
+            <div>
+              <span className="font-display text-base font-bold text-white tracking-tight">Lençóis</span>
+              <span className="font-display text-base font-bold text-[hsl(217,91%,60%)]">Tour</span>
+              <p className="text-[10px] text-[hsl(220,15%,50%)] -mt-0.5 font-medium">Painel Administrativo</p>
+            </div>
           </Link>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5 scrollbar-thin">
+          <p className="px-4 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,40%)]">Principal</p>
+          {mainItems.map(item => <SidebarLink key={item.path} {...item} />)}
+
+          {/* SGS Section */}
+          <div className="pt-3">
+            <button
+              onClick={() => setSgsOpen(!sgsOpen)}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 ${
+                isSgsActive
+                  ? "text-[hsl(217,91%,60%)] bg-white/[0.06]"
+                  : "text-[hsl(220,15%,65%)] hover:text-white hover:bg-white/[0.06]"
+              }`}
+            >
+              <Shield size={17} />
+              <span className="flex-1 text-left">SGS — Segurança</span>
+              <ChevronDown size={14} className={`transition-transform duration-200 ${sgsOpen || isSgsActive ? "rotate-180" : ""}`} />
+            </button>
+            {(sgsOpen || isSgsActive) && (
+              <div className="mt-1 space-y-0.5 border-l border-white/[0.06] ml-6">
+                {sgsItems.map(item => <SidebarLink key={item.path} {...item} indent />)}
+              </div>
+            )}
+          </div>
+
+          <div className="pt-3">
+            <p className="px-4 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,40%)]">Sistema</p>
+            <SidebarLink icon={Settings} label="Configurações" path="/admin/config" />
+          </div>
         </nav>
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border bg-card">
-          <div className="flex items-center gap-3 px-4 py-2 mb-2">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+
+        {/* User */}
+        <div className="border-t border-white/[0.08] p-3">
+          <div className="flex items-center gap-3 px-3 py-2">
+            <div className="w-8 h-8 rounded-full bg-[hsl(217,91%,60%)] flex items-center justify-center text-white font-bold text-xs shrink-0">
               {userInitials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-foreground truncate">{user?.email || "Admin"}</p>
-              <p className="text-[10px] text-muted-foreground">Administrador</p>
+              <p className="text-xs font-medium text-white/80 truncate">{user?.email || "Admin"}</p>
+              <p className="text-[10px] text-[hsl(220,15%,45%)]">Administrador</p>
             </div>
+            <button
+              onClick={async () => { await signOut(); navigate("/admin/login"); }}
+              className="p-1.5 rounded-lg text-[hsl(220,15%,50%)] hover:text-white hover:bg-white/[0.08] transition-colors"
+              title="Sair"
+            >
+              <LogOut size={16} />
+            </button>
           </div>
-          <button
-            onClick={async () => { await signOut(); navigate("/admin/login"); }}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-          >
-            <LogOut size={18} />
-            Sair
-          </button>
         </div>
       </aside>
 
+      {/* Mobile overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-foreground/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Main */}
-      <main className="flex-1 lg:ml-64">
-        <header className="bg-card border-b border-border px-6 py-4 flex items-center justify-between sticky top-0 z-30">
-          <div className="flex items-center gap-4">
-            <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-foreground">
-              <Menu size={24} />
-            </button>
-            <h1 className="font-display text-xl font-bold text-foreground">{title}</h1>
-          </div>
+      {/* === MAIN === */}
+      <main className="flex-1 lg:ml-[260px] min-h-screen flex flex-col">
+        {/* Header */}
+        <header className="bg-white border-b border-[hsl(220,20%,92%)] px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_3px_hsl(220,20%,90%)]">
           <div className="flex items-center gap-3">
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-1.5 rounded-lg text-[hsl(220,15%,40%)] hover:bg-[hsl(220,20%,96%)]">
+              <Menu size={22} />
+            </button>
+
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-[hsl(220,15%,55%)]">
+              {breadcrumbs.map((crumb, i) => (
+                <span key={crumb.path} className="flex items-center gap-1.5">
+                  {i > 0 && <ChevronRight size={12} className="text-[hsl(220,15%,75%)]" />}
+                  {i === breadcrumbs.length - 1 ? (
+                    <span className="font-medium text-[hsl(220,25%,20%)]">{crumb.label}</span>
+                  ) : (
+                    <Link to={crumb.path} className="hover:text-[hsl(217,91%,60%)] transition-colors">{crumb.label}</Link>
+                  )}
+                </span>
+              ))}
+            </div>
+            <h1 className="sm:hidden font-display text-lg font-bold text-[hsl(220,25%,18%)]">{title}</h1>
+          </div>
+
+          <div className="flex items-center gap-2">
             {/* Notifications */}
             <div className="relative" ref={notifRef}>
               <button
                 onClick={() => setNotifOpen(!notifOpen)}
-                className={`relative p-2 rounded-xl transition-colors ${notifOpen ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+                className={`relative p-2 rounded-lg transition-colors ${notifOpen ? "bg-[hsl(220,20%,94%)] text-[hsl(220,25%,20%)]" : "text-[hsl(220,15%,50%)] hover:text-[hsl(220,25%,20%)] hover:bg-[hsl(220,20%,96%)]"}`}
               >
-                <Bell size={20} />
+                <Bell size={19} />
                 {activeNotifs.length > 0 && (
-                  <span className={`absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] text-primary-foreground flex items-center justify-center font-bold ${errorCount > 0 ? "bg-destructive" : "bg-secondary"}`}>
+                  <span className={`absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 rounded-full text-[9px] text-white flex items-center justify-center font-bold ${errorCount > 0 ? "bg-red-500" : "bg-amber-500"}`}>
                     {activeNotifs.length}
                   </span>
                 )}
               </button>
 
               {notifOpen && (
-                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-card border border-border rounded-2xl shadow-lg overflow-hidden z-50">
-                  <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-                    <h3 className="font-display font-bold text-foreground text-sm">Notificações</h3>
+                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-[hsl(220,20%,92%)] rounded-xl shadow-xl overflow-hidden z-50">
+                  <div className="px-4 py-3 border-b border-[hsl(220,20%,94%)] flex items-center justify-between bg-[hsl(220,20%,98%)]">
+                    <h3 className="font-semibold text-[hsl(220,25%,18%)] text-sm">Notificações</h3>
                     {activeNotifs.length > 0 && (
-                      <button onClick={dismissAll} className="text-xs text-primary hover:underline font-medium">
-                        Limpar tudo
-                      </button>
+                      <button onClick={dismissAll} className="text-xs text-[hsl(217,91%,60%)] hover:underline font-medium">Limpar tudo</button>
                     )}
                   </div>
                   <div className="max-h-80 overflow-y-auto">
                     {activeNotifs.length === 0 ? (
                       <div className="px-4 py-8 text-center">
-                        <Check size={32} className="mx-auto text-primary mb-2" />
-                        <p className="text-sm text-muted-foreground">Nenhuma notificação pendente</p>
+                        <Check size={32} className="mx-auto text-[hsl(152,60%,42%)] mb-2" />
+                        <p className="text-sm text-[hsl(220,15%,55%)]">Tudo em ordem!</p>
                       </div>
                     ) : (
                       activeNotifs.map((n) => {
@@ -381,26 +303,20 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
                         return (
                           <div
                             key={n.id}
-                            className={`px-4 py-3 border-l-4 ${style.border} ${style.bg} hover:brightness-95 transition-all cursor-pointer flex gap-3 items-start`}
-                            onClick={() => {
-                              if (n.link) navigate(n.link);
-                              setNotifOpen(false);
-                            }}
+                            className={`px-4 py-3 border-l-[3px] ${style.border} ${style.bg} hover:brightness-[0.97] transition-all cursor-pointer flex gap-3 items-start`}
+                            onClick={() => { if (n.link) navigate(n.link); setNotifOpen(false); }}
                           >
-                            <Icon size={16} className="mt-0.5 shrink-0 text-foreground" />
+                            <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${style.dot}`} />
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-foreground">{n.title}</p>
-                              <p className="text-xs text-muted-foreground mt-0.5">{n.message}</p>
+                              <p className="text-sm font-semibold text-[hsl(220,25%,18%)]">{n.title}</p>
+                              <p className="text-xs text-[hsl(220,15%,50%)] mt-0.5">{n.message}</p>
                             </div>
-                            <div className="flex items-center gap-1 shrink-0">
-                              <span className="text-[10px] text-muted-foreground">{n.time}</span>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); dismissNotif(n.id); }}
-                                className="p-1 rounded hover:bg-muted transition-colors"
-                              >
-                                <X size={12} className="text-muted-foreground" />
-                              </button>
-                            </div>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); dismissNotif(n.id); }}
+                              className="p-1 rounded hover:bg-black/5 transition-colors shrink-0"
+                            >
+                              <X size={12} className="text-[hsl(220,15%,60%)]" />
+                            </button>
                           </div>
                         );
                       })
@@ -410,13 +326,22 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
               )}
             </div>
 
-            <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
-              {userInitials}
+            <div className="hidden sm:block h-6 w-px bg-[hsl(220,20%,90%)]" />
+            <div className="hidden sm:flex items-center gap-2 pl-1">
+              <div className="w-8 h-8 rounded-full bg-[hsl(217,91%,60%)] flex items-center justify-center text-white font-bold text-xs">
+                {userInitials}
+              </div>
             </div>
           </div>
         </header>
 
-        <div className="p-6">
+        {/* Title bar */}
+        <div className="hidden sm:block px-6 pt-5 pb-1">
+          <h1 className="font-display text-xl font-bold text-[hsl(220,25%,18%)] tracking-tight">{title}</h1>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 p-4 sm:p-6">
           {children}
         </div>
       </main>
