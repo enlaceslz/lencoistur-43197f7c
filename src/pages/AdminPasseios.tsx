@@ -533,6 +533,9 @@ const AdminPasseios = () => {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
+                    <button onClick={() => setDetailTour(t)} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-primary transition-colors" title="Ver detalhes">
+                      <Eye size={16} />
+                    </button>
                     <button onClick={() => openEdit(t)} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
                       <Pencil size={16} />
                     </button>
