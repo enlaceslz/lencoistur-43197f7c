@@ -1,6 +1,7 @@
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Shield, CreditCard, QrCode, Banknote, Users, CalendarDays, MapPin, CheckCircle, Copy, Clock } from "lucide-react";
+import { ArrowLeft, Shield, CreditCard, QrCode, Banknote, Users, CalendarDays, MapPin, CheckCircle, Copy, Clock, Printer } from "lucide-react";
+import { printReceipt } from "@/components/BookingReceipt";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
@@ -205,6 +206,30 @@ const CheckoutPage = () => {
             <Link to="/minhas-reservas" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors text-center">
               Ver Minhas Reservas
             </Link>
+            <button
+              onClick={() => printReceipt({
+                bookingCode: confirmedBooking.bookingCode,
+                customerName: confirmedBooking.customerName || name,
+                customerEmail: confirmedBooking.customerEmail || email,
+                customerPhone: confirmedBooking.customerPhone || phone,
+                itemName: confirmedBooking.itemName,
+                type: confirmedBooking.type || type,
+                date: confirmedBooking.date || date,
+                guests: confirmedBooking.guests || guests,
+                unitPrice: confirmedBooking.unitPrice || unitPrice,
+                total: confirmedBooking.total || total,
+                discount: confirmedBooking.discount || displayDiscount,
+                finalTotal: confirmedBooking.finalTotal || finalTotal,
+                payMethod: confirmedBooking.payMethod || payMethod,
+                paymentStatus: confirmedBooking.paymentStatus || "pendente",
+                status: confirmedBooking.status || "pendente",
+                pixCode: confirmedBooking.pixCode,
+                createdAt: confirmedBooking.createdAt || new Date().toISOString(),
+              })}
+              className="border border-border hover:bg-muted text-foreground px-6 py-3 rounded-xl font-semibold transition-colors text-center flex items-center justify-center gap-2"
+            >
+              <Printer size={18} /> Imprimir Recibo
+            </button>
             <a
               href={`https://wa.me/5598985880954?text=Olá! Acabei de fazer a reserva ${confirmedBooking.bookingCode} - ${confirmedBooking.itemName} para ${guests} pessoas.`}
               target="_blank"
