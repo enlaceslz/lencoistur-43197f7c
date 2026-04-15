@@ -6,7 +6,7 @@ import {
   Home, Compass, Car, Users, UserCheck, CreditCard, Settings,
   LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot,
   Shield, AlertTriangle, Activity, ClipboardCheck, Truck, UserCheck2,
-  ChevronDown, FileText, Check
+  ChevronDown, FileText, Check, Building2, Map
 } from "lucide-react";
 
 interface Notification {
@@ -34,14 +34,21 @@ const mainItems = [
 
 const sgsItems = [
   { icon: Shield, label: "Dashboard", path: "/admin/sgs" },
+  { icon: Building2, label: "Empresa", path: "/admin/sgs/empresa" },
+  { icon: Car, label: "Veículos / Frota", path: "/admin/sgs/veiculos" },
+  { icon: UserCheck2, label: "Condutores", path: "/admin/sgs/condutores" },
+  { icon: Users, label: "Visitantes", path: "/admin/sgs/condutores-visitantes" },
   { icon: AlertTriangle, label: "Matriz de Riscos", path: "/admin/sgs/riscos" },
-  { icon: Activity, label: "Incidentes", path: "/admin/sgs/incidentes" },
+  { icon: ClipboardCheck, label: "Checklists", path: "/admin/sgs/checklists" },
+  { icon: Activity, label: "Ocorrências", path: "/admin/sgs/incidentes" },
   { icon: ClipboardCheck, label: "Ações Corretivas", path: "/admin/sgs/acoes" },
-  { icon: UserCheck2, label: "Equipe (ISO 21102)", path: "/admin/sgs/equipe" },
+  { icon: UserCheck, label: "Equipe (ISO 21102)", path: "/admin/sgs/equipe" },
   { icon: ClipboardCheck, label: "Auditorias", path: "/admin/sgs/auditorias" },
   { icon: Truck, label: "Fornecedores", path: "/admin/sgs/fornecedores" },
+  { icon: Map, label: "Rotas / Trilhas", path: "/admin/sgs/rotas" },
+  { icon: FileText, label: "PGSAT (ICMBio)", path: "/admin/sgs/pgsat" },
   { icon: FileText, label: "Termos de Risco", path: "/admin/sgs/termos" },
-  { icon: Shield, label: "Resumos", path: "/admin/sgs/briefings" },
+  { icon: Shield, label: "Briefings", path: "/admin/sgs/briefings" },
   { icon: Star, label: "Pesquisas", path: "/admin/sgs/pesquisas" },
 ];
 
