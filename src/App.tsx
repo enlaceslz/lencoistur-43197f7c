@@ -40,6 +40,7 @@ import AdminSGSCondutoresVisitantes from "./pages/AdminSGSCondutoresVisitantes.t
 import AdminSGSChecklists from "./pages/AdminSGSChecklists.tsx";
 import AdminSGSRotas from "./pages/AdminSGSRotas.tsx";
 import AdminSGSPGSAT from "./pages/AdminSGSPGSAT.tsx";
+import AdminRelatorios from "./pages/AdminRelatorios.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
