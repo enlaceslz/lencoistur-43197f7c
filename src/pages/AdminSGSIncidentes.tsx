@@ -64,6 +64,7 @@ const AdminSGSIncidentes = () => {
       type: inc.type, location: inc.location, guide_name: inc.guide_name || "",
       description: inc.description, severity: inc.severity,
       people_involved: inc.people_involved || "", action_taken: inc.action_taken || "",
+      tour_id: inc.tour_id || "",
     });
     setShowForm(true);
   };
