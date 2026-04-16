@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Loader2, Pencil, Trash2 } from "lucide-react";
+import { Plus, Loader2, Pencil, Trash2, Link2 } from "lucide-react";
 import { toast } from "sonner";
 
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
@@ -37,7 +37,10 @@ interface Conta {
   booking_id: string | null;
 }
 
-const emptyForm = { descricao: "", valor: "", vencimento: "", categoria: "reserva", cliente: "", observacoes: "", status: "pendente" };
+interface CustomerOption { id: string; name: string; email: string; }
+interface BookingOption { id: string; booking_code: string; item_name: string; final_total: number; customer_name: string; }
+
+const emptyForm = { descricao: "", valor: "", vencimento: "", categoria: "reserva", cliente: "", observacoes: "", status: "pendente", booking_id: "", customer_id: "" };
 
 export default function ContasReceberTab() {
   const [contas, setContas] = useState<Conta[]>([]);
@@ -46,6 +49,8 @@ export default function ContasReceberTab() {
   const [editing, setEditing] = useState<Conta | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [customers, setCustomers] = useState<CustomerOption[]>([]);
+  const [bookings, setBookings] = useState<BookingOption[]>([]);
 
   const load = async () => {
     setLoading(true);
@@ -54,15 +59,66 @@ export default function ContasReceberTab() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  const loadRelations = async () => {
+    const [{ data: cust }, { data: bk }] = await Promise.all([
+      supabase.from("customers").select("id, name, email").order("name"),
+      supabase.from("bookings").select("id, booking_code, item_name, final_total, customers(name)").order("created_at", { ascending: false }),
+    ]);
+    if (cust) setCustomers(cust);
+    if (bk) setBookings(bk.map((b: any) => ({
+      id: b.id,
+      booking_code: b.booking_code,
+      item_name: b.item_name,
+      final_total: b.final_total,
+      customer_name: b.customers?.name || "",
+    })));
+  };
+
+  useEffect(() => { load(); loadRelations(); }, []);
 
   const totalPendente = contas.filter(c => c.status === "pendente").reduce((s, c) => s + c.valor, 0);
 
   const openNew = () => { setEditing(null); setForm(emptyForm); setOpen(true); };
   const openEdit = (c: Conta) => {
     setEditing(c);
-    setForm({ descricao: c.descricao, valor: String(c.valor / 100), vencimento: c.vencimento, categoria: c.categoria, cliente: c.cliente || "", observacoes: c.observacoes || "", status: c.status });
+    setForm({
+      descricao: c.descricao,
+      valor: String(c.valor / 100),
+      vencimento: c.vencimento,
+      categoria: c.categoria,
+      cliente: c.cliente || "",
+      observacoes: c.observacoes || "",
+      status: c.status,
+      booking_id: c.booking_id || "",
+      customer_id: "",
+    });
     setOpen(true);
+  };
+
+  const handleBookingSelect = (bookingId: string) => {
+    setForm(f => ({ ...f, booking_id: bookingId }));
+    if (bookingId) {
+      const bk = bookings.find(b => b.id === bookingId);
+      if (bk) {
+        setForm(f => ({
+          ...f,
+          booking_id: bookingId,
+          descricao: f.descricao || `Reserva ${bk.booking_code} - ${bk.item_name}`,
+          valor: f.valor || String(bk.final_total / 100),
+          cliente: bk.customer_name || f.cliente,
+        }));
+      }
+    }
+  };
+
+  const handleCustomerSelect = (customerId: string) => {
+    setForm(f => ({ ...f, customer_id: customerId }));
+    if (customerId) {
+      const cust = customers.find(c => c.id === customerId);
+      if (cust) {
+        setForm(f => ({ ...f, cliente: cust.name }));
+      }
+    }
   };
 
   const handleSave = async () => {
@@ -77,6 +133,7 @@ export default function ContasReceberTab() {
       observacoes: form.observacoes || null,
       status: form.status,
       recebido_em: form.status === "recebido" ? new Date().toISOString().slice(0, 10) : null,
+      booking_id: form.booking_id || null,
     };
     if (editing) {
       const { error } = await supabase.from("contas_receber").update(payload).eq("id", editing.id);
@@ -119,6 +176,7 @@ export default function ContasReceberTab() {
                     <th className="text-left py-3 font-medium">Descrição</th>
                     <th className="text-left py-3 font-medium">Categoria</th>
                     <th className="text-left py-3 font-medium">Cliente</th>
+                    <th className="text-left py-3 font-medium">Reserva</th>
                     <th className="text-left py-3 font-medium">Vencimento</th>
                     <th className="text-left py-3 font-medium">Status</th>
                     <th className="text-right py-3 font-medium">Valor</th>
@@ -126,22 +184,33 @@ export default function ContasReceberTab() {
                   </tr>
                 </thead>
                 <tbody>
-                  {contas.map((c) => (
-                    <tr key={c.id} className="border-b border-border last:border-0 hover:bg-muted/50">
-                      <td className="py-3 text-foreground font-medium">{c.descricao}</td>
-                      <td className="py-3 text-muted-foreground capitalize">{c.categoria}</td>
-                      <td className="py-3 text-muted-foreground">{c.cliente || "—"}</td>
-                      <td className="py-3 text-muted-foreground">{fmtDate(c.vencimento)}</td>
-                      <td className="py-3"><Badge variant="secondary" className={statusBadge[c.status] || ""}>{c.status}</Badge></td>
-                      <td className="py-3 text-right font-semibold text-foreground">{fmt(c.valor)}</td>
-                      <td className="py-3 text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button size="icon" variant="ghost" onClick={() => openEdit(c)}><Pencil size={14} /></Button>
-                          <Button size="icon" variant="ghost" className="text-destructive" onClick={() => handleDelete(c.id)}><Trash2 size={14} /></Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {contas.map((c) => {
+                    const linkedBooking = c.booking_id ? bookings.find(b => b.id === c.booking_id) : null;
+                    return (
+                      <tr key={c.id} className="border-b border-border last:border-0 hover:bg-muted/50">
+                        <td className="py-3 text-foreground font-medium">{c.descricao}</td>
+                        <td className="py-3 text-muted-foreground capitalize">{c.categoria}</td>
+                        <td className="py-3 text-muted-foreground">{c.cliente || "—"}</td>
+                        <td className="py-3 text-muted-foreground">
+                          {linkedBooking ? (
+                            <span className="flex items-center gap-1 text-xs">
+                              <Link2 size={12} className="text-primary" />
+                              <span className="font-mono">{linkedBooking.booking_code}</span>
+                            </span>
+                          ) : "—"}
+                        </td>
+                        <td className="py-3 text-muted-foreground">{fmtDate(c.vencimento)}</td>
+                        <td className="py-3"><Badge variant="secondary" className={statusBadge[c.status] || ""}>{c.status}</Badge></td>
+                        <td className="py-3 text-right font-semibold text-foreground">{fmt(c.valor)}</td>
+                        <td className="py-3 text-right">
+                          <div className="flex justify-end gap-1">
+                            <Button size="icon" variant="ghost" onClick={() => openEdit(c)}><Pencil size={14} /></Button>
+                            <Button size="icon" variant="ghost" className="text-destructive" onClick={() => handleDelete(c.id)}><Trash2 size={14} /></Button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -150,9 +219,42 @@ export default function ContasReceberTab() {
       </Card>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{editing ? "Editar" : "Nova"} Conta a Receber</DialogTitle></DialogHeader>
           <div className="space-y-4">
+            {/* Link to booking */}
+            <div>
+              <Label>Vincular à Reserva</Label>
+              <select
+                value={form.booking_id}
+                onChange={(e) => handleBookingSelect(e.target.value)}
+                className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+              >
+                <option value="">— Nenhuma reserva —</option>
+                {bookings.map(b => (
+                  <option key={b.id} value={b.id}>
+                    {b.booking_code} - {b.item_name} ({b.customer_name}) {fmt(b.final_total)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Link to customer */}
+            <div>
+              <Label>Cliente (CRM)</Label>
+              <select
+                value={form.customer_id}
+                onChange={(e) => handleCustomerSelect(e.target.value)}
+                className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+              >
+                <option value="">— Selecionar cliente —</option>
+                {customers.map(c => (
+                  <option key={c.id} value={c.id}>{c.name} ({c.email})</option>
+                ))}
+              </select>
+              <Input className="mt-2" value={form.cliente} onChange={e => setForm({ ...form, cliente: e.target.value })} placeholder="Ou digitar nome manualmente" />
+            </div>
+
             <div><Label>Descrição *</Label><Input value={form.descricao} onChange={e => setForm({ ...form, descricao: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-4">
               <div><Label>Valor (R$) *</Label><Input type="number" step="0.01" min="0" value={form.valor} onChange={e => setForm({ ...form, valor: e.target.value })} /></div>
@@ -178,7 +280,6 @@ export default function ContasReceberTab() {
                 </Select>
               </div>
             </div>
-            <div><Label>Cliente</Label><Input value={form.cliente} onChange={e => setForm({ ...form, cliente: e.target.value })} /></div>
             <div><Label>Observações</Label><Input value={form.observacoes} onChange={e => setForm({ ...form, observacoes: e.target.value })} /></div>
             <Button className="w-full" onClick={handleSave} disabled={saving}>
               {saving && <Loader2 className="animate-spin mr-2" size={14} />} Salvar
