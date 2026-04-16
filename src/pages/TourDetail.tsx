@@ -51,10 +51,12 @@ const TourDetail = () => {
   const images = tour.images || [];
   const includes = tour.includes || [];
   const highlights = tour.highlights || [];
-  const vehicleCapacity = tour.vehicle_capacity || 9;
+  const isBoatTour = tour.slug === "passeio-de-barco" || /barco/i.test(tour.name || "") || /barco/i.test(tour.category || "");
+  const vehicleCapacity = isBoatTour ? 12 : (tour.vehicle_capacity || 9);
+  const vehicleLabel = isBoatTour ? "embarcação" : "veículo";
   const isPrivate = tourMode === "privativo";
   const totalPrice = isPrivate ? (tour.private_price || 1300) : tour.price * guests;
-  const maxGuests = isPrivate ? vehicleCapacity : vehicleCapacity;
+  const maxGuests = vehicleCapacity;
 
   return (
     <div className="min-h-screen bg-background">
