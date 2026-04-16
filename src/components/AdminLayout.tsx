@@ -30,6 +30,7 @@ const mainItems = [
   { icon: Megaphone, label: "Marketing", path: "/admin/marketing" },
   { icon: Bot, label: "Inteligência Artificial", path: "/admin/ia" },
   { icon: FileText, label: "Documentação", path: "/admin/documentos" },
+  { icon: BarChart3, label: "Relatórios", path: "/admin/relatorios" },
 ];
 
 const sgsGroups = [
