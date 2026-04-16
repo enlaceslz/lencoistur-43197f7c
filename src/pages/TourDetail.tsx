@@ -63,6 +63,9 @@ const TourDetail = () => {
   const isBoatTour = tour.slug === "passeio-de-barco" || /barco/i.test(tour.name || "") || /barco/i.test(tour.category || "");
   const vehicleCapacity = isBoatTour ? 12 : (tour.vehicle_capacity || 9);
   const vehicleLabel = isBoatTour ? "embarcação" : "veículo";
+  const collectiveOn = tour.mode_collective_enabled ?? true;
+  const privateOn = tour.mode_private_enabled ?? true;
+  const showModeToggle = collectiveOn && privateOn;
   const isPrivate = tourMode === "privativo";
   const totalPrice = isPrivate ? (tour.private_price || 1300) : tour.price * guests;
   const maxGuests = vehicleCapacity;
