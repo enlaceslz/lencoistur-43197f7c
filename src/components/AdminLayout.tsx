@@ -6,7 +6,8 @@ import {
   Home, Compass, Car, Users, UserCheck, CreditCard, Settings,
   LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot,
   Shield, AlertTriangle, Activity, ClipboardCheck, Truck, UserCheck2,
-  ChevronDown, FileText, Check, Building2, Map, ChevronRight, BarChart3
+  ChevronDown, FileText, Check, Building2, Map, ChevronRight, BarChart3,
+  HelpCircle
 } from "lucide-react";
 
 interface Notification {
@@ -249,6 +250,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           <div className="pt-3">
             <p className="px-4 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,40%)]">Sistema</p>
             <SidebarLink icon={Settings} label="Configurações" path="/admin/config" />
+            <SidebarLink icon={HelpCircle} label="Ajuda" path="/admin/ajuda" />
           </div>
         </nav>
 
