@@ -13,7 +13,7 @@ const TourDetail = () => {
   const [currentImg, setCurrentImg] = useState(0);
   const [guests, setGuests] = useState(2);
   const [selectedDate, setSelectedDate] = useState("");
-  const [tourMode, setTourMode] = useState<"coletivo" | "privativo">("coletivo");
+  const [tourMode, setTourMode] = useState<"coletivo" | "privativo">("privativo");
 
   useEffect(() => {
     if (!slug) return;
@@ -21,6 +21,15 @@ const TourDetail = () => {
       const { data: t } = await supabase.from("tours").select("*").eq("slug", slug).eq("active", true).single();
       setTour(t);
       if (t) {
+        // Apply admin-configured default mode, fallback respects which modes are enabled
+        const collectiveOn = t.mode_collective_enabled ?? true;
+        const privateOn = t.mode_private_enabled ?? true;
+        const adminDefault = (t.default_mode === "coletivo" || t.default_mode === "privativo") ? t.default_mode : "privativo";
+        let initial: "coletivo" | "privativo" = adminDefault;
+        if (initial === "privativo" && !privateOn) initial = "coletivo";
+        if (initial === "coletivo" && !collectiveOn) initial = "privativo";
+        setTourMode(initial);
+
         const { data: r } = await supabase.from("reviews").select("*").eq("tour_id", t.id).order("created_at", { ascending: false });
         setTourReviews(r || []);
       }
