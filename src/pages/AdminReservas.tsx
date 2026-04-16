@@ -62,6 +62,9 @@ const AdminReservas = () => {
   const [newLoading, setNewLoading] = useState(false);
   const [tours, setTours] = useState<TourOption[]>([]);
   const [transfers, setTransfers] = useState<TransferOption[]>([]);
+  const [existingCustomers, setExistingCustomers] = useState<{ id: string; name: string; email: string; phone: string | null }[]>([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
+  const [customerSearch, setCustomerSearch] = useState("");
   const [newForm, setNewForm] = useState({
     type: "tour" as "tour" | "transfer",
     itemName: "",
@@ -76,12 +79,14 @@ const AdminReservas = () => {
   useEffect(() => {
     if (!showNewForm) return;
     const loadOptions = async () => {
-      const [{ data: t }, { data: tr }] = await Promise.all([
+      const [{ data: t }, { data: tr }, { data: cust }] = await Promise.all([
         supabase.from("tours").select("id, name, price").eq("active", true).order("name"),
         supabase.from("transfer_routes").select("id, origin, destination, price").eq("active", true).order("origin"),
+        supabase.from("customers").select("id, name, email, phone").order("name"),
       ]);
       if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price })));
       if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price })));
+      if (cust) setExistingCustomers(cust);
     };
     loadOptions();
   }, [showNewForm]);
