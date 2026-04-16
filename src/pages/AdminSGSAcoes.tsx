@@ -43,13 +43,16 @@ const AdminSGSAcoes = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const code = `AC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`;
-    const { error } = await supabase.from("sgs_corrective_actions").insert({ action_code: code, ...form });
+    const insertData: any = { action_code: code, description: form.description, responsible: form.responsible, due_date: form.due_date || null };
+    if (form.incident_id) insertData.incident_id = form.incident_id;
+    if (form.risk_id) insertData.risk_id = form.risk_id;
+    const { error } = await supabase.from("sgs_corrective_actions").insert(insertData);
     if (error) {
       toast({ title: "Erro", variant: "destructive" });
     } else {
       toast({ title: "Ação corretiva cadastrada!" });
       setShowForm(false);
-      setForm({ description: "", responsible: "", due_date: "" });
+      setForm({ description: "", responsible: "", due_date: "", incident_id: "", risk_id: "" });
       load();
     }
   };
