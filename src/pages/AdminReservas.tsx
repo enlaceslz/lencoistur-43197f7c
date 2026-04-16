@@ -551,18 +551,53 @@ const AdminReservas = () => {
             {/* Customer info */}
             <div className="border-t border-border pt-4">
               <h4 className="font-semibold text-sm text-foreground mb-3">Dados do Cliente</h4>
+              
+              {/* Existing customer selector */}
+              <div className="mb-3">
+                <label className="text-sm text-muted-foreground mb-1 block">Selecionar cliente existente</label>
+                <select
+                  value={selectedCustomerId}
+                  onChange={(e) => {
+                    const custId = e.target.value;
+                    setSelectedCustomerId(custId);
+                    if (custId) {
+                      const cust = existingCustomers.find(c => c.id === custId);
+                      if (cust) {
+                        setNewForm(f => ({
+                          ...f,
+                          customerName: cust.name,
+                          customerEmail: cust.email,
+                          customerPhone: cust.phone || "",
+                        }));
+                      }
+                    } else {
+                      setNewForm(f => ({ ...f, customerName: "", customerEmail: "", customerPhone: "" }));
+                    }
+                  }}
+                  className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+                >
+                  <option value="">— Novo cliente —</option>
+                  {existingCustomers
+                    .filter(c => !customerSearch || c.name.toLowerCase().includes(customerSearch.toLowerCase()) || c.email.toLowerCase().includes(customerSearch.toLowerCase()))
+                    .map(c => (
+                      <option key={c.id} value={c.id}>{c.name} ({c.email})</option>
+                    ))
+                  }
+                </select>
+              </div>
+
               <div className="space-y-3">
                 <div>
                   <label className="text-sm text-muted-foreground mb-1 block">Nome *</label>
-                  <Input value={newForm.customerName} onChange={(e) => setNewForm(f => ({ ...f, customerName: e.target.value }))} placeholder="Nome completo" required maxLength={255} />
+                  <Input value={newForm.customerName} onChange={(e) => setNewForm(f => ({ ...f, customerName: e.target.value }))} placeholder="Nome completo" required maxLength={255} disabled={!!selectedCustomerId} />
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground mb-1 block">E-mail *</label>
-                  <Input type="email" value={newForm.customerEmail} onChange={(e) => setNewForm(f => ({ ...f, customerEmail: e.target.value }))} placeholder="email@exemplo.com" required maxLength={255} />
+                  <Input type="email" value={newForm.customerEmail} onChange={(e) => setNewForm(f => ({ ...f, customerEmail: e.target.value }))} placeholder="email@exemplo.com" required maxLength={255} disabled={!!selectedCustomerId} />
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground mb-1 block">Telefone</label>
-                  <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: e.target.value }))} placeholder="(99) 99999-9999" maxLength={20} />
+                  <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: e.target.value }))} placeholder="(99) 99999-9999" maxLength={20} disabled={!!selectedCustomerId} />
                 </div>
               </div>
             </div>
