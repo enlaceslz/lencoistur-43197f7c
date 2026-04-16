@@ -32,25 +32,48 @@ const mainItems = [
   { icon: FileText, label: "Documentação", path: "/admin/documentos" },
 ];
 
-const sgsItems = [
-  { icon: Shield, label: "Dashboard", path: "/admin/sgs" },
-  { icon: Building2, label: "Empresa", path: "/admin/sgs/empresa" },
-  { icon: Car, label: "Veículos / Frota", path: "/admin/sgs/veiculos" },
-  { icon: UserCheck2, label: "Condutores", path: "/admin/sgs/condutores" },
-  { icon: Users, label: "Visitantes", path: "/admin/sgs/condutores-visitantes" },
-  { icon: AlertTriangle, label: "Matriz de Riscos", path: "/admin/sgs/riscos" },
-  { icon: ClipboardCheck, label: "Checklists", path: "/admin/sgs/checklists" },
-  { icon: Activity, label: "Ocorrências", path: "/admin/sgs/incidentes" },
-  { icon: ClipboardCheck, label: "Ações Corretivas", path: "/admin/sgs/acoes" },
-  { icon: UserCheck, label: "Equipe (ISO 21102)", path: "/admin/sgs/equipe" },
-  { icon: ClipboardCheck, label: "Auditorias", path: "/admin/sgs/auditorias" },
-  { icon: Truck, label: "Fornecedores", path: "/admin/sgs/fornecedores" },
-  { icon: Map, label: "Rotas / Trilhas", path: "/admin/sgs/rotas" },
-  { icon: FileText, label: "PGSAT (ICMBio)", path: "/admin/sgs/pgsat" },
-  { icon: FileText, label: "Termos de Risco", path: "/admin/sgs/termos" },
-  { icon: Shield, label: "Briefings", path: "/admin/sgs/briefings" },
-  { icon: Star, label: "Pesquisas", path: "/admin/sgs/pesquisas" },
+const sgsGroups = [
+  {
+    title: null,
+    items: [
+      { icon: Shield, label: "Dashboard", path: "/admin/sgs" },
+    ],
+  },
+  {
+    title: "Operação",
+    items: [
+      { icon: Car, label: "Veículos / Frota", path: "/admin/sgs/veiculos" },
+      { icon: UserCheck2, label: "Condutores", path: "/admin/sgs/condutores" },
+      { icon: Users, label: "Visitantes", path: "/admin/sgs/condutores-visitantes" },
+      { icon: Map, label: "Rotas / Trilhas", path: "/admin/sgs/rotas" },
+      { icon: ClipboardCheck, label: "Checklists", path: "/admin/sgs/checklists" },
+      { icon: Shield, label: "Briefings", path: "/admin/sgs/briefings" },
+    ],
+  },
+  {
+    title: "Gestão de Riscos",
+    items: [
+      { icon: AlertTriangle, label: "Matriz de Riscos", path: "/admin/sgs/riscos" },
+      { icon: Activity, label: "Ocorrências", path: "/admin/sgs/incidentes" },
+      { icon: ClipboardCheck, label: "Ações Corretivas", path: "/admin/sgs/acoes" },
+      { icon: FileText, label: "Termos de Risco", path: "/admin/sgs/termos" },
+      { icon: Star, label: "Pesquisas", path: "/admin/sgs/pesquisas" },
+    ],
+  },
+  {
+    title: "Conformidade",
+    items: [
+      { icon: Building2, label: "Empresa", path: "/admin/sgs/empresa" },
+      { icon: UserCheck, label: "Equipe (ISO 21102)", path: "/admin/sgs/equipe" },
+      { icon: Truck, label: "Fornecedores", path: "/admin/sgs/fornecedores" },
+      { icon: ClipboardCheck, label: "Auditorias", path: "/admin/sgs/auditorias" },
+      { icon: FileText, label: "PGSAT (ICMBio)", path: "/admin/sgs/pgsat" },
+    ],
+  },
 ];
+
+// Flat list for breadcrumb lookup
+const sgsItems = sgsGroups.flatMap(g => g.items);
 
 // Breadcrumb helper
 const getBreadcrumbs = (pathname: string) => {
