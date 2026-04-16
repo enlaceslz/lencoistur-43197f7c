@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, CheckCircle, XCircle } from "lucide-react";
+import { Plus, CheckCircle, XCircle, MapPin } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const CHECKLIST_ITEMS = [
@@ -14,21 +14,30 @@ const CHECKLIST_ITEMS = [
 
 const LANGUAGES = { pt: "Português", en: "English", es: "Español" };
 
+interface TourOpt { id: string; name: string; }
+
 const AdminSGSBriefings = () => {
   const [briefings, setBriefings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [tours, setTours] = useState<TourOpt[]>([]);
   const [form, setForm] = useState({
-    guide_name: "", language: "pt",
+    guide_name: "", language: "pt", tour_id: "" as string,
     safety_rules: false, tour_risks: false, lagoon_behavior: false,
     group_distance: false, emergency_orientation: false, notes: "",
   });
 
   useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (!showForm) return;
+    supabase.from("tours").select("id, name").eq("active", true).order("name").then(({ data }) => {
+      if (data) setTours(data);
+    });
+  }, [showForm]);
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("sgs_briefings").select("*").order("created_at", { ascending: false });
+    const { data } = await supabase.from("sgs_briefings").select("*, tours(name)").order("created_at", { ascending: false });
     setBriefings(data || []);
     setLoading(false);
   };
