@@ -93,8 +93,8 @@ const AdminSGSDashboard = () => {
       travessia_rios: "Travessia", paradas: "Paradas", banho_lagoas: "Lagoas",
       passeio_barco: "Barco", trilhas: "Trilhas", trajeto_volta: "Volta",
     };
-    const stageMap = new Map<string, number>();
-    risks.forEach((r: any) => { stageMap.set(r.stage, (stageMap.get(r.stage) || 0) + 1); });
+    const stageMap: Record<string, number> = {};
+    risks.forEach((r: any) => { stageMap[r.stage] = (stageMap[r.stage] || 0) + 1; });
     setRisksByStage(Array.from(stageMap.entries()).map(([stage, count]) => ({ name: stageLabels[stage] || stage, riscos: count })));
 
     const months: Record<string, number> = {};
