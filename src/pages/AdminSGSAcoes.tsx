@@ -17,13 +17,25 @@ const AdminSGSAcoes = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ description: "", responsible: "", due_date: "" });
+  const [form, setForm] = useState({ description: "", responsible: "", due_date: "", incident_id: "" as string, risk_id: "" as string });
+  const [incidents, setIncidents] = useState<{ id: string; code: string; desc: string }[]>([]);
+  const [risks, setRisks] = useState<{ id: string; code: string; hazard: string }[]>([]);
 
   useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (!showForm) return;
+    Promise.all([
+      supabase.from("sgs_incidents").select("id, incident_code, description").order("date", { ascending: false }).limit(50),
+      supabase.from("sgs_risks").select("id, risk_code, hazard").eq("status", "ativo").order("risk_level", { ascending: false }).limit(50),
+    ]).then(([incRes, riskRes]) => {
+      if (incRes.data) setIncidents(incRes.data.map(i => ({ id: i.id, code: i.incident_code, desc: i.description?.slice(0, 60) || "" })));
+      if (riskRes.data) setRisks(riskRes.data.map(r => ({ id: r.id, code: r.risk_code, hazard: r.hazard?.slice(0, 60) || "" })));
+    });
+  }, [showForm]);
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("sgs_corrective_actions").select("*").order("created_at", { ascending: false });
+    const { data } = await supabase.from("sgs_corrective_actions").select("*, sgs_incidents(incident_code), sgs_risks(risk_code, hazard)").order("created_at", { ascending: false });
     setActions(data || []);
     setLoading(false);
   };
