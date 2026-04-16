@@ -237,15 +237,15 @@ const TourDetail = () => {
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
                   {isPrivate
-                    ? `Veículo exclusivo para até ${vehicleCapacity} pessoas`
-                    : `Valor por pessoa · Veículo compartilhado (até ${vehicleCapacity} pessoas)`}
+                    ? `${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} exclusiva para até ${vehicleCapacity} pessoas`
+                    : `Valor por pessoa · ${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} compartilhada (até ${vehicleCapacity} pessoas)`}
                 </p>
               </div>
 
               <div>
                 {isPrivate ? (
                   <>
-                    <span className="text-xs text-muted-foreground">veículo exclusivo</span>
+                    <span className="text-xs text-muted-foreground">{vehicleLabel} exclusiva</span>
                     <div className="flex items-baseline gap-1">
                       <span className="font-display text-3xl font-bold text-secondary">R$ {tour.private_price || 1300}</span>
                       <span className="text-muted-foreground text-sm">/ até {vehicleCapacity} pessoas</span>
