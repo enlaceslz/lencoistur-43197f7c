@@ -138,6 +138,7 @@ const AdminSGSBriefings = () => {
                   <div>
                     <h4 className="font-bold text-foreground">{b.guide_name}</h4>
                     <p className="text-xs text-muted-foreground">
+                      {b.tours?.name && <><MapPin size={10} className="inline mr-1" />{b.tours.name} • </>}
                       {LANGUAGES[b.language as keyof typeof LANGUAGES] || b.language} • {new Date(b.created_at).toLocaleDateString("pt-BR")}
                     </p>
                   </div>
