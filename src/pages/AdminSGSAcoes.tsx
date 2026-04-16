@@ -17,13 +17,25 @@ const AdminSGSAcoes = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ description: "", responsible: "", due_date: "" });
+  const [form, setForm] = useState({ description: "", responsible: "", due_date: "", incident_id: "" as string, risk_id: "" as string });
+  const [incidents, setIncidents] = useState<{ id: string; code: string; desc: string }[]>([]);
+  const [risks, setRisks] = useState<{ id: string; code: string; hazard: string }[]>([]);
 
   useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (!showForm) return;
+    Promise.all([
+      supabase.from("sgs_incidents").select("id, incident_code, description").order("date", { ascending: false }).limit(50),
+      supabase.from("sgs_risks").select("id, risk_code, hazard").eq("status", "ativo").order("risk_level", { ascending: false }).limit(50),
+    ]).then(([incRes, riskRes]) => {
+      if (incRes.data) setIncidents(incRes.data.map(i => ({ id: i.id, code: i.incident_code, desc: i.description?.slice(0, 60) || "" })));
+      if (riskRes.data) setRisks(riskRes.data.map(r => ({ id: r.id, code: r.risk_code, hazard: r.hazard?.slice(0, 60) || "" })));
+    });
+  }, [showForm]);
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("sgs_corrective_actions").select("*").order("created_at", { ascending: false });
+    const { data } = await supabase.from("sgs_corrective_actions").select("*, sgs_incidents(incident_code), sgs_risks(risk_code, hazard)").order("created_at", { ascending: false });
     setActions(data || []);
     setLoading(false);
   };
@@ -31,13 +43,16 @@ const AdminSGSAcoes = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const code = `AC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`;
-    const { error } = await supabase.from("sgs_corrective_actions").insert({ action_code: code, ...form });
+    const insertData: any = { action_code: code, description: form.description, responsible: form.responsible, due_date: form.due_date || null };
+    if (form.incident_id) insertData.incident_id = form.incident_id;
+    if (form.risk_id) insertData.risk_id = form.risk_id;
+    const { error } = await supabase.from("sgs_corrective_actions").insert(insertData);
     if (error) {
       toast({ title: "Erro", variant: "destructive" });
     } else {
       toast({ title: "Ação corretiva cadastrada!" });
       setShowForm(false);
-      setForm({ description: "", responsible: "", due_date: "" });
+      setForm({ description: "", responsible: "", due_date: "", incident_id: "", risk_id: "" });
       load();
     }
   };
@@ -71,6 +86,22 @@ const AdminSGSAcoes = () => {
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
             <h3 className="font-display font-bold text-foreground">Nova Ação Corretiva</h3>
             <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Incidente Relacionado</label>
+                <select value={form.incident_id} onChange={(e) => setForm({ ...form, incident_id: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  <option value="">Nenhum</option>
+                  {incidents.map(i => <option key={i.id} value={i.id}>{i.code} — {i.desc}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Risco Relacionado</label>
+                <select value={form.risk_id} onChange={(e) => setForm({ ...form, risk_id: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  <option value="">Nenhum</option>
+                  {risks.map(r => <option key={r.id} value={r.id}>{r.code} — {r.hazard}</option>)}
+                </select>
+              </div>
               <div className="sm:col-span-2">
                 <label className="text-sm font-semibold text-foreground mb-1 block">Descrição *</label>
                 <textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2}
@@ -116,6 +147,13 @@ const AdminSGSAcoes = () => {
                     <p className="text-xs text-muted-foreground mt-1">
                       👤 {a.responsible} {a.due_date && `• Prazo: ${new Date(a.due_date + "T12:00").toLocaleDateString("pt-BR")}`}
                     </p>
+                    {(a.sgs_incidents?.incident_code || a.sgs_risks?.risk_code) && (
+                      <p className="text-xs text-primary mt-0.5">
+                        {a.sgs_incidents?.incident_code && `🔗 ${a.sgs_incidents.incident_code}`}
+                        {a.sgs_incidents?.incident_code && a.sgs_risks?.risk_code && " • "}
+                        {a.sgs_risks?.risk_code && `⚠️ ${a.sgs_risks.risk_code}: ${a.sgs_risks.hazard?.slice(0, 40)}`}
+                      </p>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     {a.status === "pendente" && (

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, AlertCircle, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, AlertCircle, Pencil, Trash2, MapPin } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const SEVERITY: Record<string, { label: string; color: string }> = {
@@ -11,7 +11,6 @@ const SEVERITY: Record<string, { label: string; color: string }> = {
   critica: { label: "Crítica", color: "bg-destructive text-destructive-foreground" },
 };
 
-// Tipos conforme P5 VATTI
 const TYPE_LABELS: Record<string, string> = {
   sem_ocorrencia: "Sem Ocorrência",
   incidente: "Incidente",
@@ -29,8 +28,10 @@ const STATUS_COLORS: Record<string, string> = {
 
 const emptyForm = {
   type: "incidente", location: "", guide_name: "", description: "", severity: "media",
-  people_involved: "", action_taken: "",
+  people_involved: "", action_taken: "", tour_id: "" as string,
 };
+
+interface TourOpt { id: string; name: string; }
 
 const AdminSGSIncidentes = () => {
   const [incidents, setIncidents] = useState<any[]>([]);
@@ -40,12 +41,19 @@ const AdminSGSIncidentes = () => {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [form, setForm] = useState(emptyForm);
+  const [tours, setTours] = useState<TourOpt[]>([]);
 
   useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (!showForm) return;
+    supabase.from("tours").select("id, name").eq("active", true).order("name").then(({ data }) => {
+      if (data) setTours(data);
+    });
+  }, [showForm]);
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("sgs_incidents").select("*").order("date", { ascending: false });
+    const { data } = await supabase.from("sgs_incidents").select("*, tours(name)").order("date", { ascending: false });
     setIncidents(data || []);
     setLoading(false);
   };
@@ -56,6 +64,7 @@ const AdminSGSIncidentes = () => {
       type: inc.type, location: inc.location, guide_name: inc.guide_name || "",
       description: inc.description, severity: inc.severity,
       people_involved: inc.people_involved || "", action_taken: inc.action_taken || "",
+      tour_id: inc.tour_id || "",
     });
     setShowForm(true);
   };
@@ -75,14 +84,16 @@ const AdminSGSIncidentes = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const submitData: any = { ...form };
+    if (!submitData.tour_id) delete submitData.tour_id;
 
     if (editing) {
-      const { error } = await supabase.from("sgs_incidents").update(form).eq("id", editing.id);
+      const { error } = await supabase.from("sgs_incidents").update(submitData).eq("id", editing.id);
       if (error) { toast({ title: "Erro ao atualizar", variant: "destructive" }); return; }
       toast({ title: "Incidente atualizado!" });
     } else {
       const code = `INC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`;
-      const { error } = await supabase.from("sgs_incidents").insert({ incident_code: code, ...form });
+      const { error } = await supabase.from("sgs_incidents").insert({ incident_code: code, ...submitData });
       if (error) { toast({ title: "Erro ao registrar incidente", variant: "destructive" }); return; }
       toast({ title: "Incidente registrado!" });
 
@@ -169,6 +180,14 @@ const AdminSGSIncidentes = () => {
                 </select>
               </div>
               <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Passeio Relacionado</label>
+                <select value={form.tour_id} onChange={(e) => setForm({ ...form, tour_id: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  <option value="">Nenhum</option>
+                  {tours.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                </select>
+              </div>
+              <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Local do Incidente *</label>
                 <input required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })}
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Ex: Lagoa Azul, Dunas" />
@@ -228,7 +247,10 @@ const AdminSGSIncidentes = () => {
                     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[inc.status] || ""}`}>{inc.status}</span>
                   </div>
                   <p className="text-foreground font-medium">{inc.description}</p>
-                  <p className="text-xs text-muted-foreground mt-1">📍 {inc.location} {inc.guide_name && `• Condutor: ${inc.guide_name}`}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {inc.tours?.name && <><MapPin size={10} className="inline mr-1" />{inc.tours.name} • </>}
+                    📍 {inc.location} {inc.guide_name && `• Condutor: ${inc.guide_name}`}
+                  </p>
                   {inc.people_involved && <p className="text-xs text-muted-foreground">👥 Envolvidos: {inc.people_involved}</p>}
                   {inc.action_taken && <p className="text-xs text-primary mt-1">✅ Ação: {inc.action_taken}</p>}
                 </div>

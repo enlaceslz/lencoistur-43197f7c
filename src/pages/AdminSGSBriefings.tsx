@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, CheckCircle, XCircle } from "lucide-react";
+import { Plus, CheckCircle, XCircle, MapPin } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const CHECKLIST_ITEMS = [
@@ -14,21 +14,30 @@ const CHECKLIST_ITEMS = [
 
 const LANGUAGES = { pt: "Português", en: "English", es: "Español" };
 
+interface TourOpt { id: string; name: string; }
+
 const AdminSGSBriefings = () => {
   const [briefings, setBriefings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [tours, setTours] = useState<TourOpt[]>([]);
   const [form, setForm] = useState({
-    guide_name: "", language: "pt",
+    guide_name: "", language: "pt", tour_id: "" as string,
     safety_rules: false, tour_risks: false, lagoon_behavior: false,
     group_distance: false, emergency_orientation: false, notes: "",
   });
 
   useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (!showForm) return;
+    supabase.from("tours").select("id, name").eq("active", true).order("name").then(({ data }) => {
+      if (data) setTours(data);
+    });
+  }, [showForm]);
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("sgs_briefings").select("*").order("created_at", { ascending: false });
+    const { data } = await supabase.from("sgs_briefings").select("*, tours(name)").order("created_at", { ascending: false });
     setBriefings(data || []);
     setLoading(false);
   };
@@ -36,15 +45,15 @@ const AdminSGSBriefings = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const allChecked = CHECKLIST_ITEMS.every(item => form[item.key as keyof typeof form]);
-    const { error } = await supabase.from("sgs_briefings").insert({
-      ...form, completed: allChecked,
-    });
+    const insertData: any = { ...form, completed: allChecked };
+    if (!insertData.tour_id) delete insertData.tour_id;
+    const { error } = await supabase.from("sgs_briefings").insert(insertData);
     if (error) {
       toast({ title: "Erro ao registrar resumo", variant: "destructive" });
     } else {
       toast({ title: allChecked ? "Resumo completo registrado!" : "⚠️ Resumo registrado com itens pendentes" });
       setShowForm(false);
-      setForm({ guide_name: "", language: "pt", safety_rules: false, tour_risks: false, lagoon_behavior: false, group_distance: false, emergency_orientation: false, notes: "" });
+      setForm({ guide_name: "", language: "pt", tour_id: "", safety_rules: false, tour_risks: false, lagoon_behavior: false, group_distance: false, emergency_orientation: false, notes: "" });
       load();
     }
   };
@@ -65,6 +74,14 @@ const AdminSGSBriefings = () => {
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
             <h3 className="font-display font-bold text-foreground">Registrar Resumo de Segurança</h3>
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1 block">Passeio Relacionado</label>
+              <select value={form.tour_id} onChange={e => setForm({ ...form, tour_id: e.target.value })}
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                <option value="">Nenhum (geral)</option>
+                {tours.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+            </div>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Guia Responsável *</label>
@@ -121,6 +138,7 @@ const AdminSGSBriefings = () => {
                   <div>
                     <h4 className="font-bold text-foreground">{b.guide_name}</h4>
                     <p className="text-xs text-muted-foreground">
+                      {b.tours?.name && <><MapPin size={10} className="inline mr-1" />{b.tours.name} • </>}
                       {LANGUAGES[b.language as keyof typeof LANGUAGES] || b.language} • {new Date(b.created_at).toLocaleDateString("pt-BR")}
                     </p>
                   </div>
