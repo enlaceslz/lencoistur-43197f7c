@@ -51,10 +51,12 @@ const TourDetail = () => {
   const images = tour.images || [];
   const includes = tour.includes || [];
   const highlights = tour.highlights || [];
-  const vehicleCapacity = tour.vehicle_capacity || 9;
+  const isBoatTour = tour.slug === "passeio-de-barco" || /barco/i.test(tour.name || "") || /barco/i.test(tour.category || "");
+  const vehicleCapacity = isBoatTour ? 12 : (tour.vehicle_capacity || 9);
+  const vehicleLabel = isBoatTour ? "embarcação" : "veículo";
   const isPrivate = tourMode === "privativo";
   const totalPrice = isPrivate ? (tour.private_price || 1300) : tour.price * guests;
-  const maxGuests = isPrivate ? vehicleCapacity : vehicleCapacity;
+  const maxGuests = vehicleCapacity;
 
   return (
     <div className="min-h-screen bg-background">
@@ -235,15 +237,15 @@ const TourDetail = () => {
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
                   {isPrivate
-                    ? `Veículo exclusivo para até ${vehicleCapacity} pessoas`
-                    : `Valor por pessoa · Veículo compartilhado (até ${vehicleCapacity} pessoas)`}
+                    ? `${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} exclusiva para até ${vehicleCapacity} pessoas`
+                    : `Valor por pessoa · ${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} compartilhada (até ${vehicleCapacity} pessoas)`}
                 </p>
               </div>
 
               <div>
                 {isPrivate ? (
                   <>
-                    <span className="text-xs text-muted-foreground">veículo exclusivo</span>
+                    <span className="text-xs text-muted-foreground">{vehicleLabel} exclusiva</span>
                     <div className="flex items-baseline gap-1">
                       <span className="font-display text-3xl font-bold text-secondary">R$ {tour.private_price || 1300}</span>
                       <span className="text-muted-foreground text-sm">/ até {vehicleCapacity} pessoas</span>
@@ -283,7 +285,7 @@ const TourDetail = () => {
               <div className="border-t border-border pt-4 space-y-2">
                 {isPrivate ? (
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Veículo privativo ({guests} passageiros)</span>
+                    <span className="text-muted-foreground">{isBoatTour ? "Embarcação privativa" : "Veículo privativo"} ({guests} passageiros)</span>
                     <span className="text-foreground font-semibold">R$ {totalPrice}</span>
                   </div>
                 ) : (
