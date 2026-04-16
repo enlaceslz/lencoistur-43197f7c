@@ -162,7 +162,9 @@ const AdminPasseios = () => {
     const payload = {
       name: form.name.trim(), slug,
       location: form.location.trim(), duration: form.duration.trim(),
-      price: Number(form.price), pix_discount: pixDiscount,
+      price: Number(form.price), private_price: Number(form.private_price) || 1300,
+      vehicle_capacity: Number(form.vehicle_capacity) || 9,
+      pix_discount: pixDiscount,
       tag: form.tag.trim() || null,
       description: form.description.trim(), category: form.category,
       difficulty: form.difficulty, group_size: form.group_size.trim(),
