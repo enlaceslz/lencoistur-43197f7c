@@ -32,25 +32,48 @@ const mainItems = [
   { icon: FileText, label: "Documentação", path: "/admin/documentos" },
 ];
 
-const sgsItems = [
-  { icon: Shield, label: "Dashboard", path: "/admin/sgs" },
-  { icon: Building2, label: "Empresa", path: "/admin/sgs/empresa" },
-  { icon: Car, label: "Veículos / Frota", path: "/admin/sgs/veiculos" },
-  { icon: UserCheck2, label: "Condutores", path: "/admin/sgs/condutores" },
-  { icon: Users, label: "Visitantes", path: "/admin/sgs/condutores-visitantes" },
-  { icon: AlertTriangle, label: "Matriz de Riscos", path: "/admin/sgs/riscos" },
-  { icon: ClipboardCheck, label: "Checklists", path: "/admin/sgs/checklists" },
-  { icon: Activity, label: "Ocorrências", path: "/admin/sgs/incidentes" },
-  { icon: ClipboardCheck, label: "Ações Corretivas", path: "/admin/sgs/acoes" },
-  { icon: UserCheck, label: "Equipe (ISO 21102)", path: "/admin/sgs/equipe" },
-  { icon: ClipboardCheck, label: "Auditorias", path: "/admin/sgs/auditorias" },
-  { icon: Truck, label: "Fornecedores", path: "/admin/sgs/fornecedores" },
-  { icon: Map, label: "Rotas / Trilhas", path: "/admin/sgs/rotas" },
-  { icon: FileText, label: "PGSAT (ICMBio)", path: "/admin/sgs/pgsat" },
-  { icon: FileText, label: "Termos de Risco", path: "/admin/sgs/termos" },
-  { icon: Shield, label: "Briefings", path: "/admin/sgs/briefings" },
-  { icon: Star, label: "Pesquisas", path: "/admin/sgs/pesquisas" },
+const sgsGroups = [
+  {
+    title: null,
+    items: [
+      { icon: Shield, label: "Dashboard", path: "/admin/sgs" },
+    ],
+  },
+  {
+    title: "Operação",
+    items: [
+      { icon: Car, label: "Veículos / Frota", path: "/admin/sgs/veiculos" },
+      { icon: UserCheck2, label: "Condutores", path: "/admin/sgs/condutores" },
+      { icon: Users, label: "Visitantes", path: "/admin/sgs/condutores-visitantes" },
+      { icon: Map, label: "Rotas / Trilhas", path: "/admin/sgs/rotas" },
+      { icon: ClipboardCheck, label: "Checklists", path: "/admin/sgs/checklists" },
+      { icon: Shield, label: "Briefings", path: "/admin/sgs/briefings" },
+    ],
+  },
+  {
+    title: "Gestão de Riscos",
+    items: [
+      { icon: AlertTriangle, label: "Matriz de Riscos", path: "/admin/sgs/riscos" },
+      { icon: Activity, label: "Ocorrências", path: "/admin/sgs/incidentes" },
+      { icon: ClipboardCheck, label: "Ações Corretivas", path: "/admin/sgs/acoes" },
+      { icon: FileText, label: "Termos de Risco", path: "/admin/sgs/termos" },
+      { icon: Star, label: "Pesquisas", path: "/admin/sgs/pesquisas" },
+    ],
+  },
+  {
+    title: "Conformidade",
+    items: [
+      { icon: Building2, label: "Empresa", path: "/admin/sgs/empresa" },
+      { icon: UserCheck, label: "Equipe (ISO 21102)", path: "/admin/sgs/equipe" },
+      { icon: Truck, label: "Fornecedores", path: "/admin/sgs/fornecedores" },
+      { icon: ClipboardCheck, label: "Auditorias", path: "/admin/sgs/auditorias" },
+      { icon: FileText, label: "PGSAT (ICMBio)", path: "/admin/sgs/pgsat" },
+    ],
+  },
 ];
+
+// Flat list for breadcrumb lookup
+const sgsItems = sgsGroups.flatMap(g => g.items);
 
 // Breadcrumb helper
 const getBreadcrumbs = (pathname: string) => {
@@ -205,8 +228,19 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
               <ChevronDown size={14} className={`transition-transform duration-200 ${sgsOpen || isSgsActive ? "rotate-180" : ""}`} />
             </button>
             {(sgsOpen || isSgsActive) && (
-              <div className="mt-1 space-y-0.5 border-l border-white/[0.06] ml-6">
-                {sgsItems.map(item => <SidebarLink key={item.path} {...item} indent />)}
+              <div className="mt-1 border-l border-white/[0.06] ml-6">
+                {sgsGroups.map((group, gi) => (
+                  <div key={gi}>
+                    {group.title && (
+                      <p className="px-4 pt-2.5 pb-1 text-[9px] font-semibold uppercase tracking-wider text-[hsl(220,15%,38%)]">
+                        {group.title}
+                      </p>
+                    )}
+                    <div className="space-y-0.5">
+                      {group.items.map(item => <SidebarLink key={item.path} {...item} indent />)}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
