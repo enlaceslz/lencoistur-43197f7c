@@ -235,6 +235,9 @@ const AdminReservas = () => {
           <Button variant="outline" size="sm" onClick={exportCSV} className="shrink-0">
             <Download size={14} className="mr-1" /> CSV
           </Button>
+          <Button size="sm" onClick={() => { resetNewForm(); setShowNewForm(true); }} className="shrink-0">
+            <Plus size={14} className="mr-1" /> Nova Reserva
+          </Button>
         </CardContent>
       </Card>
 
