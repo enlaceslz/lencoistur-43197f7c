@@ -13,6 +13,7 @@ const TourDetail = () => {
   const [currentImg, setCurrentImg] = useState(0);
   const [guests, setGuests] = useState(2);
   const [selectedDate, setSelectedDate] = useState("");
+  const [tourMode, setTourMode] = useState<"coletivo" | "privativo">("coletivo");
 
   useEffect(() => {
     if (!slug) return;
@@ -50,7 +51,10 @@ const TourDetail = () => {
   const images = tour.images || [];
   const includes = tour.includes || [];
   const highlights = tour.highlights || [];
-  const totalPrice = tour.price * guests;
+  const vehicleCapacity = tour.vehicle_capacity || 9;
+  const isPrivate = tourMode === "privativo";
+  const totalPrice = isPrivate ? (tour.private_price || 1300) : tour.price * guests;
+  const maxGuests = isPrivate ? vehicleCapacity : vehicleCapacity;
 
   return (
     <div className="min-h-screen bg-background">
@@ -198,12 +202,62 @@ const TourDetail = () => {
 
           <div className="lg:col-span-1">
             <div className="sticky top-24 bg-card border border-border rounded-2xl p-6 shadow-lg space-y-6">
+              {/* Tour Mode Toggle */}
               <div>
-                <span className="text-xs text-muted-foreground">a partir de</span>
-                <div className="flex items-baseline gap-1">
-                  <span className="font-display text-3xl font-bold text-primary">R$ {tour.price}</span>
-                  <span className="text-muted-foreground text-sm">/ pessoa</span>
+                <label className="text-sm font-semibold text-foreground mb-2 block">Modalidade</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setTourMode("coletivo")}
+                    className={`px-4 py-3 rounded-xl text-sm font-semibold border-2 transition-all ${
+                      tourMode === "coletivo"
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-muted text-muted-foreground hover:border-primary/40"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center gap-1">
+                      <Users size={18} />
+                      <span>Coletivo</span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setTourMode("privativo")}
+                    className={`px-4 py-3 rounded-xl text-sm font-semibold border-2 transition-all ${
+                      tourMode === "privativo"
+                        ? "border-secondary bg-secondary/10 text-secondary"
+                        : "border-border bg-muted text-muted-foreground hover:border-secondary/40"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center gap-1">
+                      <Shield size={18} />
+                      <span>Privativo</span>
+                    </div>
+                  </button>
                 </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  {isPrivate
+                    ? `Veículo exclusivo para até ${vehicleCapacity} pessoas`
+                    : `Valor por pessoa · Veículo compartilhado (até ${vehicleCapacity} pessoas)`}
+                </p>
+              </div>
+
+              <div>
+                {isPrivate ? (
+                  <>
+                    <span className="text-xs text-muted-foreground">veículo exclusivo</span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="font-display text-3xl font-bold text-secondary">R$ {tour.private_price || 1300}</span>
+                      <span className="text-muted-foreground text-sm">/ até {vehicleCapacity} pessoas</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-xs text-muted-foreground">a partir de</span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="font-display text-3xl font-bold text-primary">R$ {tour.price}</span>
+                      <span className="text-muted-foreground text-sm">/ pessoa</span>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="space-y-4">
@@ -213,35 +267,48 @@ const TourDetail = () => {
                     className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30" />
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-foreground mb-1.5 block">Participantes</label>
+                  <label className="text-sm font-semibold text-foreground mb-1.5 block">
+                    {isPrivate ? "Passageiros (inclusos no preço)" : "Participantes"}
+                  </label>
                   <div className="flex items-center gap-4 bg-muted border border-border rounded-xl px-4 py-3">
                     <button onClick={() => setGuests(Math.max(1, guests - 1))}
                       className="w-8 h-8 rounded-lg bg-card border border-border flex items-center justify-center text-foreground hover:bg-primary hover:text-primary-foreground transition-colors font-bold">-</button>
                     <span className="flex-1 text-center font-semibold text-foreground">{guests}</span>
-                    <button onClick={() => setGuests(Math.min(12, guests + 1))}
+                    <button onClick={() => setGuests(Math.min(maxGuests, guests + 1))}
                       className="w-8 h-8 rounded-lg bg-card border border-border flex items-center justify-center text-foreground hover:bg-primary hover:text-primary-foreground transition-colors font-bold">+</button>
                   </div>
                 </div>
               </div>
 
               <div className="border-t border-border pt-4 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">R$ {tour.price} × {guests} pessoas</span>
-                  <span className="text-foreground font-semibold">R$ {totalPrice}</span>
-                </div>
+                {isPrivate ? (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Veículo privativo ({guests} passageiros)</span>
+                    <span className="text-foreground font-semibold">R$ {totalPrice}</span>
+                  </div>
+                ) : (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">R$ {tour.price} × {guests} pessoas</span>
+                    <span className="text-foreground font-semibold">R$ {totalPrice}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Taxa de serviço</span>
                   <span className="text-foreground font-semibold">R$ 0</span>
                 </div>
                 <div className="flex justify-between font-bold text-lg border-t border-border pt-3">
                   <span className="text-foreground">Total</span>
-                  <span className="text-primary">R$ {totalPrice}</span>
+                  <span className={isPrivate ? "text-secondary" : "text-primary"}>R$ {totalPrice}</span>
                 </div>
               </div>
 
-              <Link to={`/checkout?tour=${tour.slug}&pax=${guests}&date=${selectedDate}`}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-xl font-semibold text-lg transition-colors block text-center">
-                Reservar Agora
+              <Link to={`/checkout?tour=${tour.slug}&pax=${guests}&date=${selectedDate}&mode=${tourMode}`}
+                className={`w-full py-4 rounded-xl font-semibold text-lg transition-colors block text-center ${
+                  isPrivate
+                    ? "bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                    : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                }`}>
+                Reservar {isPrivate ? "Privativo" : "Agora"}
               </Link>
 
               <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">
