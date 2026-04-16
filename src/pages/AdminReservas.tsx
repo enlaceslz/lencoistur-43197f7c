@@ -474,6 +474,99 @@ const AdminReservas = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* New Booking Dialog */}
+      <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Plus size={20} /> Nova Reserva
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleNewBooking} className="space-y-4">
+            {/* Type */}
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1.5 block">Tipo</label>
+              <div className="flex gap-2">
+                <Button type="button" variant={newForm.type === "tour" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, type: "tour", itemName: "" }))}>
+                  Passeio
+                </Button>
+                <Button type="button" variant={newForm.type === "transfer" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, type: "transfer", itemName: "" }))}>
+                  Translado
+                </Button>
+              </div>
+            </div>
+
+            {/* Item selection */}
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1.5 block">
+                {newForm.type === "tour" ? "Passeio" : "Rota"} *
+              </label>
+              <select
+                value={newForm.itemName}
+                onChange={(e) => setNewForm(f => ({ ...f, itemName: e.target.value }))}
+                className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+                required
+              >
+                <option value="">Selecione...</option>
+                {newForm.type === "tour"
+                  ? tours.map(t => <option key={t.id} value={t.name}>{t.name} — {fmt(t.price)}</option>)
+                  : transfers.map(t => <option key={t.id} value={t.label}>{t.label} — {fmt(t.price)}</option>)
+                }
+              </select>
+            </div>
+
+            {/* Date & Guests */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Data</label>
+                <Input type="date" value={newForm.date} onChange={(e) => setNewForm(f => ({ ...f, date: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Pessoas *</label>
+                <Input type="number" min={1} max={50} value={newForm.guests} onChange={(e) => setNewForm(f => ({ ...f, guests: parseInt(e.target.value) || 1 }))} required />
+              </div>
+            </div>
+
+            {/* Payment method */}
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1.5 block">Pagamento</label>
+              <div className="flex gap-2">
+                <Button type="button" variant={newForm.payMethod === "pix" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, payMethod: "pix" }))}>
+                  PIX
+                </Button>
+                <Button type="button" variant={newForm.payMethod === "card" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, payMethod: "card" }))}>
+                  Cartão
+                </Button>
+              </div>
+            </div>
+
+            {/* Customer info */}
+            <div className="border-t border-border pt-4">
+              <h4 className="font-semibold text-sm text-foreground mb-3">Dados do Cliente</h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm text-muted-foreground mb-1 block">Nome *</label>
+                  <Input value={newForm.customerName} onChange={(e) => setNewForm(f => ({ ...f, customerName: e.target.value }))} placeholder="Nome completo" required maxLength={255} />
+                </div>
+                <div>
+                  <label className="text-sm text-muted-foreground mb-1 block">E-mail *</label>
+                  <Input type="email" value={newForm.customerEmail} onChange={(e) => setNewForm(f => ({ ...f, customerEmail: e.target.value }))} placeholder="email@exemplo.com" required maxLength={255} />
+                </div>
+                <div>
+                  <label className="text-sm text-muted-foreground mb-1 block">Telefone</label>
+                  <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: e.target.value }))} placeholder="(99) 99999-9999" maxLength={20} />
+                </div>
+              </div>
+            </div>
+
+            <Button type="submit" className="w-full" disabled={newLoading}>
+              {newLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Plus size={16} className="mr-2" />}
+              Criar Reserva
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
