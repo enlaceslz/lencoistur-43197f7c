@@ -247,7 +247,10 @@ const AdminSGSIncidentes = () => {
                     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[inc.status] || ""}`}>{inc.status}</span>
                   </div>
                   <p className="text-foreground font-medium">{inc.description}</p>
-                  <p className="text-xs text-muted-foreground mt-1">📍 {inc.location} {inc.guide_name && `• Condutor: ${inc.guide_name}`}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {inc.tours?.name && <><MapPin size={10} className="inline mr-1" />{inc.tours.name} • </>}
+                    📍 {inc.location} {inc.guide_name && `• Condutor: ${inc.guide_name}`}
+                  </p>
                   {inc.people_involved && <p className="text-xs text-muted-foreground">👥 Envolvidos: {inc.people_involved}</p>}
                   {inc.action_taken && <p className="text-xs text-primary mt-1">✅ Ação: {inc.action_taken}</p>}
                 </div>
