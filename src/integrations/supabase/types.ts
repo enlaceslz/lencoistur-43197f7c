@@ -1555,11 +1555,13 @@ export type Database = {
           operator: string | null
           pix_discount: number
           price: number
+          private_price: number
           rating: number | null
           reviews_count: number | null
           slug: string
           tag: string | null
           updated_at: string
+          vehicle_capacity: number
         }
         Insert: {
           active?: boolean
@@ -1579,11 +1581,13 @@ export type Database = {
           operator?: string | null
           pix_discount?: number
           price: number
+          private_price?: number
           rating?: number | null
           reviews_count?: number | null
           slug: string
           tag?: string | null
           updated_at?: string
+          vehicle_capacity?: number
         }
         Update: {
           active?: boolean
@@ -1603,11 +1607,13 @@ export type Database = {
           operator?: string | null
           pix_discount?: number
           price?: number
+          private_price?: number
           rating?: number | null
           reviews_count?: number | null
           slug?: string
           tag?: string | null
           updated_at?: string
+          vehicle_capacity?: number
         }
         Relationships: []
       }

@@ -21,10 +21,11 @@ const CATEGORIES = ["Ecoturismo", "Aventura", "Passeio de Barco", "Gastronomia",
 const DIFFICULTIES = ["Fácil", "Moderada", "Moderada a Difícil", "Difícil"];
 
 const emptyForm = {
-  name: "", slug: "", location: "", duration: "", price: 0,
+  name: "", slug: "", location: "", duration: "", price: 160,
+  private_price: 1300, vehicle_capacity: 9,
   pix_discount: 0,
   tag: "", description: "", category: "Ecoturismo", difficulty: "Fácil",
-  group_size: "Até 10 pessoas", departure: "Santo Amaro do Maranhão",
+  group_size: "Até 9 pessoas", departure: "Santo Amaro do Maranhão",
   operator: "Lençóis Tour", includes: "", highlights: "", active: true,
 };
 
@@ -66,7 +67,8 @@ const AdminPasseios = () => {
     setEditingId(t.id);
     setForm({
       name: t.name, slug: t.slug, location: t.location || "",
-      duration: t.duration || "", price: t.price, pix_discount: t.pix_discount || 0,
+      duration: t.duration || "", price: t.price, private_price: t.private_price || 1300,
+      vehicle_capacity: t.vehicle_capacity || 9, pix_discount: t.pix_discount || 0,
       tag: t.tag || "",
       description: t.description || "", category: t.category || "Ecoturismo",
       difficulty: t.difficulty || "Fácil", group_size: t.group_size || "",
@@ -160,7 +162,9 @@ const AdminPasseios = () => {
     const payload = {
       name: form.name.trim(), slug,
       location: form.location.trim(), duration: form.duration.trim(),
-      price: Number(form.price), pix_discount: pixDiscount,
+      price: Number(form.price), private_price: Number(form.private_price) || 1300,
+      vehicle_capacity: Number(form.vehicle_capacity) || 9,
+      pix_discount: pixDiscount,
       tag: form.tag.trim() || null,
       description: form.description.trim(), category: form.category,
       difficulty: form.difficulty, group_size: form.group_size.trim(),
@@ -284,8 +288,18 @@ const AdminPasseios = () => {
                 className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={200} />
             </div>
             <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Preço (R$) *</label>
+              <label className="text-sm font-semibold text-foreground mb-1 block">Preço Coletivo (R$/pessoa) *</label>
               <input required type="number" min={0} max={99999} value={form.price} onChange={e => setForm({ ...form, price: Number(e.target.value) })}
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1 block">Preço Privativo (R$/veículo) *</label>
+              <input required type="number" min={0} max={99999} value={form.private_price} onChange={e => setForm({ ...form, private_price: Number(e.target.value) })}
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1 block">Lotação do Veículo</label>
+              <input type="number" min={1} max={50} value={form.vehicle_capacity} onChange={e => setForm({ ...form, vehicle_capacity: Number(e.target.value) })}
                 className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
             </div>
             <div>

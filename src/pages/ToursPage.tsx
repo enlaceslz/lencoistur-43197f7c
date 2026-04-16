@@ -132,8 +132,11 @@ const ToursPage = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-xs text-muted-foreground">a partir de</span>
-                    <p className="text-xl font-bold text-primary">R$ {tour.price}</p>
+                    <span className="text-xs text-muted-foreground">Coletivo</span>
+                    <p className="text-lg font-bold text-primary">R$ {tour.price}<span className="text-xs font-normal text-muted-foreground">/pessoa</span></p>
+                    {tour.private_price && (
+                      <p className="text-xs text-secondary font-semibold">Privativo: R$ {tour.private_price}</p>
+                    )}
                   </div>
                   <span className="bg-primary text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-semibold">
                     Ver Detalhes

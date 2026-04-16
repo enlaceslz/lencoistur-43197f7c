@@ -18,6 +18,7 @@ const CheckoutPage = () => {
   const transferId = params.get("transfer") || "";
   const guests = Number(params.get("pax")) || 2;
   const date = params.get("date") || "";
+  const tourMode = (params.get("mode") || "coletivo") as "coletivo" | "privativo";
 
   const [tour, setTour] = useState<any>(null);
   const [transfer, setTransfer] = useState<any>(null);
@@ -37,8 +38,9 @@ const CheckoutPage = () => {
     load();
   }, [type, slug, transferId]);
 
-  const itemName = tour?.name || (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
-  const unitPrice = tour?.price || transfer?.price || 0;
+  const isPrivate = tourMode === "privativo";
+  const itemName = tour ? `${tour.name}${isPrivate ? " (Privativo)" : " (Coletivo)"}` : (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
+  const unitPrice = tour ? (isPrivate ? (tour.private_price || 1300) : tour.price) : (transfer?.price || 0);
   const pixDiscountPercent = tour?.pix_discount || transfer?.pix_discount || 0;
   const image = tour?.images?.[0] || "";
   const location = tour?.location || (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
@@ -64,7 +66,7 @@ const CheckoutPage = () => {
     );
   }
 
-  const total = unitPrice * guests;
+  const total = isPrivate ? unitPrice : unitPrice * guests;
   // PIX discount is calculated server-side; display only for UI feedback
   const displayDiscount = payMethod === "pix" && pixDiscountPercent > 0
     ? Math.round(total * pixDiscountPercent / 100)
