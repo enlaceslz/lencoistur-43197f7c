@@ -84,14 +84,16 @@ const AdminSGSIncidentes = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const submitData: any = { ...form };
+    if (!submitData.tour_id) delete submitData.tour_id;
 
     if (editing) {
-      const { error } = await supabase.from("sgs_incidents").update(form).eq("id", editing.id);
+      const { error } = await supabase.from("sgs_incidents").update(submitData).eq("id", editing.id);
       if (error) { toast({ title: "Erro ao atualizar", variant: "destructive" }); return; }
       toast({ title: "Incidente atualizado!" });
     } else {
       const code = `INC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`;
-      const { error } = await supabase.from("sgs_incidents").insert({ incident_code: code, ...form });
+      const { error } = await supabase.from("sgs_incidents").insert({ incident_code: code, ...submitData });
       if (error) { toast({ title: "Erro ao registrar incidente", variant: "destructive" }); return; }
       toast({ title: "Incidente registrado!" });
 
