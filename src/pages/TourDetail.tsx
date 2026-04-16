@@ -285,7 +285,7 @@ const TourDetail = () => {
               <div className="border-t border-border pt-4 space-y-2">
                 {isPrivate ? (
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Veículo privativo ({guests} passageiros)</span>
+                    <span className="text-muted-foreground">{isBoatTour ? "Embarcação privativa" : "Veículo privativo"} ({guests} passageiros)</span>
                     <span className="text-foreground font-semibold">R$ {totalPrice}</span>
                   </div>
                 ) : (
