@@ -45,15 +45,15 @@ const AdminSGSBriefings = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const allChecked = CHECKLIST_ITEMS.every(item => form[item.key as keyof typeof form]);
-    const { error } = await supabase.from("sgs_briefings").insert({
-      ...form, completed: allChecked,
-    });
+    const insertData: any = { ...form, completed: allChecked };
+    if (!insertData.tour_id) delete insertData.tour_id;
+    const { error } = await supabase.from("sgs_briefings").insert(insertData);
     if (error) {
       toast({ title: "Erro ao registrar resumo", variant: "destructive" });
     } else {
       toast({ title: allChecked ? "Resumo completo registrado!" : "⚠️ Resumo registrado com itens pendentes" });
       setShowForm(false);
-      setForm({ guide_name: "", language: "pt", safety_rules: false, tour_risks: false, lagoon_behavior: false, group_distance: false, emergency_orientation: false, notes: "" });
+      setForm({ guide_name: "", language: "pt", tour_id: "", safety_rules: false, tour_risks: false, lagoon_behavior: false, group_distance: false, emergency_orientation: false, notes: "" });
       load();
     }
   };
