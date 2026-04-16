@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,10 +15,12 @@ import {
   Search, ShoppingCart, CheckCircle, Clock, XCircle, Eye,
   DollarSign, Ban, Loader2, Users, Calendar, CreditCard, FileText,
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
+  Plus,
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { toast } from "sonner";
 import { PrintReceiptButton, type ReceiptData } from "@/components/BookingReceipt";
+import { supabase } from "@/integrations/supabase/client";
 
 const statusConfig: Record<string, { label: string; className: string; icon: typeof CheckCircle }> = {
   confirmada: { label: "Confirmada", className: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300", icon: CheckCircle },
@@ -43,14 +45,90 @@ const fmtDateTime = (d: string) => {
   try { return new Date(d).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }); } catch { return d; }
 };
 
+interface TourOption { id: string; name: string; price: number; }
+interface TransferOption { id: string; label: string; price: number; }
+
 const AdminReservas = () => {
-  const { bookings, loading, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
+  const { bookings, loading, addBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
   const [selected, setSelected] = useState<BookingItem | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [editNotes, setEditNotes] = useState("");
   const [showNotes, setShowNotes] = useState(false);
+
+  // New booking form state
+  const [showNewForm, setShowNewForm] = useState(false);
+  const [newLoading, setNewLoading] = useState(false);
+  const [tours, setTours] = useState<TourOption[]>([]);
+  const [transfers, setTransfers] = useState<TransferOption[]>([]);
+  const [newForm, setNewForm] = useState({
+    type: "tour" as "tour" | "transfer",
+    itemName: "",
+    date: "",
+    guests: 1,
+    payMethod: "pix" as "pix" | "card",
+    customerName: "",
+    customerEmail: "",
+    customerPhone: "",
+  });
+
+  useEffect(() => {
+    if (!showNewForm) return;
+    const loadOptions = async () => {
+      const [{ data: t }, { data: tr }] = await Promise.all([
+        supabase.from("tours").select("id, name, price").eq("active", true).order("name"),
+        supabase.from("transfer_routes").select("id, origin, destination, price").eq("active", true).order("origin"),
+      ]);
+      if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price })));
+      if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price })));
+    };
+    loadOptions();
+  }, [showNewForm]);
+
+  const resetNewForm = () => {
+    setNewForm({ type: "tour", itemName: "", date: "", guests: 1, payMethod: "pix", customerName: "", customerEmail: "", customerPhone: "" });
+  };
+
+  const handleNewBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newForm.itemName || !newForm.customerName || !newForm.customerEmail) {
+      toast.error("Preencha todos os campos obrigatórios.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newForm.customerEmail.trim())) {
+      toast.error("E-mail inválido.");
+      return;
+    }
+    if (newForm.guests < 1 || newForm.guests > 50) {
+      toast.error("Quantidade de pessoas deve ser entre 1 e 50.");
+      return;
+    }
+    setNewLoading(true);
+    try {
+      await addBooking({
+        type: newForm.type,
+        itemName: newForm.itemName,
+        date: newForm.date || "",
+        guests: newForm.guests,
+        payMethod: newForm.payMethod,
+        customerName: newForm.customerName.trim(),
+        customerEmail: newForm.customerEmail.trim().toLowerCase(),
+        customerPhone: newForm.customerPhone.trim(),
+        unitPrice: 0,
+        total: 0,
+        discount: 0,
+        finalTotal: 0,
+      });
+      toast.success("Reserva criada com sucesso!");
+      setShowNewForm(false);
+      resetNewForm();
+    } catch (err: any) {
+      toast.error(err?.message || "Erro ao criar reserva.");
+    }
+    setNewLoading(false);
+  };
 
   const filtered = bookings.filter((b) => {
     const q = search.toLowerCase();
@@ -156,6 +234,9 @@ const AdminReservas = () => {
           </div>
           <Button variant="outline" size="sm" onClick={exportCSV} className="shrink-0">
             <Download size={14} className="mr-1" /> CSV
+          </Button>
+          <Button size="sm" onClick={() => { resetNewForm(); setShowNewForm(true); }} className="shrink-0">
+            <Plus size={14} className="mr-1" /> Nova Reserva
           </Button>
         </CardContent>
       </Card>
@@ -391,6 +472,99 @@ const AdminReservas = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* New Booking Dialog */}
+      <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Plus size={20} /> Nova Reserva
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleNewBooking} className="space-y-4">
+            {/* Type */}
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1.5 block">Tipo</label>
+              <div className="flex gap-2">
+                <Button type="button" variant={newForm.type === "tour" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, type: "tour", itemName: "" }))}>
+                  Passeio
+                </Button>
+                <Button type="button" variant={newForm.type === "transfer" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, type: "transfer", itemName: "" }))}>
+                  Translado
+                </Button>
+              </div>
+            </div>
+
+            {/* Item selection */}
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1.5 block">
+                {newForm.type === "tour" ? "Passeio" : "Rota"} *
+              </label>
+              <select
+                value={newForm.itemName}
+                onChange={(e) => setNewForm(f => ({ ...f, itemName: e.target.value }))}
+                className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+                required
+              >
+                <option value="">Selecione...</option>
+                {newForm.type === "tour"
+                  ? tours.map(t => <option key={t.id} value={t.name}>{t.name} — {fmt(t.price)}</option>)
+                  : transfers.map(t => <option key={t.id} value={t.label}>{t.label} — {fmt(t.price)}</option>)
+                }
+              </select>
+            </div>
+
+            {/* Date & Guests */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Data</label>
+                <Input type="date" value={newForm.date} onChange={(e) => setNewForm(f => ({ ...f, date: e.target.value }))} />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Pessoas *</label>
+                <Input type="number" min={1} max={50} value={newForm.guests} onChange={(e) => setNewForm(f => ({ ...f, guests: parseInt(e.target.value) || 1 }))} required />
+              </div>
+            </div>
+
+            {/* Payment method */}
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1.5 block">Pagamento</label>
+              <div className="flex gap-2">
+                <Button type="button" variant={newForm.payMethod === "pix" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, payMethod: "pix" }))}>
+                  PIX
+                </Button>
+                <Button type="button" variant={newForm.payMethod === "card" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, payMethod: "card" }))}>
+                  Cartão
+                </Button>
+              </div>
+            </div>
+
+            {/* Customer info */}
+            <div className="border-t border-border pt-4">
+              <h4 className="font-semibold text-sm text-foreground mb-3">Dados do Cliente</h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm text-muted-foreground mb-1 block">Nome *</label>
+                  <Input value={newForm.customerName} onChange={(e) => setNewForm(f => ({ ...f, customerName: e.target.value }))} placeholder="Nome completo" required maxLength={255} />
+                </div>
+                <div>
+                  <label className="text-sm text-muted-foreground mb-1 block">E-mail *</label>
+                  <Input type="email" value={newForm.customerEmail} onChange={(e) => setNewForm(f => ({ ...f, customerEmail: e.target.value }))} placeholder="email@exemplo.com" required maxLength={255} />
+                </div>
+                <div>
+                  <label className="text-sm text-muted-foreground mb-1 block">Telefone</label>
+                  <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: e.target.value }))} placeholder="(99) 99999-9999" maxLength={20} />
+                </div>
+              </div>
+            </div>
+
+            <Button type="submit" className="w-full" disabled={newLoading}>
+              {newLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Plus size={16} className="mr-2" />}
+              Criar Reserva
+            </Button>
+          </form>
         </DialogContent>
       </Dialog>
     </AdminLayout>
