@@ -143,7 +143,7 @@ const AdminCRM = () => {
     setSelectedCustomer(c);
     const { data } = await supabase
       .from("bookings")
-      .select("id, item_name, date, guests, final_total, status, payment_status, created_at")
+      .select("id, booking_code, item_name, date, guests, final_total, status, payment_status, created_at, type")
       .eq("customer_id", c.id)
       .order("created_at", { ascending: false });
     setCustomerBookings(data || []);
