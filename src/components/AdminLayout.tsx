@@ -228,8 +228,19 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
               <ChevronDown size={14} className={`transition-transform duration-200 ${sgsOpen || isSgsActive ? "rotate-180" : ""}`} />
             </button>
             {(sgsOpen || isSgsActive) && (
-              <div className="mt-1 space-y-0.5 border-l border-white/[0.06] ml-6">
-                {sgsItems.map(item => <SidebarLink key={item.path} {...item} indent />)}
+              <div className="mt-1 border-l border-white/[0.06] ml-6">
+                {sgsGroups.map((group, gi) => (
+                  <div key={gi}>
+                    {group.title && (
+                      <p className="px-4 pt-2.5 pb-1 text-[9px] font-semibold uppercase tracking-wider text-[hsl(220,15%,38%)]">
+                        {group.title}
+                      </p>
+                    )}
+                    <div className="space-y-0.5">
+                      {group.items.map(item => <SidebarLink key={item.path} {...item} indent />)}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
