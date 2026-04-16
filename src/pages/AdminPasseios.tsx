@@ -288,8 +288,18 @@ const AdminPasseios = () => {
                 className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={200} />
             </div>
             <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Preço (R$) *</label>
+              <label className="text-sm font-semibold text-foreground mb-1 block">Preço Coletivo (R$/pessoa) *</label>
               <input required type="number" min={0} max={99999} value={form.price} onChange={e => setForm({ ...form, price: Number(e.target.value) })}
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1 block">Preço Privativo (R$/veículo) *</label>
+              <input required type="number" min={0} max={99999} value={form.private_price} onChange={e => setForm({ ...form, private_price: Number(e.target.value) })}
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1 block">Lotação do Veículo</label>
+              <input type="number" min={1} max={50} value={form.vehicle_capacity} onChange={e => setForm({ ...form, vehicle_capacity: Number(e.target.value) })}
                 className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
             </div>
             <div>
