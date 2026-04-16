@@ -480,16 +480,25 @@ const AdminCRM = () => {
                       {customerBookings.map((b) => (
                         <div key={b.id} className="bg-muted rounded-xl px-4 py-3">
                           <div className="flex items-center justify-between mb-1">
-                            <p className="text-sm font-semibold text-foreground truncate flex-1">{b.item_name}</p>
+                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                              <span className="text-[10px] font-mono text-muted-foreground">{b.booking_code}</span>
+                              <Badge variant="outline" className="text-[9px] px-1.5 py-0">{b.type === "passeio" ? "Passeio" : "Translado"}</Badge>
+                            </div>
                             <p className="text-sm font-bold text-primary ml-2">{fmt(b.final_total)}</p>
                           </div>
-                          <div className="flex items-center justify-between">
+                          <p className="text-sm font-semibold text-foreground truncate">{b.item_name}</p>
+                          <div className="flex items-center justify-between mt-1">
                             <p className="text-xs text-muted-foreground">
                               {b.date || new Date(b.created_at).toLocaleDateString("pt-BR")} · {b.guests} pessoa(s)
                             </p>
-                            <Badge variant="outline" className={`text-[10px] ${statusConfig[b.status]?.className || ""}`}>
-                              {statusConfig[b.status]?.label || b.status}
-                            </Badge>
+                            <div className="flex gap-1">
+                              <Badge variant="outline" className={`text-[10px] ${statusConfig[b.status]?.className || ""}`}>
+                                {statusConfig[b.status]?.label || b.status}
+                              </Badge>
+                              <Badge variant="outline" className={`text-[10px] ${payStatusConfig[b.payment_status]?.className || ""}`}>
+                                {payStatusConfig[b.payment_status]?.label || b.payment_status}
+                              </Badge>
+                            </div>
                           </div>
                         </div>
                       ))}
