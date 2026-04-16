@@ -180,6 +180,14 @@ const AdminSGSIncidentes = () => {
                 </select>
               </div>
               <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Passeio Relacionado</label>
+                <select value={form.tour_id} onChange={(e) => setForm({ ...form, tour_id: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  <option value="">Nenhum</option>
+                  {tours.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                </select>
+              </div>
+              <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Local do Incidente *</label>
                 <input required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })}
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Ex: Lagoa Azul, Dunas" />
