@@ -24,6 +24,7 @@ interface Customer {
 
 interface BookingRow {
   id: string;
+  booking_code: string;
   item_name: string;
   date: string | null;
   guests: number;
@@ -31,6 +32,7 @@ interface BookingRow {
   status: string;
   payment_status: string;
   created_at: string;
+  type: string;
 }
 
 interface CustomerForm {
@@ -42,7 +44,12 @@ interface CustomerForm {
 
 const emptyForm: CustomerForm = { name: "", email: "", phone: "", cpf: "" };
 
-const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR")}`;
+const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+
+const payStatusConfig: Record<string, { label: string; className: string }> = {
+  pago: { label: "Pago", className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" },
+  pendente: { label: "Pendente", className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" },
+};
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   pendente: { label: "Pendente", className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" },
