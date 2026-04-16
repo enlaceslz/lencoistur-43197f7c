@@ -74,6 +74,16 @@ const AdminSGSBriefings = () => {
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
             <h3 className="font-display font-bold text-foreground">Registrar Resumo de Segurança</h3>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Passeio Relacionado</label>
+                <select value={form.tour_id} onChange={e => setForm({ ...form, tour_id: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  <option value="">Nenhum (geral)</option>
+                  {tours.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                </select>
+              </div>
+            </div>
+
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Guia Responsável *</label>
