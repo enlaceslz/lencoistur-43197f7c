@@ -86,6 +86,22 @@ const AdminSGSAcoes = () => {
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
             <h3 className="font-display font-bold text-foreground">Nova Ação Corretiva</h3>
             <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Incidente Relacionado</label>
+                <select value={form.incident_id} onChange={(e) => setForm({ ...form, incident_id: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  <option value="">Nenhum</option>
+                  {incidents.map(i => <option key={i.id} value={i.id}>{i.code} — {i.desc}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Risco Relacionado</label>
+                <select value={form.risk_id} onChange={(e) => setForm({ ...form, risk_id: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  <option value="">Nenhum</option>
+                  {risks.map(r => <option key={r.id} value={r.id}>{r.code} — {r.hazard}</option>)}
+                </select>
+              </div>
               <div className="sm:col-span-2">
                 <label className="text-sm font-semibold text-foreground mb-1 block">Descrição *</label>
                 <textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2}
