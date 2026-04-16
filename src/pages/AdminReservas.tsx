@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,10 +15,12 @@ import {
   Search, ShoppingCart, CheckCircle, Clock, XCircle, Eye,
   DollarSign, Ban, Loader2, Users, Calendar, CreditCard, FileText,
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
+  Plus,
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { toast } from "sonner";
 import { PrintReceiptButton, type ReceiptData } from "@/components/BookingReceipt";
+import { supabase } from "@/integrations/supabase/client";
 
 const statusConfig: Record<string, { label: string; className: string; icon: typeof CheckCircle }> = {
   confirmada: { label: "Confirmada", className: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300", icon: CheckCircle },
@@ -43,14 +45,90 @@ const fmtDateTime = (d: string) => {
   try { return new Date(d).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }); } catch { return d; }
 };
 
+interface TourOption { id: string; name: string; price: number; }
+interface TransferOption { id: string; label: string; price: number; }
+
 const AdminReservas = () => {
-  const { bookings, loading, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
+  const { bookings, loading, addBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
   const [selected, setSelected] = useState<BookingItem | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [editNotes, setEditNotes] = useState("");
   const [showNotes, setShowNotes] = useState(false);
+
+  // New booking form state
+  const [showNewForm, setShowNewForm] = useState(false);
+  const [newLoading, setNewLoading] = useState(false);
+  const [tours, setTours] = useState<TourOption[]>([]);
+  const [transfers, setTransfers] = useState<TransferOption[]>([]);
+  const [newForm, setNewForm] = useState({
+    type: "tour" as "tour" | "transfer",
+    itemName: "",
+    date: "",
+    guests: 1,
+    payMethod: "pix" as "pix" | "card",
+    customerName: "",
+    customerEmail: "",
+    customerPhone: "",
+  });
+
+  useEffect(() => {
+    if (!showNewForm) return;
+    const loadOptions = async () => {
+      const [{ data: t }, { data: tr }] = await Promise.all([
+        supabase.from("tours").select("id, name, price").eq("active", true).order("name"),
+        supabase.from("transfer_routes").select("id, origin, destination, price").eq("active", true).order("origin"),
+      ]);
+      if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price })));
+      if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price })));
+    };
+    loadOptions();
+  }, [showNewForm]);
+
+  const resetNewForm = () => {
+    setNewForm({ type: "tour", itemName: "", date: "", guests: 1, payMethod: "pix", customerName: "", customerEmail: "", customerPhone: "" });
+  };
+
+  const handleNewBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newForm.itemName || !newForm.customerName || !newForm.customerEmail) {
+      toast.error("Preencha todos os campos obrigatórios.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newForm.customerEmail.trim())) {
+      toast.error("E-mail inválido.");
+      return;
+    }
+    if (newForm.guests < 1 || newForm.guests > 50) {
+      toast.error("Quantidade de pessoas deve ser entre 1 e 50.");
+      return;
+    }
+    setNewLoading(true);
+    try {
+      await addBooking({
+        type: newForm.type,
+        itemName: newForm.itemName,
+        date: newForm.date || "",
+        guests: newForm.guests,
+        payMethod: newForm.payMethod,
+        customerName: newForm.customerName.trim(),
+        customerEmail: newForm.customerEmail.trim().toLowerCase(),
+        customerPhone: newForm.customerPhone.trim(),
+        unitPrice: 0,
+        total: 0,
+        discount: 0,
+        finalTotal: 0,
+      });
+      toast.success("Reserva criada com sucesso!");
+      setShowNewForm(false);
+      resetNewForm();
+    } catch (err: any) {
+      toast.error(err?.message || "Erro ao criar reserva.");
+    }
+    setNewLoading(false);
+  };
 
   const filtered = bookings.filter((b) => {
     const q = search.toLowerCase();
