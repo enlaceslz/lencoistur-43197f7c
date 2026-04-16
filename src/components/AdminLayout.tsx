@@ -6,7 +6,7 @@ import {
   Home, Compass, Car, Users, UserCheck, CreditCard, Settings,
   LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot,
   Shield, AlertTriangle, Activity, ClipboardCheck, Truck, UserCheck2,
-  ChevronDown, FileText, Check, Building2, Map, ChevronRight
+  ChevronDown, FileText, Check, Building2, Map, ChevronRight, BarChart3
 } from "lucide-react";
 
 interface Notification {
