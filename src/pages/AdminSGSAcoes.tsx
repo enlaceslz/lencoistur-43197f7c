@@ -147,6 +147,13 @@ const AdminSGSAcoes = () => {
                     <p className="text-xs text-muted-foreground mt-1">
                       👤 {a.responsible} {a.due_date && `• Prazo: ${new Date(a.due_date + "T12:00").toLocaleDateString("pt-BR")}`}
                     </p>
+                    {(a.sgs_incidents?.incident_code || a.sgs_risks?.risk_code) && (
+                      <p className="text-xs text-primary mt-0.5">
+                        {a.sgs_incidents?.incident_code && `🔗 ${a.sgs_incidents.incident_code}`}
+                        {a.sgs_incidents?.incident_code && a.sgs_risks?.risk_code && " • "}
+                        {a.sgs_risks?.risk_code && `⚠️ ${a.sgs_risks.risk_code}: ${a.sgs_risks.hazard?.slice(0, 40)}`}
+                      </p>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     {a.status === "pendente" && (
