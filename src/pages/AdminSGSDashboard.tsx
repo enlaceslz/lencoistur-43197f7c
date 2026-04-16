@@ -95,7 +95,7 @@ const AdminSGSDashboard = () => {
     };
     const stageMap: Record<string, number> = {};
     risks.forEach((r: any) => { stageMap[r.stage] = (stageMap[r.stage] || 0) + 1; });
-    setRisksByStage(Array.from(stageMap.entries()).map(([stage, count]) => ({ name: stageLabels[stage] || stage, riscos: count })));
+    setRisksByStage(Object.entries(stageMap).map(([stage, count]) => ({ name: stageLabels[stage] || stage, riscos: count })));
 
     const months: Record<string, number> = {};
     const now = new Date();
