@@ -93,6 +93,8 @@ const AdminReservas = () => {
 
   const resetNewForm = () => {
     setNewForm({ type: "tour", itemName: "", date: "", guests: 1, payMethod: "pix", customerName: "", customerEmail: "", customerPhone: "" });
+    setSelectedCustomerId("");
+    setCustomerSearch("");
   };
 
   const handleNewBooking = async (e: React.FormEvent) => {
