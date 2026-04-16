@@ -1541,6 +1541,7 @@ export type Database = {
           active: boolean
           category: string | null
           created_at: string
+          default_mode: string
           departure: string | null
           description: string | null
           difficulty: string | null
@@ -1551,6 +1552,8 @@ export type Database = {
           images: string[] | null
           includes: string[] | null
           location: string | null
+          mode_collective_enabled: boolean
+          mode_private_enabled: boolean
           name: string
           operator: string | null
           pix_discount: number
@@ -1567,6 +1570,7 @@ export type Database = {
           active?: boolean
           category?: string | null
           created_at?: string
+          default_mode?: string
           departure?: string | null
           description?: string | null
           difficulty?: string | null
@@ -1577,6 +1581,8 @@ export type Database = {
           images?: string[] | null
           includes?: string[] | null
           location?: string | null
+          mode_collective_enabled?: boolean
+          mode_private_enabled?: boolean
           name: string
           operator?: string | null
           pix_discount?: number
@@ -1593,6 +1599,7 @@ export type Database = {
           active?: boolean
           category?: string | null
           created_at?: string
+          default_mode?: string
           departure?: string | null
           description?: string | null
           difficulty?: string | null
@@ -1603,6 +1610,8 @@ export type Database = {
           images?: string[] | null
           includes?: string[] | null
           location?: string | null
+          mode_collective_enabled?: boolean
+          mode_private_enabled?: boolean
           name?: string
           operator?: string | null
           pix_discount?: number

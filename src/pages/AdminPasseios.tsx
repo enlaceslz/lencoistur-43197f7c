@@ -27,6 +27,9 @@ const emptyForm = {
   tag: "", description: "", category: "Ecoturismo", difficulty: "Fácil",
   group_size: "Até 9 pessoas", departure: "Santo Amaro do Maranhão",
   operator: "Lençóis Tour", includes: "", highlights: "", active: true,
+  mode_collective_enabled: true,
+  mode_private_enabled: true,
+  default_mode: "privativo" as "privativo" | "coletivo",
 };
 
 const AdminPasseios = () => {
@@ -75,6 +78,9 @@ const AdminPasseios = () => {
       departure: t.departure || "", operator: t.operator || "Lençóis Tour",
       includes: (t.includes || []).join(", "), highlights: (t.highlights || []).join(", "),
       active: t.active,
+      mode_collective_enabled: t.mode_collective_enabled ?? true,
+      mode_private_enabled: t.mode_private_enabled ?? true,
+      default_mode: (t.default_mode === "coletivo" ? "coletivo" : "privativo") as "privativo" | "coletivo",
     });
     setImageUrls(t.images || []);
     setNewUrlInput("");
@@ -173,11 +179,26 @@ const AdminPasseios = () => {
       highlights: form.highlights.split(",").map(s => s.trim()).filter(Boolean),
       images: imageUrls,
       active: form.active,
+      mode_collective_enabled: !!form.mode_collective_enabled,
+      mode_private_enabled: !!form.mode_private_enabled,
+      default_mode: form.default_mode === "coletivo" ? "coletivo" : "privativo",
     };
 
     if (!payload.name || !payload.price) {
       toast({ title: "Preencha nome e preço", variant: "destructive" });
       return;
+    }
+
+    if (!payload.mode_collective_enabled && !payload.mode_private_enabled) {
+      toast({ title: "Habilite ao menos uma modalidade (Coletivo ou Privativo)", variant: "destructive" });
+      return;
+    }
+
+    if (payload.default_mode === "coletivo" && !payload.mode_collective_enabled) {
+      payload.default_mode = "privativo";
+    }
+    if (payload.default_mode === "privativo" && !payload.mode_private_enabled) {
+      payload.default_mode = "coletivo";
     }
 
     let error;
@@ -468,6 +489,36 @@ const AdminPasseios = () => {
                 <p className="text-xs mt-1">Use URL ou faça upload de arquivos</p>
               </div>
             )}
+          </div>
+
+          <div className="border border-border rounded-2xl p-4 bg-muted/30 space-y-3">
+            <div>
+              <h4 className="text-sm font-bold text-foreground">Modalidades de Venda</h4>
+              <p className="text-xs text-muted-foreground">Habilite/desabilite as modalidades disponíveis para o cliente. A modalidade padrão será pré-selecionada na página do passeio.</p>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <label className="flex items-center gap-2 cursor-pointer bg-card border border-border rounded-xl px-3 py-2.5">
+                <input type="checkbox" checked={form.mode_collective_enabled}
+                  onChange={e => setForm({ ...form, mode_collective_enabled: e.target.checked })}
+                  className="rounded w-5 h-5" />
+                <span className="text-sm font-medium text-foreground flex-1">Coletivo (por pessoa)</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer bg-card border border-border rounded-xl px-3 py-2.5">
+                <input type="checkbox" checked={form.mode_private_enabled}
+                  onChange={e => setForm({ ...form, mode_private_enabled: e.target.checked })}
+                  className="rounded w-5 h-5" />
+                <span className="text-sm font-medium text-foreground flex-1">Privativo (veículo/embarcação)</span>
+              </label>
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1 block">Modalidade Padrão</label>
+              <select value={form.default_mode}
+                onChange={e => setForm({ ...form, default_mode: e.target.value as "privativo" | "coletivo" })}
+                className="w-full bg-card border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                <option value="privativo" disabled={!form.mode_private_enabled}>Privativo (padrão recomendado)</option>
+                <option value="coletivo" disabled={!form.mode_collective_enabled}>Coletivo</option>
+              </select>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">

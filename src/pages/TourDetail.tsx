@@ -13,7 +13,7 @@ const TourDetail = () => {
   const [currentImg, setCurrentImg] = useState(0);
   const [guests, setGuests] = useState(2);
   const [selectedDate, setSelectedDate] = useState("");
-  const [tourMode, setTourMode] = useState<"coletivo" | "privativo">("coletivo");
+  const [tourMode, setTourMode] = useState<"coletivo" | "privativo">("privativo");
 
   useEffect(() => {
     if (!slug) return;
@@ -21,6 +21,15 @@ const TourDetail = () => {
       const { data: t } = await supabase.from("tours").select("*").eq("slug", slug).eq("active", true).single();
       setTour(t);
       if (t) {
+        // Apply admin-configured default mode, fallback respects which modes are enabled
+        const collectiveOn = t.mode_collective_enabled ?? true;
+        const privateOn = t.mode_private_enabled ?? true;
+        const adminDefault = (t.default_mode === "coletivo" || t.default_mode === "privativo") ? t.default_mode : "privativo";
+        let initial: "coletivo" | "privativo" = adminDefault;
+        if (initial === "privativo" && !privateOn) initial = "coletivo";
+        if (initial === "coletivo" && !collectiveOn) initial = "privativo";
+        setTourMode(initial);
+
         const { data: r } = await supabase.from("reviews").select("*").eq("tour_id", t.id).order("created_at", { ascending: false });
         setTourReviews(r || []);
       }
@@ -54,6 +63,9 @@ const TourDetail = () => {
   const isBoatTour = tour.slug === "passeio-de-barco" || /barco/i.test(tour.name || "") || /barco/i.test(tour.category || "");
   const vehicleCapacity = isBoatTour ? 12 : (tour.vehicle_capacity || 9);
   const vehicleLabel = isBoatTour ? "embarcação" : "veículo";
+  const collectiveOn = tour.mode_collective_enabled ?? true;
+  const privateOn = tour.mode_private_enabled ?? true;
+  const showModeToggle = collectiveOn && privateOn;
   const isPrivate = tourMode === "privativo";
   const totalPrice = isPrivate ? (tour.private_price || 1300) : tour.price * guests;
   const maxGuests = vehicleCapacity;
@@ -205,42 +217,56 @@ const TourDetail = () => {
           <div className="lg:col-span-1">
             <div className="sticky top-24 bg-card border border-border rounded-2xl p-6 shadow-lg space-y-6">
               {/* Tour Mode Toggle */}
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-2 block">Modalidade</label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => setTourMode("coletivo")}
-                    className={`px-4 py-3 rounded-xl text-sm font-semibold border-2 transition-all ${
-                      tourMode === "coletivo"
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border bg-muted text-muted-foreground hover:border-primary/40"
-                    }`}
-                  >
-                    <div className="flex flex-col items-center gap-1">
-                      <Users size={18} />
-                      <span>Coletivo</span>
-                    </div>
-                  </button>
-                  <button
-                    onClick={() => setTourMode("privativo")}
-                    className={`px-4 py-3 rounded-xl text-sm font-semibold border-2 transition-all ${
-                      tourMode === "privativo"
-                        ? "border-secondary bg-secondary/10 text-secondary"
-                        : "border-border bg-muted text-muted-foreground hover:border-secondary/40"
-                    }`}
-                  >
-                    <div className="flex flex-col items-center gap-1">
-                      <Shield size={18} />
-                      <span>Privativo</span>
-                    </div>
-                  </button>
+              {showModeToggle ? (
+                <div>
+                  <label className="text-sm font-semibold text-foreground mb-2 block">Modalidade</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => setTourMode("coletivo")}
+                      className={`px-4 py-3 rounded-xl text-sm font-semibold border-2 transition-all ${
+                        tourMode === "coletivo"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border bg-muted text-muted-foreground hover:border-primary/40"
+                      }`}
+                    >
+                      <div className="flex flex-col items-center gap-1">
+                        <Users size={18} />
+                        <span>Coletivo</span>
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => setTourMode("privativo")}
+                      className={`px-4 py-3 rounded-xl text-sm font-semibold border-2 transition-all ${
+                        tourMode === "privativo"
+                          ? "border-secondary bg-secondary/10 text-secondary"
+                          : "border-border bg-muted text-muted-foreground hover:border-secondary/40"
+                      }`}
+                    >
+                      <div className="flex flex-col items-center gap-1">
+                        <Shield size={18} />
+                        <span>Privativo</span>
+                      </div>
+                    </button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {isPrivate
+                      ? `${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} exclusiva para até ${vehicleCapacity} pessoas`
+                      : `Valor por pessoa · ${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} compartilhada (até ${vehicleCapacity} pessoas)`}
+                  </p>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {isPrivate
-                    ? `${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} exclusiva para até ${vehicleCapacity} pessoas`
-                    : `Valor por pessoa · ${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} compartilhada (até ${vehicleCapacity} pessoas)`}
-                </p>
-              </div>
+              ) : (
+                <div className="bg-muted/50 border border-border rounded-xl px-4 py-3">
+                  <div className="flex items-center gap-2 text-foreground font-semibold text-sm">
+                    {isPrivate ? <Shield size={16} className="text-secondary" /> : <Users size={16} className="text-primary" />}
+                    Modalidade {isPrivate ? "Privativa" : "Coletiva"}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {isPrivate
+                      ? `${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} exclusiva para até ${vehicleCapacity} pessoas`
+                      : `Valor por pessoa · ${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} compartilhada (até ${vehicleCapacity} pessoas)`}
+                  </p>
+                </div>
+              )}
 
               <div>
                 {isPrivate ? (
