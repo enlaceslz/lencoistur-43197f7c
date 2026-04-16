@@ -27,6 +27,9 @@ const emptyForm = {
   tag: "", description: "", category: "Ecoturismo", difficulty: "Fácil",
   group_size: "Até 9 pessoas", departure: "Santo Amaro do Maranhão",
   operator: "Lençóis Tour", includes: "", highlights: "", active: true,
+  mode_collective_enabled: true,
+  mode_private_enabled: true,
+  default_mode: "privativo" as "privativo" | "coletivo",
 };
 
 const AdminPasseios = () => {
@@ -75,6 +78,9 @@ const AdminPasseios = () => {
       departure: t.departure || "", operator: t.operator || "Lençóis Tour",
       includes: (t.includes || []).join(", "), highlights: (t.highlights || []).join(", "),
       active: t.active,
+      mode_collective_enabled: t.mode_collective_enabled ?? true,
+      mode_private_enabled: t.mode_private_enabled ?? true,
+      default_mode: (t.default_mode === "coletivo" ? "coletivo" : "privativo") as "privativo" | "coletivo",
     });
     setImageUrls(t.images || []);
     setNewUrlInput("");
@@ -173,11 +179,26 @@ const AdminPasseios = () => {
       highlights: form.highlights.split(",").map(s => s.trim()).filter(Boolean),
       images: imageUrls,
       active: form.active,
+      mode_collective_enabled: !!form.mode_collective_enabled,
+      mode_private_enabled: !!form.mode_private_enabled,
+      default_mode: form.default_mode === "coletivo" ? "coletivo" : "privativo",
     };
 
     if (!payload.name || !payload.price) {
       toast({ title: "Preencha nome e preço", variant: "destructive" });
       return;
+    }
+
+    if (!payload.mode_collective_enabled && !payload.mode_private_enabled) {
+      toast({ title: "Habilite ao menos uma modalidade (Coletivo ou Privativo)", variant: "destructive" });
+      return;
+    }
+
+    if (payload.default_mode === "coletivo" && !payload.mode_collective_enabled) {
+      payload.default_mode = "privativo";
+    }
+    if (payload.default_mode === "privativo" && !payload.mode_private_enabled) {
+      payload.default_mode = "coletivo";
     }
 
     let error;
