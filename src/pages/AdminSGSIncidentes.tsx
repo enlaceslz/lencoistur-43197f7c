@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, AlertCircle, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, AlertCircle, Pencil, Trash2, MapPin } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const SEVERITY: Record<string, { label: string; color: string }> = {
@@ -11,7 +11,6 @@ const SEVERITY: Record<string, { label: string; color: string }> = {
   critica: { label: "Crítica", color: "bg-destructive text-destructive-foreground" },
 };
 
-// Tipos conforme P5 VATTI
 const TYPE_LABELS: Record<string, string> = {
   sem_ocorrencia: "Sem Ocorrência",
   incidente: "Incidente",
@@ -29,8 +28,10 @@ const STATUS_COLORS: Record<string, string> = {
 
 const emptyForm = {
   type: "incidente", location: "", guide_name: "", description: "", severity: "media",
-  people_involved: "", action_taken: "",
+  people_involved: "", action_taken: "", tour_id: "" as string,
 };
+
+interface TourOpt { id: string; name: string; }
 
 const AdminSGSIncidentes = () => {
   const [incidents, setIncidents] = useState<any[]>([]);
@@ -40,12 +41,19 @@ const AdminSGSIncidentes = () => {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [form, setForm] = useState(emptyForm);
+  const [tours, setTours] = useState<TourOpt[]>([]);
 
   useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (!showForm) return;
+    supabase.from("tours").select("id, name").eq("active", true).order("name").then(({ data }) => {
+      if (data) setTours(data);
+    });
+  }, [showForm]);
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("sgs_incidents").select("*").order("date", { ascending: false });
+    const { data } = await supabase.from("sgs_incidents").select("*, tours(name)").order("date", { ascending: false });
     setIncidents(data || []);
     setLoading(false);
   };
