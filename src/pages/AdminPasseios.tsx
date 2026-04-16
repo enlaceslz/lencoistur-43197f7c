@@ -491,6 +491,36 @@ const AdminPasseios = () => {
             )}
           </div>
 
+          <div className="border border-border rounded-2xl p-4 bg-muted/30 space-y-3">
+            <div>
+              <h4 className="text-sm font-bold text-foreground">Modalidades de Venda</h4>
+              <p className="text-xs text-muted-foreground">Habilite/desabilite as modalidades disponíveis para o cliente. A modalidade padrão será pré-selecionada na página do passeio.</p>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <label className="flex items-center gap-2 cursor-pointer bg-card border border-border rounded-xl px-3 py-2.5">
+                <input type="checkbox" checked={form.mode_collective_enabled}
+                  onChange={e => setForm({ ...form, mode_collective_enabled: e.target.checked })}
+                  className="rounded w-5 h-5" />
+                <span className="text-sm font-medium text-foreground flex-1">Coletivo (por pessoa)</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer bg-card border border-border rounded-xl px-3 py-2.5">
+                <input type="checkbox" checked={form.mode_private_enabled}
+                  onChange={e => setForm({ ...form, mode_private_enabled: e.target.checked })}
+                  className="rounded w-5 h-5" />
+                <span className="text-sm font-medium text-foreground flex-1">Privativo (veículo/embarcação)</span>
+              </label>
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1 block">Modalidade Padrão</label>
+              <select value={form.default_mode}
+                onChange={e => setForm({ ...form, default_mode: e.target.value as "privativo" | "coletivo" })}
+                className="w-full bg-card border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                <option value="privativo" disabled={!form.mode_private_enabled}>Privativo (padrão recomendado)</option>
+                <option value="coletivo" disabled={!form.mode_collective_enabled}>Coletivo</option>
+              </select>
+            </div>
+          </div>
+
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} className="rounded w-5 h-5" />
