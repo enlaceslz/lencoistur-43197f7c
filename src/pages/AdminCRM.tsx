@@ -164,7 +164,7 @@ const AdminCRM = () => {
   const [savingDependent, setSavingDependent] = useState(false);
   const [deleteDepConfirm, setDeleteDepConfirm] = useState<string | null>(null);
 
-  const relationships = ["Esposa", "Namorado", "Filho(a)", "Amigo(a)", "Tutor"];
+  const relationships = ["Cônjuge", "Namorado(a)", "Filho(a)", "Amigo(a)", "Tutor"];
 
   useEffect(() => {
     fetchCustomers();
