@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import { Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, Pencil, Trash2, X, Save } from "lucide-react";
+import { Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, Pencil, Trash2, X, Save, UserPlus, Baby } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +23,16 @@ interface Customer {
   totalBookings: number;
   totalSpent: number;
   lastBooking: string | null;
+}
+
+interface Dependent {
+  id: string;
+  customer_id: string;
+  name: string;
+  cpf: string | null;
+  birth_date: string | null;
+  relationship: string;
+  created_at: string;
 }
 
 interface BookingRow {
@@ -48,6 +58,13 @@ interface CustomerForm {
   status: string;
 }
 
+interface DependentForm {
+  name: string;
+  cpf: string;
+  birth_date: string;
+  relationship: string;
+}
+
 const emptyForm: CustomerForm = { 
   name: "", 
   email: "", 
@@ -56,6 +73,13 @@ const emptyForm: CustomerForm = {
   birth_date: "", 
   notes: "", 
   status: "regular" 
+};
+
+const emptyDependentForm: DependentForm = {
+  name: "",
+  cpf: "",
+  birth_date: "",
+  relationship: "Filho(a)"
 };
 
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
