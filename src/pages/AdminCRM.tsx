@@ -310,6 +310,76 @@ const AdminCRM = () => {
     fetchCustomers();
   };
 
+  const openCreateDependentModal = () => {
+    setEditingDependent(null);
+    setDepForm(emptyDependentForm);
+    setDependentModalOpen(true);
+  };
+
+  const openEditDependentModal = (d: Dependent) => {
+    setEditingDependent(d);
+    setDepForm({
+      name: d.name,
+      cpf: d.cpf || "",
+      birth_date: d.birth_date || "",
+      relationship: d.relationship
+    });
+    setDependentModalOpen(true);
+  };
+
+  const handleSaveDependent = async () => {
+    if (!selectedCustomer) return;
+    if (!depForm.name.trim()) {
+      toast.error("Nome é obrigatório.");
+      return;
+    }
+
+    setSavingDependent(true);
+    const payload = {
+      customer_id: selectedCustomer.id,
+      name: depForm.name.trim(),
+      cpf: depForm.cpf.replace(/\D/g, "") || null,
+      birth_date: depForm.birth_date || null,
+      relationship: depForm.relationship
+    };
+
+    if (editingDependent) {
+      const { error } = await supabase
+        .from("dependents")
+        .update(payload)
+        .eq("id", editingDependent.id);
+      if (error) {
+        toast.error("Erro ao atualizar dependente.");
+        setSavingDependent(false);
+        return;
+      }
+      toast.success("Dependente atualizado!");
+    } else {
+      const { error } = await supabase.from("dependents").insert(payload);
+      if (error) {
+        toast.error("Erro ao cadastrar dependente.");
+        setSavingDependent(false);
+        return;
+      }
+      toast.success("Dependente cadastrado!");
+    }
+
+    setSavingDependent(false);
+    setDependentModalOpen(false);
+    fetchDependents(selectedCustomer.id);
+  };
+
+  const handleDeleteDependent = async (id: string) => {
+    const { error } = await supabase.from("dependents").delete().eq("id", id);
+    if (error) {
+      toast.error("Erro ao excluir dependente.");
+      return;
+    }
+    toast.success("Dependente excluído!");
+    setDeleteDepConfirm(null);
+    if (selectedCustomer) fetchDependents(selectedCustomer.id);
+  };
+
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from("customers").delete().eq("id", id);
     if (error) {
