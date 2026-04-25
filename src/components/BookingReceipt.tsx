@@ -94,9 +94,9 @@ function generateReceiptHTML(data: ReceiptData, company?: any): string {
 <body>
   <div class="header">
     <div class="brand">
-      <h1>🏖️ LENÇÓIS TOUR</h1>
-      <p>Turismo de Aventura — Santo Amaro do Maranhão, MA</p>
-      <p>CNPJ: 00.000.000/0001-00 | CADASTUR: 00.000.000/0001-00</p>
+      <h1>🏖️ ${brandName}</h1>
+      <p>Turismo de Aventura — ${address}</p>
+      <p>CNPJ: ${cnpj} | CADASTUR: ${cadastur}</p>
     </div>
     <div class="receipt-info">
       <div class="code">${data.bookingCode}</div>
