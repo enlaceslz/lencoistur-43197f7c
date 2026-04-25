@@ -614,6 +614,9 @@ const AdminPasseios = () => {
                     <button onClick={() => setDetailTour(t)} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-primary transition-colors" title="Ver detalhes">
                       <Eye size={16} />
                     </button>
+                    <button onClick={() => handleDuplicate(t)} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-blue-500 transition-colors" title="Duplicar">
+                      <Copy size={16} />
+                    </button>
                     <button onClick={() => openEdit(t)} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
                       <Pencil size={16} />
                     </button>
