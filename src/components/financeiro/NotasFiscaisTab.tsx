@@ -293,6 +293,12 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        {b.voucher_url && (
+                          <DropdownMenuItem onClick={() => updateBooking(b.id, { voucher_url: null } as any)}>
+                            <Paperclip size={14} className="mr-2" />
+                            Remover Comprovante
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem onClick={() => handleMarkInvoiceIssued(b.id, !!b.invoice_issued)}>
                           <FileText size={14} className="mr-2" />
                           {b.invoice_issued ? "Remover NF-e" : "Marcar NF-e Emitida"}
