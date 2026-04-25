@@ -197,30 +197,39 @@ export type Database = {
       }
       customers: {
         Row: {
+          birth_date: string | null
           cpf: string | null
           created_at: string
           email: string
           id: string
           name: string
+          notes: string | null
           phone: string | null
+          status: string | null
           updated_at: string
         }
         Insert: {
+          birth_date?: string | null
           cpf?: string | null
           created_at?: string
           email: string
           id?: string
           name: string
+          notes?: string | null
           phone?: string | null
+          status?: string | null
           updated_at?: string
         }
         Update: {
+          birth_date?: string | null
           cpf?: string | null
           created_at?: string
           email?: string
           id?: string
           name?: string
+          notes?: string | null
           phone?: string | null
+          status?: string | null
           updated_at?: string
         }
         Relationships: []
