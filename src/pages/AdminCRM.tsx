@@ -219,14 +219,28 @@ const AdminCRM = () => {
     setLoading(false);
   };
 
+  const fetchDependents = async (customerId: string) => {
+    const { data } = await supabase
+      .from("dependents")
+      .select("*")
+      .eq("customer_id", customerId)
+      .order("created_at", { ascending: false });
+    setDependents(data || []);
+  };
+
   const selectCustomer = async (c: Customer) => {
     setSelectedCustomer(c);
-    const { data } = await supabase
+    
+    // Fetch bookings
+    const { data: bookings } = await supabase
       .from("bookings")
       .select("id, booking_code, item_name, date, guests, final_total, status, payment_status, created_at, type")
       .eq("customer_id", c.id)
       .order("created_at", { ascending: false });
-    setCustomerBookings(data || []);
+    setCustomerBookings(bookings || []);
+
+    // Fetch dependents
+    fetchDependents(c.id);
   };
 
   const openCreateModal = () => {
