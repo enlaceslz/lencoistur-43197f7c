@@ -298,7 +298,23 @@ const AdminReservas = () => {
                   const pc = paymentConfig[b.paymentStatus] || paymentConfig.pendente;
                   return (
                     <TableRow key={b.id} className="cursor-pointer hover:bg-muted/50" onClick={() => { setSelected(b); setEditNotes(b.notes || ""); setShowNotes(false); }}>
-                      <TableCell className="font-mono text-sm text-foreground">{b.bookingCode}</TableCell>
+                      <TableCell className="font-mono text-sm text-foreground">
+                        <div className="flex items-center gap-1">
+                          {b.bookingCode}
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6" 
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              navigator.clipboard.writeText(b.bookingCode);
+                              toast.success("Código copiado!");
+                            }}
+                          >
+                            <Copy size={12} />
+                          </Button>
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <div>
                           <p className="font-medium text-foreground">{b.customerName}</p>
