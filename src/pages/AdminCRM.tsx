@@ -232,6 +232,7 @@ const AdminCRM = () => {
       })));
     }
     setLoading(false);
+    fetchAllDependents();
   };
 
   const fetchDependents = async (customerId: string) => {
