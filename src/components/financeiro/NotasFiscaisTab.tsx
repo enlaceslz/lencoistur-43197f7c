@@ -176,14 +176,14 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
                 </TableCell>
                 <TableCell>{fmt(b.final_total)}</TableCell>
                 <TableCell>
-                  <Badge variant={b.payment_status === "pago" ? "success" : "secondary"}>
+                  <Badge variant={b.payment_status === "pago" ? "default" : "secondary"} className={b.payment_status === "pago" ? "bg-green-600 hover:bg-green-700" : ""}>
                     {b.payment_status === "pago" ? "Pago" : "Pendente"}
                   </Badge>
                 </TableCell>
                 <TableCell>
                   {b.invoice_issued ? (
                     <div className="flex flex-col gap-1">
-                      <Badge className="bg-green-100 text-green-800 border-green-200">Emitida</Badge>
+                      <Badge variant="outline" className="border-green-200 text-green-700 bg-green-50">Emitida</Badge>
                       {b.invoice_number && <span className="text-xs font-mono">#{b.invoice_number}</span>}
                     </div>
                   ) : (
@@ -192,7 +192,7 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
                 </TableCell>
                 <TableCell>
                   {b.receipt_issued ? (
-                    <Badge className="bg-blue-100 text-blue-800 border-blue-200">Enviado</Badge>
+                    <Badge variant="outline" className="border-blue-200 text-blue-700 bg-blue-50">Enviado</Badge>
                   ) : (
                     <Badge variant="outline" className="text-muted-foreground">Não enviado</Badge>
                   )}
