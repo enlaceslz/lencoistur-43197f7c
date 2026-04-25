@@ -513,9 +513,10 @@ const AdminCRM = () => {
             {/* Filter tabs */}
             <div className="flex gap-2 mb-4">
               {([
-                { key: "all" as const, label: "Todos", count: customers.length },
+                { key: "all" as const, label: "Titulares", count: customers.length },
                 { key: "with_bookings" as const, label: "Com Reservas", count: withBookings },
                 { key: "no_bookings" as const, label: "Sem Reservas", count: customers.length - withBookings },
+                { key: "dependents" as const, label: "Dependentes", count: allDependents.length },
               ]).map((f) => (
                 <button
                   key={f.key}
