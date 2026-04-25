@@ -1,0 +1,255 @@
+import { useState, useMemo } from "react";
+import { 
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  Search, Receipt, FileText, CheckCircle2, Clock, 
+  ExternalLink, Printer, MoreHorizontal, Download
+} from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { 
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { PrintReceiptButton } from "@/components/BookingReceipt";
+
+interface BookingRow {
+  id: string;
+  booking_code: string;
+  item_name: string;
+  final_total: number;
+  payment_status: string;
+  status: string;
+  created_at: string;
+  invoice_number?: string | null;
+  invoice_issued?: boolean;
+  receipt_issued?: boolean;
+  invoice_url?: string | null;
+  customers: { name: string; email: string; phone?: string } | null;
+  type: string;
+  date: string | null;
+  guests: number;
+  unit_price: number;
+  total: number;
+  discount: number;
+  pay_method: string;
+  pix_code?: string | null;
+  notes?: string | null;
+}
+
+interface NotasFiscaisTabProps {
+  bookings: any[];
+}
+
+const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+const fmtDate = (d: string) => {
+  if (!d) return "—";
+  try { return new Date(d).toLocaleDateString("pt-BR"); } catch { return d; }
+};
+
+export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFiscaisTabProps) {
+  const [search, setSearch] = useState("");
+  const [bookings, setBookings] = useState<BookingRow[]>(initialBookings);
+
+  const filtered = useMemo(() => {
+    return bookings.filter(b => 
+      b.booking_code.toLowerCase().includes(search.toLowerCase()) ||
+      b.customers?.name?.toLowerCase().includes(search.toLowerCase()) ||
+      b.invoice_number?.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [bookings, search]);
+
+  const stats = useMemo(() => {
+    const total = bookings.length;
+    const withInvoice = bookings.filter(b => b.invoice_issued).length;
+    const pendingInvoice = bookings.filter(b => !b.invoice_issued && b.payment_status === "pago").length;
+    return { total, withInvoice, pendingInvoice };
+  }, [bookings]);
+
+  const updateBooking = async (id: string, updates: Partial<BookingRow>) => {
+    const { error } = await supabase
+      .from("bookings")
+      .update(updates)
+      .eq("id", id);
+
+    if (error) {
+      toast.error("Erro ao atualizar reserva");
+      return;
+    }
+
+    setBookings(prev => prev.map(b => b.id === id ? { ...b, ...updates } : b));
+    toast.success("Reserva atualizada");
+  };
+
+  const handleMarkInvoiceIssued = (id: string, current: boolean) => {
+    const number = current ? null : prompt("Informe o número da Nota Fiscal (opcional):");
+    updateBooking(id, { 
+      invoice_issued: !current, 
+      invoice_number: number || null,
+      invoice_issued_at: !current ? new Date().toISOString() : null 
+    } as any);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <FileText size={16} /> Total de Reservas
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{stats.total}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2 text-green-600">
+              <CheckCircle2 size={16} /> Notas Emitidas
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{stats.withInvoice}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2 text-yellow-600">
+              <Clock size={16} /> Pendentes (Pagas)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{stats.pendingInvoice}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+          <Input 
+            placeholder="Buscar por código, cliente ou nota..." 
+            className="pl-10"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Reserva</TableHead>
+              <TableHead>Cliente</TableHead>
+              <TableHead>Valor</TableHead>
+              <TableHead>Status Pgto</TableHead>
+              <TableHead>NF-e</TableHead>
+              <TableHead>Recibo</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filtered.map((b) => (
+              <TableRow key={b.id}>
+                <TableCell className="font-medium">
+                  <div className="flex flex-col">
+                    <span>{b.booking_code}</span>
+                    <span className="text-xs text-muted-foreground">{fmtDate(b.created_at)}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-col">
+                    <span>{b.customers?.name || "N/A"}</span>
+                    <span className="text-xs text-muted-foreground">{b.customers?.email || ""}</span>
+                  </div>
+                </TableCell>
+                <TableCell>{fmt(b.final_total)}</TableCell>
+                <TableCell>
+                  <Badge variant={b.payment_status === "pago" ? "success" : "secondary"}>
+                    {b.payment_status === "pago" ? "Pago" : "Pendente"}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {b.invoice_issued ? (
+                    <div className="flex flex-col gap-1">
+                      <Badge className="bg-green-100 text-green-800 border-green-200">Emitida</Badge>
+                      {b.invoice_number && <span className="text-xs font-mono">#{b.invoice_number}</span>}
+                    </div>
+                  ) : (
+                    <Badge variant="outline" className="text-muted-foreground">Pendente</Badge>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {b.receipt_issued ? (
+                    <Badge className="bg-blue-100 text-blue-800 border-blue-200">Enviado</Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-muted-foreground">Não enviado</Badge>
+                  )}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <PrintReceiptButton 
+                      data={{
+                        bookingCode: b.booking_code,
+                        customerName: b.customers?.name || "",
+                        customerEmail: b.customers?.email || "",
+                        customerPhone: b.customers?.phone,
+                        itemName: b.item_name,
+                        type: b.type,
+                        date: b.date || "",
+                        guests: b.guests,
+                        unitPrice: b.unit_price,
+                        total: b.total,
+                        discount: b.discount,
+                        finalTotal: b.final_total,
+                        payMethod: b.pay_method,
+                        paymentStatus: b.payment_status,
+                        status: b.status,
+                        pixCode: b.pix_code,
+                        createdAt: b.created_at,
+                        notes: b.notes
+                      }}
+                      variant="ghost"
+                      size="icon"
+                    />
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal size={16} />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleMarkInvoiceIssued(b.id, !!b.invoice_issued)}>
+                          <FileText size={14} className="mr-2" />
+                          {b.invoice_issued ? "Remover NF-e" : "Marcar NF-e Emitida"}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => updateBooking(b.id, { receipt_issued: !b.receipt_issued })}>
+                          <Receipt size={14} className="mr-2" />
+                          {b.receipt_issued ? "Marcar Recibo Pendente" : "Marcar Recibo Enviado"}
+                        </DropdownMenuItem>
+                        {b.invoice_url && (
+                          <DropdownMenuItem onClick={() => window.open(b.invoice_url!, "_blank")}>
+                            <ExternalLink size={14} className="mr-2" />
+                            Ver Nota Fiscal
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
+    </div>
+  );
+}
