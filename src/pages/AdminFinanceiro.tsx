@@ -169,7 +169,7 @@ const AdminFinanceiro = () => {
           ))}
         </div>
 
-        {tab === "fluxo" && <FluxoCaixaTab bookings={bookings} />}
+        {tab === "fluxo" && <FluxoCaixaTab bookings={bookings} contasPagar={contasPagar} />}
         {tab === "pagar" && <ContasPagarTab />}
         {tab === "receber" && <ContasReceberTab />}
         {tab === "dre" && <DRETab bookings={bookings} />}
