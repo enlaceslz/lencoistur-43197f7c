@@ -164,8 +164,8 @@ function generateReceiptHTML(data: ReceiptData, company?: any): string {
 </html>`;
 }
 
-export function printReceipt(data: ReceiptData) {
-  const html = generateReceiptHTML(data);
+export function printReceipt(data: ReceiptData, company?: any) {
+  const html = generateReceiptHTML(data, company);
   const printWindow = window.open("", "_blank", "width=800,height=900");
   if (!printWindow) return;
   printWindow.document.write(html);
@@ -175,9 +175,9 @@ export function printReceipt(data: ReceiptData) {
   };
 }
 
-export function downloadReceiptPDF(data: ReceiptData) {
+export function downloadReceiptPDF(data: ReceiptData, company?: any) {
   // Uses print-to-PDF via browser dialog
-  printReceipt(data);
+  printReceipt(data, company);
 }
 
 interface PrintReceiptButtonProps {
