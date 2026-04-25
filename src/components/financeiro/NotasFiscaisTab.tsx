@@ -335,18 +335,19 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
                         )}
                         <DropdownMenuItem onClick={() => handleMarkInvoiceIssued(b.id, !!b.invoice_issued)}>
                           <FileText size={14} className="mr-2" />
-                          {b.invoice_issued ? "Remover NF-e" : "Marcar NF-e Emitida"}
+                          {b.invoice_issued ? "Remover Marcação de NF-e" : "Marcar NF-e Emitida"}
                         </DropdownMenuItem>
+                        {b.invoice_url && (
+                          <DropdownMenuItem onClick={() => updateBooking(b.id, { invoice_url: null } as any)}>
+                            <ExternalLink size={14} className="mr-2" />
+                            Remover Arquivo da NF-e
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem onClick={() => updateBooking(b.id, { receipt_issued: !b.receipt_issued })}>
                           <Receipt size={14} className="mr-2" />
                           {b.receipt_issued ? "Marcar Recibo Pendente" : "Marcar Recibo Enviado"}
                         </DropdownMenuItem>
-                        {b.invoice_url && (
-                          <DropdownMenuItem onClick={() => window.open(b.invoice_url!, "_blank")}>
-                            <ExternalLink size={14} className="mr-2" />
-                            Ver Nota Fiscal
-                          </DropdownMenuItem>
-                        )}
+
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
