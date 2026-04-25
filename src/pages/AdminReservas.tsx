@@ -35,7 +35,7 @@ const paymentConfig: Record<string, { label: string; className: string }> = {
   reembolsado: { label: "Reembolsado", className: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300" },
 };
 
-const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const fmtDate = (d: string) => {
   if (!d) return "—";
   try { return new Date(d + "T12:00").toLocaleDateString("pt-BR"); } catch { return d; }
