@@ -9,7 +9,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Search, Plus, Pencil, Trash2, Eye, EyeOff, Compass, Users, Clock, Star, X, Upload, Link as LinkIcon, Image as ImageIcon, GripVertical, Percent, MapPin, CheckCircle, Sparkles, Copy,
+  Search, Plus, Pencil, Trash2, Eye, EyeOff, Compass, Users, Clock, Star, X, Upload, Link as LinkIcon, Image as ImageIcon, GripVertical, Percent, MapPin, CheckCircle, Sparkles, Copy, Shield,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -189,8 +189,18 @@ const AdminPasseios = () => {
       payload.reviews_count = Math.floor(Math.random() * 20) + 5;
     }
 
-    if (!payload.name || !payload.price) {
-      toast({ title: "Preencha nome e preço", variant: "destructive" });
+    if (!payload.name) {
+      toast({ title: "Preencha o nome do passeio", variant: "destructive" });
+      return;
+    }
+
+    if (payload.mode_collective_enabled && !payload.price) {
+      toast({ title: "Preencha o preço coletivo", variant: "destructive" });
+      return;
+    }
+
+    if (payload.mode_private_enabled && !payload.private_price) {
+      toast({ title: "Preencha o preço privativo", variant: "destructive" });
       return;
     }
 
@@ -325,14 +335,16 @@ const AdminPasseios = () => {
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={200} />
               </div>
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Preço Coletivo (R$/pessoa) *</label>
-                <input required type="number" min={0} max={99999} value={form.price} onChange={e => setForm({ ...form, price: Number(e.target.value) })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" />
+                <label className="text-sm font-semibold text-foreground mb-1 block">Preço Coletivo (R$/pessoa)</label>
+                <input type="number" min={0} max={99999} value={form.price} onChange={e => setForm({ ...form, price: Number(e.target.value) })}
+                  disabled={!form.mode_collective_enabled}
+                  className={`w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 ${!form.mode_collective_enabled ? "opacity-50 grayscale" : ""}`} />
               </div>
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Preço Privativo (R$/veículo) *</label>
-                <input required type="number" min={0} max={99999} value={form.private_price} onChange={e => setForm({ ...form, private_price: Number(e.target.value) })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" />
+                <label className="text-sm font-semibold text-foreground mb-1 block">Preço Privativo (R$/veículo)</label>
+                <input type="number" min={0} max={99999} value={form.private_price} onChange={e => setForm({ ...form, private_price: Number(e.target.value) })}
+                  disabled={!form.mode_private_enabled}
+                  className={`w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 ${!form.mode_private_enabled ? "opacity-50 grayscale" : ""}`} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Lotação do Veículo</label>
@@ -542,7 +554,7 @@ const AdminPasseios = () => {
               <TableHead>Passeio</TableHead>
               <TableHead>Categoria</TableHead>
               <TableHead>Duração</TableHead>
-              <TableHead>Preço</TableHead>
+              <TableHead>Preços / Modalidades</TableHead>
               <TableHead>Desc. PIX</TableHead>
               <TableHead>Avaliação</TableHead>
               <TableHead>Status</TableHead>
@@ -573,7 +585,22 @@ const AdminPasseios = () => {
                 <TableCell className="text-muted-foreground">
                   <span className="flex items-center gap-1"><Clock size={13} /> {t.duration}</span>
                 </TableCell>
-                <TableCell className="font-medium text-foreground">{fmt(t.price)}</TableCell>
+                <TableCell>
+                  <div className="flex flex-col gap-1">
+                    {t.mode_collective_enabled && (
+                      <div className="flex items-center gap-1.5" title="Coletivo">
+                        <Users size={12} className="text-primary" />
+                        <span className="text-sm font-medium">{fmt(t.price)}</span>
+                      </div>
+                    )}
+                    {t.mode_private_enabled && (
+                      <div className="flex items-center gap-1.5" title="Privativo">
+                        <Shield size={12} className="text-secondary" />
+                        <span className="text-sm font-medium text-secondary">{fmt(t.private_price || 1300)}</span>
+                      </div>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>
                   {t.pix_discount > 0 ? (
                     <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
