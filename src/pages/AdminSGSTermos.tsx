@@ -123,9 +123,9 @@ const AdminSGSTermos = () => {
                 <Shield size={20} className="text-primary" />
                 <h3 className="font-display font-bold text-foreground">Termo de Conhecimento de Risco e Corresponsabilidade</h3>
               </div>
-              <p className="text-xs text-muted-foreground">LENÇÓIS TOUR — CNPJ: 11.622.667/0001-42</p>
-              <p className="text-xs text-muted-foreground">Pça Nsa Sra Conceição, s/n, Centro, Santo Amaro-MA • Tel: (98) 98588-0954</p>
-              <p className="text-xs text-muted-foreground mt-1">Operadora de Turismo Fora de Estrada — Rota das Emoções, Lençóis Maranhenses</p>
+              <p className="text-xs text-muted-foreground">{company?.nome_fantasia || company?.razao_social || "LENÇÓIS TOUR"} — CNPJ: {company?.cnpj || "11.622.667/0001-42"}</p>
+              <p className="text-xs text-muted-foreground">{company?.endereco || "Pça Nsa Sra Conceição, s/n, Centro, Santo Amaro-MA"} • Tel: {company?.telefone || "(98) 98588-0954"}</p>
+              <p className="text-xs text-muted-foreground mt-1">Operadora de Turismo Fora de Estrada — {company?.uc_nome || "Rota das Emoções, Lençóis Maranhenses"}</p>
               <p className="text-xs text-muted-foreground">Conforme ABNT NBR ISO 21103 — Informações aos Participantes</p>
             </div>
 
