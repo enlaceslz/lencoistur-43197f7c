@@ -191,7 +191,18 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
             {filtered.map((b) => (
               <TableRow key={b.id}>
                 <TableCell className="font-medium">
-...
+                  <div className="flex flex-col">
+                    <span>{b.booking_code}</span>
+                    <span className="text-xs text-muted-foreground">{fmtDate(b.created_at)}</span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-col">
+                    <span>{b.customers?.name || "N/A"}</span>
+                    <span className="text-xs text-muted-foreground">{b.customers?.email || ""}</span>
+                  </div>
+                </TableCell>
+                <TableCell>{fmt(b.final_total)}</TableCell>
                 <TableCell>
                   <Badge variant={b.payment_status === "pago" ? "default" : "secondary"} className={b.payment_status === "pago" ? "bg-green-600 hover:bg-green-700" : ""}>
                     {b.payment_status === "pago" ? "Pago" : "Pendente"}
