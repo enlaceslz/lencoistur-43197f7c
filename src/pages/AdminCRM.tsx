@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import { Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, Pencil, Trash2, X, Save } from "lucide-react";
+import { Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, Pencil, Trash2, X, Save, UserPlus, Baby } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +23,16 @@ interface Customer {
   totalBookings: number;
   totalSpent: number;
   lastBooking: string | null;
+}
+
+interface Dependent {
+  id: string;
+  customer_id: string;
+  name: string;
+  cpf: string | null;
+  birth_date: string | null;
+  relationship: string;
+  created_at: string;
 }
 
 interface BookingRow {
@@ -48,6 +58,13 @@ interface CustomerForm {
   status: string;
 }
 
+interface DependentForm {
+  name: string;
+  cpf: string;
+  birth_date: string;
+  relationship: string;
+}
+
 const emptyForm: CustomerForm = { 
   name: "", 
   email: "", 
@@ -56,6 +73,13 @@ const emptyForm: CustomerForm = {
   birth_date: "", 
   notes: "", 
   status: "regular" 
+};
+
+const emptyDependentForm: DependentForm = {
+  name: "",
+  cpf: "",
+  birth_date: "",
+  relationship: "Filho(a)"
 };
 
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
@@ -104,13 +128,27 @@ const validateForm = (form: CustomerForm): string | null => {
   return null;
 };
 
+const calculateAge = (birthDate: string | null) => {
+  if (!birthDate) return null;
+  const today = new Date();
+  const birth = new Date(birthDate + "T00:00:00");
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+};
+
 const AdminCRM = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [customerBookings, setCustomerBookings] = useState<BookingRow[]>([]);
-  const [filter, setFilter] = useState<"all" | "with_bookings" | "no_bookings">("all");
+  const [dependents, setDependents] = useState<Dependent[]>([]);
+  const [allDependents, setAllDependents] = useState<(Dependent & { customer_name: string })[]>([]);
+  const [filter, setFilter] = useState<"all" | "with_bookings" | "no_bookings" | "dependents">("all");
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -119,9 +157,32 @@ const AdminCRM = () => {
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
+  // Dependent Modal state
+  const [dependentModalOpen, setDependentModalOpen] = useState(false);
+  const [editingDependent, setEditingDependent] = useState<Dependent | null>(null);
+  const [depForm, setDepForm] = useState<DependentForm>(emptyDependentForm);
+  const [savingDependent, setSavingDependent] = useState(false);
+  const [deleteDepConfirm, setDeleteDepConfirm] = useState<string | null>(null);
+
+  const relationships = ["Esposa", "Namorado", "Filho(a)", "Amigo(a)", "Tutor"];
+
   useEffect(() => {
     fetchCustomers();
   }, []);
+
+  const fetchAllDependents = async () => {
+    const { data } = await supabase
+      .from("dependents")
+      .select("*, customers(name)")
+      .order("name");
+    
+    if (data) {
+      setAllDependents(data.map((d: any) => ({
+        ...d,
+        customer_name: d.customers?.name || "Desconhecido"
+      })));
+    }
+  };
 
   const fetchCustomers = async () => {
     setLoading(true);
@@ -171,16 +232,31 @@ const AdminCRM = () => {
       })));
     }
     setLoading(false);
+    fetchAllDependents();
+  };
+
+  const fetchDependents = async (customerId: string) => {
+    const { data } = await supabase
+      .from("dependents")
+      .select("*")
+      .eq("customer_id", customerId)
+      .order("created_at", { ascending: false });
+    setDependents(data || []);
   };
 
   const selectCustomer = async (c: Customer) => {
     setSelectedCustomer(c);
-    const { data } = await supabase
+    
+    // Fetch bookings
+    const { data: bookings } = await supabase
       .from("bookings")
       .select("id, booking_code, item_name, date, guests, final_total, status, payment_status, created_at, type")
       .eq("customer_id", c.id)
       .order("created_at", { ascending: false });
-    setCustomerBookings(data || []);
+    setCustomerBookings(bookings || []);
+
+    // Fetch dependents
+    fetchDependents(c.id);
   };
 
   const openCreateModal = () => {
@@ -250,6 +326,76 @@ const AdminCRM = () => {
     fetchCustomers();
   };
 
+  const openCreateDependentModal = () => {
+    setEditingDependent(null);
+    setDepForm(emptyDependentForm);
+    setDependentModalOpen(true);
+  };
+
+  const openEditDependentModal = (d: Dependent) => {
+    setEditingDependent(d);
+    setDepForm({
+      name: d.name,
+      cpf: d.cpf || "",
+      birth_date: d.birth_date || "",
+      relationship: d.relationship
+    });
+    setDependentModalOpen(true);
+  };
+
+  const handleSaveDependent = async () => {
+    if (!selectedCustomer) return;
+    if (!depForm.name.trim()) {
+      toast.error("Nome é obrigatório.");
+      return;
+    }
+
+    setSavingDependent(true);
+    const payload = {
+      customer_id: selectedCustomer.id,
+      name: depForm.name.trim(),
+      cpf: depForm.cpf.replace(/\D/g, "") || null,
+      birth_date: depForm.birth_date || null,
+      relationship: depForm.relationship
+    };
+
+    if (editingDependent) {
+      const { error } = await supabase
+        .from("dependents")
+        .update(payload)
+        .eq("id", editingDependent.id);
+      if (error) {
+        toast.error("Erro ao atualizar dependente.");
+        setSavingDependent(false);
+        return;
+      }
+      toast.success("Dependente atualizado!");
+    } else {
+      const { error } = await supabase.from("dependents").insert(payload);
+      if (error) {
+        toast.error("Erro ao cadastrar dependente.");
+        setSavingDependent(false);
+        return;
+      }
+      toast.success("Dependente cadastrado!");
+    }
+
+    setSavingDependent(false);
+    setDependentModalOpen(false);
+    fetchDependents(selectedCustomer.id);
+  };
+
+  const handleDeleteDependent = async (id: string) => {
+    const { error } = await supabase.from("dependents").delete().eq("id", id);
+    if (error) {
+      toast.error("Erro ao excluir dependente.");
+      return;
+    }
+    toast.success("Dependente excluído!");
+    setDeleteDepConfirm(null);
+    if (selectedCustomer) fetchDependents(selectedCustomer.id);
+  };
+
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from("customers").delete().eq("id", id);
     if (error) {
@@ -290,7 +436,13 @@ const AdminCRM = () => {
     const matchesSearch = c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || (c.phone || "").includes(q) || (c.cpf || "").includes(q);
     if (filter === "with_bookings") return matchesSearch && c.totalBookings > 0;
     if (filter === "no_bookings") return matchesSearch && c.totalBookings === 0;
+    if (filter === "dependents") return false; // Handled separately
     return matchesSearch;
+  });
+
+  const filteredDependents = allDependents.filter((d) => {
+    const q = search.toLowerCase();
+    return d.name.toLowerCase().includes(q) || (d.cpf || "").includes(q) || d.customer_name.toLowerCase().includes(q);
   });
 
   const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0);
@@ -361,9 +513,10 @@ const AdminCRM = () => {
             {/* Filter tabs */}
             <div className="flex gap-2 mb-4">
               {([
-                { key: "all" as const, label: "Todos", count: customers.length },
+                { key: "all" as const, label: "Titulares", count: customers.length },
                 { key: "with_bookings" as const, label: "Com Reservas", count: withBookings },
                 { key: "no_bookings" as const, label: "Sem Reservas", count: customers.length - withBookings },
+                { key: "dependents" as const, label: "Dependentes", count: allDependents.length },
               ]).map((f) => (
                 <button
                   key={f.key}
@@ -379,10 +532,10 @@ const AdminCRM = () => {
               ))}
             </div>
 
-            {filtered.length === 0 ? (
+            {(filter === "dependents" ? filteredDependents : filtered).length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
                 <Users className="mx-auto mb-3 opacity-40" size={40} />
-                <p className="font-medium">Nenhum cliente encontrado</p>
+                <p className="font-medium">Nenhum {filter === "dependents" ? "dependente" : "cliente"} encontrado</p>
                 <p className="text-sm mt-1">Clique em "Novo Cliente" para cadastrar.</p>
               </div>
             ) : (
@@ -390,68 +543,113 @@ const AdminCRM = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border text-muted-foreground">
-                      <th className="text-left py-3 font-medium">Cliente</th>
-                      <th className="text-left py-3 font-medium hidden sm:table-cell">Telefone</th>
-                      <th className="text-right py-3 font-medium">Reservas</th>
-                      <th className="text-right py-3 font-medium hidden sm:table-cell">Total Gasto</th>
+                      <th className="text-left py-3 font-medium">{filter === "dependents" ? "Dependente" : "Cliente"}</th>
+                      <th className="text-left py-3 font-medium hidden sm:table-cell">{filter === "dependents" ? "Titular" : "Telefone"}</th>
+                      <th className="text-right py-3 font-medium">{filter === "dependents" ? "Idade" : "Reservas"}</th>
+                      <th className="text-right py-3 font-medium hidden sm:table-cell">{filter === "dependents" ? "Parentesco" : "Total Gasto"}</th>
                       <th className="text-right py-3 font-medium">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filtered.map((c) => (
-                      <tr
-                        key={c.id}
-                        className={`border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer ${selectedCustomer?.id === c.id ? "bg-muted/80" : ""}`}
-                        onClick={() => selectCustomer(c)}
-                      >
-                        <td className="py-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">
-                              {c.name.trim() ? c.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="font-semibold text-foreground truncate flex items-center gap-2">
-                                {c.name}
-                                {c.status !== "regular" && (
-                                  <Badge variant="outline" className={`text-[8px] px-1 py-0 uppercase ${customerStatusConfig[c.status]?.className || ""}`}>
-                                    {customerStatusConfig[c.status]?.label || c.status}
-                                  </Badge>
-                                )}
-                              </p>
-                              <p className="text-xs text-muted-foreground truncate">{c.email}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-3 text-muted-foreground hidden sm:table-cell">{c.phone ? maskPhone(c.phone) : "—"}</td>
-                        <td className="py-3 text-right text-foreground font-medium">{c.totalBookings}</td>
-                        <td className="py-3 text-right font-semibold text-foreground hidden sm:table-cell">{fmt(c.totalSpent)}</td>
-                        <td className="py-3 text-right">
-                          <div className="flex gap-1 justify-end">
-                            {c.phone && (
-                              <a
-                                href={`https://wa.me/55${c.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${c.name.split(" ")[0]}! Tudo bem?`)}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-green-100 dark:hover:bg-green-900/30">
-                                  <Smartphone size={14} className="text-green-600" />
+                    {filter === "dependents" ? (
+                      filteredDependents.map((d) => {
+                        const age = calculateAge(d.birth_date);
+                        return (
+                          <tr
+                            key={d.id}
+                            className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
+                          >
+                            <td className="py-3">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-muted-foreground text-xs font-bold shrink-0">
+                                  <Baby size={16} />
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="font-semibold text-foreground truncate">{d.name}</p>
+                                  <p className="text-xs text-muted-foreground truncate">{d.cpf ? maskCPF(d.cpf) : "Sem CPF"}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-3 text-muted-foreground hidden sm:table-cell">
+                              <span className="flex items-center gap-1">
+                                <Users size={12} /> {d.customer_name}
+                              </span>
+                            </td>
+                            <td className="py-3 text-right text-foreground font-medium">
+                              {age !== null ? `${age} anos` : "—"}
+                            </td>
+                            <td className="py-3 text-right font-semibold text-foreground hidden sm:table-cell">
+                              <Badge variant="outline" className="text-[10px]">{d.relationship}</Badge>
+                            </td>
+                            <td className="py-3 text-right">
+                              <div className="flex gap-1 justify-end">
+                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
+                                  const parent = customers.find(c => c.id === d.customer_id);
+                                  if (parent) selectCustomer(parent);
+                                }}>
+                                  <Eye size={14} className="text-primary" />
                                 </Button>
-                              </a>
-                            )}
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); openEditModal(c); }}>
-                              <Pencil size={14} className="text-muted-foreground" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10" onClick={(e) => { e.stopPropagation(); setDeleteConfirm(c.id); }}>
-                              <Trash2 size={14} className="text-destructive" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      filtered.map((c) => (
+                        <tr
+                          key={c.id}
+                          className={`border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer ${selectedCustomer?.id === c.id ? "bg-muted/80" : ""}`}
+                          onClick={() => selectCustomer(c)}
+                        >
+                          <td className="py-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">
+                                {c.name.trim() ? c.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="font-semibold text-foreground truncate flex items-center gap-2">
+                                  {c.name}
+                                  {c.status !== "regular" && (
+                                    <Badge variant="outline" className={`text-[8px] px-1 py-0 uppercase ${customerStatusConfig[c.status]?.className || ""}`}>
+                                      {customerStatusConfig[c.status]?.label || c.status}
+                                    </Badge>
+                                  )}
+                                </p>
+                                <p className="text-xs text-muted-foreground truncate">{c.email}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3 text-muted-foreground hidden sm:table-cell">{c.phone ? maskPhone(c.phone) : "—"}</td>
+                          <td className="py-3 text-right text-foreground font-medium">{c.totalBookings}</td>
+                          <td className="py-3 text-right font-semibold text-foreground hidden sm:table-cell">{fmt(c.totalSpent)}</td>
+                          <td className="py-3 text-right">
+                            <div className="flex gap-1 justify-end">
+                              {c.phone && (
+                                <a
+                                  href={`https://wa.me/55${c.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${c.name.split(" ")[0]}! Tudo bem?`)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-green-100 dark:hover:bg-green-900/30">
+                                    <Smartphone size={14} className="text-green-600" />
+                                  </Button>
+                                </a>
+                              )}
+                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); openEditModal(c); }}>
+                                <Pencil size={14} className="text-muted-foreground" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10" onClick={(e) => { e.stopPropagation(); setDeleteConfirm(c.id); }}>
+                                <Trash2 size={14} className="text-destructive" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
-                <p className="text-xs text-muted-foreground mt-3 text-right">{filtered.length} cliente(s)</p>
+                <p className="text-xs text-muted-foreground mt-3 text-right">{(filter === "dependents" ? filteredDependents : filtered).length} registro(s)</p>
               </div>
             )}
           </div>
@@ -539,7 +737,63 @@ const AdminCRM = () => {
                   </Button>
                 </div>
 
-                <div>
+                {/* Dependentes */}
+                <div className="border-t border-border pt-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-display font-bold text-foreground">Dependentes</h4>
+                    <Button variant="ghost" size="sm" className="h-7 text-[10px] gap-1 px-2 rounded-lg" onClick={openCreateDependentModal}>
+                      <UserPlus size={12} /> Adicionar
+                    </Button>
+                  </div>
+                  {dependents.length === 0 ? (
+                    <p className="text-xs text-muted-foreground italic">Nenhum dependente cadastrado.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {dependents.map((d) => {
+                        const age = calculateAge(d.birth_date);
+                        return (
+                          <div key={d.id} className="bg-muted/50 rounded-xl p-3 relative group">
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                                  <Baby size={14} />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-semibold text-foreground leading-none">{d.name}</p>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <Badge variant="outline" className="text-[8px] px-1 py-0 uppercase bg-primary/5 text-primary border-primary/20">
+                                      {d.relationship}
+                                    </Badge>
+                                    {age !== null && (
+                                      <span className="text-[10px] text-muted-foreground">
+                                        {age} anos {age < 18 ? "(Menor)" : "(Maior)"}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openEditDependentModal(d)}>
+                                  <Pencil size={10} />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-destructive/10" onClick={() => setDeleteDepConfirm(d.id)}>
+                                  <Trash2 size={10} className="text-destructive" />
+                                </Button>
+                              </div>
+                            </div>
+                            {d.cpf && (
+                              <p className="text-[10px] text-muted-foreground mt-2 ml-11">
+                                CPF: {maskCPF(d.cpf)}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <div className="border-t border-border pt-6">
                   <h4 className="font-display font-bold text-foreground mb-3">Histórico de Reservas</h4>
                   {customerBookings.length === 0 ? (
                     <p className="text-sm text-muted-foreground">Nenhuma reserva encontrada.</p>
@@ -601,6 +855,12 @@ const AdminCRM = () => {
                 required
                 className="rounded-xl"
               />
+              {form.birth_date && (
+                <p className="text-[10px] mt-1 text-muted-foreground">
+                  Idade: {calculateAge(form.birth_date)} anos 
+                  ({calculateAge(form.birth_date)! < 18 ? "Menor" : "Maior"})
+                </p>
+              )}
             </div>
             <div>
               <Label htmlFor="customer-email">E-mail *</Label>
@@ -697,6 +957,97 @@ const AdminCRM = () => {
               Cancelar
             </Button>
             <Button variant="destructive" onClick={() => deleteConfirm && handleDelete(deleteConfirm)}>
+              <Trash2 size={14} className="mr-1" /> Excluir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dependent Modal */}
+      <Dialog open={dependentModalOpen} onOpenChange={setDependentModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editingDependent ? "Editar Dependente" : "Novo Dependente"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label htmlFor="dep-name">Nome *</Label>
+              <Input
+                id="dep-name"
+                value={depForm.name}
+                onChange={(e) => setDepForm({ ...depForm, name: e.target.value })}
+                placeholder="Nome do dependente"
+                className="rounded-xl"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="dep-relationship">Parentesco</Label>
+                <select
+                  id="dep-relationship"
+                  value={depForm.relationship}
+                  onChange={(e) => setDepForm({ ...depForm, relationship: e.target.value })}
+                  className="w-full flex h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {relationships.map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="dep-birth">Nascimento</Label>
+                <Input
+                  id="dep-birth"
+                  type="date"
+                  value={depForm.birth_date}
+                  onChange={(e) => setDepForm({ ...depForm, birth_date: e.target.value })}
+                  className="rounded-xl"
+                />
+                {depForm.birth_date && (
+                  <p className="text-[10px] mt-1 text-muted-foreground">
+                    Idade: {calculateAge(depForm.birth_date)} anos 
+                    ({calculateAge(depForm.birth_date)! < 18 ? "Menor" : "Maior"})
+                  </p>
+                )}
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="dep-cpf">CPF</Label>
+              <Input
+                id="dep-cpf"
+                value={depForm.cpf}
+                onChange={(e) => setDepForm({ ...depForm, cpf: e.target.value })}
+                placeholder="000.000.000-00"
+                maxLength={14}
+                className="rounded-xl"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDependentModalOpen(false)} disabled={savingDependent} className="rounded-xl">
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveDependent} disabled={savingDependent} className="rounded-xl">
+              {savingDependent ? <Loader2 size={14} className="animate-spin mr-1" /> : <Save size={14} className="mr-1" />}
+              {editingDependent ? "Salvar" : "Cadastrar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dependent Confirmation */}
+      <Dialog open={!!deleteDepConfirm} onOpenChange={() => setDeleteDepConfirm(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Excluir Dependente</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Tem certeza que deseja excluir este dependente?
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDepConfirm(null)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={() => deleteDepConfirm && handleDeleteDependent(deleteDepConfirm)}>
               <Trash2 size={14} className="mr-1" /> Excluir
             </Button>
           </DialogFooter>

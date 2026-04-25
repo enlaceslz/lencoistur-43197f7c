@@ -234,6 +234,47 @@ export type Database = {
         }
         Relationships: []
       }
+      dependents: {
+        Row: {
+          birth_date: string | null
+          cpf: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          name: string
+          relationship: string
+          updated_at: string
+        }
+        Insert: {
+          birth_date?: string | null
+          cpf?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          name: string
+          relationship: string
+          updated_at?: string
+        }
+        Update: {
+          birth_date?: string | null
+          cpf?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          name?: string
+          relationship?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dependents_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_types: {
         Row: {
           created_at: string
