@@ -63,7 +63,7 @@ export default function DRETab({ bookings, contasPagar = [] }: { bookings: Booki
             <span className="font-bold text-foreground">{fmt(receitaLiquida)}</span>
           </div>
           <div className="pt-3">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider py-2">Custos Operacionais (est. 35%)</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider py-2">Custos Operacionais</p>
             <div className="flex justify-between py-2 pl-4 text-sm text-muted-foreground">
               <span>(-) Combustível, seguros, guias, manutenção</span>
               <span className="text-destructive">- {fmt(custosOp)}</span>
@@ -76,13 +76,13 @@ export default function DRETab({ bookings, contasPagar = [] }: { bookings: Booki
           <div className="pt-3">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider py-2">Despesas Operacionais</p>
             <div className="flex justify-between py-2 pl-4 text-sm text-muted-foreground">
-              <span>(-) Administrativo (est. 15%)</span><span className="text-destructive">- {fmt(despesasAdmin)}</span>
+              <span>(-) Administrativo e Pessoal</span><span className="text-destructive">- {fmt(despesasAdmin)}</span>
             </div>
             <div className="flex justify-between py-2 pl-4 text-sm text-muted-foreground">
-              <span>(-) Marketing (est. 10%)</span><span className="text-destructive">- {fmt(despesasMkt)}</span>
+              <span>(-) Marketing</span><span className="text-destructive">- {fmt(despesasMkt)}</span>
             </div>
             <div className="flex justify-between py-2 pl-4 text-sm text-muted-foreground">
-              <span>(-) Tecnologia (est. 5%)</span><span className="text-destructive">- {fmt(despesasTech)}</span>
+              <span>(-) Tecnologia</span><span className="text-destructive">- {fmt(despesasTech)}</span>
             </div>
           </div>
           <div className={`flex justify-between py-4 border-t-2 px-3 rounded-lg mt-2 ${lucroOp >= 0 ? "border-primary bg-primary/5" : "border-destructive bg-destructive/5"}`}>
