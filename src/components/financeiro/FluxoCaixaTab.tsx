@@ -85,8 +85,8 @@ export default function FluxoCaixaTab({ bookings, contasPagar = [] }: { bookings
                 <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `R$${(v / 100).toFixed(0)}`} />
                 <Tooltip formatter={(value: number) => [fmt(value), ""]} />
                 <Legend />
-                <Bar dataKey="entradas" name="Receita Paga" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="descontos" name="Descontos" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="entradas" name="Receitas" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="despesas" name="Despesas" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
