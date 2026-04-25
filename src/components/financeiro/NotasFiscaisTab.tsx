@@ -30,6 +30,7 @@ interface BookingRow {
   invoice_issued?: boolean;
   receipt_issued?: boolean;
   invoice_url?: string | null;
+  voucher_url?: string | null;
   customers: { name: string; email: string; phone?: string } | null;
   type: string;
   date: string | null;
