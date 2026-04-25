@@ -114,8 +114,8 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2 text-green-600">
-              <CheckCircle2 size={16} /> Notas Emitidas
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <CheckCircle2 size={16} className="text-green-600" /> Notas Emitidas
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -124,8 +124,8 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2 text-yellow-600">
-              <Clock size={16} /> Pendentes (Pagas)
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <Clock size={16} className="text-yellow-600" /> Pendentes (Pagas)
             </CardTitle>
           </CardHeader>
           <CardContent>
