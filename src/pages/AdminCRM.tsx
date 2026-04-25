@@ -170,6 +170,20 @@ const AdminCRM = () => {
     fetchCustomers();
   }, []);
 
+  const fetchAllDependents = async () => {
+    const { data } = await supabase
+      .from("dependents")
+      .select("*, customers(name)")
+      .order("name");
+    
+    if (data) {
+      setAllDependents(data.map((d: any) => ({
+        ...d,
+        customer_name: d.customers?.name || "Desconhecido"
+      })));
+    }
+  };
+
   const fetchCustomers = async () => {
     setLoading(true);
     const { data: customersData, error } = await supabase
