@@ -16,6 +16,9 @@ interface Customer {
   email: string;
   phone: string | null;
   cpf: string | null;
+  birth_date: string | null;
+  notes: string | null;
+  status: string;
   created_at: string;
   totalBookings: number;
   totalSpent: number;
@@ -40,11 +43,33 @@ interface CustomerForm {
   email: string;
   phone: string;
   cpf: string;
+  birth_date: string;
+  notes: string;
+  status: string;
 }
 
-const emptyForm: CustomerForm = { name: "", email: "", phone: "", cpf: "" };
+const emptyForm: CustomerForm = { 
+  name: "", 
+  email: "", 
+  phone: "", 
+  cpf: "", 
+  birth_date: "", 
+  notes: "", 
+  status: "regular" 
+};
 
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+
+const maskPhone = (v: string) => {
+  v = v.replace(/\D/g, "");
+  if (v.length <= 10) return v.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+  return v.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+};
+
+const maskCPF = (v: string) => {
+  v = v.replace(/\D/g, "");
+  return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+};
 
 const payStatusConfig: Record<string, { label: string; className: string }> = {
   pago: { label: "Pago", className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" },
@@ -55,6 +80,12 @@ const statusConfig: Record<string, { label: string; className: string }> = {
   pendente: { label: "Pendente", className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" },
   confirmada: { label: "Confirmada", className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" },
   cancelada: { label: "Cancelada", className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
+};
+
+const customerStatusConfig: Record<string, { label: string; className: string }> = {
+  regular: { label: "Regular", className: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" },
+  vip: { label: "VIP", className: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" },
+  bloqueado: { label: "Bloqueado", className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
 };
 
 const validateForm = (form: CustomerForm): string | null => {
@@ -130,6 +161,9 @@ const AdminCRM = () => {
         email: c.email,
         phone: c.phone,
         cpf: c.cpf,
+        birth_date: c.birth_date,
+        notes: c.notes,
+        status: c.status || "regular",
         created_at: c.created_at,
         totalBookings: bookingsByCustomer[c.id]?.count || 0,
         totalSpent: bookingsByCustomer[c.id]?.total || 0,
@@ -157,7 +191,15 @@ const AdminCRM = () => {
 
   const openEditModal = (c: Customer) => {
     setEditingCustomer(c);
-    setForm({ name: c.name, email: c.email, phone: c.phone || "", cpf: c.cpf || "" });
+    setForm({ 
+      name: c.name, 
+      email: c.email, 
+      phone: c.phone || "", 
+      cpf: c.cpf || "",
+      birth_date: c.birth_date || "",
+      notes: c.notes || "",
+      status: c.status || "regular"
+    });
     setModalOpen(true);
   };
 
@@ -174,6 +216,9 @@ const AdminCRM = () => {
       email: form.email.trim().toLowerCase(),
       phone: form.phone.replace(/\D/g, "") || null,
       cpf: form.cpf.replace(/\D/g, "") || null,
+      birth_date: form.birth_date || null,
+      notes: form.notes || null,
+      status: form.status
     };
 
     if (editingCustomer) {
@@ -188,7 +233,7 @@ const AdminCRM = () => {
       }
       toast.success("Cliente atualizado!");
       if (selectedCustomer?.id === editingCustomer.id) {
-        setSelectedCustomer({ ...selectedCustomer, ...payload, phone: payload.phone, cpf: payload.cpf });
+        setSelectedCustomer({ ...selectedCustomer, ...payload });
       }
     } else {
       const { error } = await supabase.from("customers").insert(payload);
@@ -226,9 +271,9 @@ const AdminCRM = () => {
       toast.error("Nenhum cliente para exportar.");
       return;
     }
-    const header = "Nome,Email,Telefone,CPF,Reservas,Total Gasto,Cadastro\n";
+    const header = "Nome,Email,Telefone,CPF,Data Nascimento,Status,Reservas,Total Gasto,Cadastro,Observacoes\n";
     const rows = filtered.map(c =>
-      `"${c.name}","${c.email}","${c.phone || ""}","${c.cpf || ""}",${c.totalBookings},"${fmt(c.totalSpent)}","${new Date(c.created_at).toLocaleDateString("pt-BR")}"`
+      `"${c.name}","${c.email}","${c.phone || ""}","${c.cpf || ""}","${c.birth_date || ""}","${c.status}",${c.totalBookings},"${fmt(c.totalSpent)}","${new Date(c.created_at).toLocaleDateString("pt-BR")}","${(c.notes || "").replace(/"/g, '""')}"`
     ).join("\n");
     const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -362,15 +407,22 @@ const AdminCRM = () => {
                         <td className="py-3">
                           <div className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">
-                              {c.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
+                              {c.name.trim() ? c.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
                             </div>
                             <div className="min-w-0">
-                              <p className="font-semibold text-foreground truncate">{c.name}</p>
+                              <p className="font-semibold text-foreground truncate flex items-center gap-2">
+                                {c.name}
+                                {c.status !== "regular" && (
+                                  <Badge variant="outline" className={`text-[8px] px-1 py-0 uppercase ${customerStatusConfig[c.status]?.className || ""}`}>
+                                    {customerStatusConfig[c.status]?.label || c.status}
+                                  </Badge>
+                                )}
+                              </p>
                               <p className="text-xs text-muted-foreground truncate">{c.email}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 text-muted-foreground hidden sm:table-cell">{c.phone || "—"}</td>
+                        <td className="py-3 text-muted-foreground hidden sm:table-cell">{c.phone ? maskPhone(c.phone) : "—"}</td>
                         <td className="py-3 text-right text-foreground font-medium">{c.totalBookings}</td>
                         <td className="py-3 text-right font-semibold text-foreground hidden sm:table-cell">{fmt(c.totalSpent)}</td>
                         <td className="py-3 text-right">
@@ -410,20 +462,18 @@ const AdminCRM = () => {
               <div className="space-y-6">
                 <div className="text-center">
                   <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xl font-bold mx-auto mb-3">
-                    {selectedCustomer.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
+                    {selectedCustomer.name.trim() ? selectedCustomer.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
                   </div>
                   <h3 className="font-display text-lg font-bold text-foreground">{selectedCustomer.name}</h3>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <Badge variant="outline" className={`mt-2 uppercase text-[9px] ${customerStatusConfig[selectedCustomer.status]?.className || ""}`}>
+                    {customerStatusConfig[selectedCustomer.status]?.label || selectedCustomer.status}
+                  </Badge>
+                  <p className="text-[10px] text-muted-foreground mt-2">
                     Cliente desde {new Date(selectedCustomer.created_at).toLocaleDateString("pt-BR")}
                   </p>
-                  <div className="flex gap-2 justify-center mt-3">
-                    <Button variant="outline" size="sm" className="rounded-xl" onClick={() => openEditModal(selectedCustomer)}>
-                      <Pencil size={12} /> Editar
-                    </Button>
-                  </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-3 bg-muted/30 p-4 rounded-xl">
                   <div className="flex items-center gap-3 text-sm">
                     <Mail size={16} className="text-primary shrink-0" />
                     <span className="text-muted-foreground truncate">{selectedCustomer.email}</span>
@@ -431,22 +481,35 @@ const AdminCRM = () => {
                   {selectedCustomer.phone && (
                     <div className="flex items-center gap-3 text-sm">
                       <Phone size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground">{selectedCustomer.phone}</span>
+                      <span className="text-muted-foreground">{maskPhone(selectedCustomer.phone)}</span>
                     </div>
                   )}
                   {selectedCustomer.cpf && (
                     <div className="flex items-center gap-3 text-sm">
                       <Globe size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground">CPF: {selectedCustomer.cpf}</span>
+                      <span className="text-muted-foreground">CPF: {maskCPF(selectedCustomer.cpf)}</span>
+                    </div>
+                  )}
+                  {selectedCustomer.birth_date && (
+                    <div className="flex items-center gap-3 text-sm">
+                      <Calendar size={16} className="text-primary shrink-0" />
+                      <span className="text-muted-foreground">Nascimento: {new Date(selectedCustomer.birth_date + "T00:00:00").toLocaleDateString("pt-BR")}</span>
                     </div>
                   )}
                   {selectedCustomer.lastBooking && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <Calendar size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground">Última reserva: {new Date(selectedCustomer.lastBooking).toLocaleDateString("pt-BR")}</span>
+                    <div className="flex items-center gap-3 text-sm border-t border-border pt-3 mt-3">
+                      <RefreshCw size={16} className="text-primary shrink-0" />
+                      <span className="text-muted-foreground text-xs">Última reserva: {new Date(selectedCustomer.lastBooking).toLocaleDateString("pt-BR")}</span>
                     </div>
                   )}
                 </div>
+
+                {selectedCustomer.notes && (
+                  <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-xl border border-amber-100 dark:border-amber-900/20">
+                    <p className="text-[10px] font-bold text-amber-800 dark:text-amber-400 uppercase mb-1">Observações</p>
+                    <p className="text-xs text-amber-900 dark:text-amber-200 leading-relaxed">{selectedCustomer.notes}</p>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-muted rounded-xl p-3 text-center">
@@ -459,17 +522,22 @@ const AdminCRM = () => {
                   </div>
                 </div>
 
-                {selectedCustomer.phone && (
-                  <a
-                    href={`https://wa.me/55${selectedCustomer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selectedCustomer.name.split(" ")[0]}! Tudo bem?`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button className="w-full rounded-xl bg-green-600 hover:bg-green-700 text-white">
-                      <Smartphone size={16} /> WhatsApp
-                    </Button>
-                  </a>
-                )}
+                <div className="flex flex-col gap-2">
+                  {selectedCustomer.phone && (
+                    <a
+                      href={`https://wa.me/55${selectedCustomer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selectedCustomer.name.split(" ")[0]}! Tudo bem?`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button className="w-full rounded-xl bg-green-600 hover:bg-green-700 text-white shadow-sm">
+                        <Smartphone size={16} /> WhatsApp
+                      </Button>
+                    </a>
+                  )}
+                  <Button variant="outline" className="w-full rounded-xl" onClick={() => openEditModal(selectedCustomer)}>
+                    <Pencil size={14} /> Editar Dados
+                  </Button>
+                </div>
 
                 <div>
                   <h4 className="font-display font-bold text-foreground mb-3">Histórico de Reservas</h4>
@@ -516,14 +584,13 @@ const AdminCRM = () => {
         </div>
       </div>
 
-      {/* Create/Edit Modal */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingCustomer ? "Editar Cliente" : "Novo Cliente"}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
+            <div className="md:col-span-2">
               <Label htmlFor="customer-name">Nome *</Label>
               <Input
                 id="customer-name"
@@ -532,6 +599,7 @@ const AdminCRM = () => {
                 placeholder="Nome completo"
                 maxLength={120}
                 required
+                className="rounded-xl"
               />
             </div>
             <div>
@@ -544,7 +612,21 @@ const AdminCRM = () => {
                 placeholder="email@exemplo.com"
                 maxLength={255}
                 required
+                className="rounded-xl"
               />
+            </div>
+            <div>
+              <Label htmlFor="customer-status">Status</Label>
+              <select
+                id="customer-status"
+                value={form.status}
+                onChange={(e) => setForm({ ...form, status: e.target.value })}
+                className="w-full flex h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="regular">Regular</option>
+                <option value="vip">VIP</option>
+                <option value="bloqueado">Bloqueado</option>
+              </select>
             </div>
             <div>
               <Label htmlFor="customer-phone">Telefone</Label>
@@ -554,6 +636,7 @@ const AdminCRM = () => {
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 placeholder="(99) 99999-9999"
                 maxLength={15}
+                className="rounded-xl"
               />
             </div>
             <div>
@@ -564,14 +647,35 @@ const AdminCRM = () => {
                 onChange={(e) => setForm({ ...form, cpf: e.target.value })}
                 placeholder="000.000.000-00"
                 maxLength={14}
+                className="rounded-xl"
+              />
+            </div>
+            <div>
+              <Label htmlFor="customer-birth">Data de Nascimento</Label>
+              <Input
+                id="customer-birth"
+                type="date"
+                value={form.birth_date}
+                onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
+                className="rounded-xl"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <Label htmlFor="customer-notes">Observações</Label>
+              <textarea
+                id="customer-notes"
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                placeholder="Notas internas sobre o cliente..."
+                className="w-full min-h-[80px] rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setModalOpen(false)} disabled={saving}>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setModalOpen(false)} disabled={saving} className="rounded-xl">
               Cancelar
             </Button>
-            <Button onClick={handleSave} disabled={saving}>
+            <Button onClick={handleSave} disabled={saving} className="rounded-xl">
               {saving ? <Loader2 size={14} className="animate-spin mr-1" /> : <Save size={14} className="mr-1" />}
               {editingCustomer ? "Salvar" : "Cadastrar"}
             </Button>
