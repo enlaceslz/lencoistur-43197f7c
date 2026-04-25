@@ -128,12 +128,25 @@ const validateForm = (form: CustomerForm): string | null => {
   return null;
 };
 
+const calculateAge = (birthDate: string | null) => {
+  if (!birthDate) return null;
+  const today = new Date();
+  const birth = new Date(birthDate + "T00:00:00");
+  let age = today.getFullYear() - birth.getFullYear();
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+};
+
 const AdminCRM = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [customerBookings, setCustomerBookings] = useState<BookingRow[]>([]);
+  const [dependents, setDependents] = useState<Dependent[]>([]);
   const [filter, setFilter] = useState<"all" | "with_bookings" | "no_bookings">("all");
 
   // Modal state
@@ -142,6 +155,15 @@ const AdminCRM = () => {
   const [form, setForm] = useState<CustomerForm>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+
+  // Dependent Modal state
+  const [dependentModalOpen, setDependentModalOpen] = useState(false);
+  const [editingDependent, setEditingDependent] = useState<Dependent | null>(null);
+  const [depForm, setDepForm] = useState<DependentForm>(emptyDependentForm);
+  const [savingDependent, setSavingDependent] = useState(false);
+  const [deleteDepConfirm, setDeleteDepConfirm] = useState<string | null>(null);
+
+  const relationships = ["Esposa", "Namorado", "Filho(a)", "Amigo(a)", "Tutor"];
 
   useEffect(() => {
     fetchCustomers();
