@@ -1,0 +1,5 @@
+ALTER TABLE public.bookings 
+ADD COLUMN IF NOT EXISTS invoice_number TEXT,
+ADD COLUMN IF NOT EXISTS invoice_issued BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS receipt_issued BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS invoice_url TEXT;

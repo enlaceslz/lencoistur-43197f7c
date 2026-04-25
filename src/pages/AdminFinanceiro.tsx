@@ -4,15 +4,16 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
   DollarSign, TrendingUp, TrendingDown, CreditCard, Wallet, Receipt,
-  Loader2, Download,
+  Loader2, Download, FileText
 } from "lucide-react";
 import FinanceiroStats from "@/components/financeiro/FinanceiroStats";
 import FluxoCaixaTab from "@/components/financeiro/FluxoCaixaTab";
 import ContasPagarTab from "@/components/financeiro/ContasPagarTab";
 import ContasReceberTab from "@/components/financeiro/ContasReceberTab";
 import DRETab from "@/components/financeiro/DRETab";
+import NotasFiscaisTab from "@/components/financeiro/NotasFiscaisTab";
 
-type Tab = "fluxo" | "pagar" | "receber" | "dre";
+type Tab = "fluxo" | "pagar" | "receber" | "dre" | "notas";
 
 interface BookingRow {
   id: string;
@@ -26,7 +27,11 @@ interface BookingRow {
   pay_method: string;
   created_at: string;
   date: string | null;
-  customers: { name: string; email: string } | null;
+  customers: { name: string; email: string; phone?: string } | null;
+  invoice_number?: string | null;
+  invoice_issued?: boolean;
+  receipt_issued?: boolean;
+  invoice_url?: string | null;
 }
 
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
@@ -45,7 +50,7 @@ const AdminFinanceiro = () => {
       setLoading(true);
       const { data } = await supabase
         .from("bookings")
-        .select("*, customers(name, email)")
+        .select("*, customers(name, email, phone)")
         .order("created_at", { ascending: false });
       if (data) setBookings(data as any);
       setLoading(false);
@@ -85,6 +90,7 @@ const AdminFinanceiro = () => {
     { key: "pagar", label: "Contas a Pagar", icon: CreditCard },
     { key: "receber", label: "Contas a Receber", icon: Wallet },
     { key: "dre", label: "DRE", icon: Receipt },
+    { key: "notas", label: "Notas e Recibos", icon: FileText },
   ];
 
   const exportCSV = () => {
@@ -131,6 +137,7 @@ const AdminFinanceiro = () => {
         {tab === "pagar" && <ContasPagarTab />}
         {tab === "receber" && <ContasReceberTab />}
         {tab === "dre" && <DRETab bookings={bookings} />}
+        {tab === "notas" && <NotasFiscaisTab bookings={bookings} />}
       </div>
     </AdminLayout>
   );
