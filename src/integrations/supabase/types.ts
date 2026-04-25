@@ -38,6 +38,7 @@ export type Database = {
           type: string
           unit_price: number
           updated_at: string
+          voucher_url: string | null
         }
         Insert: {
           booking_code: string
@@ -62,6 +63,7 @@ export type Database = {
           type: string
           unit_price: number
           updated_at?: string
+          voucher_url?: string | null
         }
         Update: {
           booking_code?: string
@@ -86,6 +88,7 @@ export type Database = {
           type?: string
           unit_price?: number
           updated_at?: string
+          voucher_url?: string | null
         }
         Relationships: [
           {
