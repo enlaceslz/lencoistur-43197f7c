@@ -623,7 +623,13 @@ const AdminPasseios = () => {
           {detailTour && (
             <>
               <DialogHeader>
-                <DialogTitle className="font-display text-xl">{detailTour.name}</DialogTitle>
+                <div className="flex items-center justify-between gap-4">
+                  <DialogTitle className="font-display text-xl">{detailTour.name}</DialogTitle>
+                  <button onClick={() => { openEdit(detailTour); setDetailTour(null); }} 
+                    className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-bold hover:bg-primary/20 transition-colors">
+                    <Pencil size={14} /> Editar Passeio
+                  </button>
+                </div>
               </DialogHeader>
 
               {/* Images */}
