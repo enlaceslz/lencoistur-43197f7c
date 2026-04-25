@@ -181,6 +181,7 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
               <TableHead>Cliente</TableHead>
               <TableHead>Valor</TableHead>
               <TableHead>Status Pgto</TableHead>
+              <TableHead>Comprovante</TableHead>
               <TableHead>NF-e</TableHead>
               <TableHead>Recibo</TableHead>
               <TableHead className="text-right">Ações</TableHead>
@@ -190,22 +191,45 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
             {filtered.map((b) => (
               <TableRow key={b.id}>
                 <TableCell className="font-medium">
-                  <div className="flex flex-col">
-                    <span>{b.booking_code}</span>
-                    <span className="text-xs text-muted-foreground">{fmtDate(b.created_at)}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-col">
-                    <span>{b.customers?.name || "N/A"}</span>
-                    <span className="text-xs text-muted-foreground">{b.customers?.email || ""}</span>
-                  </div>
-                </TableCell>
-                <TableCell>{fmt(b.final_total)}</TableCell>
+...
                 <TableCell>
                   <Badge variant={b.payment_status === "pago" ? "default" : "secondary"} className={b.payment_status === "pago" ? "bg-green-600 hover:bg-green-700" : ""}>
                     {b.payment_status === "pago" ? "Pago" : "Pendente"}
                   </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    {b.voucher_url ? (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 gap-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        onClick={() => window.open(b.voucher_url!, "_blank")}
+                      >
+                        <Paperclip size={14} />
+                        Ver
+                      </Button>
+                    ) : (
+                      <div className="relative">
+                        <input
+                          type="file"
+                          id={`file-${b.id}`}
+                          className="hidden"
+                          onChange={(e) => handleFileUpload(e, b.id)}
+                          accept="image/*,.pdf"
+                        />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 gap-1 text-muted-foreground hover:text-primary"
+                          onClick={() => document.getElementById(`file-${b.id}`)?.click()}
+                        >
+                          <Upload size={14} />
+                          Anexar
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>
                   {b.invoice_issued ? (
