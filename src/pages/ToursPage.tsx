@@ -85,7 +85,7 @@ const ToursPage = () => {
           <div className="flex items-center gap-3 bg-muted rounded-xl px-4 py-3">
             <SlidersHorizontal size={16} className="text-muted-foreground" />
             <span className="text-sm text-muted-foreground whitespace-nowrap">Até R$</span>
-            <input type="range" min={50} max={500} step={10} value={maxPrice}
+            <input type="range" min={50} max={3000} step={10} value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))} className="w-24 accent-primary" />
             <span className="text-sm font-semibold text-foreground w-12">{maxPrice}</span>
           </div>
