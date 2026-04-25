@@ -13,6 +13,12 @@ const statusConfig: Record<string, { label: string; className: string; icon: typ
   concluida: { label: "Concluída", className: "bg-muted text-muted-foreground", icon: CheckCircle },
 };
 
+const formatPhone = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+  return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+};
+
 const MinhasReservas = () => {
   const { bookings, confirmPayment, cancelBooking } = useBookings();
   const [filter, setFilter] = useState("todas");
