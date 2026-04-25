@@ -155,8 +155,8 @@ function generateReceiptHTML(data: ReceiptData, company?: any): string {
   ` : ""}
 
   <div class="footer">
-    <p><strong>LENÇÓIS TOUR</strong> — Rota das Emoções</p>
-    <p>Santo Amaro do Maranhão, MA | WhatsApp: (98) 98588-0954</p>
+    <p><strong>${brandName}</strong> — Rota das Emoções</p>
+    <p>${address} | WhatsApp: ${phone}</p>
     <p>lencoistur.lovable.app</p>
     <p style="margin-top:8px;">Este documento é um comprovante de reserva. Não é um documento fiscal.</p>
   </div>
