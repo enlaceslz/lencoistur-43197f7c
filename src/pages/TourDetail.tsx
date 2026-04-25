@@ -326,7 +326,14 @@ const TourDetail = () => {
                 </div>
                 <div className="flex justify-between font-bold text-lg border-t border-border pt-3">
                   <span className="text-foreground">Total</span>
-                  <span className={isPrivate ? "text-secondary" : "text-primary"}>R$ {totalPrice}</span>
+                  <div className="text-right">
+                    <span className={isPrivate ? "text-secondary" : "text-primary"}>R$ {totalPrice}</span>
+                    {tour.pix_discount > 0 && (
+                      <p className="text-[11px] text-green-600 font-semibold">
+                        ou R$ {Math.round(totalPrice * (1 - tour.pix_discount / 100))} no PIX
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
