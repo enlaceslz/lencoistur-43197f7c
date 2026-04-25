@@ -888,6 +888,97 @@ const AdminCRM = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Dependent Modal */}
+      <Dialog open={dependentModalOpen} onOpenChange={setDependentModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editingDependent ? "Editar Dependente" : "Novo Dependente"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label htmlFor="dep-name">Nome *</Label>
+              <Input
+                id="dep-name"
+                value={depForm.name}
+                onChange={(e) => setDepForm({ ...depForm, name: e.target.value })}
+                placeholder="Nome do dependente"
+                className="rounded-xl"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="dep-relationship">Parentesco</Label>
+                <select
+                  id="dep-relationship"
+                  value={depForm.relationship}
+                  onChange={(e) => setDepForm({ ...depForm, relationship: e.target.value })}
+                  className="w-full flex h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {relationships.map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="dep-birth">Nascimento</Label>
+                <Input
+                  id="dep-birth"
+                  type="date"
+                  value={depForm.birth_date}
+                  onChange={(e) => setDepForm({ ...depForm, birth_date: e.target.value })}
+                  className="rounded-xl"
+                />
+                {depForm.birth_date && (
+                  <p className="text-[10px] mt-1 text-muted-foreground">
+                    Idade: {calculateAge(depForm.birth_date)} anos 
+                    ({calculateAge(depForm.birth_date)! < 18 ? "Menor" : "Maior"})
+                  </p>
+                )}
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="dep-cpf">CPF</Label>
+              <Input
+                id="dep-cpf"
+                value={depForm.cpf}
+                onChange={(e) => setDepForm({ ...depForm, cpf: e.target.value })}
+                placeholder="000.000.000-00"
+                maxLength={14}
+                className="rounded-xl"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDependentModalOpen(false)} disabled={savingDependent} className="rounded-xl">
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveDependent} disabled={savingDependent} className="rounded-xl">
+              {savingDependent ? <Loader2 size={14} className="animate-spin mr-1" /> : <Save size={14} className="mr-1" />}
+              {editingDependent ? "Salvar" : "Cadastrar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dependent Confirmation */}
+      <Dialog open={!!deleteDepConfirm} onOpenChange={() => setDeleteDepConfirm(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Excluir Dependente</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Tem certeza que deseja excluir este dependente?
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDepConfirm(null)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={() => deleteDepConfirm && handleDeleteDependent(deleteDepConfirm)}>
+              <Trash2 size={14} className="mr-1" /> Excluir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
