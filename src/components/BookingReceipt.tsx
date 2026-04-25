@@ -44,7 +44,13 @@ const statusLabel = (s: string) => {
   return map[s] || s;
 };
 
-function generateReceiptHTML(data: ReceiptData): string {
+function generateReceiptHTML(data: ReceiptData, company?: any): string {
+  const brandName = company?.nome_fantasia || company?.razao_social || "LENÇÓIS TOUR";
+  const cnpj = company?.cnpj || "00.000.000/0001-00";
+  const cadastur = company?.cadastur || "00.000.000/0001-00";
+  const address = company?.endereco || "Santo Amaro do Maranhão, MA";
+  const phone = company?.telefone || "(98) 98588-0954";
+
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
