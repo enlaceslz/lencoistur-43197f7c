@@ -15,7 +15,7 @@ import {
   Search, ShoppingCart, CheckCircle, Clock, XCircle, Eye,
   DollarSign, Ban, Loader2, Users, Calendar, CreditCard, FileText,
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
-  Plus,
+  Plus, Copy,
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { toast } from "sonner";
@@ -35,7 +35,7 @@ const paymentConfig: Record<string, { label: string; className: string }> = {
   reembolsado: { label: "Reembolsado", className: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300" },
 };
 
-const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const fmtDate = (d: string) => {
   if (!d) return "—";
   try { return new Date(d + "T12:00").toLocaleDateString("pt-BR"); } catch { return d; }
@@ -45,8 +45,14 @@ const fmtDateTime = (d: string) => {
   try { return new Date(d).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }); } catch { return d; }
 };
 
-interface TourOption { id: string; name: string; price: number; }
-interface TransferOption { id: string; label: string; price: number; }
+interface TourOption { id: string; name: string; price: number; pix_discount?: number; }
+interface TransferOption { id: string; label: string; price: number; pix_discount?: number; }
+
+const formatPhone = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+  return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+};
 
 const AdminReservas = () => {
   const { bookings, loading, addBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
@@ -80,12 +86,12 @@ const AdminReservas = () => {
     if (!showNewForm) return;
     const loadOptions = async () => {
       const [{ data: t }, { data: tr }, { data: cust }] = await Promise.all([
-        supabase.from("tours").select("id, name, price").eq("active", true).order("name"),
-        supabase.from("transfer_routes").select("id, origin, destination, price").eq("active", true).order("origin"),
+        supabase.from("tours").select("id, name, price, pix_discount").eq("active", true).order("name"),
+        supabase.from("transfer_routes").select("id, origin, destination, price, pix_discount").eq("active", true).order("origin"),
         supabase.from("customers").select("id, name, email, phone").order("name"),
       ]);
-      if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price })));
-      if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price })));
+      if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price, pix_discount: r.pix_discount })));
+      if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price, pix_discount: r.pix_discount })));
       if (cust) setExistingCustomers(cust);
     };
     loadOptions();
@@ -96,6 +102,19 @@ const AdminReservas = () => {
     setSelectedCustomerId("");
     setCustomerSearch("");
   };
+
+  // Calculate prices for the new form
+  const selectedItem = newForm.type === "tour" 
+    ? tours.find(t => t.name === newForm.itemName)
+    : transfers.find(t => t.label === newForm.itemName);
+  
+  const unitPrice = selectedItem?.price || 0;
+  const total = unitPrice * newForm.guests;
+  const pixDiscountPercent = selectedItem?.pix_discount || 0;
+  const discount = (newForm.payMethod === "pix" && pixDiscountPercent > 0) 
+    ? Math.round(total * pixDiscountPercent / 100) 
+    : 0;
+  const finalTotal = total - discount;
 
   const handleNewBooking = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,10 +142,10 @@ const AdminReservas = () => {
         customerName: newForm.customerName.trim(),
         customerEmail: newForm.customerEmail.trim().toLowerCase(),
         customerPhone: newForm.customerPhone.trim(),
-        unitPrice: 0,
-        total: 0,
-        discount: 0,
-        finalTotal: 0,
+        unitPrice,
+        total,
+        discount,
+        finalTotal,
       });
       toast.success("Reserva criada com sucesso!");
       setShowNewForm(false);
@@ -279,7 +298,23 @@ const AdminReservas = () => {
                   const pc = paymentConfig[b.paymentStatus] || paymentConfig.pendente;
                   return (
                     <TableRow key={b.id} className="cursor-pointer hover:bg-muted/50" onClick={() => { setSelected(b); setEditNotes(b.notes || ""); setShowNotes(false); }}>
-                      <TableCell className="font-mono text-sm text-foreground">{b.bookingCode}</TableCell>
+                      <TableCell className="font-mono text-sm text-foreground">
+                        <div className="flex items-center gap-1">
+                          {b.bookingCode}
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6" 
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              navigator.clipboard.writeText(b.bookingCode);
+                              toast.success("Código copiado!");
+                            }}
+                          >
+                            <Copy size={12} />
+                          </Button>
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <div>
                           <p className="font-medium text-foreground">{b.customerName}</p>
@@ -597,12 +632,32 @@ const AdminReservas = () => {
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground mb-1 block">Telefone</label>
-                  <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: e.target.value }))} placeholder="(99) 99999-9999" maxLength={20} disabled={!!selectedCustomerId} />
+                  <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" maxLength={15} disabled={!!selectedCustomerId} />
                 </div>
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={newLoading}>
+            {/* Summary */}
+            {unitPrice > 0 && (
+              <div className="bg-muted p-3 rounded-lg space-y-1">
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Subtotal ({newForm.guests}x {fmt(unitPrice)})</span>
+                  <span>{fmt(total)}</span>
+                </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-xs text-green-600 dark:text-green-400">
+                    <span>Desconto PIX ({pixDiscountPercent}%)</span>
+                    <span>-{fmt(discount)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm font-bold text-foreground border-t border-border mt-1 pt-1">
+                  <span>Total</span>
+                  <span>{fmt(finalTotal)}</span>
+                </div>
+              </div>
+            )}
+
+            <Button type="submit" className="w-full" disabled={newLoading || !newForm.itemName}>
               {newLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Plus size={16} className="mr-2" />}
               Criar Reserva
             </Button>

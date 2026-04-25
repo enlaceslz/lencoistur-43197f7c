@@ -13,6 +13,12 @@ const statusConfig: Record<string, { label: string; className: string; icon: typ
   concluida: { label: "Concluída", className: "bg-muted text-muted-foreground", icon: CheckCircle },
 };
 
+const formatPhone = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+  return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+};
+
 const MinhasReservas = () => {
   const { bookings, confirmPayment, cancelBooking } = useBookings();
   const [filter, setFilter] = useState("todas");
@@ -76,7 +82,9 @@ const MinhasReservas = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-display text-xl font-bold text-primary">R$ {b.finalTotal}</p>
+                      <p className="font-display text-xl font-bold text-primary">
+                        {(b.finalTotal / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                      </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {b.paymentStatus === "pago" ? (
                           <span className="text-green-600 font-medium">✓ Pago</span>
