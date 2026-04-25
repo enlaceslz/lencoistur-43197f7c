@@ -45,6 +45,7 @@ const AdminSGSTermos = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState("");
+  const [company, setCompany] = useState<any>(null);
   const [form, setForm] = useState({
     customer_name: "", nationality: "", phone: "", tour_name: "",
     risks_informed: [] as string[],
@@ -55,8 +56,12 @@ const AdminSGSTermos = () => {
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("sgs_risk_terms").select("*").order("created_at", { ascending: false });
-    setTerms(data || []);
+    const [termsRes, companyRes] = await Promise.all([
+      supabase.from("sgs_risk_terms").select("*").order("created_at", { ascending: false }),
+      supabase.from("sgs_empresa").select("*").limit(1).maybeSingle(),
+    ]);
+    setTerms(termsRes.data || []);
+    setCompany(companyRes.data);
     setLoading(false);
   };
 
