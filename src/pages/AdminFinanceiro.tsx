@@ -11,6 +11,7 @@ import FluxoCaixaTab from "@/components/financeiro/FluxoCaixaTab";
 import ContasPagarTab from "@/components/financeiro/ContasPagarTab";
 import ContasReceberTab from "@/components/financeiro/ContasReceberTab";
 import DRETab from "@/components/financeiro/DRETab";
+import NotasFiscaisTab from "@/components/financeiro/NotasFiscaisTab";
 
 type Tab = "fluxo" | "pagar" | "receber" | "dre";
 
