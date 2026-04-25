@@ -100,12 +100,12 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
     } as any);
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, bookingId: string) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, bookingId: string, field: "voucher_url" | "invoice_url") => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const fileExt = file.name.split('.').pop();
-    const filePath = `${bookingId}-${Math.random()}.${fileExt}`;
+    const filePath = `${field}/${bookingId}-${Math.random()}.${fileExt}`;
 
     try {
       const { data, error: uploadError } = await supabase.storage
@@ -118,8 +118,8 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
         .from('vouchers')
         .getPublicUrl(filePath);
 
-      await updateBooking(bookingId, { voucher_url: publicUrl } as any);
-      toast.success("Comprovante anexado com sucesso!");
+      await updateBooking(bookingId, { [field]: publicUrl } as any);
+      toast.success(field === "voucher_url" ? "Comprovante anexado!" : "Nota Fiscal anexada!");
     } catch (error) {
       console.error("Upload error:", error);
       toast.error("Erro ao enviar arquivo");
