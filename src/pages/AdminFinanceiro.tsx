@@ -86,6 +86,7 @@ const AdminFinanceiro = () => {
     { key: "pagar", label: "Contas a Pagar", icon: CreditCard },
     { key: "receber", label: "Contas a Receber", icon: Wallet },
     { key: "dre", label: "DRE", icon: Receipt },
+    { key: "notas", label: "Notas e Recibos", icon: FileText },
   ];
 
   const exportCSV = () => {
