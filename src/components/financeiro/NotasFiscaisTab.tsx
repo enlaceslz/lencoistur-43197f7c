@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Search, Receipt, FileText, CheckCircle2, Clock, 
-  ExternalLink, Printer, MoreHorizontal, Download
+  ExternalLink, Printer, MoreHorizontal, Download, Paperclip, Upload
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
