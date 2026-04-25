@@ -223,6 +223,14 @@ const AdminPasseios = () => {
     }
   };
 
+  const handleDuplicate = async (t: any) => {
+    const { id, created_at, updated_at, ...rest } = t;
+    const payload = { ...rest, name: `${t.name} (Cópia)`, slug: `${t.slug}-copia-${Date.now().toString().slice(-4)}`, active: false };
+    const { error } = await supabase.from("tours").insert(payload);
+    if (error) toast({ title: "Erro ao duplicar", variant: "destructive" });
+    else { toast({ title: "Passeio duplicado!" }); load(); }
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("Excluir este passeio?")) return;
     const { error } = await supabase.from("tours").delete().eq("id", id);
