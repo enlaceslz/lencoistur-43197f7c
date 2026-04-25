@@ -304,250 +304,236 @@ const AdminPasseios = () => {
         </button>
       </div>
 
-      {showForm && (
-        <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4 mb-6">
-          <div className="flex justify-between items-center">
-            <h3 className="font-display font-bold text-foreground">{editingId ? "Editar Passeio" : "Novo Passeio"}</h3>
-            <button type="button" onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-foreground"><X size={20} /></button>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Nome *</label>
-              <input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: generateSlug(e.target.value) })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={200} />
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Slug</label>
-              <input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={200} />
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Preço Coletivo (R$/pessoa) *</label>
-              <input required type="number" min={0} max={99999} value={form.price} onChange={e => setForm({ ...form, price: Number(e.target.value) })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Preço Privativo (R$/veículo) *</label>
-              <input required type="number" min={0} max={99999} value={form.private_price} onChange={e => setForm({ ...form, private_price: Number(e.target.value) })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Lotação do Veículo</label>
-              <input type="number" min={1} max={50} value={form.vehicle_capacity} onChange={e => setForm({ ...form, vehicle_capacity: Number(e.target.value) })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block flex items-center gap-1.5">
-                <Percent size={14} className="text-green-600" /> Desconto PIX (%)
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  min={0}
-                  max={50}
-                  value={form.pix_discount}
-                  onChange={e => setForm({ ...form, pix_discount: Number(e.target.value) })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none pr-8"
-                  placeholder="0"
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
+      <Dialog open={showForm} onOpenChange={(open) => !open && setShowForm(false)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display font-bold text-xl">
+              {editingId ? "Editar Passeio" : "Novo Passeio"}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmit} className="space-y-6 pt-2">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Nome *</label>
+                <input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: generateSlug(e.target.value) })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={200} />
               </div>
-              <p className="text-[11px] text-muted-foreground mt-1">
-                {form.pix_discount > 0 && form.price > 0
-                  ? `PIX: ${fmt(Math.round(form.price * (1 - form.pix_discount / 100)))} por pessoa`
-                  : "Sem desconto para PIX"}
-              </p>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Slug</label>
+                <input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={200} />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Preço Coletivo (R$/pessoa) *</label>
+                <input required type="number" min={0} max={99999} value={form.price} onChange={e => setForm({ ...form, price: Number(e.target.value) })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Preço Privativo (R$/veículo) *</label>
+                <input required type="number" min={0} max={99999} value={form.private_price} onChange={e => setForm({ ...form, private_price: Number(e.target.value) })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Lotação do Veículo</label>
+                <input type="number" min={1} max={50} value={form.vehicle_capacity} onChange={e => setForm({ ...form, vehicle_capacity: Number(e.target.value) })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block flex items-center gap-1.5">
+                  <Percent size={14} className="text-green-600" /> Desconto PIX (%)
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min={0}
+                    max={50}
+                    value={form.pix_discount}
+                    onChange={e => setForm({ ...form, pix_discount: Number(e.target.value) })}
+                    className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none pr-8 focus:ring-2 focus:ring-primary/20"
+                    placeholder="0"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Localização</label>
+                <input value={form.location} onChange={e => setForm({ ...form, location: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={200} />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Duração</label>
+                <input value={form.duration} onChange={e => setForm({ ...form, duration: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" placeholder="Meio dia" maxLength={100} />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Categoria</label>
+                <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20">
+                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Dificuldade</label>
+                <select value={form.difficulty} onChange={e => setForm({ ...form, difficulty: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20">
+                  {DIFFICULTIES.map(d => <option key={d} value={d}>{d}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Tag</label>
+                <input value={form.tag} onChange={e => setForm({ ...form, tag: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" placeholder="Mais Vendido" maxLength={50} />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Grupo</label>
+                <input value={form.group_size} onChange={e => setForm({ ...form, group_size: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" placeholder="Até 10 pessoas" maxLength={50} />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Saída</label>
+                <input value={form.departure} onChange={e => setForm({ ...form, departure: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={200} />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Operador</label>
+                <input value={form.operator} onChange={e => setForm({ ...form, operator: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={100} />
+              </div>
             </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Localização</label>
-              <input value={form.location} onChange={e => setForm({ ...form, location: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={200} />
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Duração</label>
-              <input value={form.duration} onChange={e => setForm({ ...form, duration: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Meio dia" maxLength={100} />
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Categoria</label>
-              <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
-                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Dificuldade</label>
-              <select value={form.difficulty} onChange={e => setForm({ ...form, difficulty: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
-                {DIFFICULTIES.map(d => <option key={d} value={d}>{d}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Tag</label>
-              <input value={form.tag} onChange={e => setForm({ ...form, tag: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Mais Vendido" maxLength={50} />
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Grupo</label>
-              <input value={form.group_size} onChange={e => setForm({ ...form, group_size: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Até 10 pessoas" maxLength={50} />
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Saída</label>
-              <input value={form.departure} onChange={e => setForm({ ...form, departure: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={200} />
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Operador</label>
-              <input value={form.operator} onChange={e => setForm({ ...form, operator: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={100} />
-            </div>
-          </div>
-          <div>
-            <label className="text-sm font-semibold text-foreground mb-1 block">Descrição</label>
-            <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-              className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-20" maxLength={2000} />
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Inclui (separados por vírgula)</label>
-              <input value={form.includes} onChange={e => setForm({ ...form, includes: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={500} />
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Destaques (separados por vírgula)</label>
-              <input value={form.highlights} onChange={e => setForm({ ...form, highlights: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" maxLength={500} />
-            </div>
-          </div>
 
-          {/* Image Management Section */}
-          <div className="space-y-3">
-            <label className="text-sm font-semibold text-foreground block">Imagens do Passeio</label>
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1 block">Descrição</label>
+              <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-24 focus:ring-2 focus:ring-primary/20" maxLength={2000} />
+            </div>
 
-            {imageUrls.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                {imageUrls.map((url, index) => (
-                  <div key={index} className="relative group rounded-xl overflow-hidden border border-border bg-muted aspect-square">
-                    <img src={url} alt={`Imagem ${index + 1}`} className="w-full h-full object-cover" 
-                      onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                      {index > 0 && (
-                        <button type="button" onClick={() => moveImage(index, index - 1)}
-                          className="p-1.5 bg-white/20 rounded-lg hover:bg-white/40 text-white text-xs" title="Mover para esquerda">
-                          ←
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Inclui (separados por vírgula)</label>
+                <input value={form.includes} onChange={e => setForm({ ...form, includes: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={500} />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Destaques (separados por vírgula)</label>
+                <input value={form.highlights} onChange={e => setForm({ ...form, highlights: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={500} />
+              </div>
+            </div>
+
+            {/* Image Management Section */}
+            <div className="space-y-3 bg-muted/20 border border-border rounded-2xl p-4">
+              <label className="text-sm font-bold text-foreground block flex items-center gap-2">
+                <ImageIcon size={16} /> Imagens do Passeio
+              </label>
+
+              {imageUrls.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                  {imageUrls.map((url, index) => (
+                    <div key={index} className="relative group rounded-xl overflow-hidden border border-border bg-muted aspect-square">
+                      <img src={url} alt={`Imagem ${index + 1}`} className="w-full h-full object-cover" 
+                        onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                        {index > 0 && (
+                          <button type="button" onClick={() => moveImage(index, index - 1)}
+                            className="p-1.5 bg-white/20 rounded-lg hover:bg-white/40 text-white text-xs" title="Mover para esquerda">
+                            ←
+                          </button>
+                        )}
+                        <button type="button" onClick={() => removeImage(index)}
+                          className="p-1.5 bg-destructive/80 rounded-lg hover:bg-destructive text-white" title="Remover">
+                          <X size={14} />
                         </button>
-                      )}
-                      <button type="button" onClick={() => removeImage(index)}
-                        className="p-1.5 bg-destructive/80 rounded-lg hover:bg-destructive text-white" title="Remover">
-                        <X size={14} />
-                      </button>
-                      {index < imageUrls.length - 1 && (
-                        <button type="button" onClick={() => moveImage(index, index + 1)}
-                          className="p-1.5 bg-white/20 rounded-lg hover:bg-white/40 text-white text-xs" title="Mover para direita">
-                          →
-                        </button>
+                        {index < imageUrls.length - 1 && (
+                          <button type="button" onClick={() => moveImage(index, index + 1)}
+                            className="p-1.5 bg-white/20 rounded-lg hover:bg-white/40 text-white text-xs" title="Mover para direita">
+                            →
+                          </button>
+                        )}
+                      </div>
+                      {index === 0 && (
+                        <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded">
+                          Capa
+                        </span>
                       )}
                     </div>
-                    {index === 0 && (
-                      <span className="absolute top-1 left-1 bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded">
-                        Capa
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
 
-            {/* Add by URL */}
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
-                <input
-                  value={newUrlInput}
-                  onChange={e => setNewUrlInput(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addUrlImage(); } }}
-                  placeholder="Cole a URL da imagem aqui..."
-                  className="w-full bg-muted border border-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-foreground outline-none"
-                />
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="relative flex-1">
+                  <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+                  <input
+                    value={newUrlInput}
+                    onChange={e => setNewUrlInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addUrlImage(); } }}
+                    placeholder="Cole a URL da imagem aqui..."
+                    className="w-full bg-muted border border-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button type="button" onClick={addUrlImage}
+                    className="bg-muted hover:bg-accent text-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border border-border whitespace-nowrap transition-colors">
+                    Adicionar URL
+                  </button>
+                  <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
+                    className="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border border-primary/20 disabled:opacity-50 transition-colors">
+                    <Upload size={14} /> {uploading ? "..." : "Upload"}
+                  </button>
+                </div>
               </div>
-              <button type="button" onClick={addUrlImage}
-                className="bg-muted hover:bg-accent text-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border border-border whitespace-nowrap">
-                <LinkIcon size={14} /> Adicionar URL
+              <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileUpload} className="hidden" />
+            </div>
+
+            <div className="border border-border rounded-2xl p-4 bg-muted/30 space-y-4">
+              <div>
+                <h4 className="text-sm font-bold text-foreground">Modalidades e Disponibilidade</h4>
+                <p className="text-xs text-muted-foreground">Configure como este passeio pode ser vendido.</p>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <label className="flex items-center gap-2 cursor-pointer bg-card border border-border rounded-xl px-4 py-3 hover:border-primary/40 transition-colors">
+                  <input type="checkbox" checked={form.mode_collective_enabled}
+                    onChange={e => setForm({ ...form, mode_collective_enabled: e.target.checked })}
+                    className="rounded w-5 h-5 accent-primary" />
+                  <span className="text-sm font-medium text-foreground flex-1">Coletivo (por pessoa)</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer bg-card border border-border rounded-xl px-4 py-3 hover:border-secondary/40 transition-colors">
+                  <input type="checkbox" checked={form.mode_private_enabled}
+                    onChange={e => setForm({ ...form, mode_private_enabled: e.target.checked })}
+                    className="rounded w-5 h-5 accent-secondary" />
+                  <span className="text-sm font-medium text-foreground flex-1">Privativo (veículo)</span>
+                </label>
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Modalidade Padrão</label>
+                <select value={form.default_mode}
+                  onChange={e => setForm({ ...form, default_mode: e.target.value as "privativo" | "coletivo" })}
+                  className="w-full bg-card border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20">
+                  <option value="privativo" disabled={!form.mode_private_enabled}>Privativo (recomendado)</option>
+                  <option value="coletivo" disabled={!form.mode_collective_enabled}>Coletivo</option>
+                </select>
+              </div>
+              <div className="pt-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} className="rounded w-5 h-5 accent-primary" />
+                  <span className="text-sm font-bold text-foreground">Passeio Ativo e Visível no Site</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-4 border-t border-border">
+              <button type="submit" className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 transition-all">
+                {editingId ? "Salvar Alterações" : "Criar Passeio"}
+              </button>
+              <button type="button" onClick={() => setShowForm(false)} className="px-6 py-3 rounded-xl text-sm font-semibold text-muted-foreground hover:bg-muted transition-colors">
+                Cancelar
               </button>
             </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
-            {/* Upload file */}
-            <div className="flex gap-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-              <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
-                className="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border border-primary/20 disabled:opacity-50">
-                <Upload size={14} />
-                {uploading ? "Enviando..." : "Upload de Imagens"}
-              </button>
-              <span className="text-xs text-muted-foreground self-center">JPG, PNG, WebP • Máx 5MB cada</span>
-            </div>
-
-            {imageUrls.length === 0 && (
-              <div className="border-2 border-dashed border-border rounded-xl p-8 text-center text-muted-foreground">
-                <ImageIcon size={32} className="mx-auto mb-2 opacity-50" />
-                <p className="text-sm">Nenhuma imagem adicionada</p>
-                <p className="text-xs mt-1">Use URL ou faça upload de arquivos</p>
-              </div>
-            )}
-          </div>
-
-          <div className="border border-border rounded-2xl p-4 bg-muted/30 space-y-3">
-            <div>
-              <h4 className="text-sm font-bold text-foreground">Modalidades de Venda</h4>
-              <p className="text-xs text-muted-foreground">Habilite/desabilite as modalidades disponíveis para o cliente. A modalidade padrão será pré-selecionada na página do passeio.</p>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-3">
-              <label className="flex items-center gap-2 cursor-pointer bg-card border border-border rounded-xl px-3 py-2.5">
-                <input type="checkbox" checked={form.mode_collective_enabled}
-                  onChange={e => setForm({ ...form, mode_collective_enabled: e.target.checked })}
-                  className="rounded w-5 h-5" />
-                <span className="text-sm font-medium text-foreground flex-1">Coletivo (por pessoa)</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer bg-card border border-border rounded-xl px-3 py-2.5">
-                <input type="checkbox" checked={form.mode_private_enabled}
-                  onChange={e => setForm({ ...form, mode_private_enabled: e.target.checked })}
-                  className="rounded w-5 h-5" />
-                <span className="text-sm font-medium text-foreground flex-1">Privativo (veículo/embarcação)</span>
-              </label>
-            </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Modalidade Padrão</label>
-              <select value={form.default_mode}
-                onChange={e => setForm({ ...form, default_mode: e.target.value as "privativo" | "coletivo" })}
-                className="w-full bg-card border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
-                <option value="privativo" disabled={!form.mode_private_enabled}>Privativo (padrão recomendado)</option>
-                <option value="coletivo" disabled={!form.mode_collective_enabled}>Coletivo</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked={form.active} onChange={e => setForm({ ...form, active: e.target.checked })} className="rounded w-5 h-5" />
-              <span className="text-sm font-medium text-foreground">Passeio ativo</span>
-            </label>
-          </div>
-          <div className="flex gap-3">
-            <button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">
-              {editingId ? "Atualizar" : "Criar Passeio"}
-            </button>
-            <button type="button" onClick={() => setShowForm(false)} className="bg-muted text-muted-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">Cancelar</button>
-          </div>
-        </form>
-      )}
 
       <Card>
         <Table>
