@@ -13,7 +13,7 @@ import ContasReceberTab from "@/components/financeiro/ContasReceberTab";
 import DRETab from "@/components/financeiro/DRETab";
 import NotasFiscaisTab from "@/components/financeiro/NotasFiscaisTab";
 
-type Tab = "fluxo" | "pagar" | "receber" | "dre";
+type Tab = "fluxo" | "pagar" | "receber" | "dre" | "notas";
 
 interface BookingRow {
   id: string;
