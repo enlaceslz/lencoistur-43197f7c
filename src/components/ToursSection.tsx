@@ -84,10 +84,17 @@ const ToursSection = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-xs text-muted-foreground">Coletivo</span>
-                      <p className="text-lg font-bold text-primary">R$ {tour.price}<span className="text-xs font-normal text-muted-foreground">/pessoa</span></p>
-                      {tour.private_price && (
-                        <p className="text-xs text-secondary font-semibold">Privativo: R$ {tour.private_price}</p>
+                      <span className="text-xs text-muted-foreground">{tour.mode_collective_enabled !== false ? "Coletivo" : "Privativo"}</span>
+                      <div className="flex items-baseline gap-1">
+                        <p className="text-lg font-bold text-primary">R$ {tour.price}</p>
+                        {tour.pix_discount > 0 && (
+                          <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">
+                            -{tour.pix_discount}% PIX
+                          </span>
+                        )}
+                      </div>
+                      {tour.private_price && tour.mode_private_enabled !== false && (
+                        <p className="text-[10px] text-secondary font-semibold">Privativo: R$ {tour.private_price}</p>
                       )}
                     </div>
                     <span className="bg-primary text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-semibold">

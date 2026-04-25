@@ -9,7 +9,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Search, Plus, Pencil, Trash2, Eye, EyeOff, Compass, Users, Clock, Star, X, Upload, Link as LinkIcon, Image as ImageIcon, GripVertical, Percent, MapPin, CheckCircle, Sparkles,
+  Search, Plus, Pencil, Trash2, Eye, EyeOff, Compass, Users, Clock, Star, X, Upload, Link as LinkIcon, Image as ImageIcon, GripVertical, Percent, MapPin, CheckCircle, Sparkles, Copy,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 
 const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR")}`;
 
-const CATEGORIES = ["Ecoturismo", "Aventura", "Passeio de Barco", "Gastronomia", "Cultural"];
+const CATEGORIES = ["Ecoturismo", "Aventura", "Passeio de Barco", "Gastronomia", "Cultural", "Quadriciclo", "Transfer"];
 const DIFFICULTIES = ["Fácil", "Moderada", "Moderada a Difícil", "Difícil"];
 
 const emptyForm = {
@@ -165,7 +165,7 @@ const AdminPasseios = () => {
     e.preventDefault();
     const slug = form.slug || generateSlug(form.name);
     const pixDiscount = Math.max(0, Math.min(50, Number(form.pix_discount) || 0));
-    const payload = {
+    const payload: any = {
       name: form.name.trim(), slug,
       location: form.location.trim(), duration: form.duration.trim(),
       price: Number(form.price), private_price: Number(form.private_price) || 1300,
@@ -183,6 +183,11 @@ const AdminPasseios = () => {
       mode_private_enabled: !!form.mode_private_enabled,
       default_mode: form.default_mode === "coletivo" ? "coletivo" : "privativo",
     };
+
+    if (!editingId) {
+      payload.rating = 5.0;
+      payload.reviews_count = Math.floor(Math.random() * 20) + 5;
+    }
 
     if (!payload.name || !payload.price) {
       toast({ title: "Preencha nome e preço", variant: "destructive" });
@@ -216,6 +221,14 @@ const AdminPasseios = () => {
       setEditingId(null);
       load();
     }
+  };
+
+  const handleDuplicate = async (t: any) => {
+    const { id, created_at, updated_at, ...rest } = t;
+    const payload = { ...rest, name: `${t.name} (Cópia)`, slug: `${t.slug}-copia-${Date.now().toString().slice(-4)}`, active: false };
+    const { error } = await supabase.from("tours").insert(payload);
+    if (error) toast({ title: "Erro ao duplicar", variant: "destructive" });
+    else { toast({ title: "Passeio duplicado!" }); load(); }
   };
 
   const handleDelete = async (id: string) => {
@@ -600,6 +613,9 @@ const AdminPasseios = () => {
                   <div className="flex justify-end gap-2">
                     <button onClick={() => setDetailTour(t)} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-primary transition-colors" title="Ver detalhes">
                       <Eye size={16} />
+                    </button>
+                    <button onClick={() => handleDuplicate(t)} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-blue-500 transition-colors" title="Duplicar">
+                      <Copy size={16} />
                     </button>
                     <button onClick={() => openEdit(t)} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
                       <Pencil size={16} />

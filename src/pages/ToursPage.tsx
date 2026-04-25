@@ -42,7 +42,7 @@ const ToursPage = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("popular");
-  const [maxPrice, setMaxPrice] = useState(500);
+  const [maxPrice, setMaxPrice] = useState(3000);
 
   useEffect(() => {
     supabase.from("tours").select("*").eq("active", true).order("name")
@@ -85,7 +85,7 @@ const ToursPage = () => {
           <div className="flex items-center gap-3 bg-muted rounded-xl px-4 py-3">
             <SlidersHorizontal size={16} className="text-muted-foreground" />
             <span className="text-sm text-muted-foreground whitespace-nowrap">Até R$</span>
-            <input type="range" min={50} max={500} step={10} value={maxPrice}
+            <input type="range" min={50} max={3000} step={10} value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))} className="w-24 accent-primary" />
             <span className="text-sm font-semibold text-foreground w-12">{maxPrice}</span>
           </div>
@@ -132,10 +132,17 @@ const ToursPage = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-xs text-muted-foreground">Coletivo</span>
-                    <p className="text-lg font-bold text-primary">R$ {tour.price}<span className="text-xs font-normal text-muted-foreground">/pessoa</span></p>
-                    {tour.private_price && (
-                      <p className="text-xs text-secondary font-semibold">Privativo: R$ {tour.private_price}</p>
+                    <span className="text-xs text-muted-foreground">{tour.mode_collective_enabled !== false ? "Coletivo" : "Privativo"}</span>
+                    <div className="flex items-baseline gap-1">
+                      <p className="text-lg font-bold text-primary">R$ {tour.price}</p>
+                      {tour.pix_discount > 0 && (
+                        <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">
+                          -{tour.pix_discount}% PIX
+                        </span>
+                      )}
+                    </div>
+                    {tour.private_price && tour.mode_private_enabled !== false && (
+                      <p className="text-[10px] text-secondary font-semibold">Privativo: R$ {tour.private_price}</p>
                     )}
                   </div>
                   <span className="bg-primary text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-semibold">
