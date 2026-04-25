@@ -42,7 +42,7 @@ const ToursPage = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("popular");
-  const [maxPrice, setMaxPrice] = useState(500);
+  const [maxPrice, setMaxPrice] = useState(3000);
 
   useEffect(() => {
     supabase.from("tours").select("*").eq("active", true).order("name")
