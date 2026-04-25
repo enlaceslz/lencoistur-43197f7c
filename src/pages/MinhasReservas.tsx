@@ -76,7 +76,9 @@ const MinhasReservas = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-display text-xl font-bold text-primary">R$ {b.finalTotal}</p>
+                      <p className="font-display text-xl font-bold text-primary">
+                        {(b.finalTotal / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                      </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {b.paymentStatus === "pago" ? (
                           <span className="text-green-600 font-medium">✓ Pago</span>
