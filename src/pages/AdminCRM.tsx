@@ -462,20 +462,18 @@ const AdminCRM = () => {
               <div className="space-y-6">
                 <div className="text-center">
                   <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xl font-bold mx-auto mb-3">
-                    {selectedCustomer.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
+                    {selectedCustomer.name.trim() ? selectedCustomer.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
                   </div>
                   <h3 className="font-display text-lg font-bold text-foreground">{selectedCustomer.name}</h3>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <Badge variant="outline" className={`mt-2 uppercase text-[9px] ${customerStatusConfig[selectedCustomer.status]?.className || ""}`}>
+                    {customerStatusConfig[selectedCustomer.status]?.label || selectedCustomer.status}
+                  </Badge>
+                  <p className="text-[10px] text-muted-foreground mt-2">
                     Cliente desde {new Date(selectedCustomer.created_at).toLocaleDateString("pt-BR")}
                   </p>
-                  <div className="flex gap-2 justify-center mt-3">
-                    <Button variant="outline" size="sm" className="rounded-xl" onClick={() => openEditModal(selectedCustomer)}>
-                      <Pencil size={12} /> Editar
-                    </Button>
-                  </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-3 bg-muted/30 p-4 rounded-xl">
                   <div className="flex items-center gap-3 text-sm">
                     <Mail size={16} className="text-primary shrink-0" />
                     <span className="text-muted-foreground truncate">{selectedCustomer.email}</span>
@@ -483,22 +481,35 @@ const AdminCRM = () => {
                   {selectedCustomer.phone && (
                     <div className="flex items-center gap-3 text-sm">
                       <Phone size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground">{selectedCustomer.phone}</span>
+                      <span className="text-muted-foreground">{maskPhone(selectedCustomer.phone)}</span>
                     </div>
                   )}
                   {selectedCustomer.cpf && (
                     <div className="flex items-center gap-3 text-sm">
                       <Globe size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground">CPF: {selectedCustomer.cpf}</span>
+                      <span className="text-muted-foreground">CPF: {maskCPF(selectedCustomer.cpf)}</span>
+                    </div>
+                  )}
+                  {selectedCustomer.birth_date && (
+                    <div className="flex items-center gap-3 text-sm">
+                      <Calendar size={16} className="text-primary shrink-0" />
+                      <span className="text-muted-foreground">Nascimento: {new Date(selectedCustomer.birth_date + "T00:00:00").toLocaleDateString("pt-BR")}</span>
                     </div>
                   )}
                   {selectedCustomer.lastBooking && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <Calendar size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground">Última reserva: {new Date(selectedCustomer.lastBooking).toLocaleDateString("pt-BR")}</span>
+                    <div className="flex items-center gap-3 text-sm border-t border-border pt-3 mt-3">
+                      <RefreshCw size={16} className="text-primary shrink-0" />
+                      <span className="text-muted-foreground text-xs">Última reserva: {new Date(selectedCustomer.lastBooking).toLocaleDateString("pt-BR")}</span>
                     </div>
                   )}
                 </div>
+
+                {selectedCustomer.notes && (
+                  <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-xl border border-amber-100 dark:border-amber-900/20">
+                    <p className="text-[10px] font-bold text-amber-800 dark:text-amber-400 uppercase mb-1">Observações</p>
+                    <p className="text-xs text-amber-900 dark:text-amber-200 leading-relaxed">{selectedCustomer.notes}</p>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-muted rounded-xl p-3 text-center">
@@ -511,17 +522,22 @@ const AdminCRM = () => {
                   </div>
                 </div>
 
-                {selectedCustomer.phone && (
-                  <a
-                    href={`https://wa.me/55${selectedCustomer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selectedCustomer.name.split(" ")[0]}! Tudo bem?`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button className="w-full rounded-xl bg-green-600 hover:bg-green-700 text-white">
-                      <Smartphone size={16} /> WhatsApp
-                    </Button>
-                  </a>
-                )}
+                <div className="flex flex-col gap-2">
+                  {selectedCustomer.phone && (
+                    <a
+                      href={`https://wa.me/55${selectedCustomer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selectedCustomer.name.split(" ")[0]}! Tudo bem?`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button className="w-full rounded-xl bg-green-600 hover:bg-green-700 text-white shadow-sm">
+                        <Smartphone size={16} /> WhatsApp
+                      </Button>
+                    </a>
+                  )}
+                  <Button variant="outline" className="w-full rounded-xl" onClick={() => openEditModal(selectedCustomer)}>
+                    <Pencil size={14} /> Editar Dados
+                  </Button>
+                </div>
 
                 <div>
                   <h4 className="font-display font-bold text-foreground mb-3">Histórico de Reservas</h4>
