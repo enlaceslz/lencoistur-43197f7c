@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
   DollarSign, TrendingUp, TrendingDown, CreditCard, Wallet, Receipt,
-  Loader2, Download,
+  Loader2, Download, FileText
 } from "lucide-react";
 import FinanceiroStats from "@/components/financeiro/FinanceiroStats";
 import FluxoCaixaTab from "@/components/financeiro/FluxoCaixaTab";
