@@ -584,14 +584,13 @@ const AdminCRM = () => {
         </div>
       </div>
 
-      {/* Create/Edit Modal */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingCustomer ? "Editar Cliente" : "Novo Cliente"}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
+            <div className="md:col-span-2">
               <Label htmlFor="customer-name">Nome *</Label>
               <Input
                 id="customer-name"
@@ -600,6 +599,7 @@ const AdminCRM = () => {
                 placeholder="Nome completo"
                 maxLength={120}
                 required
+                className="rounded-xl"
               />
             </div>
             <div>
@@ -612,7 +612,21 @@ const AdminCRM = () => {
                 placeholder="email@exemplo.com"
                 maxLength={255}
                 required
+                className="rounded-xl"
               />
+            </div>
+            <div>
+              <Label htmlFor="customer-status">Status</Label>
+              <select
+                id="customer-status"
+                value={form.status}
+                onChange={(e) => setForm({ ...form, status: e.target.value })}
+                className="w-full flex h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="regular">Regular</option>
+                <option value="vip">VIP</option>
+                <option value="bloqueado">Bloqueado</option>
+              </select>
             </div>
             <div>
               <Label htmlFor="customer-phone">Telefone</Label>
@@ -622,6 +636,7 @@ const AdminCRM = () => {
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 placeholder="(99) 99999-9999"
                 maxLength={15}
+                className="rounded-xl"
               />
             </div>
             <div>
@@ -632,14 +647,35 @@ const AdminCRM = () => {
                 onChange={(e) => setForm({ ...form, cpf: e.target.value })}
                 placeholder="000.000.000-00"
                 maxLength={14}
+                className="rounded-xl"
+              />
+            </div>
+            <div>
+              <Label htmlFor="customer-birth">Data de Nascimento</Label>
+              <Input
+                id="customer-birth"
+                type="date"
+                value={form.birth_date}
+                onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
+                className="rounded-xl"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <Label htmlFor="customer-notes">Observações</Label>
+              <textarea
+                id="customer-notes"
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                placeholder="Notas internas sobre o cliente..."
+                className="w-full min-h-[80px] rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setModalOpen(false)} disabled={saving}>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setModalOpen(false)} disabled={saving} className="rounded-xl">
               Cancelar
             </Button>
-            <Button onClick={handleSave} disabled={saving}>
+            <Button onClick={handleSave} disabled={saving} className="rounded-xl">
               {saving ? <Loader2 size={14} className="animate-spin mr-1" /> : <Save size={14} className="mr-1" />}
               {editingCustomer ? "Salvar" : "Cadastrar"}
             </Button>
