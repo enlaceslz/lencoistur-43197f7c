@@ -24,11 +24,15 @@ export type Database = {
           final_total: number
           guests: number
           id: string
+          invoice_issued: boolean | null
+          invoice_number: string | null
+          invoice_url: string | null
           item_name: string
           notes: string | null
           pay_method: string
           payment_status: string
           pix_code: string | null
+          receipt_issued: boolean | null
           status: string
           total: number
           type: string
@@ -44,11 +48,15 @@ export type Database = {
           final_total: number
           guests?: number
           id?: string
+          invoice_issued?: boolean | null
+          invoice_number?: string | null
+          invoice_url?: string | null
           item_name: string
           notes?: string | null
           pay_method: string
           payment_status?: string
           pix_code?: string | null
+          receipt_issued?: boolean | null
           status?: string
           total: number
           type: string
@@ -64,11 +72,15 @@ export type Database = {
           final_total?: number
           guests?: number
           id?: string
+          invoice_issued?: boolean | null
+          invoice_number?: string | null
+          invoice_url?: string | null
           item_name?: string
           notes?: string | null
           pay_method?: string
           payment_status?: string
           pix_code?: string | null
+          receipt_issued?: boolean | null
           status?: string
           total?: number
           type?: string
