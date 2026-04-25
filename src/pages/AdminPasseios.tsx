@@ -585,7 +585,22 @@ const AdminPasseios = () => {
                 <TableCell className="text-muted-foreground">
                   <span className="flex items-center gap-1"><Clock size={13} /> {t.duration}</span>
                 </TableCell>
-                <TableCell className="font-medium text-foreground">{fmt(t.price)}</TableCell>
+                <TableCell>
+                  <div className="flex flex-col gap-1">
+                    {t.mode_collective_enabled && (
+                      <div className="flex items-center gap-1.5" title="Coletivo">
+                        <Users size={12} className="text-primary" />
+                        <span className="text-sm font-medium">{fmt(t.price)}</span>
+                      </div>
+                    )}
+                    {t.mode_private_enabled && (
+                      <div className="flex items-center gap-1.5" title="Privativo">
+                        <Shield size={12} className="text-secondary" />
+                        <span className="text-sm font-medium text-secondary">{fmt(t.private_price || 1300)}</span>
+                      </div>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>
                   {t.pix_discount > 0 ? (
                     <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
