@@ -855,6 +855,12 @@ const AdminCRM = () => {
                 required
                 className="rounded-xl"
               />
+              {form.birth_date && (
+                <p className="text-[10px] mt-1 text-muted-foreground">
+                  Idade: {calculateAge(form.birth_date)} anos 
+                  ({calculateAge(form.birth_date)! < 18 ? "Menor" : "Maior"})
+                </p>
+              )}
             </div>
             <div>
               <Label htmlFor="customer-email">E-mail *</Label>
