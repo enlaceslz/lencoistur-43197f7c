@@ -616,12 +616,32 @@ const AdminReservas = () => {
                 </div>
                 <div>
                   <label className="text-sm text-muted-foreground mb-1 block">Telefone</label>
-                  <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: e.target.value }))} placeholder="(99) 99999-9999" maxLength={20} disabled={!!selectedCustomerId} />
+                  <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" maxLength={15} disabled={!!selectedCustomerId} />
                 </div>
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={newLoading}>
+            {/* Summary */}
+            {unitPrice > 0 && (
+              <div className="bg-muted p-3 rounded-lg space-y-1">
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Subtotal ({newForm.guests}x {fmt(unitPrice)})</span>
+                  <span>{fmt(total)}</span>
+                </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-xs text-green-600 dark:text-green-400">
+                    <span>Desconto PIX ({pixDiscountPercent}%)</span>
+                    <span>-{fmt(discount)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm font-bold text-foreground border-t border-border mt-1 pt-1">
+                  <span>Total</span>
+                  <span>{fmt(finalTotal)}</span>
+                </div>
+              </div>
+            )}
+
+            <Button type="submit" className="w-full" disabled={newLoading || !newForm.itemName}>
               {newLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Plus size={16} className="mr-2" />}
               Criar Reserva
             </Button>
