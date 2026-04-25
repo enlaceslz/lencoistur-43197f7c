@@ -603,7 +603,7 @@ const AdminPasseios = () => {
                     <button onClick={() => handleDuplicate(t)} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-blue-500 transition-colors" title="Duplicar">
                       <Copy size={16} />
                     </button>
-                    <button onClick={() => openEdit(t)} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
+                    <button onClick={() => openEdit(t)} className="p-2 rounded-lg bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all shadow-sm border border-primary/10" title="Editar">
                       <Pencil size={16} />
                     </button>
                     <button onClick={() => handleDelete(t.id)} className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
