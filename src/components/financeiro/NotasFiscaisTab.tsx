@@ -100,12 +100,12 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
     } as any);
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, bookingId: string) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, bookingId: string, field: "voucher_url" | "invoice_url") => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const fileExt = file.name.split('.').pop();
-    const filePath = `${bookingId}-${Math.random()}.${fileExt}`;
+    const filePath = `${field}/${bookingId}-${Math.random()}.${fileExt}`;
 
     try {
       const { data, error: uploadError } = await supabase.storage
@@ -118,8 +118,8 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
         .from('vouchers')
         .getPublicUrl(filePath);
 
-      await updateBooking(bookingId, { voucher_url: publicUrl } as any);
-      toast.success("Comprovante anexado com sucesso!");
+      await updateBooking(bookingId, { [field]: publicUrl } as any);
+      toast.success(field === "voucher_url" ? "Comprovante anexado!" : "Nota Fiscal anexada!");
     } catch (error) {
       console.error("Upload error:", error);
       toast.error("Erro ao enviar arquivo");
@@ -224,16 +224,16 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
                       <div className="relative">
                         <input
                           type="file"
-                          id={`file-${b.id}`}
+                          id={`voucher-${b.id}`}
                           className="hidden"
-                          onChange={(e) => handleFileUpload(e, b.id)}
+                          onChange={(e) => handleFileUpload(e, b.id, "voucher_url")}
                           accept="image/*,.pdf"
                         />
                         <Button 
                           variant="ghost" 
                           size="sm" 
                           className="h-8 gap-1 text-muted-foreground hover:text-primary"
-                          onClick={() => document.getElementById(`file-${b.id}`)?.click()}
+                          onClick={() => document.getElementById(`voucher-${b.id}`)?.click()}
                         >
                           <Upload size={14} />
                           Anexar
@@ -243,14 +243,48 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
                   </div>
                 </TableCell>
                 <TableCell>
-                  {b.invoice_issued ? (
-                    <div className="flex flex-col gap-1">
-                      <Badge variant="outline" className="border-green-200 text-green-700 bg-green-50">Emitida</Badge>
-                      {b.invoice_number && <span className="text-xs font-mono">#{b.invoice_number}</span>}
-                    </div>
-                  ) : (
-                    <Badge variant="outline" className="text-muted-foreground">Pendente</Badge>
-                  )}
+                  <div className="flex flex-col gap-1">
+                    {b.invoice_issued ? (
+                      <div className="flex flex-col gap-1">
+                        <Badge variant="outline" className="border-green-200 text-green-700 bg-green-50 w-fit">Emitida</Badge>
+                        <div className="flex items-center gap-2">
+                          {b.invoice_url ? (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-7 px-2 gap-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 text-xs"
+                              onClick={() => window.open(b.invoice_url!, "_blank")}
+                            >
+                              <Paperclip size={12} />
+                              Ver NF-e
+                            </Button>
+                          ) : (
+                            <div className="relative">
+                              <input
+                                type="file"
+                                id={`invoice-${b.id}`}
+                                className="hidden"
+                                onChange={(e) => handleFileUpload(e, b.id, "invoice_url")}
+                                accept="image/*,.pdf"
+                              />
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 px-2 gap-1 text-muted-foreground hover:text-primary text-xs"
+                                onClick={() => document.getElementById(`invoice-${b.id}`)?.click()}
+                              >
+                                <Upload size={12} />
+                                Anexar NF-e
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                        {b.invoice_number && <span className="text-[10px] font-mono opacity-70">#{b.invoice_number}</span>}
+                      </div>
+                    ) : (
+                      <Badge variant="outline" className="text-muted-foreground w-fit">Pendente</Badge>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>
                   {b.receipt_issued ? (
@@ -301,18 +335,19 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
                         )}
                         <DropdownMenuItem onClick={() => handleMarkInvoiceIssued(b.id, !!b.invoice_issued)}>
                           <FileText size={14} className="mr-2" />
-                          {b.invoice_issued ? "Remover NF-e" : "Marcar NF-e Emitida"}
+                          {b.invoice_issued ? "Remover Marcação de NF-e" : "Marcar NF-e Emitida"}
                         </DropdownMenuItem>
+                        {b.invoice_url && (
+                          <DropdownMenuItem onClick={() => updateBooking(b.id, { invoice_url: null } as any)}>
+                            <ExternalLink size={14} className="mr-2" />
+                            Remover Arquivo da NF-e
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem onClick={() => updateBooking(b.id, { receipt_issued: !b.receipt_issued })}>
                           <Receipt size={14} className="mr-2" />
                           {b.receipt_issued ? "Marcar Recibo Pendente" : "Marcar Recibo Enviado"}
                         </DropdownMenuItem>
-                        {b.invoice_url && (
-                          <DropdownMenuItem onClick={() => window.open(b.invoice_url!, "_blank")}>
-                            <ExternalLink size={14} className="mr-2" />
-                            Ver Nota Fiscal
-                          </DropdownMenuItem>
-                        )}
+
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
