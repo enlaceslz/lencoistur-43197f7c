@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Search, Receipt, FileText, CheckCircle2, Clock, 
-  ExternalLink, Printer, MoreHorizontal, Download
+  ExternalLink, Printer, MoreHorizontal, Download, Paperclip, Upload
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -30,6 +30,7 @@ interface BookingRow {
   invoice_issued?: boolean;
   receipt_issued?: boolean;
   invoice_url?: string | null;
+  voucher_url?: string | null;
   customers: { name: string; email: string; phone?: string } | null;
   type: string;
   date: string | null;
@@ -99,6 +100,32 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
     } as any);
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, bookingId: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${bookingId}-${Math.random()}.${fileExt}`;
+
+    try {
+      const { data, error: uploadError } = await supabase.storage
+        .from('vouchers')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('vouchers')
+        .getPublicUrl(filePath);
+
+      await updateBooking(bookingId, { voucher_url: publicUrl } as any);
+      toast.success("Comprovante anexado com sucesso!");
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Erro ao enviar arquivo");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -154,6 +181,7 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
               <TableHead>Cliente</TableHead>
               <TableHead>Valor</TableHead>
               <TableHead>Status Pgto</TableHead>
+              <TableHead>Comprovante</TableHead>
               <TableHead>NF-e</TableHead>
               <TableHead>Recibo</TableHead>
               <TableHead className="text-right">Ações</TableHead>
@@ -179,6 +207,40 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
                   <Badge variant={b.payment_status === "pago" ? "default" : "secondary"} className={b.payment_status === "pago" ? "bg-green-600 hover:bg-green-700" : ""}>
                     {b.payment_status === "pago" ? "Pago" : "Pendente"}
                   </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    {b.voucher_url ? (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 gap-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        onClick={() => window.open(b.voucher_url!, "_blank")}
+                      >
+                        <Paperclip size={14} />
+                        Ver
+                      </Button>
+                    ) : (
+                      <div className="relative">
+                        <input
+                          type="file"
+                          id={`file-${b.id}`}
+                          className="hidden"
+                          onChange={(e) => handleFileUpload(e, b.id)}
+                          accept="image/*,.pdf"
+                        />
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 gap-1 text-muted-foreground hover:text-primary"
+                          onClick={() => document.getElementById(`file-${b.id}`)?.click()}
+                        >
+                          <Upload size={14} />
+                          Anexar
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>
                   {b.invoice_issued ? (
@@ -231,6 +293,12 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        {b.voucher_url && (
+                          <DropdownMenuItem onClick={() => updateBooking(b.id, { voucher_url: null } as any)}>
+                            <Paperclip size={14} className="mr-2" />
+                            Remover Comprovante
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem onClick={() => handleMarkInvoiceIssued(b.id, !!b.invoice_issued)}>
                           <FileText size={14} className="mr-2" />
                           {b.invoice_issued ? "Remover NF-e" : "Marcar NF-e Emitida"}
