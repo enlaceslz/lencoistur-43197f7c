@@ -357,6 +357,36 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_types: {
+        Row: {
+          color: string | null
+          created_at: string
+          icon: string | null
+          id: string
+          label: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       partners: {
         Row: {
           active: boolean

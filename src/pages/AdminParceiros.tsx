@@ -14,12 +14,20 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Loader2, MapPin,
+  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Loader2, MapPin, Settings2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+interface PartnerType {
+  id: string;
+  name: string;
+  label: string;
+  icon: string;
+  color: string;
+}
 
 interface Partner {
   id: string;
@@ -37,12 +45,11 @@ interface Partner {
   cadastur: string | null;
 }
 
-const typeConfig: Record<string, { icon: typeof Building2; label: string; color: string }> = {
-  hotel: { icon: Building2, label: "Hotel / Pousada", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300" },
-  guia: { icon: Compass, label: "Guia Turístico", color: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300" },
-  motorista: { icon: Car, label: "Motorista", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300" },
-  agencia: { icon: Users, label: "Agência", color: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300" },
+const iconMap: Record<string, any> = {
+  Building2, Compass, Car, Users, MapPin, Search, Plus, Edit, Trash2, Loader2
 };
+
+const getIcon = (name: string) => iconMap[name] || Building2;
 
 function formatCpfCnpj(value: string): string {
   const digits = value.replace(/\D/g, "");
@@ -65,33 +72,55 @@ function isCnpj(value: string): boolean {
 
 const AdminParceiros = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
+  const [partnerTypes, setPartnerTypes] = useState<PartnerType[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("todos");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [typesDialogOpen, setTypesDialogOpen] = useState(false);
   const [editPartner, setEditPartner] = useState<Partner | null>(null);
+  const [editType, setEditType] = useState<PartnerType | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteTypeId, setDeleteTypeId] = useState<string | null>(null);
   const [cnpjLoading, setCnpjLoading] = useState(false);
+  
   const [form, setForm] = useState({
     name: "", type: "hotel", contact_name: "", phone: "", email: "",
     commission_rate: "10", cpf_cnpj: "", address: "", cnh: "", cnh_validade: "", cadastur: "",
   });
 
-  const types = ["todos", ...Object.keys(typeConfig)];
+  const [typeForm, setTypeForm] = useState({
+    name: "", label: "", icon: "Building2", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+  });
 
-  useEffect(() => { fetchPartners(); }, []);
+  useEffect(() => { 
+    fetchInitialData(); 
+  }, []);
+
+  const fetchInitialData = async () => {
+    setLoading(true);
+    await Promise.all([fetchPartners(), fetchTypes()]);
+    setLoading(false);
+  };
 
   const fetchPartners = async () => {
-    setLoading(true);
     const { data } = await supabase.from("partners").select("*").order("created_at", { ascending: false });
     if (data) setPartners(data as Partner[]);
-    setLoading(false);
+  };
+
+  const fetchTypes = async () => {
+    const { data } = await supabase.from("partner_types").select("*").order("label", { ascending: true });
+    if (data) setPartnerTypes(data as PartnerType[]);
   };
 
   const openNew = () => {
     setEditPartner(null);
-    setForm({ name: "", type: "hotel", contact_name: "", phone: "", email: "", commission_rate: "10", cpf_cnpj: "", address: "", cnh: "", cnh_validade: "", cadastur: "" });
+    setForm({ 
+      name: "", type: partnerTypes[0]?.name || "hotel", contact_name: "", phone: "", 
+      email: "", commission_rate: "10", cpf_cnpj: "", address: "", 
+      cnh: "", cnh_validade: "", cadastur: "" 
+    });
     setDialogOpen(true);
   };
 
@@ -105,6 +134,37 @@ const AdminParceiros = () => {
       cnh: p.cnh || "", cnh_validade: p.cnh_validade || "", cadastur: p.cadastur || "",
     });
     setDialogOpen(true);
+  };
+
+  const openNewType = () => {
+    setEditType(null);
+    setTypeForm({ name: "", label: "", icon: "Building2", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300" });
+  };
+
+  const openEditType = (t: PartnerType) => {
+    setEditType(t);
+    setTypeForm({ name: t.name, label: t.label, icon: t.icon, color: t.color });
+  };
+
+  const handleSaveType = async () => {
+    if (!typeForm.name || !typeForm.label) { toast.error("Nome e Rótulo são obrigatórios."); return; }
+    setSaving(true);
+    const payload = { ...typeForm, name: typeForm.name.toLowerCase().replace(/\s+/g, "_") };
+    
+    if (editType) {
+      const { error } = await supabase.from("partner_types").update(payload).eq("id", editType.id);
+      if (error) toast.error("Erro ao atualizar tipo."); else { toast.success("Tipo atualizado!"); fetchTypes(); setEditType(null); }
+    } else {
+      const { error } = await supabase.from("partner_types").insert(payload);
+      if (error) toast.error("Erro ao cadastrar tipo."); else { toast.success("Tipo cadastrado!"); fetchTypes(); }
+    }
+    setSaving(false);
+  };
+
+  const confirmDeleteType = async (id: string) => {
+    const { error } = await supabase.from("partner_types").delete().eq("id", id);
+    if (error) toast.error("Erro ao remover tipo. Verifique se existem parceiros vinculados."); 
+    else { toast.success("Tipo removido."); fetchTypes(); }
   };
 
   const lookupCnpj = async (cnpj: string) => {
@@ -196,12 +256,6 @@ const AdminParceiros = () => {
   });
 
   const activeCount = partners.filter((p) => p.active).length;
-  const stats = [
-    { icon: Building2, label: "Hotéis", value: partners.filter((p) => p.type === "hotel").length, color: "text-blue-600" },
-    { icon: Compass, label: "Guias", value: partners.filter((p) => p.type === "guia").length, color: "text-green-600" },
-    { icon: Car, label: "Motoristas", value: partners.filter((p) => p.type === "motorista").length, color: "text-amber-600" },
-    { icon: Users, label: "Agências", value: partners.filter((p) => p.type === "agencia").length, color: "text-purple-600" },
-  ];
 
   if (loading) {
     return (
@@ -215,24 +269,37 @@ const AdminParceiros = () => {
 
   return (
     <AdminLayout title="Parceiros">
-      <div className="flex items-center gap-3 mb-6">
-        <p className="text-sm text-muted-foreground">
-          <span className="font-semibold text-foreground">{partners.length}</span> parceiros cadastrados · <span className="font-semibold text-green-600">{activeCount}</span> ativos
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+          <p className="text-sm text-muted-foreground">
+            <span className="font-semibold text-foreground">{partners.length}</span> parceiros cadastrados · <span className="font-semibold text-green-600">{activeCount}</span> ativos
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setTypesDialogOpen(true)}>
+            <Settings2 size={16} className="mr-1.5" /> Gerenciar Tipos
+          </Button>
+          <Button onClick={openNew} size="sm">
+            <Plus size={16} className="mr-1.5" /> Novo Parceiro
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        {stats.map((s) => (
-          <Card key={s.label}>
-            <CardContent className="p-5 flex items-center gap-4">
-              <div className={`p-3 rounded-xl bg-muted ${s.color}`}><s.icon size={22} /></div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{s.value}</p>
-                <p className="text-xs text-muted-foreground">{s.label}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        {partnerTypes.map((t) => {
+          const Icon = getIcon(t.icon);
+          return (
+            <Card key={t.id} className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setTypeFilter(t.name)}>
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className={`p-3 rounded-xl ${t.color}`}><Icon size={22} /></div>
+                <div>
+                  <p className="text-2xl font-bold text-foreground">{partners.filter((p) => p.type === t.name).length}</p>
+                  <p className="text-xs text-muted-foreground">{t.label}</p>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       <Card className="mb-6">
@@ -242,13 +309,15 @@ const AdminParceiros = () => {
             <Input placeholder="Buscar por nome, contato, email ou CPF/CNPJ..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
           </div>
           <div className="flex gap-2 flex-wrap">
-            {types.map((t) => (
-              <Button key={t} variant={typeFilter === t ? "default" : "outline"} size="sm" onClick={() => setTypeFilter(t)} className="capitalize">
-                {t === "todos" ? "Todos" : typeConfig[t]?.label || t}
+            <Button variant={typeFilter === "todos" ? "default" : "outline"} size="sm" onClick={() => setTypeFilter("todos")}>
+              Todos
+            </Button>
+            {partnerTypes.map((t) => (
+              <Button key={t.id} variant={typeFilter === t.name ? "default" : "outline"} size="sm" onClick={() => setTypeFilter(t.name)}>
+                {t.label}
               </Button>
             ))}
           </div>
-          <Button onClick={openNew}><Plus size={16} className="mr-1" /> Novo Parceiro</Button>
         </CardContent>
       </Card>
 
@@ -257,7 +326,7 @@ const AdminParceiros = () => {
           <div className="p-12 text-center text-muted-foreground">
             <Users className="mx-auto mb-3 opacity-40" size={40} />
             <p className="font-medium">Nenhum parceiro encontrado</p>
-            <p className="text-sm mt-1">Cadastre um novo parceiro para começar.</p>
+            <p className="text-sm mt-1">Cadastre um novo parceiro ou mude o filtro.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -270,12 +339,13 @@ const AdminParceiros = () => {
                   <TableHead>Contato</TableHead>
                   <TableHead>Comissão</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="w-24">Ações</TableHead>
+                  <TableHead className="w-24 text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtered.map((p) => {
-                  const tc = typeConfig[p.type] || typeConfig.hotel;
+                  const type = partnerTypes.find(t => t.name === p.type) || partnerTypes[0];
+                  const Icon = getIcon(type?.icon || "Building2");
                   return (
                     <TableRow key={p.id}>
                       <TableCell>
@@ -286,8 +356,8 @@ const AdminParceiros = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="secondary" className={tc.color}>
-                          <tc.icon size={12} className="mr-1" />{tc.label}
+                        <Badge variant="secondary" className={type?.color}>
+                          <Icon size={12} className="mr-1" />{type?.label}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm font-mono">{p.cpf_cnpj || "—"}</TableCell>
@@ -314,8 +384,8 @@ const AdminParceiros = () => {
                           {p.active ? "Ativo" : "Inativo"}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
+                      <TableCell className="text-right">
+                        <div className="flex gap-1 justify-end">
                           <Button variant="ghost" size="icon" onClick={() => openEdit(p)}><Edit size={14} /></Button>
                           <Button variant="ghost" size="icon" onClick={() => setDeleteId(p.id)}><Trash2 size={14} className="text-destructive" /></Button>
                         </div>
@@ -348,9 +418,6 @@ const AdminParceiros = () => {
                 />
                 {cnpjLoading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-primary" size={16} />}
               </div>
-              {isCnpj(form.cpf_cnpj) && (
-                <p className="text-xs text-muted-foreground mt-1">CNPJ detectado — dados serão preenchidos automaticamente via Receita Federal.</p>
-              )}
             </div>
             <div>
               <Label className="mb-1.5 block">Nome / Razão Social *</Label>
@@ -360,8 +427,8 @@ const AdminParceiros = () => {
               <Label className="mb-1.5 block">Tipo *</Label>
               <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}
                 className="w-full bg-muted border border-border rounded-xl px-4 py-2.5 text-sm text-foreground outline-none">
-                {Object.entries(typeConfig).map(([k, v]) => (
-                  <option key={k} value={k}>{v.label}</option>
+                {partnerTypes.map((t) => (
+                  <option key={t.id} value={t.name}>{t.label}</option>
                 ))}
               </select>
             </div>
@@ -388,7 +455,6 @@ const AdminParceiros = () => {
               <Input type="number" min="0" max="100" value={form.commission_rate} onChange={(e) => setForm({ ...form, commission_rate: e.target.value })} />
             </div>
 
-            {/* Motorista: CNH fields */}
             {form.type === "motorista" && (
               <div className="space-y-4 p-4 border border-amber-200 dark:border-amber-800 rounded-xl bg-amber-50/50 dark:bg-amber-900/10">
                 <p className="text-sm font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1"><Car size={14} /> Dados do Motorista</p>
@@ -405,7 +471,6 @@ const AdminParceiros = () => {
               </div>
             )}
 
-            {/* Guia: Cadastur field */}
             {form.type === "guia" && (
               <div className="space-y-4 p-4 border border-green-200 dark:border-green-800 rounded-xl bg-green-50/50 dark:bg-green-900/10">
                 <p className="text-sm font-semibold text-green-700 dark:text-green-400 flex items-center gap-1"><Compass size={14} /> Dados do Guia</p>
@@ -423,6 +488,64 @@ const AdminParceiros = () => {
               {editPartner ? "Salvar" : "Cadastrar"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Types Management Dialog */}
+      <Dialog open={typesDialogOpen} onOpenChange={setTypesDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Gerenciar Tipos de Parceiros</DialogTitle>
+            <DialogDescription>Adicione, edite ou remova categorias de parceiros.</DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid md:grid-cols-2 gap-6 mt-4">
+            <div className="space-y-4 border-r pr-6">
+              <h4 className="font-semibold text-sm">{editType ? "Editar Tipo" : "Novo Tipo"}</h4>
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-xs">Rótulo (Ex: Restaurante)</Label>
+                  <Input value={typeForm.label} onChange={(e) => setTypeForm({ ...typeForm, label: e.target.value })} />
+                </div>
+                <div>
+                  <Label className="text-xs">Identificador único (Ex: restaurante)</Label>
+                  <Input value={typeForm.name} onChange={(e) => setTypeForm({ ...typeForm, name: e.target.value })} placeholder="sem espaços ou acentos" />
+                </div>
+                <div>
+                  <Label className="text-xs">Ícone</Label>
+                  <select value={typeForm.icon} onChange={(e) => setTypeForm({ ...typeForm, icon: e.target.value })}
+                    className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm outline-none">
+                    {Object.keys(iconMap).map(icon => <option key={icon} value={icon}>{icon}</option>)}
+                  </select>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" className="flex-1" onClick={handleSaveType} disabled={saving}>
+                    {saving && <Loader2 className="animate-spin mr-1.5" size={14} />}
+                    {editType ? "Salvar" : "Adicionar"}
+                  </Button>
+                  {editType && <Button size="sm" variant="ghost" onClick={() => setEditType(null)}>Cancelar</Button>}
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h4 className="font-semibold text-sm">Tipos Existentes</h4>
+              <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                {partnerTypes.map(t => (
+                  <div key={t.id} className="flex items-center justify-between p-2 rounded-lg border bg-muted/30 group">
+                    <div className="flex items-center gap-2">
+                      <div className={`p-1.5 rounded ${t.color}`}>{(() => { const Icon = getIcon(t.icon); return <Icon size={14} />; })()}</div>
+                      <span className="text-sm font-medium">{t.label}</span>
+                    </div>
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditType(t)}><Edit size={12} /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => confirmDeleteType(t.id)}><Trash2 size={12} /></Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
