@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import galleryLagoasAzuis from "@/assets/tour-lagoas-azuis-hero.jpg";
-import galleryBanho from "@/assets/gallery-banho-lagoa.jpg";
-import galleryPanorama from "@/assets/gallery-panorama-dunas.jpg";
-import galleryFarol from "@/assets/gallery-farol-mandacaru.jpg";
-import gallery4x4 from "@/assets/gallery-4x4-dunas.jpg";
-import galleryPorDoSol from "@/assets/gallery-por-do-sol.jpg";
-import galleryCaiaque from "@/assets/tour-caiaque.jpg";
+const galleryLagoasAzuis = "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=80";
+const galleryBanho = "https://images.unsplash.com/photo-1632734490799-738914614a93?auto=format&fit=crop&q=80";
+const galleryPanorama = "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=80";
+const galleryFarol = "https://images.unsplash.com/photo-1506190500381-458919392ca3?auto=format&fit=crop&q=80";
+const gallery4x4 = "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&q=80";
+const galleryPorDoSol = "https://images.unsplash.com/photo-1569336415962-a4bd9f67c07a?auto=format&fit=crop&q=80";
+const galleryCaiaque = "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=80";
 
 const galleryImages = [
   { src: galleryLagoasAzuis, alt: "Dunas brancas e lagoas azuis dos Lençóis Maranhenses - Santo Amaro" },
