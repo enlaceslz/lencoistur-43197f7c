@@ -9,14 +9,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { toast } from "sonner";
 import { FileText, Upload, Plus, Trash2, Download, Eye, Search, Calendar, AlertTriangle } from "lucide-react";
 
-const DOC_TYPES = [
-  { value: "certificado", label: "Certificado" },
-  { value: "alvara", label: "Alvará" },
-  { value: "licenca", label: "Licença" },
-  { value: "seguro", label: "Seguro" },
-  { value: "contrato", label: "Contrato" },
-  { value: "outro", label: "Outro" },
-];
+interface DocType {
+  id: string;
+  name: string;
+  value: string;
+}
+
 
 const STATUS_OPTIONS = [
   { value: "vigente", label: "Vigente", color: "bg-green-100 text-green-800" },
@@ -38,18 +36,23 @@ interface Doc {
 
 const AdminDocumentos = () => {
   const [docs, setDocs] = useState<Doc[]>([]);
+  const [docTypes, setDocTypes] = useState<DocType[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [typeDialogOpen, setTypeDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
-    name: "", type: "certificado", description: "", expiry_date: "", status: "vigente",
+    name: "", type: "", description: "", expiry_date: "", status: "vigente",
   });
+  const [typeForm, setTypeForm] = useState({ name: "", value: "" });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [editId, setEditId] = useState<string | null>(null);
+  const [editTypeId, setEditTypeId] = useState<string | null>(null);
+
 
   const getSignedUrl = async (storagePath: string) => {
     const { data, error } = await supabase.storage.from("company-documents").createSignedUrl(storagePath, 3600);
@@ -72,14 +75,24 @@ const AdminDocumentos = () => {
     }
   };
 
+  const loadTypes = async () => {
+    const { data } = await supabase.from("document_types").select("*").order("name");
+    setDocTypes((data as DocType[]) || []);
+    if (data && data.length > 0 && !form.type) {
+      setForm(prev => ({ ...prev, type: data[0].value }));
+    }
+  };
+
   const load = async () => {
     setLoading(true);
+    await loadTypes();
     const { data } = await supabase.from("documents").select("*").order("created_at", { ascending: false });
     setDocs((data as Doc[]) || []);
     setLoading(false);
   };
 
   useEffect(() => { load(); }, []);
+
 
   const resetForm = () => {
     setForm({ name: "", type: "certificado", description: "", expiry_date: "", status: "vigente" });
@@ -135,6 +148,41 @@ const AdminDocumentos = () => {
     load();
   };
 
+  const handleSaveType = async () => {
+    if (!typeForm.name.trim() || !typeForm.value.trim()) {
+      toast.error("Nome e valor são obrigatórios");
+      return;
+    }
+
+    if (editTypeId) {
+      const { error } = await supabase.from("document_types").update({
+        name: typeForm.name,
+        value: typeForm.value.toLowerCase().replace(/\s+/g, "_")
+      }).eq("id", editTypeId);
+      if (error) toast.error(error.message); else toast.success("Tipo de documento atualizado!");
+    } else {
+      const { error } = await supabase.from("document_types").insert({
+        name: typeForm.name,
+        value: typeForm.value.toLowerCase().replace(/\s+/g, "_")
+      });
+      if (error) toast.error(error.message); else toast.success("Tipo de documento cadastrado!");
+    }
+
+    setTypeForm({ name: "", value: "" });
+    setEditTypeId(null);
+    loadTypes();
+  };
+
+  const handleDeleteType = async (id: string) => {
+    if (!confirm("Excluir este tipo de documento?")) return;
+    const { error } = await supabase.from("document_types").delete().eq("id", id);
+    if (error) toast.error("Não foi possível excluir. Verifique se existem documentos usando este tipo.");
+    else {
+      toast.success("Tipo excluído");
+      loadTypes();
+    }
+  };
+
   const openEdit = (doc: Doc) => {
     setForm({
       name: doc.name, type: doc.type, description: doc.description || "",
@@ -144,6 +192,7 @@ const AdminDocumentos = () => {
     setSelectedFile(null);
     setDialogOpen(true);
   };
+
 
   const filtered = docs.filter(d => {
     const matchSearch = d.name.toLowerCase().includes(search.toLowerCase());
@@ -209,12 +258,16 @@ const AdminDocumentos = () => {
         </div>
         <select className="border rounded-lg px-3 py-2 text-sm" value={filterType} onChange={e => setFilterType(e.target.value)}>
           <option value="">Todos os tipos</option>
-          {DOC_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+          {docTypes.map(t => <option key={t.id} value={t.value}>{t.name}</option>)}
         </select>
+        <Button variant="outline" onClick={() => setTypeDialogOpen(true)}>
+          Gerenciar Tipos
+        </Button>
         <Button onClick={() => { resetForm(); setDialogOpen(true); }}>
           <Plus size={16} /> Novo Documento
         </Button>
       </div>
+
 
       {/* Table */}
       <Card>
@@ -237,7 +290,7 @@ const AdminDocumentos = () => {
                 {filtered.map(doc => (
                   <tr key={doc.id} className="border-b hover:bg-muted/30">
                     <td className="p-3 font-medium">{doc.name}</td>
-                    <td className="p-3">{DOC_TYPES.find(t => t.value === doc.type)?.label || doc.type}</td>
+                    <td className="p-3">{docTypes.find(t => t.value === doc.type)?.name || doc.type}</td>
                     <td className="p-3">{doc.expiry_date ? <span className="flex items-center gap-1"><Calendar size={14} />{new Date(doc.expiry_date).toLocaleDateString("pt-BR")}</span> : "—"}</td>
                     <td className="p-3">{statusBadge(doc.status)}</td>
                     <td className="p-3">{doc.file_url ? (
@@ -273,7 +326,7 @@ const AdminDocumentos = () => {
               <div>
                 <label className="text-sm font-medium">Tipo</label>
                 <select className="w-full border rounded-lg px-3 py-2 text-sm" value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
-                  {DOC_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  {docTypes.map(t => <option key={t.id} value={t.value}>{t.name}</option>)}
                 </select>
               </div>
               <div>
@@ -304,8 +357,80 @@ const AdminDocumentos = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Document Types Dialog */}
+      <Dialog open={typeDialogOpen} onOpenChange={setTypeDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Gerenciar Tipos de Documento</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <div className="flex-1 space-y-1">
+                <Input 
+                  placeholder="Nome do Tipo (ex: Alvará)" 
+                  value={typeForm.name} 
+                  onChange={e => {
+                    const val = e.target.value;
+                    setTypeForm({ 
+                      name: val, 
+                      value: val.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "_") 
+                    });
+                  }} 
+                />
+              </div>
+              <Button onClick={handleSaveType}>
+                {editTypeId ? "Salvar" : "Adicionar"}
+              </Button>
+            </div>
+
+            <div className="border rounded-md max-h-[300px] overflow-y-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/50">
+                    <th className="text-left p-2">Nome</th>
+                    <th className="text-right p-2">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {docTypes.map(type => (
+                    <tr key={type.id} className="border-b last:border-0 hover:bg-muted/30">
+                      <td className="p-2">{type.name}</td>
+                      <td className="p-2 text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => {
+                              setEditTypeId(type.id);
+                              setTypeForm({ name: type.name, value: type.value });
+                            }}
+                          >
+                            Editar
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDeleteType(type.id)}>
+                            <Trash2 size={14} className="text-destructive" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {editTypeId && (
+              <Button variant="ghost" className="w-full" onClick={() => {
+                setEditTypeId(null);
+                setTypeForm({ name: "", value: "" });
+              }}>
+                Cancelar Edição
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
+
 
 export default AdminDocumentos;
