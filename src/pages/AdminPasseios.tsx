@@ -165,7 +165,7 @@ const AdminPasseios = () => {
     e.preventDefault();
     const slug = form.slug || generateSlug(form.name);
     const pixDiscount = Math.max(0, Math.min(50, Number(form.pix_discount) || 0));
-    const payload = {
+    const payload: any = {
       name: form.name.trim(), slug,
       location: form.location.trim(), duration: form.duration.trim(),
       price: Number(form.price), private_price: Number(form.private_price) || 1300,
@@ -183,6 +183,11 @@ const AdminPasseios = () => {
       mode_private_enabled: !!form.mode_private_enabled,
       default_mode: form.default_mode === "coletivo" ? "coletivo" : "privativo",
     };
+
+    if (!editingId) {
+      payload.rating = 5.0;
+      payload.reviews_count = Math.floor(Math.random() * 20) + 5;
+    }
 
     if (!payload.name || !payload.price) {
       toast({ title: "Preencha nome e preço", variant: "destructive" });
