@@ -161,6 +161,9 @@ const AdminCRM = () => {
         email: c.email,
         phone: c.phone,
         cpf: c.cpf,
+        birth_date: c.birth_date,
+        notes: c.notes,
+        status: c.status || "regular",
         created_at: c.created_at,
         totalBookings: bookingsByCustomer[c.id]?.count || 0,
         totalSpent: bookingsByCustomer[c.id]?.total || 0,
@@ -188,7 +191,15 @@ const AdminCRM = () => {
 
   const openEditModal = (c: Customer) => {
     setEditingCustomer(c);
-    setForm({ name: c.name, email: c.email, phone: c.phone || "", cpf: c.cpf || "" });
+    setForm({ 
+      name: c.name, 
+      email: c.email, 
+      phone: c.phone || "", 
+      cpf: c.cpf || "",
+      birth_date: c.birth_date || "",
+      notes: c.notes || "",
+      status: c.status || "regular"
+    });
     setModalOpen(true);
   };
 
@@ -205,6 +216,9 @@ const AdminCRM = () => {
       email: form.email.trim().toLowerCase(),
       phone: form.phone.replace(/\D/g, "") || null,
       cpf: form.cpf.replace(/\D/g, "") || null,
+      birth_date: form.birth_date || null,
+      notes: form.notes || null,
+      status: form.status
     };
 
     if (editingCustomer) {
@@ -219,7 +233,7 @@ const AdminCRM = () => {
       }
       toast.success("Cliente atualizado!");
       if (selectedCustomer?.id === editingCustomer.id) {
-        setSelectedCustomer({ ...selectedCustomer, ...payload, phone: payload.phone, cpf: payload.cpf });
+        setSelectedCustomer({ ...selectedCustomer, ...payload });
       }
     } else {
       const { error } = await supabase.from("customers").insert(payload);
