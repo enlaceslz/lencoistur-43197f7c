@@ -53,10 +53,10 @@ const HeroSection = () => {
             <Calendar size={20} className="text-primary shrink-0" />
             <input type="text" placeholder={t("hero.searchWhen")} className="bg-transparent w-full outline-none text-foreground placeholder:text-muted-foreground" />
           </div>
-          <button className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors">
+          <Link to="/passeios" className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors">
             <Search size={18} />
             {t("hero.search")}
-          </button>
+          </Link>
         </div>
 
         <div className="animate-fade-up mt-6" style={{ animationDelay: "0.4s" }}>
