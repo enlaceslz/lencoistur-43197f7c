@@ -27,7 +27,11 @@ interface BookingRow {
   pay_method: string;
   created_at: string;
   date: string | null;
-  customers: { name: string; email: string } | null;
+  customers: { name: string; email: string; phone?: string } | null;
+  invoice_number?: string | null;
+  invoice_issued?: boolean;
+  receipt_issued?: boolean;
+  invoice_url?: string | null;
 }
 
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
