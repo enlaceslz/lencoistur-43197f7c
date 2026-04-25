@@ -436,7 +436,13 @@ const AdminCRM = () => {
     const matchesSearch = c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || (c.phone || "").includes(q) || (c.cpf || "").includes(q);
     if (filter === "with_bookings") return matchesSearch && c.totalBookings > 0;
     if (filter === "no_bookings") return matchesSearch && c.totalBookings === 0;
+    if (filter === "dependents") return false; // Handled separately
     return matchesSearch;
+  });
+
+  const filteredDependents = allDependents.filter((d) => {
+    const q = search.toLowerCase();
+    return d.name.toLowerCase().includes(q) || (d.cpf || "").includes(q) || d.customer_name.toLowerCase().includes(q);
   });
 
   const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0);
