@@ -669,7 +669,63 @@ const AdminCRM = () => {
                   </Button>
                 </div>
 
-                <div>
+                {/* Dependentes */}
+                <div className="border-t border-border pt-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-display font-bold text-foreground">Dependentes</h4>
+                    <Button variant="ghost" size="sm" className="h-7 text-[10px] gap-1 px-2 rounded-lg" onClick={openCreateDependentModal}>
+                      <UserPlus size={12} /> Adicionar
+                    </Button>
+                  </div>
+                  {dependents.length === 0 ? (
+                    <p className="text-xs text-muted-foreground italic">Nenhum dependente cadastrado.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {dependents.map((d) => {
+                        const age = calculateAge(d.birth_date);
+                        return (
+                          <div key={d.id} className="bg-muted/50 rounded-xl p-3 relative group">
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                                  <Baby size={14} />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-semibold text-foreground leading-none">{d.name}</p>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <Badge variant="outline" className="text-[8px] px-1 py-0 uppercase bg-primary/5 text-primary border-primary/20">
+                                      {d.relationship}
+                                    </Badge>
+                                    {age !== null && (
+                                      <span className="text-[10px] text-muted-foreground">
+                                        {age} anos {age < 18 ? "(Menor)" : "(Maior)"}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openEditDependentModal(d)}>
+                                  <Pencil size={10} />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-destructive/10" onClick={() => setDeleteDepConfirm(d.id)}>
+                                  <Trash2 size={10} className="text-destructive" />
+                                </Button>
+                              </div>
+                            </div>
+                            {d.cpf && (
+                              <p className="text-[10px] text-muted-foreground mt-2 ml-11">
+                                CPF: {maskCPF(d.cpf)}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <div className="border-t border-border pt-6">
                   <h4 className="font-display font-bold text-foreground mb-3">Histórico de Reservas</h4>
                   {customerBookings.length === 0 ? (
                     <p className="text-sm text-muted-foreground">Nenhuma reserva encontrada.</p>
