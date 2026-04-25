@@ -16,6 +16,9 @@ interface Customer {
   email: string;
   phone: string | null;
   cpf: string | null;
+  birth_date: string | null;
+  notes: string | null;
+  status: string;
   created_at: string;
   totalBookings: number;
   totalSpent: number;
@@ -40,9 +43,20 @@ interface CustomerForm {
   email: string;
   phone: string;
   cpf: string;
+  birth_date: string;
+  notes: string;
+  status: string;
 }
 
-const emptyForm: CustomerForm = { name: "", email: "", phone: "", cpf: "" };
+const emptyForm: CustomerForm = { 
+  name: "", 
+  email: "", 
+  phone: "", 
+  cpf: "", 
+  birth_date: "", 
+  notes: "", 
+  status: "regular" 
+};
 
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
 
