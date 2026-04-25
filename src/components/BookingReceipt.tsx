@@ -1,5 +1,7 @@
 import { Printer, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
 
 export interface ReceiptData {
   bookingCode: string;
@@ -42,7 +44,13 @@ const statusLabel = (s: string) => {
   return map[s] || s;
 };
 
-function generateReceiptHTML(data: ReceiptData): string {
+function generateReceiptHTML(data: ReceiptData, company?: any): string {
+  const brandName = company?.nome_fantasia || company?.razao_social || "LENÇÓIS TOUR";
+  const cnpj = company?.cnpj || "00.000.000/0001-00";
+  const cadastur = company?.cadastur || "00.000.000/0001-00";
+  const address = company?.endereco || "Santo Amaro do Maranhão, MA";
+  const phone = company?.telefone || "(98) 98588-0954";
+
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -86,9 +94,9 @@ function generateReceiptHTML(data: ReceiptData): string {
 <body>
   <div class="header">
     <div class="brand">
-      <h1>🏖️ LENÇÓIS TOUR</h1>
-      <p>Turismo de Aventura — Santo Amaro do Maranhão, MA</p>
-      <p>CNPJ: 00.000.000/0001-00 | CADASTUR: 00.000.000/0001-00</p>
+      <h1>🏖️ ${brandName}</h1>
+      <p>Turismo de Aventura — ${address}</p>
+      <p>CNPJ: ${cnpj} | CADASTUR: ${cadastur}</p>
     </div>
     <div class="receipt-info">
       <div class="code">${data.bookingCode}</div>
@@ -147,8 +155,8 @@ function generateReceiptHTML(data: ReceiptData): string {
   ` : ""}
 
   <div class="footer">
-    <p><strong>LENÇÓIS TOUR</strong> — Rota das Emoções</p>
-    <p>Santo Amaro do Maranhão, MA | WhatsApp: (98) 98588-0954</p>
+    <p><strong>${brandName}</strong> — Rota das Emoções</p>
+    <p>${address} | WhatsApp: ${phone}</p>
     <p>lencoistur.lovable.app</p>
     <p style="margin-top:8px;">Este documento é um comprovante de reserva. Não é um documento fiscal.</p>
   </div>
@@ -156,8 +164,8 @@ function generateReceiptHTML(data: ReceiptData): string {
 </html>`;
 }
 
-export function printReceipt(data: ReceiptData) {
-  const html = generateReceiptHTML(data);
+export function printReceipt(data: ReceiptData, company?: any) {
+  const html = generateReceiptHTML(data, company);
   const printWindow = window.open("", "_blank", "width=800,height=900");
   if (!printWindow) return;
   printWindow.document.write(html);
@@ -167,9 +175,9 @@ export function printReceipt(data: ReceiptData) {
   };
 }
 
-export function downloadReceiptPDF(data: ReceiptData) {
+export function downloadReceiptPDF(data: ReceiptData, company?: any) {
   // Uses print-to-PDF via browser dialog
-  printReceipt(data);
+  printReceipt(data, company);
 }
 
 interface PrintReceiptButtonProps {
@@ -181,8 +189,18 @@ interface PrintReceiptButtonProps {
 }
 
 export function PrintReceiptButton({ data, variant = "outline", size = "sm", className = "", label = "Imprimir Recibo" }: PrintReceiptButtonProps) {
+  const [company, setCompany] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchCompany = async () => {
+      const { data: companyData } = await supabase.from("sgs_empresa").select("*").limit(1).maybeSingle();
+      if (companyData) setCompany(companyData);
+    };
+    fetchCompany();
+  }, []);
+
   return (
-    <Button variant={variant} size={size} className={className} onClick={() => printReceipt(data)}>
+    <Button variant={variant} size={size} className={className} onClick={() => printReceipt(data, company)}>
       <Printer size={14} className="mr-1.5" />
       {label}
     </Button>
