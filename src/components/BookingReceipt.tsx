@@ -1,5 +1,7 @@
 import { Printer, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
 
 export interface ReceiptData {
   bookingCode: string;
