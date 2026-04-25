@@ -271,9 +271,9 @@ const AdminCRM = () => {
       toast.error("Nenhum cliente para exportar.");
       return;
     }
-    const header = "Nome,Email,Telefone,CPF,Reservas,Total Gasto,Cadastro\n";
+    const header = "Nome,Email,Telefone,CPF,Data Nascimento,Status,Reservas,Total Gasto,Cadastro,Observacoes\n";
     const rows = filtered.map(c =>
-      `"${c.name}","${c.email}","${c.phone || ""}","${c.cpf || ""}",${c.totalBookings},"${fmt(c.totalSpent)}","${new Date(c.created_at).toLocaleDateString("pt-BR")}"`
+      `"${c.name}","${c.email}","${c.phone || ""}","${c.cpf || ""}","${c.birth_date || ""}","${c.status}",${c.totalBookings},"${fmt(c.totalSpent)}","${new Date(c.created_at).toLocaleDateString("pt-BR")}","${(c.notes || "").replace(/"/g, '""')}"`
     ).join("\n");
     const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
