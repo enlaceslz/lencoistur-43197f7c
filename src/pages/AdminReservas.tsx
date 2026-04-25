@@ -45,8 +45,14 @@ const fmtDateTime = (d: string) => {
   try { return new Date(d).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }); } catch { return d; }
 };
 
-interface TourOption { id: string; name: string; price: number; }
-interface TransferOption { id: string; label: string; price: number; }
+interface TourOption { id: string; name: string; price: number; pix_discount?: number; }
+interface TransferOption { id: string; label: string; price: number; pix_discount?: number; }
+
+const formatPhone = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+  return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+};
 
 const AdminReservas = () => {
   const { bookings, loading, addBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
@@ -80,12 +86,12 @@ const AdminReservas = () => {
     if (!showNewForm) return;
     const loadOptions = async () => {
       const [{ data: t }, { data: tr }, { data: cust }] = await Promise.all([
-        supabase.from("tours").select("id, name, price").eq("active", true).order("name"),
-        supabase.from("transfer_routes").select("id, origin, destination, price").eq("active", true).order("origin"),
+        supabase.from("tours").select("id, name, price, pix_discount").eq("active", true).order("name"),
+        supabase.from("transfer_routes").select("id, origin, destination, price, pix_discount").eq("active", true).order("origin"),
         supabase.from("customers").select("id, name, email, phone").order("name"),
       ]);
-      if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price })));
-      if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price })));
+      if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price, pix_discount: r.pix_discount })));
+      if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price, pix_discount: r.pix_discount })));
       if (cust) setExistingCustomers(cust);
     };
     loadOptions();
@@ -96,6 +102,19 @@ const AdminReservas = () => {
     setSelectedCustomerId("");
     setCustomerSearch("");
   };
+
+  // Calculate prices for the new form
+  const selectedItem = newForm.type === "tour" 
+    ? tours.find(t => t.name === newForm.itemName)
+    : transfers.find(t => t.label === newForm.itemName);
+  
+  const unitPrice = selectedItem?.price || 0;
+  const total = unitPrice * newForm.guests;
+  const pixDiscountPercent = selectedItem?.pix_discount || 0;
+  const discount = (newForm.payMethod === "pix" && pixDiscountPercent > 0) 
+    ? Math.round(total * pixDiscountPercent / 100) 
+    : 0;
+  const finalTotal = total - discount;
 
   const handleNewBooking = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,10 +142,10 @@ const AdminReservas = () => {
         customerName: newForm.customerName.trim(),
         customerEmail: newForm.customerEmail.trim().toLowerCase(),
         customerPhone: newForm.customerPhone.trim(),
-        unitPrice: 0,
-        total: 0,
-        discount: 0,
-        finalTotal: 0,
+        unitPrice,
+        total,
+        discount,
+        finalTotal,
       });
       toast.success("Reserva criada com sucesso!");
       setShowNewForm(false);
