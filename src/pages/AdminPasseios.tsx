@@ -563,7 +563,7 @@ const AdminPasseios = () => {
                     ) : (
                       <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center"><Compass size={20} className="text-muted-foreground" /></div>
                     )}
-                    <div className="cursor-pointer" onClick={() => setDetailTour(t)}>
+                    <div className="cursor-pointer" onClick={() => openEdit(t)}>
                       <p className="font-semibold text-foreground text-sm hover:text-primary transition-colors">{t.name}</p>
                       <p className="text-xs text-muted-foreground">{t.location}</p>
                     </div>
