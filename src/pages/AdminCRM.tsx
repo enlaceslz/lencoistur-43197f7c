@@ -532,10 +532,10 @@ const AdminCRM = () => {
               ))}
             </div>
 
-            {filtered.length === 0 ? (
+            {(filter === "dependents" ? filteredDependents : filtered).length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
                 <Users className="mx-auto mb-3 opacity-40" size={40} />
-                <p className="font-medium">Nenhum cliente encontrado</p>
+                <p className="font-medium">Nenhum {filter === "dependents" ? "dependente" : "cliente"} encontrado</p>
                 <p className="text-sm mt-1">Clique em "Novo Cliente" para cadastrar.</p>
               </div>
             ) : (
@@ -543,68 +543,113 @@ const AdminCRM = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border text-muted-foreground">
-                      <th className="text-left py-3 font-medium">Cliente</th>
-                      <th className="text-left py-3 font-medium hidden sm:table-cell">Telefone</th>
-                      <th className="text-right py-3 font-medium">Reservas</th>
-                      <th className="text-right py-3 font-medium hidden sm:table-cell">Total Gasto</th>
+                      <th className="text-left py-3 font-medium">{filter === "dependents" ? "Dependente" : "Cliente"}</th>
+                      <th className="text-left py-3 font-medium hidden sm:table-cell">{filter === "dependents" ? "Titular" : "Telefone"}</th>
+                      <th className="text-right py-3 font-medium">{filter === "dependents" ? "Idade" : "Reservas"}</th>
+                      <th className="text-right py-3 font-medium hidden sm:table-cell">{filter === "dependents" ? "Parentesco" : "Total Gasto"}</th>
                       <th className="text-right py-3 font-medium">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filtered.map((c) => (
-                      <tr
-                        key={c.id}
-                        className={`border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer ${selectedCustomer?.id === c.id ? "bg-muted/80" : ""}`}
-                        onClick={() => selectCustomer(c)}
-                      >
-                        <td className="py-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">
-                              {c.name.trim() ? c.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="font-semibold text-foreground truncate flex items-center gap-2">
-                                {c.name}
-                                {c.status !== "regular" && (
-                                  <Badge variant="outline" className={`text-[8px] px-1 py-0 uppercase ${customerStatusConfig[c.status]?.className || ""}`}>
-                                    {customerStatusConfig[c.status]?.label || c.status}
-                                  </Badge>
-                                )}
-                              </p>
-                              <p className="text-xs text-muted-foreground truncate">{c.email}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-3 text-muted-foreground hidden sm:table-cell">{c.phone ? maskPhone(c.phone) : "—"}</td>
-                        <td className="py-3 text-right text-foreground font-medium">{c.totalBookings}</td>
-                        <td className="py-3 text-right font-semibold text-foreground hidden sm:table-cell">{fmt(c.totalSpent)}</td>
-                        <td className="py-3 text-right">
-                          <div className="flex gap-1 justify-end">
-                            {c.phone && (
-                              <a
-                                href={`https://wa.me/55${c.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${c.name.split(" ")[0]}! Tudo bem?`)}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-green-100 dark:hover:bg-green-900/30">
-                                  <Smartphone size={14} className="text-green-600" />
+                    {filter === "dependents" ? (
+                      filteredDependents.map((d) => {
+                        const age = calculateAge(d.birth_date);
+                        return (
+                          <tr
+                            key={d.id}
+                            className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
+                          >
+                            <td className="py-3">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-muted-foreground text-xs font-bold shrink-0">
+                                  <Baby size={16} />
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="font-semibold text-foreground truncate">{d.name}</p>
+                                  <p className="text-xs text-muted-foreground truncate">{d.cpf ? maskCPF(d.cpf) : "Sem CPF"}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-3 text-muted-foreground hidden sm:table-cell">
+                              <span className="flex items-center gap-1">
+                                <Users size={12} /> {d.customer_name}
+                              </span>
+                            </td>
+                            <td className="py-3 text-right text-foreground font-medium">
+                              {age !== null ? `${age} anos` : "—"}
+                            </td>
+                            <td className="py-3 text-right font-semibold text-foreground hidden sm:table-cell">
+                              <Badge variant="outline" className="text-[10px]">{d.relationship}</Badge>
+                            </td>
+                            <td className="py-3 text-right">
+                              <div className="flex gap-1 justify-end">
+                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
+                                  const parent = customers.find(c => c.id === d.customer_id);
+                                  if (parent) selectCustomer(parent);
+                                }}>
+                                  <Eye size={14} className="text-primary" />
                                 </Button>
-                              </a>
-                            )}
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); openEditModal(c); }}>
-                              <Pencil size={14} className="text-muted-foreground" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10" onClick={(e) => { e.stopPropagation(); setDeleteConfirm(c.id); }}>
-                              <Trash2 size={14} className="text-destructive" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      filtered.map((c) => (
+                        <tr
+                          key={c.id}
+                          className={`border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer ${selectedCustomer?.id === c.id ? "bg-muted/80" : ""}`}
+                          onClick={() => selectCustomer(c)}
+                        >
+                          <td className="py-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">
+                                {c.name.trim() ? c.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="font-semibold text-foreground truncate flex items-center gap-2">
+                                  {c.name}
+                                  {c.status !== "regular" && (
+                                    <Badge variant="outline" className={`text-[8px] px-1 py-0 uppercase ${customerStatusConfig[c.status]?.className || ""}`}>
+                                      {customerStatusConfig[c.status]?.label || c.status}
+                                    </Badge>
+                                  )}
+                                </p>
+                                <p className="text-xs text-muted-foreground truncate">{c.email}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3 text-muted-foreground hidden sm:table-cell">{c.phone ? maskPhone(c.phone) : "—"}</td>
+                          <td className="py-3 text-right text-foreground font-medium">{c.totalBookings}</td>
+                          <td className="py-3 text-right font-semibold text-foreground hidden sm:table-cell">{fmt(c.totalSpent)}</td>
+                          <td className="py-3 text-right">
+                            <div className="flex gap-1 justify-end">
+                              {c.phone && (
+                                <a
+                                  href={`https://wa.me/55${c.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${c.name.split(" ")[0]}! Tudo bem?`)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-green-100 dark:hover:bg-green-900/30">
+                                    <Smartphone size={14} className="text-green-600" />
+                                  </Button>
+                                </a>
+                              )}
+                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); openEditModal(c); }}>
+                                <Pencil size={14} className="text-muted-foreground" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10" onClick={(e) => { e.stopPropagation(); setDeleteConfirm(c.id); }}>
+                                <Trash2 size={14} className="text-destructive" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
-                <p className="text-xs text-muted-foreground mt-3 text-right">{filtered.length} cliente(s)</p>
+                <p className="text-xs text-muted-foreground mt-3 text-right">{(filter === "dependents" ? filteredDependents : filtered).length} registro(s)</p>
               </div>
             )}
           </div>
