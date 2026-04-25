@@ -133,6 +133,7 @@ const AdminFinanceiro = () => {
         {tab === "pagar" && <ContasPagarTab />}
         {tab === "receber" && <ContasReceberTab />}
         {tab === "dre" && <DRETab bookings={bookings} />}
+        {tab === "notas" && <NotasFiscaisTab bookings={bookings} />}
       </div>
     </AdminLayout>
   );
