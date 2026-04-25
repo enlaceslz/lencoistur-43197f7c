@@ -100,6 +100,32 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
     } as any);
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, bookingId: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${bookingId}-${Math.random()}.${fileExt}`;
+
+    try {
+      const { data, error: uploadError } = await supabase.storage
+        .from('vouchers')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('vouchers')
+        .getPublicUrl(filePath);
+
+      await updateBooking(bookingId, { voucher_url: publicUrl } as any);
+      toast.success("Comprovante anexado com sucesso!");
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Erro ao enviar arquivo");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
