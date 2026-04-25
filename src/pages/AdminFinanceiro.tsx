@@ -46,7 +46,7 @@ const AdminFinanceiro = () => {
       setLoading(true);
       const { data } = await supabase
         .from("bookings")
-        .select("*, customers(name, email)")
+        .select("*, customers(name, email, phone)")
         .order("created_at", { ascending: false });
       if (data) setBookings(data as any);
       setLoading(false);
