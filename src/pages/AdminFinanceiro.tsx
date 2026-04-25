@@ -44,34 +44,46 @@ const fmtDate = (d: string) => {
 const AdminFinanceiro = () => {
   const [tab, setTab] = useState<Tab>("fluxo");
   const [bookings, setBookings] = useState<BookingRow[]>([]);
+  const [contasPagar, setContasPagar] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const { data } = await supabase
-        .from("bookings")
-        .select("*, customers(name, email, phone)")
-        .order("created_at", { ascending: false });
-      if (data) setBookings(data as any);
+      const [{ data: bkData }, { data: cpData }] = await Promise.all([
+        supabase.from("bookings").select("*, customers(name, email, phone)").order("created_at", { ascending: false }),
+        supabase.from("contas_pagar").select("*")
+      ]);
+      if (bkData) setBookings(bkData as any);
+      if (cpData) setContasPagar(cpData);
       setLoading(false);
     };
     load();
   }, []);
 
-  const currentMonth = new Date().getMonth();
-  const currentYear = new Date().getFullYear();
   const validBookings = useMemo(() => bookings.filter(b => b.status !== "cancelada"), [bookings]);
 
   const monthBookings = useMemo(
     () => validBookings.filter((b) => {
       const d = new Date(b.created_at);
-      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+      return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
     }),
-    [validBookings, currentMonth, currentYear]
+    [validBookings, selectedMonth, selectedYear]
+  );
+
+  const monthContasPagar = useMemo(
+    () => contasPagar.filter(c => {
+      const d = new Date(c.vencimento + "T12:00:00");
+      return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
+    }),
+    [contasPagar, selectedMonth, selectedYear]
   );
 
   const receitaPaga = monthBookings.filter(b => b.payment_status === "pago").reduce((s, b) => s + b.final_total, 0);
+  const despesasMes = monthContasPagar.filter(c => c.status === "pago").reduce((s, c) => s + c.valor, 0);
+  const lucroMes = receitaPaga - despesasMes;
   const descontosMes = monthBookings.reduce((s, b) => s + b.discount, 0);
   const receitaBruta = monthBookings.reduce((s, b) => s + b.total, 0);
   const pagos = monthBookings.filter(b => b.payment_status === "pago");
@@ -81,9 +93,9 @@ const AdminFinanceiro = () => {
 
   const stats = [
     { label: "Receita Paga (Mês)", value: fmt(receitaPaga), change: `${pagos.length} res.`, up: true, icon: DollarSign },
-    { label: "A Receber (Reservas)", value: fmt(totalReceber), change: `${contasReceberBookings.length} pend.`, up: false, icon: Wallet },
+    { label: "Despesas (Mês)", value: fmt(despesasMes), change: `${monthContasPagar.filter(c => c.status === "pago").length} contas`, up: false, icon: TrendingDown },
+    { label: "Lucro Estimado", value: fmt(lucroMes), change: despesasMes > 0 ? `${Math.round((lucroMes / receitaPaga) * 100)}% margem` : "", up: lucroMes > 0, icon: TrendingUp },
     { label: "Ticket Médio", value: fmt(ticketMedio), change: "", up: true, icon: TrendingUp },
-    { label: "Descontos (Mês)", value: fmt(descontosMes), change: receitaBruta > 0 ? `${Math.round(descontosMes / receitaBruta * 100)}%` : "", up: false, icon: TrendingDown },
   ];
 
   const tabs: { key: Tab; label: string; icon: React.ElementType }[] = [
@@ -121,23 +133,46 @@ const AdminFinanceiro = () => {
   return (
     <AdminLayout title="Financeiro">
       <div className="space-y-6">
-        <FinanceiroStats stats={stats} />
-
-        <div className="flex items-center gap-2 overflow-x-auto">
-          {tabs.map((t) => (
-            <Button key={t.key} variant={tab === t.key ? "default" : "outline"} size="sm" onClick={() => setTab(t.key)} className="shrink-0">
-              <t.icon size={16} className="mr-1" />{t.label}
-            </Button>
-          ))}
-          <div className="ml-auto">
-            <Button variant="outline" size="sm" onClick={exportCSV}><Download size={14} className="mr-1" /> CSV</Button>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <select 
+              value={selectedMonth} 
+              onChange={(e) => setSelectedMonth(Number(e.target.value))}
+              className="bg-background border border-border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              {["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"].map((m, i) => (
+                <option key={i} value={i}>{m}</option>
+              ))}
+            </select>
+            <select 
+              value={selectedYear} 
+              onChange={(e) => setSelectedYear(Number(e.target.value))}
+              className="bg-background border border-border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              {[2023, 2024, 2025].map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={exportCSV}><Download size={14} className="mr-1" /> Exportar CSV</Button>
           </div>
         </div>
 
-        {tab === "fluxo" && <FluxoCaixaTab bookings={bookings} />}
+        <FinanceiroStats stats={stats} />
+
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-border">
+          {tabs.map((t) => (
+            <Button key={t.key} variant={tab === t.key ? "default" : "ghost"} size="sm" onClick={() => setTab(t.key)} className="shrink-0">
+              <t.icon size={16} className="mr-1" />{t.label}
+            </Button>
+          ))}
+        </div>
+
+        {tab === "fluxo" && <FluxoCaixaTab bookings={bookings} contasPagar={contasPagar} />}
         {tab === "pagar" && <ContasPagarTab />}
         {tab === "receber" && <ContasReceberTab />}
-        {tab === "dre" && <DRETab bookings={bookings} />}
+        {tab === "dre" && <DRETab bookings={bookings} contasPagar={contasPagar} />}
         {tab === "notas" && <NotasFiscaisTab bookings={bookings} />}
       </div>
     </AdminLayout>

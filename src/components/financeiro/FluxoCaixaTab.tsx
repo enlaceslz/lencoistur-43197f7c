@@ -19,13 +19,20 @@ interface BookingRow {
   created_at: string;
 }
 
-export default function FluxoCaixaTab({ bookings }: { bookings: BookingRow[] }) {
+export default function FluxoCaixaTab({ bookings, contasPagar = [] }: { bookings: BookingRow[], contasPagar?: any[] }) {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
   const validBookings = useMemo(() => bookings.filter(b => b.status !== "cancelada"), [bookings]);
 
   const monthlyData = useMemo(() => {
-    const months = Array.from({ length: 12 }, (_, i) => ({ month: MONTH_LABELS[i], entradas: 0, descontos: 0, receitaLiquida: 0 }));
+    const months = Array.from({ length: 12 }, (_, i) => ({ 
+      month: MONTH_LABELS[i], 
+      entradas: 0, 
+      despesas: 0,
+      descontos: 0, 
+      receitaLiquida: 0 
+    }));
+
     validBookings.forEach((b) => {
       const d = new Date(b.created_at);
       if (d.getFullYear() !== currentYear) return;
@@ -33,11 +40,21 @@ export default function FluxoCaixaTab({ bookings }: { bookings: BookingRow[] }) 
       if (b.payment_status === "pago") months[m].entradas += b.final_total;
       months[m].descontos += b.discount;
     });
-    months.forEach((m) => { m.receitaLiquida = m.entradas; });
-    return months;
-  }, [validBookings, currentYear]);
 
-  const monthlyFiltered = useMemo(() => monthlyData.filter(m => m.entradas > 0 || m.descontos > 0), [monthlyData]);
+    contasPagar.forEach((c) => {
+      const d = new Date(c.vencimento + "T12:00:00");
+      if (d.getFullYear() !== currentYear) return;
+      const m = d.getMonth();
+      if (c.status === "pago") months[m].despesas += c.valor;
+    });
+
+    months.forEach((m) => { 
+      m.receitaLiquida = m.entradas - m.despesas; 
+    });
+    return months;
+  }, [validBookings, contasPagar, currentYear]);
+
+  const monthlyFiltered = useMemo(() => monthlyData.filter(m => m.entradas > 0 || m.descontos > 0 || m.despesas > 0), [monthlyData]);
 
   const monthBookings = useMemo(
     () => validBookings.filter((b) => { const d = new Date(b.created_at); return d.getMonth() === currentMonth && d.getFullYear() === currentYear; }),
@@ -68,8 +85,8 @@ export default function FluxoCaixaTab({ bookings }: { bookings: BookingRow[] }) 
                 <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `R$${(v / 100).toFixed(0)}`} />
                 <Tooltip formatter={(value: number) => [fmt(value), ""]} />
                 <Legend />
-                <Bar dataKey="entradas" name="Receita Paga" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="descontos" name="Descontos" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="entradas" name="Receitas" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="despesas" name="Despesas" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
