@@ -184,7 +184,10 @@ const AdminDocumentos = () => {
   };
 
   const openEdit = (doc: Doc) => {
-...
+    setForm({
+      name: doc.name, type: doc.type, description: doc.description || "",
+      expiry_date: doc.expiry_date || "", status: doc.status,
+    });
     setEditId(doc.id);
     setSelectedFile(null);
     setDialogOpen(true);
