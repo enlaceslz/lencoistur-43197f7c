@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 
 const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR")}`;
 
-const CATEGORIES = ["Ecoturismo", "Aventura", "Passeio de Barco", "Gastronomia", "Cultural"];
+const CATEGORIES = ["Ecoturismo", "Aventura", "Passeio de Barco", "Gastronomia", "Cultural", "Quadriciclo", "Transfer"];
 const DIFFICULTIES = ["Fácil", "Moderada", "Moderada a Difícil", "Difícil"];
 
 const emptyForm = {
