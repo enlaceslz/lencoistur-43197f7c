@@ -72,12 +72,16 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
   }, [bookings]);
 
   const updateBooking = async (id: string, updates: Partial<BookingRow>) => {
+    // Remove relation objects before sending to Supabase
+    const { customers, ...dataToUpdate } = updates;
+    
     const { error } = await supabase
       .from("bookings")
-      .update(updates)
+      .update(dataToUpdate as any)
       .eq("id", id);
 
     if (error) {
+      console.error("Update error:", error);
       toast.error("Erro ao atualizar reserva");
       return;
     }
