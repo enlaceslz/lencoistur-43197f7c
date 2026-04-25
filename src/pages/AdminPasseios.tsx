@@ -189,8 +189,18 @@ const AdminPasseios = () => {
       payload.reviews_count = Math.floor(Math.random() * 20) + 5;
     }
 
-    if (!payload.name || !payload.price) {
-      toast({ title: "Preencha nome e preço", variant: "destructive" });
+    if (!payload.name) {
+      toast({ title: "Preencha o nome do passeio", variant: "destructive" });
+      return;
+    }
+
+    if (payload.mode_collective_enabled && !payload.price) {
+      toast({ title: "Preencha o preço coletivo", variant: "destructive" });
+      return;
+    }
+
+    if (payload.mode_private_enabled && !payload.private_price) {
+      toast({ title: "Preencha o preço privativo", variant: "destructive" });
       return;
     }
 
