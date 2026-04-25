@@ -147,7 +147,8 @@ const AdminCRM = () => {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [customerBookings, setCustomerBookings] = useState<BookingRow[]>([]);
   const [dependents, setDependents] = useState<Dependent[]>([]);
-  const [filter, setFilter] = useState<"all" | "with_bookings" | "no_bookings">("all");
+  const [allDependents, setAllDependents] = useState<(Dependent & { customer_name: string })[]>([]);
+  const [filter, setFilter] = useState<"all" | "with_bookings" | "no_bookings" | "dependents">("all");
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
