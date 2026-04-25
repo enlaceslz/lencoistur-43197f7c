@@ -189,8 +189,18 @@ interface PrintReceiptButtonProps {
 }
 
 export function PrintReceiptButton({ data, variant = "outline", size = "sm", className = "", label = "Imprimir Recibo" }: PrintReceiptButtonProps) {
+  const [company, setCompany] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchCompany = async () => {
+      const { data: companyData } = await supabase.from("sgs_empresa").select("*").limit(1).maybeSingle();
+      if (companyData) setCompany(companyData);
+    };
+    fetchCompany();
+  }, []);
+
   return (
-    <Button variant={variant} size={size} className={className} onClick={() => printReceipt(data)}>
+    <Button variant={variant} size={size} className={className} onClick={() => printReceipt(data, company)}>
       <Printer size={14} className="mr-1.5" />
       {label}
     </Button>
