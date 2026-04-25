@@ -11,7 +11,7 @@ interface BookingRow {
   created_at: string;
 }
 
-export default function DRETab({ bookings }: { bookings: BookingRow[] }) {
+export default function DRETab({ bookings, contasPagar = [] }: { bookings: BookingRow[], contasPagar?: any[] }) {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
 
@@ -23,15 +23,27 @@ export default function DRETab({ bookings }: { bookings: BookingRow[] }) {
     [bookings, currentMonth, currentYear]
   );
 
+  const monthContasPagar = useMemo(
+    () => contasPagar.filter(c => {
+      const d = new Date(c.vencimento + "T12:00:00");
+      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    }),
+    [contasPagar, currentMonth, currentYear]
+  );
+
   const receitaBruta = monthBookings.reduce((s, b) => s + b.total, 0);
   const descontosMes = monthBookings.reduce((s, b) => s + b.discount, 0);
   const receitaLiquida = receitaBruta - descontosMes;
-  const custosOp = Math.round(receitaLiquida * 0.35);
+  
+  // Actual costs from contas_pagar
+  const custosOp = monthContasPagar.filter(c => c.categoria === "operacional" || c.categoria === "combustivel" || c.categoria === "manutencao").reduce((s, c) => s + c.valor, 0);
+  const despesasAdmin = monthContasPagar.filter(c => c.categoria === "administrativo" || c.categoria === "pessoal").reduce((s, c) => s + c.valor, 0);
+  const despesasMkt = monthContasPagar.filter(c => c.categoria === "marketing").reduce((s, c) => s + c.valor, 0);
+  const despesasTech = monthContasPagar.filter(c => c.categoria === "tecnologia").reduce((s, c) => s + c.valor, 0);
+  const outrasDespesas = monthContasPagar.filter(c => c.categoria === "outros").reduce((s, c) => s + c.valor, 0);
+
   const lucroBruto = receitaLiquida - custosOp;
-  const despesasAdmin = Math.round(receitaLiquida * 0.15);
-  const despesasMkt = Math.round(receitaLiquida * 0.10);
-  const despesasTech = Math.round(receitaLiquida * 0.05);
-  const lucroOp = lucroBruto - (despesasAdmin + despesasMkt + despesasTech);
+  const lucroOp = lucroBruto - (despesasAdmin + despesasMkt + despesasTech + outrasDespesas);
 
   return (
     <Card>
