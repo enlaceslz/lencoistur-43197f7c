@@ -1,17 +1,18 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import {
-  BarChart3, TrendingUp, Users, ShoppingCart, Shield,
-  CreditCard, Printer, PieChart, Activity, FileText
+  BarChart3, Download, TrendingUp, Users, ShoppingCart, Shield,
+  CreditCard, Calendar, Filter, Printer, PieChart, Activity, MapPin, Mail, Phone
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart as RePieChart, Pie, Cell, AreaChart, Area
+  PieChart as RePieChart, Pie, Cell, LineChart, Line, Legend, AreaChart, Area
 } from "recharts";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 type ReportType = "reservas" | "financeiro" | "clientes" | "passeios" | "sgs" | "marketing";
 
@@ -58,13 +59,10 @@ const AdminRelatorios = () => {
       if (activeTab === "reservas") {
         let query = supabase.from("bookings").select("*").gte("created_at", since).order("created_at", { ascending: false });
         if (statusFilter !== "all") query = query.eq("status", statusFilter);
-        
         const { data: bookings } = await query;
         const b = bookings || [];
-        
         const byStatus: Record<string, number> = {};
         const byDay: Record<string, { date: string; total: number }> = {};
-        
         b.forEach((r: any) => {
           byStatus[r.status] = (byStatus[r.status] || 0) + 1;
           const day = r.created_at?.slice(0, 10);
@@ -73,29 +71,82 @@ const AdminRelatorios = () => {
             byDay[day].total += r.final_total || 0;
           }
         });
-
         setData({
           total: b.length,
           revenue: b.reduce((s: number, r: any) => s + (r.final_total || 0), 0),
           avgTicket: b.length > 0 ? Math.round(b.reduce((s: number, r: any) => s + (r.final_total || 0), 0) / b.length) : 0,
+          guests: b.reduce((s: number, r: any) => s + (r.guests || 0), 0),
           byStatus: Object.entries(byStatus).map(([name, value]) => ({ name, value })),
           byDay: Object.values(byDay).sort((a, b) => a.date.localeCompare(b.date)),
           raw: b,
         });
       } else if (activeTab === "financeiro") {
-        const { data: pagar } = await supabase.from("contas_pagar").select("*").gte("vencimento", since);
-        const { data: receber } = await supabase.from("contas_receber").select("*").gte("vencimento", since);
-        
+        const [receber, pagar] = await Promise.all([
+          supabase.from("contas_receber").select("*").gte("created_at", since),
+          supabase.from("contas_pagar").select("*").gte("created_at", since),
+        ]);
+        const cr = receber.data || [];
+        const cp = pagar.data || [];
+        const recebido = cr.filter((r: any) => r.status === "pago").reduce((s: number, r: any) => s + (r.valor || 0), 0);
+        const pago = cp.filter((r: any) => r.status === "pago").reduce((s: number, r: any) => s + (r.valor || 0), 0);
+        const catReceitas: Record<string, number> = {};
+        cr.forEach((r: any) => { catReceitas[r.categoria] = (catReceitas[r.categoria] || 0) + (r.valor || 0); });
         setData({
-          pagar: pagar?.reduce((s, c) => s + c.valor, 0) || 0,
-          receber: receber?.reduce((s, c) => s + c.valor, 0) || 0,
+          totalReceber: cr.reduce((s: number, r: any) => s + (r.valor || 0), 0),
+          totalPagar: cp.reduce((s: number, r: any) => s + (r.valor || 0), 0),
+          recebido, pago, saldo: recebido - pago,
+          receitas: Object.entries(catReceitas).map(([name, value]) => ({ name, value })),
         });
-      } else {
-        setData({ total: 0, revenue: 0, byStatus: [], byDay: [] });
+      } else if (activeTab === "clientes") {
+        const { data: customers } = await supabase.from("customers").select("*").order("created_at", { ascending: false });
+        const c = customers || [];
+        const byMonth: Record<string, number> = {};
+        c.forEach((cl: any) => {
+          const m = cl.created_at?.slice(0, 7);
+          if (m) byMonth[m] = (byMonth[m] || 0) + 1;
+        });
+        setData({
+          total: c.length,
+          growth: Object.entries(byMonth).sort(([a], [b]) => a.localeCompare(b)).slice(-6).map(([month, count]) => ({ name: month, value: count })),
+          raw: c,
+        });
+      } else if (activeTab === "passeios") {
+        const { data: bookings } = await supabase.from("bookings").select("item_name, final_total, guests").eq("type", "tour").gte("created_at", since);
+        const b = bookings || [];
+        const tourStats: Record<string, { name: string; revenue: number; guests: number }> = {};
+        b.forEach((r: any) => {
+          if (!tourStats[r.item_name]) tourStats[r.item_name] = { name: r.item_name, revenue: 0, guests: 0 };
+          tourStats[r.item_name].revenue += r.final_total || 0;
+          tourStats[r.item_name].guests += r.guests || 0;
+        });
+        setData({
+          totalRevenue: b.reduce((s: number, r: any) => s + (r.final_total || 0), 0),
+          totalGuests: b.reduce((s: number, r: any) => s + (r.guests || 0), 0),
+          byTour: Object.values(tourStats).sort((a: any, b: any) => b.revenue - a.revenue),
+        });
+      } else if (activeTab === "sgs") {
+        const [risks, incidents] = await Promise.all([
+          supabase.from("sgs_risks").select("*"),
+          supabase.from("sgs_incidents").select("*").gte("created_at", since),
+        ]);
+        setData({
+          totalRisks: (risks.data || []).length,
+          totalIncidents: (incidents.data || []).length,
+          openIncidents: (incidents.data || []).filter((i: any) => i.status !== "fechado").length,
+        });
+      } else if (activeTab === "marketing") {
+        const { data: leads } = await supabase.from("marketing_leads").select("*");
+        const l = leads || [];
+        const bySource: Record<string, number> = {};
+        l.forEach((ld: any) => { bySource[ld.source] = (bySource[ld.source] || 0) + 1; });
+        setData({
+          totalLeads: l.length,
+          hotLeads: l.filter((x: any) => x.status === "quente").length,
+          bySource: Object.entries(bySource).map(([name, value]) => ({ name, value })),
+        });
       }
     } catch (err) {
       console.error("Error loading report:", err);
-      toast({ title: "Erro ao carregar relatório", variant: "destructive" });
     }
     setLoading(false);
   }, [activeTab, period, statusFilter]);
@@ -109,77 +160,180 @@ const AdminRelatorios = () => {
     <AdminLayout title="Relatórios">
       <style>{`
         @media print {
-          @page { size: A4 portrait; margin: 1.5cm; }
+          @page { size: A4 portrait; margin: 1cm; }
+          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white !important; }
           .no-print { display: none !important; }
           .print-only { display: block !important; }
-          body { background: white !important; }
+          .admin-layout-main { padding: 0 !important; margin: 0 !important; }
+          .bg-card { border: 1px solid #e5e7eb !important; box-shadow: none !important; }
+          .shadow-sm, .shadow-md, .shadow-lg { box-shadow: none !important; }
+          canvas { max-width: 100% !important; height: auto !important; }
         }
         .print-only { display: none; }
       `}</style>
 
       <div className="space-y-6">
-        {/* Header (Visible only on print) */}
-        <div className="print-only p-6 border-b border-border mb-6">
-          <h1 className="font-display text-3xl font-bold">{empresa?.nome || "LençóisTour"}</h1>
-          <p className="text-sm text-muted-foreground">{empresa?.endereco || "Santo Amaro do Maranhão, MA"}</p>
-          <h2 className="text-xl font-semibold mt-4">Relatório de {REPORT_TABS.find(t => t.id === activeTab)?.label}</h2>
-          <p className="text-sm text-muted-foreground">Período: {period} dias | Data: {format(new Date(), "dd/MM/yyyy HH:mm")}</p>
+        {/* Professional Header for Print */}
+        <div className="print-only p-8 border-b-2 border-primary/20 bg-muted/30 rounded-t-3xl mb-8">
+          <div className="flex justify-between items-start">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
+                  <BarChart3 className="text-primary-foreground" size={24} />
+                </div>
+                <h1 className="font-display text-4xl font-bold tracking-tight">Lençóis<span className="text-secondary">Tour</span></h1>
+              </div>
+              <div className="space-y-1 text-sm text-muted-foreground ml-1">
+                <p className="flex items-center gap-2"><MapPin size={14} /> {empresa?.endereco || "Santo Amaro do Maranhão, MA"}</p>
+                <p className="flex items-center gap-2"><Phone size={14} /> {empresa?.telefone || "(98) 99999-0000"}</p>
+                <p className="flex items-center gap-2"><Mail size={14} /> {empresa?.email || "contato@lencoistour.com"}</p>
+              </div>
+            </div>
+            <div className="text-right space-y-2">
+              <div className="bg-primary/10 px-4 py-2 rounded-xl inline-block border border-primary/20">
+                <p className="text-primary font-bold text-lg uppercase tracking-wider">{REPORT_TABS.find(t => t.id === activeTab)?.label}</p>
+              </div>
+              <p className="text-sm font-medium text-muted-foreground">Relatório Gerencial</p>
+              <p className="text-xs text-muted-foreground/80">Gerado em {format(new Date(), "dd 'de' MMMM 'de' yyyy, HH:mm", { locale: ptBR })}</p>
+              <p className="text-xs text-muted-foreground/80">Período: Últimos {period} dias</p>
+            </div>
+          </div>
         </div>
 
-        {/* Filters and Controls */}
-        <div className="no-print flex gap-4 bg-card p-4 rounded-xl border border-border items-center">
-          <select value={period} onChange={e => setPeriod(e.target.value)} className="p-2 bg-background border rounded-lg text-sm">
-            <option value="7">7 dias</option>
-            <option value="30">30 dias</option>
-            <option value="365">1 ano</option>
-          </select>
-          <button onClick={printReport} className="ml-auto flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold">
-            <Printer size={16} /> Imprimir Relatório
-          </button>
+        {/* Real-time Dashboard Header (no-print) */}
+        <div className="no-print flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold font-display">Módulo de Relatórios</h2>
+            <p className="text-muted-foreground text-sm">Acompanhe a performance do seu negócio em tempo real.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 bg-card border rounded-xl px-3 py-2 shadow-sm">
+              <Calendar size={16} className="text-primary" />
+              <select value={period} onChange={e => setPeriod(e.target.value)} className="bg-transparent text-sm font-medium outline-none">
+                <option value="7">Últimos 7 dias</option>
+                <option value="30">Últimos 30 dias</option>
+                <option value="90">Últimos 90 dias</option>
+                <option value="365">Último ano</option>
+              </select>
+            </div>
+            <button onClick={printReport} className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all active:scale-95">
+              <Printer size={16} /> Imprimir
+            </button>
+          </div>
         </div>
 
-        {/* Tabs */}
-        <div className="no-print flex gap-2 overflow-x-auto pb-2">
+        {/* Navigation Tabs (no-print) */}
+        <div className="no-print flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {REPORT_TABS.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 ${activeTab === tab.id ? "bg-primary text-primary-foreground" : "bg-card border"}`}>
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold whitespace-nowrap transition-all border shadow-sm ${
+                activeTab === tab.id 
+                ? "bg-primary text-primary-foreground border-primary" 
+                : "bg-card text-muted-foreground border-border hover:bg-muted"
+              }`}>
               <tab.icon size={16} /> {tab.label}
             </button>
           ))}
         </div>
 
-        {/* Content */}
         {loading ? (
-          <div className="text-center py-10">Carregando dados...</div>
+          <div className="flex flex-col items-center justify-center py-20 space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+            <p className="text-muted-foreground font-medium">Processando dados...</p>
+          </div>
         ) : (
-          <div id="report-content" className="space-y-6">
+          <div id="report-content" className="space-y-8">
+            {/* KPI Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Total</p><p className="text-2xl font-bold">{data.total || 0}</p></CardContent></Card>
-              <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Receita</p><p className="text-2xl font-bold">{fmt(data.revenue || 0)}</p></CardContent></Card>
-              <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Ticket Médio</p><p className="text-2xl font-bold">{fmt(data.avgTicket || 0)}</p></CardContent></Card>
+              {activeTab === "reservas" && (
+                <>
+                  <KPICard label="Total de Reservas" value={data.total || 0} icon={ShoppingCart} color="text-primary" />
+                  <KPICard label="Receita Bruta" value={fmt(data.revenue || 0)} icon={CreditCard} color="text-secondary" />
+                  <KPICard label="Ticket Médio" value={fmt(data.avgTicket || 0)} icon={TrendingUp} color="text-blue-500" />
+                  <KPICard label="Total Hóspedes" value={data.guests || 0} icon={Users} color="text-purple-500" />
+                </>
+              )}
+              {activeTab === "financeiro" && (
+                <>
+                  <KPICard label="Recebido" value={fmt(data.recebido || 0)} icon={CreditCard} color="text-primary" />
+                  <KPICard label="Pago" value={fmt(data.pago || 0)} icon={ShoppingCart} color="text-destructive" />
+                  <KPICard label="Saldo Atual" value={fmt(data.saldo || 0)} icon={TrendingUp} color="text-secondary" />
+                  <KPICard label="A Receber" value={fmt(data.totalReceber || 0)} icon={Activity} color="text-blue-500" />
+                </>
+              )}
+              {/* Add other tab KPIs */}
             </div>
 
-            {data.byDay && data.byDay.length > 0 && (
-              <Card className="p-6">
-                <h3 className="font-bold mb-4">Evolução de Receita</h3>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={data.byDay}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Area type="monotone" dataKey="total" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.2} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </Card>
-            )}
+            {/* Charts Section */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {activeTab === "reservas" && (
+                <>
+                  <ChartCard title="Evolução da Receita">
+                    <ResponsiveContainer width="100%" height={280}>
+                      <AreaChart data={data.byDay}>
+                        <defs><linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/></linearGradient></defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                        <XAxis dataKey="date" fontSize={10} tick={{fill: '#9ca3af'}} axisLine={false} tickLine={false} />
+                        <YAxis fontSize={10} tick={{fill: '#9ca3af'}} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v/100}`} />
+                        <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}} formatter={(v: number) => fmt(v)} />
+                        <Area type="monotone" dataKey="total" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                  <ChartCard title="Status das Reservas">
+                    <ResponsiveContainer width="100%" height={280}>
+                      <RePieChart>
+                        <Pie data={data.byStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={8}>
+                          {data.byStatus?.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} cornerRadius={4} />)}
+                        </Pie>
+                        <Tooltip />
+                        <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}} />
+                      </RePieChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </>
+              )}
+              {/* Add other tab charts */}
+            </div>
+
+            {/* Professional Footer for Print */}
+            <div className="print-only pt-10 border-t border-border mt-10">
+              <div className="flex justify-between items-center text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
+                <p>LençóisTour - ERP de Gestão Turística</p>
+                <p>Página 1 de 1</p>
+                <p>www.lencoistour.com</p>
+              </div>
+            </div>
           </div>
         )}
       </div>
     </AdminLayout>
   );
 };
+
+const KPICard = ({ label, value, icon: Icon, color }: any) => (
+  <Card className="border-none shadow-sm bg-card hover:shadow-md transition-shadow duration-300">
+    <CardContent className="p-6">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
+        <div className={`p-2 rounded-lg bg-opacity-10 ${color.replace('text', 'bg')}`}>
+          <Icon className={color} size={16} />
+        </div>
+      </div>
+      <p className="text-2xl font-bold font-display tracking-tight text-foreground">{value}</p>
+    </CardContent>
+  </Card>
+);
+
+const ChartCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <Card className="border-none shadow-sm overflow-hidden">
+    <CardHeader className="bg-muted/30 border-b border-border/50 py-4">
+      <CardTitle className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+        <Activity size={14} className="text-primary" /> {title}
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="p-6 bg-card">{children}</CardContent>
+  </Card>
+);
 
 export default AdminRelatorios;
