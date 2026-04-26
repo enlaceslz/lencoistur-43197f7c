@@ -377,7 +377,7 @@ const CheckoutPage = () => {
                 <div>
                   <label className="text-sm font-semibold text-foreground mb-1.5 block">Telefone / WhatsApp *</label>
                   <input
-                    type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)}
+                    type="tel" required value={phone} onChange={(e) => setPhone(maskPhone(e.target.value))} maxLength={15}
                     className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30"
                     placeholder="(00) 00000-0000"
                   />
