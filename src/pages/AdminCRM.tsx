@@ -629,14 +629,21 @@ const AdminCRM = () => {
     return d.name.toLowerCase().includes(q) || (d.cpf || "").includes(q) || d.customer_name.toLowerCase().includes(q);
   });
 
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+  const newThisMonth = customers.filter(c => {
+    const d = new Date(c.created_at);
+    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+  }).length;
+
   const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0);
   const withBookings = customers.filter((c) => c.totalBookings > 0).length;
 
   const clientStats = [
     { label: "Total de Clientes", value: customers.length.toString(), icon: Users, color: "text-primary" },
-    { label: "Com Reservas", value: withBookings.toString(), icon: MapPin, color: "text-green-600" },
+    { label: "Novos (Mês)", value: newThisMonth.toString(), icon: UserPlus, color: "text-purple-600" },
     { label: "Receita Total", value: fmt(totalRevenue), icon: DollarSign, color: "text-blue-600" },
-    { label: "Ticket Médio", value: withBookings > 0 ? fmt(Math.round(totalRevenue / withBookings)) : "R$ 0", icon: DollarSign, color: "text-amber-600" },
+    { label: "Ticket Médio", value: withBookings > 0 ? fmt(Math.round(totalRevenue / withBookings)) : "R$ 0", icon: Smartphone, color: "text-amber-600" },
   ];
 
   if (loading) {
