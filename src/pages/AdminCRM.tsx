@@ -16,10 +16,18 @@ interface Customer {
   email: string;
   phone: string | null;
   cpf: string | null;
+  passport: string | null;
   birth_date: string | null;
   notes: string | null;
   status: string;
   created_at: string;
+  country: string | null;
+  cep: string | null;
+  address: string | null;
+  number: string | null;
+  neighborhood: string | null;
+  city: string | null;
+  state: string | null;
   totalBookings: number;
   totalSpent: number;
   lastBooking: string | null;
