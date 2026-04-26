@@ -50,6 +50,7 @@ const sgsGroups = [
       { icon: Users, label: "Visitantes", path: "/admin/sgs/condutores-visitantes" },
       { icon: Map, label: "Rotas / Trilhas", path: "/admin/sgs/rotas" },
       { icon: ClipboardCheck, label: "Checklists", path: "/admin/sgs/checklists" },
+      { icon: ClipboardList, label: "Controles Internos (P5)", path: "/admin/sgs/controles" },
       { icon: Shield, label: "Briefings", path: "/admin/sgs/briefings" },
     ],
   },
