@@ -1,15 +1,18 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import {
   BarChart3, Download, FileText, TrendingUp, Users, ShoppingCart, Shield,
-  CreditCard, Calendar, Filter, Printer, PieChart, Activity
+  CreditCard, Calendar, Filter, Printer, PieChart, Activity, Search, MapPin, Mail, Phone, Globe
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart as RePieChart, Pie, Cell, LineChart, Line, Legend
+  PieChart as RePieChart, Pie, Cell, LineChart, Line, Legend, AreaChart, Area
 } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 type ReportType = "reservas" | "financeiro" | "clientes" | "passeios" | "sgs" | "marketing";
 
@@ -30,8 +33,25 @@ const COLORS = [
 const AdminRelatorios = () => {
   const [activeTab, setActiveTab] = useState<ReportType>("reservas");
   const [period, setPeriod] = useState("30");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any>({});
+  const [empresa, setEmpresa] = useState<any>(null);
+  const [site, setSite] = useState<any>(null);
+  const reportRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const { data } = await supabase.from("site_settings").select("*");
+      if (data) {
+        const emp = data.find(s => s.key === "empresa")?.value;
+        const st = data.find(s => s.key === "site")?.value;
+        setEmpresa(emp);
+        setSite(st);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const loadReport = useCallback(async () => {
     setLoading(true);
