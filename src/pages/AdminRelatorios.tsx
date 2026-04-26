@@ -61,7 +61,12 @@ const AdminRelatorios = () => {
 
     try {
       if (activeTab === "reservas") {
-        const { data: bookings } = await supabase.from("bookings").select("*").gte("created_at", since).order("created_at", { ascending: false });
+        let query = supabase.from("bookings").select("*").gte("created_at", since).order("created_at", { ascending: false });
+        if (statusFilter !== "all") {
+          query = query.eq("status", statusFilter);
+        }
+        
+        const { data: bookings } = await query;
         const b = bookings || [];
         const byStatus: Record<string, number> = {};
         const byPayMethod: Record<string, number> = {};
@@ -94,10 +99,15 @@ const AdminRelatorios = () => {
           raw: b,
         });
       } else if (activeTab === "financeiro") {
-        const [receber, pagar] = await Promise.all([
-          supabase.from("contas_receber").select("*").gte("created_at", since),
-          supabase.from("contas_pagar").select("*").gte("created_at", since),
-        ]);
+        let queryCR = supabase.from("contas_receber").select("*").gte("created_at", since);
+        let queryCP = supabase.from("contas_pagar").select("*").gte("created_at", since);
+        
+        if (statusFilter !== "all") {
+          queryCR = queryCR.eq("status", statusFilter);
+          queryCP = queryCP.eq("status", statusFilter);
+        }
+
+        const [receber, pagar] = await Promise.all([queryCR, queryCP]);
         const cr = receber.data || [];
         const cp = pagar.data || [];
         const totalReceber = cr.reduce((s: number, r: any) => s + (r.valor || 0), 0);
@@ -235,7 +245,7 @@ const AdminRelatorios = () => {
       console.error("Error loading report:", err);
     }
     setLoading(false);
-  }, [activeTab, period]);
+  }, [activeTab, period, statusFilter]);
 
   useEffect(() => { loadReport(); }, [loadReport]);
 
