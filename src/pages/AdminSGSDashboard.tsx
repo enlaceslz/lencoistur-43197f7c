@@ -223,6 +223,7 @@ const AdminSGSDashboard = () => {
     { label: "Registrar Incidente", icon: Activity, path: "/admin/sgs/incidentes", color: "bg-destructive/10 text-destructive hover:bg-destructive/20" },
     { label: "Novo Briefing", icon: Shield, path: "/admin/sgs/briefings", color: "bg-primary/10 text-primary hover:bg-primary/20" },
     { label: "Novo Checklist", icon: ClipboardCheck, path: "/admin/sgs/checklists", color: "bg-primary/10 text-primary hover:bg-primary/20" },
+    { label: "Controle P5", icon: ClipboardList, path: "/admin/sgs/controles", color: "bg-secondary/10 text-secondary hover:bg-secondary/20" },
     { label: "Termo de Risco", icon: FileText, path: "/admin/sgs/termos", color: "bg-secondary/10 text-secondary hover:bg-secondary/20" },
     { label: "Novo Risco", icon: AlertTriangle, path: "/admin/sgs/riscos", color: "bg-secondary/10 text-secondary hover:bg-secondary/20" },
     { label: "Gerar PGSAT", icon: FileText, path: "/admin/sgs/pgsat", color: "bg-primary/10 text-primary hover:bg-primary/20" },
