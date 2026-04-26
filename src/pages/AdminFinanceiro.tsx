@@ -2,9 +2,11 @@ import { useState, useEffect, useMemo } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   DollarSign, TrendingUp, TrendingDown, CreditCard, Wallet, Receipt,
-  Loader2, Download, FileText
+  Loader2, Download, FileText, Printer
 } from "lucide-react";
 import FinanceiroStats from "@/components/financeiro/FinanceiroStats";
 import FluxoCaixaTab from "@/components/financeiro/FluxoCaixaTab";
