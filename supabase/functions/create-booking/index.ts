@@ -170,12 +170,13 @@ Deno.serve(async (req) => {
           status: "pendente",
           payment_status: "pendente",
           pix_code: pixCode,
-          booking_code: "TEMP",
+          booking_code: generateBookingCode(),
         })
         .select("*, customers(*)")
         .single();
 
       if (bookingErr || !booking) {
+        console.error("Error inserting booking:", bookingErr);
         return null;
       }
       return booking;
