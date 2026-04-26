@@ -556,7 +556,7 @@ const AdminPasseios = () => {
               <TableHead>Duração</TableHead>
               <TableHead>Preços / Modalidades</TableHead>
               <TableHead>Desc. PIX</TableHead>
-              <TableHead>Avaliação</TableHead>
+              <TableHead>SGS</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -602,19 +602,15 @@ const AdminPasseios = () => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  {t.pix_discount > 0 ? (
-                    <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                      {t.pix_discount}%
-                    </Badge>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">—</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <span className="flex items-center gap-1 text-foreground">
-                    <Star size={13} className="text-amber-500 fill-amber-500" /> {Number(t.rating).toFixed(1)}
-                    <span className="text-xs text-muted-foreground">({t.reviews_count || 0})</span>
-                  </span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1.5" title="SGS ISO 21101/03">
+                      <Shield size={12} className="text-primary" />
+                      <span className="text-[10px] font-bold text-primary">ISO COMPLIANT</span>
+                    </div>
+                    <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                      <Star size={11} className="text-amber-500 fill-amber-500" /> {Number(t.rating).toFixed(1)} ({t.reviews_count || 0})
+                    </span>
+                  </div>
                 </TableCell>
                 <TableCell>
                   <button onClick={() => toggleActive(t.id, t.active)}

@@ -5,11 +5,11 @@ import { Plus, CheckCircle, XCircle, MapPin } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const CHECKLIST_ITEMS = [
-  { key: "safety_rules", label: "Regras de segurança explicadas" },
-  { key: "tour_risks", label: "Riscos do passeio informados" },
-  { key: "lagoon_behavior", label: "Comportamento nas lagoas orientado" },
-  { key: "group_distance", label: "Limite de distância do grupo definido" },
-  { key: "emergency_orientation", label: "Orientação de emergência realizada" },
+  { key: "safety_rules", label: "Regras de segurança explicadas", label_en: "Safety rules explained" },
+  { key: "tour_risks", label: "Riscos do passeio informados", label_en: "Tour risks informed" },
+  { key: "lagoon_behavior", label: "Comportamento nas lagoas orientado", label_en: "Lagoon behavior guided" },
+  { key: "group_distance", label: "Limite de distância do grupo definido", label_en: "Group distance limit defined" },
+  { key: "emergency_orientation", label: "Orientação de emergência realizada", label_en: "Emergency orientation performed" },
 ];
 
 const LANGUAGES = { pt: "Português", en: "English", es: "Español" };
@@ -61,35 +61,47 @@ const AdminSGSBriefings = () => {
   const completedCount = (b: any) => CHECKLIST_ITEMS.filter(i => b[i.key]).length;
 
   return (
-    <AdminLayout title="SGS - Resumos de Segurança">
+    <AdminLayout title={form.language === "en" ? "SGS - Safety Briefings" : "SGS - Resumos de Segurança"}>
       <div className="space-y-6">
         <div className="flex justify-between gap-4">
-          <p className="text-sm text-muted-foreground">Checklist obrigatório do guia antes de cada passeio (ISO 21103)</p>
+          <p className="text-sm text-muted-foreground">
+            {form.language === "en" 
+              ? "Mandatory guide checklist before each tour (ISO 21103)" 
+              : "Checklist obrigatório do guia antes de cada passeio (ISO 21103)"}
+          </p>
           <button onClick={() => setShowForm(!showForm)}
             className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-            <Plus size={16} /> Novo Resumo
+            <Plus size={16} /> {form.language === "en" ? "New Briefing" : "Novo Resumo"}
           </button>
         </div>
 
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
-            <h3 className="font-display font-bold text-foreground">Registrar Resumo de Segurança</h3>
+            <h3 className="font-display font-bold text-foreground">
+              {form.language === "en" ? "Register Safety Briefing" : "Registrar Resumo de Segurança"}
+            </h3>
             <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Passeio Relacionado</label>
+              <label className="text-sm font-semibold text-foreground mb-1 block">
+                {form.language === "en" ? "Related Tour" : "Passeio Relacionado"}
+              </label>
               <select value={form.tour_id} onChange={e => setForm({ ...form, tour_id: e.target.value })}
                 className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
-                <option value="">Nenhum (geral)</option>
+                <option value="">{form.language === "en" ? "None (general)" : "Nenhum (geral)"}</option>
                 {tours.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
               </select>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Guia Responsável *</label>
+                <label className="text-sm font-semibold text-foreground mb-1 block">
+                  {form.language === "en" ? "Responsible Guide *" : "Guia Responsável *"}
+                </label>
                 <input required value={form.guide_name} onChange={e => setForm({ ...form, guide_name: e.target.value })}
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
               </div>
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Idioma do Resumo *</label>
+                <label className="text-sm font-semibold text-foreground mb-1 block">
+                  {form.language === "en" ? "Briefing Language *" : "Idioma do Resumo *"}
+                </label>
                 <select value={form.language} onChange={e => setForm({ ...form, language: e.target.value })}
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
                   {Object.entries(LANGUAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
@@ -98,27 +110,38 @@ const AdminSGSBriefings = () => {
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-foreground mb-2 block">Checklist de Segurança</label>
+              <label className="text-sm font-semibold text-foreground mb-2 block">
+                {form.language === "en" ? "Safety Checklist" : "Checklist de Segurança"}
+              </label>
               <div className="space-y-2">
                 {CHECKLIST_ITEMS.map(item => (
                   <label key={item.key} className="flex items-center gap-3 bg-muted rounded-xl px-4 py-3 cursor-pointer hover:bg-muted/80">
                     <input type="checkbox" checked={form[item.key as keyof typeof form] as boolean}
                       onChange={e => setForm({ ...form, [item.key]: e.target.checked })} className="rounded w-5 h-5" />
-                    <span className="text-sm text-foreground font-medium">{item.label}</span>
+                    <span className="text-sm text-foreground font-medium">
+                      {form.language === "en" ? item.label_en : item.label}
+                    </span>
                   </label>
                 ))}
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Observações</label>
+              <label className="text-sm font-semibold text-foreground mb-1 block">
+                {form.language === "en" ? "Notes" : "Observações"}
+              </label>
               <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-20" placeholder="Observações adicionais..." />
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-20" 
+                placeholder={form.language === "en" ? "Additional notes..." : "Observações adicionais..."} />
             </div>
 
             <div className="flex gap-3">
-              <button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">Salvar Resumo</button>
-              <button type="button" onClick={() => setShowForm(false)} className="bg-muted text-muted-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">Cancelar</button>
+              <button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">
+                {form.language === "en" ? "Save Briefing" : "Salvar Resumo"}
+              </button>
+              <button type="button" onClick={() => setShowForm(false)} className="bg-muted text-muted-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">
+                {form.language === "en" ? "Cancel" : "Cancelar"}
+              </button>
             </div>
           </form>
         )}

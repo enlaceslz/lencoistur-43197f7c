@@ -10,7 +10,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { Car, MapPin, Clock, Users, Plus, Pencil, Trash2, X, Check, Search, Loader2, Percent, Eye, ArrowRight } from "lucide-react";
+import { Car, MapPin, Clock, Users, Plus, Pencil, Trash2, X, Check, Search, Loader2, Percent, Eye, ArrowRight, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -336,9 +336,9 @@ const AdminTranslados = () => {
                   <TableHead>Duração</TableHead>
                   <TableHead>Veículo</TableHead>
                   <TableHead>Vagas</TableHead>
-                  <TableHead>Horários</TableHead>
                   <TableHead>Preço</TableHead>
                   <TableHead>PIX</TableHead>
+                  <TableHead>SGS</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
@@ -355,7 +355,6 @@ const AdminTranslados = () => {
                     <TableCell className="text-muted-foreground">{t.duration || "—"}</TableCell>
                     <TableCell><Badge variant="outline">{t.vehicle_type || "—"}</Badge></TableCell>
                     <TableCell className="text-muted-foreground">{t.seats}</TableCell>
-                    <TableCell className="text-muted-foreground text-xs max-w-[150px]">{(t.departures || []).join(", ") || "—"}</TableCell>
                     <TableCell className="font-medium text-foreground">{fmt(t.price)}</TableCell>
                     <TableCell>
                       {t.pix_discount > 0 ? (
@@ -363,6 +362,12 @@ const AdminTranslados = () => {
                           -{t.pix_discount}%
                         </Badge>
                       ) : <span className="text-muted-foreground text-xs">—</span>}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1 text-primary" title="Veículo com Seguro e Licenciamento em dia">
+                        <Shield size={14} />
+                        <span className="text-[10px] font-bold">SAFETY OK</span>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <button onClick={() => toggleActive(t.id, t.active)}
