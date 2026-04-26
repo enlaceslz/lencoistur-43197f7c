@@ -50,7 +50,6 @@ const CheckoutPage = () => {
   }, [type, slug, transferId, packageSlug]);
 
   const isPrivate = tourMode === "privativo";
-  const isPrivate = tourMode === "privativo";
   const itemName = tour ? `${tour.name}${isPrivate ? " (Privativo)" : " (Coletivo)"}` : (pkg ? pkg.name : (transfer ? `${transfer.origin} → ${transfer.destination}` : ""));
   const unitPrice = tour ? (isPrivate ? (tour.private_price || 1300) : tour.price) : (pkg ? pkg.price : (transfer?.price || 0));
   const pixDiscountPercent = tour?.pix_discount || transfer?.pix_discount || (pkg ? 5 : 0);
