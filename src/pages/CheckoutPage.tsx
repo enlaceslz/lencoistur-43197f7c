@@ -51,6 +51,9 @@ const CheckoutPage = () => {
   const [phone, setPhone] = useState("");
   const [cpf, setCpf] = useState("");
   const [notes, setNotes] = useState("");
+  const [nationality, setNationality] = useState<"br" | "foreign">("br");
+  const [passport, setPassport] = useState("");
+  const [country, setCountry] = useState("Brasil");
   const [confirmedBooking, setConfirmedBooking] = useState<BookingItem | null>(null);
   const [pixCopied, setPixCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
