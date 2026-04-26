@@ -76,7 +76,14 @@ const AdminSGSCondutores = () => {
               ].map(f => (
                 <div key={f.k}>
                   <label className="block text-xs font-medium text-muted-foreground mb-1">{f.l}</label>
-                  <input type={f.t || "text"} value={(form as any)[f.k]} onChange={e => set(f.k, e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" />
+                  <input 
+                    type={f.t || "text"} 
+                    value={(form as any)[f.k]} 
+                    onChange={e => set(f.k, e.target.value)} 
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" 
+                    maxLength={f.k === "cpf" ? 14 : f.k === "telefone" ? 15 : undefined}
+                  />
+
                 </div>
               ))}
               <div>
