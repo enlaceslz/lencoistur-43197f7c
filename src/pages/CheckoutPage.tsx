@@ -45,7 +45,7 @@ const CheckoutPage = () => {
   const image = tour?.images?.[0] || "";
   const location = tour?.location || (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
 
-  const [payMethod, setPayMethod] = useState<"pix" | "card">("pix");
+  const [payMethod, setPayMethod] = useState<"pix" | "card" | "info">("pix");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
