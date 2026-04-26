@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 export interface BookingItem {
   id: string;
   bookingCode: string;
-  type: "tour" | "transfer";
+  type: "tour" | "transfer" | "package";
   itemName: string;
   date: string;
   guests: number;
