@@ -357,16 +357,17 @@ const AdminTranslados = () => {
                     <TableCell className="text-muted-foreground">{t.seats}</TableCell>
                     <TableCell className="font-medium text-foreground">{fmt(t.price)}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-1 text-primary" title="Veículo com Seguro e Licenciamento em dia">
-                        <Shield size={14} />
-                        <span className="text-[10px] font-bold">SAFETY OK</span>
-                      </div>
-                    </TableCell>
                       {t.pix_discount > 0 ? (
                         <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
                           -{t.pix_discount}%
                         </Badge>
                       ) : <span className="text-muted-foreground text-xs">—</span>}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1 text-primary" title="Veículo com Seguro e Licenciamento em dia">
+                        <Shield size={14} />
+                        <span className="text-[10px] font-bold">SAFETY OK</span>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <button onClick={() => toggleActive(t.id, t.active)}
