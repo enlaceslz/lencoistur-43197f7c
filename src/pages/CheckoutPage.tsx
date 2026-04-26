@@ -319,7 +319,7 @@ const CheckoutPage = () => {
                   <div>
                     <label className="text-sm font-semibold text-foreground mb-1.5 block">CPF</label>
                     <input
-                      type="text" value={cpf} onChange={(e) => setCpf(e.target.value)}
+                      type="text" value={cpf} onChange={(e) => setCpf(maskCPF(e.target.value))} maxLength={14}
                       className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30"
                       placeholder="000.000.000-00"
                     />
