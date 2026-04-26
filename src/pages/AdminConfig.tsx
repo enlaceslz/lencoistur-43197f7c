@@ -344,7 +344,7 @@ const AdminConfig = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>WhatsApp</Label>
-                  <Input value={empresa.whatsapp} onChange={(e) => setEmpresa({ ...empresa, whatsapp: e.target.value })} maxLength={20} />
+                  <Input value={empresa.whatsapp} onChange={(e) => setEmpresa({ ...empresa, whatsapp: maskPhone(e.target.value) })} maxLength={15} />
                 </div>
                 <div className="space-y-2">
                   <Label>E-mail</Label>
