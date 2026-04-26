@@ -70,7 +70,7 @@ const CheckoutPage = () => {
   const [pixCopied, setPixCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  if (!tour && !transfer) {
+  if (!tour && !transfer && !pkg) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
