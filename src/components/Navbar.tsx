@@ -20,7 +20,7 @@ const Navbar = () => {
             <img 
               src={settings.logoUrl} 
               alt={settings.titulo || "LençóisTour"} 
-              className="h-8 md:h-10 w-auto object-contain"
+              className={`h-8 md:h-10 w-auto object-contain ${isHome ? "brightness-0 invert" : ""}`}
             />
           ) : (
             <>Lençóis<span className="text-secondary">Tour</span></>
