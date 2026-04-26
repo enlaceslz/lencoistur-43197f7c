@@ -431,7 +431,7 @@ const AdminParceiros = () => {
               </div>
               <div>
                 <Label className="mb-1.5 block">Telefone</Label>
-                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: maskPhone(e.target.value) })} maxLength={15} />
               </div>
             </div>
             <div>
