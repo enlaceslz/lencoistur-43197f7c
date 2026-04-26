@@ -108,3 +108,41 @@
     border-left: 3px solid hsl(217 91% 60%);
   }
 }
+
+@media print {
+  .no-print, 
+  nav, 
+  header, 
+  aside,
+  button,
+  footer,
+  .admin-sidebar,
+  #whatsapp-float {
+    display: none !important;
+  }
+  
+  body, .admin-main-content {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  .bg-card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .grid {
+    display: block !important;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th, td {
+    border: 1px solid #ddd !important;
+    padding: 8px !important;
+  }
+}
