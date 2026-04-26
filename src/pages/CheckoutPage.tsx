@@ -359,6 +359,13 @@ const CheckoutPage = () => {
                 </div>
               </div>
               <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Data de Nascimento (opcional)</label>
+                <input
+                  type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)}
+                  className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+              <div>
                 <label className="text-sm font-semibold text-foreground mb-1.5 block">Observações</label>
                 <textarea
                   value={notes} onChange={(e) => setNotes(e.target.value)}
