@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
 
     // Validate required fields
-    const { type, itemName, date, guests, payMethod, customerName, customerEmail, customerPhone, cpf, passport, country } = body;
+    const { type, itemName, date, guests, payMethod, customerName, customerEmail, customerPhone, cpf, passport, country, birthDate } = body;
 
     if (!type || !itemName || !customerName || !customerEmail || !payMethod) {
       return new Response(
