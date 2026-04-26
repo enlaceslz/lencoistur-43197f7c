@@ -61,7 +61,9 @@ const AdminSGSDashboard = () => {
       pendingTerms: pendingCount,
       veiculos: (veiculosRes.data || []).length,
       condutores: (condutoresRes.data || []).length,
-      checklists: checklistsRes.data?.length || 0,
+      checklists: (checklistsRes.data || []).length,
+      equipment: (equipmentRes.data || []).length,
+      procedures: (proceduresRes.data || []).length,
     });
 
     // Recent activity from incidents
