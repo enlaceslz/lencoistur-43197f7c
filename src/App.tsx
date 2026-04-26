@@ -56,6 +56,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/seguranca" element={<Seguranca />} />
           <Route path="/passeios" element={<ToursPage />} />
           <Route path="/passeios/:slug" element={<TourDetail />} />
           <Route path="/translados" element={<TransfersPage />} />
