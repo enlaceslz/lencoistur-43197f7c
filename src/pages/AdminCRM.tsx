@@ -510,6 +510,107 @@ const AdminCRM = () => {
     a.click();
     URL.revokeObjectURL(url);
     toast.success(`${filtered.length} clientes exportados!`);
+  const exportPDF = () => {
+    if (filtered.length === 0) {
+      toast.error("Nenhum cliente para exportar.");
+      return;
+    }
+
+    const doc = new jsPDF();
+    const tableColumn = ["Nome", "Email", "Telefone", "Documento", "Cidade/UF", "Reservas", "Total Gasto"];
+    const tableRows: any[] = [];
+
+    filtered.forEach(c => {
+      const customerData = [
+        c.name,
+        c.email,
+        c.phone || "—",
+        c.country === "Brasil" ? (c.cpf ? maskCPF(c.cpf) : "—") : (c.passport || "—"),
+        c.city ? `${c.city}/${c.state || ""}` : "—",
+        c.totalBookings,
+        fmt(c.totalSpent)
+      ];
+      tableRows.push(customerData);
+    });
+
+    doc.setFontSize(18);
+    doc.text("Relatório de Clientes", 14, 22);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Gerado em: ${new Date().toLocaleString("pt-BR")}`, 14, 30);
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 35,
+      theme: "striped",
+      headStyles: { fillColor: [45, 108, 223], textColor: [255, 255, 255] },
+      styles: { fontSize: 8, cellPadding: 2 },
+    });
+
+    doc.save(`clientes_${new Date().toISOString().split("T")[0]}.pdf`);
+    toast.success(`${filtered.length} clientes exportados para PDF!`);
+  };
+
+  const exportClientPDF = (c: Customer) => {
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFillColor(45, 108, 223);
+    doc.rect(0, 0, 210, 40, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.text("Ficha do Cliente", 14, 25);
+    
+    // Content
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("DADOS PESSOAIS", 14, 55);
+    doc.line(14, 57, 196, 57);
+    
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`Nome: ${c.name}`, 14, 65);
+    doc.text(`E-mail: ${c.email}`, 14, 72);
+    doc.text(`Telefone: ${c.phone ? maskPhone(c.phone) : "—"}`, 14, 79);
+    doc.text(`Documento: ${c.country === "Brasil" ? (c.cpf ? maskCPF(c.cpf) : "—") : (c.passport || "—")}`, 14, 86);
+    doc.text(`Data de Nascimento: ${c.birth_date ? new Date(c.birth_date + "T00:00:00").toLocaleDateString("pt-BR") : "—"}`, 14, 93);
+    doc.text(`Nacionalidade: ${c.country}`, 14, 100);
+    
+    doc.setFont("helvetica", "bold");
+    doc.text("ENDEREÇO", 14, 115);
+    doc.line(14, 117, 196, 117);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Endereço: ${c.address || "—"}${c.number ? `, ${c.number}` : ""}`, 14, 125);
+    doc.text(`Bairro: ${c.neighborhood || "—"}`, 14, 132);
+    doc.text(`Cidade/Estado: ${c.city || "—"} - ${c.state || "—"}`, 14, 139);
+    doc.text(`CEP: ${c.cep || "—"}`, 14, 146);
+    
+    if (c.notes) {
+      doc.setFont("helvetica", "bold");
+      doc.text("OBSERVAÇÕES", 14, 160);
+      doc.line(14, 162, 196, 162);
+      doc.setFont("helvetica", "normal");
+      const splitNotes = doc.splitTextToSize(c.notes, 180);
+      doc.text(splitNotes, 14, 170);
+    }
+
+    // Bookings summary
+    doc.setFont("helvetica", "bold");
+    doc.text("RESUMO FINANCEIRO", 14, 200);
+    doc.line(14, 202, 196, 202);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Total de Reservas: ${c.totalBookings}`, 14, 210);
+    doc.text(`Total Gasto: ${fmt(c.totalSpent)}`, 14, 217);
+    doc.text(`Última Reserva: ${c.lastBooking ? new Date(c.lastBooking).toLocaleDateString("pt-BR") : "—"}`, 14, 224);
+
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text(`Ficha gerada em ${new Date().toLocaleString("pt-BR")}`, 14, 285);
+
+    doc.save(`cliente_${c.name.replace(/\s+/g, "_")}.pdf`);
+    toast.success("Ficha do cliente gerada com sucesso!");
   };
 
   const filtered = customers.filter((c) => {
