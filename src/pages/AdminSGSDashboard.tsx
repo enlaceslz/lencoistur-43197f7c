@@ -4,7 +4,8 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Shield, AlertTriangle, CheckCircle, Users, TrendingUp, Activity, Phone, Building2,
-  Plus, ArrowRight, Clock, FileText, ClipboardCheck, Car, UserCheck2, Map, Truck, Star
+  Plus, ArrowRight, Clock, FileText, ClipboardCheck, Car, UserCheck2, Map, Truck, Star,
+  Wrench, ClipboardList
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import { jsPDF } from "jspdf";
