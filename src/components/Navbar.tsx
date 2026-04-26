@@ -55,7 +55,7 @@ const Navbar = () => {
         <div className={`md:hidden ${isHome ? "bg-foreground/95 text-primary-foreground" : "bg-card text-foreground"} backdrop-blur-lg border-t border-border px-6 py-6 flex flex-col gap-4`}>
           <Link to="/passeios" onClick={() => setOpen(false)} className="py-2">{t("nav.tours")}</Link>
           <Link to="/translados" onClick={() => setOpen(false)} className="py-2">{t("nav.transfers")}</Link>
-          <Link to="/seguranca" onClick={() => setOpen(false)} className="py-2">Segurança</Link>
+          <Link to="/seguranca" onClick={() => setOpen(false)} className="py-2">{t("nav.safety")}</Link>
           <Link to="/" onClick={() => setOpen(false)} className="py-2">{t("nav.home")}</Link>
           <Link to="/passeios" onClick={() => setOpen(false)} className="bg-secondary text-secondary-foreground px-5 py-3 rounded-lg font-semibold mt-2 text-center">
             {t("nav.bookNow")}
