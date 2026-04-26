@@ -45,7 +45,7 @@ const CheckoutPage = () => {
   const image = tour?.images?.[0] || "";
   const location = tour?.location || (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
 
-  const [payMethod, setPayMethod] = useState<"pix" | "card">("pix");
+  const [payMethod, setPayMethod] = useState<"pix" | "card" | "info">("pix");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -127,7 +127,7 @@ const CheckoutPage = () => {
               <CheckCircle size={40} className="text-green-600" />
             </div>
             <h1 className="font-display text-3xl font-bold text-foreground mb-2">
-              {confirmedBooking.payMethod === "pix" ? "Reserva Registrada!" : "Reserva Confirmada!"}
+              {confirmedBooking.payMethod === "pix" ? "Reserva Registrada!" : confirmedBooking.payMethod === "info" ? "Solicitação Enviada!" : "Reserva Confirmada!"}
             </h1>
             <p className="text-muted-foreground">
               Código da reserva: <strong className="text-foreground font-mono">{confirmedBooking.bookingCode}</strong>
@@ -172,6 +172,25 @@ const CheckoutPage = () => {
             </div>
           )}
 
+          {/* Info Payment / Contact */}
+          {confirmedBooking.payMethod === "info" && (
+            <div className="bg-card border-2 border-primary/20 rounded-2xl p-6 mb-6">
+              <div className="text-center mb-4">
+                <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold mb-3">
+                  <Users size={16} /> Solicitação de Informações
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Seus dados e os detalhes do serviço foram enviados para nossa agência. Um consultor entrará em contato em breve.
+                </p>
+              </div>
+              <div className="bg-green-50 border border-green-100 rounded-xl p-4 text-center">
+                <p className="text-xs text-green-700 font-medium">
+                  ✅ PDF profissional enviado para o e-mail da agência com sucesso.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Booking Details */}
           <div className="bg-card border border-border rounded-2xl p-6 space-y-3 mb-6">
             <h3 className="font-display font-bold text-foreground">Detalhes da Reserva</h3>
@@ -191,7 +210,7 @@ const CheckoutPage = () => {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Pagamento</span>
-              <span className="font-semibold text-foreground">{payMethod === "pix" ? "PIX" : "Cartão de Crédito"}</span>
+              <span className="font-semibold text-foreground">{payMethod === "pix" ? "PIX" : payMethod === "info" ? "Solicitação de Informações" : "Cartão de Crédito"}</span>
             </div>
             {displayDiscount > 0 && (
               <div className="flex justify-between text-sm text-green-600">
@@ -250,7 +269,9 @@ const CheckoutPage = () => {
                 <Printer size={18} /> Recibo
               </button>
               <a
-                href={`https://wa.me/5598985880954?text=Olá! Acabei de fazer a reserva ${confirmedBooking.bookingCode} - ${confirmedBooking.itemName} para ${guests} pessoas.`}
+                href={confirmedBooking.payMethod === "info" 
+                  ? `https://wa.me/5598985880954?text=Olá! Solicitei mais informações sobre a reserva ${confirmedBooking.bookingCode} - ${confirmedBooking.itemName}. Gostaria de tirar algumas dúvidas.`
+                  : `https://wa.me/5598985880954?text=Olá! Acabei de fazer a reserva ${confirmedBooking.bookingCode} - ${confirmedBooking.itemName} para ${guests} pessoas.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 bg-whatsapp hover:bg-whatsapp-hover text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors text-center flex items-center justify-center gap-2"
@@ -389,7 +410,7 @@ const CheckoutPage = () => {
             {/* Payment */}
             <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
               <h2 className="font-display text-lg font-bold text-foreground">Forma de Pagamento</h2>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <button
                   type="button"
                   onClick={() => setPayMethod("pix")}
@@ -399,7 +420,7 @@ const CheckoutPage = () => {
                    <div className="text-left">
                     <p className="font-semibold text-foreground text-sm">PIX</p>
                     <p className="text-xs text-green-600 font-medium">
-                      {pixDiscountPercent > 0 ? `${pixDiscountPercent}% de desconto` : "Pagamento instantâneo"}
+                      {pixDiscountPercent > 0 ? `${pixDiscountPercent}% desc.` : "Instantâneo"}
                     </p>
                   </div>
                 </button>
@@ -411,7 +432,18 @@ const CheckoutPage = () => {
                   <CreditCard size={24} className={payMethod === "card" ? "text-primary" : "text-muted-foreground"} />
                   <div className="text-left">
                     <p className="font-semibold text-foreground text-sm">Cartão</p>
-                    <p className="text-xs text-muted-foreground">Até 3x sem juros</p>
+                    <p className="text-xs text-muted-foreground">Até 3x s/ juros</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPayMethod("info")}
+                  className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-colors ${payMethod === "info" ? "border-primary bg-primary/5" : "border-border"}`}
+                >
+                  <Users size={24} className={payMethod === "info" ? "text-primary" : "text-muted-foreground"} />
+                  <div className="text-left">
+                    <p className="font-semibold text-foreground text-sm">Info</p>
+                    <p className="text-xs text-muted-foreground">Falar c/ agência</p>
                   </div>
                 </button>
               </div>
@@ -426,34 +458,18 @@ const CheckoutPage = () => {
                 </div>
               )}
 
+              {payMethod === "info" && (
+                <div className="bg-muted rounded-xl p-4 flex items-center gap-3">
+                  <Users size={20} className="text-primary shrink-0" />
+                   <p className="text-sm text-muted-foreground">
+                    Ao confirmar, sua solicitação será enviada para a agência. Entraremos em contato via WhatsApp para finalizar sua reserva.
+                  </p>
+                </div>
+              )}
+
               {payMethod === "card" && (
                 <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-semibold text-foreground mb-1.5 block">Número do cartão</label>
-                    <input
-                      type="text"
-                      className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30"
-                      placeholder="0000 0000 0000 0000"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-semibold text-foreground mb-1.5 block">Validade</label>
-                      <input
-                        type="text"
-                        className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30"
-                        placeholder="MM/AA"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-semibold text-foreground mb-1.5 block">CVV</label>
-                      <input
-                        type="text"
-                        className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30"
-                        placeholder="000"
-                      />
-                    </div>
-                  </div>
+...
                   <div>
                     <label className="text-sm font-semibold text-foreground mb-1.5 block">Parcelas</label>
                     <select className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none appearance-none">
@@ -470,7 +486,7 @@ const CheckoutPage = () => {
               type="submit"
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-xl font-semibold text-lg transition-colors"
             >
-              {payMethod === "pix" ? `Gerar PIX — R$ ${finalTotal}` : `Pagar R$ ${finalTotal}`}
+              {payMethod === "pix" ? `Gerar PIX — R$ ${finalTotal}` : payMethod === "info" ? "Solicitar Informações" : `Pagar R$ ${finalTotal}`}
             </button>
 
             <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">

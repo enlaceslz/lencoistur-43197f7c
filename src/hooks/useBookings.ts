@@ -12,7 +12,7 @@ export interface BookingItem {
   total: number;
   discount: number;
   finalTotal: number;
-  payMethod: "pix" | "card";
+  payMethod: "pix" | "card" | "info";
   status: "confirmada" | "pendente" | "cancelada" | "concluida";
   paymentStatus: "pago" | "pendente";
   customerName: string;
