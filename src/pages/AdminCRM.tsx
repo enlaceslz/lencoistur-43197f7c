@@ -16,10 +16,18 @@ interface Customer {
   email: string;
   phone: string | null;
   cpf: string | null;
+  passport: string | null;
   birth_date: string | null;
   notes: string | null;
   status: string;
   created_at: string;
+  country: string | null;
+  cep: string | null;
+  address: string | null;
+  number: string | null;
+  neighborhood: string | null;
+  city: string | null;
+  state: string | null;
   totalBookings: number;
   totalSpent: number;
   lastBooking: string | null;
@@ -53,9 +61,17 @@ interface CustomerForm {
   email: string;
   phone: string;
   cpf: string;
+  passport: string;
   birth_date: string;
   notes: string;
   status: string;
+  country: string;
+  cep: string;
+  address: string;
+  number: string;
+  neighborhood: string;
+  city: string;
+  state: string;
 }
 
 interface DependentForm {
@@ -70,9 +86,17 @@ const emptyForm: CustomerForm = {
   email: "", 
   phone: "", 
   cpf: "", 
+  passport: "",
   birth_date: "", 
   notes: "", 
-  status: "regular" 
+  status: "regular",
+  country: "Brasil",
+  cep: "",
+  address: "",
+  number: "",
+  neighborhood: "",
+  city: "",
+  state: ""
 };
 
 const emptyDependentForm: DependentForm = {
@@ -119,11 +143,14 @@ const validateForm = (form: CustomerForm): string | null => {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) return "E-mail inválido.";
   if (form.phone) {
     const digits = form.phone.replace(/\D/g, "");
-    if (digits.length < 10 || digits.length > 11) return "Telefone deve ter 10 ou 11 dígitos.";
+    if (digits.length < 10 && form.country === "Brasil") return "Telefone deve ter 10 ou 11 dígitos.";
   }
-  if (form.cpf) {
+  if (form.country === "Brasil" && form.cpf) {
     const cpfDigits = form.cpf.replace(/\D/g, "");
     if (cpfDigits.length !== 11) return "CPF deve ter 11 dígitos.";
+  }
+  if (form.country !== "Brasil" && !form.passport) {
+    return "Passaporte é obrigatório para estrangeiros.";
   }
   return null;
 };
@@ -155,7 +182,35 @@ const AdminCRM = () => {
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [form, setForm] = useState<CustomerForm>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [fetchingCep, setFetchingCep] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+
+  const handleCepSearch = async (cep: string) => {
+    const cleanedCep = cep.replace(/\D/g, "");
+    if (cleanedCep.length !== 8) return;
+
+    setFetchingCep(true);
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cleanedCep}/json/`);
+      const data = await response.json();
+      
+      if (data.erro) {
+        toast.error("CEP não encontrado.");
+      } else {
+        setForm(prev => ({
+          ...prev,
+          address: data.logradouro,
+          neighborhood: data.bairro,
+          city: data.localidade,
+          state: data.uf
+        }));
+      }
+    } catch (error) {
+      toast.error("Erro ao buscar CEP.");
+    } finally {
+      setFetchingCep(false);
+    }
+  };
 
   // Dependent Modal state
   const [dependentModalOpen, setDependentModalOpen] = useState(false);
@@ -222,10 +277,18 @@ const AdminCRM = () => {
         email: c.email,
         phone: c.phone,
         cpf: c.cpf,
+        passport: c.passport,
         birth_date: c.birth_date,
         notes: c.notes,
         status: c.status || "regular",
         created_at: c.created_at,
+        country: c.country || "Brasil",
+        cep: c.cep,
+        address: c.address,
+        number: c.number,
+        neighborhood: c.neighborhood,
+        city: c.city,
+        state: c.state,
         totalBookings: bookingsByCustomer[c.id]?.count || 0,
         totalSpent: bookingsByCustomer[c.id]?.total || 0,
         lastBooking: bookingsByCustomer[c.id]?.lastDate || null,
@@ -272,9 +335,17 @@ const AdminCRM = () => {
       email: c.email, 
       phone: c.phone || "", 
       cpf: c.cpf || "",
+      passport: c.passport || "",
       birth_date: c.birth_date || "",
       notes: c.notes || "",
-      status: c.status || "regular"
+      status: c.status || "regular",
+      country: c.country || "Brasil",
+      cep: c.cep || "",
+      address: c.address || "",
+      number: c.number || "",
+      neighborhood: c.neighborhood || "",
+      city: c.city || "",
+      state: c.state || ""
     });
     setModalOpen(true);
   };
@@ -291,10 +362,18 @@ const AdminCRM = () => {
       name: form.name.trim(),
       email: form.email.trim().toLowerCase(),
       phone: form.phone.replace(/\D/g, "") || null,
-      cpf: form.cpf.replace(/\D/g, "") || null,
+      cpf: form.country === "Brasil" ? (form.cpf.replace(/\D/g, "") || null) : null,
+      passport: form.country !== "Brasil" ? (form.passport || null) : null,
       birth_date: form.birth_date || null,
       notes: form.notes || null,
-      status: form.status
+      status: form.status,
+      country: form.country,
+      cep: form.cep,
+      address: form.address,
+      number: form.number,
+      neighborhood: form.neighborhood,
+      city: form.city,
+      state: form.state
     };
 
     if (editingCustomer) {
@@ -417,9 +496,9 @@ const AdminCRM = () => {
       toast.error("Nenhum cliente para exportar.");
       return;
     }
-    const header = "Nome,Email,Telefone,CPF,Data Nascimento,Status,Reservas,Total Gasto,Cadastro,Observacoes\n";
+    const header = "Nome,Email,Telefone,Documento,Data Nascimento,Status,Pais,CEP,Endereco,Cidade,Estado,Reservas,Total Gasto,Cadastro,Observacoes\n";
     const rows = filtered.map(c =>
-      `"${c.name}","${c.email}","${c.phone || ""}","${c.cpf || ""}","${c.birth_date || ""}","${c.status}",${c.totalBookings},"${fmt(c.totalSpent)}","${new Date(c.created_at).toLocaleDateString("pt-BR")}","${(c.notes || "").replace(/"/g, '""')}"`
+      `"${c.name}","${c.email}","${c.phone || ""}","${c.country === "Brasil" ? (c.cpf || "") : (c.passport || "")}","${c.birth_date || ""}","${c.status}","${c.country || "Brasil"}","${c.cep || ""}","${(c.address || "").replace(/"/g, '""')}","${c.city || ""}","${c.state || ""}",${c.totalBookings},"${fmt(c.totalSpent)}","${new Date(c.created_at).toLocaleDateString("pt-BR")}","${(c.notes || "").replace(/"/g, '""')}"`
     ).join("\n");
     const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -433,7 +512,7 @@ const AdminCRM = () => {
 
   const filtered = customers.filter((c) => {
     const q = search.toLowerCase();
-    const matchesSearch = c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || (c.phone || "").includes(q) || (c.cpf || "").includes(q);
+    const matchesSearch = c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || (c.phone || "").includes(q) || (c.cpf || "").includes(q) || (c.passport || "").toLowerCase().includes(q) || (c.city || "").toLowerCase().includes(q);
     if (filter === "with_bookings") return matchesSearch && c.totalBookings > 0;
     if (filter === "no_bookings") return matchesSearch && c.totalBookings === 0;
     if (filter === "dependents") return false; // Handled separately
@@ -682,10 +761,28 @@ const AdminCRM = () => {
                       <span className="text-muted-foreground">{maskPhone(selectedCustomer.phone)}</span>
                     </div>
                   )}
-                  {selectedCustomer.cpf && (
+                  {selectedCustomer.country === "Brasil" && selectedCustomer.cpf && (
                     <div className="flex items-center gap-3 text-sm">
                       <Globe size={16} className="text-primary shrink-0" />
                       <span className="text-muted-foreground">CPF: {maskCPF(selectedCustomer.cpf)}</span>
+                    </div>
+                  )}
+                  {selectedCustomer.country !== "Brasil" && selectedCustomer.passport && (
+                    <div className="flex items-center gap-3 text-sm">
+                      <Globe size={16} className="text-primary shrink-0" />
+                      <span className="text-muted-foreground">Passaporte: {selectedCustomer.passport}</span>
+                    </div>
+                  )}
+                  {selectedCustomer.address && (
+                    <div className="flex items-center gap-3 text-sm">
+                      <MapPin size={16} className="text-primary shrink-0" />
+                      <span className="text-muted-foreground text-[10px] leading-tight">
+                        {selectedCustomer.address}{selectedCustomer.number ? `, ${selectedCustomer.number}` : ""}
+                        <br />
+                        {selectedCustomer.neighborhood ? `${selectedCustomer.neighborhood}, ` : ""}{selectedCustomer.city} - {selectedCustomer.state}
+                        <br />
+                        {selectedCustomer.country === "Brasil" ? `CEP: ${selectedCustomer.cep}` : `Código Postal: ${selectedCustomer.cep}`}
+                      </span>
                     </div>
                   )}
                   {selectedCustomer.birth_date && (
@@ -863,6 +960,18 @@ const AdminCRM = () => {
               )}
             </div>
             <div>
+              <Label htmlFor="customer-country">Nacionalidade</Label>
+              <select
+                id="customer-country"
+                value={form.country}
+                onChange={(e) => setForm({ ...form, country: e.target.value })}
+                className="w-full flex h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="Brasil">Brasil</option>
+                <option value="Estrangeiro">Estrangeiro</option>
+              </select>
+            </div>
+            <div>
               <Label htmlFor="customer-email">E-mail *</Label>
               <Input
                 id="customer-email"
@@ -872,6 +981,54 @@ const AdminCRM = () => {
                 placeholder="email@exemplo.com"
                 maxLength={255}
                 required
+                className="rounded-xl"
+              />
+            </div>
+            <div>
+              <Label htmlFor="customer-phone">Telefone</Label>
+              <Input
+                id="customer-phone"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                placeholder={form.country === "Brasil" ? "(99) 99999-9999" : "Telefone com DDI"}
+                maxLength={20}
+                className="rounded-xl"
+              />
+            </div>
+            <div>
+              {form.country === "Brasil" ? (
+                <>
+                  <Label htmlFor="customer-cpf">CPF</Label>
+                  <Input
+                    id="customer-cpf"
+                    value={form.cpf}
+                    onChange={(e) => setForm({ ...form, cpf: e.target.value })}
+                    placeholder="000.000.000-00"
+                    maxLength={14}
+                    className="rounded-xl"
+                  />
+                </>
+              ) : (
+                <>
+                  <Label htmlFor="customer-passport">Passaporte *</Label>
+                  <Input
+                    id="customer-passport"
+                    value={form.passport}
+                    onChange={(e) => setForm({ ...form, passport: e.target.value })}
+                    placeholder="Número do Passaporte"
+                    className="rounded-xl"
+                    required
+                  />
+                </>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="customer-birth">Data de Nascimento</Label>
+              <Input
+                id="customer-birth"
+                type="date"
+                value={form.birth_date}
+                onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
                 className="rounded-xl"
               />
             </div>
@@ -888,38 +1045,86 @@ const AdminCRM = () => {
                 <option value="bloqueado">Bloqueado</option>
               </select>
             </div>
-            <div>
-              <Label htmlFor="customer-phone">Telefone</Label>
-              <Input
-                id="customer-phone"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                placeholder="(99) 99999-9999"
-                maxLength={15}
-                className="rounded-xl"
-              />
+
+            <div className="md:col-span-2 border-t border-border pt-4 mt-2">
+              <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                <MapPin size={16} /> Endereço
+              </h4>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="customer-cep">
+                    {form.country === "Brasil" ? "CEP" : "Código Postal"}
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="customer-cep"
+                      value={form.cep}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setForm({ ...form, cep: val });
+                        if (form.country === "Brasil" && val.replace(/\D/g, "").length === 8) {
+                          handleCepSearch(val);
+                        }
+                      }}
+                      placeholder={form.country === "Brasil" ? "00000-000" : "Postal Code"}
+                      className="rounded-xl"
+                    />
+                    {fetchingCep && <Loader2 size={16} className="animate-spin self-center" />}
+                  </div>
+                </div>
+                <div className="md:col-span-2">
+                  <Label htmlFor="customer-address">Logradouro / Rua</Label>
+                  <Input
+                    id="customer-address"
+                    value={form.address}
+                    onChange={(e) => setForm({ ...form, address: e.target.value })}
+                    placeholder="Av. Paulista..."
+                    className="rounded-xl"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="customer-number">Número</Label>
+                  <Input
+                    id="customer-number"
+                    value={form.number}
+                    onChange={(e) => setForm({ ...form, number: e.target.value })}
+                    placeholder="123"
+                    className="rounded-xl"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="customer-neighborhood">Bairro</Label>
+                  <Input
+                    id="customer-neighborhood"
+                    value={form.neighborhood}
+                    onChange={(e) => setForm({ ...form, neighborhood: e.target.value })}
+                    placeholder="Centro"
+                    className="rounded-xl"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="customer-city">Cidade</Label>
+                  <Input
+                    id="customer-city"
+                    value={form.city}
+                    onChange={(e) => setForm({ ...form, city: e.target.value })}
+                    placeholder="São Paulo"
+                    className="rounded-xl"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="customer-state">Estado / Província</Label>
+                  <Input
+                    id="customer-state"
+                    value={form.state}
+                    onChange={(e) => setForm({ ...form, state: e.target.value })}
+                    placeholder="SP"
+                    className="rounded-xl"
+                  />
+                </div>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="customer-cpf">CPF</Label>
-              <Input
-                id="customer-cpf"
-                value={form.cpf}
-                onChange={(e) => setForm({ ...form, cpf: e.target.value })}
-                placeholder="000.000.000-00"
-                maxLength={14}
-                className="rounded-xl"
-              />
-            </div>
-            <div>
-              <Label htmlFor="customer-birth">Data de Nascimento</Label>
-              <Input
-                id="customer-birth"
-                type="date"
-                value={form.birth_date}
-                onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
-                className="rounded-xl"
-              />
-            </div>
+
             <div className="md:col-span-2">
               <Label htmlFor="customer-notes">Observações</Label>
               <textarea
