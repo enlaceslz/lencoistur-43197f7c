@@ -40,7 +40,8 @@ const payLabel = (m: string) => {
     cartao: "Cartão de Crédito / Débito", 
     card: "Cartão de Crédito", 
     dinheiro: "Dinheiro / Espécie", 
-    transferencia: "Transferência Bancária" 
+    transferencia: "Transferência Bancária",
+    info: "Solicitação de Informações"
   };
   return map[m] || m;
 };
