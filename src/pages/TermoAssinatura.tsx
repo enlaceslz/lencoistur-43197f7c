@@ -171,6 +171,8 @@ const TermoAssinatura = () => {
       phone: booking.customers?.phone || booking.customer_phone,
       tour_name: booking.item_name,
       risks_informed: acceptedRisks,
+      health_questions: healthInfo,
+      safety_controls_informed: true,
       accepted: true,
       signature_data: signatureData,
       signed_at: new Date().toISOString(),
