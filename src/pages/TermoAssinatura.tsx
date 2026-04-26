@@ -292,6 +292,20 @@ const TermoAssinatura = () => {
       // 5. Update term with PDF URL
       await supabase.from("sgs_risk_terms").update({ pdf_url: filePath }).eq("id", termData.id);
 
+      // 6. Send Email
+      try {
+        await supabase.functions.invoke("send-term-email", {
+          body: {
+            bookingCode: booking.booking_code,
+            customerEmail: booking.customers?.email || booking.customer_email,
+            customerName: booking.customers?.name || booking.customer_name,
+            pdfUrl: filePath
+          }
+        });
+      } catch (emailErr) {
+        console.error("Error calling send-term-email function:", emailErr);
+      }
+
       toast({ title: "Termo Assinado!", description: "Obrigado por completar este passo de segurança." });
       setSigned(true);
       
