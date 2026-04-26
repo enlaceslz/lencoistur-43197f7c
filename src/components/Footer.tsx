@@ -1,9 +1,11 @@
 import { MapPin, Phone, Mail, Instagram } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const Footer = () => {
   const { t } = useTranslation();
   const tourLinks = t("footer.tourLinks", { returnObjects: true }) as string[];
+  const { settings } = useSiteSettings();
 
   return (
     <footer id="contato" className="bg-foreground text-primary-foreground border-t border-primary-foreground/10">
@@ -11,7 +13,15 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="md:col-span-1">
             <h3 className="font-display text-2xl font-bold mb-4">
-              Lençóis<span className="text-secondary">Tour</span>
+              {settings?.logoUrl ? (
+                <img 
+                  src={settings.logoUrl} 
+                  alt={settings.titulo || "LençóisTour"} 
+                  className="h-10 md:h-12 w-auto object-contain brightness-0 invert" 
+                />
+              ) : (
+                <>Lençóis<span className="text-secondary">Tour</span></>
+              )}
             </h3>
             <p className="text-primary-foreground/60 text-sm leading-relaxed mb-4">
               {t("footer.desc")}

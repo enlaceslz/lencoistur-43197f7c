@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import {
   Home, Compass, Car, Users, UserCheck, CreditCard, Settings,
   LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot,
@@ -106,6 +107,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
+  const { settings } = useSiteSettings();
 
   const isSgsActive = location.pathname.startsWith("/admin/sgs");
   const breadcrumbs = getBreadcrumbs(location.pathname);
@@ -199,14 +201,24 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
         {/* Brand */}
         <div className="px-5 py-5 border-b border-white/[0.08]">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[hsl(217,91%,60%)] flex items-center justify-center">
-              <span className="text-white font-bold text-sm">LT</span>
-            </div>
-            <div>
-              <span className="font-display text-base font-bold text-white tracking-tight">Lençóis</span>
-              <span className="font-display text-base font-bold text-[hsl(217,91%,60%)]">Tour</span>
-              <p className="text-[10px] text-[hsl(220,15%,50%)] -mt-0.5 font-medium">Painel Administrativo</p>
-            </div>
+            {settings?.logoUrl ? (
+              <img 
+                src={settings.logoUrl} 
+                alt={settings.titulo || "LençóisTour"} 
+                className="h-10 w-auto object-contain brightness-0 invert" 
+              />
+            ) : (
+              <>
+                <div className="w-8 h-8 rounded-lg bg-[hsl(217,91%,60%)] flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">LT</span>
+                </div>
+                <div>
+                  <span className="font-display text-base font-bold text-white tracking-tight">Lençóis</span>
+                  <span className="font-display text-base font-bold text-[hsl(217,91%,60%)]">Tour</span>
+                  <p className="text-[10px] text-[hsl(220,15%,50%)] -mt-0.5 font-medium">Painel Administrativo</p>
+                </div>
+              </>
+            )}
           </Link>
         </div>
 
