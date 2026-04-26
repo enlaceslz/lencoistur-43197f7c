@@ -335,9 +335,17 @@ const AdminCRM = () => {
       email: c.email, 
       phone: c.phone || "", 
       cpf: c.cpf || "",
+      passport: c.passport || "",
       birth_date: c.birth_date || "",
       notes: c.notes || "",
-      status: c.status || "regular"
+      status: c.status || "regular",
+      country: c.country || "Brasil",
+      cep: c.cep || "",
+      address: c.address || "",
+      number: c.number || "",
+      neighborhood: c.neighborhood || "",
+      city: c.city || "",
+      state: c.state || ""
     });
     setModalOpen(true);
   };
@@ -354,10 +362,18 @@ const AdminCRM = () => {
       name: form.name.trim(),
       email: form.email.trim().toLowerCase(),
       phone: form.phone.replace(/\D/g, "") || null,
-      cpf: form.cpf.replace(/\D/g, "") || null,
+      cpf: form.country === "Brasil" ? (form.cpf.replace(/\D/g, "") || null) : null,
+      passport: form.country !== "Brasil" ? (form.passport || null) : null,
       birth_date: form.birth_date || null,
       notes: form.notes || null,
-      status: form.status
+      status: form.status,
+      country: form.country,
+      cep: form.cep,
+      address: form.address,
+      number: form.number,
+      neighborhood: form.neighborhood,
+      city: form.city,
+      state: form.state
     };
 
     if (editingCustomer) {
