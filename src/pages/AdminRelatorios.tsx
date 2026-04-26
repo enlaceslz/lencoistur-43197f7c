@@ -293,7 +293,48 @@ const AdminRelatorios = () => {
                   </ChartCard>
                 </>
               )}
-              {/* Add other tab charts */}
+              {activeTab === "financeiro" && (
+                <>
+                  <ChartCard title="Distribuição de Receitas">
+                    <ResponsiveContainer width="100%" height={280}>
+                      <RePieChart>
+                        <Pie data={data.receitas} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={8}>
+                          {data.receitas?.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                        </Pie>
+                        <Tooltip formatter={(v: number) => fmt(v)} />
+                        <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}} />
+                      </RePieChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                  <ChartCard title="Comparativo Financeiro">
+                    <ResponsiveContainer width="100%" height={280}>
+                      <BarChart data={[{ name: 'Fluxo', recebido: data.recebido, pago: data.pago }]}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                        <YAxis fontSize={10} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v/100}`} />
+                        <Tooltip formatter={(v: number) => fmt(v)} />
+                        <Bar dataKey="recebido" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="pago" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </>
+              )}
+              {activeTab === "passeios" && (
+                <div className="col-span-2">
+                  <ChartCard title="Performance por Passeio">
+                    <ResponsiveContainer width="100%" height={350}>
+                      <BarChart data={data.byTour}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                        <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
+                        <YAxis fontSize={10} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v/100}`} />
+                        <Tooltip formatter={(v: number) => fmt(v)} />
+                        <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Receita" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+              )}
             </div>
 
             {/* Professional Footer for Print */}
