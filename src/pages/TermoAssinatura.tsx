@@ -5,6 +5,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Shield, CheckCircle, AlertTriangle, FileText, Pencil, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 
 // Riscos inerentes conforme P6 VATTI
 const RISKS_OPTIONS = [
@@ -164,28 +166,155 @@ const TermoAssinatura = () => {
     setSigning(true);
     const signatureData = canvas.toDataURL();
 
-    const { error } = await supabase.from("sgs_risk_terms").insert({
-      booking_id: booking.id,
-      customer_name: booking.customers?.name || booking.customer_name,
-      nationality: booking.customers?.nationality || "BR",
-      phone: booking.customers?.phone || booking.customer_phone,
-      tour_name: booking.item_name,
-      risks_informed: acceptedRisks,
-      health_questions: healthInfo,
-      safety_controls_informed: true,
-      accepted: true,
-      signature_data: signatureData,
-      signed_at: new Date().toISOString(),
-      cancellation_policy: "Conforme política da agência aceita no momento da reserva."
-    });
+    try {
+      // 1. Save term record
+      const { data: termData, error: termError } = await supabase.from("sgs_risk_terms").insert({
+        booking_id: booking.id,
+        customer_name: booking.customers?.name || booking.customer_name,
+        nationality: booking.customers?.nationality || "BR",
+        phone: booking.customers?.phone || booking.customer_phone,
+        tour_name: booking.item_name,
+        risks_informed: acceptedRisks,
+        health_questions: healthInfo,
+        safety_controls_informed: true,
+        accepted: true,
+        signature_data: signatureData,
+        signed_at: new Date().toISOString(),
+        cancellation_policy: "Conforme política da agência aceita no momento da reserva."
+      }).select().single();
 
-    if (error) {
-      toast({ title: "Erro ao salvar", description: "Tente novamente ou fale com o suporte.", variant: "destructive" });
-    } else {
+      if (termError) throw termError;
+
+      // 2. Generate PDF
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      
+      // Header
+      doc.setFillColor(0, 102, 204);
+      doc.rect(0, 0, pageWidth, 40, 'F');
+      doc.setFontSize(22);
+      doc.setTextColor(255, 255, 255);
+      doc.text("Termo de Ciência de Risco", pageWidth / 2, 20, { align: "center" });
+      doc.setFontSize(10);
+      doc.text("Sistema de Gestão de Segurança (SGS) - ISO 21103", pageWidth / 2, 30, { align: "center" });
+      
+      doc.setTextColor(0, 0, 0);
+      let currentY = 50;
+      
+      // Booking Info
+      doc.setFontSize(14);
+      doc.text("Informações da Reserva", 14, currentY);
+      currentY += 10;
+      
+      (doc as any).autoTable({
+        startY: currentY,
+        body: [
+          ["Código da Reserva", booking.booking_code],
+          ["Passeio / Atividade", booking.item_name],
+          ["Data da Atividade", new Date(booking.date + "T12:00").toLocaleDateString("pt-BR")],
+          ["Participante", booking.customers?.name || booking.customer_name],
+          ["Documento / CPF", booking.customers?.cpf || "Não informado"],
+        ],
+        theme: 'grid',
+        styles: { fontSize: 10, cellPadding: 3 },
+        columnStyles: { 0: { fontStyle: 'bold', width: 50 } }
+      });
+      
+      currentY = (doc as any).lastAutoTable.finalY + 15;
+      
+      // Risks
+      doc.setFontSize(14);
+      doc.text("Ciência de Riscos e Segurança", 14, currentY);
+      currentY += 5;
+      const risksRows = acceptedRisks.map(r => [`[X] ${r}`]);
+      (doc as any).autoTable({
+        startY: currentY,
+        body: risksRows,
+        theme: 'plain',
+        styles: { fontSize: 9, cellPadding: 1 }
+      });
+      
+      currentY = (doc as any).lastAutoTable.finalY + 15;
+      
+      // Health
+      doc.setFontSize(14);
+      doc.text("Informações de Saúde", 14, currentY);
+      currentY += 7;
+      doc.setFontSize(10);
+      const healthText = healthInfo.length > 0 ? `Condições informadas: ${healthInfo.join(", ")}` : "Nenhuma condição de saúde informada pelo participante.";
+      doc.text(healthText, 14, currentY, { maxWidth: pageWidth - 28 });
+      
+      currentY += 20;
+      
+      // Declaration
+      doc.setFontSize(12);
+      doc.text("Declaração", 14, currentY);
+      currentY += 7;
+      doc.setFontSize(9);
+      const declaration = `Declaro que fui informado sobre os riscos inerentes à atividade, bem como sobre os procedimentos de segurança. Comprometo-me a seguir as orientações da equipe técnica e assumo a responsabilidade por meus atos durante a execução do passeio.`;
+      doc.text(doc.splitTextToSize(declaration, pageWidth - 28), 14, currentY);
+      
+      currentY += 25;
+      
+      // Signature
+      doc.text("Assinatura Digital do Participante:", 14, currentY);
+      doc.addImage(signatureData, 'PNG', 14, currentY + 5, 50, 20);
+      doc.line(14, currentY + 26, 80, currentY + 26);
+      doc.text(booking.customers?.name || booking.customer_name, 14, currentY + 31);
+      doc.text(`Assinado em: ${new Date().toLocaleString("pt-BR")}`, 14, currentY + 36);
+
+      const pdfBlob = doc.output('blob');
+      const fileName = `termo_${booking.booking_code}_${Date.now()}.pdf`;
+      const filePath = `termos_assinados/${fileName}`;
+
+      // 3. Upload to Storage
+      const { error: uploadError } = await supabase.storage
+        .from("company-documents")
+        .upload(filePath, pdfBlob, {
+          contentType: 'application/pdf',
+          cacheControl: '3600'
+        });
+
+      if (uploadError) throw uploadError;
+
+      // 4. Save to Documents Module
+      const { error: docError } = await supabase.from("documents").insert({
+        name: `Termo Assinado - ${booking.item_name} - ${booking.booking_code}`,
+        type: "termo_assinado",
+        description: `Termo assinado por ${booking.customers?.name || booking.customer_name} para a reserva ${booking.booking_code} em ${new Date().toLocaleDateString("pt-BR")}`,
+        file_url: filePath,
+        file_name: fileName,
+        status: "vigente"
+      });
+
+      if (docError) throw docError;
+
+      // 5. Update term with PDF URL
+      await supabase.from("sgs_risk_terms").update({ pdf_url: filePath }).eq("id", termData.id);
+
+      // 6. Send Email
+      try {
+        await supabase.functions.invoke("send-term-email", {
+          body: {
+            bookingCode: booking.booking_code,
+            customerEmail: booking.customers?.email || booking.customer_email,
+            customerName: booking.customers?.name || booking.customer_name,
+            pdfUrl: filePath
+          }
+        });
+      } catch (emailErr) {
+        console.error("Error calling send-term-email function:", emailErr);
+      }
+
       toast({ title: "Termo Assinado!", description: "Obrigado por completar este passo de segurança." });
       setSigned(true);
+      
+    } catch (err: any) {
+      console.error(err);
+      toast({ title: "Erro ao processar", description: err.message || "Tente novamente ou fale com o suporte.", variant: "destructive" });
+    } finally {
+      setSigning(false);
     }
-    setSigning(false);
   };
 
   if (loading) {
