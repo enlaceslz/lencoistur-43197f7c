@@ -119,6 +119,7 @@ const AdminSGSDashboard = () => {
     { label: "Termo de Risco", icon: FileText, path: "/admin/sgs/termos", color: "bg-secondary/10 text-secondary hover:bg-secondary/20" },
     { label: "Novo Risco", icon: AlertTriangle, path: "/admin/sgs/riscos", color: "bg-secondary/10 text-secondary hover:bg-secondary/20" },
     { label: "Gerar PGSAT", icon: FileText, path: "/admin/sgs/pgsat", color: "bg-primary/10 text-primary hover:bg-primary/20" },
+    { label: "Gerar Relatório P1", icon: FileText, onClick: () => generateP1Report(), color: "bg-accent/10 text-accent-foreground hover:bg-accent/20" },
   ];
 
   const statCards = [
