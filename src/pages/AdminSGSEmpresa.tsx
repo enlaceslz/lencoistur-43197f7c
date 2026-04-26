@@ -3,6 +3,8 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Building2, Save, Upload, Loader2, X, Image } from "lucide-react";
+import { maskCNPJ, maskPhone } from "@/lib/masks";
+
 import { Button } from "@/components/ui/button";
 
 const AdminSGSEmpresa = () => {
