@@ -804,7 +804,7 @@ const AdminCRM = () => {
                       </Badge>
                     )}
                     {hasDependents && (
-                      <Users size={12} className="text-muted-foreground" title="Possui dependentes" />
+                      <Users size={12} className="text-muted-foreground" />
                     )}
                   </p>
                   <p className="text-xs text-muted-foreground truncate">{c.email}</p>
