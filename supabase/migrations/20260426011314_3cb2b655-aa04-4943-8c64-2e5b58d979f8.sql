@@ -1,0 +1,9 @@
+ALTER TABLE public.customers 
+ADD COLUMN country TEXT DEFAULT 'Brasil',
+ADD COLUMN cep TEXT,
+ADD COLUMN address TEXT,
+ADD COLUMN number TEXT,
+ADD COLUMN neighborhood TEXT,
+ADD COLUMN city TEXT,
+ADD COLUMN state TEXT,
+ADD COLUMN passport TEXT;

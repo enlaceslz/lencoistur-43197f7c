@@ -197,38 +197,62 @@ export type Database = {
       }
       customers: {
         Row: {
+          address: string | null
           birth_date: string | null
+          cep: string | null
+          city: string | null
+          country: string | null
           cpf: string | null
           created_at: string
           email: string
           id: string
           name: string
+          neighborhood: string | null
           notes: string | null
+          number: string | null
+          passport: string | null
           phone: string | null
+          state: string | null
           status: string | null
           updated_at: string
         }
         Insert: {
+          address?: string | null
           birth_date?: string | null
+          cep?: string | null
+          city?: string | null
+          country?: string | null
           cpf?: string | null
           created_at?: string
           email: string
           id?: string
           name: string
+          neighborhood?: string | null
           notes?: string | null
+          number?: string | null
+          passport?: string | null
           phone?: string | null
+          state?: string | null
           status?: string | null
           updated_at?: string
         }
         Update: {
+          address?: string | null
           birth_date?: string | null
+          cep?: string | null
+          city?: string | null
+          country?: string | null
           cpf?: string | null
           created_at?: string
           email?: string
           id?: string
           name?: string
+          neighborhood?: string | null
           notes?: string | null
+          number?: string | null
+          passport?: string | null
           phone?: string | null
+          state?: string | null
           status?: string | null
           updated_at?: string
         }
