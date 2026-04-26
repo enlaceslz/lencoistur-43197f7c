@@ -7,6 +7,8 @@ import {
   Plus, ArrowRight, Clock, FileText, ClipboardCheck, Car, UserCheck2, Map, Truck, Star
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 
 const AdminSGSDashboard = () => {
   const navigate = useNavigate();
