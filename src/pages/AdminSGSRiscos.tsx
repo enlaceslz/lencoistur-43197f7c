@@ -193,6 +193,10 @@ const AdminSGSRiscos = () => {
             </select>
           </div>
           <div className="flex gap-2">
+            <button onClick={() => window.print()}
+              className="bg-muted text-muted-foreground px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-1 hidden sm:flex">
+              <Printer size={16} /> Imprimir
+            </button>
             <button onClick={() => setShowLegend(!showLegend)}
               className="bg-muted text-muted-foreground px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-1">
               <Info size={16} /> Critérios NR
