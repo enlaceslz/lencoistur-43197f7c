@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import {
   DollarSign, TrendingUp, Users, Calendar,
-  ArrowUpRight, ArrowDownRight, Loader2
+  ArrowUpRight, ArrowDownRight, Loader2, ShieldAlert
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -43,17 +43,28 @@ interface BookingRow {
 const AdminDashboard = () => {
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [customerCount, setCustomerCount] = useState(0);
+  const [sgsStats, setSgsStats] = useState({ activeRisks: 0, criticalRisks: 0, pendingActions: 0 });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const load = async () => {
-      const [bRes, cRes] = await Promise.all([
+      const [bRes, cRes, rRes, aRes] = await Promise.all([
         supabase.from("bookings").select("*, customers(name, email)").order("created_at", { ascending: false }),
         supabase.from("customers").select("id", { count: "exact", head: true }),
+        supabase.from("sgs_risks").select("risk_level"),
+        supabase.from("sgs_corrective_actions").select("id").eq("status", "pendente"),
       ]);
       setBookings((bRes.data as any[]) || []);
       setCustomerCount(cRes.count || 0);
+      
+      const risks = (rRes.data as any[]) || [];
+      setSgsStats({
+        activeRisks: risks.length,
+        criticalRisks: risks.filter(r => r.risk_level >= 12).length,
+        pendingActions: aRes.data?.length || 0
+      });
+      
       setLoading(false);
     };
     load();
@@ -91,7 +102,7 @@ const AdminDashboard = () => {
     const stats = [
       { label: "Reservas Hoje", value: String(todayBookings.length), change: `${todayBookings.length}`, up: todayBookings.length > 0, icon: Calendar },
       { label: "Faturamento (Mês)", value: fmt(thisRevenue), change: `${Number(revChange) >= 0 ? "+" : ""}${revChange}%`, up: Number(revChange) >= 0, icon: DollarSign },
-      { label: "Clientes Cadastrados", value: String(customerCount), change: "", up: true, icon: Users },
+      { label: "Riscos Críticos (SGS)", value: String(sgsStats.criticalRisks), change: `${sgsStats.pendingActions} pendentes`, up: sgsStats.criticalRisks === 0, icon: ShieldAlert, isSgs: true },
       { label: "Reservas (Mês)", value: String(thisCount), change: `${Number(countChange) >= 0 ? "+" : ""}${countChange}%`, up: Number(countChange) >= 0, icon: TrendingUp },
     ];
 
@@ -161,15 +172,15 @@ const AdminDashboard = () => {
       <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat) => (
-            <div key={stat.label} className="bg-card border border-border rounded-2xl p-5">
+          {stats.map((stat: any) => (
+            <div key={stat.label} className={`bg-card border border-border rounded-2xl p-5 ${stat.isSgs && stat.value !== "0" ? "ring-2 ring-destructive/50" : ""}`}>
               <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
-                  <stat.icon size={20} className="text-primary" />
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.isSgs && stat.value !== "0" ? "bg-destructive/10" : "bg-muted"}`}>
+                  <stat.icon size={20} className={stat.isSgs && stat.value !== "0" ? "text-destructive" : "text-primary"} />
                 </div>
                 {stat.change && (
                   <span className={`flex items-center gap-1 text-xs font-semibold ${stat.up ? "text-primary" : "text-destructive"}`}>
-                    {stat.up ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                    {!stat.isSgs && (stat.up ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />)}
                     {stat.change}
                   </span>
                 )}
