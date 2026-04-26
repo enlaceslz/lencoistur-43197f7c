@@ -761,10 +761,28 @@ const AdminCRM = () => {
                       <span className="text-muted-foreground">{maskPhone(selectedCustomer.phone)}</span>
                     </div>
                   )}
-                  {selectedCustomer.cpf && (
+                  {selectedCustomer.country === "Brasil" && selectedCustomer.cpf && (
                     <div className="flex items-center gap-3 text-sm">
                       <Globe size={16} className="text-primary shrink-0" />
                       <span className="text-muted-foreground">CPF: {maskCPF(selectedCustomer.cpf)}</span>
+                    </div>
+                  )}
+                  {selectedCustomer.country !== "Brasil" && selectedCustomer.passport && (
+                    <div className="flex items-center gap-3 text-sm">
+                      <Globe size={16} className="text-primary shrink-0" />
+                      <span className="text-muted-foreground">Passaporte: {selectedCustomer.passport}</span>
+                    </div>
+                  )}
+                  {selectedCustomer.address && (
+                    <div className="flex items-center gap-3 text-sm">
+                      <MapPin size={16} className="text-primary shrink-0" />
+                      <span className="text-muted-foreground text-[10px] leading-tight">
+                        {selectedCustomer.address}{selectedCustomer.number ? `, ${selectedCustomer.number}` : ""}
+                        <br />
+                        {selectedCustomer.neighborhood ? `${selectedCustomer.neighborhood}, ` : ""}{selectedCustomer.city} - {selectedCustomer.state}
+                        <br />
+                        {selectedCustomer.country === "Brasil" ? `CEP: ${selectedCustomer.cep}` : `Código Postal: ${selectedCustomer.cep}`}
+                      </span>
                     </div>
                   )}
                   {selectedCustomer.birth_date && (
