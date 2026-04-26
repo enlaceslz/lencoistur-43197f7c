@@ -191,7 +191,7 @@ const CheckoutPage = () => {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Pagamento</span>
-              <span className="font-semibold text-foreground">{payMethod === "pix" ? "PIX" : "Cartão de Crédito"}</span>
+              <span className="font-semibold text-foreground">{payMethod === "pix" ? "PIX" : payMethod === "info" ? "Solicitação de Informações" : "Cartão de Crédito"}</span>
             </div>
             {displayDiscount > 0 && (
               <div className="flex justify-between text-sm text-green-600">
