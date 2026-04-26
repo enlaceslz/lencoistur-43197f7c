@@ -212,42 +212,52 @@ const CheckoutPage = () => {
             <p>🔄 Cancelamento grátis até 24h antes do passeio</p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link to="/minhas-reservas" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors text-center">
-              Ver Minhas Reservas
+          <div className="flex flex-col gap-3 justify-center mb-8">
+            <Link 
+              to={`/assinatura-termo?booking=${confirmedBooking.bookingCode}`}
+              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-6 py-4 rounded-xl font-bold transition-all text-center flex items-center justify-center gap-2 shadow-lg hover:scale-[1.02]"
+            >
+              <Shield size={20} />
+              Assinar Termo de Risco (Obrigatório)
             </Link>
-            <button
-              onClick={() => printReceipt({
-                bookingCode: confirmedBooking.bookingCode,
-                customerName: confirmedBooking.customerName || name,
-                customerEmail: confirmedBooking.customerEmail || email,
-                customerPhone: confirmedBooking.customerPhone || phone,
-                itemName: confirmedBooking.itemName,
-                type: confirmedBooking.type || type,
-                date: confirmedBooking.date || date,
-                guests: confirmedBooking.guests || guests,
-                unitPrice: confirmedBooking.unitPrice || unitPrice,
-                total: confirmedBooking.total || total,
-                discount: confirmedBooking.discount || displayDiscount,
-                finalTotal: confirmedBooking.finalTotal || finalTotal,
-                payMethod: confirmedBooking.payMethod || payMethod,
-                paymentStatus: confirmedBooking.paymentStatus || "pendente",
-                status: confirmedBooking.status || "pendente",
-                pixCode: confirmedBooking.pixCode,
-                createdAt: confirmedBooking.createdAt || new Date().toISOString(),
-              })}
-              className="border border-border hover:bg-muted text-foreground px-6 py-3 rounded-xl font-semibold transition-colors text-center flex items-center justify-center gap-2"
-            >
-              <Printer size={18} /> Imprimir Recibo
-            </button>
-            <a
-              href={`https://wa.me/5598985880954?text=Olá! Acabei de fazer a reserva ${confirmedBooking.bookingCode} - ${confirmedBooking.itemName} para ${guests} pessoas.`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-whatsapp hover:bg-whatsapp-hover text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors text-center"
-            >
-              Falar no WhatsApp
-            </a>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link to="/minhas-reservas" className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors text-center">
+                Ver Minhas Reservas
+              </Link>
+              <button
+                onClick={() => printReceipt({
+                  bookingCode: confirmedBooking.bookingCode,
+                  customerName: confirmedBooking.customerName || name,
+                  customerEmail: confirmedBooking.customerEmail || email,
+                  customerPhone: confirmedBooking.customerPhone || phone,
+                  itemName: confirmedBooking.itemName,
+                  type: confirmedBooking.type || type,
+                  date: confirmedBooking.date || date,
+                  guests: confirmedBooking.guests || guests,
+                  unitPrice: confirmedBooking.unitPrice || unitPrice,
+                  total: confirmedBooking.total || total,
+                  discount: confirmedBooking.discount || displayDiscount,
+                  finalTotal: confirmedBooking.finalTotal || finalTotal,
+                  payMethod: confirmedBooking.payMethod || payMethod,
+                  paymentStatus: confirmedBooking.paymentStatus || "pendente",
+                  status: confirmedBooking.status || "pendente",
+                  pixCode: confirmedBooking.pixCode,
+                  createdAt: confirmedBooking.createdAt || new Date().toISOString(),
+                })}
+                className="flex-1 border border-border hover:bg-muted text-foreground px-6 py-3 rounded-xl font-semibold transition-colors text-center flex items-center justify-center gap-2"
+              >
+                <Printer size={18} /> Recibo
+              </button>
+              <a
+                href={`https://wa.me/5598985880954?text=Olá! Acabei de fazer a reserva ${confirmedBooking.bookingCode} - ${confirmedBooking.itemName} para ${guests} pessoas.`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-whatsapp hover:bg-whatsapp-hover text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors text-center flex items-center justify-center gap-2"
+              >
+                WhatsApp
+              </a>
+            </div>
           </div>
         </div>
         <Footer />
