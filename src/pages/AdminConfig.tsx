@@ -472,7 +472,14 @@ const AdminConfig = () => {
                         <div className="relative">
                           <Input
                             value={pagamentos.pixChave}
-                            onChange={(e) => setPagamentos({ ...pagamentos, pixChave: e.target.value })}
+                            onChange={(e) => {
+                              let val = e.target.value;
+                              if (pagamentos.pixTipo === "cpf") val = maskCPF(val);
+                              if (pagamentos.pixTipo === "cnpj") val = maskCNPJ(val);
+                              if (pagamentos.pixTipo === "telefone") val = maskPhone(val);
+                              setPagamentos({ ...pagamentos, pixChave: val });
+                            }}
+
                             maxLength={selectedType?.maxLength || 50}
                             placeholder={
                               pagamentos.pixTipo === "cpf" ? "000.000.000-00" :
