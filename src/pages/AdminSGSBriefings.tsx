@@ -5,11 +5,11 @@ import { Plus, CheckCircle, XCircle, MapPin } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const CHECKLIST_ITEMS = [
-  { key: "safety_rules", label: "Regras de segurança explicadas" },
-  { key: "tour_risks", label: "Riscos do passeio informados" },
-  { key: "lagoon_behavior", label: "Comportamento nas lagoas orientado" },
-  { key: "group_distance", label: "Limite de distância do grupo definido" },
-  { key: "emergency_orientation", label: "Orientação de emergência realizada" },
+  { key: "safety_rules", label: "Regras de segurança explicadas", label_en: "Safety rules explained" },
+  { key: "tour_risks", label: "Riscos do passeio informados", label_en: "Tour risks informed" },
+  { key: "lagoon_behavior", label: "Comportamento nas lagoas orientado", label_en: "Lagoon behavior guided" },
+  { key: "group_distance", label: "Limite de distância do grupo definido", label_en: "Group distance limit defined" },
+  { key: "emergency_orientation", label: "Orientação de emergência realizada", label_en: "Emergency orientation performed" },
 ];
 
 const LANGUAGES = { pt: "Português", en: "English", es: "Español" };
