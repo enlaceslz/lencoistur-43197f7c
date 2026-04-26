@@ -41,6 +41,7 @@ import AdminSGSCondutoresVisitantes from "./pages/AdminSGSCondutoresVisitantes.t
 import AdminSGSChecklists from "./pages/AdminSGSChecklists.tsx";
 import AdminSGSRotas from "./pages/AdminSGSRotas.tsx";
 import AdminSGSPGSAT from "./pages/AdminSGSPGSAT.tsx";
+import AdminSGSControles from "./pages/AdminSGSControles.tsx";
 import AdminRelatorios from "./pages/AdminRelatorios.tsx";
 import AdminAjuda from "./pages/AdminAjuda.tsx";
 import TermoAssinatura from "./pages/TermoAssinatura.tsx";
