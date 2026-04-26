@@ -49,11 +49,12 @@ const Footer = () => {
           <div>
             <h4 className="font-display font-bold text-lg mb-4">{t("footer.companyTitle")}</h4>
             <ul className="space-y-2 text-primary-foreground/60 text-sm">
-              <li><a href="#" className="hover:text-secondary transition-colors">{t("footer.companyLinks.about")}</a></li>
-              <li><a href="#" className="hover:text-secondary transition-colors">{t("footer.companyLinks.partner")}</a></li>
-              <li><a href="/translados" className="hover:text-secondary transition-colors">{t("footer.companyLinks.transfers")}</a></li>
-              <li><a href="#" className="hover:text-secondary transition-colors">{t("footer.companyLinks.terms")}</a></li>
-              <li><a href="#" className="hover:text-secondary transition-colors">{t("footer.companyLinks.privacy")}</a></li>
+              <li><Link to="/seguranca" className="hover:text-secondary transition-colors flex items-center gap-1.5"><Shield size={14} /> Gestão de Segurança (SGS)</Link></li>
+              <li><Link to="#" className="hover:text-secondary transition-colors">{t("footer.companyLinks.about")}</Link></li>
+              <li><Link to="#" className="hover:text-secondary transition-colors">{t("footer.companyLinks.partner")}</Link></li>
+              <li><Link to="/translados" className="hover:text-secondary transition-colors">{t("footer.companyLinks.transfers")}</Link></li>
+              <li><Link to="#" className="hover:text-secondary transition-colors">{t("footer.companyLinks.terms")}</Link></li>
+              <li><Link to="#" className="hover:text-secondary transition-colors">{t("footer.companyLinks.privacy")}</Link></li>
             </ul>
           </div>
 
