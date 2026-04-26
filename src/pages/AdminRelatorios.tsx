@@ -261,8 +261,24 @@ const AdminRelatorios = () => {
                   <KPICard label="A Receber" value={fmt(data.totalReceber || 0)} icon={Activity} color="text-blue-500" />
                 </>
               )}
-              {/* Add other tab KPIs */}
-            </div>
+              {activeTab === "sgs" && (
+                <>
+                  <KPICard label="Riscos Ativos" value={data.totalRisks || 0} icon={Shield} color="text-primary" />
+                  <KPICard label="Incidentes" value={data.totalIncidents || 0} icon={Activity} color="text-destructive" />
+                  <KPICard label="Abertos" value={data.openIncidents || 0} icon={Activity} color="text-secondary" />
+                </>
+              )}
+              {activeTab === "marketing" && (
+                <>
+                  <KPICard label="Total Leads" value={data.totalLeads || 0} icon={Users} color="text-primary" />
+                  <KPICard label="Leads Quentes" value={data.hotLeads || 0} icon={TrendingUp} color="text-secondary" />
+                </>
+              )}
+              {activeTab === "clientes" && (
+                <>
+                  <KPICard label="Total Clientes" value={data.total || 0} icon={Users} color="text-primary" />
+                </>
+              )}
 
             {/* Charts Section */}
             <div className="grid md:grid-cols-2 gap-6">
