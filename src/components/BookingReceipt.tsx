@@ -24,7 +24,7 @@ export interface ReceiptData {
   notes?: string | null;
 }
 
-const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
 const fmtDate = (d: string) => {
   if (!d) return "—";
   try { return new Date(d + "T12:00").toLocaleDateString("pt-BR"); } catch { return d; }
