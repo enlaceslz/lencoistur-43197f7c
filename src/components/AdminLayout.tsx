@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import {
   Home, Compass, Car, Users, UserCheck, CreditCard, Settings,
   LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot,
