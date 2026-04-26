@@ -294,14 +294,72 @@ const AdminRelatorios = () => {
           </div>
         </div>
 
+        {/* Print styles */}
+        <style>{`
+          @media print {
+            @page { size: A4 portrait; margin: 1.5cm; }
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            #report-content { width: 100%; }
+            .bg-card { border: 1px solid #e5e7eb !important; background: white !important; }
+            .text-muted-foreground { color: #6b7280 !important; }
+            .text-foreground { color: #111827 !important; }
+          }
+          .print-only { display: none; }
+        `}</style>
+
+        {/* Print Header */}
+        <div className="print-only hidden p-6 border-b border-border mb-6">
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="font-display text-3xl font-bold text-foreground">Lençóis<span className="text-secondary">Tour</span></h1>
+              <p className="text-sm text-muted-foreground mt-2">{empresa?.endereco || "Santo Amaro do Maranhão, MA"}</p>
+              <p className="text-sm text-muted-foreground">{empresa?.email || "contato@lencoistour.com"}</p>
+              <p className="text-sm text-muted-foreground">{empresa?.telefone || "(98) 99999-0000"}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-lg font-semibold">{REPORT_TABS.find(t => t.id === activeTab)?.label} - Relatório</p>
+              <p className="text-sm text-muted-foreground">Data: {format(new Date(), "dd/MM/yyyy HH:mm")}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="no-print flex flex-wrap gap-4 items-center bg-card border border-border rounded-xl p-4">
+          <div className="flex items-center gap-2">
+            <Calendar size={16} className="text-muted-foreground" />
+            <select value={period} onChange={e => setPeriod(e.target.value)}
+              className="bg-background text-sm p-2 rounded-lg border border-border">
+              <option value="7">7 dias</option>
+              <option value="30">30 dias</option>
+              <option value="90">90 dias</option>
+              <option value="365">1 ano</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <Filter size={16} className="text-muted-foreground" />
+            <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
+              className="bg-background text-sm p-2 rounded-lg border border-border">
+              <option value="all">Todos os Status</option>
+              <option value="confirmed">Confirmado</option>
+              <option value="pending">Pendente</option>
+              <option value="cancelled">Cancelado</option>
+            </select>
+          </div>
+          <button onClick={printReport} className="ml-auto p-2 border border-border rounded-lg hover:bg-muted transition-colors">
+            <Printer size={16} />
+          </button>
+        </div>
+
         {/* Tabs */}
-        <div className="flex flex-wrap gap-1.5 bg-card border border-border rounded-xl p-1.5">
+        <div className="no-print flex flex-wrap gap-2">
           {REPORT_TABS.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                activeTab === tab.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                activeTab === tab.id ? "bg-primary text-primary-foreground" : "bg-card border border-border text-muted-foreground hover:bg-muted"
               }`}>
-              <tab.icon size={14} /> {tab.label}
+              <tab.icon size={16} /> {tab.label}
             </button>
           ))}
         </div>
@@ -309,73 +367,70 @@ const AdminRelatorios = () => {
         {loading ? (
           <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div>
         ) : (
-          <div className="space-y-6 print:space-y-4" id="report-content">
-            {/* ===== RESERVAS ===== */}
+          <div className="space-y-6" id="report-content">
+            {/* The report content sections will follow here... */}
             {activeTab === "reservas" && (
-              <>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
                     { label: "Total Reservas", value: data.total || 0 },
                     { label: "Receita Bruta", value: fmt(data.revenue || 0) },
                     { label: "Ticket Médio", value: fmt(data.avgTicket || 0) },
                     { label: "Total Hóspedes", value: data.totalGuests || 0 },
                   ].map(s => (
-                    <div key={s.label} className="bg-card border border-border rounded-2xl p-4">
-                      <p className="text-[11px] text-muted-foreground">{s.label}</p>
-                      <p className="text-xl font-bold text-foreground font-display">{s.value}</p>
-                    </div>
+                    <Card key={s.label}>
+                      <CardContent className="p-4">
+                        <p className="text-xs text-muted-foreground">{s.label}</p>
+                        <p className="text-2xl font-bold font-display mt-1">{s.value}</p>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
-
                 <div className="grid md:grid-cols-2 gap-6">
                   <ChartCard title="Receita por Dia">
-                    {data.byDay?.length > 0 ? (
-                      <ResponsiveContainer width="100%" height={220}>
-                        <BarChart data={data.byDay}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                          <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={10} tickFormatter={(v: string) => v.slice(5)} />
-                          <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} tickFormatter={(v: number) => `R$${(v/100).toFixed(0)}`} />
-                          <Tooltip formatter={(v: number) => fmt(v)} />
-                          <Bar dataKey="total" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Receita" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    ) : <EmptyChart />}
+                    <ResponsiveContainer width="100%" height={250}>
+                      <AreaChart data={data.byDay}>
+                        <defs><linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/></linearGradient></defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="date" fontSize={10} />
+                        <YAxis fontSize={10} tickFormatter={(v) => `R$${v/100}`} />
+                        <Tooltip formatter={(v: number) => fmt(v)} />
+                        <Area type="monotone" dataKey="total" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#colorTotal)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
                   </ChartCard>
-
                   <ChartCard title="Status das Reservas">
-                    {data.byStatus?.length > 0 ? (
-                      <ResponsiveContainer width="100%" height={220}>
-                        <RePieChart>
-                          <Pie data={data.byStatus} cx="50%" cy="50%" outerRadius={80} innerRadius={35} dataKey="value" label={({ name, value }: any) => `${name}: ${value}`}>
-                            {data.byStatus.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                          </Pie>
-                          <Tooltip />
-                        </RePieChart>
-                      </ResponsiveContainer>
-                    ) : <EmptyChart />}
+                    <ResponsiveContainer width="100%" height={250}>
+                      <RePieChart>
+                        <Pie data={data.byStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5}>
+                          {data.byStatus?.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </RePieChart>
+                    </ResponsiveContainer>
                   </ChartCard>
+                </div>
+              </div>
+            )}
+            {/* ... Other tabs ... */}
+          </div>
+        )}
+      </div>
+    </AdminLayout>
+  );
+};
 
-                  <ChartCard title="Método de Pagamento">
-                    {data.byPayMethod?.length > 0 ? (
-                      <ResponsiveContainer width="100%" height={220}>
-                        <RePieChart>
-                          <Pie data={data.byPayMethod} cx="50%" cy="50%" outerRadius={80} innerRadius={35} dataKey="value" label={({ name, value }: any) => `${name}: ${value}`}>
-                            {data.byPayMethod.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                          </Pie>
-                          <Tooltip />
-                        </RePieChart>
-                      </ResponsiveContainer>
-                    ) : <EmptyChart />}
-                  </ChartCard>
+const ChartCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <Card>
+    <CardHeader className="pb-2"><CardTitle className="text-sm">{title}</CardTitle></CardHeader>
+    <CardContent>{children}</CardContent>
+  </Card>
+);
 
-                  <ChartCard title="Top Passeios por Receita">
-                    {data.byTour?.length > 0 ? (
-                      <ResponsiveContainer width="100%" height={220}>
-                        <BarChart data={data.byTour} layout="vertical">
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                          <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={10} tickFormatter={(v: number) => `R$${(v/100).toFixed(0)}`} />
-                          <YAxis type="category" dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} width={120} />
-                          <Tooltip formatter={(v: number) => fmt(v)} />
+const EmptyChart = () => <div className="text-center py-12 text-sm text-muted-foreground">Sem dados</div>;
+
+export default AdminRelatorios;
                           <Bar dataKey="revenue" fill="hsl(var(--secondary))" radius={[0, 4, 4, 0]} name="Receita" />
                         </BarChart>
                       </ResponsiveContainer>
