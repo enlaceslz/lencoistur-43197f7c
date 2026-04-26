@@ -255,11 +255,48 @@ const AdminSGSTermos = () => {
                   </p>
                 </div>
               </div>
+              {t.health_questions?.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1">
+                  <span className="text-[10px] text-muted-foreground w-full mb-1">Saúde:</span>
+                  {t.health_questions.map((q: string, i: number) => (
+                    <span key={i} className="bg-destructive/10 text-destructive text-[10px] px-2 py-0.5 rounded-lg">{q}</span>
+                  ))}
+                </div>
+              )}
               {t.risks_informed?.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1">
+                  <span className="text-[10px] text-muted-foreground w-full mb-1">Riscos declarados:</span>
                   {t.risks_informed.map((r: string, i: number) => (
-                    <span key={i} className="bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-lg">{r}</span>
+                    <span key={i} className="bg-muted text-muted-foreground text-[10px] px-2 py-0.5 rounded-lg">{r}</span>
                   ))}
+                </div>
+              )}
+              {t.signature_data && (
+                <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] text-muted-foreground mb-1">Assinatura Digital:</p>
+                    <img src={t.signature_data} alt="Assinatura" className="h-12 bg-white rounded border border-border" />
+                  </div>
+                  <button 
+                    onClick={() => {
+                      const win = window.open("", "_blank");
+                      if (win) {
+                        win.document.write(`
+                          <html>
+                            <body style="margin:0; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; font-family:sans-serif;">
+                              <h2 style="margin-bottom:20px;">Termo de Ciência - ${t.customer_name}</h2>
+                              <img src="${t.signature_data}" style="border:1px solid #ccc; max-width:90%;" />
+                              <p style="margin-top:20px; color:#666;">Assinado em: ${new Date(t.signed_at).toLocaleString('pt-BR')}</p>
+                              <button onclick="window.print()" style="margin-top:20px; padding:10px 20px; cursor:pointer;">Imprimir</button>
+                            </body>
+                          </html>
+                        `);
+                      }
+                    }}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Ver Ampliado
+                  </button>
                 </div>
               )}
             </div>
