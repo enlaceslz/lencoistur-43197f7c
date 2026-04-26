@@ -474,30 +474,32 @@ const AdminReservas = () => {
                   </Button>
                 )}
                 {/* Print Receipt */}
-                <PrintReceiptButton
-                  data={{
-                    bookingCode: selected.bookingCode,
-                    customerName: selected.customerName,
-                    customerEmail: selected.customerEmail,
-                    customerPhone: selected.customerPhone,
-                    itemName: selected.itemName,
-                    type: selected.type,
-                    date: selected.date,
-                    guests: selected.guests,
-                    unitPrice: selected.unitPrice,
-                    total: selected.total,
-                    discount: selected.discount,
-                    finalTotal: selected.finalTotal,
-                    payMethod: selected.payMethod,
-                    paymentStatus: selected.paymentStatus,
-                    status: selected.status,
-                    pixCode: selected.pixCode,
-                    createdAt: selected.createdAt,
-                    notes: selected.notes,
-                  }}
-                  className="flex-1 min-w-[140px]"
-                  label="Imprimir Recibo"
-                />
+                {selected.payMethod !== "info" && (
+                  <PrintReceiptButton
+                    data={{
+                      bookingCode: selected.bookingCode,
+                      customerName: selected.customerName,
+                      customerEmail: selected.customerEmail,
+                      customerPhone: selected.customerPhone,
+                      itemName: selected.itemName,
+                      type: selected.type,
+                      date: selected.date,
+                      guests: selected.guests,
+                      unitPrice: selected.unitPrice,
+                      total: selected.total,
+                      discount: selected.discount,
+                      finalTotal: selected.finalTotal,
+                      payMethod: selected.payMethod,
+                      paymentStatus: selected.paymentStatus,
+                      status: selected.status,
+                      pixCode: selected.pixCode,
+                      createdAt: selected.createdAt,
+                      notes: selected.notes,
+                    }}
+                    className="flex-1 min-w-[140px]"
+                    label="Imprimir Recibo"
+                  />
+                )}
                 {/* WhatsApp */}
                 {selected.customerPhone && (
                   <a
