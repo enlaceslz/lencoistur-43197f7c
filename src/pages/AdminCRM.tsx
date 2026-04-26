@@ -960,6 +960,18 @@ const AdminCRM = () => {
               )}
             </div>
             <div>
+              <Label htmlFor="customer-country">Nacionalidade</Label>
+              <select
+                id="customer-country"
+                value={form.country}
+                onChange={(e) => setForm({ ...form, country: e.target.value })}
+                className="w-full flex h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="Brasil">Brasil</option>
+                <option value="Estrangeiro">Estrangeiro</option>
+              </select>
+            </div>
+            <div>
               <Label htmlFor="customer-email">E-mail *</Label>
               <Input
                 id="customer-email"
@@ -969,6 +981,54 @@ const AdminCRM = () => {
                 placeholder="email@exemplo.com"
                 maxLength={255}
                 required
+                className="rounded-xl"
+              />
+            </div>
+            <div>
+              <Label htmlFor="customer-phone">Telefone</Label>
+              <Input
+                id="customer-phone"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                placeholder={form.country === "Brasil" ? "(99) 99999-9999" : "Telefone com DDI"}
+                maxLength={20}
+                className="rounded-xl"
+              />
+            </div>
+            <div>
+              {form.country === "Brasil" ? (
+                <>
+                  <Label htmlFor="customer-cpf">CPF</Label>
+                  <Input
+                    id="customer-cpf"
+                    value={form.cpf}
+                    onChange={(e) => setForm({ ...form, cpf: e.target.value })}
+                    placeholder="000.000.000-00"
+                    maxLength={14}
+                    className="rounded-xl"
+                  />
+                </>
+              ) : (
+                <>
+                  <Label htmlFor="customer-passport">Passaporte *</Label>
+                  <Input
+                    id="customer-passport"
+                    value={form.passport}
+                    onChange={(e) => setForm({ ...form, passport: e.target.value })}
+                    placeholder="Número do Passaporte"
+                    className="rounded-xl"
+                    required
+                  />
+                </>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="customer-birth">Data de Nascimento</Label>
+              <Input
+                id="customer-birth"
+                type="date"
+                value={form.birth_date}
+                onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
                 className="rounded-xl"
               />
             </div>
@@ -985,38 +1045,86 @@ const AdminCRM = () => {
                 <option value="bloqueado">Bloqueado</option>
               </select>
             </div>
-            <div>
-              <Label htmlFor="customer-phone">Telefone</Label>
-              <Input
-                id="customer-phone"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                placeholder="(99) 99999-9999"
-                maxLength={15}
-                className="rounded-xl"
-              />
+
+            <div className="md:col-span-2 border-t border-border pt-4 mt-2">
+              <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                <MapPin size={16} /> Endereço
+              </h4>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="customer-cep">
+                    {form.country === "Brasil" ? "CEP" : "Código Postal"}
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="customer-cep"
+                      value={form.cep}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setForm({ ...form, cep: val });
+                        if (form.country === "Brasil" && val.replace(/\D/g, "").length === 8) {
+                          handleCepSearch(val);
+                        }
+                      }}
+                      placeholder={form.country === "Brasil" ? "00000-000" : "Postal Code"}
+                      className="rounded-xl"
+                    />
+                    {fetchingCep && <Loader2 size={16} className="animate-spin self-center" />}
+                  </div>
+                </div>
+                <div className="md:col-span-2">
+                  <Label htmlFor="customer-address">Logradouro / Rua</Label>
+                  <Input
+                    id="customer-address"
+                    value={form.address}
+                    onChange={(e) => setForm({ ...form, address: e.target.value })}
+                    placeholder="Av. Paulista..."
+                    className="rounded-xl"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="customer-number">Número</Label>
+                  <Input
+                    id="customer-number"
+                    value={form.number}
+                    onChange={(e) => setForm({ ...form, number: e.target.value })}
+                    placeholder="123"
+                    className="rounded-xl"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="customer-neighborhood">Bairro</Label>
+                  <Input
+                    id="customer-neighborhood"
+                    value={form.neighborhood}
+                    onChange={(e) => setForm({ ...form, neighborhood: e.target.value })}
+                    placeholder="Centro"
+                    className="rounded-xl"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="customer-city">Cidade</Label>
+                  <Input
+                    id="customer-city"
+                    value={form.city}
+                    onChange={(e) => setForm({ ...form, city: e.target.value })}
+                    placeholder="São Paulo"
+                    className="rounded-xl"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="customer-state">Estado / Província</Label>
+                  <Input
+                    id="customer-state"
+                    value={form.state}
+                    onChange={(e) => setForm({ ...form, state: e.target.value })}
+                    placeholder="SP"
+                    className="rounded-xl"
+                  />
+                </div>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="customer-cpf">CPF</Label>
-              <Input
-                id="customer-cpf"
-                value={form.cpf}
-                onChange={(e) => setForm({ ...form, cpf: e.target.value })}
-                placeholder="000.000.000-00"
-                maxLength={14}
-                className="rounded-xl"
-              />
-            </div>
-            <div>
-              <Label htmlFor="customer-birth">Data de Nascimento</Label>
-              <Input
-                id="customer-birth"
-                type="date"
-                value={form.birth_date}
-                onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
-                className="rounded-xl"
-              />
-            </div>
+
             <div className="md:col-span-2">
               <Label htmlFor="customer-notes">Observações</Label>
               <textarea
