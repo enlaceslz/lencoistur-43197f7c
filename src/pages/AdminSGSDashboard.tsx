@@ -42,6 +42,9 @@ const AdminSGSDashboard = () => {
       ? (surveys.reduce((sum: number, s: any) => sum + (s.felt_safe || 0), 0) / surveys.length).toFixed(1)
       : "0";
 
+    const termsIds = new Set((termsRes.data || []).map(t => t.booking_id));
+    const pendingCount = (bookingsRes.data || []).filter(b => !termsIds.has(b.id)).length;
+
     setStats({
       risks: risks.filter((r: any) => r.status === "ativo").length,
       incidents: incidents.filter((i: any) => i.status !== "fechado").length,
@@ -50,6 +53,7 @@ const AdminSGSDashboard = () => {
       surveyAvg: Number(avgSafety),
       briefings: (briefingsRes.data || []).length,
       terms: (termsRes.data || []).length,
+      pendingTerms: pendingCount,
       veiculos: (veiculosRes.data || []).length,
       condutores: (condutoresRes.data || []).length,
       checklists: checklistsRes.data?.length || 0,
