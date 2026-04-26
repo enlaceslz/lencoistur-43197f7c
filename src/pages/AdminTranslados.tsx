@@ -10,7 +10,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { Car, MapPin, Clock, Users, Plus, Pencil, Trash2, X, Check, Search, Loader2, Percent, Eye, ArrowRight } from "lucide-react";
+import { Car, MapPin, Clock, Users, Plus, Pencil, Trash2, X, Check, Search, Loader2, Percent, Eye, ArrowRight, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
