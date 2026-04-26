@@ -129,6 +129,7 @@ const AdminSGSDashboard = () => {
     { label: "Condutores Ativos", value: stats.condutores, icon: UserCheck2, color: "text-primary", path: "/admin/sgs/condutores" },
     { label: "Briefings", value: stats.briefings, icon: Shield, color: "text-primary", path: "/admin/sgs/briefings" },
     { label: "Termos Assinados", value: stats.terms, icon: FileText, color: "text-primary", path: "/admin/sgs/termos" },
+    { label: "Termos Pendentes", value: stats.pendingTerms, icon: Shield, color: "text-destructive", path: "/admin/sgs/termos", urgent: stats.pendingTerms > 0 },
     { label: "Avaliação Segurança", value: `${stats.surveyAvg}/5`, icon: Star, color: "text-primary", path: "/admin/sgs/pesquisas" },
   ];
 
