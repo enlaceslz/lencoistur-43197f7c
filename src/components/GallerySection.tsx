@@ -16,7 +16,7 @@ const galleryImages = [
   { src: galleryFarol, alt: "Farol de Mandacaru - Lençóis Maranhenses" },
   { src: gallery4x4, alt: "Passeio de 4x4 nas dunas dos Lençóis Maranhenses" },
   { src: galleryPorDoSol, alt: "Pôr do sol deslumbrante nos Lençóis Maranhenses" },
-  { src: galleryCaiaque, alt: "Caiaque nas lagoas cristalinas dos Lençóis" },
+  { src: galleryAerial, alt: "Vista aérea das lagoas cristalinas dos Lençóis" },
 ];
 
 const GallerySection = () => {
