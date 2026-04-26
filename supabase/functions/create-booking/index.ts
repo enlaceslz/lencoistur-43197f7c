@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
 
     // Validate required fields
-    const { type, itemName, date, guests, payMethod, customerName, customerEmail, customerPhone } = body;
+    const { type, itemName, date, guests, payMethod, customerName, customerEmail, customerPhone, cpf, passport, country, birthDate } = body;
 
     if (!type || !itemName || !customerName || !customerEmail || !payMethod) {
       return new Response(
@@ -176,6 +176,10 @@ Deno.serve(async (req) => {
         name: trimmedName,
         email: trimmedEmail,
         phone: trimmedPhone,
+        cpf: cpf || null,
+        passport: passport || null,
+        country: country || "Brasil",
+        birth_date: birthDate || null,
       })
       .select()
       .single();

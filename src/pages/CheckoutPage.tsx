@@ -51,6 +51,10 @@ const CheckoutPage = () => {
   const [phone, setPhone] = useState("");
   const [cpf, setCpf] = useState("");
   const [notes, setNotes] = useState("");
+  const [nationality, setNationality] = useState<"br" | "foreign">("br");
+  const [passport, setPassport] = useState("");
+  const [country, setCountry] = useState("Brasil");
+  const [birthDate, setBirthDate] = useState("");
   const [confirmedBooking, setConfirmedBooking] = useState<BookingItem | null>(null);
   const [pixCopied, setPixCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -90,6 +94,10 @@ const CheckoutPage = () => {
         customerName: name,
         customerEmail: email,
         customerPhone: phone,
+        cpf: nationality === "br" ? cpf : undefined,
+        passport: nationality === "foreign" ? passport : undefined,
+        country: nationality === "foreign" ? country : "Brasil",
+        birthDate: birthDate || undefined,
       });
       setConfirmedBooking(booking);
     } catch (error) {
@@ -266,7 +274,7 @@ const CheckoutPage = () => {
             <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
               <h2 className="font-display text-lg font-bold text-foreground">Dados Pessoais</h2>
               <div className="grid sm:grid-cols-2 gap-4">
-                <div>
+                <div className={nationality === "br" ? "" : "sm:col-span-2"}>
                   <label className="text-sm font-semibold text-foreground mb-1.5 block">Nome completo *</label>
                   <input
                     type="text" required value={name} onChange={(e) => setName(e.target.value)}
@@ -274,15 +282,64 @@ const CheckoutPage = () => {
                     placeholder="Seu nome completo"
                   />
                 </div>
-                <div>
-                  <label className="text-sm font-semibold text-foreground mb-1.5 block">CPF</label>
-                  <input
-                    type="text" value={cpf} onChange={(e) => setCpf(e.target.value)}
-                    className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30"
-                    placeholder="000.000.000-00"
-                  />
+                {nationality === "br" && (
+                  <div>
+                    <label className="text-sm font-semibold text-foreground mb-1.5 block">CPF</label>
+                    <input
+                      type="text" value={cpf} onChange={(e) => setCpf(e.target.value)}
+                      className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30"
+                      placeholder="000.000.000-00"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-2 block">Nacionalidade</label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="nationality"
+                      checked={nationality === "br"} 
+                      onChange={() => setNationality("br")}
+                      className="w-4 h-4 text-primary focus:ring-primary border-border bg-muted"
+                    />
+                    <span className="text-sm text-foreground">Brasileiro</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="nationality"
+                      checked={nationality === "foreign"} 
+                      onChange={() => setNationality("foreign")}
+                      className="w-4 h-4 text-primary focus:ring-primary border-border bg-muted"
+                    />
+                    <span className="text-sm text-foreground">Estrangeiro</span>
+                  </label>
                 </div>
               </div>
+
+              {nationality === "foreign" && (
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-semibold text-foreground mb-1.5 block">Passaporte / ID *</label>
+                    <input
+                      type="text" required={nationality === "foreign"} value={passport} onChange={(e) => setPassport(e.target.value)}
+                      className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30"
+                      placeholder="Número do documento"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-foreground mb-1.5 block">País *</label>
+                    <input
+                      type="text" required={nationality === "foreign"} value={country} onChange={(e) => setCountry(e.target.value)}
+                      className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30"
+                      placeholder="Seu país"
+                    />
+                  </div>
+                </div>
+              )}
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-semibold text-foreground mb-1.5 block">Telefone / WhatsApp *</label>
@@ -300,6 +357,13 @@ const CheckoutPage = () => {
                     placeholder="seu@email.com"
                   />
                 </div>
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Data de Nascimento (opcional)</label>
+                <input
+                  type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)}
+                  className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30"
+                />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1.5 block">Observações</label>

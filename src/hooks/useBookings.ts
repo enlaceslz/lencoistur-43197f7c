@@ -100,7 +100,12 @@ export function useBookings() {
 
   const addBooking = useCallback(
     async (
-      data: Omit<BookingItem, "id" | "bookingCode" | "createdAt" | "pixCode" | "status" | "paymentStatus" | "customerId">
+      data: Omit<BookingItem, "id" | "bookingCode" | "createdAt" | "pixCode" | "status" | "paymentStatus" | "customerId"> & {
+        cpf?: string;
+        passport?: string;
+        country?: string;
+        birthDate?: string;
+      }
     ): Promise<BookingItem> => {
       const { data: result, error } = await supabase.functions.invoke("create-booking", {
         body: {
@@ -112,6 +117,10 @@ export function useBookings() {
           customerName: data.customerName,
           customerEmail: data.customerEmail,
           customerPhone: data.customerPhone,
+          cpf: data.cpf,
+          passport: data.passport,
+          country: data.country,
+          birthDate: data.birthDate,
         },
       });
 
