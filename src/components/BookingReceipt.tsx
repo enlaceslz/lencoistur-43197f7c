@@ -24,7 +24,7 @@ export interface ReceiptData {
   notes?: string | null;
 }
 
-const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
 const fmtDate = (d: string) => {
   if (!d) return "—";
   try { return new Date(d + "T12:00").toLocaleDateString("pt-BR"); } catch { return d; }
@@ -40,7 +40,8 @@ const payLabel = (m: string) => {
     cartao: "Cartão de Crédito / Débito", 
     card: "Cartão de Crédito", 
     dinheiro: "Dinheiro / Espécie", 
-    transferencia: "Transferência Bancária" 
+    transferencia: "Transferência Bancária",
+    info: "Solicitação de Informações"
   };
   return map[m] || m;
 };

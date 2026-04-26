@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (!["pix", "cartao", "dinheiro", "transferencia", "info"].includes(payMethod)) {
+    if (!["pix", "cartao", "card", "dinheiro", "transferencia", "info"].includes(payMethod)) {
       return new Response(
         JSON.stringify({ error: "Método de pagamento inválido" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -87,16 +87,20 @@ Deno.serve(async (req) => {
     let pixDiscountPercent = 0;
 
     if (type === "passeio") {
+      // Strip suffix like " (Coletivo)" or " (Privativo)" if present
+      const cleanItemName = itemName.replace(/\s*\((Coletivo|Privativo)\)$/, "");
+      
       const { data: tour, error: tourErr } = await supabaseAdmin
         .from("tours")
         .select("price, name, pix_discount")
-        .eq("name", itemName)
+        .eq("name", cleanItemName)
         .eq("active", true)
         .single();
 
       if (tourErr || !tour) {
+        console.error(`Tour not found: "${cleanItemName}" (original: "${itemName}")`);
         return new Response(
-          JSON.stringify({ error: "Passeio não encontrado ou inativo" }),
+          JSON.stringify({ error: `Passeio não encontrado ou inativo: ${cleanItemName}` }),
           { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
