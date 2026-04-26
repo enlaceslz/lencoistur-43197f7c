@@ -1259,11 +1259,13 @@ export type Database = {
           cancellation_policy: string | null
           created_at: string
           customer_name: string
+          health_questions: string[] | null
           id: string
           nationality: string | null
           pdf_url: string | null
           phone: string | null
           risks_informed: string[]
+          safety_controls_informed: boolean | null
           signature_data: string | null
           signed_at: string | null
           tour_name: string
@@ -1274,11 +1276,13 @@ export type Database = {
           cancellation_policy?: string | null
           created_at?: string
           customer_name: string
+          health_questions?: string[] | null
           id?: string
           nationality?: string | null
           pdf_url?: string | null
           phone?: string | null
           risks_informed?: string[]
+          safety_controls_informed?: boolean | null
           signature_data?: string | null
           signed_at?: string | null
           tour_name: string
@@ -1289,11 +1293,13 @@ export type Database = {
           cancellation_policy?: string | null
           created_at?: string
           customer_name?: string
+          health_questions?: string[] | null
           id?: string
           nationality?: string | null
           pdf_url?: string | null
           phone?: string | null
           risks_informed?: string[]
+          safety_controls_informed?: boolean | null
           signature_data?: string | null
           signed_at?: string | null
           tour_name?: string

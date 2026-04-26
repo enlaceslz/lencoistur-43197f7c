@@ -22,16 +22,36 @@ const RISKS_OPTIONS = [
   "Desidratação",
 ];
 
+// Controles operacionais VATTI
+const SAFETY_CONTROLS = [
+  "Capacitação constante da equipe de condutores",
+  "Cabo de resgate disponível em todas as operações",
+  "Orientações de segurança por escrito e verbalmente",
+  "Equipe capacitada em primeiros socorros",
+  "Equipe preparada para realizar resgates",
+  "Plano de Resposta a Emergências (PRE) implementado",
+  "Veículos equipados com kit de segurança",
+];
+
+// Questões de saúde P6 VATTI
+const HEALTH_QUESTIONS = [
+  "Alergia", "Diabetes", "Desmaios/Convulsões", "Obeso(a)",
+  "Cirurgia recente", "Sedentário(a)", "Parte do corpo imobilizada",
+  "Necessidades especiais", "Fobia a água",
+];
+
 const TermoAssinatura = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const bookingCode = params.get("booking") || "";
   
   const [booking, setBooking] = useState<any>(null);
+  const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [signing, setSigning] = useState(false);
   const [signed, setSigned] = useState(false);
   const [acceptedRisks, setAcceptedRisks] = useState<string[]>([]);
+  const [healthInfo, setHealthInfo] = useState<string[]>([]);
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -46,19 +66,19 @@ const TermoAssinatura = () => {
 
   const loadBooking = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("bookings")
-      .select("*, customers(*)")
-      .eq("booking_code", bookingCode)
-      .maybeSingle();
+    const [bookingRes, companyRes] = await Promise.all([
+      supabase.from("bookings").select("*, customers(*)").eq("booking_code", bookingCode).maybeSingle(),
+      supabase.from("sgs_empresa").select("*").limit(1).maybeSingle()
+    ]);
       
-    if (data) {
-      setBooking(data);
+    if (bookingRes.data) {
+      setBooking(bookingRes.data);
+      setCompany(companyRes.data);
       // Check if already signed
       const { data: termData } = await supabase
         .from("sgs_risk_terms")
         .select("id")
-        .eq("booking_id", data.id)
+        .eq("booking_id", bookingRes.data.id)
         .maybeSingle();
       
       if (termData) {
@@ -66,6 +86,12 @@ const TermoAssinatura = () => {
       }
     }
     setLoading(false);
+  };
+
+  const toggleHealth = (q: string) => {
+    setHealthInfo(prev => 
+      prev.includes(q) ? prev.filter(item => item !== q) : [...prev, q]
+    );
   };
 
   const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
@@ -145,6 +171,8 @@ const TermoAssinatura = () => {
       phone: booking.customers?.phone || booking.customer_phone,
       tour_name: booking.item_name,
       risks_informed: acceptedRisks,
+      health_questions: healthInfo,
+      safety_controls_informed: true,
       accepted: true,
       signature_data: signatureData,
       signed_at: new Date().toISOString(),
@@ -216,6 +244,12 @@ const TermoAssinatura = () => {
             </div>
             <h2 className="text-sm font-semibold text-muted-foreground">Termo de Conhecimento de Risco e Corresponsabilidade</h2>
             <p className="text-xs text-muted-foreground mt-1">Conforme Norma ABNT NBR ISO 21103</p>
+            {company && (
+              <div className="mt-2 pt-2 border-t border-border/50 text-[10px] text-muted-foreground">
+                <p><strong>{company.nome_fantasia || company.razao_social}</strong> • CNPJ: {company.cnpj}</p>
+                <p>{company.endereco}, {company.cidade}-{company.estado}</p>
+              </div>
+            )}
           </div>
 
           <div className="p-6 space-y-6">
@@ -245,9 +279,43 @@ const TermoAssinatura = () => {
                 <FileText size={18} />
                 <h3 className="font-bold">Informações Importantes</h3>
               </div>
-              <div className="text-sm text-muted-foreground space-y-2 leading-relaxed">
+              <div className="text-sm text-muted-foreground space-y-3 leading-relaxed">
                 <p>O passeio será realizado em veículo 4x4 na região dos Lençóis Maranhenses. A atividade envolve deslocamento em terrenos irregulares, dunas e banho em lagoas naturais.</p>
-                <p><strong>Recomendações:</strong> Traje de banho, protetor solar, chapéu, água e seguir rigorosamente as instruções do condutor/guia.</p>
+                
+                <div className="bg-primary/5 rounded-xl p-3 border border-primary/10">
+                  <p className="font-semibold text-xs text-primary mb-2 uppercase tracking-tight">Controles Operacionais Adotados:</p>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+                    {SAFETY_CONTROLS.map(ctrl => (
+                      <li key={ctrl} className="flex items-center gap-1.5 text-[11px]">
+                        <CheckCircle size={10} className="text-primary flex-shrink-0" /> {ctrl}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Health Questions */}
+            <div className="space-y-4 pt-2">
+              <div className="flex items-center gap-2 text-foreground">
+                <Shield size={18} className="text-primary" />
+                <h3 className="font-bold">Informações de Saúde</h3>
+              </div>
+              <p className="text-xs text-muted-foreground">Você possui alguma das condições abaixo? (Opcional)</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {HEALTH_QUESTIONS.map(q => (
+                  <button 
+                    key={q}
+                    type="button"
+                    onClick={() => toggleHealth(q)}
+                    className={`flex items-center gap-2 p-2 rounded-lg border text-left transition-all ${healthInfo.includes(q) ? 'bg-primary/10 border-primary text-primary' : 'bg-muted/30 border-transparent text-muted-foreground hover:border-border'}`}
+                  >
+                    <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${healthInfo.includes(q) ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
+                      {healthInfo.includes(q) && <CheckCircle size={10} className="text-white" />}
+                    </div>
+                    <span className="text-[10px] font-medium leading-tight">{q}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
