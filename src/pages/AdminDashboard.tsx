@@ -172,15 +172,15 @@ const AdminDashboard = () => {
       <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat) => (
-            <div key={stat.label} className="bg-card border border-border rounded-2xl p-5">
+          {stats.map((stat: any) => (
+            <div key={stat.label} className={`bg-card border border-border rounded-2xl p-5 ${stat.isSgs && stat.value !== "0" ? "ring-2 ring-destructive/50" : ""}`}>
               <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
-                  <stat.icon size={20} className="text-primary" />
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.isSgs && stat.value !== "0" ? "bg-destructive/10" : "bg-muted"}`}>
+                  <stat.icon size={20} className={stat.isSgs && stat.value !== "0" ? "text-destructive" : "text-primary"} />
                 </div>
                 {stat.change && (
                   <span className={`flex items-center gap-1 text-xs font-semibold ${stat.up ? "text-primary" : "text-destructive"}`}>
-                    {stat.up ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                    {!stat.isSgs && (stat.up ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />)}
                     {stat.change}
                   </span>
                 )}
