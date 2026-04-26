@@ -11,6 +11,8 @@ import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff,
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { maskCPF, maskCNPJ, maskPhone } from "@/lib/masks";
+
 
 const PIX_KEY_TYPES = [
   { value: "cpf", label: "CPF", mask: "###.###.###-##", maxLength: 14 },
