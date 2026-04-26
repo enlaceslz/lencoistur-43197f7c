@@ -36,17 +36,11 @@ const AdminIA = () => {
   const [aiLoading, setAiLoading] = useState(false);
 
   // Config state
-  const [botName, setBotName] = useState("Assistente LençóisTour");
-  const [tone, setTone] = useState<"Formal" | "Amigável" | "Entusiasta">("Amigável");
-  const [instructions, setInstructions] = useState("Sempre sugira o WhatsApp para finalizar reservas. Mencione promoções ativas quando relevante.");
-  const [automations, setAutomations] = useState([
-    { name: "Resposta automática a perguntas", active: true },
-    { name: "Sugestão de passeios por preferência", active: true },
-    { name: "Encaminhar para humano após 3 falhas", active: true },
-    { name: "Coletar lead automaticamente", active: true },
-    { name: "Enviar resumo diário por e-mail", active: false },
-    { name: "Tradução automática (EN/ES/FR)", active: false },
-  ]);
+  const [settingsId, setSettingsId] = useState<string | null>(null);
+  const [botName, setBotName] = useState("");
+  const [tone, setTone] = useState<string>("Amigável");
+  const [instructions, setInstructions] = useState("");
+  const [automations, setAutomations] = useState<any[]>([]);
 
   useEffect(() => { loadData(); }, []);
 
