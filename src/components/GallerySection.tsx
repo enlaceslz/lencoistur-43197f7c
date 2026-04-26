@@ -7,7 +7,7 @@ const galleryPanorama = "https://images.unsplash.com/photo-1621303837174-89787a7
 const galleryFarol = "https://images.unsplash.com/photo-1506190500381-458919392ca3?auto=format&fit=crop&q=80";
 const gallery4x4 = "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&q=80";
 const galleryPorDoSol = "https://images.unsplash.com/photo-1569336415962-a4bd9f67c07a?auto=format&fit=crop&q=80";
-const galleryCaiaque = "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=80";
+const galleryCaiaque = "https://images.unsplash.com/photo-1625026214227-2c9cc0883658?auto=format&fit=crop&q=80";
 
 const galleryImages = [
   { src: galleryLagoasAzuis, alt: "Dunas brancas e lagoas azuis dos Lençóis Maranhenses - Santo Amaro" },
