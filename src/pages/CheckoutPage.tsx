@@ -15,9 +15,10 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const { addBooking } = useBookings();
 
-  const type = (params.get("type") || "tour") as "tour" | "transfer";
+  const type = (params.get("type") || "tour") as "tour" | "transfer" | "package";
   const slug = params.get("tour") || "";
   const transferId = params.get("transfer") || "";
+  const packageSlug = params.get("package") || "";
   const guests = Number(params.get("pax")) || 2;
   const date = params.get("date") || "";
   const tourMode = (params.get("mode") || "coletivo") as "coletivo" | "privativo";
