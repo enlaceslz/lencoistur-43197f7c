@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import AdminRoute from "@/components/AdminRoute";
 import Index from "./pages/Index.tsx";
+import Seguranca from "./pages/Seguranca.tsx";
 import ToursPage from "./pages/ToursPage.tsx";
 import TourDetail from "./pages/TourDetail.tsx";
 import TransfersPage from "./pages/TransfersPage.tsx";
@@ -55,6 +56,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/seguranca" element={<Seguranca />} />
           <Route path="/passeios" element={<ToursPage />} />
           <Route path="/passeios/:slug" element={<TourDetail />} />
           <Route path="/translados" element={<TransfersPage />} />
