@@ -50,119 +50,245 @@ function generateReceiptHTML(data: ReceiptData, company?: any): string {
   const cadastur = company?.cadastur || "00.000.000/0001-00";
   const address = company?.endereco || "Santo Amaro do Maranhão, MA";
   const phone = company?.telefone || "(98) 98588-0954";
+  const email = company?.email || "contato@lencoistur.com";
+  const logoUrl = company?.logo_url;
 
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <title>Recibo - ${data.bookingCode}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comprovante de Reserva - ${data.bookingCode}</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a2e; background: #fff; padding: 40px; max-width: 800px; margin: 0 auto; }
-    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 3px solid #0c4a6e; }
-    .brand h1 { font-size: 28px; color: #0c4a6e; font-weight: 800; letter-spacing: -0.5px; }
-    .brand p { font-size: 12px; color: #64748b; margin-top: 4px; }
+    body { 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+      color: #1e293b; 
+      background: #f8fafc; 
+      padding: 20px;
+      line-height: 1.5;
+    }
+    .page {
+      background: #fff;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      border-radius: 8px;
+    }
+    .header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: flex-start; 
+      margin-bottom: 40px; 
+      padding-bottom: 24px; 
+      border-bottom: 2px solid #e2e8f0; 
+    }
+    .brand-container { display: flex; align-items: center; gap: 16px; }
+    .logo { width: 64px; height: 64px; object-fit: contain; border-radius: 8px; }
+    .brand h1 { font-size: 24px; color: #0c4a6e; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 4px; }
+    .brand p { font-size: 13px; color: #64748b; line-height: 1.4; }
+    
     .receipt-info { text-align: right; }
-    .receipt-info .code { font-size: 20px; font-weight: 700; color: #0c4a6e; font-family: 'Courier New', monospace; }
+    .receipt-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+    .receipt-info .code { font-size: 22px; font-weight: 800; color: #0f172a; font-family: 'Courier New', monospace; }
     .receipt-info .date { font-size: 12px; color: #64748b; margin-top: 4px; }
-    .receipt-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; font-weight: 600; margin-bottom: 12px; }
-    .section { margin-bottom: 24px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .field label { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
-    .field value, .field p { font-size: 14px; color: #1e293b; font-weight: 500; }
-    .financial { background: #f8fafc; border-radius: 12px; padding: 20px; margin-top: 8px; }
-    .fin-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; color: #475569; }
-    .fin-row.discount { color: #16a34a; }
-    .fin-total { display: flex; justify-content: space-between; padding: 12px 0 0; margin-top: 8px; border-top: 2px solid #e2e8f0; font-size: 20px; font-weight: 700; color: #0c4a6e; }
-    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .status-confirmada, .status-pago { background: #dcfce7; color: #166534; }
-    .status-pendente { background: #fef3c7; color: #92400e; }
-    .status-cancelada, .status-reembolsado { background: #fee2e2; color: #991b1b; }
-    .status-concluida { background: #dbeafe; color: #1e40af; }
-    .pix-section { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; margin-top: 16px; }
-    .pix-code { font-family: 'Courier New', monospace; font-size: 10px; word-break: break-all; color: #374151; background: #fff; padding: 8px; border-radius: 6px; margin-top: 8px; }
-    .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8; }
-    .footer p { margin: 2px 0; }
-    .notes { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 12px; font-size: 13px; color: #78350f; margin-top: 8px; }
+    
+    .status-container { display: flex; gap: 8px; margin-bottom: 32px; }
+    .status-badge { 
+      display: inline-flex; 
+      align-items: center; 
+      padding: 6px 14px; 
+      border-radius: 9999px; 
+      font-size: 12px; 
+      font-weight: 700; 
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+    .status-confirmada, .status-pago { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .status-pendente { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .status-cancelada, .status-reembolsado { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    .status-concluida { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+    
+    .section-title { 
+      font-size: 12px; 
+      text-transform: uppercase; 
+      letter-spacing: 0.1em; 
+      color: #64748b; 
+      font-weight: 700; 
+      margin-bottom: 16px; 
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::after { content: ""; flex: 1; height: 1px; background: #f1f5f9; }
+    
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 32px; }
+    .field label { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; display: block; margin-bottom: 4px; }
+    .field p { font-size: 15px; color: #1e293b; font-weight: 600; }
+    
+    .financial-card { 
+      background: #f8fafc; 
+      border: 1px solid #e2e8f0;
+      border-radius: 12px; 
+      padding: 24px; 
+      margin-bottom: 32px; 
+    }
+    .fin-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; color: #475569; }
+    .fin-row.discount { color: #16a34a; font-weight: 600; }
+    .fin-total { 
+      display: flex; 
+      justify-content: space-between; 
+      padding-top: 16px; 
+      margin-top: 16px; 
+      border-top: 2px dashed #e2e8f0; 
+      font-size: 24px; 
+      font-weight: 800; 
+      color: #0c4a6e; 
+    }
+    
+    .pix-container { 
+      background: #f0fdf4; 
+      border: 1px solid #bbf7d0; 
+      border-radius: 12px; 
+      padding: 20px; 
+      margin-top: 24px; 
+    }
+    .pix-title { font-size: 14px; font-weight: 700; color: #166534; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .pix-code { 
+      font-family: 'Courier New', monospace; 
+      font-size: 11px; 
+      word-break: break-all; 
+      color: #334155; 
+      background: #fff; 
+      padding: 12px; 
+      border-radius: 8px; 
+      border: 1px solid #dcfce7;
+    }
+    
+    .notes-container { 
+      background: #fffbeb; 
+      border: 1px solid #fde68a; 
+      border-radius: 12px; 
+      padding: 16px; 
+      margin-bottom: 32px;
+    }
+    .notes-text { font-size: 14px; color: #78350f; line-height: 1.6; white-space: pre-wrap; }
+    
+    .footer { 
+      margin-top: 48px; 
+      padding-top: 32px; 
+      border-top: 1px solid #f1f5f9; 
+      text-align: center; 
+    }
+    .footer-brand { font-size: 16px; font-weight: 700; color: #0c4a6e; margin-bottom: 8px; }
+    .footer-info { font-size: 12px; color: #94a3b8; line-height: 1.8; }
+    .footer-tag { font-size: 10px; color: #cbd5e1; margin-top: 24px; text-transform: uppercase; letter-spacing: 0.05em; }
+
     @media print {
-      body { padding: 20px; }
-      @page { margin: 15mm; size: A4; }
+      body { background: #fff; padding: 0; }
+      .page { box-shadow: none; border-radius: 0; padding: 0; width: 100%; max-width: none; }
+      .no-print { display: none; }
+      @page { margin: 20mm; }
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="brand">
-      <h1>🏖️ ${brandName}</h1>
-      <p>Turismo de Aventura — ${address}</p>
-      <p>CNPJ: ${cnpj} | CADASTUR: ${cadastur}</p>
+  <div class="page">
+    <div class="header">
+      <div class="brand-container">
+        ${logoUrl ? `<img src="${logoUrl}" alt="Logo" class="logo">` : `<div class="logo" style="background:#0c4a6e;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:24px;">L</div>`}
+        <div class="brand">
+          <h1>${brandName}</h1>
+          <p>${address}</p>
+          <p>CNPJ: ${cnpj} | CADASTUR: ${cadastur}</p>
+        </div>
+      </div>
+      <div class="receipt-info">
+        <p class="receipt-label">Comprovante de Reserva</p>
+        <div class="code">#${data.bookingCode}</div>
+        <div class="date">Emitido em ${fmtDateTime(data.createdAt)}</div>
+      </div>
     </div>
-    <div class="receipt-info">
-      <div class="code">${data.bookingCode}</div>
-      <div class="date">Emitido em: ${fmtDateTime(data.createdAt)}</div>
-    </div>
-  </div>
 
-  <div class="section">
-    <div class="receipt-title">Recibo de Reserva</div>
-    <div style="display:flex; gap:8px; margin-bottom:16px;">
+    <div class="status-container">
       <span class="status-badge status-${data.status}">${statusLabel(data.status)}</span>
       <span class="status-badge status-${data.paymentStatus}">${statusLabel(data.paymentStatus)}</span>
     </div>
-  </div>
 
-  <div class="section">
-    <div class="receipt-title">Dados do Cliente</div>
+    <div class="section-title">Dados do Cliente</div>
     <div class="grid">
-      <div class="field"><label>Nome</label><p>${data.customerName}</p></div>
+      <div class="field"><label>Nome Completo</label><p>${data.customerName}</p></div>
       <div class="field"><label>E-mail</label><p>${data.customerEmail}</p></div>
-      ${data.customerPhone ? `<div class="field"><label>Telefone</label><p>${data.customerPhone}</p></div>` : ""}
+      <div class="field"><label>Telefone</label><p>${data.customerPhone || "Não informado"}</p></div>
+      <div class="field"><label>Código da Reserva</label><p>${data.bookingCode}</p></div>
     </div>
-  </div>
 
-  <div class="section">
-    <div class="receipt-title">Detalhes da Reserva</div>
+    <div class="section-title">Detalhes dos Serviços</div>
     <div class="grid">
-      <div class="field"><label>Tipo</label><p>${data.type === "passeio" ? "Passeio" : "Translado"}</p></div>
-      <div class="field"><label>${data.type === "passeio" ? "Passeio" : "Rota"}</label><p>${data.itemName}</p></div>
-      <div class="field"><label>Data</label><p>${fmtDate(data.date)}</p></div>
-      <div class="field"><label>Participantes</label><p>${data.guests} pessoa(s)</p></div>
-      <div class="field"><label>Pagamento</label><p>${payLabel(data.payMethod)}</p></div>
+      <div class="field"><label>Categoria</label><p>${data.type === "tour" || data.type === "passeio" ? "Passeio Turístico" : "Translado / Rota"}</p></div>
+      <div class="field"><label>Serviço / Itinerário</label><p>${data.itemName}</p></div>
+      <div class="field"><label>Data Agendada</label><p>${fmtDate(data.date)}</p></div>
+      <div class="field"><label>Total de Passageiros</label><p>${data.guests} pessoa(s)</p></div>
     </div>
-  </div>
 
-  <div class="section">
-    <div class="receipt-title">Resumo Financeiro</div>
-    <div class="financial">
-      <div class="fin-row"><span>${data.guests}x ${fmt(data.unitPrice)}</span><span>${fmt(data.total)}</span></div>
-      ${data.discount > 0 ? `<div class="fin-row discount"><span>Desconto PIX</span><span>-${fmt(data.discount)}</span></div>` : ""}
-      <div class="fin-total"><span>TOTAL</span><span>${fmt(data.finalTotal)}</span></div>
+    ${data.notes ? `
+    <div class="section-title">Observações Importantes</div>
+    <div class="notes-container">
+      <div class="notes-text">${data.notes}</div>
     </div>
-    ${data.pixCode ? `
-    <div class="pix-section">
-      <strong style="font-size:13px;color:#166534;">Código PIX Copia e Cola:</strong>
+    ` : ""}
+
+    <div class="section-title">Resumo Financeiro</div>
+    <div class="financial-card">
+      <div class="fin-row">
+        <span>${data.guests}x ${data.itemName} (${fmt(data.unitPrice)})</span>
+        <span>${fmt(data.total)}</span>
+      </div>
+      ${data.discount > 0 ? `
+      <div class="fin-row discount">
+        <span>Desconto Especial (PIX/Promoção)</span>
+        <span>-${fmt(data.discount)}</span>
+      </div>
+      ` : ""}
+      <div class="fin-row">
+        <span>Forma de Pagamento</span>
+        <span>${payLabel(data.payMethod)}</span>
+      </div>
+      <div class="fin-total">
+        <span>VALOR TOTAL</span>
+        <span>${fmt(data.finalTotal)}</span>
+      </div>
+    </div>
+
+    ${data.pixCode && data.paymentStatus !== "pago" ? `
+    <div class="pix-container">
+      <div class="pix-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7"/><path d="M16 19h6"/><path d="M19 16v6"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="12" cy="12" r="1"/></svg>
+        Pagamento via PIX
+      </div>
+      <p style="font-size:12px;color:#166534;margin-bottom:8px;">Utilize o código abaixo para realizar o pagamento no aplicativo do seu banco:</p>
       <div class="pix-code">${data.pixCode}</div>
     </div>
     ` : ""}
-  </div>
 
-  ${data.notes ? `
-  <div class="section">
-    <div class="receipt-title">Observações</div>
-    <div class="notes">${data.notes}</div>
-  </div>
-  ` : ""}
-
-  <div class="footer">
-    <p><strong>${brandName}</strong> — Rota das Emoções</p>
-    <p>${address} | WhatsApp: ${phone}</p>
-    <p>lencoistur.lovable.app</p>
-    <p style="margin-top:8px;">Este documento é um comprovante de reserva. Não é um documento fiscal.</p>
+    <div class="footer">
+      <div class="footer-brand">${brandName}</div>
+      <div class="footer-info">
+        <p>${address}</p>
+        <p>WhatsApp: ${phone} | E-mail: ${email}</p>
+        <p>Este comprovante serve como confirmação de sua reserva e deve ser apresentado no dia do serviço.</p>
+      </div>
+      <div class="footer-tag">Documento Gerado Eletronicamente via Lençóis Tour</div>
+    </div>
   </div>
 </body>
 </html>`;
 }
+
 
 export function printReceipt(data: ReceiptData, company?: any) {
   const html = generateReceiptHTML(data, company);
