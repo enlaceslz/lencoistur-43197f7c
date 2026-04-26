@@ -269,7 +269,9 @@ const CheckoutPage = () => {
                 <Printer size={18} /> Recibo
               </button>
               <a
-                href={`https://wa.me/5598985880954?text=Olá! Acabei de fazer a reserva ${confirmedBooking.bookingCode} - ${confirmedBooking.itemName} para ${guests} pessoas.`}
+                href={confirmedBooking.payMethod === "info" 
+                  ? `https://wa.me/5598985880954?text=Olá! Solicitei mais informações sobre a reserva ${confirmedBooking.bookingCode} - ${confirmedBooking.itemName}. Gostaria de tirar algumas dúvidas.`
+                  : `https://wa.me/5598985880954?text=Olá! Acabei de fazer a reserva ${confirmedBooking.bookingCode} - ${confirmedBooking.itemName} para ${guests} pessoas.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 bg-whatsapp hover:bg-whatsapp-hover text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors text-center flex items-center justify-center gap-2"
