@@ -102,7 +102,7 @@ const AdminDashboard = () => {
     const stats = [
       { label: "Reservas Hoje", value: String(todayBookings.length), change: `${todayBookings.length}`, up: todayBookings.length > 0, icon: Calendar },
       { label: "Faturamento (Mês)", value: fmt(thisRevenue), change: `${Number(revChange) >= 0 ? "+" : ""}${revChange}%`, up: Number(revChange) >= 0, icon: DollarSign },
-      { label: "Clientes Cadastrados", value: String(customerCount), change: "", up: true, icon: Users },
+      { label: "Riscos Críticos (SGS)", value: String(sgsStats.criticalRisks), change: `${sgsStats.pendingActions} pendentes`, up: sgsStats.criticalRisks === 0, icon: ShieldAlert, isSgs: true },
       { label: "Reservas (Mês)", value: String(thisCount), change: `${Number(countChange) >= 0 ? "+" : ""}${countChange}%`, up: Number(countChange) >= 0, icon: TrendingUp },
     ];
 
