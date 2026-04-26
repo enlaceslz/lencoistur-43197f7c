@@ -127,7 +127,7 @@ const CheckoutPage = () => {
               <CheckCircle size={40} className="text-green-600" />
             </div>
             <h1 className="font-display text-3xl font-bold text-foreground mb-2">
-              {confirmedBooking.payMethod === "pix" ? "Reserva Registrada!" : "Reserva Confirmada!"}
+              {confirmedBooking.payMethod === "pix" ? "Reserva Registrada!" : confirmedBooking.payMethod === "info" ? "Solicitação Enviada!" : "Reserva Confirmada!"}
             </h1>
             <p className="text-muted-foreground">
               Código da reserva: <strong className="text-foreground font-mono">{confirmedBooking.bookingCode}</strong>
