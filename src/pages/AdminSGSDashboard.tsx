@@ -10,7 +10,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 const AdminSGSDashboard = () => {
   const navigate = useNavigate();
-  const [stats, setStats] = useState({ risks: 0, incidents: 0, actions: 0, expiring: 0, surveyAvg: 0, briefings: 0, terms: 0, veiculos: 0, condutores: 0, checklists: 0 });
+  const [stats, setStats] = useState({ risks: 0, incidents: 0, actions: 0, expiring: 0, surveyAvg: 0, briefings: 0, terms: 0, pendingTerms: 0, veiculos: 0, condutores: 0, checklists: 0 });
   const [risksByLevel, setRisksByLevel] = useState<any[]>([]);
   const [incidentsByMonth, setIncidentsByMonth] = useState<any[]>([]);
   const [risksByStage, setRisksByStage] = useState<any[]>([]);
@@ -19,17 +19,18 @@ const AdminSGSDashboard = () => {
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
-    const [risksRes, incidentsRes, actionsRes, staffRes, surveysRes, briefingsRes, termsRes, veiculosRes, condutoresRes, checklistsRes] = await Promise.all([
+    const [risksRes, incidentsRes, actionsRes, staffRes, surveysRes, briefingsRes, termsRes, veiculosRes, condutoresRes, checklistsRes, bookingsRes] = await Promise.all([
       supabase.from("sgs_risks").select("*"),
       supabase.from("sgs_incidents").select("*").order("created_at", { ascending: false }),
       supabase.from("sgs_corrective_actions").select("*").in("status", ["pendente", "em_andamento"]),
       supabase.from("sgs_staff_trainings").select("*").eq("status", "vencendo"),
       supabase.from("sgs_safety_surveys").select("felt_safe"),
       supabase.from("sgs_briefings").select("id"),
-      supabase.from("sgs_risk_terms").select("id"),
+      supabase.from("sgs_risk_terms").select("booking_id"),
       supabase.from("sgs_veiculos").select("id").eq("status", "ativo"),
       supabase.from("sgs_condutores").select("id").eq("status", "ativo"),
       supabase.from("sgs_checklists").select("id, created_at").order("created_at", { ascending: false }).limit(1),
+      supabase.from("bookings").select("id").not("status", "eq", "cancelada"),
     ]);
 
     const risks = risksRes.data || [];
