@@ -389,7 +389,7 @@ const CheckoutPage = () => {
             {/* Payment */}
             <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
               <h2 className="font-display text-lg font-bold text-foreground">Forma de Pagamento</h2>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <button
                   type="button"
                   onClick={() => setPayMethod("pix")}
@@ -399,7 +399,7 @@ const CheckoutPage = () => {
                    <div className="text-left">
                     <p className="font-semibold text-foreground text-sm">PIX</p>
                     <p className="text-xs text-green-600 font-medium">
-                      {pixDiscountPercent > 0 ? `${pixDiscountPercent}% de desconto` : "Pagamento instantâneo"}
+                      {pixDiscountPercent > 0 ? `${pixDiscountPercent}% desc.` : "Instantâneo"}
                     </p>
                   </div>
                 </button>
@@ -411,7 +411,18 @@ const CheckoutPage = () => {
                   <CreditCard size={24} className={payMethod === "card" ? "text-primary" : "text-muted-foreground"} />
                   <div className="text-left">
                     <p className="font-semibold text-foreground text-sm">Cartão</p>
-                    <p className="text-xs text-muted-foreground">Até 3x sem juros</p>
+                    <p className="text-xs text-muted-foreground">Até 3x s/ juros</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPayMethod("info")}
+                  className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-colors ${payMethod === "info" ? "border-primary bg-primary/5" : "border-border"}`}
+                >
+                  <Users size={24} className={payMethod === "info" ? "text-primary" : "text-muted-foreground"} />
+                  <div className="text-left">
+                    <p className="font-semibold text-foreground text-sm">Info</p>
+                    <p className="text-xs text-muted-foreground">Falar c/ agência</p>
                   </div>
                 </button>
               </div>
