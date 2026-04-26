@@ -35,12 +35,25 @@ const fmtDateTime = (d: string) => {
 };
 
 const payLabel = (m: string) => {
-  const map: Record<string, string> = { pix: "PIX", cartao: "Cartão de Crédito", card: "Cartão de Crédito", dinheiro: "Dinheiro", transferencia: "Transferência" };
+  const map: Record<string, string> = { 
+    pix: "PIX (Pagamento Instantâneo)", 
+    cartao: "Cartão de Crédito / Débito", 
+    card: "Cartão de Crédito", 
+    dinheiro: "Dinheiro / Espécie", 
+    transferencia: "Transferência Bancária" 
+  };
   return map[m] || m;
 };
 
 const statusLabel = (s: string) => {
-  const map: Record<string, string> = { confirmada: "Confirmada", pendente: "Pendente", cancelada: "Cancelada", concluida: "Concluída", pago: "Pago", reembolsado: "Reembolsado" };
+  const map: Record<string, string> = { 
+    confirmada: "Reserva Confirmada", 
+    pendente: "Pagamento Pendente", 
+    cancelada: "Reserva Cancelada", 
+    concluida: "Serviço Concluído", 
+    pago: "Pagamento Aprovado", 
+    reembolsado: "Valor Reembolsado" 
+  };
   return map[s] || s;
 };
 
