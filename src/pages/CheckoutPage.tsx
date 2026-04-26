@@ -36,11 +36,18 @@ const CheckoutPage = () => {
       } else if (type === "transfer" && transferId) {
         const { data } = await supabase.from("transfer_routes").select("*").eq("id", transferId).single();
         setTransfer(data);
+      } else if (type === "package" && packageSlug) {
+        const pkgData = [
+          { name: "Pacote Essencial Lençóis", slug: "essencial", price: 459 },
+          { name: "Pacote Aventura Total", slug: "aventura", price: 579 },
+          { name: "Pacote Imersão Completa", slug: "imersao", price: 799 },
+        ].find(p => p.slug === packageSlug);
+        setPkg(pkgData);
       }
       setLoadingItem(false);
     };
     load();
-  }, [type, slug, transferId]);
+  }, [type, slug, transferId, packageSlug]);
 
   const isPrivate = tourMode === "privativo";
   const itemName = tour ? `${tour.name}${isPrivate ? " (Privativo)" : " (Coletivo)"}` : (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
