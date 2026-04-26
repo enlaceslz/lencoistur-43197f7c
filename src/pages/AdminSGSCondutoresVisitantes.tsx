@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { maskCPF } from "@/lib/masks";
+
 import { Users, Plus, Search, AlertTriangle } from "lucide-react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
