@@ -437,34 +437,18 @@ const CheckoutPage = () => {
                 </div>
               )}
 
+              {payMethod === "info" && (
+                <div className="bg-muted rounded-xl p-4 flex items-center gap-3">
+                  <Users size={20} className="text-primary shrink-0" />
+                   <p className="text-sm text-muted-foreground">
+                    Ao confirmar, sua solicitação será enviada para a agência. Entraremos em contato via WhatsApp para finalizar sua reserva.
+                  </p>
+                </div>
+              )}
+
               {payMethod === "card" && (
                 <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-semibold text-foreground mb-1.5 block">Número do cartão</label>
-                    <input
-                      type="text"
-                      className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30"
-                      placeholder="0000 0000 0000 0000"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-semibold text-foreground mb-1.5 block">Validade</label>
-                      <input
-                        type="text"
-                        className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30"
-                        placeholder="MM/AA"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-semibold text-foreground mb-1.5 block">CVV</label>
-                      <input
-                        type="text"
-                        className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30"
-                        placeholder="000"
-                      />
-                    </div>
-                  </div>
+...
                   <div>
                     <label className="text-sm font-semibold text-foreground mb-1.5 block">Parcelas</label>
                     <select className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none appearance-none">
@@ -481,7 +465,7 @@ const CheckoutPage = () => {
               type="submit"
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-xl font-semibold text-lg transition-colors"
             >
-              {payMethod === "pix" ? `Gerar PIX — R$ ${finalTotal}` : `Pagar R$ ${finalTotal}`}
+              {payMethod === "pix" ? `Gerar PIX — R$ ${finalTotal}` : payMethod === "info" ? "Solicitar Informações" : `Pagar R$ ${finalTotal}`}
             </button>
 
             <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">
