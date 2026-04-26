@@ -114,6 +114,110 @@ const AdminSGSDashboard = () => {
     setIncidentsByMonth(Object.entries(months).map(([month, count]) => ({ name: month.slice(5), incidentes: count })));
   };
 
+  const generateP1Report = async () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // Header
+    doc.setFillColor(0, 102, 204);
+    doc.rect(0, 0, pageWidth, 40, 'F');
+    doc.setFontSize(22);
+    doc.setTextColor(255, 255, 255);
+    doc.text("P1 - Plano de Gestão de Segurança", pageWidth / 2, 20, { align: "center" });
+    doc.setFontSize(10);
+    doc.text("Conforme ABNT NBR ISO 21101 / 21102 / 21103 + Devolutiva VATTI", pageWidth / 2, 30, { align: "center" });
+    
+    doc.setTextColor(0, 0, 0);
+    let currentY = 50;
+    
+    // Company Info
+    const { data: company } = await supabase.from("sgs_empresa").select("*").limit(1).maybeSingle();
+    doc.setFontSize(14);
+    doc.text("Identificação da Organização", 14, currentY);
+    currentY += 10;
+    
+    (doc as any).autoTable({
+      startY: currentY,
+      body: [
+        ["Razão Social", company?.razao_social || "Lençóis Tour"],
+        ["CNPJ", company?.cnpj || "—"],
+        ["Endereço", company?.endereco || "—"],
+        ["Responsável Técnico", company?.responsavel_tecnico || "—"],
+        ["Data do Relatório", new Date().toLocaleDateString("pt-BR")],
+      ],
+      theme: 'grid',
+      styles: { fontSize: 10 },
+      columnStyles: { 0: { fontStyle: 'bold', width: 50 } }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+    
+    // Safety Policy
+    doc.setFontSize(14);
+    doc.text("Política de Segurança", 14, currentY);
+    currentY += 7;
+    doc.setFontSize(10);
+    const policy = "A Lençóis Tour compromete-se a oferecer experiências de turismo de aventura com o mais alto padrão de segurança, seguindo as normas ABNT NBR ISO. Nossa gestão baseia-se na identificação proativa de riscos, treinamento contínuo da equipe e melhoria constante de nossos processos para garantir a integridade física de nossos clientes e colaboradores.";
+    doc.text(doc.splitTextToSize(policy, pageWidth - 28), 14, currentY);
+    
+    currentY += 25;
+    
+    // KPIs
+    doc.setFontSize(14);
+    doc.text("Indicadores de Desempenho (KPIs)", 14, currentY);
+    currentY += 10;
+    
+    (doc as any).autoTable({
+      startY: currentY,
+      head: [["Indicador", "Valor Atual"]],
+      body: [
+        ["Riscos Ativos Identificados", stats.risks.toString()],
+        ["Incidentes em Aberto", stats.incidents.toString()],
+        ["Ações Corretivas Pendentes", stats.actions.toString()],
+        ["Média de Satisfação/Segurança", `${stats.surveyAvg}/5`],
+        ["Briefings Realizados", stats.briefings.toString()],
+        ["Termos de Risco Assinados", stats.terms.toString()],
+      ],
+      theme: 'striped',
+      styles: { fontSize: 10 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+    
+    // Emergency
+    doc.setFontSize(14);
+    doc.text("Contatos de Emergência", 14, currentY);
+    currentY += 10;
+    
+    (doc as any).autoTable({
+      startY: currentY,
+      head: [["Instituição", "Telefone", "Localização"]],
+      body: [
+        ["Ambulância", "(98) 98757-0033", "Santo Amaro"],
+        ["Hospital Municipal", "(98) 8917-4057", "Santo Amaro"],
+        ["Corpo de Bombeiros", "193 / (98) 98917-4057", "Região"],
+        ["Defesa Civil", "(98) 97022-6113", "Santo Amaro"],
+      ],
+      theme: 'grid',
+      styles: { fontSize: 9 }
+    });
+
+    doc.addPage();
+    currentY = 20;
+    doc.setFontSize(14);
+    doc.text("Declaração de Compromisso", 14, currentY);
+    currentY += 10;
+    doc.setFontSize(10);
+    doc.text("Este documento P1 integra o Sistema de Gestão de Segurança da Lençóis Tour e deve estar disponível para consulta pública. A assinatura abaixo ratifica o compromisso da gerência com os princípios de segurança turística.", 14, currentY, { maxWidth: pageWidth - 28 });
+    
+    currentY += 50;
+    doc.line(14, currentY, 80, currentY);
+    doc.text("Assinatura do Responsável", 14, currentY + 5);
+    doc.text("Lençóis Tour", 14, currentY + 10);
+    
+    doc.save(`SGS_P1_Relatorio_${new Date().toISOString().slice(0, 10)}.pdf`);
+  };
+
   const quickActions = [
     { label: "Registrar Incidente", icon: Activity, path: "/admin/sgs/incidentes", color: "bg-destructive/10 text-destructive hover:bg-destructive/20" },
     { label: "Novo Briefing", icon: Shield, path: "/admin/sgs/briefings", color: "bg-primary/10 text-primary hover:bg-primary/20" },
