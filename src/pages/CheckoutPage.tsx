@@ -15,15 +15,17 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const { addBooking } = useBookings();
 
-  const type = (params.get("type") || "tour") as "tour" | "transfer";
+  const type = (params.get("type") || "tour") as "tour" | "transfer" | "package";
   const slug = params.get("tour") || "";
   const transferId = params.get("transfer") || "";
+  const packageSlug = params.get("package") || "";
   const guests = Number(params.get("pax")) || 2;
   const date = params.get("date") || "";
   const tourMode = (params.get("mode") || "coletivo") as "coletivo" | "privativo";
 
   const [tour, setTour] = useState<any>(null);
   const [transfer, setTransfer] = useState<any>(null);
+  const [pkg, setPkg] = useState<any>(null);
   const [loadingItem, setLoadingItem] = useState(true);
 
   useEffect(() => {
@@ -34,18 +36,25 @@ const CheckoutPage = () => {
       } else if (type === "transfer" && transferId) {
         const { data } = await supabase.from("transfer_routes").select("*").eq("id", transferId).single();
         setTransfer(data);
+      } else if (type === "package" && packageSlug) {
+        const pkgData = [
+          { name: "Pacote Essencial Lençóis", slug: "essencial", price: 459 },
+          { name: "Pacote Aventura Total", slug: "aventura", price: 579 },
+          { name: "Pacote Imersão Completa", slug: "imersao", price: 799 },
+        ].find(p => p.slug === packageSlug);
+        setPkg(pkgData);
       }
       setLoadingItem(false);
     };
     load();
-  }, [type, slug, transferId]);
+  }, [type, slug, transferId, packageSlug]);
 
   const isPrivate = tourMode === "privativo";
-  const itemName = tour ? `${tour.name}${isPrivate ? " (Privativo)" : " (Coletivo)"}` : (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
-  const unitPrice = tour ? (isPrivate ? (tour.private_price || 1300) : tour.price) : (transfer?.price || 0);
-  const pixDiscountPercent = tour?.pix_discount || transfer?.pix_discount || 0;
+  const itemName = tour ? `${tour.name}${isPrivate ? " (Privativo)" : " (Coletivo)"}` : (pkg ? pkg.name : (transfer ? `${transfer.origin} → ${transfer.destination}` : ""));
+  const unitPrice = tour ? (isPrivate ? (tour.private_price || 1300) : tour.price) : (pkg ? pkg.price : (transfer?.price || 0));
+  const pixDiscountPercent = tour?.pix_discount || transfer?.pix_discount || (pkg ? 5 : 0);
   const image = tour?.images?.[0] || "";
-  const location = tour?.location || (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
+  const location = tour?.location || (pkg ? "Santo Amaro" : (transfer ? `${transfer.origin} → ${transfer.destination}` : ""));
 
   const [payMethod, setPayMethod] = useState<"pix" | "card" | "info">("pix");
   const [name, setName] = useState("");
@@ -61,7 +70,7 @@ const CheckoutPage = () => {
   const [pixCopied, setPixCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  if (!tour && !transfer) {
+  if (!tour && !transfer && !pkg) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">

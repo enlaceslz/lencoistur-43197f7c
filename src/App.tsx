@@ -44,6 +44,7 @@ import AdminSGSPGSAT from "./pages/AdminSGSPGSAT.tsx";
 import AdminRelatorios from "./pages/AdminRelatorios.tsx";
 import AdminAjuda from "./pages/AdminAjuda.tsx";
 import TermoAssinatura from "./pages/TermoAssinatura.tsx";
+import PackageDetail from "./pages/PackageDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -62,6 +63,7 @@ const App = () => (
           <Route path="/translados" element={<TransfersPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/minhas-reservas" element={<MinhasReservas />} />
+          <Route path="/pacotes/:slug" element={<PackageDetail />} />
           <Route path="/assinatura-termo" element={<TermoAssinatura />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />

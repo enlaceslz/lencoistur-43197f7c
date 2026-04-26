@@ -243,7 +243,7 @@ function generateReceiptHTML(data: ReceiptData, company?: any): string {
 
     <div class="section-title">Detalhes dos Serviços</div>
     <div class="grid">
-      <div class="field"><label>Categoria</label><p>${data.type === "tour" || data.type === "passeio" ? "Passeio Turístico" : "Translado / Rota"}</p></div>
+      <div class="field"><label>Categoria</label><p>${data.type === "package" ? "Pacote de Experiências" : (data.type === "tour" || data.type === "passeio" ? "Passeio Turístico" : "Translado / Rota")}</p></div>
       <div class="field"><label>Serviço / Itinerário</label><p>${data.itemName}</p></div>
       <div class="field"><label>Data Agendada</label><p>${fmtDate(data.date)}</p></div>
       <div class="field"><label>Total de Passageiros</label><p>${data.guests} pessoa(s)</p></div>

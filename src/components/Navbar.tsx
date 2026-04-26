@@ -31,6 +31,7 @@ const Navbar = () => {
           <Link to="/passeios" className="hover:text-secondary transition-colors">{t("nav.tours")}</Link>
           <Link to="/translados" className="hover:text-secondary transition-colors">{t("nav.transfers")}</Link>
           <Link to="/seguranca" className="hover:text-secondary transition-colors">{t("nav.safety")}</Link>
+          <Link to="/minhas-reservas" className="hover:text-secondary transition-colors">{t("nav.myBookings")}</Link>
           {isHome && (
             <>
               <a href="#como-funciona" className="hover:text-secondary transition-colors">{t("nav.howItWorks")}</a>
@@ -56,6 +57,7 @@ const Navbar = () => {
           <Link to="/passeios" onClick={() => setOpen(false)} className="py-2">{t("nav.tours")}</Link>
           <Link to="/translados" onClick={() => setOpen(false)} className="py-2">{t("nav.transfers")}</Link>
           <Link to="/seguranca" onClick={() => setOpen(false)} className="py-2">{t("nav.safety")}</Link>
+          <Link to="/minhas-reservas" onClick={() => setOpen(false)} className="py-2">{t("nav.myBookings")}</Link>
           <Link to="/" onClick={() => setOpen(false)} className="py-2">{t("nav.home")}</Link>
           <Link to="/passeios" onClick={() => setOpen(false)} className="bg-secondary text-secondary-foreground px-5 py-3 rounded-lg font-semibold mt-2 text-center">
             {t("nav.bookNow")}
