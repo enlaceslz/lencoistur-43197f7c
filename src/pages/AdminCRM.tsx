@@ -61,9 +61,17 @@ interface CustomerForm {
   email: string;
   phone: string;
   cpf: string;
+  passport: string;
   birth_date: string;
   notes: string;
   status: string;
+  country: string;
+  cep: string;
+  address: string;
+  number: string;
+  neighborhood: string;
+  city: string;
+  state: string;
 }
 
 interface DependentForm {
@@ -78,9 +86,17 @@ const emptyForm: CustomerForm = {
   email: "", 
   phone: "", 
   cpf: "", 
+  passport: "",
   birth_date: "", 
   notes: "", 
-  status: "regular" 
+  status: "regular",
+  country: "Brasil",
+  cep: "",
+  address: "",
+  number: "",
+  neighborhood: "",
+  city: "",
+  state: ""
 };
 
 const emptyDependentForm: DependentForm = {
