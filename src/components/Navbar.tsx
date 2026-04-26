@@ -31,6 +31,7 @@ const Navbar = () => {
           <Link to="/passeios" className="hover:text-secondary transition-colors">{t("nav.tours")}</Link>
           <Link to="/translados" className="hover:text-secondary transition-colors">{t("nav.transfers")}</Link>
           <Link to="/seguranca" className="hover:text-secondary transition-colors">{t("nav.safety")}</Link>
+          <Link to="/minhas-reservas" className="hover:text-secondary transition-colors">{t("nav.myBookings")}</Link>
           {isHome && (
             <>
               <a href="#como-funciona" className="hover:text-secondary transition-colors">{t("nav.howItWorks")}</a>
