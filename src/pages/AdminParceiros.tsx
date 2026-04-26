@@ -20,6 +20,8 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { maskCPF, maskCNPJ, maskPhone, maskCpfCnpj } from "@/lib/masks";
 
 
