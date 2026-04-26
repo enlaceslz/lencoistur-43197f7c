@@ -172,6 +172,25 @@ const CheckoutPage = () => {
             </div>
           )}
 
+          {/* Info Payment / Contact */}
+          {confirmedBooking.payMethod === "info" && (
+            <div className="bg-card border-2 border-primary/20 rounded-2xl p-6 mb-6">
+              <div className="text-center mb-4">
+                <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold mb-3">
+                  <Users size={16} /> Solicitação de Informações
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Seus dados e os detalhes do serviço foram enviados para nossa agência. Um consultor entrará em contato em breve.
+                </p>
+              </div>
+              <div className="bg-green-50 border border-green-100 rounded-xl p-4 text-center">
+                <p className="text-xs text-green-700 font-medium">
+                  ✅ PDF profissional enviado para o e-mail da agência com sucesso.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Booking Details */}
           <div className="bg-card border border-border rounded-2xl p-6 space-y-3 mb-6">
             <h3 className="font-display font-bold text-foreground">Detalhes da Reserva</h3>
