@@ -68,6 +68,7 @@ export type Database = {
           type: string
           unit_price: number
           updated_at: string
+          user_id: string | null
           voucher_url: string | null
         }
         Insert: {
@@ -93,6 +94,7 @@ export type Database = {
           type: string
           unit_price: number
           updated_at?: string
+          user_id?: string | null
           voucher_url?: string | null
         }
         Update: {
@@ -118,6 +120,7 @@ export type Database = {
           type?: string
           unit_price?: number
           updated_at?: string
+          user_id?: string | null
           voucher_url?: string | null
         }
         Relationships: [
@@ -245,6 +248,7 @@ export type Database = {
           state: string | null
           status: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           address?: string | null
@@ -265,6 +269,7 @@ export type Database = {
           state?: string | null
           status?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           address?: string | null
@@ -285,6 +290,7 @@ export type Database = {
           state?: string | null
           status?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
