@@ -100,7 +100,11 @@ export function useBookings() {
 
   const addBooking = useCallback(
     async (
-      data: Omit<BookingItem, "id" | "bookingCode" | "createdAt" | "pixCode" | "status" | "paymentStatus" | "customerId">
+      data: Omit<BookingItem, "id" | "bookingCode" | "createdAt" | "pixCode" | "status" | "paymentStatus" | "customerId"> & {
+        cpf?: string;
+        passport?: string;
+        country?: string;
+      }
     ): Promise<BookingItem> => {
       const { data: result, error } = await supabase.functions.invoke("create-booking", {
         body: {
