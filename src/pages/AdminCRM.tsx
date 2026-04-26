@@ -496,9 +496,9 @@ const AdminCRM = () => {
       toast.error("Nenhum cliente para exportar.");
       return;
     }
-    const header = "Nome,Email,Telefone,CPF,Data Nascimento,Status,Reservas,Total Gasto,Cadastro,Observacoes\n";
+    const header = "Nome,Email,Telefone,Documento,Data Nascimento,Status,Pais,CEP,Endereco,Cidade,Estado,Reservas,Total Gasto,Cadastro,Observacoes\n";
     const rows = filtered.map(c =>
-      `"${c.name}","${c.email}","${c.phone || ""}","${c.cpf || ""}","${c.birth_date || ""}","${c.status}",${c.totalBookings},"${fmt(c.totalSpent)}","${new Date(c.created_at).toLocaleDateString("pt-BR")}","${(c.notes || "").replace(/"/g, '""')}"`
+      `"${c.name}","${c.email}","${c.phone || ""}","${c.country === "Brasil" ? (c.cpf || "") : (c.passport || "")}","${c.birth_date || ""}","${c.status}","${c.country || "Brasil"}","${c.cep || ""}","${(c.address || "").replace(/"/g, '""')}","${c.city || ""}","${c.state || ""}",${c.totalBookings},"${fmt(c.totalSpent)}","${new Date(c.created_at).toLocaleDateString("pt-BR")}","${(c.notes || "").replace(/"/g, '""')}"`
     ).join("\n");
     const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
