@@ -1,4 +1,4 @@
-import { Search, MapPin, Calendar } from "lucide-react";
+import { Search, MapPin, Calendar, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
