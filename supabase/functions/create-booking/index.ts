@@ -16,6 +16,14 @@ function generatePixCode(): string {
   return code;
 }
 
+function generateBookingCode(): string {
+  const year = new Date().getFullYear();
+  const num = String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0");
+  const letters = "ABCDEFGHIJKLMNPQRSTUVWXYZ";
+  const randLetter = letters[Math.floor(Math.random() * letters.length)];
+  return `RES-${year}-${num}${randLetter}`;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -92,7 +100,7 @@ Deno.serve(async (req) => {
       
       const { data: tour, error: tourErr } = await supabaseAdmin
         .from("tours")
-        .select("price, name, pix_discount")
+        .select("price, private_price, name, pix_discount")
         .eq("name", cleanItemName)
         .eq("active", true)
         .single();
@@ -104,7 +112,9 @@ Deno.serve(async (req) => {
           { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      unitPrice = tour.price;
+      
+      const isPrivate = itemName.includes("(Privativo)");
+      unitPrice = isPrivate ? (tour.private_price || 1300) : tour.price;
       pixDiscountPercent = tour.pix_discount || 0;
     } else {
       // translado - itemName format: "origin → destination"
@@ -162,12 +172,13 @@ Deno.serve(async (req) => {
           status: "pendente",
           payment_status: "pendente",
           pix_code: pixCode,
-          booking_code: "TEMP",
+          booking_code: generateBookingCode(),
         })
         .select("*, customers(*)")
         .single();
 
       if (bookingErr || !booking) {
+        console.error("Error inserting booking:", bookingErr);
         return null;
       }
       return booking;
