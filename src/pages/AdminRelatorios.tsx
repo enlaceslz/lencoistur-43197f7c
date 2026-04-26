@@ -279,6 +279,7 @@ const AdminRelatorios = () => {
                   <KPICard label="Total Clientes" value={data.total || 0} icon={Users} color="text-primary" />
                 </>
               )}
+            </div>
 
             {/* Charts Section */}
             <div className="grid md:grid-cols-2 gap-6">
