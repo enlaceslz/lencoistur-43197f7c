@@ -166,18 +166,20 @@ const MinhasReservas = () => {
                       >
                         📱 Falar no WhatsApp
                       </a>
-                      <PrintReceiptButton 
-                        data={{
-                          ...b,
-                          customerName: b.customerName || "",
-                          customerEmail: b.customerEmail || "",
-                          type: b.type || "tour",
-                        }} 
-                        variant="ghost"
-                        size="sm"
-                        className="text-primary h-auto p-0 font-semibold hover:underline hover:bg-transparent"
-                        label="Imprimir Comprovante"
-                      />
+                      {b.payMethod !== "info" && (
+                        <PrintReceiptButton 
+                          data={{
+                            ...b,
+                            customerName: b.customerName || "",
+                            customerEmail: b.customerEmail || "",
+                            type: b.type || "tour",
+                          }} 
+                          variant="ghost"
+                          size="sm"
+                          className="text-primary h-auto p-0 font-semibold hover:underline hover:bg-transparent"
+                          label="Imprimir Comprovante"
+                        />
+                      )}
                       <button
                         onClick={() => cancelBooking(b.id)}
                         className="text-destructive text-sm font-semibold hover:underline"
