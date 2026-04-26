@@ -94,6 +94,7 @@ const App = () => (
           <Route path="/admin/sgs/rotas" element={<AdminRoute><AdminSGSRotas /></AdminRoute>} />
           <Route path="/admin/sgs/pgsat" element={<AdminRoute><AdminSGSPGSAT /></AdminRoute>} />
           <Route path="/admin/sgs/termos" element={<AdminRoute><AdminSGSTermos /></AdminRoute>} />
+          <Route path="/admin/sgs/controles" element={<AdminRoute><AdminSGSControles /></AdminRoute>} />
           <Route path="/admin/sgs/briefings" element={<AdminRoute><AdminSGSBriefings /></AdminRoute>} />
           <Route path="/admin/sgs/pesquisas" element={<AdminRoute><AdminSGSPesquisas /></AdminRoute>} />
           <Route path="/admin/relatorios" element={<AdminRoute><AdminRelatorios /></AdminRoute>} />
