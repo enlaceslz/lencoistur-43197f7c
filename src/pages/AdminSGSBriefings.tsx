@@ -92,12 +92,16 @@ const AdminSGSBriefings = () => {
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Guia Responsável *</label>
+                <label className="text-sm font-semibold text-foreground mb-1 block">
+                  {form.language === "en" ? "Responsible Guide *" : "Guia Responsável *"}
+                </label>
                 <input required value={form.guide_name} onChange={e => setForm({ ...form, guide_name: e.target.value })}
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
               </div>
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Idioma do Resumo *</label>
+                <label className="text-sm font-semibold text-foreground mb-1 block">
+                  {form.language === "en" ? "Briefing Language *" : "Idioma do Resumo *"}
+                </label>
                 <select value={form.language} onChange={e => setForm({ ...form, language: e.target.value })}
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
                   {Object.entries(LANGUAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
