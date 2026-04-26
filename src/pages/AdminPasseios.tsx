@@ -556,7 +556,7 @@ const AdminPasseios = () => {
               <TableHead>Duração</TableHead>
               <TableHead>Preços / Modalidades</TableHead>
               <TableHead>Desc. PIX</TableHead>
-              <TableHead>Avaliação</TableHead>
+              <TableHead>SGS</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
