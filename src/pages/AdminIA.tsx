@@ -50,9 +50,18 @@ const AdminIA = () => {
       const now = new Date();
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
-      const [bookingsRes] = await Promise.all([
+      const [bookingsRes, settingsRes] = await Promise.all([
         supabase.from("bookings").select("item_name, final_total, status, type").gte("created_at", startOfMonth),
+        supabase.from("ai_settings").select("*").limit(1).maybeSingle(),
       ]);
+
+      if (settingsRes.data) {
+        setSettingsId(settingsRes.data.id);
+        setBotName(settingsRes.data.bot_name || "");
+        setTone(settingsRes.data.tone || "Amigável");
+        setInstructions(settingsRes.data.instructions || "");
+        setAutomations(Array.isArray(settingsRes.data.automations) ? settingsRes.data.automations : []);
+      }
 
       const bookings = bookingsRes.data || [];
       setTotalBookings(bookings.length);
@@ -80,6 +89,7 @@ const AdminIA = () => {
       setTourDemand(demand);
     } catch (err) {
       console.error("Error loading IA data:", err);
+      toast.error("Erro ao carregar dados da IA");
     } finally {
       setLoading(false);
     }
