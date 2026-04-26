@@ -63,6 +63,7 @@ const App = () => (
           <Route path="/translados" element={<TransfersPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/minhas-reservas" element={<MinhasReservas />} />
+          <Route path="/pacotes/:slug" element={<PackageDetail />} />
           <Route path="/assinatura-termo" element={<TermoAssinatura />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
