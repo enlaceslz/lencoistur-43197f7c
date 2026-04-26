@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
       
       const { data: tour, error: tourErr } = await supabaseAdmin
         .from("tours")
-        .select("price, name, pix_discount")
+        .select("price, private_price, name, pix_discount")
         .eq("name", cleanItemName)
         .eq("active", true)
         .single();
@@ -112,7 +112,9 @@ Deno.serve(async (req) => {
           { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      unitPrice = tour.price;
+      
+      const isPrivate = itemName.includes("(Privativo)");
+      unitPrice = isPrivate ? (tour.private_price || 1300) : tour.price;
       pixDiscountPercent = tour.pix_discount || 0;
     } else {
       // translado - itemName format: "origin → destination"
