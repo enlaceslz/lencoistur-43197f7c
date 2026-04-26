@@ -30,6 +30,7 @@ const Navbar = () => {
         <div className={`hidden md:flex items-center gap-8 text-sm font-medium ${isHome ? "text-primary-foreground/90" : "text-foreground/80"}`}>
           <Link to="/passeios" className="hover:text-secondary transition-colors">{t("nav.tours")}</Link>
           <Link to="/translados" className="hover:text-secondary transition-colors">{t("nav.transfers")}</Link>
+          <Link to="/seguranca" className="hover:text-secondary transition-colors">Segurança</Link>
           {isHome && (
             <>
               <a href="#como-funciona" className="hover:text-secondary transition-colors">{t("nav.howItWorks")}</a>
