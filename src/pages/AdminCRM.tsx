@@ -782,8 +782,9 @@ const AdminCRM = () => {
                         );
                       })
                     ) : (
-        const hasDependents = allDependents.some(d => d.customer_id === c.id);
-        return (
+                      filtered.map((c) => {
+                        const hasDependents = allDependents.some(d => d.customer_id === c.id);
+                        return (
           <tr
             key={c.id}
             className={`border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer ${selectedCustomer?.id === c.id ? "bg-muted/80" : ""}`}
