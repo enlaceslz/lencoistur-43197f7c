@@ -208,7 +208,8 @@ const AdminFinanceiro = () => {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={exportCSV}><Download size={14} className="mr-1" /> Exportar CSV</Button>
+            <Button variant="outline" size="sm" onClick={exportCSV}><Download size={14} className="mr-1" /> CSV</Button>
+            <Button variant="outline" size="sm" onClick={exportPDF}><Printer size={14} className="mr-1" /> Imprimir PDF</Button>
           </div>
         </div>
 
