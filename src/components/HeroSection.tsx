@@ -21,9 +21,15 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-hero" />
 
       <div className="relative z-10 container mx-auto px-4 text-center">
-        <p className="text-secondary font-semibold tracking-[0.3em] uppercase text-sm mb-4 animate-fade-up">
-          {t("hero.location")}
-        </p>
+        <div className="flex flex-col items-center gap-2 mb-4 animate-fade-up">
+          <Link to="/seguranca" className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-secondary-foreground text-[10px] md:text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/20 transition-all">
+            <ShieldCheck size={14} className="text-secondary" />
+            Compromisso com sua Segurança — ISO 21101
+          </Link>
+          <p className="text-secondary font-semibold tracking-[0.3em] uppercase text-sm">
+            {t("hero.location")}
+          </p>
+        </div>
         <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-primary-foreground leading-tight mb-6 animate-fade-up" style={{ animationDelay: "0.1s" }}>
           {t("hero.title1")}<br />
           <span className="italic font-normal">{t("hero.title2")}</span>
