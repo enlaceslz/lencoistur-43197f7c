@@ -44,7 +44,13 @@ const AdminSGSCondutores = () => {
 
   const cnhExpired = (d: string | null) => d && new Date(d) < new Date();
   const filtered = condutores.filter(c => c.nome.toLowerCase().includes(search.toLowerCase()));
-  const set = (k: string, v: any) => setForm(p => ({ ...p, [k]: v }));
+  const set = (k: string, v: any) => {
+    let value = v;
+    if (k === "cpf") value = maskCPF(v);
+    if (k === "telefone") value = maskPhone(v);
+    setForm(p => ({ ...p, [k]: value }));
+  };
+
 
   return (
     <AdminLayout title="SGS — Condutores">
