@@ -1,16 +1,16 @@
 const tourLagoasAzuis = "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=80";
 const tourRioPreguicas = "https://images.unsplash.com/photo-1506190500381-458919392ca3?auto=format&fit=crop&q=80";
 const tourEcologico = "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&q=80";
-const tourGastronomico = "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=80";
+const tourGastronomico = "https://images.unsplash.com/photo-1569336415962-a4bd9f67c07a?auto=format&fit=crop&q=80";
 const tourCultural = "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=80";
 const tourCaiaque = "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=80";
-const tourTrekking = "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=80";
-const tourQuadriciclo = "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&q=80";
+const tourTrekking = "https://images.unsplash.com/photo-1625026214227-2c9cc0883658?auto=format&fit=crop&q=80";
+const tourQuadriciclo = "https://images.unsplash.com/photo-1589112735741-26c6d04325a8?auto=format&fit=crop&q=80";
 const galleryBanho = "https://images.unsplash.com/photo-1632734490799-738914614a93?auto=format&fit=crop&q=80";
 const galleryPanorama = "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=80";
 const galleryFarol = "https://images.unsplash.com/photo-1506190500381-458919392ca3?auto=format&fit=crop&q=80";
-const gallery4x4 = "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=80";
-const galleryPorDoSol = "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&q=80";
+const gallery4x4 = "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&q=80";
+const galleryPorDoSol = "https://images.unsplash.com/photo-1569336415962-a4bd9f67c07a?auto=format&fit=crop&q=80";
 
 export interface Tour {
   id: string;
