@@ -336,9 +336,8 @@ const AdminTranslados = () => {
                   <TableHead>Duração</TableHead>
                   <TableHead>Veículo</TableHead>
                   <TableHead>Vagas</TableHead>
-                  <TableHead>Horários</TableHead>
                   <TableHead>Preço</TableHead>
-                  <TableHead>PIX</TableHead>
+                  <TableHead>SGS</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
