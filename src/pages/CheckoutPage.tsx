@@ -7,6 +7,8 @@ import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
 import { useBookings, type BookingItem } from "@/hooks/useBookings";
 import { toast } from "@/hooks/use-toast";
+import { maskCPF, maskPhone } from "@/lib/masks";
+
 
 const CheckoutPage = () => {
   const [params] = useSearchParams();
