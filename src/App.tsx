@@ -60,6 +60,7 @@ const App = () => (
           <Route path="/translados" element={<TransfersPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/minhas-reservas" element={<MinhasReservas />} />
+          <Route path="/assinatura-termo" element={<TermoAssinatura />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/crm" element={<AdminRoute><AdminCRM /></AdminRoute>} />
