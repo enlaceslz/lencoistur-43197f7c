@@ -8,7 +8,7 @@ import {
   LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot,
   Shield, AlertTriangle, Activity, ClipboardCheck, Truck, UserCheck2,
   ChevronDown, FileText, Check, Building2, Map, ChevronRight, BarChart3,
-  HelpCircle
+  HelpCircle, ClipboardList
 } from "lucide-react";
 
 interface Notification {
