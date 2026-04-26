@@ -107,6 +107,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
+  const { settings } = useSiteSettings();
 
   const isSgsActive = location.pathname.startsWith("/admin/sgs");
   const breadcrumbs = getBreadcrumbs(location.pathname);
