@@ -244,6 +244,8 @@ const AdminSGSDashboard = () => {
     { label: "Termos Assinados", value: stats.terms, icon: FileText, color: "text-primary", path: "/admin/sgs/termos" },
     { label: "Termos Pendentes", value: stats.pendingTerms, icon: Shield, color: "text-destructive", path: "/admin/sgs/termos", urgent: stats.pendingTerms > 0 },
     { label: "Avaliação Segurança", value: `${stats.surveyAvg}/5`, icon: Star, color: "text-primary", path: "/admin/sgs/pesquisas" },
+    { label: "Equipamentos (P5)", value: stats.equipment, icon: Wrench, color: "text-primary", path: "/admin/sgs/controles" },
+    { label: "Procedimentos (POP)", value: stats.procedures, icon: ClipboardList, color: "text-primary", path: "/admin/sgs/controles" },
   ];
 
   return (
