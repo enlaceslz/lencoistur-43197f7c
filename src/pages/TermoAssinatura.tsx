@@ -66,19 +66,19 @@ const TermoAssinatura = () => {
 
   const loadBooking = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("bookings")
-      .select("*, customers(*)")
-      .eq("booking_code", bookingCode)
-      .maybeSingle();
+    const [bookingRes, companyRes] = await Promise.all([
+      supabase.from("bookings").select("*, customers(*)").eq("booking_code", bookingCode).maybeSingle(),
+      supabase.from("sgs_empresa").select("*").limit(1).maybeSingle()
+    ]);
       
-    if (data) {
-      setBooking(data);
+    if (bookingRes.data) {
+      setBooking(bookingRes.data);
+      setCompany(companyRes.data);
       // Check if already signed
       const { data: termData } = await supabase
         .from("sgs_risk_terms")
         .select("id")
-        .eq("booking_id", data.id)
+        .eq("booking_id", bookingRes.data.id)
         .maybeSingle();
       
       if (termData) {
@@ -86,6 +86,12 @@ const TermoAssinatura = () => {
       }
     }
     setLoading(false);
+  };
+
+  const toggleHealth = (q: string) => {
+    setHealthInfo(prev => 
+      prev.includes(q) ? prev.filter(item => item !== q) : [...prev, q]
+    );
   };
 
   const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
