@@ -188,7 +188,7 @@ const AdminParceiros = () => {
   };
 
   const handleCpfCnpjChange = (value: string) => {
-    const formatted = formatCpfCnpj(value);
+    const formatted = maskCpfCnpj(value);
     setForm((prev) => ({ ...prev, cpf_cnpj: formatted }));
     if (isCnpj(formatted)) {
       const digits = formatted.replace(/\D/g, "");
