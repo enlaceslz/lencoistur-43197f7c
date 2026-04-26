@@ -36,17 +36,11 @@ const AdminIA = () => {
   const [aiLoading, setAiLoading] = useState(false);
 
   // Config state
-  const [botName, setBotName] = useState("Assistente LençóisTour");
-  const [tone, setTone] = useState<"Formal" | "Amigável" | "Entusiasta">("Amigável");
-  const [instructions, setInstructions] = useState("Sempre sugira o WhatsApp para finalizar reservas. Mencione promoções ativas quando relevante.");
-  const [automations, setAutomations] = useState([
-    { name: "Resposta automática a perguntas", active: true },
-    { name: "Sugestão de passeios por preferência", active: true },
-    { name: "Encaminhar para humano após 3 falhas", active: true },
-    { name: "Coletar lead automaticamente", active: true },
-    { name: "Enviar resumo diário por e-mail", active: false },
-    { name: "Tradução automática (EN/ES/FR)", active: false },
-  ]);
+  const [settingsId, setSettingsId] = useState<string | null>(null);
+  const [botName, setBotName] = useState("");
+  const [tone, setTone] = useState<string>("Amigável");
+  const [instructions, setInstructions] = useState("");
+  const [automations, setAutomations] = useState<any[]>([]);
 
   useEffect(() => { loadData(); }, []);
 
@@ -56,9 +50,18 @@ const AdminIA = () => {
       const now = new Date();
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
-      const [bookingsRes] = await Promise.all([
+      const [bookingsRes, settingsRes] = await Promise.all([
         supabase.from("bookings").select("item_name, final_total, status, type").gte("created_at", startOfMonth),
+        supabase.from("ai_settings").select("*").limit(1).maybeSingle(),
       ]);
+
+      if (settingsRes.data) {
+        setSettingsId(settingsRes.data.id);
+        setBotName(settingsRes.data.bot_name || "");
+        setTone(settingsRes.data.tone || "Amigável");
+        setInstructions(settingsRes.data.instructions || "");
+        setAutomations(Array.isArray(settingsRes.data.automations) ? settingsRes.data.automations : []);
+      }
 
       const bookings = bookingsRes.data || [];
       setTotalBookings(bookings.length);
@@ -86,6 +89,7 @@ const AdminIA = () => {
       setTourDemand(demand);
     } catch (err) {
       console.error("Error loading IA data:", err);
+      toast.error("Erro ao carregar dados da IA");
     } finally {
       setLoading(false);
     }
@@ -127,12 +131,43 @@ const AdminIA = () => {
     }
   };
 
-  const handleSaveConfig = () => {
+  const handleSaveConfig = async () => {
     setSaving(true);
-    setTimeout(() => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Não autenticado");
+
+      const settingsData = {
+        bot_name: botName,
+        tone: tone,
+        instructions: instructions,
+        automations: automations,
+        updated_at: new Date().toISOString(),
+        updated_by: user.id
+      };
+
+      let error;
+      if (settingsId) {
+        const { error: updateError } = await supabase
+          .from("ai_settings")
+          .update(settingsData)
+          .eq("id", settingsId);
+        error = updateError;
+      } else {
+        const { error: insertError } = await supabase
+          .from("ai_settings")
+          .insert([settingsData]);
+        error = insertError;
+      }
+
+      if (error) throw error;
+      toast.success("Configurações da IA salvas com sucesso!");
+    } catch (err: any) {
+      console.error("Error saving AI settings:", err);
+      toast.error(err.message || "Erro ao salvar configurações");
+    } finally {
       setSaving(false);
-      toast.success("Configurações da IA salvas!");
-    }, 600);
+    }
   };
 
   const toggleAutomation = (index: number) => {

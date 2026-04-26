@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_settings: {
+        Row: {
+          automations: Json | null
+          bot_name: string | null
+          id: string
+          instructions: string | null
+          tone: string | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          automations?: Json | null
+          bot_name?: string | null
+          id?: string
+          instructions?: string | null
+          tone?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          automations?: Json | null
+          bot_name?: string | null
+          id?: string
+          instructions?: string | null
+          tone?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           booking_code: string
