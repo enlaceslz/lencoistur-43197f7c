@@ -336,7 +336,7 @@ const AdminConfig = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>CNPJ</Label>
-                  <Input value={empresa.cnpj} onChange={(e) => setEmpresa({ ...empresa, cnpj: e.target.value })} maxLength={18} />
+                  <Input value={empresa.cnpj} onChange={(e) => setEmpresa({ ...empresa, cnpj: maskCNPJ(e.target.value) })} maxLength={18} />
                 </div>
                 <div className="space-y-2">
                   <Label>Telefone</Label>
