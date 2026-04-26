@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Calendar, Users, Copy, QrCode, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { Calendar, Users, Copy, QrCode, Clock, CheckCircle, XCircle, AlertCircle, Printer } from "lucide-react";
 import { useBookings } from "@/hooks/useBookings";
 import { toast } from "@/hooks/use-toast";
+import { PrintReceiptButton } from "@/components/BookingReceipt";
 
 const statusConfig: Record<string, { label: string; className: string; icon: typeof CheckCircle }> = {
   confirmada: { label: "Confirmada", className: "bg-primary/10 text-primary", icon: CheckCircle },
