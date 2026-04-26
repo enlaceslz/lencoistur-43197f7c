@@ -50,11 +50,12 @@ const CheckoutPage = () => {
   }, [type, slug, transferId, packageSlug]);
 
   const isPrivate = tourMode === "privativo";
-  const itemName = tour ? `${tour.name}${isPrivate ? " (Privativo)" : " (Coletivo)"}` : (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
-  const unitPrice = tour ? (isPrivate ? (tour.private_price || 1300) : tour.price) : (transfer?.price || 0);
-  const pixDiscountPercent = tour?.pix_discount || transfer?.pix_discount || 0;
+  const isPrivate = tourMode === "privativo";
+  const itemName = tour ? `${tour.name}${isPrivate ? " (Privativo)" : " (Coletivo)"}` : (pkg ? pkg.name : (transfer ? `${transfer.origin} → ${transfer.destination}` : ""));
+  const unitPrice = tour ? (isPrivate ? (tour.private_price || 1300) : tour.price) : (pkg ? pkg.price : (transfer?.price || 0));
+  const pixDiscountPercent = tour?.pix_discount || transfer?.pix_discount || (pkg ? 5 : 0);
   const image = tour?.images?.[0] || "";
-  const location = tour?.location || (transfer ? `${transfer.origin} → ${transfer.destination}` : "");
+  const location = tour?.location || (pkg ? "Santo Amaro" : (transfer ? `${transfer.origin} → ${transfer.destination}` : ""));
 
   const [payMethod, setPayMethod] = useState<"pix" | "card" | "info">("pix");
   const [name, setName] = useState("");
