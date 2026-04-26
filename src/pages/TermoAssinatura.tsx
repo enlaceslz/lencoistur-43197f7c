@@ -22,16 +22,36 @@ const RISKS_OPTIONS = [
   "Desidratação",
 ];
 
+// Controles operacionais VATTI
+const SAFETY_CONTROLS = [
+  "Capacitação constante da equipe de condutores",
+  "Cabo de resgate disponível em todas as operações",
+  "Orientações de segurança por escrito e verbalmente",
+  "Equipe capacitada em primeiros socorros",
+  "Equipe preparada para realizar resgates",
+  "Plano de Resposta a Emergências (PRE) implementado",
+  "Veículos equipados com kit de segurança",
+];
+
+// Questões de saúde P6 VATTI
+const HEALTH_QUESTIONS = [
+  "Alergia", "Diabetes", "Desmaios/Convulsões", "Obeso(a)",
+  "Cirurgia recente", "Sedentário(a)", "Parte do corpo imobilizada",
+  "Necessidades especiais", "Fobia a água",
+];
+
 const TermoAssinatura = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const bookingCode = params.get("booking") || "";
   
   const [booking, setBooking] = useState<any>(null);
+  const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [signing, setSigning] = useState(false);
   const [signed, setSigned] = useState(false);
   const [acceptedRisks, setAcceptedRisks] = useState<string[]>([]);
+  const [healthInfo, setHealthInfo] = useState<string[]>([]);
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
