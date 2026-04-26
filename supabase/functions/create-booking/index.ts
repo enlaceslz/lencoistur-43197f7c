@@ -176,6 +176,9 @@ Deno.serve(async (req) => {
         name: trimmedName,
         email: trimmedEmail,
         phone: trimmedPhone,
+        cpf: cpf || null,
+        passport: passport || null,
+        country: country || "Brasil",
       })
       .select()
       .single();
