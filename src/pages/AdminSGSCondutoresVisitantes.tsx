@@ -56,7 +56,12 @@ const AdminSGSCondutoresVisitantes = () => {
 
   const cnhExpired = (d: string | null) => d && new Date(d) < new Date();
   const filtered = visitantes.filter(v => `${v.nome} ${v.empresa_instituicao || ""}`.toLowerCase().includes(search.toLowerCase()));
-  const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
+  const set = (k: string, v: string) => {
+    let value = v;
+    if (k === "cpf") value = maskCPF(v);
+    setForm(p => ({ ...p, [k]: value }));
+  };
+
 
   return (
     <AdminLayout title="SGS — Condutores Visitantes">
