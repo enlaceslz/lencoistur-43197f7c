@@ -61,13 +61,17 @@ const AdminSGSBriefings = () => {
   const completedCount = (b: any) => CHECKLIST_ITEMS.filter(i => b[i.key]).length;
 
   return (
-    <AdminLayout title="SGS - Resumos de Segurança">
+    <AdminLayout title={form.language === "en" ? "SGS - Safety Briefings" : "SGS - Resumos de Segurança"}>
       <div className="space-y-6">
         <div className="flex justify-between gap-4">
-          <p className="text-sm text-muted-foreground">Checklist obrigatório do guia antes de cada passeio (ISO 21103)</p>
+          <p className="text-sm text-muted-foreground">
+            {form.language === "en" 
+              ? "Mandatory guide checklist before each tour (ISO 21103)" 
+              : "Checklist obrigatório do guia antes de cada passeio (ISO 21103)"}
+          </p>
           <button onClick={() => setShowForm(!showForm)}
             className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-            <Plus size={16} /> Novo Resumo
+            <Plus size={16} /> {form.language === "en" ? "New Briefing" : "Novo Resumo"}
           </button>
         </div>
 
