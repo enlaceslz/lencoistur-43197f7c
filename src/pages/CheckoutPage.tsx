@@ -97,6 +97,7 @@ const CheckoutPage = () => {
         cpf: nationality === "br" ? cpf : undefined,
         passport: nationality === "foreign" ? passport : undefined,
         country: nationality === "foreign" ? country : "Brasil",
+        birthDate: birthDate || undefined,
       });
       setConfirmedBooking(booking);
     } catch (error) {
