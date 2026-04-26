@@ -242,6 +242,12 @@ const TermoAssinatura = () => {
             </div>
             <h2 className="text-sm font-semibold text-muted-foreground">Termo de Conhecimento de Risco e Corresponsabilidade</h2>
             <p className="text-xs text-muted-foreground mt-1">Conforme Norma ABNT NBR ISO 21103</p>
+            {company && (
+              <div className="mt-2 pt-2 border-t border-border/50 text-[10px] text-muted-foreground">
+                <p><strong>{company.nome_fantasia || company.razao_social}</strong> • CNPJ: {company.cnpj}</p>
+                <p>{company.endereco}, {company.cidade}-{company.estado}</p>
+              </div>
+            )}
           </div>
 
           <div className="p-6 space-y-6">
@@ -271,9 +277,43 @@ const TermoAssinatura = () => {
                 <FileText size={18} />
                 <h3 className="font-bold">Informações Importantes</h3>
               </div>
-              <div className="text-sm text-muted-foreground space-y-2 leading-relaxed">
+              <div className="text-sm text-muted-foreground space-y-3 leading-relaxed">
                 <p>O passeio será realizado em veículo 4x4 na região dos Lençóis Maranhenses. A atividade envolve deslocamento em terrenos irregulares, dunas e banho em lagoas naturais.</p>
-                <p><strong>Recomendações:</strong> Traje de banho, protetor solar, chapéu, água e seguir rigorosamente as instruções do condutor/guia.</p>
+                
+                <div className="bg-primary/5 rounded-xl p-3 border border-primary/10">
+                  <p className="font-semibold text-xs text-primary mb-2 uppercase tracking-tight">Controles Operacionais Adotados:</p>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+                    {SAFETY_CONTROLS.map(ctrl => (
+                      <li key={ctrl} className="flex items-center gap-1.5 text-[11px]">
+                        <CheckCircle size={10} className="text-primary flex-shrink-0" /> {ctrl}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Health Questions */}
+            <div className="space-y-4 pt-2">
+              <div className="flex items-center gap-2 text-foreground">
+                <Shield size={18} className="text-primary" />
+                <h3 className="font-bold">Informações de Saúde</h3>
+              </div>
+              <p className="text-xs text-muted-foreground">Você possui alguma das condições abaixo? (Opcional)</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {HEALTH_QUESTIONS.map(q => (
+                  <button 
+                    key={q}
+                    type="button"
+                    onClick={() => toggleHealth(q)}
+                    className={`flex items-center gap-2 p-2 rounded-lg border text-left transition-all ${healthInfo.includes(q) ? 'bg-primary/10 border-primary text-primary' : 'bg-muted/30 border-transparent text-muted-foreground hover:border-border'}`}
+                  >
+                    <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${healthInfo.includes(q) ? 'bg-primary border-primary' : 'border-muted-foreground/30'}`}>
+                      {healthInfo.includes(q) && <CheckCircle size={10} className="text-white" />}
+                    </div>
+                    <span className="text-[10px] font-medium leading-tight">{q}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
