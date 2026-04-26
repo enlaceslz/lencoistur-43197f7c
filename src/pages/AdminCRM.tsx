@@ -940,6 +940,9 @@ const AdminCRM = () => {
                   <Button variant="outline" className="w-full rounded-xl" onClick={() => openEditModal(selectedCustomer)}>
                     <Pencil size={14} /> Editar Dados
                   </Button>
+                  <Button variant="outline" className="w-full rounded-xl border-primary/20 text-primary hover:bg-primary/5" onClick={() => exportClientPDF(selectedCustomer)}>
+                    <Printer size={14} /> Imprimir Ficha PDF
+                  </Button>
                 </div>
 
                 {/* Dependentes */}
