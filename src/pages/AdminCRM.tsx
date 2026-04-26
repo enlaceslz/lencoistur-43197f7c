@@ -182,7 +182,35 @@ const AdminCRM = () => {
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [form, setForm] = useState<CustomerForm>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [fetchingCep, setFetchingCep] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+
+  const handleCepSearch = async (cep: string) => {
+    const cleanedCep = cep.replace(/\D/g, "");
+    if (cleanedCep.length !== 8) return;
+
+    setFetchingCep(true);
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cleanedCep}/json/`);
+      const data = await response.json();
+      
+      if (data.erro) {
+        toast.error("CEP não encontrado.");
+      } else {
+        setForm(prev => ({
+          ...prev,
+          address: data.logradouro,
+          neighborhood: data.bairro,
+          city: data.localidade,
+          state: data.uf
+        }));
+      }
+    } catch (error) {
+      toast.error("Erro ao buscar CEP.");
+    } finally {
+      setFetchingCep(false);
+    }
+  };
 
   // Dependent Modal state
   const [dependentModalOpen, setDependentModalOpen] = useState(false);
