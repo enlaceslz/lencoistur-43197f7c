@@ -238,6 +238,43 @@ const AdminParceiros = () => {
     else { toast.success(p.active ? "Parceiro desativado." : "Parceiro ativado."); fetchPartners(); }
   };
 
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    const now = new Date();
+    const dateStr = now.toLocaleDateString("pt-BR");
+    
+    // Header
+    doc.setFontSize(18);
+    doc.setTextColor(33, 150, 243);
+    doc.text("Relatório de Parceiros - Lençóis Tour", 14, 20);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Data de geração: ${dateStr}`, 14, 28);
+    doc.text(`Total de parceiros: ${partners.length} (${activeCount} ativos)`, 14, 33);
+
+    // Table
+    const tableData = filtered.map(p => [
+      p.name,
+      partnerTypes.find(t => t.name === p.type)?.label || p.type,
+      p.cpf_cnpj || "N/A",
+      p.contact_name || "N/A",
+      `${p.commission_rate || 0}%`,
+      p.active ? "Ativo" : "Inativo"
+    ]);
+
+    autoTable(doc, {
+      startY: 40,
+      head: [["Nome", "Tipo", "CPF/CNPJ", "Contato", "Comissão", "Status"]],
+      body: tableData,
+      theme: "striped",
+      headStyles: { fillColor: [33, 150, 243] },
+      styles: { fontSize: 8 },
+    });
+
+    doc.save(`parceiros_${now.toISOString().slice(0, 10)}.pdf`);
+  };
+
   const filtered = partners.filter((p) => {
     const q = search.toLowerCase();
     const matchSearch = p.name.toLowerCase().includes(q) || (p.contact_name || "").toLowerCase().includes(q) || (p.email || "").toLowerCase().includes(q) || (p.cpf_cnpj || "").includes(q);
