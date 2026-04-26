@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (!["pix", "cartao", "dinheiro", "transferencia", "info"].includes(payMethod)) {
+    if (!["pix", "cartao", "card", "dinheiro", "transferencia", "info"].includes(payMethod)) {
       return new Response(
         JSON.stringify({ error: "Método de pagamento inválido" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
