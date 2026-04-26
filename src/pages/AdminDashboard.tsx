@@ -43,17 +43,28 @@ interface BookingRow {
 const AdminDashboard = () => {
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [customerCount, setCustomerCount] = useState(0);
+  const [sgsStats, setSgsStats] = useState({ activeRisks: 0, criticalRisks: 0, pendingActions: 0 });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const load = async () => {
-      const [bRes, cRes] = await Promise.all([
+      const [bRes, cRes, rRes, aRes] = await Promise.all([
         supabase.from("bookings").select("*, customers(name, email)").order("created_at", { ascending: false }),
         supabase.from("customers").select("id", { count: "exact", head: true }),
+        supabase.from("sgs_risks").select("risk_level"),
+        supabase.from("sgs_corrective_actions").select("id").eq("status", "pendente"),
       ]);
       setBookings((bRes.data as any[]) || []);
       setCustomerCount(cRes.count || 0);
+      
+      const risks = (rRes.data as any[]) || [];
+      setSgsStats({
+        activeRisks: risks.length,
+        criticalRisks: risks.filter(r => r.risk_level >= 12).length,
+        pendingActions: aRes.data?.length || 0
+      });
+      
       setLoading(false);
     };
     load();
