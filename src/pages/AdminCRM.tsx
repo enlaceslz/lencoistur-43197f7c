@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import { Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, Pencil, Trash2, X, Save, UserPlus, Baby } from "lucide-react";
+import { Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, Pencil, Trash2, X, Save, UserPlus, Baby, FileText, Printer } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -510,6 +512,109 @@ const AdminCRM = () => {
     toast.success(`${filtered.length} clientes exportados!`);
   };
 
+  const exportPDF = () => {
+    if (filtered.length === 0) {
+      toast.error("Nenhum cliente para exportar.");
+      return;
+    }
+
+    const doc = new jsPDF();
+    const tableColumn = ["Nome", "Email", "Telefone", "Documento", "Cidade/UF", "Reservas", "Total Gasto"];
+    const tableRows: any[] = [];
+
+    filtered.forEach(c => {
+      const customerData = [
+        c.name,
+        c.email,
+        c.phone || "—",
+        c.country === "Brasil" ? (c.cpf ? maskCPF(c.cpf) : "—") : (c.passport || "—"),
+        c.city ? `${c.city}/${c.state || ""}` : "—",
+        c.totalBookings,
+        fmt(c.totalSpent)
+      ];
+      tableRows.push(customerData);
+    });
+
+    doc.setFontSize(18);
+    doc.text("Relatório de Clientes", 14, 22);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Gerado em: ${new Date().toLocaleString("pt-BR")}`, 14, 30);
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 35,
+      theme: "striped",
+      headStyles: { fillColor: [45, 108, 223], textColor: [255, 255, 255] },
+      styles: { fontSize: 8, cellPadding: 2 },
+    });
+
+    doc.save(`clientes_${new Date().toISOString().split("T")[0]}.pdf`);
+    toast.success(`${filtered.length} clientes exportados para PDF!`);
+  };
+
+  const exportClientPDF = (c: Customer) => {
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFillColor(45, 108, 223);
+    doc.rect(0, 0, 210, 40, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.text("Ficha do Cliente", 14, 25);
+    
+    // Content
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("DADOS PESSOAIS", 14, 55);
+    doc.line(14, 57, 196, 57);
+    
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`Nome: ${c.name}`, 14, 65);
+    doc.text(`E-mail: ${c.email}`, 14, 72);
+    doc.text(`Telefone: ${c.phone ? maskPhone(c.phone) : "—"}`, 14, 79);
+    doc.text(`Documento: ${c.country === "Brasil" ? (c.cpf ? maskCPF(c.cpf) : "—") : (c.passport || "—")}`, 14, 86);
+    doc.text(`Data de Nascimento: ${c.birth_date ? new Date(c.birth_date + "T00:00:00").toLocaleDateString("pt-BR") : "—"}`, 14, 93);
+    doc.text(`Nacionalidade: ${c.country}`, 14, 100);
+    
+    doc.setFont("helvetica", "bold");
+    doc.text("ENDEREÇO", 14, 115);
+    doc.line(14, 117, 196, 117);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Endereço: ${c.address || "—"}${c.number ? `, ${c.number}` : ""}`, 14, 125);
+    doc.text(`Bairro: ${c.neighborhood || "—"}`, 14, 132);
+    doc.text(`Cidade/Estado: ${c.city || "—"} - ${c.state || "—"}`, 14, 139);
+    doc.text(`CEP: ${c.cep || "—"}`, 14, 146);
+    
+    if (c.notes) {
+      doc.setFont("helvetica", "bold");
+      doc.text("OBSERVAÇÕES", 14, 160);
+      doc.line(14, 162, 196, 162);
+      doc.setFont("helvetica", "normal");
+      const splitNotes = doc.splitTextToSize(c.notes, 180);
+      doc.text(splitNotes, 14, 170);
+    }
+
+    // Bookings summary
+    doc.setFont("helvetica", "bold");
+    doc.text("RESUMO FINANCEIRO", 14, 200);
+    doc.line(14, 202, 196, 202);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Total de Reservas: ${c.totalBookings}`, 14, 210);
+    doc.text(`Total Gasto: ${fmt(c.totalSpent)}`, 14, 217);
+    doc.text(`Última Reserva: ${c.lastBooking ? new Date(c.lastBooking).toLocaleDateString("pt-BR") : "—"}`, 14, 224);
+
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text(`Ficha gerada em ${new Date().toLocaleString("pt-BR")}`, 14, 285);
+
+    doc.save(`cliente_${c.name.replace(/\s+/g, "_")}.pdf`);
+    toast.success("Ficha do cliente gerada com sucesso!");
+  };
+
   const filtered = customers.filter((c) => {
     const q = search.toLowerCase();
     const matchesSearch = c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || (c.phone || "").includes(q) || (c.cpf || "").includes(q) || (c.passport || "").toLowerCase().includes(q) || (c.city || "").toLowerCase().includes(q);
@@ -524,14 +629,21 @@ const AdminCRM = () => {
     return d.name.toLowerCase().includes(q) || (d.cpf || "").includes(q) || d.customer_name.toLowerCase().includes(q);
   });
 
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+  const newThisMonth = customers.filter(c => {
+    const d = new Date(c.created_at);
+    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+  }).length;
+
   const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0);
   const withBookings = customers.filter((c) => c.totalBookings > 0).length;
 
   const clientStats = [
     { label: "Total de Clientes", value: customers.length.toString(), icon: Users, color: "text-primary" },
-    { label: "Com Reservas", value: withBookings.toString(), icon: MapPin, color: "text-green-600" },
+    { label: "Novos (Mês)", value: newThisMonth.toString(), icon: UserPlus, color: "text-purple-600" },
     { label: "Receita Total", value: fmt(totalRevenue), icon: DollarSign, color: "text-blue-600" },
-    { label: "Ticket Médio", value: withBookings > 0 ? fmt(Math.round(totalRevenue / withBookings)) : "R$ 0", icon: DollarSign, color: "text-amber-600" },
+    { label: "Ticket Médio", value: withBookings > 0 ? fmt(Math.round(totalRevenue / withBookings)) : "R$ 0", icon: Smartphone, color: "text-amber-600" },
   ];
 
   if (loading) {
@@ -585,6 +697,9 @@ const AdminCRM = () => {
                 </Button>
                 <Button variant="outline" size="sm" className="rounded-xl" onClick={exportCSV}>
                   <Download size={14} /> CSV
+                </Button>
+                <Button variant="outline" size="sm" className="rounded-xl" onClick={exportPDF}>
+                  <FileText size={14} /> PDF
                 </Button>
               </div>
             </div>
@@ -674,30 +789,35 @@ const AdminCRM = () => {
                         );
                       })
                     ) : (
-                      filtered.map((c) => (
-                        <tr
-                          key={c.id}
-                          className={`border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer ${selectedCustomer?.id === c.id ? "bg-muted/80" : ""}`}
-                          onClick={() => selectCustomer(c)}
-                        >
-                          <td className="py-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">
-                                {c.name.trim() ? c.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
-                              </div>
-                              <div className="min-w-0">
-                                <p className="font-semibold text-foreground truncate flex items-center gap-2">
-                                  {c.name}
-                                  {c.status !== "regular" && (
-                                    <Badge variant="outline" className={`text-[8px] px-1 py-0 uppercase ${customerStatusConfig[c.status]?.className || ""}`}>
-                                      {customerStatusConfig[c.status]?.label || c.status}
-                                    </Badge>
-                                  )}
-                                </p>
-                                <p className="text-xs text-muted-foreground truncate">{c.email}</p>
-                              </div>
-                            </div>
-                          </td>
+                      filtered.map((c) => {
+                        const hasDependents = allDependents.some(d => d.customer_id === c.id);
+                        return (
+          <tr
+            key={c.id}
+            className={`border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer ${selectedCustomer?.id === c.id ? "bg-muted/80" : ""}`}
+            onClick={() => selectCustomer(c)}
+          >
+            <td className="py-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0 shadow-sm">
+                  {c.name.trim() ? c.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-semibold text-foreground truncate flex items-center gap-2">
+                    {c.name}
+                    {c.status !== "regular" && (
+                      <Badge variant="outline" className={`text-[8px] px-1 py-0 uppercase ${customerStatusConfig[c.status]?.className || ""}`}>
+                        {customerStatusConfig[c.status]?.label || c.status}
+                      </Badge>
+                    )}
+                    {hasDependents && (
+                      <Users size={12} className="text-muted-foreground" />
+                    )}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">{c.email}</p>
+                </div>
+              </div>
+            </td>
                           <td className="py-3 text-muted-foreground hidden sm:table-cell">{c.phone ? maskPhone(c.phone) : "—"}</td>
                           <td className="py-3 text-right text-foreground font-medium">{c.totalBookings}</td>
                           <td className="py-3 text-right font-semibold text-foreground hidden sm:table-cell">{fmt(c.totalSpent)}</td>
@@ -724,7 +844,8 @@ const AdminCRM = () => {
                             </div>
                           </td>
                         </tr>
-                      ))
+                        );
+                      })
                     )}
                   </tbody>
                 </table>
@@ -831,6 +952,9 @@ const AdminCRM = () => {
                   )}
                   <Button variant="outline" className="w-full rounded-xl" onClick={() => openEditModal(selectedCustomer)}>
                     <Pencil size={14} /> Editar Dados
+                  </Button>
+                  <Button variant="outline" className="w-full rounded-xl border-primary/20 text-primary hover:bg-primary/5" onClick={() => exportClientPDF(selectedCustomer)}>
+                    <Printer size={14} /> Imprimir Ficha PDF
                   </Button>
                 </div>
 
