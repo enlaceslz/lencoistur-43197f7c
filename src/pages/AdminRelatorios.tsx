@@ -284,7 +284,7 @@ const AdminRelatorios = () => {
                     <ResponsiveContainer width="100%" height={280}>
                       <RePieChart>
                         <Pie data={data.byStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={8}>
-                          {data.byStatus?.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} cornerRadius={4} />)}
+                          {data.byStatus?.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                         </Pie>
                         <Tooltip />
                         <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}} />
