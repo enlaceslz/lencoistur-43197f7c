@@ -691,6 +691,9 @@ const AdminCRM = () => {
                 <Button variant="outline" size="sm" className="rounded-xl" onClick={exportCSV}>
                   <Download size={14} /> CSV
                 </Button>
+                <Button variant="outline" size="sm" className="rounded-xl" onClick={exportPDF}>
+                  <FileText size={14} /> PDF
+                </Button>
               </div>
             </div>
 
