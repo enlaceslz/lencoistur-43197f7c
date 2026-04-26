@@ -16,6 +16,14 @@ function generatePixCode(): string {
   return code;
 }
 
+function generateBookingCode(): string {
+  const year = new Date().getFullYear();
+  const num = String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0");
+  const letters = "ABCDEFGHIJKLMNPQRSTUVWXYZ";
+  const randLetter = letters[Math.floor(Math.random() * letters.length)];
+  return `RES-${year}-${num}${randLetter}`;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
