@@ -110,27 +110,38 @@ const AdminSGSBriefings = () => {
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-foreground mb-2 block">Checklist de Segurança</label>
+              <label className="text-sm font-semibold text-foreground mb-2 block">
+                {form.language === "en" ? "Safety Checklist" : "Checklist de Segurança"}
+              </label>
               <div className="space-y-2">
                 {CHECKLIST_ITEMS.map(item => (
                   <label key={item.key} className="flex items-center gap-3 bg-muted rounded-xl px-4 py-3 cursor-pointer hover:bg-muted/80">
                     <input type="checkbox" checked={form[item.key as keyof typeof form] as boolean}
                       onChange={e => setForm({ ...form, [item.key]: e.target.checked })} className="rounded w-5 h-5" />
-                    <span className="text-sm text-foreground font-medium">{item.label}</span>
+                    <span className="text-sm text-foreground font-medium">
+                      {form.language === "en" ? item.label_en : item.label}
+                    </span>
                   </label>
                 ))}
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Observações</label>
+              <label className="text-sm font-semibold text-foreground mb-1 block">
+                {form.language === "en" ? "Notes" : "Observações"}
+              </label>
               <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-20" placeholder="Observações adicionais..." />
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-20" 
+                placeholder={form.language === "en" ? "Additional notes..." : "Observações adicionais..."} />
             </div>
 
             <div className="flex gap-3">
-              <button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">Salvar Resumo</button>
-              <button type="button" onClick={() => setShowForm(false)} className="bg-muted text-muted-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">Cancelar</button>
+              <button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">
+                {form.language === "en" ? "Save Briefing" : "Salvar Resumo"}
+              </button>
+              <button type="button" onClick={() => setShowForm(false)} className="bg-muted text-muted-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">
+                {form.language === "en" ? "Cancel" : "Cancelar"}
+              </button>
             </div>
           </form>
         )}
