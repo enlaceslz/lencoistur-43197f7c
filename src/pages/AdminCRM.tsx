@@ -143,11 +143,14 @@ const validateForm = (form: CustomerForm): string | null => {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) return "E-mail inválido.";
   if (form.phone) {
     const digits = form.phone.replace(/\D/g, "");
-    if (digits.length < 10 || digits.length > 11) return "Telefone deve ter 10 ou 11 dígitos.";
+    if (digits.length < 10 && form.country === "Brasil") return "Telefone deve ter 10 ou 11 dígitos.";
   }
-  if (form.cpf) {
+  if (form.country === "Brasil" && form.cpf) {
     const cpfDigits = form.cpf.replace(/\D/g, "");
     if (cpfDigits.length !== 11) return "CPF deve ter 11 dígitos.";
+  }
+  if (form.country !== "Brasil" && !form.passport) {
+    return "Passaporte é obrigatório para estrangeiros.";
   }
   return null;
 };
