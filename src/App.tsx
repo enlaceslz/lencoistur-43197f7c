@@ -44,6 +44,7 @@ import AdminSGSPGSAT from "./pages/AdminSGSPGSAT.tsx";
 import AdminRelatorios from "./pages/AdminRelatorios.tsx";
 import AdminAjuda from "./pages/AdminAjuda.tsx";
 import TermoAssinatura from "./pages/TermoAssinatura.tsx";
+import PackageDetail from "./pages/PackageDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
