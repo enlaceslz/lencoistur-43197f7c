@@ -25,6 +25,7 @@ const CheckoutPage = () => {
 
   const [tour, setTour] = useState<any>(null);
   const [transfer, setTransfer] = useState<any>(null);
+  const [pkg, setPkg] = useState<any>(null);
   const [loadingItem, setLoadingItem] = useState(true);
 
   useEffect(() => {
