@@ -837,7 +837,7 @@ const AdminCRM = () => {
                             </div>
                           </td>
                         </tr>
-                      ))
+                      })
                     )}
                   </tbody>
                 </table>
