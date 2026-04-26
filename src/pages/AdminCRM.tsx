@@ -782,30 +782,34 @@ const AdminCRM = () => {
                         );
                       })
                     ) : (
-                      filtered.map((c) => (
-                        <tr
-                          key={c.id}
-                          className={`border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer ${selectedCustomer?.id === c.id ? "bg-muted/80" : ""}`}
-                          onClick={() => selectCustomer(c)}
-                        >
-                          <td className="py-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">
-                                {c.name.trim() ? c.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
-                              </div>
-                              <div className="min-w-0">
-                                <p className="font-semibold text-foreground truncate flex items-center gap-2">
-                                  {c.name}
-                                  {c.status !== "regular" && (
-                                    <Badge variant="outline" className={`text-[8px] px-1 py-0 uppercase ${customerStatusConfig[c.status]?.className || ""}`}>
-                                      {customerStatusConfig[c.status]?.label || c.status}
-                                    </Badge>
-                                  )}
-                                </p>
-                                <p className="text-xs text-muted-foreground truncate">{c.email}</p>
-                              </div>
-                            </div>
-                          </td>
+        const hasDependents = allDependents.some(d => d.customer_id === c.id);
+        return (
+          <tr
+            key={c.id}
+            className={`border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer ${selectedCustomer?.id === c.id ? "bg-muted/80" : ""}`}
+            onClick={() => selectCustomer(c)}
+          >
+            <td className="py-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0 shadow-sm">
+                  {c.name.trim() ? c.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-semibold text-foreground truncate flex items-center gap-2">
+                    {c.name}
+                    {c.status !== "regular" && (
+                      <Badge variant="outline" className={`text-[8px] px-1 py-0 uppercase ${customerStatusConfig[c.status]?.className || ""}`}>
+                        {customerStatusConfig[c.status]?.label || c.status}
+                      </Badge>
+                    )}
+                    {hasDependents && (
+                      <Users size={12} className="text-muted-foreground" title="Possui dependentes" />
+                    )}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">{c.email}</p>
+                </div>
+              </div>
+            </td>
                           <td className="py-3 text-muted-foreground hidden sm:table-cell">{c.phone ? maskPhone(c.phone) : "—"}</td>
                           <td className="py-3 text-right text-foreground font-medium">{c.totalBookings}</td>
                           <td className="py-3 text-right font-semibold text-foreground hidden sm:table-cell">{fmt(c.totalSpent)}</td>
