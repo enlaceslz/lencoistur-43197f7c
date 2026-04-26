@@ -108,6 +108,57 @@ const AdminFinanceiro = () => {
     { key: "notas", label: "Notas e Recibos", icon: FileText },
   ];
 
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    const now = new Date();
+    const dateStr = now.toLocaleDateString("pt-BR");
+    
+    // Header
+    doc.setFontSize(18);
+    doc.setTextColor(33, 150, 243);
+    doc.text("Relatório Financeiro - Lençóis Tour", 14, 20);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Data de geração: ${dateStr}`, 14, 28);
+    doc.text(`Período: ${["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"][selectedMonth]} / ${selectedYear}`, 14, 33);
+
+    // Summary Stats
+    doc.setDrawColor(220);
+    doc.line(14, 38, 196, 38);
+    
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text("Resumo do Mês:", 14, 45);
+    
+    doc.setFontSize(10);
+    doc.text(`Receita Paga: ${fmt(receitaPaga)}`, 14, 52);
+    doc.text(`Despesas: ${fmt(despesasMes)}`, 14, 57);
+    doc.text(`Lucro Estimado: ${fmt(lucroMes)}`, 14, 62);
+    doc.text(`Ticket Médio: ${fmt(ticketMedio)}`, 14, 67);
+
+    // Table
+    const tableData = monthBookings.map(b => [
+      b.booking_code,
+      b.customers?.name || "N/A",
+      b.item_name,
+      fmt(b.final_total),
+      b.payment_status === "pago" ? "Pago" : "Pendente",
+      fmtDate(b.created_at)
+    ]);
+
+    autoTable(doc, {
+      startY: 75,
+      head: [["Código", "Cliente", "Passeio", "Valor", "Status", "Data"]],
+      body: tableData,
+      theme: "striped",
+      headStyles: { fillColor: [33, 150, 243] },
+      styles: { fontSize: 8 },
+    });
+
+    doc.save(`financeiro_${selectedYear}_${selectedMonth + 1}.pdf`);
+  };
+
   const exportCSV = () => {
     const header = "Código,Cliente,Passeio,Total,Desconto,Final,Pagamento,Status,Método,Data\n";
     const rows = validBookings.map(b =>
