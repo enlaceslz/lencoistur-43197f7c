@@ -510,6 +510,8 @@ const AdminCRM = () => {
     a.click();
     URL.revokeObjectURL(url);
     toast.success(`${filtered.length} clientes exportados!`);
+  };
+
   const exportPDF = () => {
     if (filtered.length === 0) {
       toast.error("Nenhum cliente para exportar.");
