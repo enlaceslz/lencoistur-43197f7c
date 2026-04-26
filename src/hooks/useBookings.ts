@@ -116,6 +116,9 @@ export function useBookings() {
           customerName: data.customerName,
           customerEmail: data.customerEmail,
           customerPhone: data.customerPhone,
+          cpf: data.cpf,
+          passport: data.passport,
+          country: data.country,
         },
       });
 
