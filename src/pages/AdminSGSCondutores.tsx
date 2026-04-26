@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { maskCPF, maskPhone } from "@/lib/masks";
+
 import { UserCheck, Plus, Search, AlertTriangle } from "lucide-react";
 
 const emptyForm = { nome: "", cpf: "", cnh_numero: "", cnh_categoria: "B", cnh_validade: "", telefone: "", email: "", primeiros_socorros: false, off_road: false, status: "ativo", observacoes: "" };
@@ -42,7 +44,13 @@ const AdminSGSCondutores = () => {
 
   const cnhExpired = (d: string | null) => d && new Date(d) < new Date();
   const filtered = condutores.filter(c => c.nome.toLowerCase().includes(search.toLowerCase()));
-  const set = (k: string, v: any) => setForm(p => ({ ...p, [k]: v }));
+  const set = (k: string, v: any) => {
+    let value = v;
+    if (k === "cpf") value = maskCPF(v);
+    if (k === "telefone") value = maskPhone(v);
+    setForm(p => ({ ...p, [k]: value }));
+  };
+
 
   return (
     <AdminLayout title="SGS — Condutores">
@@ -68,7 +76,14 @@ const AdminSGSCondutores = () => {
               ].map(f => (
                 <div key={f.k}>
                   <label className="block text-xs font-medium text-muted-foreground mb-1">{f.l}</label>
-                  <input type={f.t || "text"} value={(form as any)[f.k]} onChange={e => set(f.k, e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" />
+                  <input 
+                    type={f.t || "text"} 
+                    value={(form as any)[f.k]} 
+                    onChange={e => set(f.k, e.target.value)} 
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" 
+                    maxLength={f.k === "cpf" ? 14 : f.k === "telefone" ? 15 : undefined}
+                  />
+
                 </div>
               ))}
               <div>

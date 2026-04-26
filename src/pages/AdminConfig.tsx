@@ -11,6 +11,8 @@ import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff,
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { maskCPF, maskCNPJ, maskPhone } from "@/lib/masks";
+
 
 const PIX_KEY_TYPES = [
   { value: "cpf", label: "CPF", mask: "###.###.###-##", maxLength: 14 },
@@ -334,15 +336,15 @@ const AdminConfig = () => {
                 </div>
                 <div className="space-y-2">
                   <Label>CNPJ</Label>
-                  <Input value={empresa.cnpj} onChange={(e) => setEmpresa({ ...empresa, cnpj: e.target.value })} maxLength={18} />
+                  <Input value={empresa.cnpj} onChange={(e) => setEmpresa({ ...empresa, cnpj: maskCNPJ(e.target.value) })} maxLength={18} />
                 </div>
                 <div className="space-y-2">
                   <Label>Telefone</Label>
-                  <Input value={empresa.telefone} onChange={(e) => setEmpresa({ ...empresa, telefone: e.target.value })} maxLength={20} />
+                  <Input value={empresa.telefone} onChange={(e) => setEmpresa({ ...empresa, telefone: maskPhone(e.target.value) })} maxLength={15} />
                 </div>
                 <div className="space-y-2">
                   <Label>WhatsApp</Label>
-                  <Input value={empresa.whatsapp} onChange={(e) => setEmpresa({ ...empresa, whatsapp: e.target.value })} maxLength={20} />
+                  <Input value={empresa.whatsapp} onChange={(e) => setEmpresa({ ...empresa, whatsapp: maskPhone(e.target.value) })} maxLength={15} />
                 </div>
                 <div className="space-y-2">
                   <Label>E-mail</Label>
@@ -470,7 +472,14 @@ const AdminConfig = () => {
                         <div className="relative">
                           <Input
                             value={pagamentos.pixChave}
-                            onChange={(e) => setPagamentos({ ...pagamentos, pixChave: e.target.value })}
+                            onChange={(e) => {
+                              let val = e.target.value;
+                              if (pagamentos.pixTipo === "cpf") val = maskCPF(val);
+                              if (pagamentos.pixTipo === "cnpj") val = maskCNPJ(val);
+                              if (pagamentos.pixTipo === "telefone") val = maskPhone(val);
+                              setPagamentos({ ...pagamentos, pixChave: val });
+                            }}
+
                             maxLength={selectedType?.maxLength || 50}
                             placeholder={
                               pagamentos.pixTipo === "cpf" ? "000.000.000-00" :

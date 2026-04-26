@@ -20,6 +20,8 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { maskCPF, maskCNPJ, maskPhone, maskCpfCnpj } from "@/lib/masks";
+
 
 interface PartnerType {
   id: string;
@@ -51,24 +53,10 @@ const iconMap: Record<string, any> = {
 
 const getIcon = (name: string) => iconMap[name] || Building2;
 
-function formatCpfCnpj(value: string): string {
-  const digits = value.replace(/\D/g, "");
-  if (digits.length <= 11) {
-    return digits
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-  }
-  return digits
-    .replace(/^(\d{2})(\d)/, "$1.$2")
-    .replace(/^(\d{2}\.\d{3})(\d)/, "$1.$2")
-    .replace(/\.(\d{3})(\d)/, ".$1/$2")
-    .replace(/(\d{4})(\d{1,2})$/, "$1-$2");
-}
-
 function isCnpj(value: string): boolean {
   return value.replace(/\D/g, "").length >= 14;
 }
+
 
 const AdminParceiros = () => {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -200,7 +188,7 @@ const AdminParceiros = () => {
   };
 
   const handleCpfCnpjChange = (value: string) => {
-    const formatted = formatCpfCnpj(value);
+    const formatted = maskCpfCnpj(value);
     setForm((prev) => ({ ...prev, cpf_cnpj: formatted }));
     if (isCnpj(formatted)) {
       const digits = formatted.replace(/\D/g, "");
@@ -443,7 +431,7 @@ const AdminParceiros = () => {
               </div>
               <div>
                 <Label className="mb-1.5 block">Telefone</Label>
-                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: maskPhone(e.target.value) })} maxLength={15} />
               </div>
             </div>
             <div>

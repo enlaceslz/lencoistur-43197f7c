@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { maskCPF } from "@/lib/masks";
+
 import { Users, Plus, Search, AlertTriangle } from "lucide-react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
@@ -54,7 +56,12 @@ const AdminSGSCondutoresVisitantes = () => {
 
   const cnhExpired = (d: string | null) => d && new Date(d) < new Date();
   const filtered = visitantes.filter(v => `${v.nome} ${v.empresa_instituicao || ""}`.toLowerCase().includes(search.toLowerCase()));
-  const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
+  const set = (k: string, v: string) => {
+    let value = v;
+    if (k === "cpf") value = maskCPF(v);
+    setForm(p => ({ ...p, [k]: value }));
+  };
+
 
   return (
     <AdminLayout title="SGS — Condutores Visitantes">
@@ -82,7 +89,14 @@ const AdminSGSCondutoresVisitantes = () => {
               ].map(f => (
                 <div key={f.k}>
                   <label className="block text-xs font-medium text-muted-foreground mb-1">{f.l}</label>
-                  <input type={f.t || "text"} value={(form as any)[f.k]} onChange={e => set(f.k, e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" />
+                  <input 
+                    type={f.t || "text"} 
+                    value={(form as any)[f.k]} 
+                    onChange={e => set(f.k, e.target.value)} 
+                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" 
+                    maxLength={f.k === "cpf" ? 14 : undefined}
+                  />
+
                 </div>
               ))}
               <div>

@@ -3,6 +3,8 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Building2, Save, Upload, Loader2, X, Image } from "lucide-react";
+import { maskCNPJ, maskPhone } from "@/lib/masks";
+
 import { Button } from "@/components/ui/button";
 
 const AdminSGSEmpresa = () => {
@@ -151,15 +153,23 @@ const AdminSGSEmpresa = () => {
     setSaving(false);
   };
 
-  const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
-
+  const set = (k: string, v: string) => {
+    let value = v;
+    if (k === "cnpj") value = maskCNPJ(v);
+    if (k === "telefone") value = maskPhone(v);
+    setForm(p => ({ ...p, [k]: value }));
+  };
+  
   const Field = ({ label, field, type = "text", span = 1 }: { label: string; field: string; type?: string; span?: number }) => (
     <div className={span === 2 ? "sm:col-span-2" : ""}>
       <label className="block text-xs font-medium text-muted-foreground mb-1">{label}</label>
       <input type={type} value={(form as any)[field] || ""} onChange={e => set(field, e.target.value)}
-        className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" />
+        className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" 
+        maxLength={field === "cnpj" ? 18 : field === "telefone" ? 15 : undefined}
+      />
     </div>
   );
+
 
   if (loading) return <AdminLayout title="SGS — Empresa"><div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div></AdminLayout>;
 
