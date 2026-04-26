@@ -104,6 +104,7 @@ export function useBookings() {
         cpf?: string;
         passport?: string;
         country?: string;
+        birthDate?: string;
       }
     ): Promise<BookingItem> => {
       const { data: result, error } = await supabase.functions.invoke("create-booking", {
@@ -119,6 +120,7 @@ export function useBookings() {
           cpf: data.cpf,
           passport: data.passport,
           country: data.country,
+          birthDate: data.birthDate,
         },
       });
 
