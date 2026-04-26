@@ -131,12 +131,43 @@ const AdminIA = () => {
     }
   };
 
-  const handleSaveConfig = () => {
+  const handleSaveConfig = async () => {
     setSaving(true);
-    setTimeout(() => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Não autenticado");
+
+      const settingsData = {
+        bot_name: botName,
+        tone: tone,
+        instructions: instructions,
+        automations: automations,
+        updated_at: new Date().toISOString(),
+        updated_by: user.id
+      };
+
+      let error;
+      if (settingsId) {
+        const { error: updateError } = await supabase
+          .from("ai_settings")
+          .update(settingsData)
+          .eq("id", settingsId);
+        error = updateError;
+      } else {
+        const { error: insertError } = await supabase
+          .from("ai_settings")
+          .insert([settingsData]);
+        error = insertError;
+      }
+
+      if (error) throw error;
+      toast.success("Configurações da IA salvas com sucesso!");
+    } catch (err: any) {
+      console.error("Error saving AI settings:", err);
+      toast.error(err.message || "Erro ao salvar configurações");
+    } finally {
       setSaving(false);
-      toast.success("Configurações da IA salvas!");
-    }, 600);
+    }
   };
 
   const toggleAutomation = (index: number) => {
