@@ -303,6 +303,9 @@ const AdminParceiros = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={exportPDF}>
+            <Settings2 size={16} className="mr-1.5" /> Exportar PDF
+          </Button>
           <Button variant="outline" size="sm" onClick={() => setTypesDialogOpen(true)}>
             <Settings2 size={16} className="mr-1.5" /> Gerenciar Tipos
           </Button>
