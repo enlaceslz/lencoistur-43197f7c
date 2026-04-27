@@ -55,7 +55,7 @@ const AdminSGSTermos = () => {
     minors: [] as any[],
   });
 
-  const [minorForm, setMinorForm] = useState({ full_name: "", cpf: "", birth_date: "" });
+  const [minorForm, setMinorForm] = useState({ full_name: "", cpf: "", birth_date: "", is_adult: false, responsible_name: "" });
 
   useEffect(() => {
     load();
