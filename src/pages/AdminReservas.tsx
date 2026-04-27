@@ -253,24 +253,48 @@ const AdminReservas = () => {
 
       {/* Filters */}
       <Card className="mb-6">
-        <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <Input placeholder="Buscar por cliente, passeio, email ou código..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {["todos", "confirmada", "pendente", "cancelada", "concluida"].map((s) => (
-              <Button key={s} variant={statusFilter === s ? "default" : "outline"} size="sm" onClick={() => setStatusFilter(s)} className="capitalize">
-                {s === "todos" ? `Todos (${bookings.length})` : `${statusConfig[s]?.label} (${bookings.filter(b => b.status === s).length})`}
+        <CardContent className="p-4 space-y-4">
+          <div className="flex flex-col md:flex-row gap-4 items-center">
+            <div className="relative flex-1 w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+              <Input placeholder="Buscar por cliente, passeio, email ou código..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+            </div>
+            <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+              {["todos", "confirmada", "pendente", "cancelada", "concluida"].map((s) => (
+                <Button key={s} variant={statusFilter === s ? "default" : "outline"} size="sm" onClick={() => setStatusFilter(s)} className="capitalize whitespace-nowrap">
+                  {s === "todos" ? `Todos` : statusConfig[s]?.label}
+                </Button>
+              ))}
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <Button variant="outline" size="sm" onClick={exportCSV}>
+                <Download size={14} className="mr-1" /> CSV
               </Button>
-            ))}
+              <Button size="sm" onClick={() => { resetNewForm(); setShowNewForm(true); }}>
+                <Plus size={14} className="mr-1" /> Nova Reserva
+              </Button>
+            </div>
           </div>
-          <Button variant="outline" size="sm" onClick={exportCSV} className="shrink-0">
-            <Download size={14} className="mr-1" /> CSV
-          </Button>
-          <Button size="sm" onClick={() => { resetNewForm(); setShowNewForm(true); }} className="shrink-0">
-            <Plus size={14} className="mr-1" /> Nova Reserva
-          </Button>
+          
+          <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border">
+            <div className="flex items-center gap-2">
+              <Calendar size={14} className="text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground">Filtrar por data:</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="h-8 text-xs w-32" />
+              <span className="text-muted-foreground text-xs">até</span>
+              <Input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="h-8 text-xs w-32" />
+              {(dateStart || dateEnd) && (
+                <Button variant="ghost" size="sm" onClick={() => { setDateStart(""); setDateEnd(""); }} className="h-7 text-xs px-2">
+                  Limpar
+                </Button>
+              )}
+            </div>
+            <div className="ml-auto text-xs text-muted-foreground">
+              Mostrando {filtered.length} de {bookings.length} reservas
+            </div>
+          </div>
         </CardContent>
       </Card>
 
