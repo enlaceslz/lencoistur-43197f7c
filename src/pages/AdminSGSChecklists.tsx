@@ -145,15 +145,34 @@ const AdminSGSChecklists = () => {
               const progress = getProgress(cl.id);
               const clItems = getItems(cl.id);
               return (
-                <div key={cl.id} className="bg-card border border-border rounded-2xl p-5">
+                <div key={cl.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <span className="font-bold text-foreground text-sm">{cl.titulo}</span>
-                      <span className="text-xs text-muted-foreground ml-2">{cl.data} · {cl.responsavel}</span>
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${cl.status === "concluido" ? "bg-primary/10" : "bg-secondary/10"}`}>
+                        <ClipboardCheck size={20} className={cl.status === "concluido" ? "text-primary" : "text-secondary"} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-foreground text-sm">{cl.titulo}</h4>
+                        <div className="flex items-center gap-3 mt-1">
+                          <span className="text-[10px] flex items-center gap-1 text-muted-foreground">
+                            <Calendar size={10} /> {new Date(cl.created_at).toLocaleDateString("pt-BR")}
+                          </span>
+                          {cl.responsavel && (
+                            <span className="text-[10px] flex items-center gap-1 text-muted-foreground">
+                              <User size={10} /> {cl.responsavel}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${cl.status === "concluido" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
-                      {cl.status === "concluido" ? "Concluído" : "Em andamento"}
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${cl.status === "concluido" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
+                        {cl.status === "concluido" ? "Concluído" : "Em andamento"}
+                      </span>
+                      <button onClick={() => handleDelete(cl.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </div>
                   {/* Progress bar */}
                   <div className="w-full h-2 bg-muted rounded-full mb-3">
