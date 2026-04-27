@@ -103,7 +103,7 @@ const AdminSGSTermos = () => {
       tour_id: form.tour_id,
       vehicle_id: form.vehicle_id || null,
       company_id: company.id,
-      customer_name: selectedCustomer?.full_name || selectedCustomer?.name,
+      customer_name: selectedCustomer?.name,
       tour_name: selectedTour?.name,
       term_date: form.term_date,
       has_allergy: form.has_allergy,
@@ -122,11 +122,11 @@ const AdminSGSTermos = () => {
       medication_details: form.medication_details,
       emergency_contact_name: form.emergency_contact_name,
       emergency_contact_phone: form.emergency_contact_phone,
-      status: "pending",
       accepted: true,
     };
 
-    const { data: termData, error } = await supabase.from("sgs_risk_terms").insert([termPayload]).select().single();
+    const { data: termData, error } = await supabase.from("sgs_risk_terms").insert([termPayload as any]).select().single();
+
 
     if (error) {
       console.error(error);
