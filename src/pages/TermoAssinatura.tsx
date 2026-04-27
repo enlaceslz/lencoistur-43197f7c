@@ -273,8 +273,17 @@ const TermoAssinatura = () => {
         columnStyles: { 0: { fontStyle: 'bold', width: 50 } }
       });
       
-      currentY = (doc as any).lastAutoTable.finalY + 15;
+      currentY = (doc as any).lastAutoTable.finalY + 10;
       
+      // Recommendations
+      doc.setFontSize(11);
+      doc.text("Recomendações e Informações:", 14, currentY);
+      currentY += 5;
+      doc.setFontSize(8);
+      const recText = "Atividade não requer habilidade específica. Recomenda-se: saber nadar; trajes de banho e roupas confortáveis; levar toalha, casaco, chapéu, repelente e protetor solar; não usar acessórios; água e lanche. Não há sanitários no percurso.";
+      doc.text(doc.splitTextToSize(recText, pageWidth - 28), 14, currentY);
+      currentY += 12;
+
       // Risks
       doc.setFontSize(14);
       doc.text("Ciência de Riscos e Segurança", 14, currentY);
