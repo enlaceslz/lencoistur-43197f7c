@@ -176,7 +176,9 @@ const AdminReservas = () => {
       b.customerName.toLowerCase().includes(q) ||
       b.itemName.toLowerCase().includes(q) ||
       b.bookingCode.toLowerCase().includes(q) ||
-      b.customerEmail.toLowerCase().includes(q);
+      b.customerEmail.toLowerCase().includes(q) ||
+      (b.customerPhone && b.customerPhone.includes(q)) ||
+      (b.cpf && b.cpf.includes(q));
     const matchStatus = statusFilter === "todos" || b.status === statusFilter;
     
     let matchDate = true;
