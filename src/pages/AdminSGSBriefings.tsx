@@ -200,10 +200,20 @@ const AdminSGSBriefings = () => {
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${b.completed ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
-                    {completedCount(b)}/{CHECKLIST_ITEMS.length}
-                  </span>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${b.completed ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
+                      {completedCount(b)}/{CHECKLIST_ITEMS.length}
+                    </span>
+                  </div>
+                  <div className="flex gap-1">
+                    <button onClick={() => openEdit(b)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors">
+                      <Pencil size={14} />
+                    </button>
+                    <button onClick={() => handleDelete(b.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
