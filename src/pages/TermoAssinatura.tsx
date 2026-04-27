@@ -37,9 +37,10 @@ const SAFETY_CONTROLS = [
 
 // Questões de saúde P6 VATTI
 const HEALTH_QUESTIONS = [
-  "Alergia", "Diabetes", "Desmaios/Convulsões", "Obeso(a)",
-  "Cirurgia recente", "Sedentário(a)", "Parte do corpo imobilizada",
-  "Necessidades especiais", "Fobia a água",
+  "Alergia", "Desmaios e/ou convulsões", "Cirurgia recente?", "Diabetes", 
+  "Obeso/a", "Sedentário", "Com alguma parte do corpo imobilizada?", 
+  "Portador de necessidades especiais?", "Fobia", "Sob efeito de álcool e/ou entorpecentes?",
+  "Toma algum tipo de medicamento?"
 ];
 
 const TermoAssinatura = () => {

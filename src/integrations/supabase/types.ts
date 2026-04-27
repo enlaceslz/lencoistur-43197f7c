@@ -1333,57 +1333,170 @@ export type Database = {
         }
         Relationships: []
       }
+      sgs_risk_term_minors: {
+        Row: {
+          birth_date: string | null
+          cpf: string | null
+          created_at: string
+          full_name: string
+          id: string
+          risk_term_id: string
+        }
+        Insert: {
+          birth_date?: string | null
+          cpf?: string | null
+          created_at?: string
+          full_name: string
+          id?: string
+          risk_term_id: string
+        }
+        Update: {
+          birth_date?: string | null
+          cpf?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          risk_term_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sgs_risk_term_minors_risk_term_id_fkey"
+            columns: ["risk_term_id"]
+            isOneToOne: false
+            referencedRelation: "sgs_risk_terms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sgs_risk_terms: {
         Row: {
           accepted: boolean
+          address: string | null
+          allergy_details: string | null
+          birth_date: string | null
           booking_id: string | null
           cancellation_policy: string | null
+          city_state: string | null
+          company_id: string | null
+          cpf: string | null
           created_at: string
+          customer_id: string | null
           customer_name: string
+          email: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          has_allergy: boolean | null
+          has_diabetes: boolean | null
+          has_fainting_convulsions: boolean | null
+          has_immobilized_part: boolean | null
+          has_phobia: boolean | null
+          has_special_needs: boolean | null
           health_questions: string[] | null
           id: string
+          is_obese: boolean | null
+          is_sedentary: boolean | null
+          medication_details: string | null
           nationality: string | null
           pdf_url: string | null
+          phobia_details: string | null
           phone: string | null
+          recent_surgery: boolean | null
           risks_informed: string[]
           safety_controls_informed: boolean | null
           signature_data: string | null
           signed_at: string | null
+          takes_medication: boolean | null
+          term_date: string | null
+          tour_id: string | null
           tour_name: string
+          under_influence: boolean | null
+          vehicle_id: string | null
         }
         Insert: {
           accepted?: boolean
+          address?: string | null
+          allergy_details?: string | null
+          birth_date?: string | null
           booking_id?: string | null
           cancellation_policy?: string | null
+          city_state?: string | null
+          company_id?: string | null
+          cpf?: string | null
           created_at?: string
+          customer_id?: string | null
           customer_name: string
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          has_allergy?: boolean | null
+          has_diabetes?: boolean | null
+          has_fainting_convulsions?: boolean | null
+          has_immobilized_part?: boolean | null
+          has_phobia?: boolean | null
+          has_special_needs?: boolean | null
           health_questions?: string[] | null
           id?: string
+          is_obese?: boolean | null
+          is_sedentary?: boolean | null
+          medication_details?: string | null
           nationality?: string | null
           pdf_url?: string | null
+          phobia_details?: string | null
           phone?: string | null
+          recent_surgery?: boolean | null
           risks_informed?: string[]
           safety_controls_informed?: boolean | null
           signature_data?: string | null
           signed_at?: string | null
+          takes_medication?: boolean | null
+          term_date?: string | null
+          tour_id?: string | null
           tour_name: string
+          under_influence?: boolean | null
+          vehicle_id?: string | null
         }
         Update: {
           accepted?: boolean
+          address?: string | null
+          allergy_details?: string | null
+          birth_date?: string | null
           booking_id?: string | null
           cancellation_policy?: string | null
+          city_state?: string | null
+          company_id?: string | null
+          cpf?: string | null
           created_at?: string
+          customer_id?: string | null
           customer_name?: string
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          has_allergy?: boolean | null
+          has_diabetes?: boolean | null
+          has_fainting_convulsions?: boolean | null
+          has_immobilized_part?: boolean | null
+          has_phobia?: boolean | null
+          has_special_needs?: boolean | null
           health_questions?: string[] | null
           id?: string
+          is_obese?: boolean | null
+          is_sedentary?: boolean | null
+          medication_details?: string | null
           nationality?: string | null
           pdf_url?: string | null
+          phobia_details?: string | null
           phone?: string | null
+          recent_surgery?: boolean | null
           risks_informed?: string[]
           safety_controls_informed?: boolean | null
           signature_data?: string | null
           signed_at?: string | null
+          takes_medication?: boolean | null
+          term_date?: string | null
+          tour_id?: string | null
           tour_name?: string
+          under_influence?: boolean | null
+          vehicle_id?: string | null
         }
         Relationships: [
           {
@@ -1391,6 +1504,34 @@ export type Database = {
             columns: ["booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sgs_risk_terms_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "sgs_empresa"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sgs_risk_terms_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sgs_risk_terms_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sgs_risk_terms_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "sgs_veiculos"
             referencedColumns: ["id"]
           },
         ]
