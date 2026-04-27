@@ -23,12 +23,54 @@ const formatPhone = (v: string) => {
 const MinhasReservas = () => {
   const { bookings, confirmPayment, cancelBooking } = useBookings();
   const [filter, setFilter] = useState("todas");
+  const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
   const filtered = filter === "todas" ? bookings : bookings.filter((b) => b.status === filter);
 
   const copyPix = (code: string) => {
     navigator.clipboard.writeText(code);
     toast({ title: "Código PIX copiado!", description: "Cole no app do seu banco." });
+  };
+
+  const handleCancel = async (id: string) => {
+    if (!confirm("Tem certeza que deseja cancelar esta reserva?")) return;
+    
+    setIsProcessing(id);
+    try {
+      await cancelBooking(id);
+      toast({ 
+        title: "Reserva cancelada", 
+        description: "Sua reserva foi cancelada com sucesso." 
+      });
+    } catch (error) {
+      console.error("Erro ao cancelar reserva:", error);
+      toast({ 
+        title: "Erro ao cancelar", 
+        description: "Não foi possível cancelar sua reserva. Entre em contato pelo WhatsApp.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(null);
+    }
+  };
+
+  const handleSimulatePayment = async (id: string) => {
+    setIsProcessing(id);
+    try {
+      await confirmPayment(id);
+      toast({ 
+        title: "Pagamento confirmado", 
+        description: "Pagamento simulado com sucesso!" 
+      });
+    } catch (error) {
+      toast({ 
+        title: "Erro ao processar", 
+        description: "Ocorreu um erro ao simular o pagamento.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(null);
+    }
   };
 
   return (
