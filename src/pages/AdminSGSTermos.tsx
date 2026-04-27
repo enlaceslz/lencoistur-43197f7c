@@ -407,7 +407,7 @@ const AdminSGSTermos = () => {
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-sm">
             <div className="flex items-center gap-3 border-b border-border pb-4">
               <Shield className="text-primary" size={24} />
-              <h3 className="font-display font-bold text-lg">Gerar Novo Termo de Responsabilidade</h3>
+              <h3 className="font-display font-bold text-lg">{editingId ? "Editar Termo de Responsabilidade" : "Gerar Novo Termo de Responsabilidade"}</h3>
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
