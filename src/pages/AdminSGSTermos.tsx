@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, CheckCircle, XCircle, Shield, FileText, Printer, Users, Trash2, UserPlus, Search } from "lucide-react";
+import { Plus, CheckCircle, XCircle, Shield, FileText, Printer, Users, Trash2, UserPlus, Search, Edit, Eye } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -27,6 +27,7 @@ const AdminSGSTermos = () => {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [company, setCompany] = useState<any>(null);
 
@@ -88,6 +89,59 @@ const AdminSGSTermos = () => {
     setForm(f => ({ ...f, minors: f.minors.filter(m => m.id !== id) }));
   };
 
+  const handleEdit = async (term: any) => {
+    setEditingId(term.id);
+    
+    // Load minors for this term
+    const { data: minorsData } = await supabase
+      .from("sgs_risk_term_minors")
+      .select("*")
+      .eq("risk_term_id", term.id);
+
+    setForm({
+      customer_id: term.customer_id,
+      tour_id: term.tour_id,
+      vehicle_id: term.vehicle_id || "",
+      has_allergy: term.has_allergy,
+      allergy_details: term.allergy_details || "",
+      has_fainting_convulsions: term.has_fainting_convulsions,
+      recent_surgery: term.recent_surgery,
+      has_diabetes: term.has_diabetes,
+      is_obese: term.is_obese,
+      is_sedentary: term.is_sedentary,
+      has_immobilized_part: term.has_immobilized_part,
+      has_special_needs: term.has_special_needs,
+      has_phobia: term.has_phobia,
+      phobia_details: term.phobia_details || "",
+      under_influence: term.under_influence,
+      takes_medication: term.takes_medication,
+      medication_details: term.medication_details || "",
+      emergency_contact_name: term.emergency_contact_name || "",
+      emergency_contact_phone: term.emergency_contact_phone || "",
+      term_date: term.term_date,
+      minors: minorsData || [],
+    });
+    
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir este termo?")) return;
+
+    // Delete minors first (cascade might be on, but being safe)
+    await supabase.from("sgs_risk_term_minors").delete().eq("risk_term_id", id);
+    
+    const { error } = await supabase.from("sgs_risk_terms").delete().eq("id", id);
+
+    if (error) {
+      toast({ title: "Erro ao excluir termo", variant: "destructive" });
+    } else {
+      toast({ title: "Termo excluído com sucesso!" });
+      load();
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.customer_id || !form.tour_id || !company) {
@@ -125,12 +179,18 @@ const AdminSGSTermos = () => {
       accepted: true,
     };
 
-    const { data: termData, error } = await supabase.from("sgs_risk_terms").insert([termPayload as any]).select().single();
+    const { data: termData, error } = editingId 
+      ? await supabase.from("sgs_risk_terms").update(termPayload as any).eq("id", editingId).select().single()
+      : await supabase.from("sgs_risk_terms").insert([termPayload as any]).select().single();
 
     if (error) {
       console.error(error);
-      toast({ title: "Erro ao registrar termo", variant: "destructive" });
+      toast({ title: editingId ? "Erro ao atualizar termo" : "Erro ao registrar termo", variant: "destructive" });
     } else {
+      if (editingId) {
+        await supabase.from("sgs_risk_term_minors").delete().eq("risk_term_id", editingId);
+      }
+
       if (form.minors.length > 0) {
         const minorsPayload = form.minors.map(m => ({
           risk_term_id: termData.id,
@@ -141,14 +201,16 @@ const AdminSGSTermos = () => {
         await supabase.from("sgs_risk_term_minors").insert(minorsPayload);
       }
 
-      toast({ title: "Termo de conhecimento gerado com sucesso!" });
+      toast({ title: editingId ? "Termo atualizado com sucesso!" : "Termo de conhecimento gerado com sucesso!" });
       setShowForm(false);
+      setEditingId(null);
       resetForm();
       load();
     }
   };
 
   const resetForm = () => {
+    setEditingId(null);
     setForm({
       customer_id: "",
       tour_id: "",
@@ -334,7 +396,10 @@ const AdminSGSTermos = () => {
             />
           </div>
           <button 
-            onClick={() => setShowForm(!showForm)}
+            onClick={() => {
+              if (!showForm) resetForm();
+              setShowForm(!showForm);
+            }}
             className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
           >
             {showForm ? <XCircle size={16} /> : <Plus size={16} />} 
@@ -346,7 +411,7 @@ const AdminSGSTermos = () => {
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-sm">
             <div className="flex items-center gap-3 border-b border-border pb-4">
               <Shield className="text-primary" size={24} />
-              <h3 className="font-display font-bold text-lg">Gerar Novo Termo de Responsabilidade</h3>
+              <h3 className="font-display font-bold text-lg">{editingId ? "Editar Termo de Responsabilidade" : "Gerar Novo Termo de Responsabilidade"}</h3>
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
@@ -500,7 +565,7 @@ const AdminSGSTermos = () => {
                 type="submit" 
                 className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl text-sm font-bold shadow-sm transition-all active:scale-[0.98]"
               >
-                Gerar Termo de Responsabilidade
+                {editingId ? "Atualizar Termo de Responsabilidade" : "Gerar Termo de Responsabilidade"}
               </button>
               <button 
                 type="button" 
@@ -543,10 +608,24 @@ const AdminSGSTermos = () => {
                 <div className="flex gap-2">
                   <button 
                     onClick={() => printTerm(t.id)}
-                    className="p-3 bg-secondary/10 hover:bg-secondary/20 text-secondary-foreground rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
-                    title="Imprimir Termo"
+                    className="p-3 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
+                    title="Visualizar Termo"
                   >
-                    <Printer size={18} /> <span className="hidden sm:inline">Imprimir</span>
+                    <Eye size={18} /> <span className="hidden sm:inline">Visualizar</span>
+                  </button>
+                  <button 
+                    onClick={() => handleEdit(t)}
+                    className="p-3 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
+                    title="Editar Termo"
+                  >
+                    <Edit size={18} /> <span className="hidden sm:inline">Editar</span>
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(t.id)}
+                    className="p-3 bg-destructive/10 hover:bg-destructive/20 text-destructive rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
+                    title="Excluir Termo"
+                  >
+                    <Trash2 size={18} /> <span className="hidden sm:inline">Excluir</span>
                   </button>
                 </div>
               </div>
