@@ -145,27 +145,67 @@ const Seguranca = () => {
 
       {/* Transparência Section */}
       <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 max-w-4xl text-center">
-          <h2 className="font-display text-3xl font-bold mb-6">Transparência e Documentação</h2>
-          <p className="text-muted-foreground mb-10">
-            Nossa Política de Segurança e Plano de Gestão estão disponíveis para consulta pública. 
-            Acreditamos que um turista bem informado é um turista mais seguro.
-          </p>
-          <div className="grid sm:grid-cols-2 gap-6">
-            <div className="p-6 border border-border rounded-3xl text-left bg-muted/20">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">Transparência e Documentação</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Nossa Política de Segurança e Planos de Gestão estão disponíveis para consulta. 
+              Seguimos rigorosamente os requisitos da Devolutiva VATTI para conformidade ISO.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="p-6 border border-border rounded-3xl text-left bg-muted/20 hover:border-primary/30 transition-all">
               <FileText className="text-primary mb-4" size={32} />
               <h3 className="font-bold mb-2">P1 — Política de Segurança</h3>
-              <p className="text-xs text-muted-foreground mb-4">Relatório oficial descrevendo nossas diretrizes e compromissos com a segurança conforme ISO 21101.</p>
-              <Link to="/admin/sgs" className="text-primary text-sm font-bold flex items-center gap-1 hover:underline">
-                Visualizar documento <ExternalLink size={14} />
+              <p className="text-xs text-muted-foreground mb-4">Diretrizes e compromissos oficiais da Lençóis Tour com a segurança do turista e da equipe.</p>
+              <Link to="/admin/sgs/empresa" className="text-primary text-xs font-bold flex items-center gap-1 hover:underline">
+                Consultar política <ExternalLink size={12} />
               </Link>
             </div>
-            <div className="p-6 border border-border rounded-3xl text-left bg-muted/20">
+            
+            <div className="p-6 border border-border rounded-3xl text-left bg-muted/20 hover:border-primary/30 transition-all">
+              <Activity className="text-primary mb-4" size={32} />
+              <h3 className="font-bold mb-2">P2 — Matriz de Riscos</h3>
+              <p className="text-xs text-muted-foreground mb-4">Identificação e tratamento de riscos em todas as etapas: da recepção ao retorno do passeio.</p>
+              <Link to="/admin/sgs/riscos" className="text-primary text-xs font-bold flex items-center gap-1 hover:underline">
+                Ver matriz de riscos <ExternalLink size={12} />
+              </Link>
+            </div>
+
+            <div className="p-6 border border-border rounded-3xl text-left bg-muted/20 hover:border-primary/30 transition-all">
+              <AlertTriangle className="text-primary mb-4" size={32} />
+              <h3 className="font-bold mb-2">P3 — Ações Preventivas</h3>
+              <p className="text-xs text-muted-foreground mb-4">Plano de ações para mitigar riscos inaceitáveis e garantir a melhoria contínua do SGS.</p>
+              <Link to="/admin/sgs/acoes" className="text-primary text-xs font-bold flex items-center gap-1 hover:underline">
+                Ações em andamento <ExternalLink size={12} />
+              </Link>
+            </div>
+
+            <div className="p-6 border border-border rounded-3xl text-left bg-muted/20 hover:border-primary/30 transition-all">
               <Shield className="text-primary mb-4" size={32} />
-              <h3 className="font-bold mb-2">Informações aos Participantes</h3>
-              <p className="text-xs text-muted-foreground mb-4">Manual de orientações básicas sobre riscos, equipamentos e conduta segura durante os passeios.</p>
-              <Link to="/passeios" className="text-primary text-sm font-bold flex items-center gap-1 hover:underline">
-                Acesse nossos roteiros <ExternalLink size={14} />
+              <h3 className="font-bold mb-2">P4/P5 — Procedimentos</h3>
+              <p className="text-xs text-muted-foreground mb-4">Manuais de operação e checklists diários de veículos e equipamentos de segurança.</p>
+              <Link to="/admin/sgs/checklists" className="text-primary text-xs font-bold flex items-center gap-1 hover:underline">
+                Checklists operacionais <ExternalLink size={12} />
+              </Link>
+            </div>
+
+            <div className="p-6 border border-border rounded-3xl text-left bg-muted/20 hover:border-primary/30 transition-all">
+              <Users className="text-primary mb-4" size={32} />
+              <h3 className="font-bold mb-2">P6 — Termo de Ciência</h3>
+              <p className="text-xs text-muted-foreground mb-4">Informação transparente ao participante sobre riscos e responsabilidades compartilhadas.</p>
+              <Link to="/admin/sgs/termos" className="text-primary text-xs font-bold flex items-center gap-1 hover:underline">
+                Modelo do termo <ExternalLink size={12} />
+              </Link>
+            </div>
+
+            <div className="p-6 border border-border rounded-3xl text-left bg-muted/20 hover:border-primary/30 transition-all">
+              <CheckCircle className="text-primary mb-4" size={32} />
+              <h3 className="font-bold mb-2">Auditorias Internas</h3>
+              <p className="text-xs text-muted-foreground mb-4">Verificação periódica de conformidade com as normas ABNT NBR ISO 21101.</p>
+              <Link to="/admin/sgs/auditorias" className="text-primary text-xs font-bold flex items-center gap-1 hover:underline">
+                Relatórios de auditoria <ExternalLink size={12} />
               </Link>
             </div>
           </div>
