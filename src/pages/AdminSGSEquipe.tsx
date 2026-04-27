@@ -165,21 +165,29 @@ const AdminSGSEquipe = () => {
           const sTrainings = getStaffTrainings(s.id);
           const expired = hasExpiredTraining(s.id);
           return (
-            <div key={s.id} className={`bg-card border rounded-2xl p-5 ${expired ? "border-destructive" : "border-border"}`}>
-              <div className="flex flex-col sm:flex-row justify-between gap-3 mb-3">
+            <div key={s.id} className={`bg-card border rounded-2xl p-5 hover:shadow-md transition-all ${expired ? "border-destructive/50" : "border-border"}`}>
+              <div className="flex flex-col sm:flex-row justify-between gap-3 mb-4">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${s.blocked ? "bg-destructive/10" : "bg-primary/10"}`}>
-                    <UserCheck size={20} className={s.blocked ? "text-destructive" : "text-primary"} />
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${s.blocked ? "bg-destructive/10" : "bg-primary/10"}`}>
+                    <UserCheck size={24} className={s.blocked ? "text-destructive" : "text-primary"} />
                   </div>
                   <div>
-                    <h4 className="font-bold text-foreground">{s.name}</h4>
-                    <p className="text-xs text-muted-foreground">{ROLES[s.role]} {s.blocked && "• ⛔ BLOQUEADO"}</p>
+                    <h4 className="font-bold text-foreground text-lg">{s.name}</h4>
+                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-tight">{ROLES[s.role]} {s.blocked && <span className="text-destructive ml-1">· BLOQUEADO</span>}</p>
                   </div>
                 </div>
-                <button onClick={() => setShowTrainingForm(showTrainingForm === s.id ? null : s.id)}
-                  className="text-primary text-xs font-semibold hover:underline flex items-center gap-1">
-                  <Shield size={14} /> Adicionar Treinamento
-                </button>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => openEdit(s)} className="p-2 rounded-lg hover:bg-muted text-muted-foreground" title="Editar">
+                    <Pencil size={16} />
+                  </button>
+                  <button onClick={() => handleDelete(s.id)} className="p-2 rounded-lg hover:bg-destructive/10 text-destructive" title="Excluir">
+                    <Trash2 size={16} />
+                  </button>
+                  <button onClick={() => setShowTrainingForm(showTrainingForm === s.id ? null : s.id)}
+                    className="ml-2 bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5">
+                    <Shield size={14} /> Treinamento
+                  </button>
+                </div>
               </div>
 
               {showTrainingForm === s.id && (
