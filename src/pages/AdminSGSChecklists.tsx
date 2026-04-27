@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { ClipboardCheck, Plus, CheckCircle, Circle } from "lucide-react";
+import { ClipboardCheck, Plus, CheckCircle, Circle, Trash2, Calendar, User } from "lucide-react";
 
 const CHECKLIST_TEMPLATES: Record<string, string[]> = {
   veiculo_diario: ["Nível de óleo", "Nível de água/radiador", "Pressão dos pneus", "Estado dos pneus (desgaste)", "Freios (teste)", "Luzes (farol/lanterna/seta)", "Limpador/lavador de para-brisa", "Cinto de segurança (todos)", "Extintor de incêndio (validade)", "Triângulo de sinalização", "Macaco e chave de roda", "Estepe calibrado", "Kit primeiros socorros", "Documentação do veículo", "Combustível suficiente"],
