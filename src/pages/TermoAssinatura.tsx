@@ -80,15 +80,34 @@ const TermoAssinatura = () => {
     if (bookingRes.data) {
       setBooking(bookingRes.data);
       setCompany(companyRes.data);
-      // Check if already signed
+      
+      // Check if term already exists for this booking
       const { data: termData } = await supabase
         .from("sgs_risk_terms")
-        .select("id")
+        .select("*")
         .eq("booking_id", bookingRes.data.id)
         .maybeSingle();
       
       if (termData) {
-        setSigned(true);
+        setTerm(termData);
+        setAcceptedRisks(termData.risks_informed || []);
+        setHealthInfo(termData.health_questions || []);
+        
+        // Load companions
+        const { data: companionsData } = await supabase
+          .from("sgs_risk_term_minors")
+          .select("*")
+          .eq("risk_term_id", termData.id);
+        
+        if (companionsData) {
+          setCompanions(companionsData);
+        }
+
+        // If everyone has signed, mark as signed
+        const adultsNeedSigning = companionsData?.filter(c => c.is_adult && !c.signature_data).length === 0;
+        if (termData.signature_data && adultsNeedSigning) {
+          setSigned(true);
+        }
       }
     }
     setLoading(false);
