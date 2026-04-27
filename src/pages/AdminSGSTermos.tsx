@@ -604,10 +604,24 @@ const AdminSGSTermos = () => {
                 <div className="flex gap-2">
                   <button 
                     onClick={() => printTerm(t.id)}
-                    className="p-3 bg-secondary/10 hover:bg-secondary/20 text-secondary-foreground rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
-                    title="Imprimir Termo"
+                    className="p-3 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
+                    title="Visualizar Termo"
                   >
-                    <Printer size={18} /> <span className="hidden sm:inline">Imprimir</span>
+                    <Eye size={18} /> <span className="hidden sm:inline">Visualizar</span>
+                  </button>
+                  <button 
+                    onClick={() => handleEdit(t)}
+                    className="p-3 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
+                    title="Editar Termo"
+                  >
+                    <Edit size={18} /> <span className="hidden sm:inline">Editar</span>
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(t.id)}
+                    className="p-3 bg-destructive/10 hover:bg-destructive/20 text-destructive rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
+                    title="Excluir Termo"
+                  >
+                    <Trash2 size={18} /> <span className="hidden sm:inline">Excluir</span>
                   </button>
                 </div>
               </div>
