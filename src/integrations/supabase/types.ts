@@ -1340,7 +1340,11 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          is_adult: boolean | null
+          responsible_name: string | null
           risk_term_id: string
+          signature_data: string | null
+          signed_at: string | null
         }
         Insert: {
           birth_date?: string | null
@@ -1348,7 +1352,11 @@ export type Database = {
           created_at?: string
           full_name: string
           id?: string
+          is_adult?: boolean | null
+          responsible_name?: string | null
           risk_term_id: string
+          signature_data?: string | null
+          signed_at?: string | null
         }
         Update: {
           birth_date?: string | null
@@ -1356,7 +1364,11 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          is_adult?: boolean | null
+          responsible_name?: string | null
           risk_term_id?: string
+          signature_data?: string | null
+          signed_at?: string | null
         }
         Relationships: [
           {
@@ -1389,6 +1401,7 @@ export type Database = {
           has_diabetes: boolean | null
           has_fainting_convulsions: boolean | null
           has_immobilized_part: boolean | null
+          has_multiple_signers: boolean | null
           has_phobia: boolean | null
           has_special_needs: boolean | null
           health_questions: string[] | null
@@ -1432,6 +1445,7 @@ export type Database = {
           has_diabetes?: boolean | null
           has_fainting_convulsions?: boolean | null
           has_immobilized_part?: boolean | null
+          has_multiple_signers?: boolean | null
           has_phobia?: boolean | null
           has_special_needs?: boolean | null
           health_questions?: string[] | null
@@ -1475,6 +1489,7 @@ export type Database = {
           has_diabetes?: boolean | null
           has_fainting_convulsions?: boolean | null
           has_immobilized_part?: boolean | null
+          has_multiple_signers?: boolean | null
           has_phobia?: boolean | null
           has_special_needs?: boolean | null
           health_questions?: string[] | null
