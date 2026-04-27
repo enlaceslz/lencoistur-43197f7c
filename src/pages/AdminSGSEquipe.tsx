@@ -149,9 +149,21 @@ const AdminSGSEquipe = () => {
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
               </div>
             </div>
-            <div className="flex gap-3">
-              <button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">Salvar</button>
-              <button type="button" onClick={() => setShowForm(false)} className="bg-muted text-muted-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">Cancelar</button>
+            <div className="flex flex-wrap gap-6 items-center">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input type="checkbox" checked={form.blocked} onChange={e => setForm({ ...form, blocked: e.target.checked })} 
+                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary/20" />
+                <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">Membro Bloqueado (Suspenso)</span>
+              </label>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all">
+                {editId ? "Atualizar" : "Salvar Membro"}
+              </button>
+              <button type="button" onClick={() => { setShowForm(false); setEditId(null); }} 
+                className="bg-muted text-muted-foreground hover:bg-muted/80 px-8 py-2.5 rounded-xl text-sm font-bold transition-all">
+                Cancelar
+              </button>
             </div>
           </form>
         )}
