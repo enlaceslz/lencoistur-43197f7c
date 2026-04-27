@@ -166,7 +166,12 @@ const AdminReservas = () => {
       b.bookingCode.toLowerCase().includes(q) ||
       b.customerEmail.toLowerCase().includes(q);
     const matchStatus = statusFilter === "todos" || b.status === statusFilter;
-    return matchSearch && matchStatus;
+    
+    let matchDate = true;
+    if (dateStart) matchDate = matchDate && b.date >= dateStart;
+    if (dateEnd) matchDate = matchDate && b.date <= dateEnd;
+    
+    return matchSearch && matchStatus && matchDate;
   });
 
   const totalPago = bookings
