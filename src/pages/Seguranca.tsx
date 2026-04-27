@@ -1,6 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Shield, CheckCircle, AlertTriangle, Phone, FileText, Activity, Users, Award } from "lucide-react";
+import { Shield, CheckCircle, AlertTriangle, Phone, FileText, Activity, Users, Award, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
