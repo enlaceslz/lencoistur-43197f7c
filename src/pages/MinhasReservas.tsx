@@ -225,10 +225,11 @@ const MinhasReservas = () => {
                         />
                       )}
                       <button
-                        onClick={() => cancelBooking(b.id)}
-                        className="text-destructive text-sm font-semibold hover:underline"
+                        onClick={() => handleCancel(b.id)}
+                        disabled={isProcessing === b.id}
+                        className="text-destructive text-sm font-semibold hover:underline disabled:opacity-50"
                       >
-                        Cancelar
+                        {isProcessing === b.id ? "Processando..." : "Cancelar"}
                       </button>
                     </div>
                   )}
