@@ -32,7 +32,14 @@ const AdminSGSVeiculos = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.marca.trim() || !form.placa.trim()) { toast({ title: "Marca e placa obrigatórios", variant: "destructive" }); return; }
-    const payload = { ...form, ano: form.ano ? Number(form.ano) : null, capacidade: Number(form.capacidade), quilometragem: Number(form.quilometragem) };
+    const payload = { 
+      ...form, 
+      ano: form.ano ? Number(form.ano) : null, 
+      capacidade: form.capacidade ? Number(form.capacidade) : null, 
+      quilometragem: form.quilometragem ? Number(form.quilometragem) : 0,
+      seguro_validade: form.seguro_validade || null,
+      licenciamento_validade: form.licenciamento_validade || null
+    };
     let res;
     if (editId) {
       res = await supabase.from("sgs_veiculos").update(payload).eq("id", editId);
