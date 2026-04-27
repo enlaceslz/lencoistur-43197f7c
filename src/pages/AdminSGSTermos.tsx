@@ -380,9 +380,16 @@ const AdminSGSTermos = () => {
         </div>
 
         <div class="section">
-          <div class="section-title">Ciência e Declaração</div>
-          <p style="font-size: 11px;">Declaro que li todas as informações e recomendações, que respondi com veracidade e que minhas dúvidas foram sanadas. Comprometo-me a seguir as orientações da equipe. Tenho ciência dos riscos mencionados e isento a empresa de danos causados por atos próprios contrários às orientações.</p>
-          <p class="small" style="margin-top: 5px;"><strong>Observação:</strong> Nossa empresa opera de acordo com a legislação pertinente e detém todas as autorizações necessárias.</p>
+          <div class="section-title">Ciência e Declaração de Responsabilidade</div>
+          <p style="font-size: 10px; color: #444; margin-bottom: 5px;">
+            Declaro que li todas as informações e recomendações, que respondi com veracidade e que todas as minhas dúvidas foram sanadas. Comprometo-me a seguir rigorosamente as orientações da equipe técnica e condutores para garantir a segurança individual e do grupo.
+          </p>
+          <p style="font-size: 10px; color: #444; margin-bottom: 5px;">
+            Tenho plena ciência dos riscos mencionados e assumo a responsabilidade por atos próprios que contrariem as normas de segurança estabelecidas. Confirmo estar em condições físicas e psicológicas adequadas para a realização da atividade.
+          </p>
+          <p style="font-size: 10px; color: #444;">
+            <strong>Observação:</strong> Esta operação segue as normas da ABNT NBR ISO 21103 e demais legislações pertinentes ao turismo de aventura.
+          </p>
         </div>
 
         <div class="footer">
