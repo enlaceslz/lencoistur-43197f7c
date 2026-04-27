@@ -63,8 +63,8 @@ const AdminSGSTermos = () => {
   const load = async () => {
     setLoading(true);
     const [termsRes, customersRes, toursRes, vehiclesRes, companyRes] = await Promise.all([
-      supabase.from("sgs_risk_terms").select("*, customers(full_name, name), tours(name), sgs_veiculos(modelo)").order("created_at", { ascending: false }),
-      supabase.from("customers").select("id, name, full_name, cpf, birth_date, phone, email, address, city_state"),
+      supabase.from("sgs_risk_terms").select("*, customers(*), tours(name), sgs_veiculos(modelo)").order("created_at", { ascending: false }),
+      supabase.from("customers").select("*"),
       supabase.from("tours").select("id, name, description, duration, schedule, price_per_person"),
       supabase.from("sgs_veiculos").select("id, modelo, placa"),
       supabase.from("sgs_empresa").select("*").limit(1).maybeSingle(),
@@ -126,7 +126,6 @@ const AdminSGSTermos = () => {
     };
 
     const { data: termData, error } = await supabase.from("sgs_risk_terms").insert([termPayload as any]).select().single();
-
 
     if (error) {
       console.error(error);
@@ -198,18 +197,16 @@ const AdminSGSTermos = () => {
 
     const healthResponse = (val: boolean) => val ? "S" : "N";
 
-    // Fix customer data access
     const customerName = (term.customers as any)?.name || term.customer_name;
     const customerCityState = (term.customers as any)?.city && (term.customers as any)?.state 
       ? `${(term.customers as any).city}/${(term.customers as any).state}` 
       : term.city_state || "___";
 
-
     const html = `
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Termo de Conhecimento de Risco - ${term.customer_name}</title>
+        <title>Termo de Conhecimento de Risco - ${customerName}</title>
         <style>
           body { font-family: 'Arial', sans-serif; line-height: 1.4; color: #333; max-width: 800px; margin: 40px auto; padding: 20px; }
           .header { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
@@ -258,12 +255,12 @@ const AdminSGSTermos = () => {
         <div class="section">
           <div class="section-title">Informações do Cliente</div>
           <div class="grid">
-            <div><strong>Nome:</strong> ${term.customers?.full_name || term.customer_name}</div>
-            <div><strong>CPF/Passaporte:</strong> ${term.customers?.cpf || term.cpf || "___"}</div>
-            <div><strong>Data Nasc:</strong> ${term.customers?.birth_date ? format(new Date(term.customers.birth_date), "dd/MM/yyyy") : "___"}</div>
-            <div><strong>Telefone:</strong> ${term.customers?.phone || term.phone || "___"}</div>
-            <div><strong>Cidade/UF:</strong> ${term.customers?.city_state || term.city_state || "___"}</div>
-            <div><strong>E-mail:</strong> ${term.customers?.email || term.email || "___"}</div>
+            <div><strong>Nome:</strong> ${customerName}</div>
+            <div><strong>CPF/Passaporte:</strong> ${(term.customers as any)?.cpf || term.cpf || "___"}</div>
+            <div><strong>Data Nasc:</strong> ${(term.customers as any)?.birth_date ? format(new Date((term.customers as any).birth_date), "dd/MM/yyyy") : "___"}</div>
+            <div><strong>Telefone:</strong> ${(term.customers as any)?.phone || term.phone || "___"}</div>
+            <div><strong>Cidade/UF:</strong> ${customerCityState}</div>
+            <div><strong>E-mail:</strong> ${(term.customers as any)?.email || term.email || "___"}</div>
           </div>
           <p><strong>Contato de Emergência:</strong> ${term.emergency_contact_name || "___"} - Tel: ${term.emergency_contact_phone || "___"}</p>
         </div>
@@ -363,7 +360,7 @@ const AdminSGSTermos = () => {
                 >
                   <option value="">Selecione o Cliente</option>
                   {customers.map(c => (
-                    <option key={c.id} value={c.id}>{c.full_name || c.name}</option>
+                    <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
               </div>
