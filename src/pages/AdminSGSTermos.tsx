@@ -82,7 +82,7 @@ const AdminSGSTermos = () => {
   const addMinor = () => {
     if (!minorForm.full_name) return;
     setForm(f => ({ ...f, minors: [...f.minors, { ...minorForm, id: Math.random().toString() }] }));
-    setMinorForm({ full_name: "", cpf: "", birth_date: "" });
+    setMinorForm({ full_name: "", cpf: "", birth_date: "", is_adult: false, responsible_name: "" });
   };
 
   const removeMinor = (id: string) => {
