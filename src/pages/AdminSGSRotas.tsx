@@ -113,17 +113,48 @@ const AdminSGSRotas = () => {
             {filtered.map(r => {
               const dif = DIFICULDADE[r.dificuldade] || DIFICULDADE.moderado;
               return (
-                <div key={r.id} className="bg-card border border-border rounded-2xl p-5 cursor-pointer hover:shadow-md transition-shadow" onClick={() => openEdit(r)}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-bold text-foreground text-sm">{r.nome}</span>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${dif.color}`}>{dif.label}</span>
+                <div key={r.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-muted rounded-lg">
+                        <Map size={18} className="text-primary" />
+                      </div>
+                      <span className="font-bold text-foreground text-sm">{r.nome}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${dif.color}`}>{dif.label}</span>
+                      <div className="flex gap-1">
+                        <button onClick={() => openEdit(r)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors">
+                          <Pencil size={14} />
+                        </button>
+                        <button onClick={() => handleDelete(r.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-muted-foreground space-y-1">
-                    <p>Tipo: {r.tipo} {r.distancia_km && `· ${r.distancia_km} km`} {r.duracao_estimada && `· ${r.duracao_estimada}`}</p>
-                    {r.capacidade_maxima && <p>Capacidade: {r.capacidade_maxima} pessoas</p>}
-                    {r.descricao && <p className="line-clamp-2">{r.descricao}</p>}
+                  <div className="text-xs text-muted-foreground space-y-2">
+                    <div className="flex flex-wrap gap-x-3 gap-y-1">
+                      <span className="flex items-center gap-1 capitalize">
+                        <Footprints size={12} /> {r.tipo.replace("_", " ")}
+                      </span>
+                      {r.distancia_km && (
+                        <span className="flex items-center gap-1">
+                          📍 {r.distancia_km} km
+                        </span>
+                      )}
+                      {r.duracao_estimada && (
+                        <span className="flex items-center gap-1">
+                          <Clock size={12} /> {r.duracao_estimada}
+                        </span>
+                      )}
+                    </div>
+                    {r.descricao && <p className="line-clamp-2 italic text-[11px] leading-relaxed">"{r.descricao}"</p>}
                   </div>
-                  <span className={`mt-2 inline-block text-[10px] px-2 py-0.5 rounded-full font-medium ${r.status === "ativa" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{r.status}</span>
+                  <div className="mt-3 pt-3 border-t border-border flex items-center justify-between">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${r.status === "ativa" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{r.status}</span>
+                    {r.capacidade_maxima && <span className="text-[10px] text-muted-foreground font-medium">Capacidade: {r.capacidade_maxima}</span>}
+                  </div>
                 </div>
               );
             })}
