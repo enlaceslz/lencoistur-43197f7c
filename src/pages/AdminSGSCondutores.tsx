@@ -37,13 +37,37 @@ const AdminSGSCondutores = () => {
   };
 
   const openEdit = (c: any) => {
-    setForm({ nome: c.nome, cpf: c.cpf || "", cnh_numero: c.cnh_numero || "", cnh_categoria: c.cnh_categoria || "B", cnh_validade: c.cnh_validade || "", telefone: c.telefone || "", email: c.email || "", primeiros_socorros: c.primeiros_socorros, off_road: c.off_road, status: c.status, observacoes: c.observacoes || "" });
+    setForm({
+      nome: c.nome,
+      cpf: c.cpf || "",
+      cnh_numero: c.cnh_numero || "",
+      cnh_categoria: c.cnh_categoria || "B",
+      cnh_validade: c.cnh_validade || "",
+      telefone: c.telefone || "",
+      email: c.email || "",
+      primeiros_socorros: !!c.primeiros_socorros,
+      off_road: !!c.off_road,
+      status: c.status || "ativo",
+      observacoes: c.observacoes || ""
+    });
     setEditId(c.id);
     setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir este condutor?")) return;
+    const { error } = await supabase.from("sgs_condutores").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Condutor excluído com sucesso!" });
+      load();
+    }
   };
 
   const cnhExpired = (d: string | null) => d && new Date(d) < new Date();
-  const filtered = condutores.filter(c => c.nome.toLowerCase().includes(search.toLowerCase()));
+  const filtered = condutores.filter(c => c.nome.toLowerCase().includes(search.toLowerCase()) || (c.cpf && c.cpf.includes(search)));
   const set = (k: string, v: any) => {
     let value = v;
     if (k === "cpf") value = maskCPF(v);
