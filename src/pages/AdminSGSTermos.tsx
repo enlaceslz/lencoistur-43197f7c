@@ -396,7 +396,10 @@ const AdminSGSTermos = () => {
             />
           </div>
           <button 
-            onClick={() => setShowForm(!showForm)}
+            onClick={() => {
+              if (!showForm) resetForm();
+              setShowForm(!showForm);
+            }}
             className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
           >
             {showForm ? <XCircle size={16} /> : <Plus size={16} />} 
