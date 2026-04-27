@@ -346,7 +346,7 @@ const TermoAssinatura = () => {
       if (docError) throw docError;
 
       // 5. Update term with PDF URL
-      await supabase.from("sgs_risk_terms").update({ pdf_url: filePath }).eq("id", termData.id);
+      await supabase.from("sgs_risk_terms").update({ pdf_url: filePath }).eq("id", currentTermId);
 
       // 6. Send Email
       try {
