@@ -44,9 +44,21 @@ const AdminSGSRotas = () => {
     setForm({ nome: r.nome, tipo: r.tipo, descricao: r.descricao || "", distancia_km: r.distancia_km?.toString() || "", duracao_estimada: r.duracao_estimada || "", dificuldade: r.dificuldade || "moderado", capacidade_maxima: r.capacidade_maxima?.toString() || "", status: r.status, observacoes: r.observacoes || "" });
     setEditId(r.id);
     setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const filtered = rotas.filter(r => r.nome.toLowerCase().includes(search.toLowerCase()));
+  const handleDelete = async (id: string) => {
+    if (!confirm("Excluir esta rota?")) return;
+    const { error } = await supabase.from("sgs_rotas").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Rota excluída!" });
+      load();
+    }
+  };
+
+  const filtered = rotas.filter(r => r.nome.toLowerCase().includes(search.toLowerCase()) || r.tipo.toLowerCase().includes(search.toLowerCase()));
   const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
 
   return (
