@@ -55,7 +55,7 @@ const AdminSGSTermos = () => {
     minors: [] as any[],
   });
 
-  const [minorForm, setMinorForm] = useState({ full_name: "", cpf: "", birth_date: "" });
+  const [minorForm, setMinorForm] = useState({ full_name: "", cpf: "", birth_date: "", is_adult: false, responsible_name: "" });
 
   useEffect(() => {
     load();
@@ -82,7 +82,7 @@ const AdminSGSTermos = () => {
   const addMinor = () => {
     if (!minorForm.full_name) return;
     setForm(f => ({ ...f, minors: [...f.minors, { ...minorForm, id: Math.random().toString() }] }));
-    setMinorForm({ full_name: "", cpf: "", birth_date: "" });
+    setMinorForm({ full_name: "", cpf: "", birth_date: "", is_adult: false, responsible_name: "" });
   };
 
   const removeMinor = (id: string) => {
@@ -197,6 +197,8 @@ const AdminSGSTermos = () => {
           full_name: m.full_name,
           cpf: m.cpf,
           birth_date: m.birth_date || null,
+          is_adult: m.is_adult || false,
+          responsible_name: m.responsible_name || null
         }));
         await supabase.from("sgs_risk_term_minors").insert(minorsPayload);
       }
@@ -254,8 +256,15 @@ const AdminSGSTermos = () => {
     const formattedDate = format(new Date(term.term_date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
     
     const minorsHtml = term.sgs_risk_term_minors?.map((m: any, i: number) => `
-      <p style="margin: 5px 0;">${i + 1}- ${m.full_name}, ${m.cpf ? `CPF: ${m.cpf}` : ""}, Data Nasc: ${m.birth_date ? format(new Date(m.birth_date), "dd/MM/yyyy") : "___"}</p>
-    `).join("") || "Nenhum menor declarado.";
+      <div style="margin: 8px 0; padding-bottom: 5px; border-bottom: 1px solid #f0f0f0;">
+        <p style="margin: 2px 0;"><strong>${i + 1}- ${m.full_name}</strong> ${m.is_adult ? "(Maior de Idade)" : "(Menor de Idade)"}</p>
+        <p style="margin: 2px 0; font-size: 10px; color: #666;">
+          ${m.cpf ? `CPF: ${m.cpf}` : ""} ${m.birth_date ? `| Nasc: ${format(new Date(m.birth_date), "dd/MM/yyyy")}` : ""} 
+          ${!m.is_adult && m.responsible_name ? `| Responsável: ${m.responsible_name}` : ""}
+        </p>
+        ${m.signature_data ? `<div style="margin-top: 5px;"><img src="${m.signature_data}" style="height: 40px;" /><br/><span style="font-size: 8px;">Assinado em ${format(new Date(m.signed_at), "dd/MM/yyyy HH:mm")}</span></div>` : ""}
+      </div>
+    `).join("") || "Nenhum acompanhante declarado.";
 
     const healthResponse = (val: boolean) => val ? "S" : "N";
 
@@ -516,11 +525,11 @@ const AdminSGSTermos = () => {
             </div>
 
             <div className="space-y-4">
-              <h4 className="text-sm font-bold flex items-center gap-2 border-t pt-4"><Users size={16} /> Acompanhantes Menores de Idade</h4>
+              <h4 className="text-sm font-bold flex items-center gap-2 border-t pt-4"><Users size={16} /> Acompanhantes</h4>
               <div className="bg-muted p-4 rounded-2xl space-y-4">
-                <div className="grid sm:grid-cols-3 gap-3">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   <input 
-                    placeholder="Nome completo do menor"
+                    placeholder="Nome completo"
                     value={minorForm.full_name}
                     onChange={e => setMinorForm({ ...minorForm, full_name: e.target.value })}
                     className="bg-background border border-border rounded-xl px-3 py-2 text-xs outline-none"
@@ -531,27 +540,98 @@ const AdminSGSTermos = () => {
                     onChange={e => setMinorForm({ ...minorForm, cpf: e.target.value })}
                     className="bg-background border border-border rounded-xl px-3 py-2 text-xs outline-none"
                   />
-                  <div className="flex gap-2">
-                    <input 
-                      type="date"
-                      value={minorForm.birth_date}
-                      onChange={e => setMinorForm({ ...minorForm, birth_date: e.target.value })}
-                      className="flex-1 bg-background border border-border rounded-xl px-3 py-2 text-xs outline-none"
-                    />
+                  <input 
+                    type="date"
+                    value={minorForm.birth_date}
+                    onChange={e => {
+                      const birthDate = e.target.value;
+                      let isAdult = false;
+                      if (birthDate) {
+                        const birth = new Date(birthDate);
+                        const today = new Date();
+                        let age = today.getFullYear() - birth.getFullYear();
+                        const m = today.getMonth() - birth.getMonth();
+                        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+                          age--;
+                        }
+                        isAdult = age >= 18;
+                      }
+                      setMinorForm({ ...minorForm, birth_date: birthDate, is_adult: isAdult });
+                    }}
+                    className="bg-background border border-border rounded-xl px-3 py-2 text-xs outline-none"
+                  />
+                  <div className="flex items-center gap-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input 
+                        type="checkbox"
+                        checked={minorForm.is_adult}
+                        onChange={e => setMinorForm({ ...minorForm, is_adult: e.target.checked })}
+                        className="w-4 h-4 rounded border-border text-primary"
+                      />
+                      <span className="text-[10px] font-semibold uppercase">Maior de Idade</span>
+                    </label>
+                  </div>
+                </div>
+
+                {!minorForm.is_adult && (
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">Quem é o responsável?</label>
+                      <select
+                        value={minorForm.responsible_name}
+                        onChange={e => setMinorForm({ ...minorForm, responsible_name: e.target.value })}
+                        className="w-full bg-background border border-border rounded-xl px-3 py-2 text-xs outline-none"
+                      >
+                        <option value="">Selecione o Responsável</option>
+                        {/* Option 1: The main customer */}
+                        {customers.find(c => c.id === form.customer_id) && (
+                          <option value={customers.find(c => c.id === form.customer_id).name}>
+                            {customers.find(c => c.id === form.customer_id).name} (Cliente Principal)
+                          </option>
+                        )}
+                        {/* Option 2: Other adult companions already added */}
+                        {form.minors.filter(m => m.is_adult).map(adult => (
+                          <option key={adult.id} value={adult.full_name}>
+                            {adult.full_name} (Acompanhante Adulto)
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex items-end">
+                      <button 
+                        type="button" 
+                        onClick={addMinor}
+                        className="w-full bg-primary text-primary-foreground py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2"
+                      >
+                        <UserPlus size={16} /> Adicionar Acompanhante
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {minorForm.is_adult && (
+                  <div className="flex justify-end">
                     <button 
                       type="button" 
                       onClick={addMinor}
-                      className="bg-primary text-primary-foreground p-2 rounded-xl"
+                      className="bg-primary text-primary-foreground px-6 py-2 rounded-xl text-xs font-bold flex items-center gap-2"
                     >
-                      <UserPlus size={18} />
+                      <UserPlus size={16} /> Adicionar Acompanhante Adulto
                     </button>
                   </div>
-                </div>
+                )}
+
                 {form.minors.length > 0 && (
                   <div className="space-y-2 pt-2">
                     {form.minors.map(m => (
                       <div key={m.id} className="flex items-center justify-between bg-background border border-border px-3 py-2 rounded-lg text-xs">
-                        <span>{m.full_name} {m.cpf ? `(${m.cpf})` : ""} {m.birth_date ? `• ${format(new Date(m.birth_date), "dd/MM/yyyy")}` : ""}</span>
+                        <div className="flex flex-col">
+                          <span className="font-bold">{m.full_name} {m.is_adult ? "(Adulto)" : "(Menor)"}</span>
+                          <span className="text-[10px] text-muted-foreground">
+                            {m.birth_date ? `Nascimento: ${format(new Date(m.birth_date), "dd/MM/yyyy")}` : ""} 
+                            {!m.is_adult && m.responsible_name ? ` • Responsável: ${m.responsible_name}` : ""}
+                          </span>
+                        </div>
                         <button type="button" onClick={() => removeMinor(m.id)} className="text-destructive"><Trash2 size={14} /></button>
                       </div>
                     ))}

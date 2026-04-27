@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Shield, CheckCircle, AlertTriangle, FileText, Pencil, Trash2 } from "lucide-react";
+import { Shield, CheckCircle, AlertTriangle, FileText, Pencil, Trash2, Users } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
@@ -49,12 +49,15 @@ const TermoAssinatura = () => {
   const bookingCode = params.get("booking") || "";
   
   const [booking, setBooking] = useState<any>(null);
+  const [term, setTerm] = useState<any>(null);
+  const [companions, setCompanions] = useState<any[]>([]);
   const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [signing, setSigning] = useState(false);
   const [signed, setSigned] = useState(false);
   const [acceptedRisks, setAcceptedRisks] = useState<string[]>([]);
   const [healthInfo, setHealthInfo] = useState<string[]>([]);
+  const [signatures, setSignatures] = useState<{[key: string]: string}>({});
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -77,15 +80,34 @@ const TermoAssinatura = () => {
     if (bookingRes.data) {
       setBooking(bookingRes.data);
       setCompany(companyRes.data);
-      // Check if already signed
+      
+      // Check if term already exists for this booking
       const { data: termData } = await supabase
         .from("sgs_risk_terms")
-        .select("id")
+        .select("*")
         .eq("booking_id", bookingRes.data.id)
         .maybeSingle();
       
       if (termData) {
-        setSigned(true);
+        setTerm(termData);
+        setAcceptedRisks(termData.risks_informed || []);
+        setHealthInfo(termData.health_questions || []);
+        
+        // Load companions
+        const { data: companionsData } = await supabase
+          .from("sgs_risk_term_minors")
+          .select("*")
+          .eq("risk_term_id", termData.id);
+        
+        if (companionsData) {
+          setCompanions(companionsData);
+        }
+
+        // If everyone has signed, mark as signed
+        const adultsNeedSigning = companionsData?.filter(c => c.is_adult && !c.signature_data).length === 0;
+        if (termData.signature_data && adultsNeedSigning) {
+          setSigned(true);
+        }
       }
     }
     setLoading(false);
@@ -155,36 +177,69 @@ const TermoAssinatura = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     
-    // Check if canvas is empty (simplified)
+    // Check main signature
     const blank = document.createElement('canvas');
     blank.width = canvas.width;
     blank.height = canvas.height;
     if (canvas.toDataURL() === blank.toDataURL()) {
-      toast({ title: "Assinatura necessária", description: "Por favor, assine no campo indicado.", variant: "destructive" });
+      toast({ title: "Assinatura necessária", description: "O participante principal deve assinar no campo indicado.", variant: "destructive" });
       return;
+    }
+
+    // Check companion signatures if any adult
+    const adultCompanions = companions.filter(c => c.is_adult);
+    for (const companion of adultCompanions) {
+      if (!signatures[companion.id] && !companion.signature_data) {
+        toast({ title: "Assinatura pendente", description: `O acompanhante ${companion.full_name} deve assinar.`, variant: "destructive" });
+        return;
+      }
     }
 
     setSigning(true);
     const signatureData = canvas.toDataURL();
 
     try {
-      // 1. Save term record
-      const { data: termData, error: termError } = await supabase.from("sgs_risk_terms").insert({
-        booking_id: booking.id,
-        customer_name: booking.customers?.name || booking.customer_name,
-        nationality: booking.customers?.nationality || "BR",
-        phone: booking.customers?.phone || booking.customer_phone,
-        tour_name: booking.item_name,
-        risks_informed: acceptedRisks,
-        health_questions: healthInfo,
-        safety_controls_informed: true,
-        accepted: true,
-        signature_data: signatureData,
-        signed_at: new Date().toISOString(),
-        cancellation_policy: "Conforme política da agência aceita no momento da reserva."
-      }).select().single();
+      let currentTermId = term?.id;
 
-      if (termError) throw termError;
+      if (!currentTermId) {
+        // 1. Save term record if it doesn't exist
+        const { data: termData, error: termError } = await supabase.from("sgs_risk_terms").insert({
+          booking_id: booking.id,
+          customer_name: booking.customers?.name || booking.customer_name,
+          nationality: booking.customers?.nationality || "BR",
+          phone: booking.customers?.phone || booking.customer_phone,
+          tour_name: booking.item_name,
+          risks_informed: acceptedRisks,
+          health_questions: healthInfo,
+          safety_controls_informed: true,
+          accepted: true,
+          signature_data: signatureData,
+          signed_at: new Date().toISOString(),
+          cancellation_policy: "Conforme política da agência aceita no momento da reserva."
+        }).select().single();
+
+        if (termError) throw termError;
+        currentTermId = termData.id;
+      } else {
+        // Update existing term
+        const { error: termError } = await supabase.from("sgs_risk_terms").update({
+          risks_informed: acceptedRisks,
+          health_questions: healthInfo,
+          signature_data: signatureData,
+          signed_at: new Date().toISOString(),
+          accepted: true
+        }).eq("id", currentTermId);
+
+        if (termError) throw termError;
+      }
+
+      // 2. Update companion signatures
+      for (const companionId in signatures) {
+        await supabase.from("sgs_risk_term_minors").update({
+          signature_data: signatures[companionId],
+          signed_at: new Date().toISOString()
+        }).eq("id", companionId);
+      }
 
       // 2. Generate PDF
       const doc = new jsPDF();
@@ -245,7 +300,29 @@ const TermoAssinatura = () => {
       const healthText = healthInfo.length > 0 ? `Condições informadas: ${healthInfo.join(", ")}` : "Nenhuma condição de saúde informada pelo participante.";
       doc.text(healthText, 14, currentY, { maxWidth: pageWidth - 28 });
       
-      currentY += 20;
+      currentY += 15;
+
+      // Companions
+      if (companions.length > 0) {
+        doc.setFontSize(14);
+        doc.text("Acompanhantes", 14, currentY);
+        currentY += 5;
+        const companionsRows = companions.map(c => [
+          c.full_name, 
+          c.is_adult ? "Adulto" : "Menor", 
+          c.is_adult ? (signatures[c.id] || c.signature_data ? "Assinado" : "Pendente") : `Resp: ${c.responsible_name || '-'}`
+        ]);
+        (doc as any).autoTable({
+          startY: currentY,
+          head: [['Nome', 'Tipo', 'Status / Resp.']],
+          body: companionsRows,
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 2 }
+        });
+        currentY = (doc as any).lastAutoTable.finalY + 15;
+      }
+      
+      currentY += 5;
       
       // Declaration
       doc.setFontSize(12);
@@ -291,7 +368,7 @@ const TermoAssinatura = () => {
       if (docError) throw docError;
 
       // 5. Update term with PDF URL
-      await supabase.from("sgs_risk_terms").update({ pdf_url: filePath }).eq("id", termData.id);
+      await supabase.from("sgs_risk_terms").update({ pdf_url: filePath }).eq("id", currentTermId);
 
       // 6. Send Email
       try {
@@ -475,6 +552,135 @@ const TermoAssinatura = () => {
                 Ciente de todos os riscos acima
               </button>
             </div>
+
+            {/* Companions Section */}
+            {companions.length > 0 && (
+              <div className="space-y-4 border-t border-border pt-6">
+                <div className="flex items-center gap-2 text-foreground">
+                  <Users size={18} className="text-primary" />
+                  <h3 className="font-bold">Acompanhantes</h3>
+                </div>
+                <div className="space-y-3">
+                  {companions.map(companion => (
+                    <div key={companion.id} className="bg-muted/30 border border-border/50 rounded-2xl p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <p className="text-sm font-bold">{companion.full_name}</p>
+                          <p className="text-[10px] text-muted-foreground uppercase font-semibold">
+                            {companion.is_adult ? "Maior de Idade" : `Menor de Idade • Responsável: ${companion.responsible_name || 'Não informado'}`}
+                          </p>
+                        </div>
+                        {companion.is_adult && (
+                          <div className="flex flex-col items-end">
+                            {companion.signature_data ? (
+                              <span className="text-[10px] bg-green-500/10 text-green-600 px-2 py-0.5 rounded-full font-bold">ASSINADO</span>
+                            ) : (
+                              <span className="text-[10px] bg-amber-500/10 text-amber-600 px-2 py-0.5 rounded-full font-bold">ASSINATURA PENDENTE</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {companion.is_adult && !companion.signature_data && (
+                        <div className="mt-3 space-y-2">
+                          <p className="text-[10px] font-bold text-muted-foreground uppercase">Assinatura do Acompanhante:</p>
+                          <div className="bg-white rounded-xl border border-border overflow-hidden h-32 relative">
+                            <canvas 
+                              id={`canvas-${companion.id}`}
+                              className="w-full h-full cursor-crosshair touch-none"
+                              onMouseDown={(e) => {
+                                const canvas = e.currentTarget;
+                                const ctx = canvas.getContext('2d');
+                                if (!ctx) return;
+                                ctx.lineWidth = 2;
+                                ctx.lineCap = 'round';
+                                ctx.strokeStyle = '#000';
+                                const rect = canvas.getBoundingClientRect();
+                                let lastX = e.clientX - rect.left;
+                                let lastY = e.clientY - rect.top;
+                                ctx.beginPath();
+                                ctx.moveTo(lastX, lastY);
+
+                                const handleMouseMove = (moveEvent: MouseEvent) => {
+                                  const x = moveEvent.clientX - rect.left;
+                                  const y = moveEvent.clientY - rect.top;
+                                  ctx.lineTo(x, y);
+                                  ctx.stroke();
+                                };
+
+                                const handleMouseUp = () => {
+                                  window.removeEventListener('mousemove', handleMouseMove);
+                                  window.removeEventListener('mouseup', handleMouseUp);
+                                  setSignatures(prev => ({ ...prev, [companion.id]: canvas.toDataURL() }));
+                                };
+
+                                window.addEventListener('mousemove', handleMouseMove);
+                                window.addEventListener('mouseup', handleMouseUp);
+                              }}
+                              onTouchStart={(e) => {
+                                const canvas = e.currentTarget;
+                                const ctx = canvas.getContext('2d');
+                                if (!ctx) return;
+                                ctx.lineWidth = 2;
+                                ctx.lineCap = 'round';
+                                ctx.strokeStyle = '#000';
+                                const rect = canvas.getBoundingClientRect();
+                                let lastX = e.touches[0].clientX - rect.left;
+                                let lastY = e.touches[0].clientY - rect.top;
+                                ctx.beginPath();
+                                ctx.moveTo(lastX, lastY);
+
+                                const handleTouchMove = (moveEvent: TouchEvent) => {
+                                  moveEvent.preventDefault();
+                                  const x = moveEvent.touches[0].clientX - rect.left;
+                                  const y = moveEvent.touches[0].clientY - rect.top;
+                                  ctx.lineTo(x, y);
+                                  ctx.stroke();
+                                };
+
+                                const handleTouchEnd = () => {
+                                  window.removeEventListener('touchmove', handleTouchMove);
+                                  window.removeEventListener('touchend', handleTouchEnd);
+                                  setSignatures(prev => ({ ...prev, [companion.id]: canvas.toDataURL() }));
+                                };
+
+                                window.addEventListener('touchmove', handleTouchMove, { passive: false });
+                                window.addEventListener('touchend', handleTouchEnd);
+                              }}
+                            />
+                            <button 
+                              type="button"
+                              onClick={(e) => {
+                                const canvas = document.getElementById(`canvas-${companion.id}`) as HTMLCanvasElement;
+                                if (canvas) {
+                                  const ctx = canvas.getContext('2d');
+                                  ctx?.clearRect(0, 0, canvas.width, canvas.height);
+                                  setSignatures(prev => {
+                                    const next = { ...prev };
+                                    delete next[companion.id];
+                                    return next;
+                                  });
+                                }
+                              }}
+                              className="absolute bottom-2 right-2 p-1.5 bg-muted/80 rounded-lg text-muted-foreground hover:text-destructive transition-colors"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {companion.signature_data && (
+                        <div className="mt-2 flex flex-col items-center border-t border-dashed pt-2">
+                           <img src={companion.signature_data} alt="Assinatura" className="h-12 object-contain" />
+                           <p className="text-[8px] text-muted-foreground">Assinado em {new Date(companion.signed_at).toLocaleString('pt-BR')}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Signature Area */}
             <div className="space-y-4 border-t border-border pt-6">
