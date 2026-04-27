@@ -132,7 +132,7 @@ const AdminSGSPesquisas = () => {
             <p className="text-center text-muted-foreground py-8">Nenhuma pesquisa registrada</p>
           ) : surveys.map(s => (
             <div key={s.id} className={`bg-card border rounded-2xl p-5 ${s.danger_situations ? "border-destructive" : "border-border"}`}>
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-start gap-4">
                 <div className="flex items-center gap-3">
                   {s.danger_situations ? (
                     <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
