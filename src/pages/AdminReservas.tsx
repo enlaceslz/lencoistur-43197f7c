@@ -415,6 +415,16 @@ const AdminReservas = () => {
                       <Phone size={14} /> {selected.customerPhone}
                     </span>
                   )}
+                  {selected.cpf && (
+                    <span className="flex items-center gap-2 text-muted-foreground text-xs">
+                      <FileText size={12} /> CPF: {selected.cpf}
+                    </span>
+                  )}
+                  {selected.passport && (
+                    <span className="flex items-center gap-2 text-muted-foreground text-xs">
+                      <FileText size={12} /> Passaporte: {selected.passport}
+                    </span>
+                  )}
                 </div>
               </div>
 
