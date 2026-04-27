@@ -312,15 +312,33 @@ const AdminSGSTermos = () => {
 
         <div class="section">
           <div class="section-title">Informações e Recomendações</div>
-          <p class="small">A atividade não requer nenhuma habilidade específica, mas recomenda-se: saber nadar (teremos paradas para banhos nas lagoas); vestir-se com traje de banho, roupas e calçados confortáveis; levar uma toalha (ou canga), um casaco corta-vento, chapéu ou boné, óculos de sol, REPELENTE e PROTETOR SOLAR; não usar acessórios (brincos, relógios, pulseiras, anéis, etc.); precaver-se com água e lanche.</p>
-          <p class="small">Durante todo o percurso não há sanitários disponíveis, apenas no local de embarque e restaurantes.</p>
+          <div style="font-size: 10px; color: #444;">
+            <p>A atividade não requer habilidades técnicas avançadas, mas para sua melhor experiência recomendamos:</p>
+            <ul style="margin-top: 5px; padding-left: 15px;">
+              <li>Saber nadar (haverá paradas para banho em lagoas e rios);</li>
+              <li>Trajes de banho, roupas leves e calçados que possam molhar;</li>
+              <li>Levar: toalha, casaco corta-vento, chapéu/boné e óculos de sol;</li>
+              <li><strong>Indispensável:</strong> REPELENTE e PROTETOR SOLAR;</li>
+              <li>Evitar acessórios (brincos, relógios, anéis) para prevenir perdas ou acidentes;</li>
+              <li>Portar água potável e lanche leve para o percurso.</li>
+            </ul>
+            <p style="margin-top: 5px; font-style: italic;">Nota: Sanitários disponíveis apenas no local de embarque e em restaurantes selecionados.</p>
+          </div>
         </div>
 
         <div class="section">
           <div class="section-title">Riscos e Cuidados com a Segurança</div>
-          <p class="small">Informamos que os riscos inerentes ao passeio fora de estrada na Rota das Emoções são, principalmente: insolação, hipotermia, picadas de insetos, mau tempo, perda de objetos pessoais, capotamento, colisão com outro veículo, quedas na água, ingestão ou respiração de água, afogamento e até lesões graves ou gravíssimas.</p>
-          <p class="small">Para contornar essas situações adotamos controles operacionais: capacitação constante da nossa equipe de condutores, cabo de resgate, orientações aos clientes e equipe preparada para realizar resgates e atendimento de primeiros socorros, condizentes com o nosso Plano de Resposta a Emergências (PRE).</p>
-          <p class="small">Por segurança, se necessário, a atividade poderá ser interrompida por nossa equipe no caso de condições climáticas não favoráveis (chuva excessiva, ventos fortes, queda de granizo, neblina, serração, incidentes com os condutores).</p>
+          <div style="font-size: 10px; color: #444;">
+            <p>Os riscos inerentes ao passeio off-road na Rota das Emoções incluem: insolação, variações térmicas (hipotermia), picadas de insetos, mudanças climáticas bruscas, perda de objetos, incidentes veiculares (capotamento/colisão) e riscos aquáticos.</p>
+            <p style="margin-top: 5px;"><strong>Nossas Medidas de Segurança:</strong></p>
+            <ul style="padding-left: 15px;">
+              <li>Condutores com certificação e treinamento contínuo;</li>
+              <li>Equipamentos de resgate e comunicação em todas as viaturas;</li>
+              <li>Equipe preparada para Primeiros Socorros e Resgate;</li>
+              <li>Plano de Resposta a Emergências (PRE) rigorosamente seguido.</li>
+            </ul>
+            <p style="margin-top: 5px; font-weight: bold;">A atividade poderá ser interrompida a qualquer momento por decisão técnica em caso de condições climáticas adversas ou riscos à integridade do grupo.</p>
+          </div>
         </div>
 
         <div class="section">
