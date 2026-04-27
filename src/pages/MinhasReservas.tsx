@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Calendar, Users, Copy, QrCode, Clock, CheckCircle, XCircle, AlertCircle, Printer } from "lucide-react";
+import { Calendar, Users, Copy, QrCode, Clock, CheckCircle, XCircle, AlertCircle, Printer, LogIn } from "lucide-react";
 import { useBookings } from "@/hooks/useBookings";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { PrintReceiptButton } from "@/components/BookingReceipt";
 
@@ -21,14 +22,58 @@ const formatPhone = (v: string) => {
 };
 
 const MinhasReservas = () => {
-  const { bookings, confirmPayment, cancelBooking } = useBookings();
+  const { user, loading: authLoading } = useAuth();
+  const { bookings, loading: bookingsLoading, confirmPayment, cancelBooking } = useBookings();
   const [filter, setFilter] = useState("todas");
+  const [isProcessing, setIsProcessing] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const filtered = filter === "todas" ? bookings : bookings.filter((b) => b.status === filter);
 
   const copyPix = (code: string) => {
     navigator.clipboard.writeText(code);
     toast({ title: "Código PIX copiado!", description: "Cole no app do seu banco." });
+  };
+
+  const handleCancel = async (id: string) => {
+    if (!confirm("Tem certeza que deseja cancelar esta reserva?")) return;
+    
+    setIsProcessing(id);
+    try {
+      await cancelBooking(id);
+      toast({ 
+        title: "Reserva cancelada", 
+        description: "Sua reserva foi cancelada com sucesso." 
+      });
+    } catch (error) {
+      console.error("Erro ao cancelar reserva:", error);
+      toast({ 
+        title: "Erro ao cancelar", 
+        description: "Não foi possível cancelar sua reserva. Entre em contato pelo WhatsApp.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(null);
+    }
+  };
+
+  const handleSimulatePayment = async (id: string) => {
+    setIsProcessing(id);
+    try {
+      await confirmPayment(id);
+      toast({ 
+        title: "Pagamento confirmado", 
+        description: "Pagamento simulado com sucesso!" 
+      });
+    } catch (error) {
+      toast({ 
+        title: "Erro ao processar", 
+        description: "Ocorreu um erro ao simular o pagamento.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(null);
+    }
   };
 
   return (
@@ -115,17 +160,19 @@ const MinhasReservas = () => {
                             <Copy size={14} /> Copiar PIX
                           </button>
                           <button
-                            onClick={() => confirmPayment(b.id)}
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-xl text-sm font-semibold transition-colors"
+                            onClick={() => handleSimulatePayment(b.id)}
+                            disabled={isProcessing === b.id}
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
                           >
-                            Simular Pagamento
+                            {isProcessing === b.id ? "Processando..." : "Simular Pagamento"}
                           </button>
                         </div>
                       </div>
                       <div className="mt-3 flex gap-3">
                         <button
-                          onClick={() => cancelBooking(b.id)}
-                          className="text-destructive text-sm font-semibold hover:underline"
+                          onClick={() => handleCancel(b.id)}
+                          disabled={isProcessing === b.id}
+                          className="text-destructive text-sm font-semibold hover:underline disabled:opacity-50"
                         >
                           Cancelar Reserva
                         </button>
@@ -181,10 +228,11 @@ const MinhasReservas = () => {
                         />
                       )}
                       <button
-                        onClick={() => cancelBooking(b.id)}
-                        className="text-destructive text-sm font-semibold hover:underline"
+                        onClick={() => handleCancel(b.id)}
+                        disabled={isProcessing === b.id}
+                        className="text-destructive text-sm font-semibold hover:underline disabled:opacity-50"
                       >
-                        Cancelar
+                        {isProcessing === b.id ? "Processando..." : "Cancelar"}
                       </button>
                     </div>
                   )}
@@ -200,7 +248,26 @@ const MinhasReservas = () => {
               );
             })}
 
-            {filtered.length === 0 && (
+            {(authLoading || bookingsLoading) ? (
+              <div className="text-center py-20">
+                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Carregando suas reservas...</p>
+              </div>
+            ) : !user ? (
+              <div className="text-center py-16 bg-card border border-border rounded-2xl">
+                <LogIn size={48} className="mx-auto text-primary/40 mb-4" />
+                <h2 className="text-xl font-bold text-foreground mb-2">Acesse sua conta</h2>
+                <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
+                  Faça login para visualizar e gerenciar suas reservas.
+                </p>
+                <button 
+                  onClick={() => navigate("/admin/login")}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors inline-block"
+                >
+                  Entrar na Conta
+                </button>
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="text-center py-16">
                 <AlertCircle size={48} className="mx-auto text-muted-foreground/40 mb-4" />
                 <p className="text-lg text-muted-foreground mb-4">
@@ -210,7 +277,7 @@ const MinhasReservas = () => {
                   Explorar Passeios
                 </Link>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

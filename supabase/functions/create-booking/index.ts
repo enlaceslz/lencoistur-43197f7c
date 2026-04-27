@@ -84,11 +84,24 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Use service role to bypass RLS - server-side only
+    // Get the user ID from the authorization header if present
+    const authHeader = req.headers.get("Authorization");
+    let userId = null;
+
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
+
+    if (authHeader) {
+      const supabaseClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } }
+      );
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      userId = user?.id;
+    }
 
     // Look up the actual price and pix_discount from the database
     let unitPrice: number;
@@ -160,6 +173,7 @@ Deno.serve(async (req) => {
         .from("bookings")
         .insert({
           customer_id: customerId,
+          user_id: userId,
           type,
           item_name: itemName,
           date: date || null,

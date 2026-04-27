@@ -136,31 +136,35 @@ export function useBookings() {
   );
 
   const confirmPayment = useCallback(async (id: string) => {
-    await supabase
+    const { error } = await supabase
       .from("bookings")
       .update({ status: "confirmada", payment_status: "pago" })
       .eq("id", id);
+    if (error) throw error;
   }, []);
 
   const cancelBooking = useCallback(async (id: string) => {
-    await supabase
+    const { error } = await supabase
       .from("bookings")
       .update({ status: "cancelada" })
       .eq("id", id);
+    if (error) throw error;
   }, []);
 
   const completeBooking = useCallback(async (id: string) => {
-    await supabase
+    const { error } = await supabase
       .from("bookings")
       .update({ status: "concluida" })
       .eq("id", id);
+    if (error) throw error;
   }, []);
 
   const updateBookingNotes = useCallback(async (id: string, notes: string) => {
-    await supabase
+    const { error } = await supabase
       .from("bookings")
       .update({ notes })
       .eq("id", id);
+    if (error) throw error;
   }, []);
 
   return { bookings, loading, addBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes, refresh: fetchBookings };
