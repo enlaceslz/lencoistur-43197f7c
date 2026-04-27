@@ -10,26 +10,26 @@ import "jspdf-autotable";
 
 // Riscos inerentes conforme P6 VATTI
 const RISKS_OPTIONS = [
-  "Insolação e hipotermia",
-  "Picadas de insetos",
-  "Mau tempo e mudanças climáticas",
-  "Perda de objetos pessoais",
-  "Capotamento ou colisão com outro veículo",
-  "Quedas na água",
-  "Ingestão ou respiração de água",
+  "Insolação e variações térmicas",
+  "Interação com fauna local / Picadas de insetos",
+  "Instabilidade climática e fenômenos naturais",
+  "Danos ou perda de pertences pessoais",
+  "Incidentes veiculares (Capotamento / Colisão)",
+  "Riscos aquáticos (Quedas, Ingestão de água)",
   "Afogamento",
-  "Lesões graves ou gravíssimas",
+  "Incidentes em trilhas (Quedas / Entorses)",
+  "Lesões de natureza grave ou gravíssima",
 ];
 
 // Controles operacionais VATTI
 const SAFETY_CONTROLS = [
-  "Capacitação constante da equipe de condutores",
-  "Capacitação constante da equipe de condutores",
-  "Cabo de resgate em todas as operações",
-  "Orientações aos clientes",
-  "Equipe capacitada para situações de emergência",
-  "Equipe preparada para resgates e primeiros socorros",
-  "Plano de Resposta a Emergências (PRE) implementado",
+  "Condutores certificados e treinados",
+  "Treinamento contínuo em SGS",
+  "Equipamentos de resgate a bordo",
+  "Protocolos de Primeiros Socorros",
+  "Briefing de segurança pré-saída",
+  "Monitoramento de condições climáticas",
+  "Plano de Resposta a Emergências (PRE)",
 ];
 
 // Questões de saúde P6 VATTI
@@ -490,19 +490,49 @@ const TermoAssinatura = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-primary">
                 <FileText size={18} />
-                <h3 className="font-bold">Informações Importantes</h3>
+                <h3 className="font-bold">Informações e Recomendações</h3>
               </div>
-              <div className="text-sm text-muted-foreground space-y-3 leading-relaxed">
-                <p>A atividade não requer nenhuma habilidade específica, mas recomenda-se: saber nadar; vestir-se com traje de banho, roupas e calçados confortáveis; levar toalha, casaco corta-vento, chapéu, óculos de sol, REPELENTE e PROTETOR SOLAR; não usar acessórios; precaver-se com água e lanche.</p>
-                <p>Durante todo o percurso não há sanitários disponíveis, apenas no local de embarque e restaurantes.</p>
-                <p className="text-[11px] italic">Por segurança, a atividade poderá ser interrompida em caso de condições climáticas desfavoráveis ou incidentes.</p>
+              <div className="text-sm text-muted-foreground space-y-4 leading-relaxed">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[13px]">
+                  <div className="flex items-start gap-2">
+                    <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                    <span>Trajes de banho e roupas leves/confortáveis</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                    <span>Levar toalha, casaco leve e óculos de sol</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                    <span><strong>Uso de protetor solar e repelente</strong></span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                    <span>Saber nadar (paradas em lagoas/rios)</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                    <span>Evitar acessórios e joias</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                    <span>Portar água e lanche leve</span>
+                  </div>
+                </div>
+
+                <div className="bg-amber-500/5 border border-amber-500/10 rounded-xl p-3">
+                  <p className="text-[11px] font-medium text-amber-700 leading-tight">
+                    <AlertTriangle size={12} className="inline mr-1 -mt-0.5" />
+                    Nota: Sanitários disponíveis apenas no embarque e pontos de parada específicos. Atividades podem ser suspensas por condições climáticas adversas.
+                  </p>
+                </div>
                 
-                <div className="bg-primary/5 rounded-xl p-3 border border-primary/10">
-                  <p className="font-semibold text-xs text-primary mb-2 uppercase tracking-tight">Controles Operacionais Adotados:</p>
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
+                <div className="bg-primary/5 rounded-xl p-4 border border-primary/10">
+                  <p className="font-bold text-xs text-primary mb-3 uppercase tracking-wider">Protocolos de Segurança SGS:</p>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
                     {SAFETY_CONTROLS.map(ctrl => (
-                      <li key={ctrl} className="flex items-center gap-1.5 text-[11px]">
-                        <CheckCircle size={10} className="text-primary flex-shrink-0" /> {ctrl}
+                      <li key={ctrl} className="flex items-center gap-2 text-[11px] font-medium text-foreground/80">
+                        <Shield size={12} className="text-primary flex-shrink-0" /> {ctrl}
                       </li>
                     ))}
                   </ul>
@@ -727,7 +757,7 @@ const TermoAssinatura = () => {
             {/* Declaration */}
             <div className="bg-secondary/5 border border-secondary/20 rounded-2xl p-4">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Ao assinar este termo, declaro que li todas as informações e recomendações, que respondi as questões com veracidade e que minhas dúvidas foram sanadas. Comprometo-me a cumprir com os procedimentos e seguir as orientações da equipe da <strong>LENÇÓIS TOUR</strong>. Tenho ciência de que qualquer ato meu contrário às informações recebidas pode causar danos à minha integridade física, os quais assumo integralmente.
+                Ao assinar este termo, declaro que li todas as informações e recomendações, que respondi as questões com total veracidade e que todas as minhas dúvidas foram sanadas. Comprometo-me a cumprir rigorosamente com os procedimentos de segurança e seguir as orientações da equipe da <strong>{company?.nome_fantasia || 'LENÇÓIS TOUR'}</strong>. Tenho plena ciência de que minha segurança e a do grupo dependem do cumprimento destas normas, e assumo a corresponsabilidade por meus atos durante a atividade.
               </p>
             </div>
 
