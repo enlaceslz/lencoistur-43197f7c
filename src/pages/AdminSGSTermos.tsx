@@ -65,7 +65,7 @@ const AdminSGSTermos = () => {
     const [termsRes, customersRes, toursRes, vehiclesRes, companyRes] = await Promise.all([
       supabase.from("sgs_risk_terms").select("*, customers(*), tours(name), sgs_veiculos(modelo)").order("created_at", { ascending: false }),
       supabase.from("customers").select("*"),
-      supabase.from("tours").select("id, name, description, duration, price, private_price"),
+      supabase.from("tours").select("id, name, description, duration, price, private_price").eq("active", true).order("name"),
       supabase.from("sgs_veiculos").select("id, modelo, placa"),
       supabase.from("sgs_empresa").select("*").limit(1).maybeSingle(),
     ]);
