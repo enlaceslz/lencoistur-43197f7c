@@ -248,7 +248,26 @@ const MinhasReservas = () => {
               );
             })}
 
-            {filtered.length === 0 && (
+            {(authLoading || bookingsLoading) ? (
+              <div className="text-center py-20">
+                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Carregando suas reservas...</p>
+              </div>
+            ) : !user ? (
+              <div className="text-center py-16 bg-card border border-border rounded-2xl">
+                <LogIn size={48} className="mx-auto text-primary/40 mb-4" />
+                <h2 className="text-xl font-bold text-foreground mb-2">Acesse sua conta</h2>
+                <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
+                  Faça login para visualizar e gerenciar suas reservas.
+                </p>
+                <button 
+                  onClick={() => navigate("/admin/login")}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors inline-block"
+                >
+                  Entrar na Conta
+                </button>
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="text-center py-16">
                 <AlertCircle size={48} className="mx-auto text-muted-foreground/40 mb-4" />
                 <p className="text-lg text-muted-foreground mb-4">
@@ -258,7 +277,7 @@ const MinhasReservas = () => {
                   Explorar Passeios
                 </Link>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
