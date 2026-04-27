@@ -33,6 +33,8 @@ const AdminSGSPesquisas = () => {
       setForm({ felt_safe: 5, guide_explained_risks: true, danger_situations: false, danger_description: "", overall_rating: 5, comments: "" });
       load();
     }
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("Excluir esta pesquisa?")) return;
     const { error } = await supabase.from("sgs_safety_surveys").delete().eq("id", id);
