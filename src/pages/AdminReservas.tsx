@@ -667,17 +667,26 @@ const AdminReservas = () => {
               </div>
 
               <div className="space-y-3">
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1 block">Nome *</label>
-                  <Input value={newForm.customerName} onChange={(e) => setNewForm(f => ({ ...f, customerName: e.target.value }))} placeholder="Nome completo" required maxLength={255} disabled={!!selectedCustomerId} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">CPF</label>
+                    <Input value={newForm.cpf} onChange={(e) => setNewForm(f => ({ ...f, cpf: e.target.value }))} placeholder="000.000.000-00" disabled={!!selectedCustomerId} />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">Passaporte (Estrangeiros)</label>
+                    <Input value={newForm.passport} onChange={(e) => setNewForm(f => ({ ...f, passport: e.target.value }))} placeholder="Número do passaporte" disabled={!!selectedCustomerId} />
+                  </div>
                 </div>
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1 block">E-mail *</label>
-                  <Input type="email" value={newForm.customerEmail} onChange={(e) => setNewForm(f => ({ ...f, customerEmail: e.target.value }))} placeholder="email@exemplo.com" required maxLength={255} disabled={!!selectedCustomerId} />
-                </div>
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1 block">Telefone</label>
-                  <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" maxLength={15} disabled={!!selectedCustomerId} />
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">Data de Nascimento</label>
+                    <Input type="date" value={newForm.birthDate} onChange={(e) => setNewForm(f => ({ ...f, birthDate: e.target.value }))} disabled={!!selectedCustomerId} />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">País</label>
+                    <Input value={newForm.country} onChange={(e) => setNewForm(f => ({ ...f, country: e.target.value }))} placeholder="Ex: Brasil" disabled={!!selectedCustomerId} />
+                  </div>
                 </div>
               </div>
             </div>
