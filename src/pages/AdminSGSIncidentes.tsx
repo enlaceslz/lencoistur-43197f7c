@@ -66,6 +66,7 @@ const AdminSGSIncidentes = () => {
       description: inc.description, severity: inc.severity,
       people_involved: inc.people_involved || "", action_taken: inc.action_taken || "",
       tour_id: inc.tour_id || "",
+      date: new Date(inc.date).toISOString().slice(0, 16),
     });
     setShowForm(true);
   };
