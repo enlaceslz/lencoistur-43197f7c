@@ -58,6 +58,8 @@ const AdminReservas = () => {
   const { bookings, loading, addBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
+  const [dateStart, setDateStart] = useState("");
+  const [dateEnd, setDateEnd] = useState("");
   const [selected, setSelected] = useState<BookingItem | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [editNotes, setEditNotes] = useState("");
@@ -80,6 +82,10 @@ const AdminReservas = () => {
     customerName: "",
     customerEmail: "",
     customerPhone: "",
+    cpf: "",
+    passport: "",
+    country: "Brasil",
+    birthDate: "",
   });
 
   useEffect(() => {
@@ -98,7 +104,11 @@ const AdminReservas = () => {
   }, [showNewForm]);
 
   const resetNewForm = () => {
-    setNewForm({ type: "tour", itemName: "", date: "", guests: 1, payMethod: "pix", customerName: "", customerEmail: "", customerPhone: "" });
+    setNewForm({
+      type: "tour", itemName: "", date: "", guests: 1, payMethod: "pix",
+      customerName: "", customerEmail: "", customerPhone: "",
+      cpf: "", passport: "", country: "Brasil", birthDate: ""
+    });
     setSelectedCustomerId("");
     setCustomerSearch("");
   };
@@ -142,6 +152,10 @@ const AdminReservas = () => {
         customerName: newForm.customerName.trim(),
         customerEmail: newForm.customerEmail.trim().toLowerCase(),
         customerPhone: newForm.customerPhone.trim(),
+        cpf: newForm.cpf.trim() || undefined,
+        passport: newForm.passport.trim() || undefined,
+        country: newForm.country.trim(),
+        birthDate: newForm.birthDate || undefined,
         unitPrice,
         total,
         discount,
@@ -162,9 +176,16 @@ const AdminReservas = () => {
       b.customerName.toLowerCase().includes(q) ||
       b.itemName.toLowerCase().includes(q) ||
       b.bookingCode.toLowerCase().includes(q) ||
-      b.customerEmail.toLowerCase().includes(q);
+      b.customerEmail.toLowerCase().includes(q) ||
+      (b.customerPhone && b.customerPhone.includes(q)) ||
+      (b.cpf && b.cpf.includes(q));
     const matchStatus = statusFilter === "todos" || b.status === statusFilter;
-    return matchSearch && matchStatus;
+    
+    let matchDate = true;
+    if (dateStart) matchDate = matchDate && b.date >= dateStart;
+    if (dateEnd) matchDate = matchDate && b.date <= dateEnd;
+    
+    return matchSearch && matchStatus && matchDate;
   });
 
   const totalPago = bookings
@@ -246,24 +267,48 @@ const AdminReservas = () => {
 
       {/* Filters */}
       <Card className="mb-6">
-        <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <Input placeholder="Buscar por cliente, passeio, email ou código..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {["todos", "confirmada", "pendente", "cancelada", "concluida"].map((s) => (
-              <Button key={s} variant={statusFilter === s ? "default" : "outline"} size="sm" onClick={() => setStatusFilter(s)} className="capitalize">
-                {s === "todos" ? `Todos (${bookings.length})` : `${statusConfig[s]?.label} (${bookings.filter(b => b.status === s).length})`}
+        <CardContent className="p-4 space-y-4">
+          <div className="flex flex-col md:flex-row gap-4 items-center">
+            <div className="relative flex-1 w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+              <Input placeholder="Buscar por cliente, passeio, email ou código..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+            </div>
+            <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+              {["todos", "confirmada", "pendente", "cancelada", "concluida"].map((s) => (
+                <Button key={s} variant={statusFilter === s ? "default" : "outline"} size="sm" onClick={() => setStatusFilter(s)} className="capitalize whitespace-nowrap">
+                  {s === "todos" ? `Todos` : statusConfig[s]?.label}
+                </Button>
+              ))}
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <Button variant="outline" size="sm" onClick={exportCSV}>
+                <Download size={14} className="mr-1" /> CSV
               </Button>
-            ))}
+              <Button size="sm" onClick={() => { resetNewForm(); setShowNewForm(true); }}>
+                <Plus size={14} className="mr-1" /> Nova Reserva
+              </Button>
+            </div>
           </div>
-          <Button variant="outline" size="sm" onClick={exportCSV} className="shrink-0">
-            <Download size={14} className="mr-1" /> CSV
-          </Button>
-          <Button size="sm" onClick={() => { resetNewForm(); setShowNewForm(true); }} className="shrink-0">
-            <Plus size={14} className="mr-1" /> Nova Reserva
-          </Button>
+          
+          <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border">
+            <div className="flex items-center gap-2">
+              <Calendar size={14} className="text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground">Filtrar por data:</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="h-8 text-xs w-32" />
+              <span className="text-muted-foreground text-xs">até</span>
+              <Input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="h-8 text-xs w-32" />
+              {(dateStart || dateEnd) && (
+                <Button variant="ghost" size="sm" onClick={() => { setDateStart(""); setDateEnd(""); }} className="h-7 text-xs px-2">
+                  Limpar
+                </Button>
+              )}
+            </div>
+            <div className="ml-auto text-xs text-muted-foreground">
+              Mostrando {filtered.length} de {bookings.length} reservas
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -372,6 +417,16 @@ const AdminReservas = () => {
                       <Phone size={14} /> {selected.customerPhone}
                     </span>
                   )}
+                  {selected.cpf && (
+                    <span className="flex items-center gap-2 text-muted-foreground text-xs">
+                      <FileText size={12} /> CPF: {selected.cpf}
+                    </span>
+                  )}
+                  {selected.passport && (
+                    <span className="flex items-center gap-2 text-muted-foreground text-xs">
+                      <FileText size={12} /> Passaporte: {selected.passport}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -436,8 +491,27 @@ const AdminReservas = () => {
                         {actionLoading ? <Loader2 className="animate-spin mr-1" size={14} /> : null} Salvar
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => setShowNotes(false)}>Cancelar</Button>
-                    </div>
+                {/* Links */}
+                {(selected.invoiceUrl || selected.voucherUrl) && (
+                  <div className="flex gap-2 w-full">
+                    {selected.invoiceUrl && (
+                      <Button variant="outline" size="sm" className="flex-1" asChild>
+                        <a href={selected.invoiceUrl} target="_blank" rel="noopener noreferrer">
+                          <FileText size={14} className="mr-1" /> Nota Fiscal
+                        </a>
+                      </Button>
+                    )}
+                    {selected.voucherUrl && (
+                      <Button variant="outline" size="sm" className="flex-1" asChild>
+                        <a href={selected.voucherUrl} target="_blank" rel="noopener noreferrer">
+                          <FileText size={14} className="mr-1" /> Voucher
+                        </a>
+                      </Button>
+                    )}
                   </div>
+                )}
+              </div>
+            </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">{selected.notes || "Nenhuma observação."}</p>
                 )}
@@ -495,6 +569,8 @@ const AdminReservas = () => {
                       pixCode: selected.pixCode,
                       createdAt: selected.createdAt,
                       notes: selected.notes,
+                      cpf: selected.cpf,
+                      passport: selected.passport,
                     }}
                     className="flex-1 min-w-[140px]"
                     label="Imprimir Recibo"
@@ -628,13 +704,37 @@ const AdminReservas = () => {
                   <label className="text-sm text-muted-foreground mb-1 block">Nome *</label>
                   <Input value={newForm.customerName} onChange={(e) => setNewForm(f => ({ ...f, customerName: e.target.value }))} placeholder="Nome completo" required maxLength={255} disabled={!!selectedCustomerId} />
                 </div>
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1 block">E-mail *</label>
-                  <Input type="email" value={newForm.customerEmail} onChange={(e) => setNewForm(f => ({ ...f, customerEmail: e.target.value }))} placeholder="email@exemplo.com" required maxLength={255} disabled={!!selectedCustomerId} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">E-mail *</label>
+                    <Input type="email" value={newForm.customerEmail} onChange={(e) => setNewForm(f => ({ ...f, customerEmail: e.target.value }))} placeholder="email@exemplo.com" required maxLength={255} disabled={!!selectedCustomerId} />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">Telefone</label>
+                    <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" maxLength={15} disabled={!!selectedCustomerId} />
+                  </div>
                 </div>
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1 block">Telefone</label>
-                  <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" maxLength={15} disabled={!!selectedCustomerId} />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">CPF</label>
+                    <Input value={newForm.cpf} onChange={(e) => setNewForm(f => ({ ...f, cpf: e.target.value }))} placeholder="000.000.000-00" disabled={!!selectedCustomerId} />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">Passaporte</label>
+                    <Input value={newForm.passport} onChange={(e) => setNewForm(f => ({ ...f, passport: e.target.value }))} placeholder="Para estrangeiros" disabled={!!selectedCustomerId} />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">Data de Nascimento</label>
+                    <Input type="date" value={newForm.birthDate} onChange={(e) => setNewForm(f => ({ ...f, birthDate: e.target.value }))} disabled={!!selectedCustomerId} />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">País</label>
+                    <Input value={newForm.country} onChange={(e) => setNewForm(f => ({ ...f, country: e.target.value }))} placeholder="Ex: Brasil" disabled={!!selectedCustomerId} />
+                  </div>
                 </div>
               </div>
             </div>

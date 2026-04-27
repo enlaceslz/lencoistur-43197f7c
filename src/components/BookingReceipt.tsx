@@ -22,6 +22,8 @@ export interface ReceiptData {
   pixCode?: string | null;
   createdAt: string;
   notes?: string | null;
+  cpf?: string;
+  passport?: string;
 }
 
 const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
@@ -238,6 +240,7 @@ function generateReceiptHTML(data: ReceiptData, company?: any): string {
       <div class="field"><label>Nome Completo</label><p>${data.customerName}</p></div>
       <div class="field"><label>E-mail</label><p>${data.customerEmail}</p></div>
       <div class="field"><label>Telefone</label><p>${data.customerPhone || "Não informado"}</p></div>
+      <div class="field"><label>Documento</label><p>${data.cpf ? `CPF: ${data.cpf}` : (data.passport ? `Passaporte: ${data.passport}` : "Não informado")}</p></div>
       <div class="field"><label>Código da Reserva</label><p>${data.bookingCode}</p></div>
     </div>
 
