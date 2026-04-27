@@ -31,23 +31,60 @@ const AdminSGSVeiculos = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.marca.trim() || !form.placa.trim()) { toast({ title: "Marca e placa obrigatórios", variant: "destructive" }); return; }
+    if (!form.marca.trim() || !form.modelo.trim() || !form.placa.trim()) { 
+      toast({ title: "Marca, modelo e placa são obrigatórios", variant: "destructive" }); 
+      return; 
+    }
+
     const payload = { 
-      ...form, 
+      marca: form.marca.trim(),
+      modelo: form.modelo.trim(),
+      placa: form.placa.trim().toUpperCase(),
       ano: form.ano ? Number(form.ano) : null, 
       capacidade: form.capacidade ? Number(form.capacidade) : null, 
       quilometragem: form.quilometragem ? Number(form.quilometragem) : 0,
+      renavam: form.renavam?.trim() || null,
+      chassi: form.chassi?.trim() || null,
+      cor: form.cor?.trim() || null,
+      tipo: form.tipo,
+      combustivel: form.combustivel,
+      seguradora: form.seguradora?.trim() || null,
       seguro_validade: form.seguro_validade || null,
-      licenciamento_validade: form.licenciamento_validade || null
+      licenciamento_validade: form.licenciamento_validade || null,
+      status: form.status,
+      observacoes: form.observacoes?.trim() || null
     };
-    let res;
-    if (editId) {
-      res = await supabase.from("sgs_veiculos").update(payload).eq("id", editId);
-    } else {
-      res = await supabase.from("sgs_veiculos").insert(payload);
+
+    try {
+      let res;
+      if (editId) {
+        res = await supabase.from("sgs_veiculos").update(payload).eq("id", editId);
+      } else {
+        res = await supabase.from("sgs_veiculos").insert(payload);
+      }
+
+      if (res.error) {
+        console.error("Erro ao salvar veículo:", res.error);
+        toast({ 
+          title: "Erro ao salvar", 
+          description: res.error.message, 
+          variant: "destructive" 
+        });
+      } else {
+        toast({ title: editId ? "Veículo atualizado!" : "Veículo cadastrado!" });
+        setForm(emptyForm);
+        setShowForm(false);
+        setEditId(null);
+        load();
+      }
+    } catch (err: any) {
+      console.error("Erro inesperado:", err);
+      toast({ 
+        title: "Erro inesperado", 
+        description: err.message, 
+        variant: "destructive" 
+      });
     }
-    if (res.error) toast({ title: "Erro", description: res.error.message, variant: "destructive" });
-    else { toast({ title: editId ? "Veículo atualizado!" : "Veículo cadastrado!" }); setForm(emptyForm); setShowForm(false); setEditId(null); load(); }
   };
 
   const openEdit = (v: any) => {
