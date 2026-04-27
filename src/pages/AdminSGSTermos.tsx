@@ -89,49 +89,74 @@ const AdminSGSTermos = () => {
     setForm(f => ({ ...f, minors: f.minors.filter(m => m.id !== id) }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.customer_id || !form.tour_id || !company) {
-      toast({ title: "Preencha os campos obrigatórios", variant: "destructive" });
-      return;
+  const handleEdit = async (term: any) => {
+    setEditingId(term.id);
+    
+    // Load minors for this term
+    const { data: minorsData } = await supabase
+      .from("sgs_risk_term_minors")
+      .select("*")
+      .eq("risk_term_id", term.id);
+
+    setForm({
+      customer_id: term.customer_id,
+      tour_id: term.tour_id,
+      vehicle_id: term.vehicle_id || "",
+      has_allergy: term.has_allergy,
+      allergy_details: term.allergy_details || "",
+      has_fainting_convulsions: term.has_fainting_convulsions,
+      recent_surgery: term.recent_surgery,
+      has_diabetes: term.has_diabetes,
+      is_obese: term.is_obese,
+      is_sedentary: term.is_sedentary,
+      has_immobilized_part: term.has_immobilized_part,
+      has_special_needs: term.has_special_needs,
+      has_phobia: term.has_phobia,
+      phobia_details: term.phobia_details || "",
+      under_influence: term.under_influence,
+      takes_medication: term.takes_medication,
+      medication_details: term.medication_details || "",
+      emergency_contact_name: term.emergency_contact_name || "",
+      emergency_contact_phone: term.emergency_contact_phone || "",
+      term_date: term.term_date,
+      minors: minorsData || [],
+    });
+    
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir este termo?")) return;
+
+    // Delete minors first (cascade might be on, but being safe)
+    await supabase.from("sgs_risk_term_minors").delete().eq("risk_term_id", id);
+    
+    const { error } = await supabase.from("sgs_risk_terms").delete().eq("id", id);
+
+    if (error) {
+      toast({ title: "Erro ao excluir termo", variant: "destructive" });
+    } else {
+      toast({ title: "Termo excluído com sucesso!" });
+      load();
     }
+  };
 
-    const selectedCustomer = customers.find(c => c.id === form.customer_id);
-    const selectedTour = tours.find(t => t.id === form.tour_id);
-
-    const termPayload = {
-      customer_id: form.customer_id,
-      tour_id: form.tour_id,
-      vehicle_id: form.vehicle_id || null,
-      company_id: company.id,
-      customer_name: selectedCustomer?.name,
-      tour_name: selectedTour?.name,
-      term_date: form.term_date,
-      has_allergy: form.has_allergy,
-      allergy_details: form.allergy_details,
-      has_fainting_convulsions: form.has_fainting_convulsions,
-      recent_surgery: form.recent_surgery,
-      has_diabetes: form.has_diabetes,
-      is_obese: form.is_obese,
-      is_sedentary: form.is_sedentary,
-      has_immobilized_part: form.has_immobilized_part,
-      has_special_needs: form.has_special_needs,
-      has_phobia: form.has_phobia,
-      phobia_details: form.phobia_details,
-      under_influence: form.under_influence,
-      takes_medication: form.takes_medication,
-      medication_details: form.medication_details,
-      emergency_contact_name: form.emergency_contact_name,
-      emergency_contact_phone: form.emergency_contact_phone,
-      accepted: true,
-    };
-
-    const { data: termData, error } = await supabase.from("sgs_risk_terms").insert([termPayload as any]).select().single();
+  const handleSubmit = async (e: React.FormEvent) => {
+...
+    const { data: termData, error } = editingId 
+      ? await supabase.from("sgs_risk_terms").update(termPayload as any).eq("id", editingId).select().single()
+      : await supabase.from("sgs_risk_terms").insert([termPayload as any]).select().single();
 
     if (error) {
       console.error(error);
-      toast({ title: "Erro ao registrar termo", variant: "destructive" });
+      toast({ title: editingId ? "Erro ao atualizar termo" : "Erro ao registrar termo", variant: "destructive" });
     } else {
+      // If editing, delete existing minors and re-insert
+      if (editingId) {
+        await supabase.from("sgs_risk_term_minors").delete().eq("risk_term_id", editingId);
+      }
+
       if (form.minors.length > 0) {
         const minorsPayload = form.minors.map(m => ({
           risk_term_id: termData.id,
@@ -142,8 +167,9 @@ const AdminSGSTermos = () => {
         await supabase.from("sgs_risk_term_minors").insert(minorsPayload);
       }
 
-      toast({ title: "Termo de conhecimento gerado com sucesso!" });
+      toast({ title: editingId ? "Termo atualizado com sucesso!" : "Termo de conhecimento gerado com sucesso!" });
       setShowForm(false);
+      setEditingId(null);
       resetForm();
       load();
     }
