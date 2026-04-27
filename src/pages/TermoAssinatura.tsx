@@ -49,12 +49,15 @@ const TermoAssinatura = () => {
   const bookingCode = params.get("booking") || "";
   
   const [booking, setBooking] = useState<any>(null);
+  const [term, setTerm] = useState<any>(null);
+  const [companions, setCompanions] = useState<any[]>([]);
   const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [signing, setSigning] = useState(false);
   const [signed, setSigned] = useState(false);
   const [acceptedRisks, setAcceptedRisks] = useState<string[]>([]);
   const [healthInfo, setHealthInfo] = useState<string[]>([]);
+  const [signatures, setSignatures] = useState<{[key: string]: string}>({});
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
