@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Star, AlertTriangle } from "lucide-react";
+import { Plus, Star, AlertTriangle, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const AdminSGSPesquisas = () => {
@@ -31,6 +31,17 @@ const AdminSGSPesquisas = () => {
       toast({ title: "Pesquisa de segurança registrada!" });
       setShowForm(false);
       setForm({ felt_safe: 5, guide_explained_risks: true, danger_situations: false, danger_description: "", overall_rating: 5, comments: "" });
+      load();
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Excluir esta pesquisa?")) return;
+    const { error } = await supabase.from("sgs_safety_surveys").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Pesquisa excluída!" });
       load();
     }
   };
@@ -121,7 +132,7 @@ const AdminSGSPesquisas = () => {
             <p className="text-center text-muted-foreground py-8">Nenhuma pesquisa registrada</p>
           ) : surveys.map(s => (
             <div key={s.id} className={`bg-card border rounded-2xl p-5 ${s.danger_situations ? "border-destructive" : "border-border"}`}>
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-start gap-4">
                 <div className="flex items-center gap-3">
                   {s.danger_situations ? (
                     <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
@@ -144,6 +155,9 @@ const AdminSGSPesquisas = () => {
                     </p>
                   </div>
                 </div>
+                <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                  <Trash2 size={16} />
+                </button>
               </div>
               {(s.comments || s.danger_description) && (
                 <p className="mt-2 text-sm text-muted-foreground">{s.danger_description || s.comments}</p>

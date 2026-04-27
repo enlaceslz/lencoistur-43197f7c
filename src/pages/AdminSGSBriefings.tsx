@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, CheckCircle, XCircle, MapPin } from "lucide-react";
+import { Plus, CheckCircle, XCircle, MapPin, Pencil, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const CHECKLIST_ITEMS = [
@@ -20,6 +20,7 @@ const AdminSGSBriefings = () => {
   const [briefings, setBriefings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
   const [tours, setTours] = useState<TourOpt[]>([]);
   const [form, setForm] = useState({
     guide_name: "", language: "pt", tour_id: "" as string,
@@ -45,15 +46,48 @@ const AdminSGSBriefings = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const allChecked = CHECKLIST_ITEMS.every(item => form[item.key as keyof typeof form]);
-    const insertData: any = { ...form, completed: allChecked };
-    if (!insertData.tour_id) delete insertData.tour_id;
-    const { error } = await supabase.from("sgs_briefings").insert(insertData);
-    if (error) {
+    const submitData: any = { ...form, completed: allChecked };
+    if (!submitData.tour_id) delete submitData.tour_id;
+    
+    let res;
+    if (editId) res = await supabase.from("sgs_briefings").update(submitData).eq("id", editId);
+    else res = await supabase.from("sgs_briefings").insert(submitData);
+
+    if (res.error) {
       toast({ title: "Erro ao registrar resumo", variant: "destructive" });
     } else {
-      toast({ title: allChecked ? "Resumo completo registrado!" : "⚠️ Resumo registrado com itens pendentes" });
+      toast({ title: editId ? "Resumo atualizado!" : (allChecked ? "Resumo completo registrado!" : "⚠️ Resumo registrado com itens pendentes") });
       setShowForm(false);
+      setEditId(null);
       setForm({ guide_name: "", language: "pt", tour_id: "", safety_rules: false, tour_risks: false, lagoon_behavior: false, group_distance: false, emergency_orientation: false, notes: "" });
+      load();
+    }
+  };
+
+  const openEdit = (b: any) => {
+    setForm({
+      guide_name: b.guide_name,
+      language: b.language || "pt",
+      tour_id: b.tour_id || "",
+      safety_rules: !!b.safety_rules,
+      tour_risks: !!b.tour_risks,
+      lagoon_behavior: !!b.lagoon_behavior,
+      group_distance: !!b.group_distance,
+      emergency_orientation: !!b.emergency_orientation,
+      notes: b.notes || ""
+    });
+    setEditId(b.id);
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Excluir este resumo de segurança?")) return;
+    const { error } = await supabase.from("sgs_briefings").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Resumo excluído!" });
       load();
     }
   };
@@ -166,10 +200,20 @@ const AdminSGSBriefings = () => {
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${b.completed ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
-                    {completedCount(b)}/{CHECKLIST_ITEMS.length}
-                  </span>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${b.completed ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
+                      {completedCount(b)}/{CHECKLIST_ITEMS.length}
+                    </span>
+                  </div>
+                  <div className="flex gap-1">
+                    <button onClick={() => openEdit(b)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors">
+                      <Pencil size={14} />
+                    </button>
+                    <button onClick={() => handleDelete(b.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
               </div>
               <div className="mt-3 flex flex-wrap gap-2">

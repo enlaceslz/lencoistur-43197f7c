@@ -4,9 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { maskCPF, maskPhone } from "@/lib/masks";
 
-import { UserCheck, Plus, Search, AlertTriangle } from "lucide-react";
+import { UserCheck, Plus, Search, AlertTriangle, Pencil, Trash2 } from "lucide-react";
 
-const emptyForm = { nome: "", cpf: "", cnh_numero: "", cnh_categoria: "B", cnh_validade: "", telefone: "", email: "", primeiros_socorros: false, off_road: false, status: "ativo", observacoes: "" };
+const emptyForm = { nome: "", cpf: "", cnh_numero: "", cnh_categoria: "B", cnh_validade: "", telefone: "", email: "", primeiros_socorros: false, off_road: false, status: "ativo" as const, observacoes: "" };
 
 const AdminSGSCondutores = () => {
   const [condutores, setCondutores] = useState<any[]>([]);
@@ -37,13 +37,37 @@ const AdminSGSCondutores = () => {
   };
 
   const openEdit = (c: any) => {
-    setForm({ nome: c.nome, cpf: c.cpf || "", cnh_numero: c.cnh_numero || "", cnh_categoria: c.cnh_categoria || "B", cnh_validade: c.cnh_validade || "", telefone: c.telefone || "", email: c.email || "", primeiros_socorros: c.primeiros_socorros, off_road: c.off_road, status: c.status, observacoes: c.observacoes || "" });
+    setForm({
+      nome: c.nome,
+      cpf: c.cpf || "",
+      cnh_numero: c.cnh_numero || "",
+      cnh_categoria: c.cnh_categoria || "B",
+      cnh_validade: c.cnh_validade || "",
+      telefone: c.telefone || "",
+      email: c.email || "",
+      primeiros_socorros: !!c.primeiros_socorros,
+      off_road: !!c.off_road,
+      status: c.status || "ativo",
+      observacoes: c.observacoes || ""
+    });
     setEditId(c.id);
     setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir este condutor?")) return;
+    const { error } = await supabase.from("sgs_condutores").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Condutor excluído com sucesso!" });
+      load();
+    }
   };
 
   const cnhExpired = (d: string | null) => d && new Date(d) < new Date();
-  const filtered = condutores.filter(c => c.nome.toLowerCase().includes(search.toLowerCase()));
+  const filtered = condutores.filter(c => c.nome.toLowerCase().includes(search.toLowerCase()) || (c.cpf && c.cpf.includes(search)));
   const set = (k: string, v: any) => {
     let value = v;
     if (k === "cpf") value = maskCPF(v);
@@ -109,22 +133,33 @@ const AdminSGSCondutores = () => {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map(c => (
-              <div key={c.id} className="bg-card border border-border rounded-2xl p-5 cursor-pointer hover:shadow-md transition-shadow" onClick={() => openEdit(c)}>
+              <div key={c.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-bold text-foreground text-sm">{c.nome}</span>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${c.status === "ativo" ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}>{c.status}</span>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${c.status === "ativo" ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}>{c.status}</span>
+                    <div className="flex gap-1">
+                      <button onClick={() => openEdit(c)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors">
+                        <Pencil size={14} />
+                      </button>
+                      <button onClick={() => handleDelete(c.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
                 <div className="text-xs text-muted-foreground space-y-1">
+                  {c.cpf && <p>CPF: {c.cpf}</p>}
                   {c.cnh_numero && <p>CNH: {c.cnh_numero} ({c.cnh_categoria})</p>}
                   {c.cnh_validade && (
                     <p className={cnhExpired(c.cnh_validade) ? "text-destructive font-medium" : ""}>
                       {cnhExpired(c.cnh_validade) && <AlertTriangle size={12} className="inline mr-1" />}
-                      Validade CNH: {c.cnh_validade} {cnhExpired(c.cnh_validade) && "(VENCIDA)"}
+                      Validade: {new Date(c.cnh_validade + "T12:00").toLocaleDateString("pt-BR")} {cnhExpired(c.cnh_validade) && "(VENCIDA)"}
                     </p>
                   )}
-                  <div className="flex gap-2 mt-2">
-                    {c.primeiros_socorros && <span className="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-full">1º Socorros</span>}
-                    {c.off_road && <span className="bg-secondary/10 text-secondary text-[10px] px-2 py-0.5 rounded-full">Off-Road</span>}
+                  <div className="flex gap-2 mt-3">
+                    {c.primeiros_socorros && <span className="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-full border border-primary/20">1º Socorros</span>}
+                    {c.off_road && <span className="bg-secondary/10 text-secondary text-[10px] px-2 py-0.5 rounded-full border border-secondary/20">Off-Road</span>}
                   </div>
                 </div>
               </div>

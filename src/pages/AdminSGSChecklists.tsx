@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { ClipboardCheck, Plus, CheckCircle, Circle } from "lucide-react";
+import { ClipboardCheck, Plus, CheckCircle, Circle, Trash2, Calendar, User } from "lucide-react";
 
 const CHECKLIST_TEMPLATES: Record<string, string[]> = {
   veiculo_diario: ["Nível de óleo", "Nível de água/radiador", "Pressão dos pneus", "Estado dos pneus (desgaste)", "Freios (teste)", "Luzes (farol/lanterna/seta)", "Limpador/lavador de para-brisa", "Cinto de segurança (todos)", "Extintor de incêndio (validade)", "Triângulo de sinalização", "Macaco e chave de roda", "Estepe calibrado", "Kit primeiros socorros", "Documentação do veículo", "Combustível suficiente"],
@@ -62,6 +62,21 @@ const AdminSGSChecklists = () => {
     const ci = getItems(id);
     if (!ci.length) return 0;
     return Math.round((ci.filter(i => i.conforme).length / ci.length) * 100);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Excluir este checklist? Esta ação não pode ser desfeita.")) return;
+    
+    // Delete items first
+    await supabase.from("sgs_checklist_items").delete().eq("checklist_id", id);
+    
+    const { error } = await supabase.from("sgs_checklists").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Checklist excluído com sucesso!" });
+      load();
+    }
   };
 
   const toggleChecklistItem = async (itemId: string, current: boolean) => {
@@ -130,15 +145,34 @@ const AdminSGSChecklists = () => {
               const progress = getProgress(cl.id);
               const clItems = getItems(cl.id);
               return (
-                <div key={cl.id} className="bg-card border border-border rounded-2xl p-5">
+                <div key={cl.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <span className="font-bold text-foreground text-sm">{cl.titulo}</span>
-                      <span className="text-xs text-muted-foreground ml-2">{cl.data} · {cl.responsavel}</span>
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${cl.status === "concluido" ? "bg-primary/10" : "bg-secondary/10"}`}>
+                        <ClipboardCheck size={20} className={cl.status === "concluido" ? "text-primary" : "text-secondary"} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-foreground text-sm">{cl.titulo}</h4>
+                        <div className="flex items-center gap-3 mt-1">
+                          <span className="text-[10px] flex items-center gap-1 text-muted-foreground">
+                            <Calendar size={10} /> {new Date(cl.created_at).toLocaleDateString("pt-BR")}
+                          </span>
+                          {cl.responsavel && (
+                            <span className="text-[10px] flex items-center gap-1 text-muted-foreground">
+                              <User size={10} /> {cl.responsavel}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${cl.status === "concluido" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
-                      {cl.status === "concluido" ? "Concluído" : "Em andamento"}
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${cl.status === "concluido" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
+                        {cl.status === "concluido" ? "Concluído" : "Em andamento"}
+                      </span>
+                      <button onClick={() => handleDelete(cl.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </div>
                   {/* Progress bar */}
                   <div className="w-full h-2 bg-muted rounded-full mb-3">
