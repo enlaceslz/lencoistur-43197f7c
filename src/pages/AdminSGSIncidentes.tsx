@@ -29,6 +29,7 @@ const STATUS_COLORS: Record<string, string> = {
 const emptyForm = {
   type: "incidente", location: "", guide_name: "", description: "", severity: "media",
   people_involved: "", action_taken: "", tour_id: "" as string,
+  date: new Date().toISOString().slice(0, 16),
 };
 
 interface TourOpt { id: string; name: string; }
