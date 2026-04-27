@@ -58,6 +58,8 @@ const AdminReservas = () => {
   const { bookings, loading, addBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
+  const [dateStart, setDateStart] = useState("");
+  const [dateEnd, setDateEnd] = useState("");
   const [selected, setSelected] = useState<BookingItem | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [editNotes, setEditNotes] = useState("");
