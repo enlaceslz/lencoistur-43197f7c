@@ -133,22 +133,33 @@ const AdminSGSCondutores = () => {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map(c => (
-              <div key={c.id} className="bg-card border border-border rounded-2xl p-5 cursor-pointer hover:shadow-md transition-shadow" onClick={() => openEdit(c)}>
+              <div key={c.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-bold text-foreground text-sm">{c.nome}</span>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${c.status === "ativo" ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}>{c.status}</span>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${c.status === "ativo" ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}>{c.status}</span>
+                    <div className="flex gap-1">
+                      <button onClick={() => openEdit(c)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors">
+                        <Pencil size={14} />
+                      </button>
+                      <button onClick={() => handleDelete(c.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
                 <div className="text-xs text-muted-foreground space-y-1">
+                  {c.cpf && <p>CPF: {c.cpf}</p>}
                   {c.cnh_numero && <p>CNH: {c.cnh_numero} ({c.cnh_categoria})</p>}
                   {c.cnh_validade && (
                     <p className={cnhExpired(c.cnh_validade) ? "text-destructive font-medium" : ""}>
                       {cnhExpired(c.cnh_validade) && <AlertTriangle size={12} className="inline mr-1" />}
-                      Validade CNH: {c.cnh_validade} {cnhExpired(c.cnh_validade) && "(VENCIDA)"}
+                      Validade: {new Date(c.cnh_validade + "T12:00").toLocaleDateString("pt-BR")} {cnhExpired(c.cnh_validade) && "(VENCIDA)"}
                     </p>
                   )}
-                  <div className="flex gap-2 mt-2">
-                    {c.primeiros_socorros && <span className="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-full">1º Socorros</span>}
-                    {c.off_road && <span className="bg-secondary/10 text-secondary text-[10px] px-2 py-0.5 rounded-full">Off-Road</span>}
+                  <div className="flex gap-2 mt-3">
+                    {c.primeiros_socorros && <span className="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-full border border-primary/20">1º Socorros</span>}
+                    {c.off_road && <span className="bg-secondary/10 text-secondary text-[10px] px-2 py-0.5 rounded-full border border-secondary/20">Off-Road</span>}
                   </div>
                 </div>
               </div>
