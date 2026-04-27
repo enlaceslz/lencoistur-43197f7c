@@ -22,6 +22,12 @@ export interface BookingItem {
   pixCode?: string;
   notes?: string;
   customerId?: string;
+  cpf?: string;
+  passport?: string;
+  country?: string;
+  birthDate?: string;
+  invoiceUrl?: string;
+  voucherUrl?: string;
 }
 
 function generateBookingCode(): string {
