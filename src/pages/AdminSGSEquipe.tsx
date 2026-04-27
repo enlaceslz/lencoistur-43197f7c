@@ -33,14 +33,67 @@ const AdminSGSEquipe = () => {
     setLoading(false);
   };
 
-  const addStaff = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.from("sgs_staff").insert(form);
-    if (error) { toast({ title: "Erro", variant: "destructive" }); return; }
-    toast({ title: "Membro adicionado!" });
+    if (!form.name.trim()) return;
+    
+    let res;
+    if (editId) {
+      res = await supabase.from("sgs_staff").update(form).eq("id", editId);
+    } else {
+      res = await supabase.from("sgs_staff").insert(form);
+    }
+
+    if (res.error) {
+      toast({ title: "Erro", description: res.error.message, variant: "destructive" });
+      return;
+    }
+
+    toast({ title: editId ? "Membro atualizado!" : "Membro adicionado!" });
     setShowForm(false);
-    setForm({ name: "", role: "guia", phone: "", email: "", document: "" });
+    setEditId(null);
+    setForm({ name: "", role: "guia", phone: "", email: "", document: "", blocked: false });
     load();
+  };
+
+  const openEdit = (s: any) => {
+    setForm({
+      name: s.name,
+      role: s.role || "guia",
+      phone: s.phone || "",
+      email: s.email || "",
+      document: s.document || "",
+      blocked: !!s.blocked
+    });
+    setEditId(s.id);
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Excluir este membro da equipe? Isso também removerá seus treinamentos vinculados.")) return;
+    
+    // First delete trainings
+    await supabase.from("sgs_staff_trainings").delete().eq("staff_id", id);
+    
+    const { error } = await supabase.from("sgs_staff").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Membro excluído com sucesso!" });
+      load();
+    }
+  };
+
+  const deleteTraining = async (id: string) => {
+    if (!confirm("Excluir este treinamento?")) return;
+    const { error } = await supabase.from("sgs_staff_trainings").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Erro ao excluir treinamento", variant: "destructive" });
+    } else {
+      toast({ title: "Treinamento excluído!" });
+      load();
+    }
   };
 
   const addTraining = async (e: React.FormEvent) => {
