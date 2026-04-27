@@ -157,17 +157,19 @@ const MinhasReservas = () => {
                             <Copy size={14} /> Copiar PIX
                           </button>
                           <button
-                            onClick={() => confirmPayment(b.id)}
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-xl text-sm font-semibold transition-colors"
+                            onClick={() => handleSimulatePayment(b.id)}
+                            disabled={isProcessing === b.id}
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
                           >
-                            Simular Pagamento
+                            {isProcessing === b.id ? "Processando..." : "Simular Pagamento"}
                           </button>
                         </div>
                       </div>
                       <div className="mt-3 flex gap-3">
                         <button
-                          onClick={() => cancelBooking(b.id)}
-                          className="text-destructive text-sm font-semibold hover:underline"
+                          onClick={() => handleCancel(b.id)}
+                          disabled={isProcessing === b.id}
+                          className="text-destructive text-sm font-semibold hover:underline disabled:opacity-50"
                         >
                           Cancelar Reserva
                         </button>
