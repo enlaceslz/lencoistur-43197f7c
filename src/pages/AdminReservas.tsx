@@ -569,6 +569,8 @@ const AdminReservas = () => {
                       pixCode: selected.pixCode,
                       createdAt: selected.createdAt,
                       notes: selected.notes,
+                      cpf: selected.cpf,
+                      passport: selected.passport,
                     }}
                     className="flex-1 min-w-[140px]"
                     label="Imprimir Recibo"
