@@ -143,7 +143,42 @@ const AdminSGSTermos = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-...
+    e.preventDefault();
+    if (!form.customer_id || !form.tour_id || !company) {
+      toast({ title: "Preencha os campos obrigatórios", variant: "destructive" });
+      return;
+    }
+
+    const selectedCustomer = customers.find(c => c.id === form.customer_id);
+    const selectedTour = tours.find(t => t.id === form.tour_id);
+
+    const termPayload = {
+      customer_id: form.customer_id,
+      tour_id: form.tour_id,
+      vehicle_id: form.vehicle_id || null,
+      company_id: company.id,
+      customer_name: selectedCustomer?.name,
+      tour_name: selectedTour?.name,
+      term_date: form.term_date,
+      has_allergy: form.has_allergy,
+      allergy_details: form.allergy_details,
+      has_fainting_convulsions: form.has_fainting_convulsions,
+      recent_surgery: form.recent_surgery,
+      has_diabetes: form.has_diabetes,
+      is_obese: form.is_obese,
+      is_sedentary: form.is_sedentary,
+      has_immobilized_part: form.has_immobilized_part,
+      has_special_needs: form.has_special_needs,
+      has_phobia: form.has_phobia,
+      phobia_details: form.phobia_details,
+      under_influence: form.under_influence,
+      takes_medication: form.takes_medication,
+      medication_details: form.medication_details,
+      emergency_contact_name: form.emergency_contact_name,
+      emergency_contact_phone: form.emergency_contact_phone,
+      accepted: true,
+    };
+
     const { data: termData, error } = editingId 
       ? await supabase.from("sgs_risk_terms").update(termPayload as any).eq("id", editingId).select().single()
       : await supabase.from("sgs_risk_terms").insert([termPayload as any]).select().single();
@@ -152,7 +187,6 @@ const AdminSGSTermos = () => {
       console.error(error);
       toast({ title: editingId ? "Erro ao atualizar termo" : "Erro ao registrar termo", variant: "destructive" });
     } else {
-      // If editing, delete existing minors and re-insert
       if (editingId) {
         await supabase.from("sgs_risk_term_minors").delete().eq("risk_term_id", editingId);
       }
