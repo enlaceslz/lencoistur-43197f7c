@@ -66,6 +66,12 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
     pixCode: row.pix_code || undefined,
     notes: row.notes || undefined,
     customerId: row.customer_id,
+    cpf: customer?.cpf || undefined,
+    passport: customer?.passport || undefined,
+    country: customer?.country || undefined,
+    birthDate: customer?.birth_date || undefined,
+    invoiceUrl: row.invoice_url || undefined,
+    voucherUrl: row.voucher_url || undefined,
   };
 }
 
