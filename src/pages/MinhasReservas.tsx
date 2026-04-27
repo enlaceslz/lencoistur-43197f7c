@@ -22,9 +22,11 @@ const formatPhone = (v: string) => {
 };
 
 const MinhasReservas = () => {
-  const { bookings, confirmPayment, cancelBooking } = useBookings();
+  const { user, loading: authLoading } = useAuth();
+  const { bookings, loading: bookingsLoading, confirmPayment, cancelBooking } = useBookings();
   const [filter, setFilter] = useState("todas");
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const filtered = filter === "todas" ? bookings : bookings.filter((b) => b.status === filter);
 
