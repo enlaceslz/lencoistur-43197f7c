@@ -82,6 +82,10 @@ const AdminReservas = () => {
     customerName: "",
     customerEmail: "",
     customerPhone: "",
+    cpf: "",
+    passport: "",
+    country: "Brasil",
+    birthDate: "",
   });
 
   useEffect(() => {
