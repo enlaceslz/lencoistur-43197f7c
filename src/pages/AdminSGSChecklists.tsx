@@ -64,6 +64,21 @@ const AdminSGSChecklists = () => {
     return Math.round((ci.filter(i => i.conforme).length / ci.length) * 100);
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm("Excluir este checklist? Esta ação não pode ser desfeita.")) return;
+    
+    // Delete items first
+    await supabase.from("sgs_checklist_items").delete().eq("checklist_id", id);
+    
+    const { error } = await supabase.from("sgs_checklists").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Checklist excluído com sucesso!" });
+      load();
+    }
+  };
+
   const toggleChecklistItem = async (itemId: string, current: boolean) => {
     await supabase.from("sgs_checklist_items").update({ conforme: !current }).eq("id", itemId);
     load();
