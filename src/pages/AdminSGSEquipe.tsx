@@ -16,7 +16,8 @@ const AdminSGSEquipe = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [showTrainingForm, setShowTrainingForm] = useState<string | null>(null);
-  const [form, setForm] = useState({ name: "", role: "guia", phone: "", email: "", document: "" });
+  const [editId, setEditId] = useState<string | null>(null);
+  const [form, setForm] = useState({ name: "", role: "guia", phone: "", email: "", document: "", blocked: false });
   const [trainingForm, setTrainingForm] = useState({ training_name: "", training_type: "primeiros_socorros", completed_date: "", expiry_date: "" });
 
   useEffect(() => { load(); }, []);
