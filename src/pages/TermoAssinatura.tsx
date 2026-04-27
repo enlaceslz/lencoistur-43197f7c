@@ -11,28 +11,25 @@ import "jspdf-autotable";
 // Riscos inerentes conforme P6 VATTI
 const RISKS_OPTIONS = [
   "Insolação e hipotermia",
-  "Picadas de insetos e animais peçonhentos",
-  "Mau tempo e mudanças climáticas repentinas",
+  "Picadas de insetos",
+  "Mau tempo e mudanças climáticas",
   "Perda de objetos pessoais",
-  "Capotamento ou tombamento do veículo",
-  "Colisão com outro veículo",
+  "Capotamento ou colisão com outro veículo",
   "Quedas na água",
   "Ingestão ou respiração de água",
   "Afogamento",
-  "Lesões graves ou gravíssimas (traumatismos, escoriações)",
-  "Queimadura solar",
-  "Desidratação",
+  "Lesões graves ou gravíssimas",
 ];
 
 // Controles operacionais VATTI
 const SAFETY_CONTROLS = [
   "Capacitação constante da equipe de condutores",
-  "Cabo de resgate disponível em todas as operações",
-  "Orientações de segurança por escrito e verbalmente",
-  "Equipe capacitada em primeiros socorros",
-  "Equipe preparada para realizar resgates",
+  "Capacitação constante da equipe de condutores",
+  "Cabo de resgate em todas as operações",
+  "Orientações aos clientes",
+  "Equipe capacitada para situações de emergência",
+  "Equipe preparada para resgates e primeiros socorros",
   "Plano de Resposta a Emergências (PRE) implementado",
-  "Veículos equipados com kit de segurança",
 ];
 
 // Questões de saúde P6 VATTI
@@ -276,8 +273,17 @@ const TermoAssinatura = () => {
         columnStyles: { 0: { fontStyle: 'bold', width: 50 } }
       });
       
-      currentY = (doc as any).lastAutoTable.finalY + 15;
+      currentY = (doc as any).lastAutoTable.finalY + 10;
       
+      // Recommendations
+      doc.setFontSize(11);
+      doc.text("Recomendações e Informações:", 14, currentY);
+      currentY += 5;
+      doc.setFontSize(8);
+      const recText = "Atividade não requer habilidade específica. Recomenda-se: saber nadar; trajes de banho e roupas confortáveis; levar toalha, casaco, chapéu, repelente e protetor solar; não usar acessórios; água e lanche. Não há sanitários no percurso.";
+      doc.text(doc.splitTextToSize(recText, pageWidth - 28), 14, currentY);
+      currentY += 12;
+
       // Risks
       doc.setFontSize(14);
       doc.text("Ciência de Riscos e Segurança", 14, currentY);
@@ -487,7 +493,9 @@ const TermoAssinatura = () => {
                 <h3 className="font-bold">Informações Importantes</h3>
               </div>
               <div className="text-sm text-muted-foreground space-y-3 leading-relaxed">
-                <p>O passeio será realizado em veículo 4x4 na região dos Lençóis Maranhenses. A atividade envolve deslocamento em terrenos irregulares, dunas e banho em lagoas naturais.</p>
+                <p>A atividade não requer nenhuma habilidade específica, mas recomenda-se: saber nadar; vestir-se com traje de banho, roupas e calçados confortáveis; levar toalha, casaco corta-vento, chapéu, óculos de sol, REPELENTE e PROTETOR SOLAR; não usar acessórios; precaver-se com água e lanche.</p>
+                <p>Durante todo o percurso não há sanitários disponíveis, apenas no local de embarque e restaurantes.</p>
+                <p className="text-[11px] italic">Por segurança, a atividade poderá ser interrompida em caso de condições climáticas desfavoráveis ou incidentes.</p>
                 
                 <div className="bg-primary/5 rounded-xl p-3 border border-primary/10">
                   <p className="font-semibold text-xs text-primary mb-2 uppercase tracking-tight">Controles Operacionais Adotados:</p>
