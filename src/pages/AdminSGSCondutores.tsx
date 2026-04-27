@@ -4,9 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { maskCPF, maskPhone } from "@/lib/masks";
 
-import { UserCheck, Plus, Search, AlertTriangle } from "lucide-react";
+import { UserCheck, Plus, Search, AlertTriangle, Pencil, Trash2 } from "lucide-react";
 
-const emptyForm = { nome: "", cpf: "", cnh_numero: "", cnh_categoria: "B", cnh_validade: "", telefone: "", email: "", primeiros_socorros: false, off_road: false, status: "ativo", observacoes: "" };
+const emptyForm = { nome: "", cpf: "", cnh_numero: "", cnh_categoria: "B", cnh_validade: "", telefone: "", email: "", primeiros_socorros: false, off_road: false, status: "ativo" as const, observacoes: "" };
 
 const AdminSGSCondutores = () => {
   const [condutores, setCondutores] = useState<any[]>([]);
