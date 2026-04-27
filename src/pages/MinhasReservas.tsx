@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Calendar, Users, Copy, QrCode, Clock, CheckCircle, XCircle, AlertCircle, Printer } from "lucide-react";
+import { Calendar, Users, Copy, QrCode, Clock, CheckCircle, XCircle, AlertCircle, Printer, LogIn } from "lucide-react";
 import { useBookings } from "@/hooks/useBookings";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { PrintReceiptButton } from "@/components/BookingReceipt";
 
