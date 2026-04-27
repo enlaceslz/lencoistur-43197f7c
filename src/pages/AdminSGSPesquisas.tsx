@@ -155,6 +155,9 @@ const AdminSGSPesquisas = () => {
                     </p>
                   </div>
                 </div>
+                <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                  <Trash2 size={16} />
+                </button>
               </div>
               {(s.comments || s.danger_description) && (
                 <p className="mt-2 text-sm text-muted-foreground">{s.danger_description || s.comments}</p>
