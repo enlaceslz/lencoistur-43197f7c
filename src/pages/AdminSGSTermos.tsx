@@ -363,7 +363,8 @@ const AdminSGSTermos = () => {
 
         <div class="section">
           <div class="section-title">Ciência e Declaração</div>
-          <p style="font-size: 11px;">Declaro que li todas as informações e recomendações, que respondi com veracidade e que minhas dúvidas foram sanadas. Comprometo-me a seguir as orientações da equipe. Tenho ciência dos riscos mencionados e isento a Lençóis Tour de danos causados por atos próprios contrários às orientações.</p>
+          <p style="font-size: 11px;">Declaro que li todas as informações e recomendações, que respondi com veracidade e que minhas dúvidas foram sanadas. Comprometo-me a seguir as orientações da equipe. Tenho ciência dos riscos mencionados e isento a empresa de danos causados por atos próprios contrários às orientações.</p>
+          <p class="small" style="margin-top: 5px;"><strong>Observação:</strong> Nossa empresa opera de acordo com a legislação pertinente e detém todas as autorizações necessárias.</p>
         </div>
 
         <div class="footer">
