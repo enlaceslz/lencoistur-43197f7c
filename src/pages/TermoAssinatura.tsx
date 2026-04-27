@@ -11,17 +11,14 @@ import "jspdf-autotable";
 // Riscos inerentes conforme P6 VATTI
 const RISKS_OPTIONS = [
   "Insolação e hipotermia",
-  "Picadas de insetos e animais peçonhentos",
-  "Mau tempo e mudanças climáticas repentinas",
+  "Picadas de insetos",
+  "Mau tempo e mudanças climáticas",
   "Perda de objetos pessoais",
-  "Capotamento ou tombamento do veículo",
-  "Colisão com outro veículo",
+  "Capotamento ou colisão com outro veículo",
   "Quedas na água",
   "Ingestão ou respiração de água",
   "Afogamento",
-  "Lesões graves ou gravíssimas (traumatismos, escoriações)",
-  "Queimadura solar",
-  "Desidratação",
+  "Lesões graves ou gravíssimas",
 ];
 
 // Controles operacionais VATTI
