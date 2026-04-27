@@ -218,6 +218,9 @@ const AdminSGSEquipe = () => {
                         <span className={`px-2 py-0.5 rounded-full font-semibold ${
                           t.status === "vencido" ? "bg-destructive/10 text-destructive" : t.status === "vencendo" ? "bg-secondary/10 text-secondary" : "bg-primary/10 text-primary"
                         }`}>{t.status}</span>
+                        <button onClick={() => deleteTraining(t.id)} className="p-1 rounded hover:bg-destructive/10 text-destructive ml-1">
+                          <Trash2 size={12} />
+                        </button>
                       </div>
                     </div>
                   ))}
