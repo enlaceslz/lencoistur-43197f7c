@@ -757,7 +757,7 @@ const TermoAssinatura = () => {
             {/* Declaration */}
             <div className="bg-secondary/5 border border-secondary/20 rounded-2xl p-4">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Ao assinar este termo, declaro que li todas as informações e recomendações, que respondi as questões com veracidade e que minhas dúvidas foram sanadas. Comprometo-me a cumprir com os procedimentos e seguir as orientações da equipe da <strong>LENÇÓIS TOUR</strong>. Tenho ciência de que qualquer ato meu contrário às informações recebidas pode causar danos à minha integridade física, os quais assumo integralmente.
+                Ao assinar este termo, declaro que li todas as informações e recomendações, que respondi as questões com total veracidade e que todas as minhas dúvidas foram sanadas. Comprometo-me a cumprir rigorosamente com os procedimentos de segurança e seguir as orientações da equipe da <strong>{company?.nome_fantasia || 'LENÇÓIS TOUR'}</strong>. Tenho plena ciência de que minha segurança e a do grupo dependem do cumprimento destas normas, e assumo a corresponsabilidade por meus atos durante a atividade.
               </p>
             </div>
 
