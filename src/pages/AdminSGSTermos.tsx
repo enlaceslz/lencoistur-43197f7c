@@ -126,7 +126,7 @@ const AdminSGSTermos = () => {
       accepted: true,
     };
 
-    const { data: termData, error } = await supabase.from("sgs_risk_terms").insert(termPayload).select().single();
+    const { data: termData, error } = await supabase.from("sgs_risk_terms").insert([termPayload]).select().single();
 
     if (error) {
       console.error(error);
@@ -197,6 +197,13 @@ const AdminSGSTermos = () => {
     `).join("") || "Nenhum menor declarado.";
 
     const healthResponse = (val: boolean) => val ? "S" : "N";
+
+    // Fix customer data access
+    const customerName = (term.customers as any)?.name || term.customer_name;
+    const customerCityState = (term.customers as any)?.city && (term.customers as any)?.state 
+      ? `${(term.customers as any).city}/${(term.customers as any).state}` 
+      : term.city_state || "___";
+
 
     const html = `
       <!DOCTYPE html>
