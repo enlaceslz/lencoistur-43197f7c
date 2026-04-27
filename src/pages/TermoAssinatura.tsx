@@ -24,12 +24,12 @@ const RISKS_OPTIONS = [
 // Controles operacionais VATTI
 const SAFETY_CONTROLS = [
   "Capacitação constante da equipe de condutores",
-  "Cabo de resgate disponível em todas as operações",
-  "Orientações de segurança por escrito e verbalmente",
-  "Equipe capacitada em primeiros socorros",
-  "Equipe preparada para realizar resgates",
+  "Capacitação constante da equipe de condutores",
+  "Cabo de resgate em todas as operações",
+  "Orientações aos clientes",
+  "Equipe capacitada para situações de emergência",
+  "Equipe preparada para resgates e primeiros socorros",
   "Plano de Resposta a Emergências (PRE) implementado",
-  "Veículos equipados com kit de segurança",
 ];
 
 // Questões de saúde P6 VATTI
