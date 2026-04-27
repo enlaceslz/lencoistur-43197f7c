@@ -10,26 +10,26 @@ import "jspdf-autotable";
 
 // Riscos inerentes conforme P6 VATTI
 const RISKS_OPTIONS = [
-  "Insolação e hipotermia",
-  "Picadas de insetos",
-  "Mau tempo e mudanças climáticas",
-  "Perda de objetos pessoais",
-  "Capotamento ou colisão com outro veículo",
-  "Quedas na água",
-  "Ingestão ou respiração de água",
+  "Insolação e variações térmicas",
+  "Interação com fauna local / Picadas de insetos",
+  "Instabilidade climática e fenômenos naturais",
+  "Danos ou perda de pertences pessoais",
+  "Incidentes veiculares (Capotamento / Colisão)",
+  "Riscos aquáticos (Quedas, Ingestão de água)",
   "Afogamento",
-  "Lesões graves ou gravíssimas",
+  "Incidentes em trilhas (Quedas / Entorses)",
+  "Lesões de natureza grave ou gravíssima",
 ];
 
 // Controles operacionais VATTI
 const SAFETY_CONTROLS = [
-  "Capacitação constante da equipe de condutores",
-  "Capacitação constante da equipe de condutores",
-  "Cabo de resgate em todas as operações",
-  "Orientações aos clientes",
-  "Equipe capacitada para situações de emergência",
-  "Equipe preparada para resgates e primeiros socorros",
-  "Plano de Resposta a Emergências (PRE) implementado",
+  "Condutores certificados e treinados",
+  "Treinamento contínuo em SGS",
+  "Equipamentos de resgate a bordo",
+  "Protocolos de Primeiros Socorros",
+  "Briefing de segurança pré-saída",
+  "Monitoramento de condições climáticas",
+  "Plano de Resposta a Emergências (PRE)",
 ];
 
 // Questões de saúde P6 VATTI
