@@ -22,6 +22,8 @@ export interface ReceiptData {
   pixCode?: string | null;
   createdAt: string;
   notes?: string | null;
+  cpf?: string;
+  passport?: string;
 }
 
 const fmt = (v: number) => `R$ ${v.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
