@@ -300,7 +300,29 @@ const TermoAssinatura = () => {
       const healthText = healthInfo.length > 0 ? `Condições informadas: ${healthInfo.join(", ")}` : "Nenhuma condição de saúde informada pelo participante.";
       doc.text(healthText, 14, currentY, { maxWidth: pageWidth - 28 });
       
-      currentY += 20;
+      currentY += 15;
+
+      // Companions
+      if (companions.length > 0) {
+        doc.setFontSize(14);
+        doc.text("Acompanhantes", 14, currentY);
+        currentY += 5;
+        const companionsRows = companions.map(c => [
+          c.full_name, 
+          c.is_adult ? "Adulto" : "Menor", 
+          c.is_adult ? (signatures[c.id] || c.signature_data ? "Assinado" : "Pendente") : `Resp: ${c.responsible_name || '-'}`
+        ]);
+        (doc as any).autoTable({
+          startY: currentY,
+          head: [['Nome', 'Tipo', 'Status / Resp.']],
+          body: companionsRows,
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 2 }
+        });
+        currentY = (doc as any).lastAutoTable.finalY + 15;
+      }
+      
+      currentY += 5;
       
       // Declaration
       doc.setFontSize(12);
