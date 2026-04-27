@@ -8,7 +8,7 @@ import {
   LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot,
   Shield, AlertTriangle, Activity, ClipboardCheck, Truck, UserCheck2,
   ChevronDown, FileText, Check, Building2, Map, ChevronRight, BarChart3,
-  HelpCircle
+  HelpCircle, ClipboardList
 } from "lucide-react";
 
 interface Notification {
@@ -50,6 +50,7 @@ const sgsGroups = [
       { icon: Users, label: "Visitantes", path: "/admin/sgs/condutores-visitantes" },
       { icon: Map, label: "Rotas / Trilhas", path: "/admin/sgs/rotas" },
       { icon: ClipboardCheck, label: "Checklists", path: "/admin/sgs/checklists" },
+      { icon: ClipboardList, label: "Controles Internos (P5)", path: "/admin/sgs/controles" },
       { icon: Shield, label: "Briefings", path: "/admin/sgs/briefings" },
     ],
   },

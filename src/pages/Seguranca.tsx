@@ -1,6 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Shield, CheckCircle, AlertTriangle, Phone, FileText, Activity, Users, Award } from "lucide-react";
+import { Shield, CheckCircle, AlertTriangle, Phone, FileText, Activity, Users, Award, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
@@ -138,6 +138,35 @@ const Seguranca = () => {
                   * Nossa equipe possui Plano de Resposta a Emergências (PRE) <br /> treinado e atualizado.
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Transparência Section */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 max-w-4xl text-center">
+          <h2 className="font-display text-3xl font-bold mb-6">Transparência e Documentação</h2>
+          <p className="text-muted-foreground mb-10">
+            Nossa Política de Segurança e Plano de Gestão estão disponíveis para consulta pública. 
+            Acreditamos que um turista bem informado é um turista mais seguro.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div className="p-6 border border-border rounded-3xl text-left bg-muted/20">
+              <FileText className="text-primary mb-4" size={32} />
+              <h3 className="font-bold mb-2">P1 — Política de Segurança</h3>
+              <p className="text-xs text-muted-foreground mb-4">Relatório oficial descrevendo nossas diretrizes e compromissos com a segurança conforme ISO 21101.</p>
+              <Link to="/admin/sgs" className="text-primary text-sm font-bold flex items-center gap-1 hover:underline">
+                Visualizar documento <ExternalLink size={14} />
+              </Link>
+            </div>
+            <div className="p-6 border border-border rounded-3xl text-left bg-muted/20">
+              <Shield className="text-primary mb-4" size={32} />
+              <h3 className="font-bold mb-2">Informações aos Participantes</h3>
+              <p className="text-xs text-muted-foreground mb-4">Manual de orientações básicas sobre riscos, equipamentos e conduta segura durante os passeios.</p>
+              <Link to="/passeios" className="text-primary text-sm font-bold flex items-center gap-1 hover:underline">
+                Acesse nossos roteiros <ExternalLink size={14} />
+              </Link>
             </div>
           </div>
         </div>

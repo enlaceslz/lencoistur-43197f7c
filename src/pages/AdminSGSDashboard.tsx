@@ -4,7 +4,8 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Shield, AlertTriangle, CheckCircle, Users, TrendingUp, Activity, Phone, Building2,
-  Plus, ArrowRight, Clock, FileText, ClipboardCheck, Car, UserCheck2, Map, Truck, Star
+  Plus, ArrowRight, Clock, FileText, ClipboardCheck, Car, UserCheck2, Map, Truck, Star,
+  Wrench, ClipboardList
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import { jsPDF } from "jspdf";
@@ -12,7 +13,7 @@ import "jspdf-autotable";
 
 const AdminSGSDashboard = () => {
   const navigate = useNavigate();
-  const [stats, setStats] = useState({ risks: 0, incidents: 0, actions: 0, expiring: 0, surveyAvg: 0, briefings: 0, terms: 0, pendingTerms: 0, veiculos: 0, condutores: 0, checklists: 0 });
+  const [stats, setStats] = useState({ risks: 0, incidents: 0, actions: 0, expiring: 0, surveyAvg: 0, briefings: 0, terms: 0, pendingTerms: 0, veiculos: 0, condutores: 0, checklists: 0, equipment: 0, procedures: 0 });
   const [risksByLevel, setRisksByLevel] = useState<any[]>([]);
   const [incidentsByMonth, setIncidentsByMonth] = useState<any[]>([]);
   const [risksByStage, setRisksByStage] = useState<any[]>([]);
@@ -21,7 +22,7 @@ const AdminSGSDashboard = () => {
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
-    const [risksRes, incidentsRes, actionsRes, staffRes, surveysRes, briefingsRes, termsRes, veiculosRes, condutoresRes, checklistsRes, bookingsRes] = await Promise.all([
+    const [risksRes, incidentsRes, actionsRes, staffRes, surveysRes, briefingsRes, termsRes, veiculosRes, condutoresRes, checklistsRes, bookingsRes, equipmentRes, proceduresRes] = await Promise.all([
       supabase.from("sgs_risks").select("*"),
       supabase.from("sgs_incidents").select("*").order("created_at", { ascending: false }),
       supabase.from("sgs_corrective_actions").select("*").in("status", ["pendente", "em_andamento"]),
@@ -33,6 +34,8 @@ const AdminSGSDashboard = () => {
       supabase.from("sgs_condutores").select("id").eq("status", "ativo"),
       supabase.from("sgs_checklists").select("id, created_at").order("created_at", { ascending: false }).limit(1),
       supabase.from("bookings").select("id").not("status", "eq", "cancelada"),
+      supabase.from("sgs_equipment").select("id"),
+      supabase.from("sgs_procedures").select("id"),
     ]);
 
     const risks = risksRes.data || [];
@@ -58,7 +61,9 @@ const AdminSGSDashboard = () => {
       pendingTerms: pendingCount,
       veiculos: (veiculosRes.data || []).length,
       condutores: (condutoresRes.data || []).length,
-      checklists: checklistsRes.data?.length || 0,
+      checklists: (checklistsRes.data || []).length,
+      equipment: (equipmentRes.data || []).length,
+      procedures: (proceduresRes.data || []).length,
     });
 
     // Recent activity from incidents
@@ -222,6 +227,7 @@ const AdminSGSDashboard = () => {
     { label: "Registrar Incidente", icon: Activity, path: "/admin/sgs/incidentes", color: "bg-destructive/10 text-destructive hover:bg-destructive/20" },
     { label: "Novo Briefing", icon: Shield, path: "/admin/sgs/briefings", color: "bg-primary/10 text-primary hover:bg-primary/20" },
     { label: "Novo Checklist", icon: ClipboardCheck, path: "/admin/sgs/checklists", color: "bg-primary/10 text-primary hover:bg-primary/20" },
+    { label: "Controle P5", icon: ClipboardList, path: "/admin/sgs/controles", color: "bg-secondary/10 text-secondary hover:bg-secondary/20" },
     { label: "Termo de Risco", icon: FileText, path: "/admin/sgs/termos", color: "bg-secondary/10 text-secondary hover:bg-secondary/20" },
     { label: "Novo Risco", icon: AlertTriangle, path: "/admin/sgs/riscos", color: "bg-secondary/10 text-secondary hover:bg-secondary/20" },
     { label: "Gerar PGSAT", icon: FileText, path: "/admin/sgs/pgsat", color: "bg-primary/10 text-primary hover:bg-primary/20" },
@@ -238,6 +244,8 @@ const AdminSGSDashboard = () => {
     { label: "Termos Assinados", value: stats.terms, icon: FileText, color: "text-primary", path: "/admin/sgs/termos" },
     { label: "Termos Pendentes", value: stats.pendingTerms, icon: Shield, color: "text-destructive", path: "/admin/sgs/termos", urgent: stats.pendingTerms > 0 },
     { label: "Avaliação Segurança", value: `${stats.surveyAvg}/5`, icon: Star, color: "text-primary", path: "/admin/sgs/pesquisas" },
+    { label: "Equipamentos (P5)", value: stats.equipment, icon: Wrench, color: "text-primary", path: "/admin/sgs/controles" },
+    { label: "Procedimentos (POP)", value: stats.procedures, icon: ClipboardList, color: "text-primary", path: "/admin/sgs/controles" },
   ];
 
   return (

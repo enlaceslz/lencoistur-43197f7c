@@ -1151,6 +1151,45 @@ export type Database = {
         }
         Relationships: []
       }
+      sgs_equipment: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          last_inspection: string | null
+          name: string
+          next_inspection: string | null
+          notes: string | null
+          responsible: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          last_inspection?: string | null
+          name: string
+          next_inspection?: string | null
+          notes?: string | null
+          responsible?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          last_inspection?: string | null
+          name?: string
+          next_inspection?: string | null
+          notes?: string | null
+          responsible?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sgs_incidents: {
         Row: {
           action_taken: string | null
@@ -1255,6 +1294,42 @@ export type Database = {
           titulo?: string
           updated_at?: string
           versao?: string
+        }
+        Relationships: []
+      }
+      sgs_procedures: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          file_url: string | null
+          id: string
+          status: string | null
+          title: string
+          updated_at: string
+          version: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          status?: string | null
+          title: string
+          updated_at?: string
+          version?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          file_url?: string | null
+          id?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+          version?: string | null
         }
         Relationships: []
       }
