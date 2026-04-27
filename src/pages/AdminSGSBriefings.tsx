@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, CheckCircle, XCircle, MapPin } from "lucide-react";
+import { Plus, CheckCircle, XCircle, MapPin, Pencil, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const CHECKLIST_ITEMS = [
