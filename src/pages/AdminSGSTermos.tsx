@@ -210,6 +210,7 @@ const AdminSGSTermos = () => {
   };
 
   const resetForm = () => {
+    setEditingId(null);
     setForm({
       customer_id: "",
       tour_id: "",
