@@ -561,7 +561,7 @@ const AdminSGSTermos = () => {
                 type="submit" 
                 className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl text-sm font-bold shadow-sm transition-all active:scale-[0.98]"
               >
-                Gerar Termo de Responsabilidade
+                {editingId ? "Atualizar Termo de Responsabilidade" : "Gerar Termo de Responsabilidade"}
               </button>
               <button 
                 type="button" 
