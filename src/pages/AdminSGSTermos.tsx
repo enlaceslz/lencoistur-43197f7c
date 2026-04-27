@@ -311,16 +311,16 @@ const AdminSGSTermos = () => {
         </div>
 
         <div class="section">
-          <div class="section-title">Descrição da Atividade</div>
-          <p><strong>Passeio:</strong> ${term.tours?.name || term.tour_name}</p>
-          <p>${term.tours?.description || "Passeio em veículo 4x4 na Rota das Emoções com duração de aproximadamente 8h. Inicia na agência às 9h com visita às dunas. Três paradas para banho. Chegada às 17h."}</p>
-          <p><strong>Veículo:</strong> ${term.sgs_veiculos?.modelo || "Veículo 4x4 padrão"} - Placa: ${term.sgs_veiculos?.placa || "___"}</p>
-          <p class="small">Idade mínima recomendada: 2 anos. Peso máximo: 110kg. Recomenda-se saber nadar e traje de banho.</p>
+          <div class="section-title">Informações e Recomendações</div>
+          <p class="small">A atividade não requer nenhuma habilidade específica, mas recomenda-se: saber nadar (teremos paradas para banhos nas lagoas); vestir-se com traje de banho, roupas e calçados confortáveis; levar uma toalha (ou canga), um casaco corta-vento, chapéu ou boné, óculos de sol, REPELENTE e PROTETOR SOLAR; não usar acessórios (brincos, relógios, pulseiras, anéis, etc.); precaver-se com água e lanche.</p>
+          <p class="small">Durante todo o percurso não há sanitários disponíveis, apenas no local de embarque e restaurantes.</p>
         </div>
 
         <div class="section">
           <div class="section-title">Riscos e Cuidados com a Segurança</div>
-          <p class="small">Os riscos inerentes são: insolação, hipotermia, picadas de insetos, mau tempo, perda de objetos, capotamento, colisão, quedas na água, afogamento e lesões. Adotamos controles como capacitação, cabos de resgate e orientações.</p>
+          <p class="small">Informamos que os riscos inerentes ao passeio fora de estrada na Rota das Emoções são, principalmente: insolação, hipotermia, picadas de insetos, mau tempo, perda de objetos pessoais, capotamento, colisão com outro veículo, quedas na água, ingestão ou respiração de água, afogamento e até lesões graves ou gravíssimas.</p>
+          <p class="small">Para contornar essas situações adotamos controles operacionais: capacitação constante da nossa equipe de condutores, cabo de resgate, orientações aos clientes e equipe preparada para realizar resgates e atendimento de primeiros socorros, condizentes com o nosso Plano de Resposta a Emergências (PRE).</p>
+          <p class="small">Por segurança, se necessário, a atividade poderá ser interrompida por nossa equipe no caso de condições climáticas não favoráveis (chuva excessiva, ventos fortes, queda de granizo, neblina, serração, incidentes com os condutores).</p>
         </div>
 
         <div class="section">
