@@ -116,25 +116,30 @@ const AdminSGSEquipe = () => {
       <div className="space-y-6">
         <div className="flex justify-between gap-4">
           <p className="text-sm text-muted-foreground">Gestão de competências conforme ABNT NBR ISO 21102</p>
-          <button onClick={() => setShowForm(!showForm)}
+          <button onClick={() => { setEditId(null); setForm({ name: "", role: "guia", phone: "", email: "", document: "", blocked: false }); setShowForm(!showForm); }}
             className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
             <Plus size={16} /> Novo Membro
           </button>
         </div>
 
         {showForm && (
-          <form onSubmit={addStaff} className="bg-card border border-border rounded-2xl p-6 space-y-4">
-            <h3 className="font-display font-bold text-foreground">Adicionar Membro</h3>
+          <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-lg animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="flex justify-between items-center">
+              <h3 className="font-display font-bold text-lg text-foreground">{editId ? "Editar Membro" : "Novo Membro"}</h3>
+              <button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="text-muted-foreground hover:text-foreground">
+                <X size={20} />
+              </button>
+            </div>
             <div className="grid sm:grid-cols-3 gap-4">
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Nome *</label>
+                <label className="text-xs font-semibold text-muted-foreground mb-1 block uppercase tracking-wider">Nome *</label>
                 <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+                  className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
               </div>
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Função *</label>
+                <label className="text-xs font-semibold text-muted-foreground mb-1 block uppercase tracking-wider">Função *</label>
                 <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  className="w-full bg-muted/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all">
                   {Object.entries(ROLES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </div>
