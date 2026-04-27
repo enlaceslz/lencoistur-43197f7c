@@ -197,6 +197,8 @@ const AdminSGSTermos = () => {
           full_name: m.full_name,
           cpf: m.cpf,
           birth_date: m.birth_date || null,
+          is_adult: m.is_adult || false,
+          responsible_name: m.responsible_name || null
         }));
         await supabase.from("sgs_risk_term_minors").insert(minorsPayload);
       }
