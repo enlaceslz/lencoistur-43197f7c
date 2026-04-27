@@ -489,8 +489,27 @@ const AdminReservas = () => {
                         {actionLoading ? <Loader2 className="animate-spin mr-1" size={14} /> : null} Salvar
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => setShowNotes(false)}>Cancelar</Button>
-                    </div>
+                {/* Links */}
+                {(selected.invoiceUrl || selected.voucherUrl) && (
+                  <div className="flex gap-2 w-full">
+                    {selected.invoiceUrl && (
+                      <Button variant="outline" size="sm" className="flex-1" asChild>
+                        <a href={selected.invoiceUrl} target="_blank" rel="noopener noreferrer">
+                          <FileText size={14} className="mr-1" /> Nota Fiscal
+                        </a>
+                      </Button>
+                    )}
+                    {selected.voucherUrl && (
+                      <Button variant="outline" size="sm" className="flex-1" asChild>
+                        <a href={selected.voucherUrl} target="_blank" rel="noopener noreferrer">
+                          <FileText size={14} className="mr-1" /> Voucher
+                        </a>
+                      </Button>
+                    )}
                   </div>
+                )}
+              </div>
+            </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">{selected.notes || "Nenhuma observação."}</p>
                 )}
