@@ -256,8 +256,15 @@ const AdminSGSTermos = () => {
     const formattedDate = format(new Date(term.term_date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
     
     const minorsHtml = term.sgs_risk_term_minors?.map((m: any, i: number) => `
-      <p style="margin: 5px 0;">${i + 1}- ${m.full_name}, ${m.cpf ? `CPF: ${m.cpf}` : ""}, Data Nasc: ${m.birth_date ? format(new Date(m.birth_date), "dd/MM/yyyy") : "___"}</p>
-    `).join("") || "Nenhum menor declarado.";
+      <div style="margin: 8px 0; padding-bottom: 5px; border-bottom: 1px solid #f0f0f0;">
+        <p style="margin: 2px 0;"><strong>${i + 1}- ${m.full_name}</strong> ${m.is_adult ? "(Maior de Idade)" : "(Menor de Idade)"}</p>
+        <p style="margin: 2px 0; font-size: 10px; color: #666;">
+          ${m.cpf ? `CPF: ${m.cpf}` : ""} ${m.birth_date ? `| Nasc: ${format(new Date(m.birth_date), "dd/MM/yyyy")}` : ""} 
+          ${!m.is_adult && m.responsible_name ? `| Responsável: ${m.responsible_name}` : ""}
+        </p>
+        ${m.signature_data ? `<div style="margin-top: 5px;"><img src="${m.signature_data}" style="height: 40px;" /><br/><span style="font-size: 8px;">Assinado em ${format(new Date(m.signed_at), "dd/MM/yyyy HH:mm")}</span></div>` : ""}
+      </div>
+    `).join("") || "Nenhum acompanhante declarado.";
 
     const healthResponse = (val: boolean) => val ? "S" : "N";
 
