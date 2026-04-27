@@ -173,6 +173,7 @@ Deno.serve(async (req) => {
         .from("bookings")
         .insert({
           customer_id: customerId,
+          user_id: userId,
           type,
           item_name: itemName,
           date: date || null,
