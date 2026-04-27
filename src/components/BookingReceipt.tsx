@@ -240,6 +240,7 @@ function generateReceiptHTML(data: ReceiptData, company?: any): string {
       <div class="field"><label>Nome Completo</label><p>${data.customerName}</p></div>
       <div class="field"><label>E-mail</label><p>${data.customerEmail}</p></div>
       <div class="field"><label>Telefone</label><p>${data.customerPhone || "Não informado"}</p></div>
+      <div class="field"><label>Documento</label><p>${data.cpf ? `CPF: ${data.cpf}` : (data.passport ? `Passaporte: ${data.passport}` : "Não informado")}</p></div>
       <div class="field"><label>Código da Reserva</label><p>${data.bookingCode}</p></div>
     </div>
 
