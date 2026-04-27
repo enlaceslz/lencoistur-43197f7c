@@ -104,7 +104,11 @@ const AdminReservas = () => {
   }, [showNewForm]);
 
   const resetNewForm = () => {
-    setNewForm({ type: "tour", itemName: "", date: "", guests: 1, payMethod: "pix", customerName: "", customerEmail: "", customerPhone: "" });
+    setNewForm({
+      type: "tour", itemName: "", date: "", guests: 1, payMethod: "pix",
+      customerName: "", customerEmail: "", customerPhone: "",
+      cpf: "", passport: "", country: "Brasil", birthDate: ""
+    });
     setSelectedCustomerId("");
     setCustomerSearch("");
   };
