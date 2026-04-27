@@ -4,7 +4,7 @@ const tourEcologico = "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9
 const tourGastronomico = "https://images.unsplash.com/photo-1569336415962-a4bd9f67c07a?auto=format&fit=crop&q=95&w=2560";
 const tourCultural = "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=95&w=2560";
 const tourCaiaque = "https://images.unsplash.com/photo-1625026214227-2c9cc0883658?auto=format&fit=crop&q=95&w=2560";
-const tourTrekking = "https://images.unsplash.com/photo-1625026214227-2c9cc0883658?auto=format&fit=crop&q=95&w=2560";
+const tourTrekking = "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=95&w=2560";
 const tourQuadriciclo = "https://images.unsplash.com/photo-1589112735741-26c6d04325a8?auto=format&fit=crop&q=95&w=2560";
 const galleryBanho = "https://images.unsplash.com/photo-1632734490799-738914614a93?auto=format&fit=crop&q=95&w=2560";
 const galleryPanorama = "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=95&w=2560";

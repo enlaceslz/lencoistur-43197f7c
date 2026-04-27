@@ -29,6 +29,7 @@ const STATUS_COLORS: Record<string, string> = {
 const emptyForm = {
   type: "incidente", location: "", guide_name: "", description: "", severity: "media",
   people_involved: "", action_taken: "", tour_id: "" as string,
+  date: new Date().toISOString().slice(0, 16),
 };
 
 interface TourOpt { id: string; name: string; }
@@ -65,6 +66,7 @@ const AdminSGSIncidentes = () => {
       description: inc.description, severity: inc.severity,
       people_involved: inc.people_involved || "", action_taken: inc.action_taken || "",
       tour_id: inc.tour_id || "",
+      date: new Date(inc.date).toISOString().slice(0, 16),
     });
     setShowForm(true);
   };
@@ -178,6 +180,11 @@ const AdminSGSIncidentes = () => {
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
                   {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Data e Hora *</label>
+                <input required type="datetime-local" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Passeio Relacionado</label>
