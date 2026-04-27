@@ -177,36 +177,69 @@ const TermoAssinatura = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     
-    // Check if canvas is empty (simplified)
+    // Check main signature
     const blank = document.createElement('canvas');
     blank.width = canvas.width;
     blank.height = canvas.height;
     if (canvas.toDataURL() === blank.toDataURL()) {
-      toast({ title: "Assinatura necessária", description: "Por favor, assine no campo indicado.", variant: "destructive" });
+      toast({ title: "Assinatura necessária", description: "O participante principal deve assinar no campo indicado.", variant: "destructive" });
       return;
+    }
+
+    // Check companion signatures if any adult
+    const adultCompanions = companions.filter(c => c.is_adult);
+    for (const companion of adultCompanions) {
+      if (!signatures[companion.id] && !companion.signature_data) {
+        toast({ title: "Assinatura pendente", description: `O acompanhante ${companion.full_name} deve assinar.`, variant: "destructive" });
+        return;
+      }
     }
 
     setSigning(true);
     const signatureData = canvas.toDataURL();
 
     try {
-      // 1. Save term record
-      const { data: termData, error: termError } = await supabase.from("sgs_risk_terms").insert({
-        booking_id: booking.id,
-        customer_name: booking.customers?.name || booking.customer_name,
-        nationality: booking.customers?.nationality || "BR",
-        phone: booking.customers?.phone || booking.customer_phone,
-        tour_name: booking.item_name,
-        risks_informed: acceptedRisks,
-        health_questions: healthInfo,
-        safety_controls_informed: true,
-        accepted: true,
-        signature_data: signatureData,
-        signed_at: new Date().toISOString(),
-        cancellation_policy: "Conforme política da agência aceita no momento da reserva."
-      }).select().single();
+      let currentTermId = term?.id;
 
-      if (termError) throw termError;
+      if (!currentTermId) {
+        // 1. Save term record if it doesn't exist
+        const { data: termData, error: termError } = await supabase.from("sgs_risk_terms").insert({
+          booking_id: booking.id,
+          customer_name: booking.customers?.name || booking.customer_name,
+          nationality: booking.customers?.nationality || "BR",
+          phone: booking.customers?.phone || booking.customer_phone,
+          tour_name: booking.item_name,
+          risks_informed: acceptedRisks,
+          health_questions: healthInfo,
+          safety_controls_informed: true,
+          accepted: true,
+          signature_data: signatureData,
+          signed_at: new Date().toISOString(),
+          cancellation_policy: "Conforme política da agência aceita no momento da reserva."
+        }).select().single();
+
+        if (termError) throw termError;
+        currentTermId = termData.id;
+      } else {
+        // Update existing term
+        const { error: termError } = await supabase.from("sgs_risk_terms").update({
+          risks_informed: acceptedRisks,
+          health_questions: healthInfo,
+          signature_data: signatureData,
+          signed_at: new Date().toISOString(),
+          accepted: true
+        }).eq("id", currentTermId);
+
+        if (termError) throw termError;
+      }
+
+      // 2. Update companion signatures
+      for (const companionId in signatures) {
+        await supabase.from("sgs_risk_term_minors").update({
+          signature_data: signatures[companionId],
+          signed_at: new Date().toISOString()
+        }).eq("id", companionId);
+      }
 
       // 2. Generate PDF
       const doc = new jsPDF();
