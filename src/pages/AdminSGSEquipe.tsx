@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, UserCheck, AlertTriangle, Shield } from "lucide-react";
+import { Plus, Search, UserCheck, AlertTriangle, Shield, Pencil, Trash2, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const ROLES: Record<string, string> = { guia: "Guia", motorista: "Motorista", apoio: "Apoio" };
