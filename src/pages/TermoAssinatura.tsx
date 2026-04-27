@@ -484,7 +484,8 @@ const TermoAssinatura = () => {
                 <h3 className="font-bold">Informações Importantes</h3>
               </div>
               <div className="text-sm text-muted-foreground space-y-3 leading-relaxed">
-                <p>O passeio será realizado em veículo 4x4 na região dos Lençóis Maranhenses. A atividade envolve deslocamento em terrenos irregulares, dunas e banho em lagoas naturais.</p>
+                <p>A atividade não requer nenhuma habilidade específica, mas recomenda-se: saber nadar; vestir-se com traje de banho, roupas e calçados confortáveis; levar toalha, casaco corta-vento, chapéu, óculos de sol, REPELENTE e PROTETOR SOLAR; não usar acessórios; precaver-se com água e lanche.</p>
+                <p>Durante todo o percurso não há sanitários disponíveis, apenas no local de embarque e restaurantes.</p>
                 
                 <div className="bg-primary/5 rounded-xl p-3 border border-primary/10">
                   <p className="font-semibold text-xs text-primary mb-2 uppercase tracking-tight">Controles Operacionais Adotados:</p>
