@@ -20,6 +20,7 @@ const AdminSGSBriefings = () => {
   const [briefings, setBriefings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
   const [tours, setTours] = useState<TourOpt[]>([]);
   const [form, setForm] = useState({
     guide_name: "", language: "pt", tour_id: "" as string,
