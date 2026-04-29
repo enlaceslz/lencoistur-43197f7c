@@ -30,6 +30,7 @@ const AdminSGSTermos = () => {
   const [showConfig, setShowConfig] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("todos"); // "todos", "assinado", "pendente"
   const [company, setCompany] = useState<any>(null);
 
   const [termConfig, setTermConfig] = useState({
