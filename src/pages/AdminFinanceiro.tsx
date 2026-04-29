@@ -333,8 +333,8 @@ const AdminFinanceiro = () => {
               transition={{ duration: 0.2 }}
             >
               {tab === "fluxo" && <FluxoCaixaTab bookings={bookings} contasPagar={contasPagar} />}
-              {tab === "pagar" && <ContasPagarTab />}
-              {tab === "receber" && <ContasReceberTab />}
+              {tab === "pagar" && <ContasPagarTab company={company} />}
+              {tab === "receber" && <ContasReceberTab company={company} />}
               {tab === "dre" && <DRETab bookings={bookings} contasPagar={contasPagar} />}
               {tab === "notas" && <NotasFiscaisTab bookings={bookings} />}
             </motion.div>
