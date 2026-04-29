@@ -44,6 +44,7 @@ const TermoAssinatura = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const bookingCode = params.get("booking") || "";
+  const bookingIdParam = params.get("booking_id") || "";
   const termId = params.get("id") || "";
   
   const [booking, setBooking] = useState<any>(null);
