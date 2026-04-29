@@ -602,6 +602,11 @@ const AdminPasseios = () => {
                   </div>
                 </TableCell>
                 <TableCell>
+                  <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">
+                    {t.pix_discount}%
+                  </Badge>
+                </TableCell>
+                <TableCell>
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-1.5" title="SGS ISO 21101/03">
                       <Shield size={12} className="text-primary" />
