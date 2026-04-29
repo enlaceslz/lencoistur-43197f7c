@@ -14,6 +14,7 @@ import ContasPagarTab from "@/components/financeiro/ContasPagarTab";
 import ContasReceberTab from "@/components/financeiro/ContasReceberTab";
 import DRETab from "@/components/financeiro/DRETab";
 import NotasFiscaisTab from "@/components/financeiro/NotasFiscaisTab";
+import { formatCurrency } from "@/lib/utils";
 
 type Tab = "fluxo" | "pagar" | "receber" | "dre" | "notas";
 
@@ -37,11 +38,9 @@ interface BookingRow {
   voucher_url?: string | null;
 }
 
-const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmt = (v: number) => formatCurrency(v / 100);
 const fmtDate = (d: string) => {
-  if (!d) return "—";
-  try { return new Date(d).toLocaleDateString("pt-BR"); } catch { return d; }
-};
+...
 
 const AdminFinanceiro = () => {
   const [tab, setTab] = useState<Tab>("fluxo");
