@@ -39,9 +39,9 @@ const CheckoutPage = () => {
         setTransfer(data);
       } else if (type === "package" && packageSlug) {
         const pkgData = [
-          { name: "Pacote Essencial Lençóis", slug: "essencial", price: 459 },
-          { name: "Pacote Aventura Total", slug: "aventura", price: 579 },
-          { name: "Pacote Imersão Completa", slug: "imersao", price: 799 },
+          { name: "Pacote Essencial Lençóis", slug: "essencial", price: 45900 },
+          { name: "Pacote Aventura Total", slug: "aventura", price: 57900 },
+          { name: "Pacote Imersão Completa", slug: "imersao", price: 79900 },
         ].find(p => p.slug === packageSlug);
         setPkg(pkgData);
       }
