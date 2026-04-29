@@ -704,7 +704,7 @@ const AdminPasseios = () => {
                 </div>
                 <div className="bg-muted rounded-xl p-3 flex flex-col justify-center">
                   <p className="text-xs text-muted-foreground flex items-center gap-1"><Shield size={12} className="text-secondary" /> Privativo</p>
-                  <p className="text-sm font-bold text-secondary mt-1">{fmt(detailTour.private_price || 130000)}</p>
+                  <p className="text-sm font-bold text-secondary mt-1">{fmt(detailTour.private_price || 1300)}</p>
                 </div>
                 <div className="bg-muted rounded-xl p-3">
                   <p className="text-xs text-muted-foreground flex items-center gap-1"><Star size={12} /> Avaliação</p>
