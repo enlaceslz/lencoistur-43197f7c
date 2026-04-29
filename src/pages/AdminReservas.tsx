@@ -789,7 +789,7 @@ const AdminReservas = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <label className="text-sm text-muted-foreground mb-1 block">Data de Nascimento</label>
-                    <Input type="date" value={newForm.birthDate} onChange={(e) => setNewForm(f => ({ ...f, birthDate: e.target.value }))} disabled={!!selectedCustomerId} />
+                    <Input type="date" value={newForm.birthDate} onChange={(e) => setNewForm(f => ({ ...f, birthDate: e.target.value }))} disabled={!!selectedCustomerId && !editingId} />
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground mb-1 block">País</label>
