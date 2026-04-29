@@ -331,7 +331,7 @@ const AdminRelatorios = () => {
                       <BarChart data={[{ name: 'Fluxo', recebido: data.recebido, pago: data.pago }]}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                         <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                        <YAxis fontSize={10} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v/100}`} />
+                        <YAxis fontSize={10} axisLine={false} tickLine={false} tickFormatter={(v) => `R$ ${(v/100).toLocaleString('pt-BR')}`} />
                         <Tooltip formatter={(v: number) => fmt(v)} />
                         <Bar dataKey="recebido" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                         <Bar dataKey="pago" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
