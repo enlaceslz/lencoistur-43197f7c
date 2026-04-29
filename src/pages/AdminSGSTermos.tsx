@@ -344,7 +344,8 @@ const AdminSGSTermos = () => {
 
         <div class="section">
           <div class="section-title">Informações e Recomendações</div>
-          <div style="font-size: 10px; color: #444;">
+          <div style="font-size: 10px; color: #444; white-space: pre-wrap;">
+            ${term.sgs_empresa?.term_recommendations || `
             <p>A atividade não requer habilidades técnicas avançadas, mas para sua melhor experiência recomendamos:</p>
             <ul style="margin-top: 5px; padding-left: 15px;">
               <li>Saber nadar (haverá paradas para banho em lagoas e rios);</li>
@@ -354,13 +355,14 @@ const AdminSGSTermos = () => {
               <li>Evitar acessórios (brincos, relógios, anéis) para prevenir perdas ou acidentes;</li>
               <li>Portar água potável e lanche leve para o percurso.</li>
             </ul>
-            <p style="margin-top: 5px; font-style: italic;">Nota: Sanitários disponíveis apenas no local de embarque e em restaurantes selecionados.</p>
+            `}
           </div>
         </div>
 
         <div class="section">
           <div class="section-title">Riscos e Cuidados com a Segurança</div>
-          <div style="font-size: 10px; color: #444;">
+          <div style="font-size: 10px; color: #444; white-space: pre-wrap;">
+            ${term.sgs_empresa?.term_safety_risks || `
             <p>Os riscos inerentes ao passeio off-road na Rota das Emoções incluem: insolação, variações térmicas (hipotermia), picadas de insetos, mudanças climáticas bruscas, perda de objetos, incidentes veiculares (capotamento/colisão) e riscos aquáticos.</p>
             <p style="margin-top: 5px;"><strong>Nossas Medidas de Segurança:</strong></p>
             <ul style="padding-left: 15px;">
@@ -369,7 +371,7 @@ const AdminSGSTermos = () => {
               <li>Equipe preparada para Primeiros Socorros e Resgate;</li>
               <li>Plano de Resposta a Emergências (PRE) rigorosamente seguido.</li>
             </ul>
-            <p style="margin-top: 5px; font-weight: bold;">A atividade poderá ser interrompida a qualquer momento por decisão técnica em caso de condições climáticas adversas ou riscos à integridade do grupo.</p>
+            `}
           </div>
         </div>
 
