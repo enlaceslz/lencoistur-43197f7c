@@ -590,6 +590,27 @@ const AdminSGSTermos = () => {
 
             <div className="grid md:grid-cols-3 gap-6">
               <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Vincular a Reserva (Opcional)</label>
+                <select 
+                  value={form.booking_id}
+                  onChange={e => {
+                    const bid = e.target.value;
+                    const booking = bookings.find(b => b.id === bid);
+                    if (booking) {
+                      setForm(f => ({ ...f, booking_id: bid, customer_id: booking.customer_id }));
+                    } else {
+                      setForm(f => ({ ...f, booking_id: bid }));
+                    }
+                  }}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none"
+                >
+                  <option value="">Selecione a Reserva</option>
+                  {bookings.map(b => (
+                    <option key={b.id} value={b.id}>{b.booking_code} - {b.item_name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Cliente *</label>
                 <select 
                   required
