@@ -15,7 +15,7 @@ import {
   Search, ShoppingCart, CheckCircle, Clock, XCircle, Eye,
   DollarSign, Ban, Loader2, Users, Calendar, CreditCard, FileText,
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
-  Plus, Copy,
+  Plus, Copy, Pencil,
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { toast } from "sonner";
@@ -55,7 +55,7 @@ const formatPhone = (v: string) => {
 };
 
 const AdminReservas = () => {
-  const { bookings, loading, addBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
+  const { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
   const [dateStart, setDateStart] = useState("");
@@ -64,6 +64,7 @@ const AdminReservas = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [editNotes, setEditNotes] = useState("");
   const [showNotes, setShowNotes] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // New booking form state
   const [showNewForm, setShowNewForm] = useState(false);
@@ -104,6 +105,30 @@ const AdminReservas = () => {
     loadOptions();
   }, [showNewForm]);
 
+  const openEdit = (b: BookingItem) => {
+    setEditingId(b.id);
+    const mode = b.itemName.includes("(Privativo)") ? "privativo" : "coletivo";
+    const cleanName = b.itemName.replace(/\s*\((Coletivo|Privativo)\)$/, "");
+    
+    setNewForm({
+      type: b.type === "transfer" ? "transfer" : "tour",
+      tourMode: mode as "coletivo" | "privativo",
+      itemName: b.type === "transfer" ? b.itemName : cleanName,
+      date: b.date,
+      guests: b.guests,
+      payMethod: b.payMethod === "info" ? "pix" : b.payMethod as "pix" | "card",
+      customerName: b.customerName,
+      customerEmail: b.customerEmail,
+      customerPhone: b.customerPhone,
+      cpf: b.cpf || "",
+      passport: b.passport || "",
+      country: b.country || "Brasil",
+      birthDate: b.birthDate || "",
+    });
+    setSelectedCustomerId(b.customerId || "");
+    setShowNewForm(true);
+  };
+
   const resetNewForm = () => {
     setNewForm({
       type: "tour", tourMode: "coletivo", itemName: "", date: "", guests: 1, payMethod: "pix",
@@ -112,13 +137,10 @@ const AdminReservas = () => {
     });
     setSelectedCustomerId("");
     setCustomerSearch("");
+    setEditingId(null);
   };
 
   // Calculate prices for the new form
-  const selectedItem = newForm.type === "tour" 
-    ? tours.find(t => t.name === newForm.itemName)
-    : transfers.find(t => t.label === newForm.itemName);
-  
   const selectedTour = newForm.type === "tour" ? tours.find(t => t.name === newForm.itemName) : null;
   const selectedTransfer = newForm.type === "transfer" ? transfers.find(t => t.label === newForm.itemName) : null;
   
@@ -149,8 +171,8 @@ const AdminReservas = () => {
     }
     setNewLoading(true);
     try {
-      await addBooking({
-        type: newForm.type,
+      const bookingData = {
+        type: newForm.type === "transfer" ? "transfer" : "tour",
         itemName: newForm.type === "tour" ? `${newForm.itemName} (${newForm.tourMode === "privativo" ? "Privativo" : "Coletivo"})` : newForm.itemName,
         date: newForm.date || "",
         guests: newForm.guests,
@@ -166,12 +188,22 @@ const AdminReservas = () => {
         total,
         discount,
         finalTotal,
-      });
-      toast.success("Reserva criada com sucesso!");
+      };
+
+      if (editingId) {
+        const original = bookings.find(b => b.id === editingId);
+        if (original && original.customerId) {
+          await updateBooking(editingId, original.customerId, bookingData);
+          toast.success("Reserva atualizada com sucesso!");
+        }
+      } else {
+        await addBooking(bookingData as any);
+        toast.success("Reserva criada com sucesso!");
+      }
       setShowNewForm(false);
       resetNewForm();
     } catch (err: any) {
-      toast.error(err?.message || "Erro ao criar reserva.");
+      toast.error(err?.message || "Erro ao processar reserva.");
     }
     setNewLoading(false);
   };
@@ -539,6 +571,9 @@ const AdminReservas = () => {
 
               {/* Actions */}
               <div className="flex gap-3 pt-2 flex-wrap">
+                <Button variant="outline" onClick={() => { setSelected(null); openEdit(selected); }} disabled={actionLoading} className="flex-1 min-w-[140px]">
+                  <Pencil size={16} className="mr-2" /> Editar Reserva
+                </Button>
                 {selected.status === "pendente" && selected.paymentStatus === "pendente" && (
                   <Button onClick={() => handleAction(() => confirmPayment(selected.id), "Pagamento confirmado!")} disabled={actionLoading} className="flex-1 min-w-[140px]">
                     {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle size={16} className="mr-2" />}
@@ -608,7 +643,8 @@ const AdminReservas = () => {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Plus size={20} /> Nova Reserva
+              {editingId ? <Pencil size={20} /> : <Plus size={20} />} 
+              {editingId ? "Editar Reserva" : "Nova Reserva"}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleNewBooking} className="space-y-4">
@@ -726,38 +762,38 @@ const AdminReservas = () => {
               <div className="space-y-3">
                 <div>
                   <label className="text-sm text-muted-foreground mb-1 block">Nome *</label>
-                  <Input value={newForm.customerName} onChange={(e) => setNewForm(f => ({ ...f, customerName: e.target.value }))} placeholder="Nome completo" required maxLength={255} disabled={!!selectedCustomerId} />
+                  <Input value={newForm.customerName} onChange={(e) => setNewForm(f => ({ ...f, customerName: e.target.value }))} placeholder="Nome completo" required maxLength={255} disabled={!!selectedCustomerId && !editingId} />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <label className="text-sm text-muted-foreground mb-1 block">E-mail *</label>
-                    <Input type="email" value={newForm.customerEmail} onChange={(e) => setNewForm(f => ({ ...f, customerEmail: e.target.value }))} placeholder="email@exemplo.com" required maxLength={255} disabled={!!selectedCustomerId} />
+                    <Input type="email" value={newForm.customerEmail} onChange={(e) => setNewForm(f => ({ ...f, customerEmail: e.target.value }))} placeholder="email@exemplo.com" required maxLength={255} disabled={!!selectedCustomerId && !editingId} />
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground mb-1 block">Telefone</label>
-                    <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" maxLength={15} disabled={!!selectedCustomerId} />
+                    <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" maxLength={15} disabled={!!selectedCustomerId && !editingId} />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <label className="text-sm text-muted-foreground mb-1 block">CPF</label>
-                    <Input value={newForm.cpf} onChange={(e) => setNewForm(f => ({ ...f, cpf: e.target.value }))} placeholder="000.000.000-00" disabled={!!selectedCustomerId} />
+                    <Input value={newForm.cpf} onChange={(e) => setNewForm(f => ({ ...f, cpf: e.target.value }))} placeholder="000.000.000-00" disabled={!!selectedCustomerId && !editingId} />
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground mb-1 block">Passaporte</label>
-                    <Input value={newForm.passport} onChange={(e) => setNewForm(f => ({ ...f, passport: e.target.value }))} placeholder="Para estrangeiros" disabled={!!selectedCustomerId} />
+                    <Input value={newForm.passport} onChange={(e) => setNewForm(f => ({ ...f, passport: e.target.value }))} placeholder="Para estrangeiros" disabled={!!selectedCustomerId && !editingId} />
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <label className="text-sm text-muted-foreground mb-1 block">Data de Nascimento</label>
-                    <Input type="date" value={newForm.birthDate} onChange={(e) => setNewForm(f => ({ ...f, birthDate: e.target.value }))} disabled={!!selectedCustomerId} />
+                    <Input type="date" value={newForm.birthDate} onChange={(e) => setNewForm(f => ({ ...f, birthDate: e.target.value }))} disabled={!!selectedCustomerId && !editingId} />
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground mb-1 block">País</label>
-                    <Input value={newForm.country} onChange={(e) => setNewForm(f => ({ ...f, country: e.target.value }))} placeholder="Ex: Brasil" disabled={!!selectedCustomerId} />
+                    <Input value={newForm.country} onChange={(e) => setNewForm(f => ({ ...f, country: e.target.value }))} placeholder="Ex: Brasil" disabled={!!selectedCustomerId && !editingId} />
                   </div>
                 </div>
               </div>
@@ -784,8 +820,8 @@ const AdminReservas = () => {
             )}
 
             <Button type="submit" className="w-full" disabled={newLoading || !newForm.itemName}>
-              {newLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Plus size={16} className="mr-2" />}
-              Criar Reserva
+              {newLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : (editingId ? <Pencil size={16} className="mr-2" /> : <Plus size={16} className="mr-2" />)}
+              {editingId ? "Salvar Alterações" : "Criar Reserva"}
             </Button>
           </form>
         </DialogContent>

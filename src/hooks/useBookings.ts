@@ -179,5 +179,39 @@ export function useBookings() {
     if (error) throw error;
   }, []);
 
-  return { bookings, loading, addBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes, refresh: fetchBookings };
+  const updateBooking = useCallback(async (id: string, customerId: string, data: any) => {
+    const { error: customerError } = await supabase
+      .from("customers")
+      .update({
+        name: data.customerName,
+        email: data.customerEmail,
+        phone: data.customerPhone,
+        cpf: data.cpf,
+        passport: data.passport,
+        country: data.country,
+        birth_date: data.birthDate,
+      })
+      .eq("id", customerId);
+    
+    if (customerError) throw customerError;
+
+    const { error: bookingError } = await supabase
+      .from("bookings")
+      .update({
+        type: data.type,
+        item_name: data.itemName,
+        date: data.date,
+        guests: data.guests,
+        pay_method: data.payMethod,
+        unit_price: data.unitPrice,
+        total: data.total,
+        discount: data.discount,
+        final_total: data.finalTotal,
+      })
+      .eq("id", id);
+      
+    if (bookingError) throw bookingError;
+  }, []);
+
+  return { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes, refresh: fetchBookings };
 }
