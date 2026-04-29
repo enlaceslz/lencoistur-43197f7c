@@ -14,7 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Loader2, MapPin, Settings2, Eye, Phone, Mail, User, Percent, FileText, Calendar, CheckCircle2, XCircle
+  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Loader2, MapPin, Settings2, Eye, Phone, Mail, User, Percent, FileText, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -50,6 +50,8 @@ interface Partner {
   cnh: string | null;
   cnh_validade: string | null;
   cadastur: string | null;
+  remuneration_type: string | null;
+  remuneration_value: number | null;
 }
 
 const iconMap: Record<string, any> = {
@@ -82,6 +84,7 @@ const AdminParceiros = () => {
   const [form, setForm] = useState({
     name: "", type: "hotel", contact_name: "", phone: "", email: "",
     commission_rate: "10", cpf_cnpj: "", address: "", cnh: "", cnh_validade: "", cadastur: "",
+    remuneration_type: "comissao_percent", remuneration_value: "0"
   });
 
   const [typeForm, setTypeForm] = useState({
@@ -113,7 +116,8 @@ const AdminParceiros = () => {
     setForm({ 
       name: "", type: partnerTypes[0]?.name || "hotel", contact_name: "", phone: "", 
       email: "", commission_rate: "10", cpf_cnpj: "", address: "", 
-      cnh: "", cnh_validade: "", cadastur: "" 
+      cnh: "", cnh_validade: "", cadastur: "",
+      remuneration_type: "comissao_percent", remuneration_value: "0"
     });
     setDialogOpen(true);
   };
@@ -126,6 +130,8 @@ const AdminParceiros = () => {
       email: p.email || "", commission_rate: String(p.commission_rate || 0),
       cpf_cnpj: p.cpf_cnpj || "", address: p.address || "",
       cnh: p.cnh || "", cnh_validade: p.cnh_validade || "", cadastur: p.cadastur || "",
+      remuneration_type: p.remuneration_type || "comissao_percent",
+      remuneration_value: String(p.remuneration_value || 0)
     });
     setDialogOpen(true);
   };
@@ -215,6 +221,8 @@ const AdminParceiros = () => {
       cnh: form.type === "motorista" ? (form.cnh.trim() || null) : null,
       cnh_validade: form.type === "motorista" && form.cnh_validade ? form.cnh_validade : null,
       cadastur: form.type === "guia" ? (form.cadastur.trim() || null) : null,
+      remuneration_type: form.remuneration_type,
+      remuneration_value: Number(form.remuneration_value) || 0,
     };
 
     if (editPartner) {
@@ -371,7 +379,7 @@ const AdminParceiros = () => {
                   <TableHead>Tipo</TableHead>
                   <TableHead>CPF/CNPJ</TableHead>
                   <TableHead>Contato</TableHead>
-                  <TableHead>Comissão</TableHead>
+                  <TableHead>Remuneração</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="w-24 text-right">Ações</TableHead>
                 </TableRow>
@@ -405,7 +413,12 @@ const AdminParceiros = () => {
                           <span className="block text-xs text-green-600 dark:text-green-400">Cadastur: {p.cadastur}</span>
                         )}
                       </TableCell>
-                      <TableCell className="font-medium text-foreground">{p.commission_rate || 0}%</TableCell>
+                      <TableCell className="font-medium text-foreground">
+                        {p.remuneration_type === "comissao_percent" && `${p.remuneration_value || 0}%`}
+                        {p.remuneration_type === "valor_por_passeio" && `R$ ${p.remuneration_value || 0} / passeio`}
+                        {p.remuneration_type === "valor_mensal" && `R$ ${p.remuneration_value || 0} / mês`}
+                        {!p.remuneration_type && `${p.commission_rate || 0}%`}
+                      </TableCell>
                       <TableCell>
                         <Badge
                           variant="secondary"
@@ -485,9 +498,35 @@ const AdminParceiros = () => {
               <Label className="mb-1.5 block">Email</Label>
               <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             </div>
-            <div>
-              <Label className="mb-1.5 block">Comissão (%)</Label>
-              <Input type="number" min="0" max="100" value={form.commission_rate} onChange={(e) => setForm({ ...form, commission_rate: e.target.value })} />
+            <div className="p-4 border border-blue-100 dark:border-blue-900 rounded-xl bg-blue-50/30 dark:bg-blue-900/10 space-y-4">
+              <p className="text-sm font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-1">
+                <Landmark size={14} /> Regra de Remuneração
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="mb-1.5 block">Tipo de Remuneração</Label>
+                  <select 
+                    value={form.remuneration_type} 
+                    onChange={(e) => setForm({ ...form, remuneration_type: e.target.value })}
+                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option value="comissao_percent">Comissão %</option>
+                    <option value="valor_por_passeio">Por Passeio R$</option>
+                    <option value="valor_mensal">Mensal R$</option>
+                  </select>
+                </div>
+                <div>
+                  <Label className="mb-1.5 block">
+                    {form.remuneration_type === "comissao_percent" ? "Porcentagem (%)" : "Valor (R$)"}
+                  </Label>
+                  <Input 
+                    type="number" 
+                    min="0" 
+                    value={form.remuneration_value} 
+                    onChange={(e) => setForm({ ...form, remuneration_value: e.target.value })} 
+                  />
+                </div>
+              </div>
             </div>
 
             {form.type === "motorista" && (
@@ -648,10 +687,32 @@ const AdminParceiros = () => {
                     <p className="font-medium">{viewPartner?.contact_name || "Não informado"}</p>
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Comissão</Label>
+                    <Label className="text-xs text-muted-foreground">Remuneração</Label>
                     <div className="flex items-center gap-2 text-primary font-bold text-lg">
-                      <Percent size={18} />
-                      {viewPartner?.commission_rate || 0}%
+                      {viewPartner?.remuneration_type === "comissao_percent" && (
+                        <>
+                          <Percent size={18} />
+                          {viewPartner?.remuneration_value || 0}%
+                        </>
+                      )}
+                      {viewPartner?.remuneration_type === "valor_por_passeio" && (
+                        <>
+                          <Banknote size={18} />
+                          R$ {viewPartner?.remuneration_value || 0} <span className="text-xs font-normal text-muted-foreground ml-1">por passeio</span>
+                        </>
+                      )}
+                      {viewPartner?.remuneration_type === "valor_mensal" && (
+                        <>
+                          <Clock size={18} />
+                          R$ {viewPartner?.remuneration_value || 0} <span className="text-xs font-normal text-muted-foreground ml-1">por mês</span>
+                        </>
+                      )}
+                      {!viewPartner?.remuneration_type && (
+                        <>
+                          <Percent size={18} />
+                          {viewPartner?.commission_rate || 0}%
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
