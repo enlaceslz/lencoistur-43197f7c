@@ -520,6 +520,69 @@ const AdminCRM = () => {
     fetchCustomers();
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!selectedCustomer || !e.target.files || e.target.files.length === 0) return;
+    
+    setUploadingDoc(true);
+    const file = e.target.files[0];
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${selectedCustomer.id}/${Date.now()}.${fileExt}`;
+    
+    try {
+      const { data, error } = await supabase.storage
+        .from('customer-documents')
+        .upload(fileName, file);
+        
+      if (error) throw error;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('customer-documents')
+        .getPublicUrl(fileName);
+        
+      const { error: dbError } = await supabase
+        .from('customer_documents')
+        .insert({
+          customer_id: selectedCustomer.id,
+          name: file.name,
+          file_url: publicUrl,
+          file_type: file.type,
+          file_size: file.size,
+          category: docCategory
+        });
+        
+      if (dbError) throw dbError;
+      
+      toast.success("Documento anexado!");
+      fetchDocuments(selectedCustomer.id);
+    } catch (error: any) {
+      toast.error("Erro ao anexar documento: " + error.message);
+    } finally {
+      setUploadingDoc(false);
+    }
+  };
+
+  const handleDeleteDocument = async (id: string) => {
+    const doc = customerDocuments.find(d => d.id === id);
+    if (!doc) return;
+    
+    try {
+      const path = doc.file_url.split('/').pop();
+      if (path) {
+        const fullPath = `${selectedCustomer?.id}/${path}`;
+        await supabase.storage.from('customer-documents').remove([fullPath]);
+      }
+      
+      const { error } = await supabase.from("customer_documents").delete().eq("id", id);
+      if (error) throw error;
+      
+      toast.success("Documento removido!");
+      if (selectedCustomer) fetchDocuments(selectedCustomer.id);
+    } catch (error: any) {
+      toast.error("Erro ao excluir documento.");
+    }
+    setDeleteDocConfirm(null);
+  };
+
   const exportCSV = () => {
     if (filtered.length === 0) {
       toast.error("Nenhum cliente para exportar.");
