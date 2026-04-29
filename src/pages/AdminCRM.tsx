@@ -1047,6 +1047,75 @@ const AdminCRM = () => {
                     <Printer size={14} /> Imprimir Ficha PDF
                   </Button>
                 </div>
+                <div className="border-t border-border pt-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-display font-bold text-foreground">Documentos e Anexos</h4>
+                    <div className="flex gap-2">
+                      <select 
+                        className="text-[10px] bg-muted border border-border rounded px-1"
+                        value={docCategory}
+                        onChange={(e) => setDocCategory(e.target.value)}
+                      >
+                        <option value="outros">Outros</option>
+                        <option value="recibo">Recibo</option>
+                        <option value="termo">Termo</option>
+                        <option value="documento">Documento</option>
+                      </select>
+                      <Label htmlFor="doc-upload" className="cursor-pointer">
+                        <div className="flex items-center gap-1 bg-primary/10 text-primary hover:bg-primary/20 px-2 py-1 rounded text-[10px] font-bold transition-colors">
+                          {uploadingDoc ? <Loader2 size={12} className="animate-spin" /> : <Paperclip size={12} />}
+                          Anexar
+                        </div>
+                        <Input 
+                          id="doc-upload" 
+                          type="file" 
+                          className="hidden" 
+                          onChange={handleFileUpload} 
+                          disabled={uploadingDoc}
+                        />
+                      </Label>
+                    </div>
+                  </div>
+                  
+                  {customerDocuments.length === 0 ? (
+                    <p className="text-[10px] text-muted-foreground italic bg-muted/20 p-3 rounded-xl border border-dashed border-border text-center">
+                      Nenhum documento anexado.
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {customerDocuments.map((doc) => (
+                        <div key={doc.id} className="bg-muted/50 rounded-xl p-3 flex items-center justify-between group">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-8 h-8 rounded-lg bg-background flex items-center justify-center shrink-0 border border-border">
+                              <FileText size={16} className="text-primary" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-foreground truncate">{doc.name}</p>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline" className="text-[8px] px-1 py-0 uppercase bg-background">
+                                  {doc.category}
+                                </Badge>
+                                <span className="text-[10px] text-muted-foreground">
+                                  {new Date(doc.created_at).toLocaleDateString("pt-BR")}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <a href={doc.file_url} target="_blank" rel="noopener noreferrer">
+                              <Button variant="ghost" size="icon" className="h-7 w-7">
+                                <Download size={12} />
+                              </Button>
+                            </a>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-destructive/10" onClick={() => setDeleteDocConfirm(doc.id)}>
+                              <Trash2 size={12} className="text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
                 {/* Dependentes */}
                 <div className="border-t border-border pt-6">
