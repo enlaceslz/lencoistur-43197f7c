@@ -158,6 +158,25 @@ const AdminConfig = () => {
     toast.success("Logo enviada com sucesso!");
   };
 
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast.error("Selecione um arquivo de imagem válido."); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("A imagem deve ter no máximo 5MB."); return; }
+
+    setUploadingBanner(true);
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `banners/banner-${Date.now()}.${ext}`;
+
+    const { error } = await supabase.storage.from("tour-images").upload(path, file, { upsert: true });
+    if (error) { toast.error("Erro ao enviar banner: " + error.message); setUploadingBanner(false); return; }
+
+    const { data: urlData } = supabase.storage.from("tour-images").getPublicUrl(path);
+    setSite((prev) => ({ ...prev, bannerUrl: urlData.publicUrl }));
+    setUploadingBanner(false);
+    toast.success("Banner principal enviado com sucesso!");
+  };
+
   const handleChangePassword = async () => {
     if (!novaSenha || !confirmarSenha) { toast.error("Preencha a nova senha e a confirmação."); return; }
     if (novaSenha.length < 8) { toast.error("A nova senha deve ter pelo menos 8 caracteres."); return; }
