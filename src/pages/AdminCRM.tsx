@@ -35,6 +35,17 @@ interface Customer {
   lastBooking: string | null;
 }
 
+interface CustomerDocument {
+  id: string;
+  customer_id: string;
+  name: string;
+  file_url: string;
+  file_type: string | null;
+  file_size: number | null;
+  category: string;
+  created_at: string;
+}
+
 interface Dependent {
   id: string;
   customer_id: string;
