@@ -505,7 +505,7 @@ const CheckoutPage = () => {
               type="submit"
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-xl font-semibold text-lg transition-colors"
             >
-              {payMethod === "pix" ? `Gerar PIX — R$ ${finalTotal}` : payMethod === "info" ? "Solicitar Informações" : `Pagar R$ ${finalTotal}`}
+              {payMethod === "pix" ? `Gerar PIX — ${formatCurrency(finalTotal / 100)}` : payMethod === "info" ? "Solicitar Informações" : `Pagar ${formatCurrency(finalTotal / 100)}`}
             </button>
 
             <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">
