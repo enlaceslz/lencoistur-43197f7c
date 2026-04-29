@@ -7,10 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Loader2, Pencil, Trash2, Link2, Calendar, User, Tag, CheckCircle2, AlertCircle } from "lucide-react";
+import { Plus, Loader2, Pencil, Trash2, Link2, Calendar, User, Tag, CheckCircle2, AlertCircle, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const fmt = (v: number) => formatCurrency(v);
 
@@ -25,7 +27,7 @@ const parseCurrency = (v: string) => {
 
 const fmtDate = (d: string | null) => {
   if (!d) return "—";
-  try { return new Date(d + "T00:00:00").toLocaleDateString("pt-BR"); } catch { return d; }
+  try { return new Date(d + "T12:00:00").toLocaleDateString("pt-BR"); } catch { return d; }
 };
 
 const statusConfig: Record<string, { class: string, icon: any }> = {
@@ -54,7 +56,7 @@ interface BookingOption { id: string; booking_code: string; item_name: string; f
 
 const emptyForm = { descricao: "", valor: 0, vencimento: "", categoria: "reserva", cliente: "", observacoes: "", status: "pendente", booking_id: "", customer_id: "" };
 
-export default function ContasReceberTab() {
+export default function ContasReceberTab({ company }: { company?: any }) {
   const [contas, setContas] = useState<Conta[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
