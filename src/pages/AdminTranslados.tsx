@@ -16,9 +16,18 @@ import { toast } from "sonner";
 
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+const maskCurrency = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  return (Number(n) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+};
+
+const parseCurrency = (v: string) => {
+  return Number(v.replace(/\D/g, ""));
+};
+
 const emptyForm = {
   origin: "", destination: "", duration: "", distance: "",
-  price: "", vehicle_type: "Van Executiva", seats: 10,
+  price: 0, vehicle_type: "Van Executiva", seats: 10,
   departures: "", active: true, pix_discount: 0,
 };
 
