@@ -108,7 +108,7 @@ const emptyDependentForm: DependentForm = {
   relationship: "Filho(a)"
 };
 
-const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const maskPhone = (v: string) => {
   v = v.replace(/\D/g, "");
