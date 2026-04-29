@@ -471,6 +471,26 @@ const AdminSGSTermos = () => {
               className="w-full pl-9 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30" 
             />
           </div>
+          <div className="flex bg-muted p-1 rounded-xl">
+            <button 
+              onClick={() => setStatusFilter("todos")}
+              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${statusFilter === "todos" ? "bg-white text-primary shadow-sm" : "text-muted-foreground"}`}
+            >
+              Todos
+            </button>
+            <button 
+              onClick={() => setStatusFilter("assinado")}
+              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${statusFilter === "assinado" ? "bg-white text-green-600 shadow-sm" : "text-muted-foreground"}`}
+            >
+              Assinados
+            </button>
+            <button 
+              onClick={() => setStatusFilter("pendente")}
+              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${statusFilter === "pendente" ? "bg-white text-amber-600 shadow-sm" : "text-muted-foreground"}`}
+            >
+              Pendentes
+            </button>
+          </div>
           <div className="flex gap-2">
             <button 
               onClick={() => {
