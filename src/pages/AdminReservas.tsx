@@ -37,7 +37,7 @@ const paymentConfig: Record<string, { label: string; className: string }> = {
 };
 
 
-const fmt = (v: number) => (v / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const fmt = (v: number) => formatCurrency(v);
 const fmtDate = (d: string) => {
 
   if (!d) return "—";
