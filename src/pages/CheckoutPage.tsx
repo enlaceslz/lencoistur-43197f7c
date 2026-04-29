@@ -10,6 +10,13 @@ import { toast } from "@/hooks/use-toast";
 import { maskCPF, maskPhone } from "@/lib/masks";
 
 
+const formatCurrency = (value: number) => {
+  return value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+};
+
 const CheckoutPage = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -178,7 +185,7 @@ const CheckoutPage = () => {
               </div>
 
               <div className="mt-4 text-center">
-                <p className="text-lg font-bold text-primary font-display">R$ {confirmedBooking.finalTotal}</p>
+                <p className="text-lg font-bold text-primary font-display">{formatCurrency(confirmedBooking.finalTotal)}</p>
               </div>
             </div>
           )}
@@ -226,12 +233,12 @@ const CheckoutPage = () => {
             {displayDiscount > 0 && (
               <div className="flex justify-between text-sm text-green-600">
                 <span>Desconto PIX ({pixDiscountPercent}%)</span>
-                <span className="font-semibold">-R$ {displayDiscount}</span>
+                <span className="font-semibold">-{formatCurrency(displayDiscount)}</span>
               </div>
             )}
             <div className="flex justify-between font-bold text-lg border-t border-border pt-3">
               <span className="text-foreground">Total</span>
-              <span className="text-primary">R$ {confirmedBooking.finalTotal}</span>
+              <span className="text-primary">{formatCurrency(confirmedBooking.finalTotal)}</span>
             </div>
           </div>
 

@@ -5,6 +5,13 @@ import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+const formatCurrency = (value: number) => {
+  return value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+};
+
 const TourDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const [tour, setTour] = useState<any>(null);
@@ -273,7 +280,7 @@ const TourDetail = () => {
                   <>
                     <span className="text-xs text-muted-foreground">{vehicleLabel} exclusiva</span>
                     <div className="flex items-baseline gap-1">
-                      <span className="font-display text-3xl font-bold text-secondary">R$ {tour.private_price || 1300}</span>
+                      <span className="font-display text-3xl font-bold text-secondary">{formatCurrency(tour.private_price || 1300)}</span>
                       <span className="text-muted-foreground text-sm">/ até {vehicleCapacity} pessoas</span>
                     </div>
                   </>
@@ -281,7 +288,7 @@ const TourDetail = () => {
                   <>
                     <span className="text-xs text-muted-foreground">a partir de</span>
                     <div className="flex items-baseline gap-1">
-                      <span className="font-display text-3xl font-bold text-primary">R$ {tour.price}</span>
+                      <span className="font-display text-3xl font-bold text-primary">{formatCurrency(tour.price)}</span>
                       <span className="text-muted-foreground text-sm">/ pessoa</span>
                     </div>
                   </>
@@ -312,25 +319,25 @@ const TourDetail = () => {
                 {isPrivate ? (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">{isBoatTour ? "Embarcação privativa" : "Veículo privativo"} ({guests} passageiros)</span>
-                    <span className="text-foreground font-semibold">R$ {totalPrice}</span>
+                    <span className="text-foreground font-semibold">{formatCurrency(totalPrice)}</span>
                   </div>
                 ) : (
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">R$ {tour.price} × {guests} pessoas</span>
-                    <span className="text-foreground font-semibold">R$ {totalPrice}</span>
+                    <span className="text-muted-foreground">{formatCurrency(tour.price)} × {guests} pessoas</span>
+                    <span className="text-foreground font-semibold">{formatCurrency(totalPrice)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Taxa de serviço</span>
-                  <span className="text-foreground font-semibold">R$ 0</span>
+                  <span className="text-foreground font-semibold">{formatCurrency(0)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-lg border-t border-border pt-3">
                   <span className="text-foreground">Total</span>
                   <div className="text-right">
-                    <span className={isPrivate ? "text-secondary" : "text-primary"}>R$ {totalPrice}</span>
+                    <span className={isPrivate ? "text-secondary" : "text-primary"}>{formatCurrency(totalPrice)}</span>
                     {tour.pix_discount > 0 && (
                       <p className="text-[11px] text-green-600 font-semibold">
-                        ou R$ {Math.round(totalPrice * (1 - tour.pix_discount / 100))} no PIX
+                        ou {formatCurrency(Math.round(totalPrice * (1 - tour.pix_discount / 100)))} no PIX
                       </p>
                     )}
                   </div>

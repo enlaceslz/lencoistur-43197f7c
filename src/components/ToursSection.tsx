@@ -30,6 +30,13 @@ const localImageMap: Record<string, string> = {
   "passeio-de-quadriciclo": tourQuadriciclo,
 };
 
+const formatCurrency = (value: number) => {
+  return value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+};
+
 const ToursSection = () => {
   const { t } = useTranslation();
   const [tours, setTours] = useState<any[]>([]);
@@ -95,7 +102,7 @@ const ToursSection = () => {
                       </span>
                       <div className="flex items-baseline gap-1">
                         <p className={`text-lg font-bold ${tour.mode_collective_enabled !== false ? "text-primary" : "text-secondary"}`}>
-                          R$ {tour.mode_collective_enabled !== false ? tour.price : tour.private_price}
+                          {formatCurrency(tour.mode_collective_enabled !== false ? tour.price : tour.private_price)}
                         </p>
                         {tour.pix_discount > 0 && (
                           <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">
