@@ -3,6 +3,7 @@ import { Clock, Sparkles, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { formatCurrency } from "@/lib/utils";
 
 interface Package {
   id: string;
@@ -21,19 +22,19 @@ const packages: Package[] = [
   {
     id: "pkg-1", name: "Pacote Essencial Lençóis", slug: "essencial",
     description: "O melhor dos Lençóis Maranhenses em 3 dias. Ideal para quem tem pouco tempo mas quer viver as experiências mais icônicas.",
-    tourSlugs: ["lagoas-azuis", "passeio-de-barco", "passeio-gastronomico"], days: 3, originalPrice: 570, discountPrice: 459, tag: "Mais Vendido",
+    tourSlugs: ["lagoas-azuis", "passeio-de-barco", "passeio-gastronomico"], days: 3, originalPrice: 57000, discountPrice: 45900, tag: "Mais Vendido",
     highlights: ["Lagoas Azuis", "Rio Preguiças", "Gastronomia local", "Transfer incluso"],
   },
   {
     id: "pkg-2", name: "Pacote Aventura Total", slug: "aventura",
     description: "Para quem busca adrenalina! Caiaque, quadriciclo e trekking nas dunas mais impressionantes do Brasil.",
-    tourSlugs: ["descida-de-caiaque", "trekking-nas-dunas", "passeio-de-quadriciclo"], days: 4, originalPrice: 720, discountPrice: 579, tag: "Aventura",
+    tourSlugs: ["descida-de-caiaque", "trekking-nas-dunas", "passeio-de-quadriciclo"], days: 4, originalPrice: 72000, discountPrice: 57900, tag: "Aventura",
     highlights: ["Caiaque nos rios", "Trekking nas dunas", "Quadriciclo", "Lagoas remotas"],
   },
   {
     id: "pkg-3", name: "Pacote Imersão Completa", slug: "imersao",
     description: "A experiência definitiva: 5 dias explorando todos os cantos dos Lençóis Maranhenses com roteiros exclusivos.",
-    tourSlugs: ["lagoas-azuis", "passeio-de-barco", "roteiro-ecologico", "roteiro-cultural", "descida-de-caiaque"], days: 5, originalPrice: 1060, discountPrice: 799, tag: "Premium",
+    tourSlugs: ["lagoas-azuis", "passeio-de-barco", "roteiro-ecologico", "roteiro-cultural", "descida-de-caiaque"], days: 5, originalPrice: 106000, discountPrice: 79900, tag: "Premium",
     highlights: ["5 passeios completos", "Roteiro ecológico", "Cultural + gastronômico", "Guia exclusivo"],
   },
 ];
@@ -108,11 +109,11 @@ const PackagesSection = () => {
                   <div className="border-t border-border pt-4 flex items-end justify-between">
                     <div>
                       <span className="text-sm text-muted-foreground line-through">
-                        {pkg.originalPrice.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                        {formatCurrency(pkg.originalPrice)}
                       </span>
                       <div className="flex items-baseline gap-1">
                         <span className="font-display text-2xl font-bold text-primary">
-                          {pkg.discountPrice.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                          {formatCurrency(pkg.discountPrice)}
                         </span>
                         <span className="text-xs text-muted-foreground">{t("packages.perPerson")}</span>
                       </div>
