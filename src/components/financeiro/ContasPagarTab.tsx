@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -103,6 +103,16 @@ export default function ContasPagarTab({ company }: { company?: any }) {
     }
     setSaving(false); setOpen(false); load();
   };
+
+  const filteredContas = useMemo(() => {
+    return contas.filter(c => {
+      const matchesSearch = c.descricao.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           (c.fornecedor?.toLowerCase() || "").includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === "todos" || c.status === statusFilter;
+      const matchesCategory = categoryFilter === "todos" || c.categoria === categoryFilter;
+      return matchesSearch && matchesStatus && matchesCategory;
+    });
+  }, [contas, searchTerm, statusFilter, categoryFilter]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Excluir esta conta?")) return;
