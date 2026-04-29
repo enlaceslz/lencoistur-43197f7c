@@ -93,7 +93,7 @@ export default function ContasReceberTab() {
     setEditing(c);
     setForm({
       descricao: c.descricao,
-      valor: String(c.valor / 100),
+      valor: c.valor,
       vencimento: c.vencimento,
       categoria: c.categoria,
       cliente: c.cliente || "",
