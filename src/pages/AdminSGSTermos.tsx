@@ -655,12 +655,12 @@ const AdminSGSTermos = () => {
 
             <div className="grid md:grid-cols-3 gap-6">
                <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Data do Termo</label>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Data do Termo (Atualizada automaticamente)</label>
                 <input 
                   type="date"
+                  disabled
                   value={form.term_date}
-                  onChange={e => setForm({ ...form, term_date: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none"
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none opacity-70 cursor-not-allowed"
                 />
               </div>
               <div>
