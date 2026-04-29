@@ -643,7 +643,8 @@ const AdminReservas = () => {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Plus size={20} /> Nova Reserva
+              {editingId ? <Pencil size={20} /> : <Plus size={20} />} 
+              {editingId ? "Editar Reserva" : "Nova Reserva"}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleNewBooking} className="space-y-4">
