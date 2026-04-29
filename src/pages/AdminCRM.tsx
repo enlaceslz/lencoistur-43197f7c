@@ -1173,7 +1173,7 @@ const AdminCRM = () => {
                   )}
                 </div>
 
-                <div className="border-t border-border pt-6">
+                <div className="border-t border-border pt-6 mt-6">
                   <h4 className="font-display font-bold text-foreground mb-3">Histórico de Reservas</h4>
                   {customerBookings.length === 0 ? (
                     <p className="text-sm text-muted-foreground">Nenhuma reserva encontrada.</p>
