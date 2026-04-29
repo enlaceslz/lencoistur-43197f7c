@@ -100,6 +100,10 @@ const getBreadcrumbs = (pathname: string) => {
 
 const AdminLayout = ({ children, title }: { children: React.ReactNode; title: string }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    const saved = localStorage.getItem("admin-sidebar-collapsed");
+    return saved === "true";
+  });
   const [sgsOpen, setSgsOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -109,6 +113,10 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
   const { settings } = useSiteSettings();
+
+  useEffect(() => {
+    localStorage.setItem("admin-sidebar-collapsed", String(sidebarCollapsed));
+  }, [sidebarCollapsed]);
 
   const isSgsActive = location.pathname.startsWith("/admin/sgs");
   const breadcrumbs = getBreadcrumbs(location.pathname);
