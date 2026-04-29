@@ -1118,7 +1118,7 @@ const AdminCRM = () => {
                 </div>
 
                 {/* Dependentes */}
-                <div className="border-t border-border pt-6">
+                <div className="border-t border-border pt-6 mt-6">
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="font-display font-bold text-foreground">Dependentes</h4>
                     <Button variant="ghost" size="sm" className="h-7 text-[10px] gap-1 px-2 rounded-lg" onClick={openCreateDependentModal}>
