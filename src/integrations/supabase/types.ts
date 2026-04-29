@@ -1099,6 +1099,8 @@ export type Database = {
           responsavel_nome: string | null
           responsavel_tecnico: string | null
           telefone: string | null
+          term_recommendations: string | null
+          term_safety_risks: string | null
           uc_nome: string | null
           uc_tipo: string | null
           updated_at: string
@@ -1122,6 +1124,8 @@ export type Database = {
           responsavel_nome?: string | null
           responsavel_tecnico?: string | null
           telefone?: string | null
+          term_recommendations?: string | null
+          term_safety_risks?: string | null
           uc_nome?: string | null
           uc_tipo?: string | null
           updated_at?: string
@@ -1145,6 +1149,8 @@ export type Database = {
           responsavel_nome?: string | null
           responsavel_tecnico?: string | null
           telefone?: string | null
+          term_recommendations?: string | null
+          term_safety_risks?: string | null
           uc_nome?: string | null
           uc_tipo?: string | null
           updated_at?: string
