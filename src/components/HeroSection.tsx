@@ -30,7 +30,7 @@ const HeroSection = () => {
   return (
     <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
       <img
-        src={HERO_IMG}
+        src={heroImg}
         alt="Vista aérea dos Lençóis Maranhenses com lagoas azuis e dunas brancas - Santo Amaro MA"
         className="absolute inset-0 w-full h-full object-cover"
         width={1920}
