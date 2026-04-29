@@ -71,7 +71,7 @@ const validatePixKey = (key: string, type: PixKeyType): { valid: boolean; messag
 
 const DEFAULTS = {
   empresa: { nome: "LençóisTour", cnpj: "12.345.678/0001-90", telefone: "(98) 99999-0000", whatsapp: "(98) 99999-0000", endereco: "Santo Amaro do Maranhão, MA", email: "contato@lencoistour.com" },
-  site: { titulo: "LençóisTour - Passeios nos Lençóis Maranhenses", metaDescricao: "Descubra os Lençóis Maranhenses com a melhor experiência turística.", whatsappUrl: "https://wa.me/5598999990000", instagram: "https://instagram.com/lencoistour", corPrimaria: "#2563eb", logoUrl: null as string | null },
+  site: { titulo: "LençóisTour - Passeios nos Lençóis Maranhenses", metaDescricao: "Descubra os Lençóis Maranhenses com a melhor experiência turística.", whatsappUrl: "https://wa.me/5598999990000", instagram: "https://instagram.com/lencoistour", corPrimaria: "#2563eb", logoUrl: null as string | null, bannerUrl: null as string | null },
   pagamentos: { pix: true, cartao: true, boleto: false, dinheiro: true, transferencia: false, pixChave: "12.345.678/0001-90", pixTipo: "cnpj" as PixKeyType },
   notificacoes: { email: true, whatsapp: true, push: false, novaReserva: true, cancelamento: true, pagamento: true },
 };
