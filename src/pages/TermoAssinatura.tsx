@@ -280,9 +280,20 @@ const TermoAssinatura = () => {
       doc.text("Recomendações e Informações:", 14, currentY);
       currentY += 5;
       doc.setFontSize(8);
-      const recText = "Atividade não requer habilidade específica. Recomenda-se: saber nadar; trajes de banho e roupas confortáveis; levar toalha, casaco, chapéu, repelente e protetor solar; não usar acessórios; água e lanche. Não há sanitários no percurso.";
+      const recText = company?.term_recommendations || "Atividade não requer habilidade específica. Recomenda-se: saber nadar; trajes de banho e roupas confortáveis; levar toalha, casaco, chapéu, repelente e protetor solar; não usar acessórios; água e lanche. Não há sanitários no percurso.";
       doc.text(doc.splitTextToSize(recText, pageWidth - 28), 14, currentY);
-      currentY += 12;
+      
+      if (company?.term_safety_risks) {
+        currentY += (doc.splitTextToSize(recText, pageWidth - 28).length * 4) + 5;
+        doc.setFontSize(11);
+        doc.text("Riscos e Segurança:", 14, currentY);
+        currentY += 5;
+        doc.setFontSize(8);
+        doc.text(doc.splitTextToSize(company.term_safety_risks, pageWidth - 28), 14, currentY);
+        currentY += (doc.splitTextToSize(company.term_safety_risks, pageWidth - 28).length * 4) + 5;
+      } else {
+        currentY += 12;
+      }
 
       // Risks
       doc.setFontSize(14);
