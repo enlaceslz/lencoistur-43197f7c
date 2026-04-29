@@ -539,19 +539,20 @@ const CheckoutPage = () => {
 
                 <div className="border-t border-border pt-4 space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">R$ {unitPrice} × {guests}</span>
-                    <span className="text-foreground font-semibold">R$ {total}</span>
+                    <span className="text-muted-foreground">{formatCurrency(unitPrice / 100)} × {guests}</span>
+                    <span className="text-foreground font-semibold">{formatCurrency(total / 100)}</span>
                   </div>
                   {displayDiscount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Desconto PIX ({pixDiscountPercent}%)</span>
-                      <span className="font-semibold">-R$ {displayDiscount}</span>
+                      <span className="font-semibold">-{formatCurrency(displayDiscount / 100)}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-bold text-lg border-t border-border pt-3">
                     <span className="text-foreground">Total</span>
-                    <span className="text-primary">R$ {finalTotal}</span>
+                    <span className="text-primary">{formatCurrency(finalTotal / 100)}</span>
                   </div>
+
                 </div>
               </div>
             </div>
