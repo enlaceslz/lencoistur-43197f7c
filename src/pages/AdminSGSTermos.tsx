@@ -82,7 +82,33 @@ const AdminSGSTermos = () => {
     setTours(toursRes.data || []);
     setVehicles(vehiclesRes.data || []);
     setCompany(companyRes.data);
+    if (companyRes.data) {
+      setTermConfig({
+        term_recommendations: companyRes.data.term_recommendations || "",
+        term_safety_risks: companyRes.data.term_safety_risks || ""
+      });
+    }
     setLoading(false);
+  };
+
+  const handleSaveConfig = async () => {
+    if (!company) return;
+    const { error } = await supabase
+      .from("sgs_empresa")
+      .update({
+        term_recommendations: termConfig.term_recommendations,
+        term_safety_risks: termConfig.term_safety_risks,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", company.id);
+
+    if (error) {
+      toast({ title: "Erro ao salvar configurações", variant: "destructive" });
+    } else {
+      toast({ title: "Configurações salvas com sucesso!" });
+      setShowConfig(false);
+      load();
+    }
   };
 
   const addMinor = () => {
