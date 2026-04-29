@@ -40,9 +40,12 @@ interface BookingRow {
 
 const fmt = (v: number) => formatCurrency(v / 100);
 const fmtDate = (d: string) => {
-...
+  if (!d) return "—";
+  try { return new Date(d).toLocaleDateString("pt-BR"); } catch { return d; }
+};
 
 const AdminFinanceiro = () => {
+
   const [tab, setTab] = useState<Tab>("fluxo");
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [contasPagar, setContasPagar] = useState<any[]>([]);
