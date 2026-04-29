@@ -191,6 +191,7 @@ const AdminSGSTermos = () => {
 
     const termPayload = {
       customer_id: form.customer_id,
+      booking_id: form.booking_id || null,
       tour_id: form.tour_id,
       vehicle_id: form.vehicle_id || null,
       company_id: company.id,
@@ -213,7 +214,7 @@ const AdminSGSTermos = () => {
       medication_details: form.medication_details,
       emergency_contact_name: form.emergency_contact_name,
       emergency_contact_phone: form.emergency_contact_phone,
-      accepted: true,
+      accepted: editingId ? true : false, // Online signature will mark as accepted
     };
 
     const { data: termData, error } = editingId 
