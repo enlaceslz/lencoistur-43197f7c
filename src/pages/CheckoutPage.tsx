@@ -179,7 +179,7 @@ const CheckoutPage = () => {
               </div>
 
               <div className="mt-4 text-center">
-                <p className="text-lg font-bold text-primary font-display">{formatCurrency(confirmedBooking.finalTotal)}</p>
+                <p className="text-lg font-bold text-primary font-display">{formatCurrency(confirmedBooking.finalTotal / 100)}</p>
               </div>
             </div>
           )}
@@ -227,17 +227,18 @@ const CheckoutPage = () => {
             {displayDiscount > 0 && (
               <div className="flex justify-between text-sm text-green-600">
                 <span>Desconto PIX ({pixDiscountPercent}%)</span>
-                <span className="font-semibold">-{formatCurrency(displayDiscount)}</span>
+                <span className="font-semibold">-{formatCurrency(displayDiscount / 100)}</span>
               </div>
             )}
             <div className="flex justify-between font-bold text-lg border-t border-border pt-3">
               <span className="text-foreground">Total</span>
-              <span className="text-primary">{formatCurrency(confirmedBooking.finalTotal)}</span>
+              <span className="text-primary">{formatCurrency(confirmedBooking.finalTotal / 100)}</span>
             </div>
           </div>
 
           {/* Info */}
           <div className="bg-muted rounded-xl p-4 mb-8 text-sm text-muted-foreground space-y-2">
+
             <p>📧 Enviamos a confirmação para <strong className="text-foreground">{confirmedBooking.customerEmail}</strong></p>
             <p>📱 Você receberá lembretes por WhatsApp no número informado</p>
             <p>🔄 Cancelamento grátis até 24h antes do passeio</p>
