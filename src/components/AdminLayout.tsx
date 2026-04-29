@@ -195,10 +195,11 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           active
             ? "admin-sidebar-item-active text-white bg-white/[0.08]"
             : "text-[hsl(220,15%,65%)] hover:text-white hover:bg-white/[0.06]"
-        } ${indent ? "ml-3 pl-4" : ""}`}
+        } ${indent ? "ml-3 pl-4" : ""} ${sidebarCollapsed ? "justify-center px-0" : ""}`}
+        title={sidebarCollapsed ? label : ""}
       >
-        <Icon size={indent ? 15 : 17} className={active ? "text-[hsl(217,91%,60%)]" : ""} />
-        <span className="truncate">{label}</span>
+        <Icon size={indent ? 15 : 17} className={`${active ? "text-[hsl(217,91%,60%)]" : ""} shrink-0`} />
+        {!sidebarCollapsed && <span className="truncate">{label}</span>}
       </Link>
     );
   };
