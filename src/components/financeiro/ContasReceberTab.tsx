@@ -106,7 +106,6 @@ export default function ContasReceberTab() {
   };
 
   const handleBookingSelect = (bookingId: string) => {
-    setForm(f => ({ ...f, booking_id: bookingId }));
     if (bookingId) {
       const bk = bookings.find(b => b.id === bookingId);
       if (bk) {
@@ -114,10 +113,12 @@ export default function ContasReceberTab() {
           ...f,
           booking_id: bookingId,
           descricao: f.descricao || `Reserva ${bk.booking_code} - ${bk.item_name}`,
-          valor: f.valor || String(bk.final_total / 100),
+          valor: f.valor || bk.final_total,
           cliente: bk.customer_name || f.cliente,
         }));
       }
+    } else {
+      setForm(f => ({ ...f, booking_id: "" }));
     }
   };
 
