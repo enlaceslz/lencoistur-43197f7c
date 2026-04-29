@@ -470,7 +470,8 @@ const CheckoutPage = () => {
                   <Banknote size={20} className="text-green-600 shrink-0" />
                    <p className="text-sm text-muted-foreground">
                     Ao confirmar, você receberá o QR Code PIX para pagamento imediato.
-                    {displayDiscount > 0 && <> Economia de <strong className="text-green-600">R$ {displayDiscount}</strong>!</>}
+                    {displayDiscount > 0 && <> Economia de <strong className="text-green-600">{formatCurrency(displayDiscount / 100)}</strong>!</>}
+
                   </p>
                 </div>
               )}
