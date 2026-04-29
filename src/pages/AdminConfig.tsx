@@ -851,6 +851,84 @@ const AdminConfig = () => {
             )}
           </div>
         </TabsContent>
+
+        {/* GALERIA */}
+        <TabsContent value="galeria">
+          <Card className="border-border">
+            <CardContent className="p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-display font-bold text-foreground text-lg">Galeria de Fotos</h3>
+                  <p className="text-sm text-muted-foreground">Gerencie as imagens da seção "Momentos Inesquecíveis"</p>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    ref={galleryInputRef}
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleGalleryUpload}
+                  />
+                  <Button
+                    onClick={() => galleryInputRef.current?.click()}
+                    disabled={uploadingGallery}
+                    variant="outline"
+                    className="rounded-xl"
+                  >
+                    {uploadingGallery ? <Loader2 size={16} className="animate-spin mr-2" /> : <UploadCloud size={16} className="mr-2" />}
+                    Adicionar Fotos
+                  </Button>
+                  <Button
+                    onClick={() => saveSetting("gallery", gallery as unknown as Record<string, unknown>, "Galeria")}
+                    disabled={saving}
+                    className="rounded-xl"
+                  >
+                    {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
+                    Salvar Galeria
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {gallery.images.length === 0 ? (
+                  <div className="col-span-full py-12 text-center border-2 border-dashed border-border rounded-2xl bg-muted/30">
+                    <Image size={40} className="mx-auto mb-2 text-muted-foreground opacity-20" />
+                    <p className="text-sm text-muted-foreground">Nenhuma imagem personalizada. A galeria está usando as imagens padrão.</p>
+                  </div>
+                ) : (
+                  gallery.images.map((img, index) => (
+                    <div key={index} className="relative group aspect-square rounded-xl overflow-hidden border border-border shadow-sm">
+                      <img src={img.src} alt={img.alt} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => removeGalleryImage(index)}
+                          className="p-2 bg-destructive text-destructive-foreground rounded-full hover:scale-110 transition-transform"
+                          title="Remover imagem"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 p-1 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <input
+                          className="w-full bg-transparent text-[10px] text-white outline-none border-none focus:ring-0 px-1"
+                          value={img.alt}
+                          onChange={(e) => {
+                            const newImages = [...gallery.images];
+                            newImages[index].alt = e.target.value;
+                            setGallery({ images: newImages });
+                          }}
+                          placeholder="Legenda (ALT)"
+                        />
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground italic">* Arraste para reordenar (em breve) ou use legendas para SEO. Lembre-se de clicar em salvar.</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </AdminLayout>
   );
