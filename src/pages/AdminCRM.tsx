@@ -324,6 +324,15 @@ const AdminCRM = () => {
     setDependents(data || []);
   };
 
+  const fetchDocuments = async (customerId: string) => {
+    const { data } = await supabase
+      .from("customer_documents")
+      .select("*")
+      .eq("customer_id", customerId)
+      .order("created_at", { ascending: false });
+    setCustomerDocuments(data || []);
+  };
+
   const selectCustomer = async (c: Customer) => {
     setSelectedCustomer(c);
     
@@ -337,6 +346,9 @@ const AdminCRM = () => {
 
     // Fetch dependents
     fetchDependents(c.id);
+
+    // Fetch documents
+    fetchDocuments(c.id);
   };
 
   const openCreateModal = () => {
