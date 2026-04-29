@@ -771,7 +771,7 @@ const AdminReservas = () => {
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground mb-1 block">Telefone</label>
-                    <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" maxLength={15} disabled={!!selectedCustomerId} />
+                    <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" maxLength={15} disabled={!!selectedCustomerId && !editingId} />
                   </div>
                 </div>
 
