@@ -17,29 +17,10 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { PrintReceiptButton } from "@/components/BookingReceipt";
+import { formatCurrency } from "@/lib/utils";
 
 interface BookingRow {
-  id: string;
-  booking_code: string;
-  item_name: string;
-  final_total: number;
-  payment_status: string;
-  status: string;
-  created_at: string;
-  invoice_number?: string | null;
-  invoice_issued?: boolean;
-  receipt_issued?: boolean;
-  invoice_url?: string | null;
-  voucher_url?: string | null;
-  customers: { name: string; email: string; phone?: string } | null;
-  type: string;
-  date: string | null;
-  guests: number;
-  unit_price: number;
-  total: number;
-  discount: number;
-  pay_method: string;
-  pix_code?: string | null;
+...
   notes?: string | null;
 }
 
@@ -47,8 +28,9 @@ interface NotasFiscaisTabProps {
   bookings: any[];
 }
 
-const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmt = (v: number) => formatCurrency(v / 100);
 const fmtDate = (d: string) => {
+
   if (!d) return "—";
   try { return new Date(d).toLocaleDateString("pt-BR"); } catch { return d; }
 };
