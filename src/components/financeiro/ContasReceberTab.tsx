@@ -7,10 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Loader2, Pencil, Trash2, Link2, Calendar, User, Tag, CheckCircle2, AlertCircle } from "lucide-react";
+import { Plus, Loader2, Pencil, Trash2, Link2, Calendar, User, Tag, CheckCircle2, AlertCircle, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const fmt = (v: number) => formatCurrency(v);
 
@@ -25,7 +27,7 @@ const parseCurrency = (v: string) => {
 
 const fmtDate = (d: string | null) => {
   if (!d) return "—";
-  try { return new Date(d + "T00:00:00").toLocaleDateString("pt-BR"); } catch { return d; }
+  try { return new Date(d + "T12:00:00").toLocaleDateString("pt-BR"); } catch { return d; }
 };
 
 const statusConfig: Record<string, { class: string, icon: any }> = {
@@ -54,7 +56,7 @@ interface BookingOption { id: string; booking_code: string; item_name: string; f
 
 const emptyForm = { descricao: "", valor: 0, vencimento: "", categoria: "reserva", cliente: "", observacoes: "", status: "pendente", booking_id: "", customer_id: "" };
 
-export default function ContasReceberTab() {
+export default function ContasReceberTab({ company }: { company?: any }) {
   const [contas, setContas] = useState<Conta[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -164,6 +166,56 @@ export default function ContasReceberTab() {
     toast.success("Conta excluída."); load();
   };
 
+  const exportPDF = async () => {
+    const doc = new jsPDF();
+    const brandName = company?.nome_fantasia || "LENÇÓIS TOUR";
+    const now = new Date();
+
+    if (company?.logo_url) {
+      try {
+        const img = new Image();
+        img.src = company.logo_url;
+        await new Promise((resolve) => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+        doc.addImage(img, 'PNG', 14, 10, 20, 20);
+      } catch (e) {}
+    }
+
+    doc.setFontSize(16);
+    doc.setTextColor(15, 23, 42);
+    doc.setFont("helvetica", "bold");
+    doc.text(brandName, 40, 18);
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Relatório de Contas a Receber`, 40, 23);
+    doc.text(`Gerado em: ${now.toLocaleDateString("pt-BR")}`, 40, 28);
+
+    const tableData = contas.map(c => [
+      c.descricao,
+      c.cliente || "Consumidor Final",
+      c.categoria,
+      fmtDate(c.vencimento),
+      c.status.toUpperCase(),
+      fmt(c.valor)
+    ]);
+
+    autoTable(doc, {
+      startY: 40,
+      head: [["Descrição", "Cliente", "Categoria", "Vencimento", "Status", "Valor"]],
+      body: tableData,
+      theme: "grid",
+      headStyles: { fillColor: [16, 185, 129] }, // Emerald-500 for Receber
+      styles: { fontSize: 8 },
+      columnStyles: { 5: { halign: 'right' } }
+    });
+
+    doc.save("Relatorio_Contas_Receber.pdf");
+  };
+
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" size={32} /></div>;
 
   return (
@@ -174,6 +226,9 @@ export default function ContasReceberTab() {
           <p className="text-sm text-muted-foreground">Monitore suas entradas e faturamento</p>
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
+          <Button variant="outline" onClick={exportPDF} className="rounded-xl border-emerald-200 text-emerald-600 hover:bg-emerald-50">
+            <Printer size={18} className="mr-2" /> Exportar
+          </Button>
           <div className="bg-emerald-50 dark:bg-emerald-950/20 px-4 py-2 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
             <p className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">Total a Receber</p>
             <p className="text-lg font-bold text-emerald-700 dark:text-emerald-300">{fmt(totalPendente)}</p>

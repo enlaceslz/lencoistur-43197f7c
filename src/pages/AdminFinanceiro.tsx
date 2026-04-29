@@ -50,6 +50,7 @@ const AdminFinanceiro = () => {
   const [tab, setTab] = useState<Tab>("fluxo");
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [contasPagar, setContasPagar] = useState<any[]>([]);
+  const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -57,12 +58,14 @@ const AdminFinanceiro = () => {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const [{ data: bkData }, { data: cpData }] = await Promise.all([
+      const [{ data: bkData }, { data: cpData }, { data: compData }] = await Promise.all([
         supabase.from("bookings").select("*, customers(name, email, phone)").order("created_at", { ascending: false }),
-        supabase.from("contas_pagar").select("*")
+        supabase.from("contas_pagar").select("*"),
+        supabase.from("sgs_empresa").select("*").limit(1).maybeSingle()
       ]);
       if (bkData) setBookings(bkData as any);
       if (cpData) setContasPagar(cpData);
+      if (compData) setCompany(compData);
       setLoading(false);
     };
     load();
@@ -107,32 +110,84 @@ const AdminFinanceiro = () => {
     { key: "notas", label: "Docs", icon: FileText },
   ];
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
     const doc = new jsPDF();
     const now = new Date();
     const dateStr = now.toLocaleDateString("pt-BR");
+    const monthName = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"][selectedMonth];
     
+    // Header styling
+    const brandName = company?.nome_fantasia || "LENÇÓIS TOUR";
+    const cnpj = company?.cnpj || "";
+    const address = company?.endereco || "";
+    const phone = company?.telefone || "";
+
+    // Logo
+    if (company?.logo_url) {
+      try {
+        const img = new Image();
+        img.src = company.logo_url;
+        await new Promise((resolve) => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+        doc.addImage(img, 'PNG', 14, 10, 25, 25);
+      } catch (e) {
+        console.error("Error loading logo for PDF", e);
+      }
+    }
+
+    // Company Info
     doc.setFontSize(18);
+    doc.setTextColor(15, 23, 42); // slate-900
+    doc.setFont("helvetica", "bold");
+    doc.text(brandName, 45, 18);
+    
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 116, 139); // slate-500
+    doc.text(`CNPJ: ${cnpj}`, 45, 23);
+    doc.text(`${address}`, 45, 28);
+    doc.text(`Contato: ${phone}`, 45, 33);
+
+    // Title & Period
+    doc.setFontSize(14);
     doc.setTextColor(33, 150, 243);
-    doc.text("Relatório Financeiro - Lençóis Tour", 14, 20);
+    doc.setFont("helvetica", "bold");
+    doc.text("RELATÓRIO FINANCEIRO MENSAL", 14, 50);
     
     doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Data: ${dateStr}`, 14, 28);
-    doc.text(`Período: ${["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"][selectedMonth]} / ${selectedYear}`, 14, 33);
+    doc.setTextColor(71, 85, 105); // slate-600
+    doc.text(`Período: ${monthName} de ${selectedYear}`, 14, 56);
+    doc.text(`Gerado em: ${dateStr}`, 150, 56);
 
-    doc.setDrawColor(220);
-    doc.line(14, 38, 196, 38);
-    
+    // Divider
+    doc.setDrawColor(226, 232, 240);
+    doc.line(14, 60, 196, 60);
+
+    // Summary Cards Section
+    doc.setFillColor(248, 250, 252);
+    doc.roundedRect(14, 65, 182, 30, 3, 3, "F");
+
+    doc.setFontSize(9);
+    doc.setTextColor(100, 116, 139);
+    doc.text("RESUMO DO PERÍODO", 20, 72);
+
+    doc.setFontSize(11);
+    doc.setTextColor(15, 23, 42);
+    doc.text("Receita Bruta:", 20, 80);
+    doc.text(fmt(receitaPaga), 60, 80);
+
+    doc.text("Despesas:", 20, 87);
+    doc.text(fmt(despesasMes), 60, 87);
+
     doc.setFontSize(12);
-    doc.setTextColor(0);
-    doc.text("Resumo Financeiro:", 14, 45);
-    
-    doc.setFontSize(10);
-    doc.text(`Receita Paga: ${fmt(receitaPaga)}`, 14, 52);
-    doc.text(`Despesas: ${fmt(despesasMes)}`, 14, 57);
-    doc.text(`Lucro Líquido: ${fmt(lucroMes)}`, 14, 62);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(lucroMes >= 0 ? 22 : 220, lucroMes >= 0 ? 163 : 38, lucroMes >= 0 ? 74 : 38);
+    doc.text("Resultado Líquido:", 110, 84);
+    doc.text(fmt(lucroMes), 155, 84);
 
+    // Table
     const tableData = monthBookings.map(b => [
       b.booking_code,
       b.customers?.name || "N/A",
@@ -143,15 +198,44 @@ const AdminFinanceiro = () => {
     ]);
 
     autoTable(doc, {
-      startY: 75,
-      head: [["Código", "Cliente", "Passeio", "Valor", "Status", "Data"]],
+      startY: 100,
+      head: [["Código", "Cliente", "Serviço", "Valor", "Status", "Data"]],
       body: tableData,
-      theme: "striped",
-      headStyles: { fillColor: [33, 150, 243] },
-      styles: { fontSize: 8 },
+      theme: "grid",
+      headStyles: { 
+        fillColor: [33, 150, 243], 
+        textColor: 255, 
+        fontSize: 9, 
+        fontStyle: 'bold',
+        halign: 'center'
+      },
+      styles: { 
+        fontSize: 8, 
+        cellPadding: 3,
+        textColor: 51,
+        lineColor: [226, 232, 240]
+      },
+      columnStyles: {
+        3: { halign: 'right' },
+        4: { halign: 'center' },
+        5: { halign: 'center' }
+      },
+      alternateRowStyles: {
+        fillColor: [249, 250, 251]
+      }
     });
 
-    doc.save(`financeiro_${selectedYear}_${selectedMonth + 1}.pdf`);
+    // Footer
+    const pageCount = (doc as any).internal.getNumberOfPages();
+    for(let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(148, 163, 184);
+      doc.text(`Página ${i} de ${pageCount}`, 105, 285, { align: "center" });
+      doc.text("Lençóis Tour - Gestão Profissional de Turismo", 14, 285);
+    }
+
+    doc.save(`Relatorio_Financeiro_${monthName}_${selectedYear}.pdf`);
   };
 
   if (loading) {
@@ -249,8 +333,8 @@ const AdminFinanceiro = () => {
               transition={{ duration: 0.2 }}
             >
               {tab === "fluxo" && <FluxoCaixaTab bookings={bookings} contasPagar={contasPagar} />}
-              {tab === "pagar" && <ContasPagarTab />}
-              {tab === "receber" && <ContasReceberTab />}
+              {tab === "pagar" && <ContasPagarTab company={company} />}
+              {tab === "receber" && <ContasReceberTab company={company} />}
               {tab === "dre" && <DRETab bookings={bookings} contasPagar={contasPagar} />}
               {tab === "notas" && <NotasFiscaisTab bookings={bookings} />}
             </motion.div>
