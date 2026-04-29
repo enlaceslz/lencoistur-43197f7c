@@ -8,16 +8,10 @@ import { useState, useEffect } from "react";
 import { useBookings, type BookingItem } from "@/hooks/useBookings";
 import { toast } from "@/hooks/use-toast";
 import { maskCPF, maskPhone } from "@/lib/masks";
-
-
-const formatCurrency = (value: number) => {
-  return value.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
-};
+import { formatCurrency } from "@/lib/utils";
 
 const CheckoutPage = () => {
+
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { addBooking } = useBookings();
