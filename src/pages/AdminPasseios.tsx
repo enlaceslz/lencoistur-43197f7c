@@ -14,13 +14,15 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
+import { formatCurrency } from "@/lib/utils";
 
-const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const fmt = (v: number) => formatCurrency(v / 100);
 
 const maskCurrency = (v: string) => {
   const n = v.replace(/\D/g, "");
-  return (Number(n)).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+  return (Number(n) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
 };
+
 
 const parseCurrency = (v: string) => {
   return Number(v.replace(/\D/g, ""));

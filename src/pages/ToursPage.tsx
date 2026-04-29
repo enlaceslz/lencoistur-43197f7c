@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Star, MapPin, Clock, Search, SlidersHorizontal } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { formatCurrency } from "@/lib/utils";
 
 import tourLagoasAzuis from "@/assets/tour-lagoas-azuis-hero.jpg";
 import tourRioPreguicas from "@/assets/tour-rio-preguicas.jpg";
@@ -30,24 +31,16 @@ const localImageMap: Record<string, string> = {
   "trekking-nas-dunas": tourTrekking,
   "passeio-de-quadriciclo": tourQuadriciclo,
 };
-
-const getTourImage = (tour: any): string | null => {
-  if (tour.images?.[0]) return tour.images[0];
-  return localImageMap[tour.slug] || null;
-};
-
 const sortOptions = [
-  { value: "popular", label: "Mais Popular" },
+  { value: "popular", label: "Mais Populares" },
+  { value: "rating", label: "Melhor Avaliados" },
   { value: "price-asc", label: "Menor Preço" },
   { value: "price-desc", label: "Maior Preço" },
-  { value: "rating", label: "Melhor Avaliação" },
 ];
 
-const formatCurrency = (value: number) => {
-  return value.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
+const getTourImage = (tour: any) => {
+  if (tour.images && tour.images.length > 0) return tour.images[0];
+  return localImageMap[tour.slug] || "/placeholder.svg";
 };
 
 const ToursPage = () => {

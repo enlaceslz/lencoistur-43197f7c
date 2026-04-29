@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { PrintReceiptButton } from "@/components/BookingReceipt";
+import { formatCurrency } from "@/lib/utils";
 
 interface BookingRow {
   id: string;
@@ -43,12 +44,14 @@ interface BookingRow {
   notes?: string | null;
 }
 
+
 interface NotasFiscaisTabProps {
   bookings: any[];
 }
 
-const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmt = (v: number) => formatCurrency(v / 100);
 const fmtDate = (d: string) => {
+
   if (!d) return "—";
   try { return new Date(d).toLocaleDateString("pt-BR"); } catch { return d; }
 };

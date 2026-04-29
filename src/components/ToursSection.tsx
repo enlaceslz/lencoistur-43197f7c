@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { formatCurrency } from "@/lib/utils";
 
 const tourLagoasAzuis = "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=95&w=2560";
 const tourRioPreguicas = "https://images.unsplash.com/photo-1516750084509-ca4891ded48d?auto=format&fit=crop&q=95&w=2560";
@@ -30,12 +31,7 @@ const localImageMap: Record<string, string> = {
   "passeio-de-quadriciclo": tourQuadriciclo,
 };
 
-const formatCurrency = (value: number) => {
-  return value.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
-};
+
 
 const ToursSection = () => {
   const { t } = useTranslation();

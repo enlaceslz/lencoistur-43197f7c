@@ -8,16 +8,10 @@ import { useState, useEffect } from "react";
 import { useBookings, type BookingItem } from "@/hooks/useBookings";
 import { toast } from "@/hooks/use-toast";
 import { maskCPF, maskPhone } from "@/lib/masks";
-
-
-const formatCurrency = (value: number) => {
-  return value.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
-};
+import { formatCurrency } from "@/lib/utils";
 
 const CheckoutPage = () => {
+
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { addBooking } = useBookings();
@@ -185,7 +179,7 @@ const CheckoutPage = () => {
               </div>
 
               <div className="mt-4 text-center">
-                <p className="text-lg font-bold text-primary font-display">{formatCurrency(confirmedBooking.finalTotal)}</p>
+                <p className="text-lg font-bold text-primary font-display">{formatCurrency(confirmedBooking.finalTotal / 100)}</p>
               </div>
             </div>
           )}
@@ -233,17 +227,18 @@ const CheckoutPage = () => {
             {displayDiscount > 0 && (
               <div className="flex justify-between text-sm text-green-600">
                 <span>Desconto PIX ({pixDiscountPercent}%)</span>
-                <span className="font-semibold">-{formatCurrency(displayDiscount)}</span>
+                <span className="font-semibold">-{formatCurrency(displayDiscount / 100)}</span>
               </div>
             )}
             <div className="flex justify-between font-bold text-lg border-t border-border pt-3">
               <span className="text-foreground">Total</span>
-              <span className="text-primary">{formatCurrency(confirmedBooking.finalTotal)}</span>
+              <span className="text-primary">{formatCurrency(confirmedBooking.finalTotal / 100)}</span>
             </div>
           </div>
 
           {/* Info */}
           <div className="bg-muted rounded-xl p-4 mb-8 text-sm text-muted-foreground space-y-2">
+
             <p>📧 Enviamos a confirmação para <strong className="text-foreground">{confirmedBooking.customerEmail}</strong></p>
             <p>📱 Você receberá lembretes por WhatsApp no número informado</p>
             <p>🔄 Cancelamento grátis até 24h antes do passeio</p>
@@ -475,7 +470,8 @@ const CheckoutPage = () => {
                   <Banknote size={20} className="text-green-600 shrink-0" />
                    <p className="text-sm text-muted-foreground">
                     Ao confirmar, você receberá o QR Code PIX para pagamento imediato.
-                    {displayDiscount > 0 && <> Economia de <strong className="text-green-600">R$ {displayDiscount}</strong>!</>}
+                    {displayDiscount > 0 && <> Economia de <strong className="text-green-600">{formatCurrency(displayDiscount / 100)}</strong>!</>}
+
                   </p>
                 </div>
               )}
@@ -495,9 +491,10 @@ const CheckoutPage = () => {
                   <div>
                     <label className="text-sm font-semibold text-foreground mb-1.5 block">Parcelas</label>
                     <select className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none appearance-none">
-                      <option>1x de R$ {finalTotal} (sem juros)</option>
-                      <option>2x de R$ {Math.ceil(finalTotal / 2)} (sem juros)</option>
-                      <option>3x de R$ {Math.ceil(finalTotal / 3)} (sem juros)</option>
+                      <option>1x de {formatCurrency(finalTotal / 100)} (sem juros)</option>
+                      <option>2x de {formatCurrency(Math.ceil(finalTotal / 2) / 100)} (sem juros)</option>
+                      <option>3x de {formatCurrency(Math.ceil(finalTotal / 3) / 100)} (sem juros)</option>
+
                     </select>
                   </div>
                 </div>
@@ -508,7 +505,7 @@ const CheckoutPage = () => {
               type="submit"
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-xl font-semibold text-lg transition-colors"
             >
-              {payMethod === "pix" ? `Gerar PIX — R$ ${finalTotal}` : payMethod === "info" ? "Solicitar Informações" : `Pagar R$ ${finalTotal}`}
+              {payMethod === "pix" ? `Gerar PIX — ${formatCurrency(finalTotal / 100)}` : payMethod === "info" ? "Solicitar Informações" : `Pagar ${formatCurrency(finalTotal / 100)}`}
             </button>
 
             <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">
@@ -542,19 +539,20 @@ const CheckoutPage = () => {
 
                 <div className="border-t border-border pt-4 space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">R$ {unitPrice} × {guests}</span>
-                    <span className="text-foreground font-semibold">R$ {total}</span>
+                    <span className="text-muted-foreground">{formatCurrency(unitPrice / 100)} × {guests}</span>
+                    <span className="text-foreground font-semibold">{formatCurrency(total / 100)}</span>
                   </div>
                   {displayDiscount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Desconto PIX ({pixDiscountPercent}%)</span>
-                      <span className="font-semibold">-R$ {displayDiscount}</span>
+                      <span className="font-semibold">-{formatCurrency(displayDiscount / 100)}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-bold text-lg border-t border-border pt-3">
                     <span className="text-foreground">Total</span>
-                    <span className="text-primary">R$ {finalTotal}</span>
+                    <span className="text-primary">{formatCurrency(finalTotal / 100)}</span>
                   </div>
+
                 </div>
               </div>
             </div>
