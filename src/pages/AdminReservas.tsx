@@ -782,7 +782,7 @@ const AdminReservas = () => {
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground mb-1 block">Passaporte</label>
-                    <Input value={newForm.passport} onChange={(e) => setNewForm(f => ({ ...f, passport: e.target.value }))} placeholder="Para estrangeiros" disabled={!!selectedCustomerId} />
+                    <Input value={newForm.passport} onChange={(e) => setNewForm(f => ({ ...f, passport: e.target.value }))} placeholder="Para estrangeiros" disabled={!!selectedCustomerId && !editingId} />
                   </div>
                 </div>
                 
