@@ -23,7 +23,7 @@ const packages: Package[] = [
   {
     id: "pkg-1", name: "Pacote Essencial Lençóis", slug: "essencial",
     description: "O melhor dos Lençóis Maranhenses em 3 dias. Ideal para quem tem pouco tempo mas quer viver as experiências mais icônicas.",
-    tourSlugs: ["lagoas-azuis", "passeio-de-barco", "passeio-gastronomico"], days: 3, originalPrice: 570, discountPrice: 459, tag: "Mais Vendido",
+    tourSlugs: ["lagoas-azuis", "passeio-de-barco", "america"], days: 3, originalPrice: 570, discountPrice: 459, tag: "Mais Vendido",
     highlights: ["Lagoas Azuis", "Rio Preguiças", "Gastronomia local", "Transfer incluso"],
   },
   {

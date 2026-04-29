@@ -15,11 +15,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 
-const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmt = (v: number) => `R$ ${(v).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const maskCurrency = (v: string) => {
   const n = v.replace(/\D/g, "");
-  return (Number(n) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+  return (Number(n)).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
 };
 
 const parseCurrency = (v: string) => {
@@ -30,8 +30,8 @@ const CATEGORIES = ["Ecoturismo", "Aventura", "Passeio de Barco", "Gastronomia",
 const DIFFICULTIES = ["Fácil", "Moderada", "Moderada a Difícil", "Difícil"];
 
 const emptyForm = {
-  name: "", slug: "", location: "", duration: "", price: 16000,
-  private_price: 130000, vehicle_capacity: 9,
+  name: "", slug: "", location: "", duration: "", price: 160,
+  private_price: 1300, vehicle_capacity: 9,
   pix_discount: 0,
   tag: "", description: "", category: "Ecoturismo", difficulty: "Fácil",
   group_size: "Até 9 pessoas", departure: "Santo Amaro do Maranhão",

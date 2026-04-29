@@ -15,6 +15,12 @@ const tourQuadriciclo = "https://images.unsplash.com/photo-1589112735741-26c6d04
 
 const localImageMap: Record<string, string> = {
   "lagoas-azuis": tourLagoasAzuis,
+  "betania": tourLagoasAzuis,
+  "america": tourLagoasAzuis,
+  "ponta-verde": tourLagoasAzuis,
+  "emendadas": tourLagoasAzuis,
+  "circuito-municipal-gaivota": tourLagoasAzuis,
+  "travosa": tourLagoasAzuis,
   "passeio-de-barco": tourRioPreguicas,
   "roteiro-ecologico": tourEcologico,
   "passeio-gastronomico": tourGastronomico,
