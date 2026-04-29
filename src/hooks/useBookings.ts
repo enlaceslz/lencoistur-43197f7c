@@ -158,7 +158,7 @@ export function useBookings() {
   const cancelBooking = useCallback(async (id: string) => {
     const { error } = await supabase
       .from("bookings")
-      .update({ status: "cancelada" })
+      .delete()
       .eq("id", id);
     if (error) throw error;
   }, []);

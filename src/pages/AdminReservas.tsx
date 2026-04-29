@@ -199,7 +199,11 @@ const AdminReservas = () => {
     { icon: DollarSign, label: "Receita Total", value: fmt(totalPago), color: "text-blue-600" },
   ];
 
-  const handleAction = async (action: () => Promise<void>, successMsg: string) => {
+  const handleAction = async (action: () => Promise<void>, successMsg: string, isCancellation = false) => {
+    if (isCancellation) {
+      const confirm = window.confirm("⚠️ Tem certeza que deseja cancelar esta reserva?\n\nEsta ação excluirá permanentemente a reserva do histórico.");
+      if (!confirm) return;
+    }
     setActionLoading(true);
     try {
       await action();
@@ -541,12 +545,10 @@ const AdminReservas = () => {
                     Marcar Concluída
                   </Button>
                 )}
-                {selected.status !== "cancelada" && selected.status !== "concluida" && (
-                  <Button variant="destructive" onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada.")} disabled={actionLoading} className="flex-1 min-w-[140px]">
-                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
-                    Cancelar Reserva
-                  </Button>
-                )}
+                <Button variant="destructive" onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada e removida.", true)} disabled={actionLoading} className="flex-1 min-w-[140px]">
+                  {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
+                  Cancelar e Excluir
+                </Button>
                 {/* Print Receipt */}
                 {selected.payMethod !== "info" && (
                   <PrintReceiptButton
