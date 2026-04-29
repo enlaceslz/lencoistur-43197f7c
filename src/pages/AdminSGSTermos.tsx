@@ -910,6 +910,32 @@ const AdminSGSTermos = () => {
                       <span className="hidden sm:inline">Enviar Link</span>
                     </button>
                   )}
+                  {!t.signature_data && (
+                    <button 
+                      onClick={() => {
+                        const customer = customers.find(c => c.id === t.customer_id);
+                        if (!customer?.phone) {
+                          toast({ title: "Cliente sem telefone", description: "Cadastre um número para enviar o link.", variant: "destructive" });
+                          return;
+                        }
+                        
+                        const baseUrl = window.location.origin;
+                        const signUrl = `${baseUrl}/assinatura-termo?id=${t.id}${t.booking_id ? `&booking_id=${t.booking_id}` : ''}`;
+                        const message = `Olá ${customer.name}! Aqui está o seu link para assinatura do Termo de Ciência de Risco para o passeio ${t.tour_name}: ${signUrl}`;
+                        
+                        const cleanPhone = customer.phone.replace(/\D/g, "");
+                        const whatsappUrl = `https://wa.me/${cleanPhone.startsWith('55') ? cleanPhone : '55' + cleanPhone}?text=${encodeURIComponent(message)}`;
+                        window.open(whatsappUrl, '_blank');
+                        
+                        toast({ title: "WhatsApp aberto", description: "A janela do WhatsApp foi iniciada." });
+                      }}
+                      className="p-3 bg-green-500/10 hover:bg-green-500/20 text-green-600 rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
+                      title="Enviar Link por WhatsApp"
+                    >
+                      <MessageCircle size={18} />
+                      <span className="hidden sm:inline">WhatsApp</span>
+                    </button>
+                  )}
                   <button 
                     onClick={() => printTerm(t.id)}
                     className="p-3 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
