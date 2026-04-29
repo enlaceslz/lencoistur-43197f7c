@@ -59,13 +59,13 @@ const ToursPage = () => {
     .filter((t) => {
       const matchSearch = t.name.toLowerCase().includes(search.toLowerCase()) ||
         (t.location || "").toLowerCase().includes(search.toLowerCase());
-      const effectivePrice = t.mode_collective_enabled !== false ? t.price : (t.private_price || 0);
+      const effectivePrice = (t.mode_collective_enabled !== false ? t.price : (t.private_price || 0)) / 100;
       const matchPrice = effectivePrice <= maxPrice;
       return matchSearch && matchPrice;
     })
     .sort((a, b) => {
-      const priceA = a.mode_collective_enabled !== false ? a.price : (a.private_price || 0);
-      const priceB = b.mode_collective_enabled !== false ? b.price : (b.private_price || 0);
+      const priceA = (a.mode_collective_enabled !== false ? a.price : (a.private_price || 0)) / 100;
+      const priceB = (b.mode_collective_enabled !== false ? b.price : (b.private_price || 0)) / 100;
       if (sort === "price-asc") return priceA - priceB;
       if (sort === "price-desc") return priceB - priceA;
       if (sort === "rating") return (b.rating || 0) - (a.rating || 0);

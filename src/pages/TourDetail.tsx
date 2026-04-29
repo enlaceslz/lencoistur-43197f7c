@@ -5,12 +5,7 @@ import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-const formatCurrency = (value: number) => {
-  return (value).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
-};
+import { formatCurrency } from "@/lib/utils";
 
 const TourDetail = () => {
   const { slug } = useParams<{ slug: string }>();
