@@ -583,6 +583,8 @@ export type Database = {
           id: string
           name: string
           phone: string | null
+          remuneration_type: string | null
+          remuneration_value: number | null
           type: string
           updated_at: string
         }
@@ -600,6 +602,8 @@ export type Database = {
           id?: string
           name: string
           phone?: string | null
+          remuneration_type?: string | null
+          remuneration_value?: number | null
           type: string
           updated_at?: string
         }
@@ -617,6 +621,8 @@ export type Database = {
           id?: string
           name?: string
           phone?: string | null
+          remuneration_type?: string | null
+          remuneration_value?: number | null
           type?: string
           updated_at?: string
         }
