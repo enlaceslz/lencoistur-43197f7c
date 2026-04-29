@@ -105,6 +105,30 @@ const AdminReservas = () => {
     loadOptions();
   }, [showNewForm]);
 
+  const openEdit = (b: BookingItem) => {
+    setEditingId(b.id);
+    const mode = b.itemName.includes("(Privativo)") ? "privativo" : "coletivo";
+    const cleanName = b.itemName.replace(/\s*\((Coletivo|Privativo)\)$/, "");
+    
+    setNewForm({
+      type: b.type === "transfer" ? "transfer" : "tour",
+      tourMode: mode as "coletivo" | "privativo",
+      itemName: b.type === "transfer" ? b.itemName : cleanName,
+      date: b.date,
+      guests: b.guests,
+      payMethod: b.payMethod === "info" ? "pix" : b.payMethod as "pix" | "card",
+      customerName: b.customerName,
+      customerEmail: b.customerEmail,
+      customerPhone: b.customerPhone,
+      cpf: b.cpf || "",
+      passport: b.passport || "",
+      country: b.country || "Brasil",
+      birthDate: b.birthDate || "",
+    });
+    setSelectedCustomerId(b.customerId || "");
+    setShowNewForm(true);
+  };
+
   const resetNewForm = () => {
     setNewForm({
       type: "tour", tourMode: "coletivo", itemName: "", date: "", guests: 1, payMethod: "pix",
@@ -113,13 +137,10 @@ const AdminReservas = () => {
     });
     setSelectedCustomerId("");
     setCustomerSearch("");
+    setEditingId(null);
   };
 
   // Calculate prices for the new form
-  const selectedItem = newForm.type === "tour" 
-    ? tours.find(t => t.name === newForm.itemName)
-    : transfers.find(t => t.label === newForm.itemName);
-  
   const selectedTour = newForm.type === "tour" ? tours.find(t => t.name === newForm.itemName) : null;
   const selectedTransfer = newForm.type === "transfer" ? transfers.find(t => t.label === newForm.itemName) : null;
   
@@ -150,8 +171,8 @@ const AdminReservas = () => {
     }
     setNewLoading(true);
     try {
-      await addBooking({
-        type: newForm.type,
+      const bookingData = {
+        type: newForm.type === "transfer" ? "transfer" : "tour",
         itemName: newForm.type === "tour" ? `${newForm.itemName} (${newForm.tourMode === "privativo" ? "Privativo" : "Coletivo"})` : newForm.itemName,
         date: newForm.date || "",
         guests: newForm.guests,
@@ -167,12 +188,22 @@ const AdminReservas = () => {
         total,
         discount,
         finalTotal,
-      });
-      toast.success("Reserva criada com sucesso!");
+      };
+
+      if (editingId) {
+        const original = bookings.find(b => b.id === editingId);
+        if (original && original.customerId) {
+          await updateBooking(editingId, original.customerId, bookingData);
+          toast.success("Reserva atualizada com sucesso!");
+        }
+      } else {
+        await addBooking(bookingData as any);
+        toast.success("Reserva criada com sucesso!");
+      }
       setShowNewForm(false);
       resetNewForm();
     } catch (err: any) {
-      toast.error(err?.message || "Erro ao criar reserva.");
+      toast.error(err?.message || "Erro ao processar reserva.");
     }
     setNewLoading(false);
   };
