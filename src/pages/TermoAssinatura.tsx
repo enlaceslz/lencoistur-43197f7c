@@ -280,9 +280,20 @@ const TermoAssinatura = () => {
       doc.text("Recomendações e Informações:", 14, currentY);
       currentY += 5;
       doc.setFontSize(8);
-      const recText = "Atividade não requer habilidade específica. Recomenda-se: saber nadar; trajes de banho e roupas confortáveis; levar toalha, casaco, chapéu, repelente e protetor solar; não usar acessórios; água e lanche. Não há sanitários no percurso.";
+      const recText = company?.term_recommendations || "Atividade não requer habilidade específica. Recomenda-se: saber nadar; trajes de banho e roupas confortáveis; levar toalha, casaco, chapéu, repelente e protetor solar; não usar acessórios; água e lanche. Não há sanitários no percurso.";
       doc.text(doc.splitTextToSize(recText, pageWidth - 28), 14, currentY);
-      currentY += 12;
+      
+      if (company?.term_safety_risks) {
+        currentY += (doc.splitTextToSize(recText, pageWidth - 28).length * 4) + 5;
+        doc.setFontSize(11);
+        doc.text("Riscos e Segurança:", 14, currentY);
+        currentY += 5;
+        doc.setFontSize(8);
+        doc.text(doc.splitTextToSize(company.term_safety_risks, pageWidth - 28), 14, currentY);
+        currentY += (doc.splitTextToSize(company.term_safety_risks, pageWidth - 28).length * 4) + 5;
+      } else {
+        currentY += 12;
+      }
 
       // Risks
       doc.setFontSize(14);
@@ -492,53 +503,61 @@ const TermoAssinatura = () => {
                 <FileText size={18} />
                 <h3 className="font-bold">Informações e Recomendações</h3>
               </div>
-              <div className="text-sm text-muted-foreground space-y-4 leading-relaxed">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[13px]">
-                  <div className="flex items-start gap-2">
-                    <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
-                    <span>Trajes de banho e roupas leves/confortáveis</span>
+              <div className="text-sm text-muted-foreground leading-relaxed">
+                {company?.term_recommendations ? (
+                  <div className="whitespace-pre-wrap text-[13px] bg-muted/30 p-4 rounded-2xl border border-border/50">
+                    {company.term_recommendations}
                   </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
-                    <span>Levar toalha, casaco leve e óculos de sol</span>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[13px]">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                      <span>Trajes de banho e roupas leves/confortáveis</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                      <span>Levar toalha, casaco leve e óculos de sol</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                      <span><strong>Uso de protetor solar e repelente</strong></span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                      <span>Saber nadar (paradas em lagoas/rios)</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                      <span>Evitar acessórios e joias</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
+                      <span>Portar água e lanche leve</span>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
-                    <span><strong>Uso de protetor solar e repelente</strong></span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
-                    <span>Saber nadar (paradas em lagoas/rios)</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
-                    <span>Evitar acessórios e joias</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle size={14} className="text-primary mt-0.5 flex-shrink-0" />
-                    <span>Portar água e lanche leve</span>
-                  </div>
-                </div>
+                )}
 
-                <div className="bg-amber-500/5 border border-amber-500/10 rounded-xl p-3">
+                <div className="mt-4 bg-amber-500/5 border border-amber-500/10 rounded-xl p-3">
                   <p className="text-[11px] font-medium text-amber-700 leading-tight">
                     <AlertTriangle size={12} className="inline mr-1 -mt-0.5" />
                     Nota: Sanitários disponíveis apenas no embarque e pontos de parada específicos. Atividades podem ser suspensas por condições climáticas adversas.
                   </p>
                 </div>
-                
-                <div className="bg-primary/5 rounded-xl p-4 border border-primary/10">
-                  <p className="font-bold text-xs text-primary mb-3 uppercase tracking-wider">Protocolos de Segurança SGS:</p>
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
-                    {SAFETY_CONTROLS.map(ctrl => (
-                      <li key={ctrl} className="flex items-center gap-2 text-[11px] font-medium text-foreground/80">
-                        <Shield size={12} className="text-primary flex-shrink-0" /> {ctrl}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
               </div>
             </div>
+
+            {/* Safety Risks Content */}
+            {company?.term_safety_risks && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-primary">
+                  <Shield size={18} />
+                  <h3 className="font-bold">Riscos e Cuidados com a Segurança</h3>
+                </div>
+                <div className="whitespace-pre-wrap text-[13px] bg-muted/30 p-4 rounded-2xl border border-border/50 leading-relaxed text-muted-foreground">
+                  {company.term_safety_risks}
+                </div>
+              </div>
+            )}
 
             {/* Health Questions */}
             <div className="space-y-4 pt-2">

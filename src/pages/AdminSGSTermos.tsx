@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, CheckCircle, XCircle, Shield, FileText, Printer, Users, Trash2, UserPlus, Search, Edit, Eye } from "lucide-react";
+import { Plus, CheckCircle, XCircle, Shield, FileText, Printer, Users, Trash2, UserPlus, Search, Edit, Eye, Settings, Save } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -27,9 +27,15 @@ const AdminSGSTermos = () => {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [showConfig, setShowConfig] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [company, setCompany] = useState<any>(null);
+
+  const [termConfig, setTermConfig] = useState({
+    term_recommendations: "",
+    term_safety_risks: ""
+  });
 
   const [form, setForm] = useState({
     customer_id: "",
@@ -76,7 +82,33 @@ const AdminSGSTermos = () => {
     setTours(toursRes.data || []);
     setVehicles(vehiclesRes.data || []);
     setCompany(companyRes.data);
+    if (companyRes.data) {
+      setTermConfig({
+        term_recommendations: companyRes.data.term_recommendations || "",
+        term_safety_risks: companyRes.data.term_safety_risks || ""
+      });
+    }
     setLoading(false);
+  };
+
+  const handleSaveConfig = async () => {
+    if (!company) return;
+    const { error } = await supabase
+      .from("sgs_empresa")
+      .update({
+        term_recommendations: termConfig.term_recommendations,
+        term_safety_risks: termConfig.term_safety_risks,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", company.id);
+
+    if (error) {
+      toast({ title: "Erro ao salvar configurações", variant: "destructive" });
+    } else {
+      toast({ title: "Configurações salvas com sucesso!" });
+      setShowConfig(false);
+      load();
+    }
   };
 
   const addMinor = () => {
@@ -312,7 +344,8 @@ const AdminSGSTermos = () => {
 
         <div class="section">
           <div class="section-title">Informações e Recomendações</div>
-          <div style="font-size: 10px; color: #444;">
+          <div style="font-size: 10px; color: #444; white-space: pre-wrap;">
+            ${term.sgs_empresa?.term_recommendations || `
             <p>A atividade não requer habilidades técnicas avançadas, mas para sua melhor experiência recomendamos:</p>
             <ul style="margin-top: 5px; padding-left: 15px;">
               <li>Saber nadar (haverá paradas para banho em lagoas e rios);</li>
@@ -322,13 +355,14 @@ const AdminSGSTermos = () => {
               <li>Evitar acessórios (brincos, relógios, anéis) para prevenir perdas ou acidentes;</li>
               <li>Portar água potável e lanche leve para o percurso.</li>
             </ul>
-            <p style="margin-top: 5px; font-style: italic;">Nota: Sanitários disponíveis apenas no local de embarque e em restaurantes selecionados.</p>
+            `}
           </div>
         </div>
 
         <div class="section">
           <div class="section-title">Riscos e Cuidados com a Segurança</div>
-          <div style="font-size: 10px; color: #444;">
+          <div style="font-size: 10px; color: #444; white-space: pre-wrap;">
+            ${term.sgs_empresa?.term_safety_risks || `
             <p>Os riscos inerentes ao passeio off-road na Rota das Emoções incluem: insolação, variações térmicas (hipotermia), picadas de insetos, mudanças climáticas bruscas, perda de objetos, incidentes veiculares (capotamento/colisão) e riscos aquáticos.</p>
             <p style="margin-top: 5px;"><strong>Nossas Medidas de Segurança:</strong></p>
             <ul style="padding-left: 15px;">
@@ -337,7 +371,7 @@ const AdminSGSTermos = () => {
               <li>Equipe preparada para Primeiros Socorros e Resgate;</li>
               <li>Plano de Resposta a Emergências (PRE) rigorosamente seguido.</li>
             </ul>
-            <p style="margin-top: 5px; font-weight: bold;">A atividade poderá ser interrompida a qualquer momento por decisão técnica em caso de condições climáticas adversas ou riscos à integridade do grupo.</p>
+            `}
           </div>
         </div>
 
@@ -430,17 +464,86 @@ const AdminSGSTermos = () => {
               className="w-full pl-9 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30" 
             />
           </div>
-          <button 
-            onClick={() => {
-              if (!showForm) resetForm();
-              setShowForm(!showForm);
-            }}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
-          >
-            {showForm ? <XCircle size={16} /> : <Plus size={16} />} 
-            {showForm ? "Fechar Formulário" : "Novo Termo"}
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => {
+                setShowConfig(!showConfig);
+                setShowForm(false);
+              }}
+              className="bg-muted hover:bg-muted/80 text-muted-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
+            >
+              <Settings size={16} />
+              Configurar Conteúdo
+            </button>
+            <button 
+              onClick={() => {
+                if (!showForm) resetForm();
+                setShowForm(!showForm);
+                setShowConfig(false);
+              }}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
+            >
+              {showForm ? <XCircle size={16} /> : <Plus size={16} />} 
+              {showForm ? "Fechar Formulário" : "Novo Termo"}
+            </button>
+          </div>
         </div>
+
+        {showConfig && (
+          <div className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="flex items-center justify-between border-b border-border pb-4">
+              <div className="flex items-center gap-3">
+                <Settings className="text-primary" size={24} />
+                <h3 className="font-display font-bold text-lg">Configurações de Conteúdo dos Termos</h3>
+              </div>
+              <button onClick={() => setShowConfig(false)} className="text-muted-foreground hover:text-foreground">
+                <XCircle size={20} />
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-bold flex items-center gap-2">
+                  <FileText size={16} className="text-primary" />
+                  Informações e Recomendações
+                </label>
+                <textarea 
+                  value={termConfig.term_recommendations}
+                  onChange={e => setTermConfig({ ...termConfig, term_recommendations: e.target.value })}
+                  rows={10}
+                  className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none"
+                  placeholder="Liste as recomendações para os clientes..."
+                />
+                <p className="text-[10px] text-muted-foreground">Este texto aparecerá na seção de Recomendações do termo impresso e digital.</p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold flex items-center gap-2">
+                  <Shield size={16} className="text-primary" />
+                  Riscos e Cuidados com a Segurança
+                </label>
+                <textarea 
+                  value={termConfig.term_safety_risks}
+                  onChange={e => setTermConfig({ ...termConfig, term_safety_risks: e.target.value })}
+                  rows={10}
+                  className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none"
+                  placeholder="Descreva os riscos e medidas de segurança..."
+                />
+                <p className="text-[10px] text-muted-foreground">Este texto aparecerá na seção de Riscos do termo impresso e digital.</p>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-4">
+              <button 
+                onClick={handleSaveConfig}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm transition-all active:scale-95"
+              >
+                <Save size={18} />
+                Salvar Alterações
+              </button>
+            </div>
+          </div>
+        )}
 
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-sm">
