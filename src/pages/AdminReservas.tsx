@@ -75,6 +75,7 @@ const AdminReservas = () => {
   const [customerSearch, setCustomerSearch] = useState("");
   const [newForm, setNewForm] = useState({
     type: "tour" as "tour" | "transfer",
+    tourMode: "coletivo" as "coletivo" | "privativo",
     itemName: "",
     date: "",
     guests: 1,
@@ -105,7 +106,7 @@ const AdminReservas = () => {
 
   const resetNewForm = () => {
     setNewForm({
-      type: "tour", itemName: "", date: "", guests: 1, payMethod: "pix",
+      type: "tour", tourMode: "coletivo", itemName: "", date: "", guests: 1, payMethod: "pix",
       customerName: "", customerEmail: "", customerPhone: "",
       cpf: "", passport: "", country: "Brasil", birthDate: ""
     });
@@ -118,8 +119,10 @@ const AdminReservas = () => {
     ? tours.find(t => t.name === newForm.itemName)
     : transfers.find(t => t.label === newForm.itemName);
   
-  const unitPrice = selectedItem?.price || 0;
-  const total = unitPrice * newForm.guests;
+  const unitPrice = newForm.type === "tour" 
+    ? (newForm.tourMode === "privativo" ? (selectedItem?.private_price || 0) : (selectedItem?.price || 0))
+    : (selectedItem?.price || 0);
+  const total = newForm.type === "tour" && newForm.tourMode === "privativo" ? unitPrice : unitPrice * newForm.guests;
   const pixDiscountPercent = selectedItem?.pix_discount || 0;
   const discount = (newForm.payMethod === "pix" && pixDiscountPercent > 0) 
     ? Math.round(total * pixDiscountPercent / 100) 
@@ -145,7 +148,7 @@ const AdminReservas = () => {
     try {
       await addBooking({
         type: newForm.type,
-        itemName: newForm.itemName,
+        itemName: newForm.type === "tour" ? `${newForm.itemName} (${newForm.tourMode === "privativo" ? "Privativo" : "Coletivo"})` : newForm.itemName,
         date: newForm.date || "",
         guests: newForm.guests,
         payMethod: newForm.payMethod,
@@ -620,22 +623,38 @@ const AdminReservas = () => {
             </div>
 
             {/* Item selection */}
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1.5 block">
-                {newForm.type === "tour" ? "Passeio" : "Rota"} *
-              </label>
-              <select
-                value={newForm.itemName}
-                onChange={(e) => setNewForm(f => ({ ...f, itemName: e.target.value }))}
-                className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
-                required
-              >
-                <option value="">Selecione...</option>
-                {newForm.type === "tour"
-                  ? tours.map(t => <option key={t.id} value={t.name}>{t.name} — {fmt(t.price)}</option>)
-                  : transfers.map(t => <option key={t.id} value={t.label}>{t.label} — {fmt(t.price)}</option>)
-                }
-              </select>
+            <div className="space-y-4">
+              {newForm.type === "tour" && (
+                <div>
+                  <label className="text-sm font-semibold text-foreground mb-1.5 block">Modalidade</label>
+                  <div className="flex gap-2">
+                    <Button type="button" variant={newForm.tourMode === "coletivo" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, tourMode: "coletivo" }))} className="flex-1">
+                      Coletivo (por pessoa)
+                    </Button>
+                    <Button type="button" variant={newForm.tourMode === "privativo" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, tourMode: "privativo" }))} className="flex-1">
+                      Privativo (veículo)
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">
+                  {newForm.type === "tour" ? "Passeio" : "Rota"} *
+                </label>
+                <select
+                  value={newForm.itemName}
+                  onChange={(e) => setNewForm(f => ({ ...f, itemName: e.target.value }))}
+                  className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+                  required
+                >
+                  <option value="">Selecione...</option>
+                  {newForm.type === "tour"
+                    ? tours.map(t => <option key={t.id} value={t.name}>{t.name} — {fmt(newForm.tourMode === "privativo" ? t.private_price : t.price)}</option>)
+                    : transfers.map(t => <option key={t.id} value={t.label}>{t.label} — {fmt(t.price)}</option>)
+                  }
+                </select>
+              </div>
             </div>
 
             {/* Date & Guests */}
@@ -745,7 +764,7 @@ const AdminReservas = () => {
             {unitPrice > 0 && (
               <div className="bg-muted p-3 rounded-lg space-y-1">
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Subtotal ({newForm.guests}x {fmt(unitPrice)})</span>
+                  <span>Subtotal ({newForm.type === "tour" && newForm.tourMode === "privativo" ? "Veículo Privativo" : `${newForm.guests}x ${fmt(unitPrice)}`})</span>
                   <span>{fmt(total)}</span>
                 </div>
                 {discount > 0 && (
