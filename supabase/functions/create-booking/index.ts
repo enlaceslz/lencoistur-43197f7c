@@ -155,8 +155,9 @@ Deno.serve(async (req) => {
       unitPrice = route.price;
       pixDiscountPercent = route.pix_discount || 0;
     }
-
-    const total = unitPrice * guestsNum;
+    
+    const isPrivate = itemName.includes("(Privativo)");
+    const total = isPrivate ? unitPrice : unitPrice * guestsNum;
     
     // Apply PIX discount server-side (only for PIX payments, capped 0-50%)
     const validPixDiscount = Math.max(0, Math.min(50, pixDiscountPercent));
