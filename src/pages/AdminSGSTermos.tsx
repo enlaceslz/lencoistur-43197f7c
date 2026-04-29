@@ -26,6 +26,7 @@ const AdminSGSTermos = () => {
   const [tours, setTours] = useState<any[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [bookings, setBookings] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
