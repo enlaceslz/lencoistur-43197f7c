@@ -59,6 +59,9 @@ export default function ContasPagarTab({ company }: { company?: any }) {
   const [editing, setEditing] = useState<Conta | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("todos");
+  const [categoryFilter, setCategoryFilter] = useState<string>("todos");
 
   const load = async () => {
     setLoading(true);
@@ -135,7 +138,7 @@ export default function ContasPagarTab({ company }: { company?: any }) {
     doc.text(`Relatório de Contas a Pagar`, 40, 23);
     doc.text(`Gerado em: ${now.toLocaleDateString("pt-BR")}`, 40, 28);
 
-    const tableData = contas.map(c => [
+    const tableData = filteredContas.map(c => [
       c.descricao,
       c.categoria,
       c.fornecedor || "—",
@@ -206,7 +209,7 @@ export default function ContasPagarTab({ company }: { company?: any }) {
                       </td>
                     </tr>
                   ) : (
-                    contas.map((c, idx) => {
+                    filteredContas.map((c, idx) => {
                       const status = statusConfig[c.status] || statusConfig.pendente;
                       const StatusIcon = status.icon;
                       
