@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -65,6 +65,9 @@ export default function ContasReceberTab({ company }: { company?: any }) {
   const [saving, setSaving] = useState(false);
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [bookings, setBookings] = useState<BookingOption[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("todos");
+  const [categoryFilter, setCategoryFilter] = useState<string>("todos");
 
   const load = async () => {
     setLoading(true);
@@ -160,6 +163,16 @@ export default function ContasReceberTab({ company }: { company?: any }) {
     setSaving(false); setOpen(false); load();
   };
 
+  const filteredContas = useMemo(() => {
+    return contas.filter(c => {
+      const matchesSearch = c.descricao.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           (c.cliente?.toLowerCase() || "").includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === "todos" || c.status === statusFilter;
+      const matchesCategory = categoryFilter === "todos" || c.categoria === categoryFilter;
+      return matchesSearch && matchesStatus && matchesCategory;
+    });
+  }, [contas, searchTerm, statusFilter, categoryFilter]);
+
   const handleDelete = async (id: string) => {
     if (!confirm("Excluir esta conta?")) return;
     await supabase.from("contas_receber").delete().eq("id", id);
@@ -194,7 +207,7 @@ export default function ContasReceberTab({ company }: { company?: any }) {
     doc.text(`Relatório de Contas a Receber`, 40, 23);
     doc.text(`Gerado em: ${now.toLocaleDateString("pt-BR")}`, 40, 28);
 
-    const tableData = contas.map(c => [
+    const tableData = filteredContas.map(c => [
       c.descricao,
       c.cliente || "Consumidor Final",
       c.categoria,
@@ -265,7 +278,7 @@ export default function ContasReceberTab({ company }: { company?: any }) {
                       </td>
                     </tr>
                   ) : (
-                    contas.map((c, idx) => {
+                    filteredContas.map((c, idx) => {
                       const status = statusConfig[c.status] || statusConfig.pendente;
                       const StatusIcon = status.icon;
                       const linkedBooking = c.booking_id ? bookings.find(b => b.id === c.booking_id) : null;
