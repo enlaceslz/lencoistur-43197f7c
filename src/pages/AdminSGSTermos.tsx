@@ -438,7 +438,7 @@ const AdminSGSTermos = () => {
         </div>
 
         <div class="footer">
-          <p>Santo Amaro, ${formattedDate}</p>
+          <p>${term.sgs_empresa?.cidade || "Santo Amaro"}, ${formattedDate}</p>
           <div class="signature-box">
             Assinatura do Cliente
           </div>
