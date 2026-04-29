@@ -192,8 +192,8 @@ const AdminSGSRiscos = () => {
                 <div key={p} className="aspect-square flex items-center justify-center text-[10px] font-bold text-muted-foreground">{p}</div>
               ))}
               {[5, 4, 3, 2, 1].map(c => (
-                <>
-                  <div key={`c-${c}`} className="aspect-square flex items-center justify-center text-[10px] font-bold text-muted-foreground">{c}</div>
+                <div key={`row-${c}`} className="contents">
+                  <div className="aspect-square flex items-center justify-center text-[10px] font-bold text-muted-foreground">{c}</div>
                   {[1, 2, 3, 4, 5].map(p => {
                     const level = p * c;
                     const count = risks.filter(r => r.probability === p && r.impact === c).length;
@@ -211,7 +211,7 @@ const AdminSGSRiscos = () => {
                       </div>
                     );
                   })}
-                </>
+                </div>
               ))}
             </div>
             <div className="mt-4 flex flex-wrap gap-3">
@@ -373,54 +373,61 @@ const AdminSGSRiscos = () => {
         )}
 
         {/* Table */}
-        <div className="bg-card border border-border rounded-2xl overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-muted">
+              <thead className="bg-muted/50 border-b border-border">
                 <tr>
-                  <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Código</th>
-                  <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Etapa</th>
-                  <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Perigo / Danos</th>
-                  <th className="text-center px-4 py-3 font-semibold text-muted-foreground">P</th>
-                  <th className="text-center px-4 py-3 font-semibold text-muted-foreground">C</th>
-                  <th className="text-center px-4 py-3 font-semibold text-muted-foreground">NR</th>
-                  <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Classificação</th>
-                  <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Responsável</th>
-                  <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Status</th>
-                  <th className="text-right px-4 py-3 font-semibold text-muted-foreground">Ações</th>
+                  <th className="text-left px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">Código</th>
+                  <th className="text-left px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">Etapa / Atividade</th>
+                  <th className="text-left px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">Perigo / Danos</th>
+                  <th className="text-center px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">NR (P x C)</th>
+                  <th className="text-left px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">Responsável</th>
+                  <th className="text-right px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">Ações</th>
                 </tr>
               </thead>
-              <tbody>
-                {loading ? (
-                  <tr><td colSpan={10} className="text-center py-8 text-muted-foreground">Carregando...</td></tr>
-                ) : filtered.length === 0 ? (
-                  <tr><td colSpan={10} className="text-center py-8 text-muted-foreground">Nenhum risco encontrado</td></tr>
+              <tbody className="divide-y divide-border">
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground italic">
+                      Nenhum risco encontrado com os filtros atuais.
+                    </td>
+                  </tr>
                 ) : filtered.map((r) => {
                   const rc = riskClass(r.risk_level);
                   return (
-                    <tr key={r.id} className="border-t border-border hover:bg-muted/50">
-                      <td className="px-4 py-3 font-mono text-xs text-foreground">{r.risk_code}</td>
-                      <td className="px-4 py-3 text-foreground text-xs">{STAGES[r.stage] || r.stage}</td>
-                      <td className="px-4 py-3">
-                        <p className="text-foreground font-medium text-xs">{r.activity}</p>
-                        <p className="text-muted-foreground text-xs">{r.hazard}</p>
+                    <tr key={r.id} className="hover:bg-muted/30 transition-colors group">
+                      <td className="px-4 py-4 font-mono text-[11px] text-muted-foreground">{r.risk_code}</td>
+                      <td className="px-4 py-4">
+                        <p className="font-bold text-foreground">{r.activity}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase font-semibold">{STAGES[r.stage]}</p>
                       </td>
-                      <td className="px-4 py-3 text-center text-foreground">{r.probability}</td>
-                      <td className="px-4 py-3 text-center text-foreground">{r.impact}</td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`px-2 py-1 rounded-lg text-xs font-bold ${rc.color}`}>{r.risk_level}</span>
+                      <td className="px-4 py-4 text-muted-foreground">{r.hazard}</td>
+                      <td className="px-4 py-4">
+                        <div className="flex flex-col items-center">
+                          <span className={`px-2 py-1 rounded-lg font-bold text-xs min-w-[30px] text-center ${rc.color}`}>
+                            {r.risk_level}
+                          </span>
+                          <span className="text-[9px] mt-1 text-muted-foreground font-medium">{rc.label}</span>
+                        </div>
                       </td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-lg text-xs font-semibold ${rc.color}`}>{rc.label}</span>
-                      </td>
-                      <td className="px-4 py-3 text-foreground text-xs">{r.responsible}</td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${STATUS_COLORS[r.status] || ""}`}>{r.status}</span>
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex justify-end gap-1">
-                          <button onClick={() => openEdit(r)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground"><Pencil size={14} /></button>
-                          <button onClick={() => handleDelete(r.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive"><Trash2 size={14} /></button>
+                      <td className="px-4 py-4 text-foreground font-medium">{r.responsible}</td>
+                      <td className="px-4 py-4">
+                        <div className="flex justify-end gap-2">
+                          <button 
+                            onClick={() => openEdit(r)}
+                            className="p-2 hover:bg-secondary/10 text-secondary rounded-lg transition-colors"
+                            title="Editar"
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(r.id)}
+                            className="p-2 hover:bg-destructive/10 text-destructive rounded-xl transition-colors"
+                            title="Excluir"
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </div>
                       </td>
                     </tr>
