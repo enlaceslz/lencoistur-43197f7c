@@ -148,11 +148,40 @@ export function useBookings() {
   );
 
   const confirmPayment = useCallback(async (id: string) => {
-    const { error } = await supabase
+    const { data: booking, error: fetchError } = await supabase
+      .from("bookings")
+      .select("*, customers(name)")
+      .eq("id", id)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    const { error: updateError } = await supabase
       .from("bookings")
       .update({ status: "confirmada", payment_status: "pago" })
       .eq("id", id);
-    if (error) throw error;
+    
+    if (updateError) throw updateError;
+
+    // Integrar com Financeiro: Gerar Conta a Receber automaticamente
+    const { error: financeError } = await supabase
+      .from("contas_receber")
+      .insert({
+        descricao: `Reserva ${booking.booking_code} - ${booking.item_name}`,
+        valor: booking.final_total,
+        vencimento: booking.date || new Date().toISOString().slice(0, 10),
+        status: "recebido",
+        categoria: "reserva",
+        cliente: booking.customers?.name || "Cliente",
+        booking_id: booking.id,
+        recebido_em: new Date().toISOString().slice(0, 10),
+        observacoes: `Gerado automaticamente via CRM (Reserva ${booking.booking_code})`
+      });
+
+    if (financeError) {
+      console.error("Erro ao gerar conta a receber:", financeError);
+      // Não barramos a confirmação da reserva se o financeiro falhar, mas logamos.
+    }
   }, []);
 
   const cancelBooking = useCallback(async (id: string) => {
