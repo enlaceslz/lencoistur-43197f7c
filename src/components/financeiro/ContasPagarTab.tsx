@@ -164,7 +164,7 @@ export default function ContasPagarTab() {
           <div className="space-y-4">
             <div><Label>Descrição *</Label><Input value={form.descricao} onChange={e => setForm({ ...form, descricao: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-4">
-              <div><Label>Valor (R$) *</Label><Input type="number" step="0.01" min="0" value={form.valor} onChange={e => setForm({ ...form, valor: e.target.value })} /></div>
+              <div><Label>Valor (R$) *</Label><Input value={maskCurrency(String(form.valor))} onChange={e => setForm({ ...form, valor: parseCurrency(e.target.value) })} /></div>
               <div><Label>Vencimento *</Label><Input type="date" value={form.vencimento} onChange={e => setForm({ ...form, vencimento: e.target.value })} /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
