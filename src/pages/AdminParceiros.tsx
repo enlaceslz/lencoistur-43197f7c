@@ -77,6 +77,7 @@ const AdminParceiros = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteTypeId, setDeleteTypeId] = useState<string | null>(null);
   const [cnpjLoading, setCnpjLoading] = useState(false);
+  const [viewPartner, setViewPartner] = useState<Partner | null>(null);
   
   const [form, setForm] = useState({
     name: "", type: "hotel", contact_name: "", phone: "", email: "",
