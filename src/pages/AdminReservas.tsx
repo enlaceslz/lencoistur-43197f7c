@@ -762,7 +762,7 @@ const AdminReservas = () => {
               <div className="space-y-3">
                 <div>
                   <label className="text-sm text-muted-foreground mb-1 block">Nome *</label>
-                  <Input value={newForm.customerName} onChange={(e) => setNewForm(f => ({ ...f, customerName: e.target.value }))} placeholder="Nome completo" required maxLength={255} disabled={!!selectedCustomerId} />
+                  <Input value={newForm.customerName} onChange={(e) => setNewForm(f => ({ ...f, customerName: e.target.value }))} placeholder="Nome completo" required maxLength={255} disabled={!!selectedCustomerId && !editingId} />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
