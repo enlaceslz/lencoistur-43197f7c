@@ -793,7 +793,7 @@ const AdminReservas = () => {
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground mb-1 block">País</label>
-                    <Input value={newForm.country} onChange={(e) => setNewForm(f => ({ ...f, country: e.target.value }))} placeholder="Ex: Brasil" disabled={!!selectedCustomerId} />
+                    <Input value={newForm.country} onChange={(e) => setNewForm(f => ({ ...f, country: e.target.value }))} placeholder="Ex: Brasil" disabled={!!selectedCustomerId && !editingId} />
                   </div>
                 </div>
               </div>
