@@ -185,7 +185,11 @@ const AdminTranslados = () => {
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Preço (R$) *</label>
-                <Input required type="number" min={0} step="0.01" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} placeholder="250.00" />
+                <Input 
+                  required 
+                  value={maskCurrency(String(form.price))} 
+                  onChange={e => setForm({ ...form, price: parseCurrency(e.target.value) })} 
+                  placeholder="250,00" />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Desconto PIX (%)</label>
