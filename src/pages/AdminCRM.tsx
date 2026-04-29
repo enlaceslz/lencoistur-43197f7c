@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import { Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, Pencil, Trash2, X, Save, UserPlus, Baby, FileText, Printer } from "lucide-react";
+import { Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, Pencil, Trash2, X, Save, UserPlus, Baby, FileText, Printer, Paperclip, Upload } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +33,17 @@ interface Customer {
   totalBookings: number;
   totalSpent: number;
   lastBooking: string | null;
+}
+
+interface CustomerDocument {
+  id: string;
+  customer_id: string;
+  name: string;
+  file_url: string;
+  file_type: string | null;
+  file_size: number | null;
+  category: string;
+  created_at: string;
 }
 
 interface Dependent {
@@ -175,6 +186,7 @@ const AdminCRM = () => {
   const [search, setSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [customerBookings, setCustomerBookings] = useState<BookingRow[]>([]);
+  const [customerDocuments, setCustomerDocuments] = useState<CustomerDocument[]>([]);
   const [dependents, setDependents] = useState<Dependent[]>([]);
   const [allDependents, setAllDependents] = useState<(Dependent & { customer_name: string })[]>([]);
   const [filter, setFilter] = useState<"all" | "with_bookings" | "no_bookings" | "dependents">("all");
@@ -186,6 +198,9 @@ const AdminCRM = () => {
   const [saving, setSaving] = useState(false);
   const [fetchingCep, setFetchingCep] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [deleteDocConfirm, setDeleteDocConfirm] = useState<string | null>(null);
+  const [docCategory, setDocCategory] = useState("outros");
 
   const handleCepSearch = async (cep: string) => {
     const cleanedCep = cep.replace(/\D/g, "");
@@ -309,6 +324,15 @@ const AdminCRM = () => {
     setDependents(data || []);
   };
 
+  const fetchDocuments = async (customerId: string) => {
+    const { data } = await supabase
+      .from("customer_documents")
+      .select("*")
+      .eq("customer_id", customerId)
+      .order("created_at", { ascending: false });
+    setCustomerDocuments(data || []);
+  };
+
   const selectCustomer = async (c: Customer) => {
     setSelectedCustomer(c);
     
@@ -322,6 +346,9 @@ const AdminCRM = () => {
 
     // Fetch dependents
     fetchDependents(c.id);
+
+    // Fetch documents
+    fetchDocuments(c.id);
   };
 
   const openCreateModal = () => {
@@ -491,6 +518,69 @@ const AdminCRM = () => {
       setCustomerBookings([]);
     }
     fetchCustomers();
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!selectedCustomer || !e.target.files || e.target.files.length === 0) return;
+    
+    setUploadingDoc(true);
+    const file = e.target.files[0];
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${selectedCustomer.id}/${Date.now()}.${fileExt}`;
+    
+    try {
+      const { data, error } = await supabase.storage
+        .from('customer-documents')
+        .upload(fileName, file);
+        
+      if (error) throw error;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('customer-documents')
+        .getPublicUrl(fileName);
+        
+      const { error: dbError } = await supabase
+        .from('customer_documents')
+        .insert({
+          customer_id: selectedCustomer.id,
+          name: file.name,
+          file_url: publicUrl,
+          file_type: file.type,
+          file_size: file.size,
+          category: docCategory
+        });
+        
+      if (dbError) throw dbError;
+      
+      toast.success("Documento anexado!");
+      fetchDocuments(selectedCustomer.id);
+    } catch (error: any) {
+      toast.error("Erro ao anexar documento: " + error.message);
+    } finally {
+      setUploadingDoc(false);
+    }
+  };
+
+  const handleDeleteDocument = async (id: string) => {
+    const doc = customerDocuments.find(d => d.id === id);
+    if (!doc) return;
+    
+    try {
+      const path = doc.file_url.split('/').pop();
+      if (path) {
+        const fullPath = `${selectedCustomer?.id}/${path}`;
+        await supabase.storage.from('customer-documents').remove([fullPath]);
+      }
+      
+      const { error } = await supabase.from("customer_documents").delete().eq("id", id);
+      if (error) throw error;
+      
+      toast.success("Documento removido!");
+      if (selectedCustomer) fetchDocuments(selectedCustomer.id);
+    } catch (error: any) {
+      toast.error("Erro ao excluir documento.");
+    }
+    setDeleteDocConfirm(null);
   };
 
   const exportCSV = () => {
@@ -957,9 +1047,78 @@ const AdminCRM = () => {
                     <Printer size={14} /> Imprimir Ficha PDF
                   </Button>
                 </div>
+                <div className="border-t border-border pt-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-display font-bold text-foreground">Documentos e Anexos</h4>
+                    <div className="flex gap-2">
+                      <select 
+                        className="text-[10px] bg-muted border border-border rounded px-1"
+                        value={docCategory}
+                        onChange={(e) => setDocCategory(e.target.value)}
+                      >
+                        <option value="outros">Outros</option>
+                        <option value="recibo">Recibo</option>
+                        <option value="termo">Termo</option>
+                        <option value="documento">Documento</option>
+                      </select>
+                      <Label htmlFor="doc-upload" className="cursor-pointer">
+                        <div className="flex items-center gap-1 bg-primary/10 text-primary hover:bg-primary/20 px-2 py-1 rounded text-[10px] font-bold transition-colors">
+                          {uploadingDoc ? <Loader2 size={12} className="animate-spin" /> : <Paperclip size={12} />}
+                          Anexar
+                        </div>
+                        <Input 
+                          id="doc-upload" 
+                          type="file" 
+                          className="hidden" 
+                          onChange={handleFileUpload} 
+                          disabled={uploadingDoc}
+                        />
+                      </Label>
+                    </div>
+                  </div>
+                  
+                  {customerDocuments.length === 0 ? (
+                    <p className="text-[10px] text-muted-foreground italic bg-muted/20 p-3 rounded-xl border border-dashed border-border text-center">
+                      Nenhum documento anexado.
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {customerDocuments.map((doc) => (
+                        <div key={doc.id} className="bg-muted/50 rounded-xl p-3 flex items-center justify-between group">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-8 h-8 rounded-lg bg-background flex items-center justify-center shrink-0 border border-border">
+                              <FileText size={16} className="text-primary" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-foreground truncate">{doc.name}</p>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline" className="text-[8px] px-1 py-0 uppercase bg-background">
+                                  {doc.category}
+                                </Badge>
+                                <span className="text-[10px] text-muted-foreground">
+                                  {new Date(doc.created_at).toLocaleDateString("pt-BR")}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <a href={doc.file_url} target="_blank" rel="noopener noreferrer">
+                              <Button variant="ghost" size="icon" className="h-7 w-7">
+                                <Download size={12} />
+                              </Button>
+                            </a>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-destructive/10" onClick={() => setDeleteDocConfirm(doc.id)}>
+                              <Trash2 size={12} className="text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
                 {/* Dependentes */}
-                <div className="border-t border-border pt-6">
+                <div className="border-t border-border pt-6 mt-6">
                   <div className="flex items-center justify-between mb-3">
                     <h4 className="font-display font-bold text-foreground">Dependentes</h4>
                     <Button variant="ghost" size="sm" className="h-7 text-[10px] gap-1 px-2 rounded-lg" onClick={openCreateDependentModal}>
@@ -1014,7 +1173,7 @@ const AdminCRM = () => {
                   )}
                 </div>
 
-                <div className="border-t border-border pt-6">
+                <div className="border-t border-border pt-6 mt-6">
                   <h4 className="font-display font-bold text-foreground mb-3">Histórico de Reservas</h4>
                   {customerBookings.length === 0 ? (
                     <p className="text-sm text-muted-foreground">Nenhuma reserva encontrada.</p>
@@ -1058,6 +1217,26 @@ const AdminCRM = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete Document Confirmation */}
+      <Dialog open={!!deleteDocConfirm} onOpenChange={() => setDeleteDocConfirm(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Remover Documento</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Tem certeza que deseja remover este anexo permanentemente?
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDocConfirm(null)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={() => deleteDocConfirm && handleDeleteDocument(deleteDocConfirm)}>
+              <Trash2 size={14} className="mr-1" /> Excluir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
