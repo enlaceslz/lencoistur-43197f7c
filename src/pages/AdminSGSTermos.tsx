@@ -200,7 +200,7 @@ const AdminSGSTermos = () => {
       company_id: company.id,
       customer_name: selectedCustomer?.name,
       tour_name: selectedTour?.name,
-      term_date: form.term_date,
+      term_date: format(new Date(), "yyyy-MM-dd"), // Sempre usa a data atual ao salvar/enviar
       has_allergy: form.has_allergy,
       allergy_details: form.allergy_details,
       has_fainting_convulsions: form.has_fainting_convulsions,
@@ -217,7 +217,7 @@ const AdminSGSTermos = () => {
       medication_details: form.medication_details,
       emergency_contact_name: form.emergency_contact_name,
       emergency_contact_phone: form.emergency_contact_phone,
-      accepted: editingId ? true : false, // Online signature will mark as accepted
+      accepted: editingId ? true : false,
     };
 
     const { data: termData, error } = editingId 
@@ -655,12 +655,12 @@ const AdminSGSTermos = () => {
 
             <div className="grid md:grid-cols-3 gap-6">
                <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Data do Termo</label>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Data do Termo (Atualizada automaticamente)</label>
                 <input 
                   type="date"
+                  disabled
                   value={form.term_date}
-                  onChange={e => setForm({ ...form, term_date: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none"
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none opacity-70 cursor-not-allowed"
                 />
               </div>
               <div>
