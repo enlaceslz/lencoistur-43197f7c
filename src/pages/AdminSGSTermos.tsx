@@ -136,6 +136,7 @@ const AdminSGSTermos = () => {
 
     setForm({
       customer_id: term.customer_id,
+      booking_id: term.booking_id || "",
       tour_id: term.tour_id,
       vehicle_id: term.vehicle_id || "",
       has_allergy: term.has_allergy,
