@@ -31,8 +31,17 @@ const localImageMap: Record<string, string> = {
   "trekking-nas-dunas": tourTrekking,
   "passeio-de-quadriciclo": tourQuadriciclo,
 };
+const sortOptions = [
+  { value: "popular", label: "Mais Populares" },
+  { value: "rating", label: "Melhor Avaliados" },
+  { value: "price-asc", label: "Menor Preço" },
+  { value: "price-desc", label: "Maior Preço" },
+];
 
-
+const getTourImage = (tour: any) => {
+  if (tour.images && tour.images.length > 0) return tour.images[0];
+  return localImageMap[tour.slug] || "/placeholder.svg";
+};
 
 const ToursPage = () => {
   const [tours, setTours] = useState<any[]>([]);
