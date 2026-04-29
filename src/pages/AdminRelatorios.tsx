@@ -347,7 +347,7 @@ const AdminRelatorios = () => {
                       <BarChart data={data.byTour}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                         <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
-                        <YAxis fontSize={10} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v/100}`} />
+                        <YAxis fontSize={10} axisLine={false} tickLine={false} tickFormatter={(v) => `R$ ${(v/100).toLocaleString('pt-BR')}`} />
                         <Tooltip formatter={(v: number) => fmt(v)} />
                         <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Receita" />
                       </BarChart>
