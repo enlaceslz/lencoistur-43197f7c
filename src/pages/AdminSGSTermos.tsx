@@ -38,8 +38,11 @@ const AdminSGSTermos = () => {
     term_safety_risks: ""
   });
 
+  const [sendingEmail, setSendingEmail] = useState<string | null>(null);
+
   const [form, setForm] = useState({
     customer_id: "",
+    booking_id: "",
     tour_id: "",
     vehicle_id: "",
     has_allergy: false,
