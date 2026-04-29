@@ -438,7 +438,7 @@ const AdminSGSTermos = () => {
         </div>
 
         <div class="footer">
-          <p>${term.sgs_empresa?.cidade || "Santo Amaro"}, ${formattedDate}</p>
+          <p>${term.sgs_empresa?.cidade ? term.sgs_empresa.cidade.toUpperCase() : "SANTO AMARO"} - ${term.sgs_empresa?.estado || "MA"}, ${formattedDate}</p>
           <div class="signature-box">
             Assinatura do Cliente
           </div>
