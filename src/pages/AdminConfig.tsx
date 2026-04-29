@@ -84,6 +84,7 @@ const AdminConfig = () => {
   const [site, setSite] = useState(DEFAULTS.site);
   const [pagamentos, setPagamentos] = useState(DEFAULTS.pagamentos);
   const [notifications, setNotifications] = useState(DEFAULTS.notificacoes);
+  const [gallery, setGallery] = useState(DEFAULTS.gallery);
 
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
