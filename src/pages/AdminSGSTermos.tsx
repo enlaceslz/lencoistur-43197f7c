@@ -882,9 +882,8 @@ const AdminSGSTermos = () => {
                         }
                         setSendingEmail(t.id);
                         try {
-                          const { data: { publicUrl } } = supabase.storage.from('company-documents').getPublicUrl('dummy');
                           const baseUrl = window.location.origin;
-                          const signUrl = `${baseUrl}/assinatura-termo?id=${t.id}`;
+                          const signUrl = `${baseUrl}/assinatura-termo?id=${t.id}${t.booking_id ? `&booking_id=${t.booking_id}` : ''}`;
                           
                           const { error } = await supabase.functions.invoke("send-term-email", {
                             body: {
