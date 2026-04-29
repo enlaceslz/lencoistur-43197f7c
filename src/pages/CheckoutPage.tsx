@@ -470,87 +470,36 @@ const CheckoutPage = () => {
                   <Banknote size={20} className="text-green-600 shrink-0" />
                    <p className="text-sm text-muted-foreground">
                     Ao confirmar, você receberá o QR Code PIX para pagamento imediato.
-                    {displayDiscount > 0 && <> Economia de <strong className="text-green-600">{formatCurrency(displayDiscount / 100)}</strong>!</>}
-
-                  </p>
-                </div>
-              )}
-
-              {payMethod === "info" && (
-                <div className="bg-muted rounded-xl p-4 flex items-center gap-3">
-                  <Users size={20} className="text-primary shrink-0" />
-                   <p className="text-sm text-muted-foreground">
-                    Ao confirmar, sua solicitação será enviada para a agência. Entraremos em contato via WhatsApp para finalizar sua reserva.
-                  </p>
-                </div>
-              )}
-
-              {payMethod === "card" && (
-                <div className="space-y-4">
+                    {displayDiscount > 0 && <> Economia de <strong className="text-green-600">{formatCurrency(displayDiscount)}</strong>!</>}
 ...
-                  <div>
-                    <label className="text-sm font-semibold text-foreground mb-1.5 block">Parcelas</label>
                     <select className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none appearance-none">
-                      <option>1x de {formatCurrency(finalTotal / 100)} (sem juros)</option>
-                      <option>2x de {formatCurrency(Math.ceil(finalTotal / 2) / 100)} (sem juros)</option>
-                      <option>3x de {formatCurrency(Math.ceil(finalTotal / 3) / 100)} (sem juros)</option>
+                      <option>1x de {formatCurrency(finalTotal)} (sem juros)</option>
+                      <option>2x de {formatCurrency(Math.ceil(finalTotal / 2))} (sem juros)</option>
+                      <option>3x de {formatCurrency(Math.ceil(finalTotal / 3))} (sem juros)</option>
 
                     </select>
-                  </div>
-                </div>
-              )}
-            </div>
-
+...
             <button
               type="submit"
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-xl font-semibold text-lg transition-colors"
             >
-              {payMethod === "pix" ? `Gerar PIX — ${formatCurrency(finalTotal / 100)}` : payMethod === "info" ? "Solicitar Informações" : `Pagar ${formatCurrency(finalTotal / 100)}`}
+              {payMethod === "pix" ? `Gerar PIX — ${formatCurrency(finalTotal)}` : payMethod === "info" ? "Solicitar Informações" : `Pagar ${formatCurrency(finalTotal)}`}
             </button>
-
-            <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">
-              <Shield size={14} />
-              <span>Pagamento seguro · Cancelamento grátis até 24h antes</span>
-            </div>
-          </form>
-
-          {/* Summary */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24 bg-card border border-border rounded-2xl overflow-hidden shadow-lg">
-              {image && <img src={image} alt={itemName} className="w-full h-40 object-cover" />}
-              {!image && (
-                <div className="w-full h-40 bg-gradient-hero flex items-center justify-center">
-                  <MapPin size={32} className="text-primary-foreground" />
-                </div>
-              )}
-              <div className="p-6 space-y-4">
-                <h3 className="font-display text-lg font-bold text-foreground">{itemName}</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <MapPin size={15} className="text-primary" /> {location}
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <CalendarDays size={15} className="text-primary" /> {date ? new Date(date + "T12:00").toLocaleDateString("pt-BR") : "Data a definir"}
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Users size={15} className="text-primary" /> {guests} participante{guests > 1 ? "s" : ""}
-                  </div>
-                </div>
-
+...
                 <div className="border-t border-border pt-4 space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{formatCurrency(unitPrice / 100)} × {guests}</span>
-                    <span className="text-foreground font-semibold">{formatCurrency(total / 100)}</span>
+                    <span className="text-muted-foreground">{formatCurrency(unitPrice)} × {guests}</span>
+                    <span className="text-foreground font-semibold">{formatCurrency(total)}</span>
                   </div>
                   {displayDiscount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Desconto PIX ({pixDiscountPercent}%)</span>
-                      <span className="font-semibold">-{formatCurrency(displayDiscount / 100)}</span>
+                      <span className="font-semibold">-{formatCurrency(displayDiscount)}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-bold text-lg border-t border-border pt-3">
                     <span className="text-foreground">Total</span>
-                    <span className="text-primary">{formatCurrency(finalTotal / 100)}</span>
+                    <span className="text-primary">{formatCurrency(finalTotal)}</span>
                   </div>
 
                 </div>
