@@ -62,12 +62,12 @@ const TermoAssinatura = () => {
   const [isDrawing, setIsDrawing] = useState(false);
 
   useEffect(() => {
-    if (bookingCode || termId) {
+    if (bookingCode || termId || bookingIdParam) {
       loadData();
     } else {
       setLoading(false);
     }
-  }, [bookingCode, termId]);
+  }, [bookingCode, termId, bookingIdParam]);
 
   const loadData = async () => {
     setLoading(true);
