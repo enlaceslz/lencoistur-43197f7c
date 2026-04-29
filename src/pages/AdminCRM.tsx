@@ -197,7 +197,8 @@ const AdminCRM = () => {
   const [form, setForm] = useState<CustomerForm>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [fetchingCep, setFetchingCep] = useState(false);
-  const [uploadingDoc, setSavingDoc] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
   const [deleteDocConfirm, setDeleteDocConfirm] = useState<string | null>(null);
   const [docCategory, setDocCategory] = useState("outros");
 
