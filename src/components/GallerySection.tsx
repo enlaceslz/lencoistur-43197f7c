@@ -1,27 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
-const galleryLagoasAzuis = "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=95&w=2560";
-const galleryBanho = "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=95&w=2560";
-const galleryPanorama = "https://images.unsplash.com/photo-1616421004128-40656a877073?auto=format&fit=crop&q=95&w=2560";
-const galleryFarol = "https://images.unsplash.com/photo-1636113945956-6f81e59273f3?auto=format&fit=crop&q=95&w=2560";
-const gallery4x4 = "https://images.unsplash.com/photo-1589112735741-26c6d04325a8?auto=format&fit=crop&q=95&w=2560";
-const galleryPorDoSol = "https://images.unsplash.com/photo-1511216335778-7cb8f49fa7a3?auto=format&fit=crop&q=95&w=2560";
-const galleryAerial = "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&q=95&w=2560";
+import { supabase } from "@/integrations/supabase/client";
 
-const galleryImages = [
-  { src: galleryLagoasAzuis, alt: "Dunas brancas e lagoas azuis dos Lençóis Maranhenses - Santo Amaro" },
-  { src: galleryBanho, alt: "Turistas nadando nas lagoas cristalinas dos Lençóis Maranhenses" },
-  { src: galleryPanorama, alt: "Panorama das dunas e lagoas ao pôr do sol" },
-  { src: galleryFarol, alt: "Farol de Mandacaru - Lençóis Maranhenses" },
-  { src: gallery4x4, alt: "Passeio de 4x4 nas dunas dos Lençóis Maranhenses" },
-  { src: galleryPorDoSol, alt: "Pôr do sol deslumbrante nos Lençóis Maranhenses" },
-  { src: galleryAerial, alt: "Vista aérea das lagoas cristalinas dos Lençóis" },
+const DEFAULT_GALLERY = [
+  { src: "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=95&w=2560", alt: "Dunas brancas e lagoas azuis dos Lençóis Maranhenses - Santo Amaro" },
+  { src: "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=95&w=2560", alt: "Turistas nadando nas lagoas cristalinas dos Lençóis Maranhenses" },
+  { src: "https://images.unsplash.com/photo-1616421004128-40656a877073?auto=format&fit=crop&q=95&w=2560", alt: "Panorama das dunas e lagoas ao pôr do sol" },
+  { src: "https://images.unsplash.com/photo-1636113945956-6f81e59273f3?auto=format&fit=crop&q=95&w=2560", alt: "Farol de Mandacaru - Lençóis Maranhenses" },
+  { src: "https://images.unsplash.com/photo-1589112735741-26c6d04325a8?auto=format&fit=crop&q=95&w=2560", alt: "Passeio de 4x4 nas dunas dos Lençóis Maranhenses" },
+  { src: "https://images.unsplash.com/photo-1511216335778-7cb8f49fa7a3?auto=format&fit=crop&q=95&w=2560", alt: "Pôr do sol deslumbrante nos Lençóis Maranhenses" },
+  { src: "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&q=95&w=2560", alt: "Vista aérea das lagoas cristalinas dos Lençóis" },
 ];
 
 const GallerySection = () => {
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [galleryImages, setGalleryImages] = useState(DEFAULT_GALLERY);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    const loadGallery = async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "gallery")
+        .maybeSingle();
+      
+      if (data && Array.isArray((data.value as any)?.images)) {
+        setGalleryImages((data.value as any).images);
+      }
+    };
+    loadGallery();
+  }, []);
 
   const navigate = (dir: number) => {
     if (lightbox === null) return;
