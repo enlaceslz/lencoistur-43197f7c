@@ -491,9 +491,10 @@ const CheckoutPage = () => {
                   <div>
                     <label className="text-sm font-semibold text-foreground mb-1.5 block">Parcelas</label>
                     <select className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none appearance-none">
-                      <option>1x de R$ {finalTotal} (sem juros)</option>
-                      <option>2x de R$ {Math.ceil(finalTotal / 2)} (sem juros)</option>
-                      <option>3x de R$ {Math.ceil(finalTotal / 3)} (sem juros)</option>
+                      <option>1x de {formatCurrency(finalTotal / 100)} (sem juros)</option>
+                      <option>2x de {formatCurrency(Math.ceil(finalTotal / 2) / 100)} (sem juros)</option>
+                      <option>3x de {formatCurrency(Math.ceil(finalTotal / 3) / 100)} (sem juros)</option>
+
                     </select>
                   </div>
                 </div>
