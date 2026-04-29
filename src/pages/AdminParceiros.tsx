@@ -419,9 +419,10 @@ const AdminParceiros = () => {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex gap-1 justify-end">
-                          <Button variant="ghost" size="icon" onClick={() => openEdit(p)}><Edit size={14} /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(p.id)}><Trash2 size={14} className="text-destructive" /></Button>
+                        <div className="flex gap-1 justify-end" onClick={(e) => e.stopPropagation()}>
+                          <Button variant="ghost" size="icon" onClick={() => setViewPartner(p)} title="Visualizar"><Eye size={14} /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => openEdit(p)} title="Editar"><Edit size={14} /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(p.id)} title="Excluir"><Trash2 size={14} className="text-destructive" /></Button>
                         </div>
                       </TableCell>
                     </TableRow>
