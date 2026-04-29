@@ -74,7 +74,7 @@ const AdminTranslados = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const priceNum = Math.round(Number(form.price) * 100);
+    const priceNum = form.price;
     if (!form.origin.trim() || !form.destination.trim() || priceNum <= 0) {
       toast.error("Preencha origem, destino e preço válido.");
       return;
