@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, CheckCircle, XCircle, Shield, FileText, Printer, Users, Trash2, UserPlus, Search, Edit, Eye, Settings, Save } from "lucide-react";
+import { Plus, CheckCircle, XCircle, Shield, FileText, Printer, Users, Trash2, UserPlus, Search, Edit, Eye, Settings, Save, Send, Link as LinkIcon, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -26,6 +26,7 @@ const AdminSGSTermos = () => {
   const [tours, setTours] = useState<any[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [bookings, setBookings] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -38,8 +39,11 @@ const AdminSGSTermos = () => {
     term_safety_risks: ""
   });
 
+  const [sendingEmail, setSendingEmail] = useState<string | null>(null);
+
   const [form, setForm] = useState({
     customer_id: "",
+    booking_id: "",
     tour_id: "",
     vehicle_id: "",
     has_allergy: false,
@@ -70,18 +74,20 @@ const AdminSGSTermos = () => {
 
   const load = async () => {
     setLoading(true);
-    const [termsRes, customersRes, toursRes, vehiclesRes, companyRes] = await Promise.all([
+    const [termsRes, customersRes, toursRes, vehiclesRes, companyRes, bookingsRes] = await Promise.all([
       supabase.from("sgs_risk_terms").select("*, customers(*), tours(name), sgs_veiculos(modelo)").order("created_at", { ascending: false }),
       supabase.from("customers").select("*"),
       supabase.from("tours").select("id, name, description, duration, price, private_price").eq("active", true).order("name"),
       supabase.from("sgs_veiculos").select("id, modelo, placa"),
       supabase.from("sgs_empresa").select("*").limit(1).maybeSingle(),
+      supabase.from("bookings").select("id, booking_code, item_name, customer_id").order("created_at", { ascending: false }),
     ]);
 
     setTerms(termsRes.data || []);
     setCustomers(customersRes.data || []);
     setTours(toursRes.data || []);
     setVehicles(vehiclesRes.data || []);
+    setBookings(bookingsRes.data || []);
     setCompany(companyRes.data);
     if (companyRes.data) {
       setTermConfig({
@@ -133,6 +139,7 @@ const AdminSGSTermos = () => {
 
     setForm({
       customer_id: term.customer_id,
+      booking_id: term.booking_id || "",
       tour_id: term.tour_id,
       vehicle_id: term.vehicle_id || "",
       has_allergy: term.has_allergy,
@@ -187,6 +194,7 @@ const AdminSGSTermos = () => {
 
     const termPayload = {
       customer_id: form.customer_id,
+      booking_id: form.booking_id || null,
       tour_id: form.tour_id,
       vehicle_id: form.vehicle_id || null,
       company_id: company.id,
@@ -209,7 +217,7 @@ const AdminSGSTermos = () => {
       medication_details: form.medication_details,
       emergency_contact_name: form.emergency_contact_name,
       emergency_contact_phone: form.emergency_contact_phone,
-      accepted: true,
+      accepted: editingId ? true : false, // Online signature will mark as accepted
     };
 
     const { data: termData, error } = editingId 
@@ -248,6 +256,7 @@ const AdminSGSTermos = () => {
     setEditingId(null);
     setForm({
       customer_id: "",
+      booking_id: "",
       tour_id: "",
       vehicle_id: "",
       has_allergy: false,
@@ -581,6 +590,27 @@ const AdminSGSTermos = () => {
 
             <div className="grid md:grid-cols-3 gap-6">
               <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Vincular a Reserva (Opcional)</label>
+                <select 
+                  value={form.booking_id}
+                  onChange={e => {
+                    const bid = e.target.value;
+                    const booking = bookings.find(b => b.id === bid);
+                    if (booking) {
+                      setForm(f => ({ ...f, booking_id: bid, customer_id: booking.customer_id }));
+                    } else {
+                      setForm(f => ({ ...f, booking_id: bid }));
+                    }
+                  }}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none"
+                >
+                  <option value="">Selecione a Reserva</option>
+                  {bookings.map(b => (
+                    <option key={b.id} value={b.id}>{b.booking_code} - {b.item_name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Cliente *</label>
                 <select 
                   required
@@ -842,6 +872,44 @@ const AdminSGSTermos = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
+                  {!t.signature_data && (
+                    <button 
+                      onClick={async () => {
+                        const customer = customers.find(c => c.id === t.customer_id);
+                        if (!customer?.email) {
+                          toast({ title: "Cliente sem e-mail", description: "Cadastre um e-mail para enviar o link.", variant: "destructive" });
+                          return;
+                        }
+                        setSendingEmail(t.id);
+                        try {
+                          const baseUrl = window.location.origin;
+                          const signUrl = `${baseUrl}/assinatura-termo?id=${t.id}${t.booking_id ? `&booking_id=${t.booking_id}` : ''}`;
+                          
+                          const { error } = await supabase.functions.invoke("send-term-email", {
+                            body: {
+                              customerEmail: customer.email,
+                              customerName: customer.name,
+                              signUrl: signUrl,
+                              tourName: t.tour_name
+                            }
+                          });
+                          
+                          if (error) throw error;
+                          toast({ title: "E-mail enviado!", description: "Link de assinatura enviado ao cliente." });
+                        } catch (err) {
+                          toast({ title: "Erro ao enviar", description: "Não foi possível enviar o e-mail.", variant: "destructive" });
+                        } finally {
+                          setSendingEmail(null);
+                        }
+                      }}
+                      disabled={sendingEmail === t.id}
+                      className="p-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold disabled:opacity-50"
+                      title="Enviar Link por E-mail"
+                    >
+                      {sendingEmail === t.id ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                      <span className="hidden sm:inline">Enviar Link</span>
+                    </button>
+                  )}
                   <button 
                     onClick={() => printTerm(t.id)}
                     className="p-3 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
