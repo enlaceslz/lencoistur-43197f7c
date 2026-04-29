@@ -17,12 +17,21 @@ import { Input } from "@/components/ui/input";
 
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+const maskCurrency = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  return (Number(n) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+};
+
+const parseCurrency = (v: string) => {
+  return Number(v.replace(/\D/g, ""));
+};
+
 const CATEGORIES = ["Ecoturismo", "Aventura", "Passeio de Barco", "Gastronomia", "Cultural", "Quadriciclo", "Transfer"];
 const DIFFICULTIES = ["Fácil", "Moderada", "Moderada a Difícil", "Difícil"];
 
 const emptyForm = {
-  name: "", slug: "", location: "", duration: "", price: 160,
-  private_price: 1300, vehicle_capacity: 9,
+  name: "", slug: "", location: "", duration: "", price: 16000,
+  private_price: 130000, vehicle_capacity: 9,
   pix_discount: 0,
   tag: "", description: "", category: "Ecoturismo", difficulty: "Fácil",
   group_size: "Até 9 pessoas", departure: "Santo Amaro do Maranhão",
@@ -336,13 +345,17 @@ const AdminPasseios = () => {
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Preço Coletivo (R$/pessoa)</label>
-                <input type="number" min={0} max={99999} value={form.price} onChange={e => setForm({ ...form, price: Number(e.target.value) })}
+                <input 
+                  value={maskCurrency(String(form.price))} 
+                  onChange={e => setForm({ ...form, price: parseCurrency(e.target.value) })}
                   disabled={!form.mode_collective_enabled}
                   className={`w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 ${!form.mode_collective_enabled ? "opacity-50 grayscale" : ""}`} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Preço Privativo (R$/veículo)</label>
-                <input type="number" min={0} max={99999} value={form.private_price} onChange={e => setForm({ ...form, private_price: Number(e.target.value) })}
+                <input 
+                  value={maskCurrency(String(form.private_price))} 
+                  onChange={e => setForm({ ...form, private_price: parseCurrency(e.target.value) })}
                   disabled={!form.mode_private_enabled}
                   className={`w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 ${!form.mode_private_enabled ? "opacity-50 grayscale" : ""}`} />
               </div>

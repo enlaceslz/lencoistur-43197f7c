@@ -16,9 +16,18 @@ import { toast } from "sonner";
 
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+const maskCurrency = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  return (Number(n) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+};
+
+const parseCurrency = (v: string) => {
+  return Number(v.replace(/\D/g, ""));
+};
+
 const emptyForm = {
   origin: "", destination: "", duration: "", distance: "",
-  price: "", vehicle_type: "Van Executiva", seats: 10,
+  price: 0, vehicle_type: "Van Executiva", seats: 10,
   departures: "", active: true, pix_discount: 0,
 };
 
@@ -53,7 +62,7 @@ const AdminTranslados = () => {
     setForm({
       origin: r.origin, destination: r.destination,
       duration: r.duration || "", distance: r.distance || "",
-      price: String(r.price / 100),
+      price: r.price,
       vehicle_type: r.vehicle_type || "",
       seats: r.seats || 10,
       departures: (r.departures || []).join(", "),
@@ -65,7 +74,7 @@ const AdminTranslados = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const priceNum = Math.round(Number(form.price) * 100);
+    const priceNum = form.price;
     if (!form.origin.trim() || !form.destination.trim() || priceNum <= 0) {
       toast.error("Preencha origem, destino e preço válido.");
       return;
@@ -176,7 +185,11 @@ const AdminTranslados = () => {
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Preço (R$) *</label>
-                <Input required type="number" min={0} step="0.01" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} placeholder="250.00" />
+                <Input 
+                  required 
+                  value={maskCurrency(String(form.price))} 
+                  onChange={e => setForm({ ...form, price: parseCurrency(e.target.value) })} 
+                  placeholder="250,00" />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Desconto PIX (%)</label>
@@ -184,8 +197,8 @@ const AdminTranslados = () => {
                   <Input type="number" min={0} max={50} value={form.pix_discount} onChange={e => setForm({ ...form, pix_discount: Number(e.target.value) })} />
                   <Percent size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 </div>
-                {Number(form.price) > 0 && form.pix_discount > 0 && (
-                  <p className="text-xs text-green-600 mt-1">PIX: R$ {(Number(form.price) * (1 - form.pix_discount / 100)).toFixed(2)}</p>
+                {form.price > 0 && form.pix_discount > 0 && (
+                  <p className="text-xs text-green-600 mt-1">PIX: {fmt(Math.round(form.price * (1 - form.pix_discount / 100)))}</p>
                 )}
               </div>
               <div>

@@ -11,6 +11,16 @@ import { Plus, Loader2, Pencil, Trash2, Link2 } from "lucide-react";
 import { toast } from "sonner";
 
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+
+const maskCurrency = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  return (Number(n) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+};
+
+const parseCurrency = (v: string) => {
+  return Number(v.replace(/\D/g, ""));
+};
+
 const fmtDate = (d: string | null) => {
   if (!d) return "—";
   try { return new Date(d + "T00:00:00").toLocaleDateString("pt-BR"); } catch { return d; }
@@ -40,7 +50,7 @@ interface Conta {
 interface CustomerOption { id: string; name: string; email: string; }
 interface BookingOption { id: string; booking_code: string; item_name: string; final_total: number; customer_name: string; }
 
-const emptyForm = { descricao: "", valor: "", vencimento: "", categoria: "reserva", cliente: "", observacoes: "", status: "pendente", booking_id: "", customer_id: "" };
+const emptyForm = { descricao: "", valor: 0, vencimento: "", categoria: "reserva", cliente: "", observacoes: "", status: "pendente", booking_id: "", customer_id: "" };
 
 export default function ContasReceberTab() {
   const [contas, setContas] = useState<Conta[]>([]);
@@ -83,7 +93,7 @@ export default function ContasReceberTab() {
     setEditing(c);
     setForm({
       descricao: c.descricao,
-      valor: String(c.valor / 100),
+      valor: c.valor,
       vencimento: c.vencimento,
       categoria: c.categoria,
       cliente: c.cliente || "",
@@ -96,7 +106,6 @@ export default function ContasReceberTab() {
   };
 
   const handleBookingSelect = (bookingId: string) => {
-    setForm(f => ({ ...f, booking_id: bookingId }));
     if (bookingId) {
       const bk = bookings.find(b => b.id === bookingId);
       if (bk) {
@@ -104,10 +113,12 @@ export default function ContasReceberTab() {
           ...f,
           booking_id: bookingId,
           descricao: f.descricao || `Reserva ${bk.booking_code} - ${bk.item_name}`,
-          valor: f.valor || String(bk.final_total / 100),
+          valor: f.valor || bk.final_total,
           cliente: bk.customer_name || f.cliente,
         }));
       }
+    } else {
+      setForm(f => ({ ...f, booking_id: "" }));
     }
   };
 
@@ -122,11 +133,11 @@ export default function ContasReceberTab() {
   };
 
   const handleSave = async () => {
-    if (!form.descricao.trim() || !form.vencimento || !form.valor) { toast.error("Preencha os campos obrigatórios."); return; }
+    if (!form.descricao.trim() || !form.vencimento || form.valor <= 0) { toast.error("Preencha os campos obrigatórios."); return; }
     setSaving(true);
     const payload = {
       descricao: form.descricao.trim(),
-      valor: Math.round(parseFloat(form.valor) * 100),
+      valor: form.valor,
       vencimento: form.vencimento,
       categoria: form.categoria,
       cliente: form.cliente || null,
@@ -257,7 +268,7 @@ export default function ContasReceberTab() {
 
             <div><Label>Descrição *</Label><Input value={form.descricao} onChange={e => setForm({ ...form, descricao: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-4">
-              <div><Label>Valor (R$) *</Label><Input type="number" step="0.01" min="0" value={form.valor} onChange={e => setForm({ ...form, valor: e.target.value })} /></div>
+              <div><Label>Valor (R$) *</Label><Input value={maskCurrency(String(form.valor))} onChange={e => setForm({ ...form, valor: parseCurrency(e.target.value) })} /></div>
               <div><Label>Vencimento *</Label><Input type="date" value={form.vencimento} onChange={e => setForm({ ...form, vencimento: e.target.value })} /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
