@@ -145,40 +145,51 @@ const AdminSGSChecklists = () => {
               const progress = getProgress(cl.id);
               const clItems = getItems(cl.id);
               return (
-                <div key={cl.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-shadow">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${cl.status === "concluido" ? "bg-primary/10" : "bg-secondary/10"}`}>
-                        <ClipboardCheck size={20} className={cl.status === "concluido" ? "text-primary" : "text-secondary"} />
+                <div key={cl.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-all group border-l-4 border-l-primary/10 hover:border-l-primary transition-all">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-xl ${cl.status === "concluido" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary shadow-sm shadow-secondary/10"}`}>
+                        <ClipboardCheck size={24} />
                       </div>
                       <div>
-                        <h4 className="font-bold text-foreground text-sm">{cl.titulo}</h4>
-                        <div className="flex items-center gap-3 mt-1">
-                          <span className="text-[10px] flex items-center gap-1 text-muted-foreground">
-                            <Calendar size={10} /> {new Date(cl.created_at).toLocaleDateString("pt-BR")}
+                        <h4 className="font-bold text-foreground text-base mb-1">{cl.titulo}</h4>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                          <span className="text-[11px] flex items-center gap-1.5 text-muted-foreground font-medium">
+                            <Calendar size={12} className="text-primary" /> {new Date(cl.created_at).toLocaleDateString("pt-BR")}
                           </span>
                           {cl.responsavel && (
-                            <span className="text-[10px] flex items-center gap-1 text-muted-foreground">
-                              <User size={10} /> {cl.responsavel}
+                            <span className="text-[11px] flex items-center gap-1.5 text-muted-foreground font-medium">
+                              <User size={12} className="text-primary" /> {cl.responsavel}
                             </span>
                           )}
+                          <span className="text-[11px] px-2 py-0.5 rounded-md bg-muted text-muted-foreground font-bold uppercase tracking-wider">
+                            {cl.tipo.replace('_', ' ')}
+                          </span>
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${cl.status === "concluido" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
+                      <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest ${cl.status === "concluido" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
                         {cl.status === "concluido" ? "Concluído" : "Em andamento"}
                       </span>
-                      <button onClick={() => handleDelete(cl.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
-                        <Trash2 size={14} />
+                      <button onClick={() => handleDelete(cl.id)} className="p-2 rounded-xl hover:bg-destructive/10 text-destructive transition-colors" title="Excluir">
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </div>
                   {/* Progress bar */}
-                  <div className="w-full h-2 bg-muted rounded-full mb-3">
-                    <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${progress}%` }} />
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between items-center text-[11px] font-bold uppercase tracking-wider">
+                      <span className="text-muted-foreground">Progresso da Inspeção</span>
+                      <span className={progress === 100 ? "text-primary" : "text-secondary"}>{progress}%</span>
+                    </div>
+                    <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full transition-all duration-500 ${progress === 100 ? "bg-primary" : "bg-secondary"}`} style={{ width: `${progress}%` }} />
+                    </div>
+                    <p className="text-[11px] text-muted-foreground font-medium italic">
+                      {clItems.filter(i => i.conforme).length} de {clItems.length} itens em conformidade
+                    </p>
                   </div>
-                  <p className="text-xs text-muted-foreground mb-2">{progress}% completo ({clItems.filter(i => i.conforme).length}/{clItems.length} itens)</p>
                   {clItems.length > 0 && (
                     <div className="grid sm:grid-cols-2 gap-1">
                       {clItems.map(item => (
