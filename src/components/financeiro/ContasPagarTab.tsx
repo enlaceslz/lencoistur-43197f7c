@@ -46,7 +46,7 @@ interface Conta {
   pago_em: string | null;
 }
 
-const emptyForm = { descricao: "", valor: "", vencimento: "", categoria: "operacional", fornecedor: "", observacoes: "", status: "pendente" };
+const emptyForm = { descricao: "", valor: 0, vencimento: "", categoria: "operacional", fornecedor: "", observacoes: "", status: "pendente" };
 
 export default function ContasPagarTab() {
   const [contas, setContas] = useState<Conta[]>([]);
