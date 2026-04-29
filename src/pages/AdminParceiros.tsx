@@ -381,7 +381,7 @@ const AdminParceiros = () => {
                   const type = partnerTypes.find(t => t.name === p.type) || partnerTypes[0];
                   const Icon = getIcon(type?.icon || "Building2");
                   return (
-                    <TableRow key={p.id}>
+                    <TableRow key={p.id} className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setViewPartner(p)}>
                       <TableCell>
                         <div>
                           <p className="font-semibold text-foreground">{p.name}</p>
