@@ -464,17 +464,86 @@ const AdminSGSTermos = () => {
               className="w-full pl-9 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30" 
             />
           </div>
-          <button 
-            onClick={() => {
-              if (!showForm) resetForm();
-              setShowForm(!showForm);
-            }}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
-          >
-            {showForm ? <XCircle size={16} /> : <Plus size={16} />} 
-            {showForm ? "Fechar Formulário" : "Novo Termo"}
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => {
+                setShowConfig(!showConfig);
+                setShowForm(false);
+              }}
+              className="bg-muted hover:bg-muted/80 text-muted-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
+            >
+              <Settings size={16} />
+              Configurar Conteúdo
+            </button>
+            <button 
+              onClick={() => {
+                if (!showForm) resetForm();
+                setShowForm(!showForm);
+                setShowConfig(false);
+              }}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
+            >
+              {showForm ? <XCircle size={16} /> : <Plus size={16} />} 
+              {showForm ? "Fechar Formulário" : "Novo Termo"}
+            </button>
+          </div>
         </div>
+
+        {showConfig && (
+          <div className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="flex items-center justify-between border-b border-border pb-4">
+              <div className="flex items-center gap-3">
+                <Settings className="text-primary" size={24} />
+                <h3 className="font-display font-bold text-lg">Configurações de Conteúdo dos Termos</h3>
+              </div>
+              <button onClick={() => setShowConfig(false)} className="text-muted-foreground hover:text-foreground">
+                <XCircle size={20} />
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-bold flex items-center gap-2">
+                  <FileText size={16} className="text-primary" />
+                  Informações e Recomendações
+                </label>
+                <textarea 
+                  value={termConfig.term_recommendations}
+                  onChange={e => setTermConfig({ ...termConfig, term_recommendations: e.target.value })}
+                  rows={10}
+                  className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none"
+                  placeholder="Liste as recomendações para os clientes..."
+                />
+                <p className="text-[10px] text-muted-foreground">Este texto aparecerá na seção de Recomendações do termo impresso e digital.</p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold flex items-center gap-2">
+                  <Shield size={16} className="text-primary" />
+                  Riscos e Cuidados com a Segurança
+                </label>
+                <textarea 
+                  value={termConfig.term_safety_risks}
+                  onChange={e => setTermConfig({ ...termConfig, term_safety_risks: e.target.value })}
+                  rows={10}
+                  className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none"
+                  placeholder="Descreva os riscos e medidas de segurança..."
+                />
+                <p className="text-[10px] text-muted-foreground">Este texto aparecerá na seção de Riscos do termo impresso e digital.</p>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-4">
+              <button 
+                onClick={handleSaveConfig}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm transition-all active:scale-95"
+              >
+                <Save size={18} />
+                Salvar Alterações
+              </button>
+            </div>
+          </div>
+        )}
 
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-6 shadow-sm">
