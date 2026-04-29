@@ -25,7 +25,7 @@ const statusMap: Record<string, { label: string; className: string }> = {
   concluida: { label: "Concluída", className: "bg-primary/10 text-primary" },
 };
 
-const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 interface BookingRow {
   id: string;
