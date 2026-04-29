@@ -189,29 +189,38 @@ const AdminSGSBriefings = () => {
             <div key={b.id} className={`bg-card border rounded-2xl p-5 ${b.completed ? "border-border" : "border-secondary"}`}>
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${b.completed ? "bg-primary/10" : "bg-secondary/10"}`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${b.completed ? "bg-primary/10" : "bg-secondary/10 shadow-sm shadow-secondary/20"}`}>
                     {b.completed ? <CheckCircle size={20} className="text-primary" /> : <XCircle size={20} className="text-secondary" />}
                   </div>
                   <div>
-                    <h4 className="font-bold text-foreground">{b.guide_name}</h4>
-                    <p className="text-xs text-muted-foreground">
-                      {b.tours?.name && <><MapPin size={10} className="inline mr-1" />{b.tours.name} • </>}
-                      {LANGUAGES[b.language as keyof typeof LANGUAGES] || b.language} • {new Date(b.created_at).toLocaleDateString("pt-BR")}
+                    <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
+                      {b.guide_name}
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest ${b.completed ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
+                        {b.completed ? (form.language === "en" ? "COMPLETE" : "CONCLUÍDO") : (form.language === "en" ? "PENDING" : "PENDENTE")}
+                      </span>
+                    </h4>
+                    <p className="text-[11px] text-muted-foreground flex items-center gap-2 mt-0.5">
+                      {b.tours?.name && <span className="flex items-center gap-1 font-medium text-foreground/80"><MapPin size={10} className="text-primary" />{b.tours.name}</span>}
+                      <span>•</span>
+                      <span className="uppercase">{LANGUAGES[b.language as keyof typeof LANGUAGES] || b.language}</span>
+                      <span>•</span>
+                      <span>{new Date(b.created_at).toLocaleDateString("pt-BR")}</span>
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${b.completed ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
+                <div className="flex items-center gap-4">
+                  <div className="text-right hidden sm:block">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">Checklist</p>
+                    <span className={`text-xs font-bold ${b.completed ? "text-primary" : "text-secondary"}`}>
                       {completedCount(b)}/{CHECKLIST_ITEMS.length}
                     </span>
                   </div>
                   <div className="flex gap-1">
-                    <button onClick={() => openEdit(b)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors">
-                      <Pencil size={14} />
+                    <button onClick={() => openEdit(b)} className="p-2 rounded-xl hover:bg-muted text-muted-foreground transition-colors" title="Editar">
+                      <Pencil size={16} />
                     </button>
-                    <button onClick={() => handleDelete(b.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
-                      <Trash2 size={14} />
+                    <button onClick={() => handleDelete(b.id)} className="p-2 rounded-xl hover:bg-destructive/10 text-destructive transition-colors" title="Excluir">
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
