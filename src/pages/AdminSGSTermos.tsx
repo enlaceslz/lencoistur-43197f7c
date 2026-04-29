@@ -252,6 +252,7 @@ const AdminSGSTermos = () => {
     setEditingId(null);
     setForm({
       customer_id: "",
+      booking_id: "",
       tour_id: "",
       vehicle_id: "",
       has_allergy: false,
