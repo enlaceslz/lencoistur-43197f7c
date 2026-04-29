@@ -207,26 +207,28 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   return (
     <div className="min-h-screen bg-[hsl(220,20%,96%)] flex">
       {/* === SIDEBAR === */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-[260px] admin-sidebar transform transition-transform duration-200 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[80px]" : "w-[260px]"} admin-sidebar transform transition-all duration-200 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
         {/* Brand */}
-        <div className="px-5 py-5 border-b border-white/[0.08]">
+        <div className={`px-5 py-5 border-b border-white/[0.08] ${sidebarCollapsed ? "flex justify-center" : ""}`}>
           <Link to="/" className="flex items-center gap-2">
             {settings?.logoUrl ? (
               <img 
                 src={settings.logoUrl} 
                 alt={settings.titulo || "LençóisTour"} 
-                className="h-10 w-auto object-contain brightness-0 invert" 
+                className={`${sidebarCollapsed ? "h-6" : "h-10"} w-auto object-contain brightness-0 invert`} 
               />
             ) : (
               <>
-                <div className="w-8 h-8 rounded-lg bg-[hsl(217,91%,60%)] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[hsl(217,91%,60%)] flex items-center justify-center shrink-0">
                   <span className="text-white font-bold text-sm">LT</span>
                 </div>
-                <div>
-                  <span className="font-display text-base font-bold text-white tracking-tight">Lençóis</span>
-                  <span className="font-display text-base font-bold text-[hsl(217,91%,60%)]">Tour</span>
-                  <p className="text-[10px] text-[hsl(220,15%,50%)] -mt-0.5 font-medium">Painel Administrativo</p>
-                </div>
+                {!sidebarCollapsed && (
+                  <div>
+                    <span className="font-display text-base font-bold text-white tracking-tight">Lençóis</span>
+                    <span className="font-display text-base font-bold text-[hsl(217,91%,60%)]">Tour</span>
+                    <p className="text-[10px] text-[hsl(220,15%,50%)] -mt-0.5 font-medium">Painel Administrativo</p>
+                  </div>
+                )}
               </>
             )}
           </Link>
