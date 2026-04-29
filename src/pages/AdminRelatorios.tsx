@@ -156,7 +156,7 @@ const AdminRelatorios = () => {
 
   useEffect(() => { loadReport(); }, [loadReport]);
 
-  const fmt = (v: number) => (v / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const printReport = () => window.print();
 
   return (
