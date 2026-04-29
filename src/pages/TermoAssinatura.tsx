@@ -82,9 +82,11 @@ const TermoAssinatura = () => {
         const termRes = await supabase.from("sgs_risk_terms").select("*, customers(*)").eq("id", termId).maybeSingle();
         if (termRes.data) {
           termData = termRes.data;
-          // Try to find booking linked to this term
           if (termData.booking_id) {
             const bookingRes = await supabase.from("bookings").select("*, customers(*)").eq("id", termData.booking_id).maybeSingle();
+            bookingData = bookingRes.data;
+          } else if (bookingIdParam) {
+            const bookingRes = await supabase.from("bookings").select("*, customers(*)").eq("id", bookingIdParam).maybeSingle();
             bookingData = bookingRes.data;
           }
         }
@@ -95,6 +97,9 @@ const TermoAssinatura = () => {
           const termRes = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
           termData = termRes.data;
         }
+      } else if (bookingIdParam) {
+        const bookingRes = await supabase.from("bookings").select("*, customers(*)").eq("id", bookingIdParam).maybeSingle();
+        bookingData = bookingRes.data;
       }
 
       if (bookingData || termData) {
