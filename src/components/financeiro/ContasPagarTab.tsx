@@ -70,7 +70,7 @@ export default function ContasPagarTab() {
   const openNew = () => { setEditing(null); setForm(emptyForm); setOpen(true); };
   const openEdit = (c: Conta) => {
     setEditing(c);
-    setForm({ descricao: c.descricao, valor: String(c.valor / 100), vencimento: c.vencimento, categoria: c.categoria, fornecedor: c.fornecedor || "", observacoes: c.observacoes || "", status: c.status });
+    setForm({ descricao: c.descricao, valor: c.valor, vencimento: c.vencimento, categoria: c.categoria, fornecedor: c.fornecedor || "", observacoes: c.observacoes || "", status: c.status });
     setOpen(true);
   };
 
