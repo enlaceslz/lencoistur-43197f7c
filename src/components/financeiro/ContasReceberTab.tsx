@@ -133,11 +133,11 @@ export default function ContasReceberTab() {
   };
 
   const handleSave = async () => {
-    if (!form.descricao.trim() || !form.vencimento || !form.valor) { toast.error("Preencha os campos obrigatórios."); return; }
+    if (!form.descricao.trim() || !form.vencimento || form.valor <= 0) { toast.error("Preencha os campos obrigatórios."); return; }
     setSaving(true);
     const payload = {
       descricao: form.descricao.trim(),
-      valor: Math.round(parseFloat(form.valor) * 100),
+      valor: form.valor,
       vencimento: form.vencimento,
       categoria: form.categoria,
       cliente: form.cliente || null,
