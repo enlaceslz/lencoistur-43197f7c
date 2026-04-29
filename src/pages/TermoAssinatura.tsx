@@ -372,12 +372,12 @@ const TermoAssinatura = () => {
       doc.text(`Assinado em: ${new Date().toLocaleString("pt-BR")}`, 14, currentY + 36);
 
       const pdfBlob = doc.output('blob');
-      const fileName = `termo_${booking.booking_code}_${Date.now()}.pdf`;
+      const fileName = `termo_${booking?.booking_code || 'manual'}_${Date.now()}.pdf`;
       const filePath = `termos_assinados/${fileName}`;
 
       // 3. Upload to Storage
       const { error: uploadError } = await supabase.storage
-        .from("company-documents")
+        .from("customer-documents")
         .upload(filePath, pdfBlob, {
           contentType: 'application/pdf',
           cacheControl: '3600'
@@ -385,17 +385,31 @@ const TermoAssinatura = () => {
 
       if (uploadError) throw uploadError;
 
-      // 4. Save to Documents Module
-      const { error: docError } = await supabase.from("documents").insert({
-        name: `Termo Assinado - ${booking.item_name} - ${booking.booking_code}`,
+      // 4. Save to CRM Customer Documents
+      const customerId = booking?.customer_id || term?.customer_id;
+      if (customerId) {
+        const { error: docError } = await supabase.from("customer_documents").insert({
+          customer_id: customerId,
+          name: `Termo Assinado - ${booking?.item_name || term?.tour_name}`,
+          file_url: supabase.storage.from("customer-documents").getPublicUrl(filePath).data.publicUrl,
+          file_type: "application/pdf",
+          file_size: pdfBlob.size,
+          category: "termo"
+        });
+        if (docError) console.error("Error saving to customer_documents:", docError);
+      }
+
+      // Also save to generic Documents Module
+      const { error: genericDocError } = await supabase.from("documents").insert({
+        name: `Termo Assinado - ${booking?.item_name || term?.tour_name} - ${booking?.booking_code || 'SGS'}`,
         type: "termo_assinado",
-        description: `Termo assinado por ${booking.customers?.name || booking.customer_name} para a reserva ${booking.booking_code} em ${new Date().toLocaleDateString("pt-BR")}`,
+        description: `Termo assinado por ${booking?.customers?.name || booking?.customer_name || term?.customer_name} em ${new Date().toLocaleDateString("pt-BR")}`,
         file_url: filePath,
         file_name: fileName,
         status: "vigente"
       });
 
-      if (docError) throw docError;
+      if (genericDocError) console.error("Error saving to generic documents:", genericDocError);
 
       // 5. Update term with PDF URL
       await supabase.from("sgs_risk_terms").update({ pdf_url: filePath }).eq("id", currentTermId);
