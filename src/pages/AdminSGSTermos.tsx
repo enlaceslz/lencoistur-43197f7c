@@ -446,11 +446,17 @@ const AdminSGSTermos = () => {
     win.document.close();
   };
 
-  const filtered = terms.filter(t =>
-    !search || 
-    t.customer_name?.toLowerCase().includes(search.toLowerCase()) || 
-    t.tour_name?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = terms.filter(t => {
+    const matchesSearch = !search || 
+      t.customer_name?.toLowerCase().includes(search.toLowerCase()) || 
+      t.tour_name?.toLowerCase().includes(search.toLowerCase());
+    
+    const matchesStatus = statusFilter === "todos" || 
+      (statusFilter === "assinado" && t.signature_data) || 
+      (statusFilter === "pendente" && !t.signature_data);
+      
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <AdminLayout title="SGS - Termos de Ciência de Risco">
