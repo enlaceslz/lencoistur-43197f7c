@@ -1218,6 +1218,26 @@ const AdminCRM = () => {
         </div>
       </div>
 
+      {/* Delete Document Confirmation */}
+      <Dialog open={!!deleteDocConfirm} onOpenChange={() => setDeleteDocConfirm(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Remover Documento</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Tem certeza que deseja remover este anexo permanentemente?
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDocConfirm(null)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={() => deleteDocConfirm && handleDeleteDocument(deleteDocConfirm)}>
+              <Trash2 size={14} className="mr-1" /> Excluir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
