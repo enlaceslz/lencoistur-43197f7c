@@ -197,6 +197,44 @@ const AdminConfig = () => {
     setConfirmarSenha("");
   };
 
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingGallery(true);
+    const newImages = [...gallery.images];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!file.type.startsWith("image/")) continue;
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`A imagem ${file.name} é muito grande (máx 5MB)`);
+        continue;
+      }
+
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `gallery/img-${Date.now()}-${i}.${ext}`;
+
+      const { error } = await supabase.storage.from("tour-images").upload(path, file);
+      if (error) {
+        toast.error(`Erro ao enviar ${file.name}: ${error.message}`);
+        continue;
+      }
+
+      const { data: urlData } = supabase.storage.from("tour-images").getPublicUrl(path);
+      newImages.push({ src: urlData.publicUrl, alt: "Foto da Galeria LençóisTour" });
+    }
+
+    setGallery({ images: newImages });
+    setUploadingGallery(false);
+    toast.success("Imagens enviadas! Não esqueça de salvar as alterações.");
+  };
+
+  const removeGalleryImage = (index: number) => {
+    const newImages = gallery.images.filter((_, i) => i !== index);
+    setGallery({ images: newImages });
+  };
+
   const BACKUP_TABLES = [
     "site_settings", "tours", "transfer_routes", "customers", "bookings",
     "partners", "contas_pagar", "contas_receber", "reviews", "documents",
