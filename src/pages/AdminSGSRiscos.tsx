@@ -179,32 +179,87 @@ const AdminSGSRiscos = () => {
         </div>
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between gap-4">
-          <div className="flex gap-2 flex-1">
-            <div className="relative flex-1 max-w-md">
-              <Search size={16} className="absolute left-3 top-3 text-muted-foreground" />
-              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar riscos..."
-                className="w-full pl-9 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30" />
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Heatmap Matrix */}
+          <div className="bg-card border border-border rounded-2xl p-5 flex-shrink-0">
+            <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+              <AlertTriangle size={16} className="text-secondary" />
+              Matriz de Riscos (PxC)
+            </h3>
+            <div className="grid grid-cols-6 gap-1 w-full max-w-[300px]">
+              <div className="aspect-square flex items-center justify-center text-[10px] font-bold text-muted-foreground italic">C \ P</div>
+              {[1, 2, 3, 4, 5].map(p => (
+                <div key={p} className="aspect-square flex items-center justify-center text-[10px] font-bold text-muted-foreground">{p}</div>
+              ))}
+              {[5, 4, 3, 2, 1].map(c => (
+                <div key={`row-${c}`} className="contents">
+                  <div className="aspect-square flex items-center justify-center text-[10px] font-bold text-muted-foreground">{c}</div>
+                  {[1, 2, 3, 4, 5].map(p => {
+                    const level = p * c;
+                    const count = risks.filter(r => r.probability === p && r.impact === c).length;
+                    let bgColor = "bg-primary/20";
+                    if (level >= 12) bgColor = "bg-destructive/80";
+                    else if (level >= 6) bgColor = "bg-secondary/60";
+                    
+                    return (
+                      <div 
+                        key={`${p}-${c}`} 
+                        className={`aspect-square rounded-md flex items-center justify-center text-xs font-bold transition-all ${count > 0 ? bgColor + " text-white shadow-sm scale-105" : "bg-muted/30 text-muted-foreground/30"}`}
+                        title={`P=${p}, C=${c}, NR=${level}: ${count} riscos`}
+                      >
+                        {count > 0 ? count : ""}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
-            <select value={filterStage} onChange={(e) => setFilterStage(e.target.value)}
-              className="bg-card border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
-              <option value="todas">Todas etapas</option>
-              {Object.entries(STAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-            </select>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                <div className="w-2.5 h-2.5 rounded-full bg-primary/30" /> Aceitável
+              </div>
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                <div className="w-2.5 h-2.5 rounded-full bg-secondary/60" /> Temp. Aceitável
+              </div>
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                <div className="w-2.5 h-2.5 rounded-full bg-destructive/80" /> Inaceitável
+              </div>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <button onClick={() => window.print()}
-              className="bg-muted text-muted-foreground px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-1 hidden sm:flex">
-              <Printer size={16} /> Imprimir
-            </button>
-            <button onClick={() => setShowLegend(!showLegend)}
-              className="bg-muted text-muted-foreground px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-1">
-              <Info size={16} /> Critérios NR
-            </button>
-            <button onClick={() => { setEditing(null); setForm(emptyForm); setShowForm(!showForm); }}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-              <Plus size={16} /> Novo Risco
-            </button>
+
+          <div className="flex-1 space-y-4">
+            <div className="flex flex-col sm:flex-row justify-between gap-4">
+              <div className="flex gap-2 flex-1">
+                <div className="relative flex-1 max-w-md">
+                  <Search size={16} className="absolute left-3 top-3 text-muted-foreground" />
+                  <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar riscos..."
+                    className="w-full pl-9 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <select value={filterStage} onChange={(e) => setFilterStage(e.target.value)}
+                  className="bg-card border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  <option value="todas">Todas etapas</option>
+                  {Object.entries(STAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                </select>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => window.print()}
+                  className="bg-muted text-muted-foreground px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-1 hidden sm:flex">
+                  <Printer size={16} /> Imprimir
+                </button>
+                <button onClick={() => setShowLegend(!showLegend)}
+                  className="bg-muted text-muted-foreground px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-1">
+                  <Info size={16} /> Critérios NR
+                </button>
+                <button onClick={() => { setEditing(null); setForm(emptyForm); setShowForm(!showForm); }}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-sm shadow-primary/20">
+                  <Plus size={16} /> Novo Risco
+                </button>
+              </div>
+            </div>
+            
+            <p className="text-xs text-muted-foreground italic">
+              A matriz acima visualiza a distribuição dos riscos cadastrados. Clique em "Critérios NR" para entender a pontuação.
+            </p>
           </div>
         </div>
 
@@ -318,54 +373,61 @@ const AdminSGSRiscos = () => {
         )}
 
         {/* Table */}
-        <div className="bg-card border border-border rounded-2xl overflow-hidden">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-muted">
+              <thead className="bg-muted/50 border-b border-border">
                 <tr>
-                  <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Código</th>
-                  <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Etapa</th>
-                  <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Perigo / Danos</th>
-                  <th className="text-center px-4 py-3 font-semibold text-muted-foreground">P</th>
-                  <th className="text-center px-4 py-3 font-semibold text-muted-foreground">C</th>
-                  <th className="text-center px-4 py-3 font-semibold text-muted-foreground">NR</th>
-                  <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Classificação</th>
-                  <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Responsável</th>
-                  <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Status</th>
-                  <th className="text-right px-4 py-3 font-semibold text-muted-foreground">Ações</th>
+                  <th className="text-left px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">Código</th>
+                  <th className="text-left px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">Etapa / Atividade</th>
+                  <th className="text-left px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">Perigo / Danos</th>
+                  <th className="text-center px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">NR (P x C)</th>
+                  <th className="text-left px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">Responsável</th>
+                  <th className="text-right px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">Ações</th>
                 </tr>
               </thead>
-              <tbody>
-                {loading ? (
-                  <tr><td colSpan={10} className="text-center py-8 text-muted-foreground">Carregando...</td></tr>
-                ) : filtered.length === 0 ? (
-                  <tr><td colSpan={10} className="text-center py-8 text-muted-foreground">Nenhum risco encontrado</td></tr>
+              <tbody className="divide-y divide-border">
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground italic">
+                      Nenhum risco encontrado com os filtros atuais.
+                    </td>
+                  </tr>
                 ) : filtered.map((r) => {
                   const rc = riskClass(r.risk_level);
                   return (
-                    <tr key={r.id} className="border-t border-border hover:bg-muted/50">
-                      <td className="px-4 py-3 font-mono text-xs text-foreground">{r.risk_code}</td>
-                      <td className="px-4 py-3 text-foreground text-xs">{STAGES[r.stage] || r.stage}</td>
-                      <td className="px-4 py-3">
-                        <p className="text-foreground font-medium text-xs">{r.activity}</p>
-                        <p className="text-muted-foreground text-xs">{r.hazard}</p>
+                    <tr key={r.id} className="hover:bg-muted/30 transition-colors group">
+                      <td className="px-4 py-4 font-mono text-[11px] text-muted-foreground">{r.risk_code}</td>
+                      <td className="px-4 py-4">
+                        <p className="font-bold text-foreground">{r.activity}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase font-semibold">{STAGES[r.stage]}</p>
                       </td>
-                      <td className="px-4 py-3 text-center text-foreground">{r.probability}</td>
-                      <td className="px-4 py-3 text-center text-foreground">{r.impact}</td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`px-2 py-1 rounded-lg text-xs font-bold ${rc.color}`}>{r.risk_level}</span>
+                      <td className="px-4 py-4 text-muted-foreground">{r.hazard}</td>
+                      <td className="px-4 py-4">
+                        <div className="flex flex-col items-center">
+                          <span className={`px-2 py-1 rounded-lg font-bold text-xs min-w-[30px] text-center ${rc.color}`}>
+                            {r.risk_level}
+                          </span>
+                          <span className="text-[9px] mt-1 text-muted-foreground font-medium">{rc.label}</span>
+                        </div>
                       </td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-lg text-xs font-semibold ${rc.color}`}>{rc.label}</span>
-                      </td>
-                      <td className="px-4 py-3 text-foreground text-xs">{r.responsible}</td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${STATUS_COLORS[r.status] || ""}`}>{r.status}</span>
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex justify-end gap-1">
-                          <button onClick={() => openEdit(r)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground"><Pencil size={14} /></button>
-                          <button onClick={() => handleDelete(r.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive"><Trash2 size={14} /></button>
+                      <td className="px-4 py-4 text-foreground font-medium">{r.responsible}</td>
+                      <td className="px-4 py-4">
+                        <div className="flex justify-end gap-2">
+                          <button 
+                            onClick={() => openEdit(r)}
+                            className="p-2 hover:bg-secondary/10 text-secondary rounded-lg transition-colors"
+                            title="Editar"
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(r.id)}
+                            className="p-2 hover:bg-destructive/10 text-destructive rounded-xl transition-colors"
+                            title="Excluir"
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </div>
                       </td>
                     </tr>
