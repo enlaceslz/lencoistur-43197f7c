@@ -358,7 +358,7 @@ const AdminReservas = () => {
       </Card>
 
       {/* Table */}
-      <Card>
+      <Card className="border-none shadow-sm overflow-hidden">
         {filtered.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground">
             <ShoppingCart className="mx-auto mb-3 opacity-40" size={40} />
@@ -369,16 +369,16 @@ const AdminReservas = () => {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Código</TableHead>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Passeio/Translado</TableHead>
-                  <TableHead>Data</TableHead>
-                  <TableHead>Pax</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Pagamento</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Criado em</TableHead>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="font-bold">Código</TableHead>
+                  <TableHead className="font-bold">Cliente</TableHead>
+                  <TableHead className="font-bold">Passeio/Translado</TableHead>
+                  <TableHead className="font-bold text-center">Data</TableHead>
+                  <TableHead className="font-bold text-center">Pax</TableHead>
+                  <TableHead className="font-bold text-right">Total</TableHead>
+                  <TableHead className="font-bold text-center">Pagamento</TableHead>
+                  <TableHead className="font-bold text-center">Status</TableHead>
+                  <TableHead className="font-bold">Criado em</TableHead>
                   <TableHead className="w-12"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -387,16 +387,22 @@ const AdminReservas = () => {
                   const sc = statusConfig[b.status] || statusConfig.pendente;
                   const pc = paymentConfig[b.paymentStatus] || paymentConfig.pendente;
                   return (
-                    <TableRow key={b.id} className="cursor-pointer hover:bg-muted/50" onClick={() => { setSelected(b); setEditNotes(b.notes || ""); setShowNotes(false); }}>
+                    <TableRow 
+                      key={b.id} 
+                      className="cursor-pointer hover:bg-primary/5 transition-colors border-b border-border/50 group" 
+                      onClick={() => { setSelected(b); setEditNotes(b.notes || ""); setShowNotes(false); }}
+                    >
                       <TableCell className="font-mono text-sm text-foreground">
                         <div className="flex items-center gap-1">
-                          {b.bookingCode}
+                          <span className="bg-muted px-1.5 py-0.5 rounded text-xs group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                            {b.bookingCode}
+                          </span>
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-6 w-6" 
+                            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" 
                             onClick={(e) => { 
-                              e.stopPropagation(); 
+                              e.stopPropagation();
                               navigator.clipboard.writeText(b.bookingCode);
                               toast.success("Código copiado!");
                             }}
@@ -406,24 +412,45 @@ const AdminReservas = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div>
-                          <p className="font-medium text-foreground">{b.customerName}</p>
-                          <p className="text-xs text-muted-foreground">{b.customerEmail}</p>
+                        <div className="flex flex-col">
+                          <span className="font-bold text-foreground group-hover:text-primary transition-colors">{b.customerName}</span>
+                          <span className="text-[10px] text-muted-foreground">{b.customerEmail}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-muted-foreground max-w-[200px] truncate">{b.itemName}</TableCell>
-                      <TableCell className="text-muted-foreground">{fmtDate(b.date)}</TableCell>
-                      <TableCell className="text-foreground">{b.guests}</TableCell>
-                      <TableCell className="font-medium text-foreground">{fmt(b.finalTotal)}</TableCell>
-                      <TableCell>
-                        <Badge variant="secondary" className={pc.className}>{pc.label}</Badge>
+                      <TableCell className="max-w-[200px] truncate">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">{b.itemName}</span>
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                            {b.type === 'transfer' ? <Car size={10} /> : <Compass size={10} />}
+                            {b.type.toUpperCase()}
+                          </span>
+                        </div>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary" className={sc.className}>{sc.label}</Badge>
+                      <TableCell className="text-center font-medium">
+                        <div className="flex flex-col items-center">
+                          <span className="text-sm">{fmtDate(b.date)}</span>
+                          {b.date && new Date(b.date) < new Date() && b.status !== 'concluida' && (
+                            <span className="text-[9px] text-amber-600 font-bold uppercase tracking-tighter">Data Passada</span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className="font-bold">{b.guests}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right font-black text-foreground">{fmt(b.finalTotal)}</TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className={`${pc.className} border rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase`}>
+                          {pc.label}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className={`${sc.className} border rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase`}>
+                          {sc.label}
+                        </Badge>
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground whitespace-nowrap">{fmtDateTime(b.createdAt)}</TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setSelected(b); setEditNotes(b.notes || ""); setShowNotes(false); }}>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full group-hover:bg-primary group-hover:text-white transition-all">
                           <Eye size={14} />
                         </Button>
                       </TableCell>
