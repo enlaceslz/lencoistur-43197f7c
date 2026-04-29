@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Search, Receipt, FileText, CheckCircle2, Clock, 
-  ExternalLink, Printer, MoreHorizontal, Download, Paperclip, Upload
+  MoreHorizontal, Download, Paperclip, Upload, Filter,
+  ExternalLink, Plus
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { PrintReceiptButton } from "@/components/BookingReceipt";
 import { formatCurrency } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface BookingRow {
   id: string;
@@ -44,14 +46,12 @@ interface BookingRow {
   notes?: string | null;
 }
 
-
 interface NotasFiscaisTabProps {
   bookings: any[];
 }
 
 const fmt = (v: number) => formatCurrency(v);
 const fmtDate = (d: string) => {
-
   if (!d) return "—";
   try { return new Date(d).toLocaleDateString("pt-BR"); } catch { return d; }
 };
@@ -76,7 +76,6 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
   }, [bookings]);
 
   const updateBooking = async (id: string, updates: Partial<BookingRow>) => {
-    // Remove relation objects before sending to Supabase
     const { customers, ...dataToUpdate } = updates;
     
     const { error } = await supabase
@@ -131,232 +130,220 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <FileText size={16} /> Total de Reservas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{stats.total}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-green-600" /> Notas Emitidas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{stats.withInvoice}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Clock size={16} className="text-yellow-600" /> Pendentes (Pagas)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">{stats.pendingInvoice}</p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[
+          { label: "Total de Reservas", value: stats.total, icon: FileText, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-950/20" },
+          { label: "Notas Emitidas", value: stats.withInvoice, icon: CheckCircle2, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-950/20" },
+          { label: "Pendentes (Pagas)", value: stats.pendingInvoice, icon: Clock, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-950/20" },
+        ].map((s, idx) => (
+          <motion.div
+            key={s.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.1 }}
+          >
+            <Card className="border-none shadow-sm hover:shadow-md transition-shadow">
+              <CardContent className="p-6 flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">{s.label}</p>
+                  <p className="text-3xl font-black mt-1">{s.value}</p>
+                </div>
+                <div className={`p-4 rounded-2xl ${s.bg} ${s.color}`}>
+                  <s.icon size={24} />
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="relative flex-1">
+      <div className="flex flex-col sm:flex-row items-center gap-4 bg-card p-4 rounded-2xl border border-border/50">
+        <div className="relative flex-1 w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
           <Input 
             placeholder="Buscar por código, cliente ou nota..." 
-            className="pl-10"
+            className="pl-10 rounded-xl border-none bg-muted/50 h-11 focus:ring-2 focus:ring-primary"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
+        <Button variant="outline" className="rounded-xl h-11 border-border/50 hover:bg-muted font-bold text-xs uppercase tracking-wider">
+          <Filter size={16} className="mr-2" /> Filtros
+        </Button>
       </div>
 
-      <Card>
+      <Card className="border-none shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Reserva</TableHead>
-              <TableHead>Cliente</TableHead>
-              <TableHead>Valor</TableHead>
-              <TableHead>Status Pgto</TableHead>
-              <TableHead>Comprovante</TableHead>
-              <TableHead>NF-e</TableHead>
-              <TableHead>Recibo</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
+            <TableRow className="bg-muted/30 border-b border-border">
+              <TableHead className="px-6 py-4 font-bold text-[10px] uppercase tracking-widest">Reserva</TableHead>
+              <TableHead className="px-6 py-4 font-bold text-[10px] uppercase tracking-widest">Cliente</TableHead>
+              <TableHead className="px-6 py-4 font-bold text-[10px] uppercase tracking-widest">Valor</TableHead>
+              <TableHead className="px-6 py-4 font-bold text-[10px] uppercase tracking-widest">Status Pgto</TableHead>
+              <TableHead className="px-6 py-4 font-bold text-[10px] uppercase tracking-widest">Documentos</TableHead>
+              <TableHead className="px-6 py-4 font-bold text-[10px] uppercase tracking-widest text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map((b) => (
-              <TableRow key={b.id}>
-                <TableCell className="font-medium">
-                  <div className="flex flex-col">
-                    <span>{b.booking_code}</span>
-                    <span className="text-xs text-muted-foreground">{fmtDate(b.created_at)}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-col">
-                    <span>{b.customers?.name || "N/A"}</span>
-                    <span className="text-xs text-muted-foreground">{b.customers?.email || ""}</span>
-                  </div>
-                </TableCell>
-                <TableCell>{fmt(b.final_total)}</TableCell>
-                <TableCell>
-                  <Badge variant={b.payment_status === "pago" ? "default" : "secondary"} className={b.payment_status === "pago" ? "bg-green-600 hover:bg-green-700" : ""}>
-                    {b.payment_status === "pago" ? "Pago" : "Pendente"}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {b.voucher_url ? (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-8 gap-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                        onClick={() => window.open(b.voucher_url!, "_blank")}
-                      >
-                        <Paperclip size={14} />
-                        Ver
-                      </Button>
-                    ) : (
-                      <div className="relative">
-                        <input
-                          type="file"
-                          id={`voucher-${b.id}`}
-                          className="hidden"
-                          onChange={(e) => handleFileUpload(e, b.id, "voucher_url")}
-                          accept="image/*,.pdf"
-                        />
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 gap-1 text-muted-foreground hover:text-primary"
-                          onClick={() => document.getElementById(`voucher-${b.id}`)?.click()}
-                        >
-                          <Upload size={14} />
-                          Anexar
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-col gap-1">
-                    {b.invoice_issued ? (
-                      <div className="flex flex-col gap-1">
-                        <Badge variant="outline" className="border-green-200 text-green-700 bg-green-50 w-fit">Emitida</Badge>
-                        <div className="flex items-center gap-2">
-                          {b.invoice_url ? (
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-7 px-2 gap-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 text-xs"
-                              onClick={() => window.open(b.invoice_url!, "_blank")}
+            <AnimatePresence mode="popLayout">
+              {filtered.map((b, idx) => (
+                <motion.tr 
+                  key={b.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: idx * 0.03 }}
+                  className="group hover:bg-primary/5 border-b border-border/50 last:border-0"
+                >
+                  <TableCell className="px-6 py-4">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-foreground group-hover:text-primary transition-colors">{b.booking_code}</span>
+                      <span className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1 font-mono uppercase">
+                        <Clock size={10} /> {fmtDate(b.created_at)}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-foreground">{b.customers?.name || "N/A"}</span>
+                      <span className="text-xs text-muted-foreground">{b.customers?.email || ""}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
+                    <span className="font-black text-foreground">{fmt(b.final_total)}</span>
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
+                    <Badge variant="outline" className={`rounded-lg px-2 py-0.5 font-bold uppercase text-[9px] border ${
+                      b.payment_status === "pago" 
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-100" 
+                        : "bg-amber-50 text-amber-700 border-amber-100"
+                    }`}>
+                      {b.payment_status === "pago" ? "Pago" : "Pendente"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      {/* Comprovante */}
+                      <div className="group/doc">
+                        {b.voucher_url ? (
+                          <button 
+                            onClick={() => window.open(b.voucher_url!, "_blank")}
+                            className="flex items-center gap-1.5 p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors text-[10px] font-bold uppercase"
+                          >
+                            <Paperclip size={12} /> Comprovante
+                          </button>
+                        ) : (
+                          <div className="relative">
+                            <input
+                              type="file"
+                              id={`voucher-${b.id}`}
+                              className="hidden"
+                              onChange={(e) => handleFileUpload(e, b.id, "voucher_url")}
+                              accept="image/*,.pdf"
+                            />
+                            <button 
+                              onClick={() => document.getElementById(`voucher-${b.id}`)?.click()}
+                              className="flex items-center gap-1.5 p-1.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-primary transition-colors text-[10px] font-bold uppercase border border-dashed border-border"
                             >
-                              <Paperclip size={12} />
-                              Ver NF-e
-                            </Button>
-                          ) : (
-                            <div className="relative">
-                              <input
-                                type="file"
-                                id={`invoice-${b.id}`}
-                                className="hidden"
-                                onChange={(e) => handleFileUpload(e, b.id, "invoice_url")}
-                                accept="image/*,.pdf"
-                              />
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-7 px-2 gap-1 text-muted-foreground hover:text-primary text-xs"
-                                onClick={() => document.getElementById(`invoice-${b.id}`)?.click()}
-                              >
-                                <Upload size={12} />
-                                Anexar NF-e
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                        {b.invoice_number && <span className="text-[10px] font-mono opacity-70">#{b.invoice_number}</span>}
+                              <Upload size={12} /> Comprovante
+                            </button>
+                          </div>
+                        )}
                       </div>
-                    ) : (
-                      <Badge variant="outline" className="text-muted-foreground w-fit">Pendente</Badge>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {b.receipt_issued ? (
-                    <Badge variant="outline" className="border-blue-200 text-blue-700 bg-blue-50">Enviado</Badge>
-                  ) : (
-                    <Badge variant="outline" className="text-muted-foreground">Não enviado</Badge>
-                  )}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <PrintReceiptButton 
-                      data={{
-                        bookingCode: b.booking_code,
-                        customerName: b.customers?.name || "",
-                        customerEmail: b.customers?.email || "",
-                        customerPhone: b.customers?.phone,
-                        itemName: b.item_name,
-                        type: b.type,
-                        date: b.date || "",
-                        guests: b.guests,
-                        unitPrice: b.unit_price,
-                        total: b.total,
-                        discount: b.discount,
-                        finalTotal: b.final_total,
-                        payMethod: b.pay_method,
-                        paymentStatus: b.payment_status,
-                        status: b.status,
-                        pixCode: b.pix_code,
-                        createdAt: b.created_at,
-                        notes: b.notes
-                      }}
-                      variant="ghost"
-                      size="icon"
-                    />
-                    
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal size={16} />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {b.voucher_url && (
-                          <DropdownMenuItem onClick={() => updateBooking(b.id, { voucher_url: null } as any)}>
-                            <Paperclip size={14} className="mr-2" />
-                            Remover Comprovante
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem onClick={() => handleMarkInvoiceIssued(b.id, !!b.invoice_issued)}>
-                          <FileText size={14} className="mr-2" />
-                          {b.invoice_issued ? "Remover Marcação de NF-e" : "Marcar NF-e Emitida"}
-                        </DropdownMenuItem>
-                        {b.invoice_url && (
-                          <DropdownMenuItem onClick={() => updateBooking(b.id, { invoice_url: null } as any)}>
-                            <ExternalLink size={14} className="mr-2" />
-                            Remover Arquivo da NF-e
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem onClick={() => updateBooking(b.id, { receipt_issued: !b.receipt_issued })}>
-                          <Receipt size={14} className="mr-2" />
-                          {b.receipt_issued ? "Marcar Recibo Pendente" : "Marcar Recibo Enviado"}
-                        </DropdownMenuItem>
 
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+                      {/* NF-e */}
+                      <div className="group/doc">
+                        {b.invoice_issued ? (
+                          <div className="flex items-center gap-2">
+                             <button 
+                                onClick={() => b.invoice_url && window.open(b.invoice_url, "_blank")}
+                                className="flex items-center gap-1.5 p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors text-[10px] font-bold uppercase"
+                              >
+                                <FileText size={12} /> NF-e #{b.invoice_number || "S/N"}
+                              </button>
+                          </div>
+                        ) : (
+                          <div className="relative">
+                             <input
+                              type="file"
+                              id={`invoice-${b.id}`}
+                              className="hidden"
+                              onChange={(e) => handleFileUpload(e, b.id, "invoice_url")}
+                              accept="image/*,.pdf"
+                            />
+                            <button 
+                              onClick={() => handleMarkInvoiceIssued(b.id, false)}
+                              className="flex items-center gap-1.5 p-1.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-primary transition-colors text-[10px] font-bold uppercase border border-dashed border-border"
+                            >
+                              <Plus size={12} /> Emitir NF-e
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <PrintReceiptButton 
+                        data={{
+                          bookingCode: b.booking_code,
+                          customerName: b.customers?.name || "",
+                          customerEmail: b.customers?.email || "",
+                          customerPhone: b.customers?.phone,
+                          itemName: b.item_name,
+                          type: b.type,
+                          date: b.date || "",
+                          guests: b.guests,
+                          unitPrice: b.unit_price,
+                          total: b.total,
+                          discount: b.discount,
+                          finalTotal: b.final_total,
+                          payMethod: b.pay_method,
+                          paymentStatus: b.payment_status,
+                          status: b.status,
+                          pixCode: b.pix_code,
+                          createdAt: b.created_at,
+                          notes: b.notes
+                        }}
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary"
+                      />
+                      
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl">
+                            <MoreHorizontal size={18} />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="rounded-xl border-none shadow-xl">
+                          <DropdownMenuItem onClick={() => updateBooking(b.id, { receipt_issued: !b.receipt_issued })} className="rounded-lg gap-2">
+                            <Receipt size={14} className="text-primary" />
+                            {b.receipt_issued ? "Desmarcar Recibo" : "Marcar Recibo Enviado"}
+                          </DropdownMenuItem>
+                          
+                          <DropdownMenuItem onClick={() => handleMarkInvoiceIssued(b.id, !!b.invoice_issued)} className="rounded-lg gap-2">
+                            <FileText size={14} className="text-emerald-500" />
+                            {b.invoice_issued ? "Remover Marcação de NF-e" : "Marcar NF-e Emitida"}
+                          </DropdownMenuItem>
+
+                          {b.invoice_issued && !b.invoice_url && (
+                            <DropdownMenuItem onClick={() => document.getElementById(`invoice-${b.id}`)?.click()} className="rounded-lg gap-2">
+                              <Upload size={14} className="text-blue-500" />
+                              Anexar Arquivo NF-e
+                            </DropdownMenuItem>
+                          )}
+
+                          <DropdownMenuItem className="rounded-lg gap-2 text-rose-500">
+                             <Download size={14} />
+                             Exportar Dados
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableCell>
+                </motion.tr>
+              ))}
+            </AnimatePresence>
           </TableBody>
         </Table>
       </Card>
