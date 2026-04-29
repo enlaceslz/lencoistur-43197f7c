@@ -186,6 +186,7 @@ const AdminCRM = () => {
   const [search, setSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [customerBookings, setCustomerBookings] = useState<BookingRow[]>([]);
+  const [customerDocuments, setCustomerDocuments] = useState<CustomerDocument[]>([]);
   const [dependents, setDependents] = useState<Dependent[]>([]);
   const [allDependents, setAllDependents] = useState<(Dependent & { customer_name: string })[]>([]);
   const [filter, setFilter] = useState<"all" | "with_bookings" | "no_bookings" | "dependents">("all");
