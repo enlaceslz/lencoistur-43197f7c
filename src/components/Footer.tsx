@@ -18,7 +18,7 @@ const Footer = () => {
                 <img 
                   src={settings.logoUrl} 
                   alt={settings.titulo || "LençóisTour"} 
-                  className="h-10 md:h-12 w-auto object-contain brightness-0 invert" 
+                  className="h-12 md:h-14 w-auto object-contain" 
                 />
               ) : (
                 <>Lençóis<span className="text-secondary">Tour</span></>
