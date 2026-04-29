@@ -119,11 +119,14 @@ const AdminReservas = () => {
     ? tours.find(t => t.name === newForm.itemName)
     : transfers.find(t => t.label === newForm.itemName);
   
+  const selectedTour = newForm.type === "tour" ? tours.find(t => t.name === newForm.itemName) : null;
+  const selectedTransfer = newForm.type === "transfer" ? transfers.find(t => t.label === newForm.itemName) : null;
+  
   const unitPrice = newForm.type === "tour" 
-    ? (newForm.tourMode === "privativo" ? (selectedItem?.private_price || 0) : (selectedItem?.price || 0))
-    : (selectedItem?.price || 0);
+    ? (newForm.tourMode === "privativo" ? (selectedTour?.private_price || 0) : (selectedTour?.price || 0))
+    : (selectedTransfer?.price || 0);
   const total = newForm.type === "tour" && newForm.tourMode === "privativo" ? unitPrice : unitPrice * newForm.guests;
-  const pixDiscountPercent = selectedItem?.pix_discount || 0;
+  const pixDiscountPercent = (selectedTour?.pix_discount || selectedTransfer?.pix_discount || 0);
   const discount = (newForm.payMethod === "pix" && pixDiscountPercent > 0) 
     ? Math.round(total * pixDiscountPercent / 100) 
     : 0;
