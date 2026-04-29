@@ -40,6 +40,13 @@ const packages: Package[] = [
   },
 ];
 
+const formatCurrency = (value: number) => {
+  return value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+};
+
 const PackageDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -161,12 +168,12 @@ const PackageDetail = () => {
           <div className="space-y-6">
             <div className="bg-card border border-border rounded-2xl p-6 shadow-sm sticky top-28">
               <div className="mb-6">
-                <p className="text-sm text-muted-foreground line-through">De R$ {pkg.originalPrice}</p>
+                <p className="text-sm text-muted-foreground line-through">De {formatCurrency(pkg.originalPrice)}</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold text-primary font-display">R$ {pkg.discountPrice}</span>
+                  <span className="text-4xl font-bold text-primary font-display">{formatCurrency(pkg.discountPrice)}</span>
                   <span className="text-muted-foreground">/ pessoa</span>
                 </div>
-                <p className="text-xs text-green-600 font-semibold mt-1">Você economiza R$ {pkg.originalPrice - pkg.discountPrice} neste combo!</p>
+                <p className="text-xs text-green-600 font-semibold mt-1">Você economiza {formatCurrency(pkg.originalPrice - pkg.discountPrice)} neste combo!</p>
               </div>
 
               <div className="space-y-4 mb-6">
