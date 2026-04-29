@@ -698,17 +698,21 @@ const AdminPasseios = () => {
                   <p className="text-xs text-muted-foreground flex items-center gap-1"><Users size={12} /> Grupo</p>
                   <p className="text-sm font-semibold text-foreground mt-1">{detailTour.group_size || "—"}</p>
                 </div>
-                <div className="bg-muted rounded-xl p-3">
-                  <p className="text-xs text-muted-foreground">Preço</p>
+                <div className="bg-muted rounded-xl p-3 flex flex-col justify-center">
+                  <p className="text-xs text-muted-foreground flex items-center gap-1"><Users size={12} className="text-primary" /> Coletivo</p>
                   <p className="text-sm font-bold text-primary mt-1">{fmt(detailTour.price)}</p>
+                </div>
+                <div className="bg-muted rounded-xl p-3 flex flex-col justify-center">
+                  <p className="text-xs text-muted-foreground flex items-center gap-1"><Shield size={12} className="text-secondary" /> Privativo</p>
+                  <p className="text-sm font-bold text-secondary mt-1">{fmt(detailTour.private_price || 130000)}</p>
                 </div>
                 <div className="bg-muted rounded-xl p-3">
                   <p className="text-xs text-muted-foreground flex items-center gap-1"><Star size={12} /> Avaliação</p>
                   <p className="text-sm font-semibold text-foreground mt-1">{Number(detailTour.rating || 0).toFixed(1)} ({detailTour.reviews_count || 0})</p>
                 </div>
-                <div className="bg-muted rounded-xl p-3">
+                <div className="bg-muted rounded-xl p-3 flex flex-col justify-center">
                   <p className="text-xs text-muted-foreground">Status</p>
-                  <Badge variant={detailTour.active ? "default" : "secondary"} className="mt-1">
+                  <Badge variant={detailTour.active ? "default" : "secondary"} className="mt-1 w-fit">
                     {detailTour.active ? "Ativo" : "Inativo"}
                   </Badge>
                 </div>
