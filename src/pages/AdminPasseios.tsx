@@ -14,8 +14,10 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
+import { formatCurrency } from "@/lib/utils";
 
-const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const fmt = (v: number) => formatCurrency(v);
+
 
 const maskCurrency = (v: string) => {
   const n = v.replace(/\D/g, "");
