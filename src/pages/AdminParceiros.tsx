@@ -14,7 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Loader2, MapPin, Settings2
+  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Loader2, MapPin, Settings2, Eye, Phone, Mail, User, Percent, FileText, Calendar, CheckCircle2, XCircle
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -23,6 +23,9 @@ import { toast } from "sonner";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { maskCPF, maskCNPJ, maskPhone, maskCpfCnpj } from "@/lib/masks";
+import { Separator } from "@/components/ui/separator";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 
 interface PartnerType {
@@ -74,6 +77,7 @@ const AdminParceiros = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteTypeId, setDeleteTypeId] = useState<string | null>(null);
   const [cnpjLoading, setCnpjLoading] = useState(false);
+  const [viewPartner, setViewPartner] = useState<Partner | null>(null);
   
   const [form, setForm] = useState({
     name: "", type: "hotel", contact_name: "", phone: "", email: "",
@@ -377,7 +381,7 @@ const AdminParceiros = () => {
                   const type = partnerTypes.find(t => t.name === p.type) || partnerTypes[0];
                   const Icon = getIcon(type?.icon || "Building2");
                   return (
-                    <TableRow key={p.id}>
+                    <TableRow key={p.id} className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setViewPartner(p)}>
                       <TableCell>
                         <div>
                           <p className="font-semibold text-foreground">{p.name}</p>
@@ -415,9 +419,10 @@ const AdminParceiros = () => {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex gap-1 justify-end">
-                          <Button variant="ghost" size="icon" onClick={() => openEdit(p)}><Edit size={14} /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(p.id)}><Trash2 size={14} className="text-destructive" /></Button>
+                        <div className="flex gap-1 justify-end" onClick={(e) => e.stopPropagation()}>
+                          <Button variant="ghost" size="icon" onClick={() => setViewPartner(p)} title="Visualizar"><Eye size={14} /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => openEdit(p)} title="Editar"><Edit size={14} /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(p.id)} title="Excluir"><Trash2 size={14} className="text-destructive" /></Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -596,6 +601,150 @@ const AdminParceiros = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      {/* View Partner Details Dialog */}
+      <Dialog open={!!viewPartner} onOpenChange={(open) => !open && setViewPartner(null)}>
+        <DialogContent className="max-w-2xl sm:max-w-xl">
+          <DialogHeader className="pb-4 border-b">
+            <div className="flex items-center gap-4">
+              <div className={`p-4 rounded-2xl ${partnerTypes.find(t => t.name === viewPartner?.type)?.color || "bg-primary/10 text-primary"}`}>
+                {(() => {
+                  const Icon = getIcon(partnerTypes.find(t => t.name === viewPartner?.type)?.icon || "Building2");
+                  return <Icon size={32} />;
+                })()}
+              </div>
+              <div>
+                <DialogTitle className="text-2xl font-bold">{viewPartner?.name}</DialogTitle>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge variant="outline" className="text-xs uppercase font-semibold tracking-wider">
+                    {partnerTypes.find(t => t.name === viewPartner?.type)?.label || viewPartner?.type}
+                  </Badge>
+                  <Badge 
+                    className={viewPartner?.active 
+                      ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300" 
+                      : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                    }
+                  >
+                    {viewPartner?.active ? "Ativo" : "Inativo"}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6">
+            <div className="space-y-6">
+              <section>
+                <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <User size={14} /> Informações Básicas
+                </h4>
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-xs text-muted-foreground">CPF / CNPJ</Label>
+                    <p className="font-medium font-mono">{viewPartner?.cpf_cnpj || "Não informado"}</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Nome do Contato</Label>
+                    <p className="font-medium">{viewPartner?.contact_name || "Não informado"}</p>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Comissão</Label>
+                    <div className="flex items-center gap-2 text-primary font-bold text-lg">
+                      <Percent size={18} />
+                      {viewPartner?.commission_rate || 0}%
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {viewPartner?.address && (
+                <section>
+                  <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <MapPin size={14} /> Localização
+                  </h4>
+                  <p className="text-sm leading-relaxed">{viewPartner.address}</p>
+                </section>
+              )}
+            </div>
+
+            <div className="space-y-6">
+              <section>
+                <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Phone size={14} /> Contato
+                </h4>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+                    <div className="p-2 rounded-full bg-primary/10 text-primary"><Phone size={14} /></div>
+                    <span className="text-sm font-medium">{viewPartner?.phone || "Sem telefone"}</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+                    <div className="p-2 rounded-full bg-primary/10 text-primary"><Mail size={14} /></div>
+                    <span className="text-sm font-medium truncate">{viewPartner?.email || "Sem e-mail"}</span>
+                  </div>
+                </div>
+              </section>
+
+              {(viewPartner?.type === "motorista" || viewPartner?.type === "guia") && (
+                <section>
+                  <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <FileText size={14} /> Documentação
+                  </h4>
+                  <div className="p-4 rounded-xl border border-dashed border-border bg-muted/20">
+                    {viewPartner.type === "motorista" ? (
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-muted-foreground">CNH</span>
+                          <span className="text-sm font-bold">{viewPartner.cnh || "Não cadastrada"}</span>
+                        </div>
+                        <Separator />
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-muted-foreground">Validade</span>
+                          <span className="text-sm font-bold flex items-center gap-2 text-amber-600">
+                            <Calendar size={14} />
+                            {viewPartner.cnh_validade ? format(new Date(viewPartner.cnh_validade + "T12:00:00"), "dd/MM/yyyy", { locale: ptBR }) : "N/A"}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-muted-foreground">CADASTUR</span>
+                        <span className="text-sm font-bold">{viewPartner.cadastur || "Não cadastrado"}</span>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter className="border-t pt-4 sm:justify-between gap-2">
+            <Button variant="outline" className="gap-2" onClick={() => {
+              if (viewPartner) {
+                openEdit(viewPartner);
+                setViewPartner(null);
+              }
+            }}>
+              <Edit size={16} /> Editar Dados
+            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant={viewPartner?.active ? "destructive" : "default"} 
+                className="gap-2"
+                onClick={() => {
+                  if (viewPartner) {
+                    toggleActive(viewPartner);
+                    setViewPartner(null);
+                  }
+                }}
+              >
+                {viewPartner?.active ? <XCircle size={16} /> : <CheckCircle2 size={16} />}
+                {viewPartner?.active ? "Desativar Parceiro" : "Ativar Parceiro"}
+              </Button>
+              <Button onClick={() => setViewPartner(null)}>Fechar</Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
