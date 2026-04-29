@@ -41,7 +41,7 @@ const packages: Package[] = [
 ];
 
 const formatCurrency = (value: number) => {
-  return value.toLocaleString("pt-BR", {
+  return (value).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
   });

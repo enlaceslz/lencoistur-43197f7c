@@ -107,9 +107,13 @@ const PackagesSection = () => {
 
                   <div className="border-t border-border pt-4 flex items-end justify-between">
                     <div>
-                      <span className="text-sm text-muted-foreground line-through">R$ {pkg.originalPrice}</span>
+                      <span className="text-sm text-muted-foreground line-through">
+                        {pkg.originalPrice.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                      </span>
                       <div className="flex items-baseline gap-1">
-                        <span className="font-display text-2xl font-bold text-primary">R$ {pkg.discountPrice}</span>
+                        <span className="font-display text-2xl font-bold text-primary">
+                          {pkg.discountPrice.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                        </span>
                         <span className="text-xs text-muted-foreground">{t("packages.perPerson")}</span>
                       </div>
                     </div>
