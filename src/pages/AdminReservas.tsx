@@ -45,7 +45,7 @@ const fmtDateTime = (d: string) => {
   try { return new Date(d).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }); } catch { return d; }
 };
 
-interface TourOption { id: string; name: string; price: number; pix_discount?: number; }
+interface TourOption { id: string; name: string; price: number; private_price?: number; pix_discount?: number; }
 interface TransferOption { id: string; label: string; price: number; pix_discount?: number; }
 
 const formatPhone = (v: string) => {
@@ -75,6 +75,7 @@ const AdminReservas = () => {
   const [customerSearch, setCustomerSearch] = useState("");
   const [newForm, setNewForm] = useState({
     type: "tour" as "tour" | "transfer",
+    tourMode: "coletivo" as "coletivo" | "privativo",
     itemName: "",
     date: "",
     guests: 1,
@@ -92,11 +93,11 @@ const AdminReservas = () => {
     if (!showNewForm) return;
     const loadOptions = async () => {
       const [{ data: t }, { data: tr }, { data: cust }] = await Promise.all([
-        supabase.from("tours").select("id, name, price, pix_discount").eq("active", true).order("name"),
+        supabase.from("tours").select("id, name, price, private_price, pix_discount").eq("active", true).order("name"),
         supabase.from("transfer_routes").select("id, origin, destination, price, pix_discount").eq("active", true).order("origin"),
         supabase.from("customers").select("id, name, email, phone").order("name"),
       ]);
-      if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price, pix_discount: r.pix_discount })));
+      if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price, private_price: r.private_price, pix_discount: r.pix_discount })));
       if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price, pix_discount: r.pix_discount })));
       if (cust) setExistingCustomers(cust);
     };
@@ -105,7 +106,7 @@ const AdminReservas = () => {
 
   const resetNewForm = () => {
     setNewForm({
-      type: "tour", itemName: "", date: "", guests: 1, payMethod: "pix",
+      type: "tour", tourMode: "coletivo", itemName: "", date: "", guests: 1, payMethod: "pix",
       customerName: "", customerEmail: "", customerPhone: "",
       cpf: "", passport: "", country: "Brasil", birthDate: ""
     });
@@ -118,9 +119,14 @@ const AdminReservas = () => {
     ? tours.find(t => t.name === newForm.itemName)
     : transfers.find(t => t.label === newForm.itemName);
   
-  const unitPrice = selectedItem?.price || 0;
-  const total = unitPrice * newForm.guests;
-  const pixDiscountPercent = selectedItem?.pix_discount || 0;
+  const selectedTour = newForm.type === "tour" ? tours.find(t => t.name === newForm.itemName) : null;
+  const selectedTransfer = newForm.type === "transfer" ? transfers.find(t => t.label === newForm.itemName) : null;
+  
+  const unitPrice = newForm.type === "tour" 
+    ? (newForm.tourMode === "privativo" ? (selectedTour?.private_price || 0) : (selectedTour?.price || 0))
+    : (selectedTransfer?.price || 0);
+  const total = newForm.type === "tour" && newForm.tourMode === "privativo" ? unitPrice : unitPrice * newForm.guests;
+  const pixDiscountPercent = (selectedTour?.pix_discount || selectedTransfer?.pix_discount || 0);
   const discount = (newForm.payMethod === "pix" && pixDiscountPercent > 0) 
     ? Math.round(total * pixDiscountPercent / 100) 
     : 0;
@@ -145,7 +151,7 @@ const AdminReservas = () => {
     try {
       await addBooking({
         type: newForm.type,
-        itemName: newForm.itemName,
+        itemName: newForm.type === "tour" ? `${newForm.itemName} (${newForm.tourMode === "privativo" ? "Privativo" : "Coletivo"})` : newForm.itemName,
         date: newForm.date || "",
         guests: newForm.guests,
         payMethod: newForm.payMethod,
@@ -620,22 +626,38 @@ const AdminReservas = () => {
             </div>
 
             {/* Item selection */}
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1.5 block">
-                {newForm.type === "tour" ? "Passeio" : "Rota"} *
-              </label>
-              <select
-                value={newForm.itemName}
-                onChange={(e) => setNewForm(f => ({ ...f, itemName: e.target.value }))}
-                className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
-                required
-              >
-                <option value="">Selecione...</option>
-                {newForm.type === "tour"
-                  ? tours.map(t => <option key={t.id} value={t.name}>{t.name} — {fmt(t.price)}</option>)
-                  : transfers.map(t => <option key={t.id} value={t.label}>{t.label} — {fmt(t.price)}</option>)
-                }
-              </select>
+            <div className="space-y-4">
+              {newForm.type === "tour" && (
+                <div>
+                  <label className="text-sm font-semibold text-foreground mb-1.5 block">Modalidade</label>
+                  <div className="flex gap-2">
+                    <Button type="button" variant={newForm.tourMode === "coletivo" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, tourMode: "coletivo" }))} className="flex-1">
+                      Coletivo (por pessoa)
+                    </Button>
+                    <Button type="button" variant={newForm.tourMode === "privativo" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, tourMode: "privativo" }))} className="flex-1">
+                      Privativo (veículo)
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">
+                  {newForm.type === "tour" ? "Passeio" : "Rota"} *
+                </label>
+                <select
+                  value={newForm.itemName}
+                  onChange={(e) => setNewForm(f => ({ ...f, itemName: e.target.value }))}
+                  className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+                  required
+                >
+                  <option value="">Selecione...</option>
+                  {newForm.type === "tour"
+                    ? tours.map(t => <option key={t.id} value={t.name}>{t.name} — {fmt(newForm.tourMode === "privativo" ? t.private_price : t.price)}</option>)
+                    : transfers.map(t => <option key={t.id} value={t.label}>{t.label} — {fmt(t.price)}</option>)
+                  }
+                </select>
+              </div>
             </div>
 
             {/* Date & Guests */}
@@ -745,7 +767,7 @@ const AdminReservas = () => {
             {unitPrice > 0 && (
               <div className="bg-muted p-3 rounded-lg space-y-1">
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Subtotal ({newForm.guests}x {fmt(unitPrice)})</span>
+                  <span>Subtotal ({newForm.type === "tour" && newForm.tourMode === "privativo" ? "Veículo Privativo" : `${newForm.guests}x ${fmt(unitPrice)}`})</span>
                   <span>{fmt(total)}</span>
                 </div>
                 {discount > 0 && (
