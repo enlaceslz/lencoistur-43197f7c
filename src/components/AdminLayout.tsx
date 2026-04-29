@@ -284,22 +284,27 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
         </nav>
 
         {/* User */}
-        <div className="border-t border-white/[0.08] p-3">
+        <div className={`border-t border-white/[0.08] p-3 ${sidebarCollapsed ? "flex justify-center" : ""}`}>
           <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-8 h-8 rounded-full bg-[hsl(217,91%,60%)] flex items-center justify-center text-white font-bold text-xs shrink-0">
+            <div className={`w-8 h-8 rounded-full bg-[hsl(217,91%,60%)] flex items-center justify-center text-white font-bold text-xs shrink-0 ${sidebarCollapsed ? "cursor-pointer" : ""}`}
+              onClick={() => sidebarCollapsed && setSidebarCollapsed(false)}>
               {userInitials}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-white/80 truncate">{user?.email || "Admin"}</p>
-              <p className="text-[10px] text-[hsl(220,15%,45%)]">Administrador</p>
-            </div>
-            <button
-              onClick={async () => { await signOut(); navigate("/admin/login"); }}
-              className="p-1.5 rounded-lg text-[hsl(220,15%,50%)] hover:text-white hover:bg-white/[0.08] transition-colors"
-              title="Sair"
-            >
-              <LogOut size={16} />
-            </button>
+            {!sidebarCollapsed && (
+              <>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-white/80 truncate">{user?.email || "Admin"}</p>
+                  <p className="text-[10px] text-[hsl(220,15%,45%)]">Administrador</p>
+                </div>
+                <button
+                  onClick={async () => { await signOut(); navigate("/admin/login"); }}
+                  className="p-1.5 rounded-lg text-[hsl(220,15%,50%)] hover:text-white hover:bg-white/[0.08] transition-colors"
+                  title="Sair"
+                >
+                  <LogOut size={16} />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </aside>
