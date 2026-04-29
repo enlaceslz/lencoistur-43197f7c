@@ -113,6 +113,7 @@ const AdminConfig = () => {
           if (row.key === "site") setSite({ ...DEFAULTS.site, ...val });
           if (row.key === "pagamentos") setPagamentos({ ...DEFAULTS.pagamentos, ...val, pixTipo: (val as any).pixTipo && PIX_KEY_TYPES.some(t => t.value === (val as any).pixTipo) ? (val as any).pixTipo : DEFAULTS.pagamentos.pixTipo });
           if (row.key === "notificacoes") setNotifications({ ...DEFAULTS.notificacoes, ...val });
+          if (row.key === "gallery") setGallery({ ...DEFAULTS.gallery, ...val });
         }
       }
     } catch (err) {
