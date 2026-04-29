@@ -49,7 +49,7 @@ interface NotasFiscaisTabProps {
   bookings: any[];
 }
 
-const fmt = (v: number) => formatCurrency(v / 100);
+const fmt = (v: number) => formatCurrency(v);
 const fmtDate = (d: string) => {
 
   if (!d) return "—";

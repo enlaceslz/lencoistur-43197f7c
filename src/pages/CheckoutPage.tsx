@@ -52,7 +52,7 @@ const CheckoutPage = () => {
 
   const isPrivate = tourMode === "privativo";
   const itemName = tour ? `${tour.name}${isPrivate ? " (Privativo)" : " (Coletivo)"}` : (pkg ? pkg.name : (transfer ? `${transfer.origin} → ${transfer.destination}` : ""));
-  const unitPrice = tour ? (isPrivate ? (tour.private_price || 1300) : tour.price) : (pkg ? pkg.price : (transfer?.price || 0));
+  const unitPrice = tour ? (isPrivate ? (tour.private_price || 130000) : tour.price) : (pkg ? pkg.price : (transfer?.price || 0));
   const pixDiscountPercent = tour?.pix_discount || transfer?.pix_discount || (pkg ? 5 : 0);
   const image = tour?.images?.[0] || "";
   const location = tour?.location || (pkg ? "Santo Amaro" : (transfer ? `${transfer.origin} → ${transfer.destination}` : ""));
@@ -179,7 +179,7 @@ const CheckoutPage = () => {
               </div>
 
               <div className="mt-4 text-center">
-                <p className="text-lg font-bold text-primary font-display">{formatCurrency(confirmedBooking.finalTotal / 100)}</p>
+                <p className="text-lg font-bold text-primary font-display">{formatCurrency(confirmedBooking.finalTotal)}</p>
               </div>
             </div>
           )}
@@ -227,12 +227,12 @@ const CheckoutPage = () => {
             {displayDiscount > 0 && (
               <div className="flex justify-between text-sm text-green-600">
                 <span>Desconto PIX ({pixDiscountPercent}%)</span>
-                <span className="font-semibold">-{formatCurrency(displayDiscount / 100)}</span>
+                <span className="font-semibold">-{formatCurrency(displayDiscount)}</span>
               </div>
             )}
             <div className="flex justify-between font-bold text-lg border-t border-border pt-3">
               <span className="text-foreground">Total</span>
-              <span className="text-primary">{formatCurrency(confirmedBooking.finalTotal / 100)}</span>
+              <span className="text-primary">{formatCurrency(confirmedBooking.finalTotal)}</span>
             </div>
           </div>
 
@@ -470,8 +470,7 @@ const CheckoutPage = () => {
                   <Banknote size={20} className="text-green-600 shrink-0" />
                    <p className="text-sm text-muted-foreground">
                     Ao confirmar, você receberá o QR Code PIX para pagamento imediato.
-                    {displayDiscount > 0 && <> Economia de <strong className="text-green-600">{formatCurrency(displayDiscount / 100)}</strong>!</>}
-
+                    {displayDiscount > 0 && <> Economia de <strong className="text-green-600">{formatCurrency(displayDiscount)}</strong>!</>}
                   </p>
                 </div>
               )}
@@ -487,14 +486,18 @@ const CheckoutPage = () => {
 
               {payMethod === "card" && (
                 <div className="space-y-4">
-...
+                  <div className="bg-muted rounded-xl p-4 flex items-center gap-3">
+                    <CreditCard size={20} className="text-primary shrink-0" />
+                    <p className="text-sm text-muted-foreground">
+                      Pagamento via cartão de crédito processado com segurança pela agência.
+                    </p>
+                  </div>
                   <div>
                     <label className="text-sm font-semibold text-foreground mb-1.5 block">Parcelas</label>
                     <select className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none appearance-none">
-                      <option>1x de {formatCurrency(finalTotal / 100)} (sem juros)</option>
-                      <option>2x de {formatCurrency(Math.ceil(finalTotal / 2) / 100)} (sem juros)</option>
-                      <option>3x de {formatCurrency(Math.ceil(finalTotal / 3) / 100)} (sem juros)</option>
-
+                      <option>1x de {formatCurrency(finalTotal)} (sem juros)</option>
+                      <option>2x de {formatCurrency(Math.ceil(finalTotal / 2))} (sem juros)</option>
+                      <option>3x de {formatCurrency(Math.ceil(finalTotal / 3))} (sem juros)</option>
                     </select>
                   </div>
                 </div>
@@ -504,8 +507,9 @@ const CheckoutPage = () => {
             <button
               type="submit"
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-xl font-semibold text-lg transition-colors"
+              disabled={submitting}
             >
-              {payMethod === "pix" ? `Gerar PIX — ${formatCurrency(finalTotal / 100)}` : payMethod === "info" ? "Solicitar Informações" : `Pagar ${formatCurrency(finalTotal / 100)}`}
+              {submitting ? "Processando..." : (payMethod === "pix" ? `Gerar PIX — ${formatCurrency(finalTotal)}` : payMethod === "info" ? "Solicitar Informações" : `Pagar ${formatCurrency(finalTotal)}`)}
             </button>
 
             <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">
@@ -539,20 +543,19 @@ const CheckoutPage = () => {
 
                 <div className="border-t border-border pt-4 space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{formatCurrency(unitPrice / 100)} × {guests}</span>
-                    <span className="text-foreground font-semibold">{formatCurrency(total / 100)}</span>
+                    <span className="text-muted-foreground">{formatCurrency(unitPrice)} × {guests}</span>
+                    <span className="text-foreground font-semibold">{formatCurrency(total)}</span>
                   </div>
                   {displayDiscount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Desconto PIX ({pixDiscountPercent}%)</span>
-                      <span className="font-semibold">-{formatCurrency(displayDiscount / 100)}</span>
+                      <span className="font-semibold">-{formatCurrency(displayDiscount)}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-bold text-lg border-t border-border pt-3">
                     <span className="text-foreground">Total</span>
-                    <span className="text-primary">{formatCurrency(finalTotal / 100)}</span>
+                    <span className="text-primary">{formatCurrency(finalTotal)}</span>
                   </div>
-
                 </div>
               </div>
             </div>
