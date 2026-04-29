@@ -5,6 +5,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Search, Receipt, FileText, CheckCircle2, Clock, 
@@ -65,7 +66,7 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
     return bookings.filter(b => {
       const matchesSearch = b.booking_code.toLowerCase().includes(search.toLowerCase()) ||
                            b.customers?.name?.toLowerCase().includes(search.toLowerCase()) ||
-                           b.invoice_number?.toLowerCase().includes(search.toLowerCase());
+                           (b.invoice_number || "").toLowerCase().includes(search.toLowerCase());
       
       const matchesStatus = statusFilter === "todos" || 
                            (statusFilter === "emitida" ? b.invoice_issued : !b.invoice_issued);
@@ -380,7 +381,7 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
                             </DropdownMenuItem>
                           )}
 
-                          <DropdownMenuItem className="rounded-lg gap-2 text-rose-500">
+                          <DropdownMenuItem className="rounded-lg gap-2 text-rose-500" onClick={exportToCSV}>
                              <Download size={14} />
                              Exportar Dados
                           </DropdownMenuItem>
