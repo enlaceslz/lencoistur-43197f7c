@@ -236,7 +236,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5 scrollbar-thin">
-          <p className="px-4 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,40%)]">Principal</p>
+          {!sidebarCollapsed && <p className="px-4 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,40%)]">Principal</p>}
           {mainItems.map(item => <SidebarLink key={item.path} {...item} />)}
 
           {/* SGS Section */}
@@ -247,13 +247,18 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
                 isSgsActive
                   ? "text-[hsl(217,91%,60%)] bg-white/[0.06]"
                   : "text-[hsl(220,15%,65%)] hover:text-white hover:bg-white/[0.06]"
-              }`}
+              } ${sidebarCollapsed ? "justify-center px-0" : ""}`}
+              title={sidebarCollapsed ? "SGS — Segurança" : ""}
             >
-              <Shield size={17} />
-              <span className="flex-1 text-left">SGS — Segurança</span>
-              <ChevronDown size={14} className={`transition-transform duration-200 ${sgsOpen || isSgsActive ? "rotate-180" : ""}`} />
+              <Shield size={17} className="shrink-0" />
+              {!sidebarCollapsed && (
+                <>
+                  <span className="flex-1 text-left">SGS — Segurança</span>
+                  <ChevronDown size={14} className={`transition-transform duration-200 ${sgsOpen || isSgsActive ? "rotate-180" : ""}`} />
+                </>
+              )}
             </button>
-            {(sgsOpen || isSgsActive) && (
+            {(sgsOpen || isSgsActive) && !sidebarCollapsed && (
               <div className="mt-1 border-l border-white/[0.06] ml-6">
                 {sgsGroups.map((group, gi) => (
                   <div key={gi}>
@@ -272,7 +277,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           </div>
 
           <div className="pt-3">
-            <p className="px-4 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,40%)]">Sistema</p>
+            {!sidebarCollapsed && <p className="px-4 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,40%)]">Sistema</p>}
             <SidebarLink icon={Settings} label="Configurações" path="/admin/config" />
             <SidebarLink icon={HelpCircle} label="Ajuda" path="/admin/ajuda" />
           </div>
