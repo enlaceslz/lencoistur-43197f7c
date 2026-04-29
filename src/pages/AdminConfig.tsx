@@ -71,7 +71,7 @@ const validatePixKey = (key: string, type: PixKeyType): { valid: boolean; messag
 
 const DEFAULTS = {
   empresa: { nome: "LençóisTour", cnpj: "12.345.678/0001-90", telefone: "(98) 99999-0000", whatsapp: "(98) 99999-0000", endereco: "Santo Amaro do Maranhão, MA", email: "contato@lencoistour.com" },
-  site: { titulo: "LençóisTour - Passeios nos Lençóis Maranhenses", metaDescricao: "Descubra os Lençóis Maranhenses com a melhor experiência turística.", whatsappUrl: "https://wa.me/5598999990000", instagram: "https://instagram.com/lencoistour", corPrimaria: "#2563eb", logoUrl: null as string | null },
+  site: { titulo: "LençóisTour - Passeios nos Lençóis Maranhenses", metaDescricao: "Descubra os Lençóis Maranhenses com a melhor experiência turística.", whatsappUrl: "https://wa.me/5598999990000", instagram: "https://instagram.com/lencoistour", corPrimaria: "#2563eb", logoUrl: null as string | null, bannerUrl: null as string | null },
   pagamentos: { pix: true, cartao: true, boleto: false, dinheiro: true, transferencia: false, pixChave: "12.345.678/0001-90", pixTipo: "cnpj" as PixKeyType },
   notificacoes: { email: true, whatsapp: true, push: false, novaReserva: true, cancelamento: true, pagamento: true },
 };
@@ -90,7 +90,9 @@ const AdminConfig = () => {
   const [changingPassword, setChangingPassword] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
   const restoreInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
   const [backupLoading, setBackupLoading] = useState(false);
   const [restoreLoading, setRestoreLoading] = useState(false);
   const [backupHistory, setBackupHistory] = useState<Array<{ date: string; tables: number; records: number; size: string }>>([]);
@@ -154,6 +156,25 @@ const AdminConfig = () => {
     setSite((prev) => ({ ...prev, logoUrl: urlData.publicUrl }));
     setUploadingLogo(false);
     toast.success("Logo enviada com sucesso!");
+  };
+
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast.error("Selecione um arquivo de imagem válido."); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("A imagem deve ter no máximo 5MB."); return; }
+
+    setUploadingBanner(true);
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `banners/banner-${Date.now()}.${ext}`;
+
+    const { error } = await supabase.storage.from("tour-images").upload(path, file, { upsert: true });
+    if (error) { toast.error("Erro ao enviar banner: " + error.message); setUploadingBanner(false); return; }
+
+    const { data: urlData } = supabase.storage.from("tour-images").getPublicUrl(path);
+    setSite((prev) => ({ ...prev, bannerUrl: urlData.publicUrl }));
+    setUploadingBanner(false);
+    toast.success("Banner principal enviado com sucesso!");
   };
 
   const handleChangePassword = async () => {
@@ -395,6 +416,39 @@ const AdminConfig = () => {
                 <div className="space-y-2">
                   <Label>Ou cole a URL da logo</Label>
                   <Input placeholder="https://exemplo.com/logo.png" value={site.logoUrl || ""} onChange={(e) => setSite({ ...site, logoUrl: e.target.value || null })} maxLength={500} />
+                </div>
+
+                <div className="space-y-3 border-t border-border pt-4 mt-4">
+                  <Label className="text-sm font-semibold">Banner Principal (Hero)</Label>
+                  <div className="flex flex-col gap-4">
+                    <div className="w-full aspect-video rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-muted overflow-hidden">
+                      {site.bannerUrl ? (
+                        <img src={site.bannerUrl} alt="Banner" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="text-center">
+                          <Image size={48} className="text-muted-foreground mx-auto mb-2" />
+                          <p className="text-xs text-muted-foreground">Nenhum banner configurado</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} />
+                      <Button type="button" variant="outline" size="sm" onClick={() => bannerInputRef.current?.click()} disabled={uploadingBanner} className="rounded-lg">
+                        {uploadingBanner ? <Loader2 size={14} className="animate-spin mr-1" /> : <UploadCloud size={14} className="mr-1" />}
+                        {site.bannerUrl ? "Trocar Banner" : "Enviar Banner"}
+                      </Button>
+                      {site.bannerUrl && (
+                        <Button type="button" variant="ghost" size="sm" onClick={() => setSite({ ...site, bannerUrl: null })} className="text-destructive rounded-lg">
+                          <Trash2 size={14} className="mr-1" /> Remover
+                        </Button>
+                      )}
+                      <p className="text-[10px] text-muted-foreground">Recomendado: 1920x1080px. Máx. 5MB.</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">URL do Banner</Label>
+                    <Input placeholder="https://exemplo.com/banner.jpg" value={site.bannerUrl || ""} onChange={(e) => setSite({ ...site, bannerUrl: e.target.value || null })} maxLength={500} className="h-8 text-xs" />
+                  </div>
                 </div>
               </div>
               <div className="space-y-4">
