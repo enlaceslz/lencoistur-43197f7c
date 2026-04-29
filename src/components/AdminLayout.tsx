@@ -315,11 +315,20 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
       )}
 
       {/* === MAIN === */}
-      <main className="flex-1 lg:ml-[260px] min-h-screen flex flex-col">
+      <main className={`flex-1 ${sidebarCollapsed ? "lg:ml-[80px]" : "lg:ml-[260px]"} min-h-screen flex flex-col transition-all duration-200`}>
         {/* Header */}
         <header className="bg-white border-b border-[hsl(220,20%,92%)] px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_3px_hsl(220,20%,90%)]">
           <div className="flex items-center gap-3">
-            <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-1.5 rounded-lg text-[hsl(220,15%,40%)] hover:bg-[hsl(220,20%,96%)]">
+            <button 
+              onClick={() => {
+                if (window.innerWidth >= 1024) {
+                  setSidebarCollapsed(!sidebarCollapsed);
+                } else {
+                  setSidebarOpen(true);
+                }
+              }} 
+              className="p-1.5 rounded-lg text-[hsl(220,15%,40%)] hover:bg-[hsl(220,20%,96%)]"
+            >
               <Menu size={22} />
             </button>
 
