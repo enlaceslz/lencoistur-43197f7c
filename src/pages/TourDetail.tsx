@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 const formatCurrency = (value: number) => {
-  return value.toLocaleString("pt-BR", {
+  return (value).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
   });

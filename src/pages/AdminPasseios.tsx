@@ -32,8 +32,8 @@ const CATEGORIES = ["Ecoturismo", "Aventura", "Passeio de Barco", "Gastronomia",
 const DIFFICULTIES = ["Fácil", "Moderada", "Moderada a Difícil", "Difícil"];
 
 const emptyForm = {
-  name: "", slug: "", location: "", duration: "", price: 160,
-  private_price: 1300, vehicle_capacity: 9,
+  name: "", slug: "", location: "", duration: "", price: 16000,
+  private_price: 130000, vehicle_capacity: 9,
   pix_discount: 0,
   tag: "", description: "", category: "Ecoturismo", difficulty: "Fácil",
   group_size: "Até 9 pessoas", departure: "Santo Amaro do Maranhão",
