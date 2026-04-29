@@ -30,6 +30,7 @@ const AdminSGSTermos = () => {
   const [showConfig, setShowConfig] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("todos"); // "todos", "assinado", "pendente"
   const [company, setCompany] = useState<any>(null);
 
   const [termConfig, setTermConfig] = useState({
@@ -445,11 +446,17 @@ const AdminSGSTermos = () => {
     win.document.close();
   };
 
-  const filtered = terms.filter(t =>
-    !search || 
-    t.customer_name?.toLowerCase().includes(search.toLowerCase()) || 
-    t.tour_name?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = terms.filter(t => {
+    const matchesSearch = !search || 
+      t.customer_name?.toLowerCase().includes(search.toLowerCase()) || 
+      t.tour_name?.toLowerCase().includes(search.toLowerCase());
+    
+    const matchesStatus = statusFilter === "todos" || 
+      (statusFilter === "assinado" && t.signature_data) || 
+      (statusFilter === "pendente" && !t.signature_data);
+      
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <AdminLayout title="SGS - Termos de Ciência de Risco">
@@ -463,6 +470,26 @@ const AdminSGSTermos = () => {
               placeholder="Buscar por cliente ou passeio..."
               className="w-full pl-9 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30" 
             />
+          </div>
+          <div className="flex bg-muted p-1 rounded-xl">
+            <button 
+              onClick={() => setStatusFilter("todos")}
+              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${statusFilter === "todos" ? "bg-white text-primary shadow-sm" : "text-muted-foreground"}`}
+            >
+              Todos
+            </button>
+            <button 
+              onClick={() => setStatusFilter("assinado")}
+              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${statusFilter === "assinado" ? "bg-white text-green-600 shadow-sm" : "text-muted-foreground"}`}
+            >
+              Assinados
+            </button>
+            <button 
+              onClick={() => setStatusFilter("pendente")}
+              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${statusFilter === "pendente" ? "bg-white text-amber-600 shadow-sm" : "text-muted-foreground"}`}
+            >
+              Pendentes
+            </button>
           </div>
           <div className="flex gap-2">
             <button 

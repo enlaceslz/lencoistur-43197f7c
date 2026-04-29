@@ -1,18 +1,36 @@
 import { Search, MapPin, Calendar, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
-const HERO_IMG = "https://images.unsplash.com/photo-1616421004128-40656a877073?auto=format&fit=crop&q=100&w=3840";
+const HERO_IMG_DEFAULT = "https://images.unsplash.com/photo-1616421004128-40656a877073?auto=format&fit=crop&q=100&w=3840";
 
 const categoryKeys = ["boat", "eco", "gastro", "cultural", "kayak", "trekking"] as const;
 
 const HeroSection = () => {
   const { t } = useTranslation();
+  const [heroImg, setHeroImg] = useState(HERO_IMG_DEFAULT);
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "site")
+        .maybeSingle();
+      
+      if (data && (data.value as any)?.bannerUrl) {
+        setHeroImg((data.value as any).bannerUrl);
+      }
+    };
+    loadSettings();
+  }, []);
 
   return (
     <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
       <img
-        src={HERO_IMG}
+        src={heroImg}
         alt="Vista aérea dos Lençóis Maranhenses com lagoas azuis e dunas brancas - Santo Amaro MA"
         className="absolute inset-0 w-full h-full object-cover"
         width={1920}
