@@ -45,7 +45,7 @@ const fmtDateTime = (d: string) => {
   try { return new Date(d).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }); } catch { return d; }
 };
 
-interface TourOption { id: string; name: string; price: number; pix_discount?: number; }
+interface TourOption { id: string; name: string; price: number; private_price?: number; pix_discount?: number; }
 interface TransferOption { id: string; label: string; price: number; pix_discount?: number; }
 
 const formatPhone = (v: string) => {
@@ -93,11 +93,11 @@ const AdminReservas = () => {
     if (!showNewForm) return;
     const loadOptions = async () => {
       const [{ data: t }, { data: tr }, { data: cust }] = await Promise.all([
-        supabase.from("tours").select("id, name, price, pix_discount").eq("active", true).order("name"),
+        supabase.from("tours").select("id, name, price, private_price, pix_discount").eq("active", true).order("name"),
         supabase.from("transfer_routes").select("id, origin, destination, price, pix_discount").eq("active", true).order("origin"),
         supabase.from("customers").select("id, name, email, phone").order("name"),
       ]);
-      if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price, pix_discount: r.pix_discount })));
+      if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price, private_price: r.private_price, pix_discount: r.pix_discount })));
       if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price, pix_discount: r.pix_discount })));
       if (cust) setExistingCustomers(cust);
     };
