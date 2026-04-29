@@ -62,7 +62,7 @@ const AdminTranslados = () => {
     setForm({
       origin: r.origin, destination: r.destination,
       duration: r.duration || "", distance: r.distance || "",
-      price: String(r.price / 100),
+      price: r.price,
       vehicle_type: r.vehicle_type || "",
       seats: r.seats || 10,
       departures: (r.departures || []).join(", "),
