@@ -73,18 +73,20 @@ const AdminSGSTermos = () => {
 
   const load = async () => {
     setLoading(true);
-    const [termsRes, customersRes, toursRes, vehiclesRes, companyRes] = await Promise.all([
+    const [termsRes, customersRes, toursRes, vehiclesRes, companyRes, bookingsRes] = await Promise.all([
       supabase.from("sgs_risk_terms").select("*, customers(*), tours(name), sgs_veiculos(modelo)").order("created_at", { ascending: false }),
       supabase.from("customers").select("*"),
       supabase.from("tours").select("id, name, description, duration, price, private_price").eq("active", true).order("name"),
       supabase.from("sgs_veiculos").select("id, modelo, placa"),
       supabase.from("sgs_empresa").select("*").limit(1).maybeSingle(),
+      supabase.from("bookings").select("id, booking_code, item_name, customer_id").order("created_at", { ascending: false }),
     ]);
 
     setTerms(termsRes.data || []);
     setCustomers(customersRes.data || []);
     setTours(toursRes.data || []);
     setVehicles(vehiclesRes.data || []);
+    setBookings(bookingsRes.data || []);
     setCompany(companyRes.data);
     if (companyRes.data) {
       setTermConfig({
