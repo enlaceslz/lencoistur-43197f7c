@@ -70,43 +70,55 @@ const TermoAssinatura = () => {
 
   const loadData = async () => {
     setLoading(true);
-    const [bookingRes, companyRes] = await Promise.all([
-      supabase.from("bookings").select("*, customers(*)").eq("booking_code", bookingCode).maybeSingle(),
-      supabase.from("sgs_empresa").select("*").limit(1).maybeSingle()
-    ]);
-      
-    if (bookingRes.data) {
-      setBooking(bookingRes.data);
+    try {
+      const companyRes = await supabase.from("sgs_empresa").select("*").limit(1).maybeSingle();
       setCompany(companyRes.data);
-      
-      // Check if term already exists for this booking
-      const { data: termData } = await supabase
-        .from("sgs_risk_terms")
-        .select("*")
-        .eq("booking_id", bookingRes.data.id)
-        .maybeSingle();
-      
-      if (termData) {
-        setTerm(termData);
-        setAcceptedRisks(termData.risks_informed || []);
-        setHealthInfo(termData.health_questions || []);
-        
-        // Load companions
-        const { data: companionsData } = await supabase
-          .from("sgs_risk_term_minors")
-          .select("*")
-          .eq("risk_term_id", termData.id);
-        
-        if (companionsData) {
-          setCompanions(companionsData);
-        }
 
-        // If everyone has signed, mark as signed
-        const adultsNeedSigning = companionsData?.filter(c => c.is_adult && !c.signature_data).length === 0;
-        if (termData.signature_data && adultsNeedSigning) {
-          setSigned(true);
+      let bookingData = null;
+      let termData = null;
+
+      if (termId) {
+        const termRes = await supabase.from("sgs_risk_terms").select("*, customers(*)").eq("id", termId).maybeSingle();
+        if (termRes.data) {
+          termData = termRes.data;
+          // Try to find booking linked to this term
+          if (termData.booking_id) {
+            const bookingRes = await supabase.from("bookings").select("*, customers(*)").eq("id", termData.booking_id).maybeSingle();
+            bookingData = bookingRes.data;
+          }
+        }
+      } else if (bookingCode) {
+        const bookingRes = await supabase.from("bookings").select("*, customers(*)").eq("booking_code", bookingCode).maybeSingle();
+        bookingData = bookingRes.data;
+        if (bookingData) {
+          const termRes = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
+          termData = termRes.data;
         }
       }
+
+      if (bookingData || termData) {
+        setBooking(bookingData);
+        setTerm(termData);
+
+        if (termData) {
+          setAcceptedRisks(termData.risks_informed || []);
+          setHealthInfo(termData.health_questions || []);
+          
+          const { data: companionsData } = await supabase
+            .from("sgs_risk_term_minors")
+            .select("*")
+            .eq("risk_term_id", termData.id);
+          
+          if (companionsData) setCompanions(companionsData);
+
+          const adultsNeedSigning = companionsData?.filter(c => c.is_adult && !c.signature_data).length === 0;
+          if (termData.signature_data && adultsNeedSigning) {
+            setSigned(true);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error loading term data:", err);
     }
     setLoading(false);
   };
