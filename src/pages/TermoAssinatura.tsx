@@ -414,14 +414,14 @@ const TermoAssinatura = () => {
       // 5. Update term with PDF URL
       await supabase.from("sgs_risk_terms").update({ pdf_url: filePath }).eq("id", currentTermId);
 
-      // 6. Send Email
+      // 6. Send Confirmation Email
       try {
         await supabase.functions.invoke("send-term-email", {
           body: {
-            bookingCode: booking.booking_code,
-            customerEmail: booking.customers?.email || booking.customer_email,
-            customerName: booking.customers?.name || booking.customer_name,
-            pdfUrl: filePath
+            customerEmail: booking?.customers?.email || booking?.customer_email || term?.customers?.email || term?.email,
+            customerName: booking?.customers?.name || booking?.customer_name || term?.customer_name,
+            signUrl: null, // Just a confirmation
+            tourName: booking?.item_name || term?.tour_name
           }
         });
       } catch (emailErr) {
