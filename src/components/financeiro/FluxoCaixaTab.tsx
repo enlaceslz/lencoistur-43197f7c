@@ -8,7 +8,7 @@ import {
 import { formatCurrency } from "@/lib/utils";
 
 const MONTH_LABELS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-const fmt = (v: number) => formatCurrency(v / 100);
+const fmt = (v: number) => formatCurrency(v);
 const PIE_COLORS = ["hsl(var(--primary))", "hsl(var(--destructive))", "#f59e0b", "#8b5cf6", "#06b6d4"];
 
 

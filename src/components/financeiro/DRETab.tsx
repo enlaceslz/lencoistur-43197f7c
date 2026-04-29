@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 
 const MONTH_LABELS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-const fmt = (v: number) => formatCurrency(v / 100);
+const fmt = (v: number) => formatCurrency(v);
 
 
 interface BookingRow {

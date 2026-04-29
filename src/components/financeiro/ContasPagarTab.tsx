@@ -11,7 +11,7 @@ import { Plus, Loader2, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 
-const fmt = (v: number) => formatCurrency(v / 100);
+const fmt = (v: number) => formatCurrency(v);
 
 
 const maskCurrency = (v: string) => {
