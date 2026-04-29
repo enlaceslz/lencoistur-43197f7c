@@ -100,6 +100,10 @@ const getBreadcrumbs = (pathname: string) => {
 
 const AdminLayout = ({ children, title }: { children: React.ReactNode; title: string }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    const saved = localStorage.getItem("admin-sidebar-collapsed");
+    return saved === "true";
+  });
   const [sgsOpen, setSgsOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -109,6 +113,10 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
   const { settings } = useSiteSettings();
+
+  useEffect(() => {
+    localStorage.setItem("admin-sidebar-collapsed", String(sidebarCollapsed));
+  }, [sidebarCollapsed]);
 
   const isSgsActive = location.pathname.startsWith("/admin/sgs");
   const breadcrumbs = getBreadcrumbs(location.pathname);
@@ -187,10 +195,11 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           active
             ? "admin-sidebar-item-active text-white bg-white/[0.08]"
             : "text-[hsl(220,15%,65%)] hover:text-white hover:bg-white/[0.06]"
-        } ${indent ? "ml-3 pl-4" : ""}`}
+        } ${indent ? "ml-3 pl-4" : ""} ${sidebarCollapsed ? "justify-center px-0" : ""}`}
+        title={sidebarCollapsed ? label : ""}
       >
-        <Icon size={indent ? 15 : 17} className={active ? "text-[hsl(217,91%,60%)]" : ""} />
-        <span className="truncate">{label}</span>
+        <Icon size={indent ? 15 : 17} className={`${active ? "text-[hsl(217,91%,60%)]" : ""} shrink-0`} />
+        {!sidebarCollapsed && <span className="truncate">{label}</span>}
       </Link>
     );
   };
@@ -198,26 +207,28 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   return (
     <div className="min-h-screen bg-[hsl(220,20%,96%)] flex">
       {/* === SIDEBAR === */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-[260px] admin-sidebar transform transition-transform duration-200 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[80px]" : "w-[260px]"} admin-sidebar transform transition-all duration-200 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
         {/* Brand */}
-        <div className="px-5 py-5 border-b border-white/[0.08]">
+        <div className={`px-5 py-5 border-b border-white/[0.08] ${sidebarCollapsed ? "flex justify-center" : ""}`}>
           <Link to="/" className="flex items-center gap-2">
             {settings?.logoUrl ? (
               <img 
                 src={settings.logoUrl} 
                 alt={settings.titulo || "LençóisTour"} 
-                className="h-10 w-auto object-contain brightness-0 invert" 
+                className={`${sidebarCollapsed ? "h-6" : "h-10"} w-auto object-contain brightness-0 invert`} 
               />
             ) : (
               <>
-                <div className="w-8 h-8 rounded-lg bg-[hsl(217,91%,60%)] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[hsl(217,91%,60%)] flex items-center justify-center shrink-0">
                   <span className="text-white font-bold text-sm">LT</span>
                 </div>
-                <div>
-                  <span className="font-display text-base font-bold text-white tracking-tight">Lençóis</span>
-                  <span className="font-display text-base font-bold text-[hsl(217,91%,60%)]">Tour</span>
-                  <p className="text-[10px] text-[hsl(220,15%,50%)] -mt-0.5 font-medium">Painel Administrativo</p>
-                </div>
+                {!sidebarCollapsed && (
+                  <div>
+                    <span className="font-display text-base font-bold text-white tracking-tight">Lençóis</span>
+                    <span className="font-display text-base font-bold text-[hsl(217,91%,60%)]">Tour</span>
+                    <p className="text-[10px] text-[hsl(220,15%,50%)] -mt-0.5 font-medium">Painel Administrativo</p>
+                  </div>
+                )}
               </>
             )}
           </Link>
@@ -225,7 +236,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5 scrollbar-thin">
-          <p className="px-4 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,40%)]">Principal</p>
+          {!sidebarCollapsed && <p className="px-4 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,40%)]">Principal</p>}
           {mainItems.map(item => <SidebarLink key={item.path} {...item} />)}
 
           {/* SGS Section */}
@@ -236,13 +247,18 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
                 isSgsActive
                   ? "text-[hsl(217,91%,60%)] bg-white/[0.06]"
                   : "text-[hsl(220,15%,65%)] hover:text-white hover:bg-white/[0.06]"
-              }`}
+              } ${sidebarCollapsed ? "justify-center px-0" : ""}`}
+              title={sidebarCollapsed ? "SGS — Segurança" : ""}
             >
-              <Shield size={17} />
-              <span className="flex-1 text-left">SGS — Segurança</span>
-              <ChevronDown size={14} className={`transition-transform duration-200 ${sgsOpen || isSgsActive ? "rotate-180" : ""}`} />
+              <Shield size={17} className="shrink-0" />
+              {!sidebarCollapsed && (
+                <>
+                  <span className="flex-1 text-left">SGS — Segurança</span>
+                  <ChevronDown size={14} className={`transition-transform duration-200 ${sgsOpen || isSgsActive ? "rotate-180" : ""}`} />
+                </>
+              )}
             </button>
-            {(sgsOpen || isSgsActive) && (
+            {(sgsOpen || isSgsActive) && !sidebarCollapsed && (
               <div className="mt-1 border-l border-white/[0.06] ml-6">
                 {sgsGroups.map((group, gi) => (
                   <div key={gi}>
@@ -261,29 +277,34 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           </div>
 
           <div className="pt-3">
-            <p className="px-4 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,40%)]">Sistema</p>
+            {!sidebarCollapsed && <p className="px-4 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,40%)]">Sistema</p>}
             <SidebarLink icon={Settings} label="Configurações" path="/admin/config" />
             <SidebarLink icon={HelpCircle} label="Ajuda" path="/admin/ajuda" />
           </div>
         </nav>
 
         {/* User */}
-        <div className="border-t border-white/[0.08] p-3">
+        <div className={`border-t border-white/[0.08] p-3 ${sidebarCollapsed ? "flex justify-center" : ""}`}>
           <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-8 h-8 rounded-full bg-[hsl(217,91%,60%)] flex items-center justify-center text-white font-bold text-xs shrink-0">
+            <div className={`w-8 h-8 rounded-full bg-[hsl(217,91%,60%)] flex items-center justify-center text-white font-bold text-xs shrink-0 ${sidebarCollapsed ? "cursor-pointer" : ""}`}
+              onClick={() => sidebarCollapsed && setSidebarCollapsed(false)}>
               {userInitials}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-white/80 truncate">{user?.email || "Admin"}</p>
-              <p className="text-[10px] text-[hsl(220,15%,45%)]">Administrador</p>
-            </div>
-            <button
-              onClick={async () => { await signOut(); navigate("/admin/login"); }}
-              className="p-1.5 rounded-lg text-[hsl(220,15%,50%)] hover:text-white hover:bg-white/[0.08] transition-colors"
-              title="Sair"
-            >
-              <LogOut size={16} />
-            </button>
+            {!sidebarCollapsed && (
+              <>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-white/80 truncate">{user?.email || "Admin"}</p>
+                  <p className="text-[10px] text-[hsl(220,15%,45%)]">Administrador</p>
+                </div>
+                <button
+                  onClick={async () => { await signOut(); navigate("/admin/login"); }}
+                  className="p-1.5 rounded-lg text-[hsl(220,15%,50%)] hover:text-white hover:bg-white/[0.08] transition-colors"
+                  title="Sair"
+                >
+                  <LogOut size={16} />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </aside>
@@ -294,11 +315,20 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
       )}
 
       {/* === MAIN === */}
-      <main className="flex-1 lg:ml-[260px] min-h-screen flex flex-col">
+      <main className={`flex-1 ${sidebarCollapsed ? "lg:ml-[80px]" : "lg:ml-[260px]"} min-h-screen flex flex-col transition-all duration-200`}>
         {/* Header */}
         <header className="bg-white border-b border-[hsl(220,20%,92%)] px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_3px_hsl(220,20%,90%)]">
           <div className="flex items-center gap-3">
-            <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-1.5 rounded-lg text-[hsl(220,15%,40%)] hover:bg-[hsl(220,20%,96%)]">
+            <button 
+              onClick={() => {
+                if (window.innerWidth >= 1024) {
+                  setSidebarCollapsed(!sidebarCollapsed);
+                } else {
+                  setSidebarOpen(true);
+                }
+              }} 
+              className="p-1.5 rounded-lg text-[hsl(220,15%,40%)] hover:bg-[hsl(220,20%,96%)]"
+            >
               <Menu size={22} />
             </button>
 
