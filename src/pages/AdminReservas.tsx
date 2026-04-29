@@ -134,7 +134,7 @@ const AdminReservas = () => {
 
   const resetNewForm = () => {
     setNewForm({
-      type: "tour", tourMode: "coletivo", itemName: "", date: "", guests: 1, payMethod: "pix",
+      type: "tour", tourMode: "coletivo", itemName: "", date: "", guests: 2, payMethod: "pix",
       customerName: "", customerEmail: "", customerPhone: "",
       cpf: "", passport: "", country: "Brasil", birthDate: ""
     });
