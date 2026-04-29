@@ -38,7 +38,7 @@ interface BookingRow {
   voucher_url?: string | null;
 }
 
-const fmt = (v: number) => (v / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const fmt = (v: number) => formatCurrency(v);
 const fmtDate = (d: string) => {
   if (!d) return "—";
   try { return new Date(d).toLocaleDateString("pt-BR"); } catch { return d; }
