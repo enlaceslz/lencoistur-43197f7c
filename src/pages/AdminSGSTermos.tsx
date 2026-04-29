@@ -200,7 +200,7 @@ const AdminSGSTermos = () => {
       company_id: company.id,
       customer_name: selectedCustomer?.name,
       tour_name: selectedTour?.name,
-      term_date: form.term_date,
+      term_date: format(new Date(), "yyyy-MM-dd"), // Sempre usa a data atual ao salvar/enviar
       has_allergy: form.has_allergy,
       allergy_details: form.allergy_details,
       has_fainting_convulsions: form.has_fainting_convulsions,
@@ -217,7 +217,7 @@ const AdminSGSTermos = () => {
       medication_details: form.medication_details,
       emergency_contact_name: form.emergency_contact_name,
       emergency_contact_phone: form.emergency_contact_phone,
-      accepted: editingId ? true : false, // Online signature will mark as accepted
+      accepted: editingId ? true : false,
     };
 
     const { data: termData, error } = editingId 
