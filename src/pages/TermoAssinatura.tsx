@@ -44,6 +44,7 @@ const TermoAssinatura = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const bookingCode = params.get("booking") || "";
+  const termId = params.get("id") || "";
   
   const [booking, setBooking] = useState<any>(null);
   const [term, setTerm] = useState<any>(null);
@@ -60,14 +61,14 @@ const TermoAssinatura = () => {
   const [isDrawing, setIsDrawing] = useState(false);
 
   useEffect(() => {
-    if (bookingCode) {
-      loadBooking();
+    if (bookingCode || termId) {
+      loadData();
     } else {
       setLoading(false);
     }
-  }, [bookingCode]);
+  }, [bookingCode, termId]);
 
-  const loadBooking = async () => {
+  const loadData = async () => {
     setLoading(true);
     const [bookingRes, companyRes] = await Promise.all([
       supabase.from("bookings").select("*, customers(*)").eq("booking_code", bookingCode).maybeSingle(),
