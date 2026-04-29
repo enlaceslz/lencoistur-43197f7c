@@ -14,7 +14,7 @@ import { Car, MapPin, Clock, Users, Plus, Pencil, Trash2, X, Check, Search, Load
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const emptyForm = {
   origin: "", destination: "", duration: "", distance: "",
