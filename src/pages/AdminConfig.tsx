@@ -417,6 +417,39 @@ const AdminConfig = () => {
                   <Label>Ou cole a URL da logo</Label>
                   <Input placeholder="https://exemplo.com/logo.png" value={site.logoUrl || ""} onChange={(e) => setSite({ ...site, logoUrl: e.target.value || null })} maxLength={500} />
                 </div>
+
+                <div className="space-y-3 border-t border-border pt-4 mt-4">
+                  <Label className="text-sm font-semibold">Banner Principal (Hero)</Label>
+                  <div className="flex flex-col gap-4">
+                    <div className="w-full aspect-video rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-muted overflow-hidden">
+                      {site.bannerUrl ? (
+                        <img src={site.bannerUrl} alt="Banner" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="text-center">
+                          <Image size={48} className="text-muted-foreground mx-auto mb-2" />
+                          <p className="text-xs text-muted-foreground">Nenhum banner configurado</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} />
+                      <Button type="button" variant="outline" size="sm" onClick={() => bannerInputRef.current?.click()} disabled={uploadingBanner} className="rounded-lg">
+                        {uploadingBanner ? <Loader2 size={14} className="animate-spin mr-1" /> : <UploadCloud size={14} className="mr-1" />}
+                        {site.bannerUrl ? "Trocar Banner" : "Enviar Banner"}
+                      </Button>
+                      {site.bannerUrl && (
+                        <Button type="button" variant="ghost" size="sm" onClick={() => setSite({ ...site, bannerUrl: null })} className="text-destructive rounded-lg">
+                          <Trash2 size={14} className="mr-1" /> Remover
+                        </Button>
+                      )}
+                      <p className="text-[10px] text-muted-foreground">Recomendado: 1920x1080px. Máx. 5MB.</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">URL do Banner</Label>
+                    <Input placeholder="https://exemplo.com/banner.jpg" value={site.bannerUrl || ""} onChange={(e) => setSite({ ...site, bannerUrl: e.target.value || null })} maxLength={500} className="h-8 text-xs" />
+                  </div>
+                </div>
               </div>
               <div className="space-y-4">
                 <div className="space-y-2">
