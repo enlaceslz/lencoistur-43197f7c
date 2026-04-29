@@ -545,12 +545,10 @@ const AdminReservas = () => {
                     Marcar Concluída
                   </Button>
                 )}
-                {selected.status !== "cancelada" && selected.status !== "concluida" && (
-                  <Button variant="destructive" onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada.")} disabled={actionLoading} className="flex-1 min-w-[140px]">
-                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
-                    Cancelar Reserva
-                  </Button>
-                )}
+                <Button variant="destructive" onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada e removida.", true)} disabled={actionLoading} className="flex-1 min-w-[140px]">
+                  {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
+                  Cancelar e Excluir
+                </Button>
                 {/* Print Receipt */}
                 {selected.payMethod !== "info" && (
                   <PrintReceiptButton
