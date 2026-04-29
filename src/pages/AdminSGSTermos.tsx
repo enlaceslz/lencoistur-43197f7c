@@ -848,6 +848,45 @@ const AdminSGSTermos = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
+                  {!t.signature_data && (
+                    <button 
+                      onClick={async () => {
+                        const customer = customers.find(c => c.id === t.customer_id);
+                        if (!customer?.email) {
+                          toast({ title: "Cliente sem e-mail", description: "Cadastre um e-mail para enviar o link.", variant: "destructive" });
+                          return;
+                        }
+                        setSendingEmail(t.id);
+                        try {
+                          const { data: { publicUrl } } = supabase.storage.from('company-documents').getPublicUrl('dummy');
+                          const baseUrl = window.location.origin;
+                          const signUrl = `${baseUrl}/assinatura-termo?id=${t.id}`;
+                          
+                          const { error } = await supabase.functions.invoke("send-term-email", {
+                            body: {
+                              customerEmail: customer.email,
+                              customerName: customer.name,
+                              signUrl: signUrl,
+                              tourName: t.tour_name
+                            }
+                          });
+                          
+                          if (error) throw error;
+                          toast({ title: "E-mail enviado!", description: "Link de assinatura enviado ao cliente." });
+                        } catch (err) {
+                          toast({ title: "Erro ao enviar", description: "Não foi possível enviar o e-mail.", variant: "destructive" });
+                        } finally {
+                          setSendingEmail(null);
+                        }
+                      }}
+                      disabled={sendingEmail === t.id}
+                      className="p-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold disabled:opacity-50"
+                      title="Enviar Link por E-mail"
+                    >
+                      {sendingEmail === t.id ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                      <span className="hidden sm:inline">Enviar Link</span>
+                    </button>
+                  )}
                   <button 
                     onClick={() => printTerm(t.id)}
                     className="p-3 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
