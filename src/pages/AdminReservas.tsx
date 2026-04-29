@@ -82,7 +82,7 @@ const AdminReservas = () => {
     tourMode: "coletivo" as "coletivo" | "privativo",
     itemName: "",
     date: "",
-    guests: 1,
+    guests: 2,
     payMethod: "pix" as "pix" | "card",
     customerName: "",
     customerEmail: "",
