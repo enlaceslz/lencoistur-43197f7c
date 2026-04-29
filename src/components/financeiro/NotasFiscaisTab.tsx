@@ -5,6 +5,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Search, Receipt, FileText, CheckCircle2, Clock, 
@@ -59,14 +60,45 @@ const fmtDate = (d: string) => {
 export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFiscaisTabProps) {
   const [search, setSearch] = useState("");
   const [bookings, setBookings] = useState<BookingRow[]>(initialBookings);
+  const [statusFilter, setStatusFilter] = useState("todos");
 
   const filtered = useMemo(() => {
-    return bookings.filter(b => 
-      b.booking_code.toLowerCase().includes(search.toLowerCase()) ||
-      b.customers?.name?.toLowerCase().includes(search.toLowerCase()) ||
-      b.invoice_number?.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [bookings, search]);
+    return bookings.filter(b => {
+      const matchesSearch = b.booking_code.toLowerCase().includes(search.toLowerCase()) ||
+                           b.customers?.name?.toLowerCase().includes(search.toLowerCase()) ||
+                           (b.invoice_number || "").toLowerCase().includes(search.toLowerCase());
+      
+      const matchesStatus = statusFilter === "todos" || 
+                           (statusFilter === "emitida" ? b.invoice_issued : !b.invoice_issued);
+      
+      return matchesSearch && matchesStatus;
+    });
+  }, [bookings, search, statusFilter]);
+
+  const exportToCSV = () => {
+    const headers = ["Código", "Cliente", "Email", "Valor", "Status Pgto", "NF Emitida", "Nº Nota", "Data"];
+    const rows = filtered.map(b => [
+      b.booking_code,
+      b.customers?.name || "N/A",
+      b.customers?.email || "N/A",
+      b.final_total.toString(),
+      b.payment_status,
+      b.invoice_issued ? "Sim" : "Não",
+      b.invoice_number || "N/A",
+      fmtDate(b.created_at)
+    ]);
+
+    const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `notas_fiscais_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const stats = useMemo(() => {
     const total = bookings.length;
@@ -167,9 +199,25 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Button variant="outline" className="rounded-xl h-11 border-border/50 hover:bg-muted font-bold text-xs uppercase tracking-wider">
-          <Filter size={16} className="mr-2" /> Filtros
-        </Button>
+        <div className="flex items-center gap-2">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="rounded-xl h-11 w-[160px] border-none bg-muted/50">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos Status</SelectItem>
+              <SelectItem value="emitida">NF Emitida</SelectItem>
+              <SelectItem value="pendente">Pendente</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button 
+            variant="outline" 
+            onClick={exportToCSV}
+            className="rounded-xl h-11 border-border/50 hover:bg-muted font-bold text-xs uppercase tracking-wider"
+          >
+            <Download size={16} className="mr-2" /> Exportar
+          </Button>
+        </div>
       </div>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
@@ -333,7 +381,7 @@ export default function NotasFiscaisTab({ bookings: initialBookings }: NotasFisc
                             </DropdownMenuItem>
                           )}
 
-                          <DropdownMenuItem className="rounded-lg gap-2 text-rose-500">
+                          <DropdownMenuItem className="rounded-lg gap-2 text-rose-500" onClick={exportToCSV}>
                              <Download size={14} />
                              Exportar Dados
                           </DropdownMenuItem>
