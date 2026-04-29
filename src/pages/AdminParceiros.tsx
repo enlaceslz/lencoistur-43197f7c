@@ -266,18 +266,26 @@ const AdminParceiros = () => {
     doc.text(`Total de parceiros: ${partners.length} (${activeCount} ativos)`, 14, 33);
 
     // Table
-    const tableData = filtered.map(p => [
-      p.name,
-      partnerTypes.find(t => t.name === p.type)?.label || p.type,
-      p.cpf_cnpj || "N/A",
-      p.contact_name || "N/A",
-      `${p.commission_rate || 0}%`,
-      p.active ? "Ativo" : "Inativo"
-    ]);
+    const tableData = filtered.map(p => {
+      let remStr = "";
+      if (p.remuneration_type === "comissao_percent") remStr = `${p.remuneration_value || 0}%`;
+      else if (p.remuneration_type === "valor_por_passeio") remStr = `R$ ${p.remuneration_value || 0} / passeio`;
+      else if (p.remuneration_type === "valor_mensal") remStr = `R$ ${p.remuneration_value || 0} / mês`;
+      else remStr = `${p.commission_rate || 0}%`;
+
+      return [
+        p.name,
+        partnerTypes.find(t => t.name === p.type)?.label || p.type,
+        p.cpf_cnpj || "N/A",
+        p.contact_name || "N/A",
+        remStr,
+        p.active ? "Ativo" : "Inativo"
+      ];
+    });
 
     autoTable(doc, {
       startY: 40,
-      head: [["Nome", "Tipo", "CPF/CNPJ", "Contato", "Comissão", "Status"]],
+      head: [["Nome", "Tipo", "CPF/CNPJ", "Contato", "Remuneração", "Status"]],
       body: tableData,
       theme: "striped",
       headStyles: { fillColor: [33, 150, 243] },
