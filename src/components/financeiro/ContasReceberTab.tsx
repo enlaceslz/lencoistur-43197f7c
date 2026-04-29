@@ -50,7 +50,7 @@ interface Conta {
 interface CustomerOption { id: string; name: string; email: string; }
 interface BookingOption { id: string; booking_code: string; item_name: string; final_total: number; customer_name: string; }
 
-const emptyForm = { descricao: "", valor: "", vencimento: "", categoria: "reserva", cliente: "", observacoes: "", status: "pendente", booking_id: "", customer_id: "" };
+const emptyForm = { descricao: "", valor: 0, vencimento: "", categoria: "reserva", cliente: "", observacoes: "", status: "pendente", booking_id: "", customer_id: "" };
 
 export default function ContasReceberTab() {
   const [contas, setContas] = useState<Conta[]>([]);
