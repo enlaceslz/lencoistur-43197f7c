@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Search, Receipt, FileText, CheckCircle2, Clock, 
   MoreHorizontal, Download, Paperclip, Upload, Filter,
-  ExternalLink
+  ExternalLink, Plus
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
