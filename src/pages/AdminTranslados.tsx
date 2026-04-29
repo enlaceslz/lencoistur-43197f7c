@@ -197,8 +197,8 @@ const AdminTranslados = () => {
                   <Input type="number" min={0} max={50} value={form.pix_discount} onChange={e => setForm({ ...form, pix_discount: Number(e.target.value) })} />
                   <Percent size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 </div>
-                {Number(form.price) > 0 && form.pix_discount > 0 && (
-                  <p className="text-xs text-green-600 mt-1">PIX: R$ {(Number(form.price) * (1 - form.pix_discount / 100)).toFixed(2)}</p>
+                {form.price > 0 && form.pix_discount > 0 && (
+                  <p className="text-xs text-green-600 mt-1">PIX: {fmt(Math.round(form.price * (1 - form.pix_discount / 100)))}</p>
                 )}
               </div>
               <div>
