@@ -199,7 +199,11 @@ const AdminReservas = () => {
     { icon: DollarSign, label: "Receita Total", value: fmt(totalPago), color: "text-blue-600" },
   ];
 
-  const handleAction = async (action: () => Promise<void>, successMsg: string) => {
+  const handleAction = async (action: () => Promise<void>, successMsg: string, isCancellation = false) => {
+    if (isCancellation) {
+      const confirm = window.confirm("⚠️ Tem certeza que deseja cancelar esta reserva?\n\nEsta ação excluirá permanentemente a reserva do histórico.");
+      if (!confirm) return;
+    }
     setActionLoading(true);
     try {
       await action();
