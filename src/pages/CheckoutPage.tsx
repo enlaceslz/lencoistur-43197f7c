@@ -52,7 +52,7 @@ const CheckoutPage = () => {
 
   const isPrivate = tourMode === "privativo";
   const itemName = tour ? `${tour.name}${isPrivate ? " (Privativo)" : " (Coletivo)"}` : (pkg ? pkg.name : (transfer ? `${transfer.origin} → ${transfer.destination}` : ""));
-  const unitPrice = tour ? (isPrivate ? (tour.private_price || 1300) : tour.price) : (pkg ? pkg.price : (transfer?.price || 0));
+  const unitPrice = tour ? (isPrivate ? (tour.private_price || 130000) : tour.price) : (pkg ? pkg.price : (transfer?.price || 0));
   const pixDiscountPercent = tour?.pix_discount || transfer?.pix_discount || (pkg ? 5 : 0);
   const image = tour?.images?.[0] || "";
   const location = tour?.location || (pkg ? "Santo Amaro" : (transfer ? `${transfer.origin} → ${transfer.destination}` : ""));
@@ -471,21 +471,76 @@ const CheckoutPage = () => {
                    <p className="text-sm text-muted-foreground">
                     Ao confirmar, você receberá o QR Code PIX para pagamento imediato.
                     {displayDiscount > 0 && <> Economia de <strong className="text-green-600">{formatCurrency(displayDiscount)}</strong>!</>}
-...
+                  </p>
+                </div>
+              )}
+
+              {payMethod === "info" && (
+                <div className="bg-muted rounded-xl p-4 flex items-center gap-3">
+                  <Users size={20} className="text-primary shrink-0" />
+                   <p className="text-sm text-muted-foreground">
+                    Ao confirmar, sua solicitação será enviada para a agência. Entraremos em contato via WhatsApp para finalizar sua reserva.
+                  </p>
+                </div>
+              )}
+
+              {payMethod === "card" && (
+                <div className="space-y-4">
+                  <div className="bg-muted rounded-xl p-4 flex items-center gap-3">
+                    <CreditCard size={20} className="text-primary shrink-0" />
+                    <p className="text-sm text-muted-foreground">
+                      Pagamento via cartão de crédito processado com segurança pela agência.
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-foreground mb-1.5 block">Parcelas</label>
                     <select className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none appearance-none">
                       <option>1x de {formatCurrency(finalTotal)} (sem juros)</option>
                       <option>2x de {formatCurrency(Math.ceil(finalTotal / 2))} (sem juros)</option>
                       <option>3x de {formatCurrency(Math.ceil(finalTotal / 3))} (sem juros)</option>
-
                     </select>
-...
+                  </div>
+                </div>
+              )}
+            </div>
+
             <button
               type="submit"
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-xl font-semibold text-lg transition-colors"
+              disabled={submitting}
             >
-              {payMethod === "pix" ? `Gerar PIX — ${formatCurrency(finalTotal)}` : payMethod === "info" ? "Solicitar Informações" : `Pagar ${formatCurrency(finalTotal)}`}
+              {submitting ? "Processando..." : (payMethod === "pix" ? `Gerar PIX — ${formatCurrency(finalTotal)}` : payMethod === "info" ? "Solicitar Informações" : `Pagar ${formatCurrency(finalTotal)}`)}
             </button>
-...
+
+            <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">
+              <Shield size={14} />
+              <span>Pagamento seguro · Cancelamento grátis até 24h antes</span>
+            </div>
+          </form>
+
+          {/* Summary */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24 bg-card border border-border rounded-2xl overflow-hidden shadow-lg">
+              {image && <img src={image} alt={itemName} className="w-full h-40 object-cover" />}
+              {!image && (
+                <div className="w-full h-40 bg-gradient-hero flex items-center justify-center">
+                  <MapPin size={32} className="text-primary-foreground" />
+                </div>
+              )}
+              <div className="p-6 space-y-4">
+                <h3 className="font-display text-lg font-bold text-foreground">{itemName}</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <MapPin size={15} className="text-primary" /> {location}
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <CalendarDays size={15} className="text-primary" /> {date ? new Date(date + "T12:00").toLocaleDateString("pt-BR") : "Data a definir"}
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Users size={15} className="text-primary" /> {guests} participante{guests > 1 ? "s" : ""}
+                  </div>
+                </div>
+
                 <div className="border-t border-border pt-4 space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{formatCurrency(unitPrice)} × {guests}</span>
@@ -501,7 +556,6 @@ const CheckoutPage = () => {
                     <span className="text-foreground">Total</span>
                     <span className="text-primary">{formatCurrency(finalTotal)}</span>
                   </div>
-
                 </div>
               </div>
             </div>
