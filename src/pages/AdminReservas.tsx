@@ -55,7 +55,7 @@ const formatPhone = (v: string) => {
 };
 
 const AdminReservas = () => {
-  const { bookings, loading, addBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
+  const { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
   const [dateStart, setDateStart] = useState("");
@@ -64,6 +64,7 @@ const AdminReservas = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [editNotes, setEditNotes] = useState("");
   const [showNotes, setShowNotes] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // New booking form state
   const [showNewForm, setShowNewForm] = useState(false);
