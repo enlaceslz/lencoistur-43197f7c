@@ -11,6 +11,16 @@ import { Plus, Loader2, Pencil, Trash2, Link2 } from "lucide-react";
 import { toast } from "sonner";
 
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+
+const maskCurrency = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  return (Number(n) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+};
+
+const parseCurrency = (v: string) => {
+  return Number(v.replace(/\D/g, ""));
+};
+
 const fmtDate = (d: string | null) => {
   if (!d) return "—";
   try { return new Date(d + "T00:00:00").toLocaleDateString("pt-BR"); } catch { return d; }
