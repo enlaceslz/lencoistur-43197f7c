@@ -243,6 +243,7 @@ const TermoAssinatura = () => {
           health_questions: healthInfo,
           signature_data: signatureData,
           signed_at: new Date().toISOString(),
+          term_date: new Date().toISOString().split('T')[0], // Atualiza a data do termo para o dia da assinatura
           accepted: true
         }).eq("id", currentTermId);
 
