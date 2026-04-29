@@ -74,6 +74,7 @@ const DEFAULTS = {
   site: { titulo: "LençóisTour - Passeios nos Lençóis Maranhenses", metaDescricao: "Descubra os Lençóis Maranhenses com a melhor experiência turística.", whatsappUrl: "https://wa.me/5598999990000", instagram: "https://instagram.com/lencoistour", corPrimaria: "#2563eb", logoUrl: null as string | null, bannerUrl: null as string | null },
   pagamentos: { pix: true, cartao: true, boleto: false, dinheiro: true, transferencia: false, pixChave: "12.345.678/0001-90", pixTipo: "cnpj" as PixKeyType },
   notificacoes: { email: true, whatsapp: true, push: false, novaReserva: true, cancelamento: true, pagamento: true },
+  gallery: { images: [] as Array<{ src: string; alt: string }> },
 };
 
 const AdminConfig = () => {
@@ -83,6 +84,7 @@ const AdminConfig = () => {
   const [site, setSite] = useState(DEFAULTS.site);
   const [pagamentos, setPagamentos] = useState(DEFAULTS.pagamentos);
   const [notifications, setNotifications] = useState(DEFAULTS.notificacoes);
+  const [gallery, setGallery] = useState(DEFAULTS.gallery);
 
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
@@ -92,6 +94,8 @@ const AdminConfig = () => {
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const restoreInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
   const [uploadingBanner, setUploadingBanner] = useState(false);
   const [backupLoading, setBackupLoading] = useState(false);
   const [restoreLoading, setRestoreLoading] = useState(false);
@@ -111,6 +115,7 @@ const AdminConfig = () => {
           if (row.key === "site") setSite({ ...DEFAULTS.site, ...val });
           if (row.key === "pagamentos") setPagamentos({ ...DEFAULTS.pagamentos, ...val, pixTipo: (val as any).pixTipo && PIX_KEY_TYPES.some(t => t.value === (val as any).pixTipo) ? (val as any).pixTipo : DEFAULTS.pagamentos.pixTipo });
           if (row.key === "notificacoes") setNotifications({ ...DEFAULTS.notificacoes, ...val });
+          if (row.key === "gallery") setGallery({ ...DEFAULTS.gallery, ...val });
         }
       }
     } catch (err) {
@@ -190,6 +195,44 @@ const AdminConfig = () => {
     toast.success("Senha alterada com sucesso!");
     setNovaSenha("");
     setConfirmarSenha("");
+  };
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingGallery(true);
+    const newImages = [...gallery.images];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!file.type.startsWith("image/")) continue;
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`A imagem ${file.name} é muito grande (máx 5MB)`);
+        continue;
+      }
+
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `gallery/img-${Date.now()}-${i}.${ext}`;
+
+      const { error } = await supabase.storage.from("tour-images").upload(path, file);
+      if (error) {
+        toast.error(`Erro ao enviar ${file.name}: ${error.message}`);
+        continue;
+      }
+
+      const { data: urlData } = supabase.storage.from("tour-images").getPublicUrl(path);
+      newImages.push({ src: urlData.publicUrl, alt: "Foto da Galeria LençóisTour" });
+    }
+
+    setGallery({ images: newImages });
+    setUploadingGallery(false);
+    toast.success("Imagens enviadas! Não esqueça de salvar as alterações.");
+  };
+
+  const removeGalleryImage = (index: number) => {
+    const newImages = gallery.images.filter((_, i) => i !== index);
+    setGallery({ images: newImages });
   };
 
   const BACKUP_TABLES = [
@@ -343,6 +386,7 @@ const AdminConfig = () => {
           <TabsTrigger value="notificacoes"><Bell size={14} className="mr-1" /> Notificações</TabsTrigger>
           <TabsTrigger value="seguranca"><Shield size={14} className="mr-1" /> Segurança</TabsTrigger>
           <TabsTrigger value="backup"><Database size={14} className="mr-1" /> Backup</TabsTrigger>
+          <TabsTrigger value="galeria"><Image size={14} className="mr-1" /> Galeria</TabsTrigger>
         </TabsList>
 
         {/* EMPRESA */}
@@ -806,6 +850,84 @@ const AdminConfig = () => {
               </Card>
             )}
           </div>
+        </TabsContent>
+
+        {/* GALERIA */}
+        <TabsContent value="galeria">
+          <Card className="border-border">
+            <CardContent className="p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-display font-bold text-foreground text-lg">Galeria de Fotos</h3>
+                  <p className="text-sm text-muted-foreground">Gerencie as imagens da seção "Momentos Inesquecíveis"</p>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    ref={galleryInputRef}
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleGalleryUpload}
+                  />
+                  <Button
+                    onClick={() => galleryInputRef.current?.click()}
+                    disabled={uploadingGallery}
+                    variant="outline"
+                    className="rounded-xl"
+                  >
+                    {uploadingGallery ? <Loader2 size={16} className="animate-spin mr-2" /> : <UploadCloud size={16} className="mr-2" />}
+                    Adicionar Fotos
+                  </Button>
+                  <Button
+                    onClick={() => saveSetting("gallery", gallery as unknown as Record<string, unknown>, "Galeria")}
+                    disabled={saving}
+                    className="rounded-xl"
+                  >
+                    {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
+                    Salvar Galeria
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {gallery.images.length === 0 ? (
+                  <div className="col-span-full py-12 text-center border-2 border-dashed border-border rounded-2xl bg-muted/30">
+                    <Image size={40} className="mx-auto mb-2 text-muted-foreground opacity-20" />
+                    <p className="text-sm text-muted-foreground">Nenhuma imagem personalizada. A galeria está usando as imagens padrão.</p>
+                  </div>
+                ) : (
+                  gallery.images.map((img, index) => (
+                    <div key={index} className="relative group aspect-square rounded-xl overflow-hidden border border-border shadow-sm">
+                      <img src={img.src} alt={img.alt} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => removeGalleryImage(index)}
+                          className="p-2 bg-destructive text-destructive-foreground rounded-full hover:scale-110 transition-transform"
+                          title="Remover imagem"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 p-1 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <input
+                          className="w-full bg-transparent text-[10px] text-white outline-none border-none focus:ring-0 px-1"
+                          value={img.alt}
+                          onChange={(e) => {
+                            const newImages = [...gallery.images];
+                            newImages[index].alt = e.target.value;
+                            setGallery({ images: newImages });
+                          }}
+                          placeholder="Legenda (ALT)"
+                        />
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground italic">* Arraste para reordenar (em breve) ou use legendas para SEO. Lembre-se de clicar em salvar.</p>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </AdminLayout>
