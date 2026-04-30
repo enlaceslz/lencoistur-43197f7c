@@ -192,6 +192,8 @@ export default function ContasPagarTab({ company }: { company?: any }) {
           <Button onClick={openNew} className="rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95">
             <Plus size={18} className="mr-2" /> Novo Registro
           </Button>
+        </div>
+      </div>
       <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm mb-4">
         <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="relative flex-1 w-full">
