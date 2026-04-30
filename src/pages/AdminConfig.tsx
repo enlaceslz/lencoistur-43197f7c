@@ -474,37 +474,78 @@ const AdminConfig = () => {
 
         {/* SITE */}
         <TabsContent value="site">
-          <Card className="border-border">
-            <CardContent className="p-6 space-y-5">
-              <h3 className="font-display font-bold text-foreground text-lg">Configurações do Site</h3>
-              <div className="space-y-3">
-                <Label className="text-sm font-semibold">Logo da Empresa</Label>
-                <div className="flex items-center gap-4">
-                  <div className="w-24 h-24 rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-muted overflow-hidden">
-                    {site.logoUrl ? (
-                      <img src={site.logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
-                    ) : (
-                      <Image size={32} className="text-muted-foreground" />
-                    )}
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-8 space-y-8">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+                  <Globe size={32} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-foreground">Aparência do Website</h3>
+                  <p className="text-sm text-muted-foreground">Personalize a identidade visual voltada ao cliente.</p>
+                </div>
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-10">
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Logotipo da Marca</Label>
+                    <div className="flex items-center gap-6 p-4 rounded-2xl bg-muted/30 border border-border/50">
+                      <div className="w-24 h-24 rounded-xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center bg-background overflow-hidden shrink-0">
+                        {site.logoUrl ? (
+                          <img src={site.logoUrl} alt="Logo" className="w-full h-full object-contain p-2" />
+                        ) : (
+                          <Image size={32} className="text-muted-foreground/20" />
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                        <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo} className="rounded-xl font-bold h-9">
+                          {uploadingLogo ? <Loader2 size={14} className="animate-spin mr-2" /> : <Upload size={14} className="mr-2" />}
+                          {site.logoUrl ? "Alterar Logo" : "Fazer Upload"}
+                        </Button>
+                        <p className="text-[10px] text-muted-foreground font-medium italic">Sugerido: PNG transparente, máx 2MB.</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
-                    <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo} className="rounded-lg">
-                      {uploadingLogo ? <Loader2 size={14} className="animate-spin mr-1" /> : <Upload size={14} className="mr-1" />}
-                      {site.logoUrl ? "Trocar Logo" : "Enviar Logo"}
-                    </Button>
-                    {site.logoUrl && (
-                      <Button type="button" variant="ghost" size="sm" onClick={() => setSite({ ...site, logoUrl: null })} className="text-destructive rounded-lg">
-                        <X size={14} className="mr-1" /> Remover
-                      </Button>
-                    )}
-                    <p className="text-xs text-muted-foreground">PNG, JPG ou SVG. Máx. 2MB.</p>
+
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Título Principal do Site</Label>
+                    <Input 
+                      placeholder="Ex: Lençóis Tour - Os melhores passeios" 
+                      value={site.titulo} 
+                      onChange={(e) => setSite({ ...site, titulo: e.target.value })} 
+                      className="h-12 rounded-xl border-muted-foreground/20 font-bold"
+                    />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Ou cole a URL da logo</Label>
-                  <Input placeholder="https://exemplo.com/logo.png" value={site.logoUrl || ""} onChange={(e) => setSite({ ...site, logoUrl: e.target.value || null })} maxLength={500} />
+
+                <div className="space-y-3">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Meta Descrição (SEO)</Label>
+                  <Textarea 
+                    rows={4}
+                    placeholder="Descrição para Google e redes sociais..." 
+                    value={site.metaDescricao} 
+                    onChange={(e) => setSite({ ...site, metaDescricao: e.target.value })} 
+                    className="rounded-2xl border-muted-foreground/20 resize-none h-[116px] p-4 font-medium text-sm"
+                  />
+                  <p className="text-[10px] text-muted-foreground text-right italic font-bold">{site.metaDescricao.length}/160 caracteres sugeridos</p>
                 </div>
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-border flex justify-end">
+                <Button 
+                  onClick={() => saveSetting("site", site, "Site")} 
+                  disabled={saving}
+                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20"
+                >
+                  {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save size={18} className="mr-2" />}
+                  Publicar Alterações
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
                 <div className="space-y-3 border-t border-border pt-4 mt-4">
                   <Label className="text-sm font-semibold">Banner Principal (Hero)</Label>
