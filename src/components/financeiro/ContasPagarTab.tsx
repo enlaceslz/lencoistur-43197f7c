@@ -197,7 +197,9 @@ export default function ContasPagarTab({ company }: { company?: any }) {
       <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm mb-4">
         <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="relative flex-1 w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+              <Search size={16} />
+            </span>
             <Input 
               placeholder="Buscar por descrição, fornecedor ou observações..." 
               value={searchTerm} 
