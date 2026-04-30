@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, AlertTriangle, Search, Info, Pencil, Trash2, Printer } from "lucide-react";
+import { Plus, AlertTriangle, Search, Info, Pencil, Trash2, Printer, CheckCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 
 // P2 - Etapas conforme Devolutiva VATTI
