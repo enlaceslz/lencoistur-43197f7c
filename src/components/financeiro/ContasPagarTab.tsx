@@ -192,8 +192,44 @@ export default function ContasPagarTab({ company }: { company?: any }) {
           <Button onClick={openNew} className="rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95">
             <Plus size={18} className="mr-2" /> Novo Registro
           </Button>
-        </div>
-      </div>
+      <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm mb-4">
+        <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="relative flex-1 w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+            <Input 
+              placeholder="Buscar por descrição, fornecedor ou observações..." 
+              value={searchTerm} 
+              onChange={(e) => setSearchTerm(e.target.value)} 
+              className="pl-10 h-10 rounded-xl"
+            />
+          </div>
+          <div className="flex gap-2 w-full md:w-auto overflow-x-auto no-scrollbar pb-1 md:pb-0">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[130px] h-10 rounded-xl">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos Status</SelectItem>
+                <SelectItem value="pendente">Pendentes</SelectItem>
+                <SelectItem value="pago">Pagos</SelectItem>
+                <SelectItem value="vencido">Vencidos</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[140px] h-10 rounded-xl">
+                <SelectValue placeholder="Categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todas Categorias</SelectItem>
+                {categorias.map(cat => (
+                  <SelectItem key={cat} value={cat} className="capitalize">{cat}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
         <CardContent className="p-0">
