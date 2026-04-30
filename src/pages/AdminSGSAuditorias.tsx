@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, ClipboardCheck, CheckCircle, XCircle } from "lucide-react";
+import { Plus, ClipboardCheck, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const CATEGORIES: Record<string, string> = {
