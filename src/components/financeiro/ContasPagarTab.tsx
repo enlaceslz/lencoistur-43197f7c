@@ -106,8 +106,10 @@ export default function ContasPagarTab({ company }: { company?: any }) {
 
   const filteredContas = useMemo(() => {
     return contas.filter(c => {
-      const matchesSearch = c.descricao.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                           (c.fornecedor?.toLowerCase() || "").includes(searchTerm.toLowerCase());
+      const q = searchTerm.toLowerCase();
+      const matchesSearch = c.descricao.toLowerCase().includes(q) || 
+                           (c.fornecedor?.toLowerCase() || "").includes(q) ||
+                           (c.observacoes?.toLowerCase() || "").includes(q);
       const matchesStatus = statusFilter === "todos" || c.status === statusFilter;
       const matchesCategory = categoryFilter === "todos" || c.categoria === categoryFilter;
       return matchesSearch && matchesStatus && matchesCategory;
