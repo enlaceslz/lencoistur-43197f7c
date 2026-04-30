@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
 
     // Validate required fields
-    const { type, itemName, date, guests, payMethod, customerName, customerEmail, customerPhone, cpf, passport, country, birthDate } = body;
+    const { type, itemName, date, guests, payMethod, customerName, customerEmail, customerPhone, cpf, passport, country, birthDate, companions } = body;
 
     if (!type || !itemName || !customerName || !customerEmail || !payMethod) {
       return new Response(
@@ -195,6 +195,16 @@ Deno.serve(async (req) => {
       if (bookingErr || !booking) {
         console.error("Error inserting booking:", bookingErr);
         return null;
+      }
+      if (companions && Array.isArray(companions) && companions.length > 0) {
+        const dependents = companions.map(c => ({
+          customer_id: customerId,
+          name: c.name,
+          cpf: c.cpf || null,
+          birth_date: c.birthDate || null,
+          relationship: c.relationship || 'Acompanhante'
+        }));
+        await supabaseAdmin.from("dependents").insert(dependents);
       }
       return booking;
     };

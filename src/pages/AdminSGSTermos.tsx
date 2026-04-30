@@ -594,11 +594,31 @@ const AdminSGSTermos = () => {
                 <label className="text-sm font-semibold text-foreground mb-1 block">Vincular a Reserva (Opcional)</label>
                 <select 
                   value={form.booking_id}
-                  onChange={e => {
+                  onChange={async e => {
                     const bid = e.target.value;
                     const booking = bookings.find(b => b.id === bid);
                     if (booking) {
                       setForm(f => ({ ...f, booking_id: bid, customer_id: booking.customer_id }));
+                      
+                      // Auto-load dependents from the customer to populate companions
+                      const { data: deps } = await supabase
+                        .from("dependents")
+                        .select("*")
+                        .eq("customer_id", booking.customer_id);
+                      
+                      if (deps && deps.length > 0) {
+                        setForm(f => ({
+                          ...f,
+                          minors: deps.map(d => ({
+                            full_name: d.name,
+                            cpf: d.cpf || "",
+                            birth_date: d.birth_date || "",
+                            is_adult: true, // assume default or calculate based on age
+                            id: d.id
+                          }))
+                        }));
+                        toast({ title: `${deps.length} acompanhantes importados automaticamente` });
+                      }
                     } else {
                       setForm(f => ({ ...f, booking_id: bid }));
                     }

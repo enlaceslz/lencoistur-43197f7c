@@ -9,6 +9,7 @@ import { useBookings, type BookingItem } from "@/hooks/useBookings";
 import { toast } from "@/hooks/use-toast";
 import { maskCPF, maskPhone } from "@/lib/masks";
 import { formatCurrency } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 const CheckoutPage = () => {
 
@@ -67,9 +68,27 @@ const CheckoutPage = () => {
   const [passport, setPassport] = useState("");
   const [country, setCountry] = useState("Brasil");
   const [birthDate, setBirthDate] = useState("");
+  const [companions, setCompanions] = useState<{ name: string; cpf: string; birthDate: string }[]>([]);
   const [confirmedBooking, setConfirmedBooking] = useState<BookingItem | null>(null);
   const [pixCopied, setPixCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (guests > 1) {
+      const count = guests - 1;
+      setCompanions(prev => {
+        const newCompanions = [...prev];
+        if (newCompanions.length < count) {
+          for (let i = newCompanions.length; i < count; i++) {
+            newCompanions.push({ name: "", cpf: "", birthDate: "" });
+          }
+        }
+        return newCompanions.slice(0, count);
+      });
+    } else {
+      setCompanions([]);
+    }
+  }, [guests]);
 
   if (!tour && !transfer && !pkg) {
     return (
@@ -110,6 +129,7 @@ const CheckoutPage = () => {
         passport: nationality === "foreign" ? passport : undefined,
         country: nationality === "foreign" ? country : "Brasil",
         birthDate: birthDate || undefined,
+        companions: companions.filter(c => c.name.trim() !== ""),
       });
       setConfirmedBooking(booking);
     } catch (error) {
@@ -423,6 +443,72 @@ const CheckoutPage = () => {
                 />
               </div>
             </div>
+
+            {/* Companions */}
+            {guests > 1 && (
+              <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
+                    <Users size={20} className="text-primary" />
+                    Dados dos Acompanhantes
+                  </h2>
+                  <Badge variant="outline" className="text-[10px] uppercase font-black">{companions.length} pessoa(s)</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground italic">Informe os dados dos outros participantes para agilizar o seguro e os termos de risco.</p>
+                
+                <div className="space-y-6">
+                  {companions.map((comp, idx) => (
+                    <div key={idx} className="p-4 rounded-xl bg-muted/30 border border-border/50 space-y-3">
+                      <p className="text-xs font-bold text-primary uppercase tracking-widest">Acompanhante {idx + 1}</p>
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <div className="sm:col-span-2">
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1 block">Nome Completo</label>
+                          <input 
+                            type="text" 
+                            value={comp.name} 
+                            onChange={(e) => {
+                              const newComps = [...companions];
+                              newComps[idx].name = e.target.value;
+                              setCompanions(newComps);
+                            }}
+                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20" 
+                            placeholder="Nome do acompanhante"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1 block">CPF (opcional)</label>
+                          <input 
+                            type="text" 
+                            value={comp.cpf} 
+                            onChange={(e) => {
+                              const newComps = [...companions];
+                              newComps[idx].cpf = maskCPF(e.target.value);
+                              setCompanions(newComps);
+                            }}
+                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20" 
+                            placeholder="000.000.000-00"
+                            maxLength={14}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1 block">Nascimento</label>
+                          <input 
+                            type="date" 
+                            value={comp.birthDate} 
+                            onChange={(e) => {
+                              const newComps = [...companions];
+                              newComps[idx].birthDate = e.target.value;
+                              setCompanions(newComps);
+                            }}
+                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20" 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Payment */}
             <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
