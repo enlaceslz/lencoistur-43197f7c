@@ -310,12 +310,19 @@ const AdminPasseios = () => {
           />
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <button 
-            onClick={openNew}
-            className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
-          >
-            <Plus size={20} strokeWidth={3} /> Novo Passeio
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button 
+                onClick={openNew}
+                className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+              >
+                <Plus size={20} strokeWidth={3} /> Novo Passeio
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Cadastrar novo passeio no catálogo</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
       </div>
 
@@ -494,14 +501,29 @@ const AdminPasseios = () => {
                   />
                 </div>
                 <div className="flex gap-2">
-                  <button type="button" onClick={addUrlImage}
-                    className="bg-muted hover:bg-accent text-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border border-border whitespace-nowrap transition-colors">
-                    Adicionar URL
-                  </button>
-                  <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
-                    className="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border border-primary/20 disabled:opacity-50 transition-colors">
-                    <Upload size={14} /> {uploading ? "..." : "Upload"}
-                  </button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" onClick={addUrlImage}
+                        className="bg-muted hover:bg-accent text-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border border-border whitespace-nowrap transition-colors">
+                        Adicionar URL
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Adicionar imagem via link externo</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
+                        className="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border border-primary/20 disabled:opacity-50 transition-colors">
+                        <Upload size={14} /> {uploading ? "..." : "Upload"}
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Fazer upload de fotos do computador</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               </div>
               <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileUpload} className="hidden" />
@@ -544,12 +566,27 @@ const AdminPasseios = () => {
             </div>
 
             <div className="flex gap-3 pt-4 border-t border-border">
-              <button type="submit" className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 transition-all">
-                {editingId ? "Salvar Alterações" : "Criar Passeio"}
-              </button>
-              <button type="button" onClick={() => setShowForm(false)} className="px-6 py-3 rounded-xl text-sm font-semibold text-muted-foreground hover:bg-muted transition-colors">
-                Cancelar
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type="submit" className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 transition-all">
+                    {editingId ? "Salvar Alterações" : "Criar Passeio"}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{editingId ? "Confirmar alterações no passeio" : "Finalizar cadastro do passeio"}</p>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type="button" onClick={() => setShowForm(false)} className="px-6 py-3 rounded-xl text-sm font-semibold text-muted-foreground hover:bg-muted transition-colors">
+                    Cancelar
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Sair sem salvar</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </form>
         </DialogContent>
@@ -649,10 +686,17 @@ const AdminPasseios = () => {
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <button onClick={() => toggleActive(t.id, t.active)}
-                        className={`font-black text-[9px] uppercase px-3 py-1 rounded-xl border transition-all active:scale-95 ${t.active ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200"}`}>
-                        {t.active ? "Publicado" : "Pausado"}
-                      </button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button onClick={() => toggleActive(t.id, t.active)}
+                            className={`font-black text-[9px] uppercase px-3 py-1 rounded-xl border transition-all active:scale-95 ${t.active ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200"}`}>
+                            {t.active ? "Publicado" : "Pausado"}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{t.active ? "Clique para ocultar este passeio do site" : "Clique para tornar este passeio visível no site"}</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </TableCell>
                     <TableCell className="text-right pr-6">
                       <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">

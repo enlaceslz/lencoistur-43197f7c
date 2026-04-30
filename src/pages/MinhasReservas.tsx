@@ -7,6 +7,7 @@ import { useBookings } from "@/hooks/useBookings";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { PrintReceiptButton } from "@/components/BookingReceipt";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 const statusConfig: Record<string, { label: string; className: string; icon: typeof CheckCircle }> = {
   confirmada: { label: "Confirmada", className: "bg-primary/10 text-primary", icon: CheckCircle },
@@ -153,29 +154,51 @@ const MinhasReservas = () => {
                           </div>
                         </div>
                         <div className="flex gap-2 sm:ml-auto">
-                          <button
-                            onClick={() => copyPix(b.pixCode!)}
-                            className="bg-card border border-border text-foreground px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-1 hover:bg-muted transition-colors"
-                          >
-                            <Copy size={14} /> Copiar PIX
-                          </button>
-                          <button
-                            onClick={() => handleSimulatePayment(b.id)}
-                            disabled={isProcessing === b.id}
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
-                          >
-                            {isProcessing === b.id ? "Processando..." : "Simular Pagamento"}
-                          </button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={() => copyPix(b.pixCode!)}
+                                className="bg-card border border-border text-foreground px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-1 hover:bg-muted transition-colors"
+                              >
+                                <Copy size={14} /> Copiar PIX
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Copiar código PIX Copia e Cola</p>
+                            </TooltipContent>
+                          </Tooltip>
+
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={() => handleSimulatePayment(b.id)}
+                                disabled={isProcessing === b.id}
+                                className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
+                              >
+                                {isProcessing === b.id ? "Processando..." : "Simular Pagamento"}
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Simular confirmação de pagamento (Apenas Teste)</p>
+                            </TooltipContent>
+                          </Tooltip>
                         </div>
                       </div>
                       <div className="mt-3 flex gap-3">
-                        <button
-                          onClick={() => handleCancel(b.id)}
-                          disabled={isProcessing === b.id}
-                          className="text-destructive text-sm font-semibold hover:underline disabled:opacity-50"
-                        >
-                          Cancelar Reserva
-                        </button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              onClick={() => handleCancel(b.id)}
+                              disabled={isProcessing === b.id}
+                              className="text-destructive text-sm font-semibold hover:underline disabled:opacity-50"
+                            >
+                              Cancelar Reserva
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Solicitar cancelamento desta reserva</p>
+                          </TooltipContent>
+                        </Tooltip>
                         <a
                           href={`https://wa.me/5598985880954?text=${encodeURIComponent(`Olá! Preciso de ajuda com minha reserva ${b.bookingCode}`)}`}
                           target="_blank"
@@ -227,13 +250,20 @@ const MinhasReservas = () => {
                           label="Imprimir Comprovante"
                         />
                       )}
-                      <button
-                        onClick={() => handleCancel(b.id)}
-                        disabled={isProcessing === b.id}
-                        className="text-destructive text-sm font-semibold hover:underline disabled:opacity-50"
-                      >
-                        {isProcessing === b.id ? "Processando..." : "Cancelar"}
-                      </button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() => handleCancel(b.id)}
+                            disabled={isProcessing === b.id}
+                            className="text-destructive text-sm font-semibold hover:underline disabled:opacity-50"
+                          >
+                            {isProcessing === b.id ? "Processando..." : "Cancelar"}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Cancelar reserva confirmada</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   )}
 

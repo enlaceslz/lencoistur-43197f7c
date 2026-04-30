@@ -460,14 +460,21 @@ const AdminConfig = () => {
               </div>
 
               <div className="mt-10 pt-6 border-t border-border flex justify-end">
-                <Button 
-                  onClick={() => saveSetting("empresa", empresa, "Empresa")} 
-                  disabled={saving}
-                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20"
-                >
-                  {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save size={18} className="mr-2" />}
-                  Atualizar Dados
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      onClick={() => saveSetting("empresa", empresa, "Empresa")} 
+                      disabled={saving}
+                      className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20"
+                    >
+                      {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save size={18} className="mr-2" />}
+                      Atualizar Dados
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Salvar alterações nas informações da agência</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </CardContent>
           </Card>
@@ -501,10 +508,17 @@ const AdminConfig = () => {
                       </div>
                       <div className="space-y-2">
                         <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
-                        <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo} className="rounded-xl font-bold h-9">
-                          {uploadingLogo ? <Loader2 size={14} className="animate-spin mr-2" /> : <Upload size={14} className="mr-2" />}
-                          {site.logoUrl ? "Alterar Logo" : "Fazer Upload"}
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo} className="rounded-xl font-bold h-9">
+                              {uploadingLogo ? <Loader2 size={14} className="animate-spin mr-2" /> : <Upload size={14} className="mr-2" />}
+                              {site.logoUrl ? "Alterar Logo" : "Fazer Upload"}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{site.logoUrl ? "Substituir logotipo atual" : "Enviar imagem do logotipo"}</p>
+                          </TooltipContent>
+                        </Tooltip>
                         <p className="text-[10px] text-muted-foreground font-medium italic">Sugerido: PNG transparente, máx 2MB.</p>
                       </div>
                     </div>
@@ -535,14 +549,21 @@ const AdminConfig = () => {
               </div>
 
               <div className="mt-6 pt-6 border-t border-border flex justify-end">
-                <Button 
-                  onClick={() => saveSetting("site", site, "Site")} 
-                  disabled={saving}
-                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20"
-                >
-                  {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save size={18} className="mr-2" />}
-                  Publicar Alterações
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      onClick={() => saveSetting("site", site, "Site")} 
+                      disabled={saving}
+                      className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20"
+                    >
+                      {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save size={18} className="mr-2" />}
+                      Publicar Alterações
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Aplicar alterações de aparência no site público</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </CardContent>
           </Card>
@@ -604,10 +625,17 @@ const AdminConfig = () => {
                       </div>
                       <div className="flex items-center gap-3">
                         <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} />
-                        <Button type="button" variant="outline" size="sm" onClick={() => bannerInputRef.current?.click()} disabled={uploadingBanner} className="rounded-xl font-bold h-9">
-                          {uploadingBanner ? <Loader2 size={14} className="animate-spin mr-2" /> : <UploadCloud size={14} className="mr-2" />}
-                          {site.bannerUrl ? "Alterar Banner" : "Enviar Banner"}
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button type="button" variant="outline" size="sm" onClick={() => bannerInputRef.current?.click()} disabled={uploadingBanner} className="rounded-xl font-bold h-9">
+                              {uploadingBanner ? <Loader2 size={14} className="animate-spin mr-2" /> : <UploadCloud size={14} className="mr-2" />}
+                              {site.bannerUrl ? "Alterar Banner" : "Enviar Banner"}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{site.bannerUrl ? "Substituir banner principal" : "Fazer upload do banner de destaque"}</p>
+                          </TooltipContent>
+                        </Tooltip>
                         {site.bannerUrl && (
                           <Button type="button" variant="ghost" size="sm" onClick={() => setSite({ ...site, bannerUrl: null })} className="text-destructive h-9">
                             <Trash2 size={14} className="mr-2" /> Remover
@@ -912,10 +940,17 @@ const AdminConfig = () => {
                 {confirmarSenha && novaSenha !== confirmarSenha && <p className="text-xs text-destructive">As senhas não conferem.</p>}
               </div>
               <div className="mt-6 pt-6 border-t border-border flex justify-end">
-                <Button onClick={handleChangePassword} disabled={changingPassword} className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-slate-500/20 bg-slate-700 hover:bg-slate-800 text-white">
-                  {changingPassword ? <Loader2 size={16} className="animate-spin mr-2" /> : <Shield size={16} className="mr-2" />}
-                  Atualizar Senha
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button onClick={handleChangePassword} disabled={changingPassword} className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-slate-500/20 bg-slate-700 hover:bg-slate-800 text-white">
+                      {changingPassword ? <Loader2 size={16} className="animate-spin mr-2" /> : <Shield size={16} className="mr-2" />}
+                      Atualizar Senha
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Salvar nova senha de acesso</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </CardContent>
           </Card>
@@ -950,10 +985,17 @@ const AdminConfig = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                  <Button onClick={handleBackup} disabled={backupLoading} className="rounded-xl">
-                    {backupLoading ? <Loader2 size={16} className="animate-spin mr-1" /> : <Download size={16} className="mr-1" />}
-                    {backupLoading ? "Gerando backup..." : "Gerar Backup Completo"}
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button onClick={handleBackup} disabled={backupLoading} className="rounded-xl">
+                        {backupLoading ? <Loader2 size={16} className="animate-spin mr-1" /> : <Download size={16} className="mr-1" />}
+                        {backupLoading ? "Gerando backup..." : "Gerar Backup Completo"}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Exportar todos os dados do banco para um arquivo JSON</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               </CardContent>
             </Card>
@@ -980,15 +1022,22 @@ const AdminConfig = () => {
 
                 <div className="flex flex-wrap gap-3">
                   <input ref={restoreInputRef} type="file" accept=".json" className="hidden" onChange={handleRestore} />
-                  <Button
-                    variant="outline"
-                    onClick={() => restoreInputRef.current?.click()}
-                    disabled={restoreLoading}
-                    className="rounded-xl"
-                  >
-                    {restoreLoading ? <Loader2 size={16} className="animate-spin mr-1" /> : <UploadCloud size={16} className="mr-1" />}
-                    {restoreLoading ? "Restaurando..." : "Selecionar Arquivo de Backup"}
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        onClick={() => restoreInputRef.current?.click()}
+                        disabled={restoreLoading}
+                        className="rounded-xl"
+                      >
+                        {restoreLoading ? <Loader2 size={16} className="animate-spin mr-1" /> : <UploadCloud size={16} className="mr-1" />}
+                        {restoreLoading ? "Restaurando..." : "Selecionar Arquivo de Backup"}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Substituir dados atuais por um arquivo de backup anterior</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               </CardContent>
             </Card>
@@ -1044,23 +1093,38 @@ const AdminConfig = () => {
                     className="hidden"
                     onChange={handleGalleryUpload}
                   />
-                  <Button
-                    onClick={() => galleryInputRef.current?.click()}
-                    disabled={uploadingGallery}
-                    variant="outline"
-                    className="rounded-xl font-bold"
-                  >
-                    {uploadingGallery ? <Loader2 size={16} className="animate-spin mr-2" /> : <UploadCloud size={16} className="mr-2" />}
-                    Fazer Upload
-                  </Button>
-                  <Button
-                    onClick={() => saveSetting("gallery", gallery as unknown as Record<string, unknown>, "Galeria")}
-                    disabled={saving}
-                    className="rounded-xl font-black uppercase tracking-widest bg-primary text-white shadow-lg shadow-primary/20 h-10 px-6"
-                  >
-                    {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
-                    Publicar Galeria
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={() => galleryInputRef.current?.click()}
+                        disabled={uploadingGallery}
+                        variant="outline"
+                        className="rounded-xl font-bold"
+                      >
+                        {uploadingGallery ? <Loader2 size={16} className="animate-spin mr-2" /> : <UploadCloud size={16} className="mr-2" />}
+                        Fazer Upload
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Adicionar novas fotos à galeria do site</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={() => saveSetting("gallery", gallery as unknown as Record<string, unknown>, "Galeria")}
+                        disabled={saving}
+                        className="rounded-xl font-black uppercase tracking-widest bg-primary text-white shadow-lg shadow-primary/20 h-10 px-6"
+                      >
+                        {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
+                        Publicar Galeria
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Salvar e atualizar a galeria no site público</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               </div>
 

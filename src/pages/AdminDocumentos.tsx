@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { FileText, Upload, Plus, Trash2, Download, Eye, Search, Calendar, AlertTriangle } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 interface DocType {
   id: string;
@@ -260,12 +261,27 @@ const AdminDocumentos = () => {
           <option value="">Todos os tipos</option>
           {docTypes.map(t => <option key={t.id} value={t.value}>{t.name}</option>)}
         </select>
-        <Button variant="outline" onClick={() => setTypeDialogOpen(true)}>
-          Gerenciar Tipos
-        </Button>
-        <Button onClick={() => { resetForm(); setDialogOpen(true); }}>
-          <Plus size={16} /> Novo Documento
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" onClick={() => setTypeDialogOpen(true)}>
+              Gerenciar Tipos
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Configurar categorias de documentos (ex: Alvará, Certidão)</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button onClick={() => { resetForm(); setDialogOpen(true); }}>
+              <Plus size={16} /> Novo Documento
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Cadastrar e fazer upload de um novo documento</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
 
 
@@ -295,14 +311,44 @@ const AdminDocumentos = () => {
                     <td className="p-3">{statusBadge(doc.status)}</td>
                     <td className="p-3">{doc.file_url ? (
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => handleViewFile(doc.file_url!)}><Eye size={14} /></Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDownloadFile(doc.file_url!, doc.file_name || "documento")}><Download size={14} /></Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm" onClick={() => handleViewFile(doc.file_url!)}><Eye size={14} /></Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Visualizar documento em nova aba</p>
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm" onClick={() => handleDownloadFile(doc.file_url!, doc.file_name || "documento")}><Download size={14} /></Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Baixar arquivo original</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     ) : <span className="text-muted-foreground">—</span>}</td>
                     <td className="p-3 text-right">
                       <div className="flex justify-end gap-1">
-                        <Button variant="outline" size="sm" onClick={() => openEdit(doc)}>Editar</Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDelete(doc.id)}><Trash2 size={14} className="text-destructive" /></Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="outline" size="sm" onClick={() => openEdit(doc)}>Editar</Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Editar informações deste documento</p>
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm" onClick={() => handleDelete(doc.id)}><Trash2 size={14} className="text-destructive" /></Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Remover permanentemente</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     </td>
                   </tr>
@@ -351,9 +397,16 @@ const AdminDocumentos = () => {
                 <p className="text-xs text-muted-foreground mt-1">Arquivo atual: {docs.find(d => d.id === editId)?.file_name}</p>
               )}
             </div>
-            <Button className="w-full" onClick={handleSave} disabled={uploading}>
-              {uploading ? "Enviando..." : <><Upload size={16} /> {editId ? "Salvar Alterações" : "Cadastrar Documento"}</>}
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button className="w-full" onClick={handleSave} disabled={uploading}>
+                  {uploading ? "Enviando..." : <><Upload size={16} /> {editId ? "Salvar Alterações" : "Cadastrar Documento"}</>}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{editId ? "Confirmar alterações no documento" : "Finalizar cadastro e upload"}</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </DialogContent>
       </Dialog>

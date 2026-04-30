@@ -10,6 +10,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Car, MapPin, Clock, Users, Plus, Pencil, Trash2, X, Check, Search, Loader2, Percent, Eye, ArrowRight, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -163,7 +164,14 @@ const AdminTranslados = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
             <Input placeholder="Buscar por origem, destino ou veículo..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
           </div>
-          <Button onClick={openNew} className="shrink-0"><Plus size={16} className="mr-1" /> Nova Rota</Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button onClick={openNew} className="shrink-0"><Plus size={16} className="mr-1" /> Nova Rota</Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Cadastrar novo trecho de translado</p>
+            </TooltipContent>
+          </Tooltip>
         </CardContent>
       </Card>
 
@@ -227,11 +235,26 @@ const AdminTranslados = () => {
               <span className="text-sm font-medium text-foreground">Rota ativa</span>
             </label>
             <div className="flex gap-3">
-              <Button type="submit" disabled={saving}>
-                {saving ? <Loader2 className="animate-spin mr-1" size={16} /> : null}
-                {editingId ? "Atualizar" : "Criar Rota"}
-              </Button>
-              <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button type="submit" disabled={saving}>
+                    {saving ? <Loader2 className="animate-spin mr-1" size={16} /> : null}
+                    {editingId ? "Atualizar" : "Criar Rota"}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{editingId ? "Salvar alterações na rota" : "Finalizar cadastro da rota"}</p>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Sair sem salvar</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </form>
         </DialogContent>
@@ -383,16 +406,46 @@ const AdminTranslados = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <button onClick={() => toggleActive(t.id, t.active)}
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${t.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                        {t.active ? "Ativa" : "Inativa"}
-                      </button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button onClick={() => toggleActive(t.id, t.active)}
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${t.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                            {t.active ? "Ativa" : "Inativa"}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{t.active ? "Desativar esta rota para vendas" : "Ativar esta rota para vendas"}</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => setDetailRoute(t)} title="Ver detalhes"><Eye size={16} /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => openEdit(t)}><Pencil size={16} /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => setDeleteId(t.id)} className="hover:text-destructive"><Trash2 size={16} /></Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={() => setDetailRoute(t)}><Eye size={16} /></Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Ver detalhes completos</p>
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={() => openEdit(t)}><Pencil size={16} /></Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Editar informações da rota</p>
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={() => setDeleteId(t.id)} className="hover:text-destructive"><Trash2 size={16} /></Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Excluir permanentemente</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     </TableCell>
                   </TableRow>

@@ -8,6 +8,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Smartphone, Trash2, Search } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { statusColors } from "./statusColors";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -95,7 +96,14 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
             <Input placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild><Button><Plus size={16} className="mr-1" /> Lead</Button></DialogTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DialogTrigger asChild><Button><Plus size={16} className="mr-1" /> Lead</Button></DialogTrigger>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Adicionar lead manualmente</p>
+              </TooltipContent>
+            </Tooltip>
             <DialogContent className="sm:max-w-lg">
               <DialogHeader><DialogTitle>Adicionar Lead</DialogTitle></DialogHeader>
               <div className="space-y-4 py-2">
@@ -176,12 +184,26 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
                 <TableCell>
                   <div className="flex gap-1">
                     {l.phone && (
-                      <a href={`https://wa.me/55${l.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${l.name.split(" ")[0]}! Tudo bem?`)}`} target="_blank" rel="noopener noreferrer">
-                        <Button variant="ghost" size="icon" className="h-8 w-8"><Smartphone size={16} className="text-green-600" /></Button>
-                      </a>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <a href={`https://wa.me/55${l.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${l.name.split(" ")[0]}! Tudo bem?`)}`} target="_blank" rel="noopener noreferrer">
+                            <Button variant="ghost" size="icon" className="h-8 w-8"><Smartphone size={16} className="text-green-600" /></Button>
+                          </a>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Iniciar conversa no WhatsApp</p>
+                        </TooltipContent>
+                      </Tooltip>
                     )}
                     <AlertDialog>
-                      <AlertDialogTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><Trash2 size={14} className="text-destructive" /></Button></AlertDialogTrigger>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <AlertDialogTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><Trash2 size={14} className="text-destructive" /></Button></AlertDialogTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Remover permanentemente</p>
+                        </TooltipContent>
+                      </Tooltip>
                       <AlertDialogContent>
                         <AlertDialogHeader><AlertDialogTitle>Remover lead?</AlertDialogTitle><AlertDialogDescription>"{l.name}" será removido permanentemente.</AlertDialogDescription></AlertDialogHeader>
                         <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => handleDelete(l.id)}>Remover</AlertDialogAction></AlertDialogFooter>

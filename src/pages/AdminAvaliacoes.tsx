@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Star, ThumbsUp, MessageSquare, TrendingUp, Loader2, Trash2, Plus, Search, Filter } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -203,9 +204,16 @@ const AdminAvaliacoes = () => {
           </SelectContent>
         </Select>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={resetForm}><Plus size={16} className="mr-1" /> Nova Avaliação</Button>
-          </DialogTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DialogTrigger asChild>
+                <Button onClick={resetForm}><Plus size={16} className="mr-1" /> Nova Avaliação</Button>
+              </DialogTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Cadastrar avaliação manual de cliente</p>
+            </TooltipContent>
+          </Tooltip>
           <DialogContent>
             <DialogHeader><DialogTitle>Nova Avaliação</DialogTitle></DialogHeader>
             <div className="space-y-4">
@@ -247,7 +255,7 @@ const AdminAvaliacoes = () => {
                 Salvar Avaliação
               </Button>
             </div>
-          </DialogContent>
+            </DialogContent>
         </Dialog>
       </div>
 
@@ -280,11 +288,18 @@ const AdminAvaliacoes = () => {
                       ))}
                     </div>
                     <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <Trash2 size={14} className="text-destructive" />
-                        </Button>
-                      </AlertDialogTrigger>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <Trash2 size={14} className="text-destructive" />
+                            </Button>
+                          </AlertDialogTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Remover permanentemente esta avaliação</p>
+                        </TooltipContent>
+                      </Tooltip>
                       <AlertDialogContent>
                         <AlertDialogHeader>
                           <AlertDialogTitle>Remover avaliação?</AlertDialogTitle>
