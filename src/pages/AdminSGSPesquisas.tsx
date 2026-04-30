@@ -99,7 +99,17 @@ const AdminSGSPesquisas = () => {
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
             <h3 className="font-display font-bold text-foreground">Pesquisa de Segurança Pós-Passeio</h3>
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Reserva (Opcional)</label>
+                <select value={form.booking_id} onChange={e => setForm({ ...form, booking_id: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  <option value="">Nenhuma / Geral</option>
+                  {bookings.map(b => (
+                    <option key={b.id} value={b.id}>{b.booking_code} - {b.customer_name} ({b.item_name})</option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Sentiu-se seguro? (1-5) *</label>
                 <input type="number" min={1} max={5} required value={form.felt_safe}
