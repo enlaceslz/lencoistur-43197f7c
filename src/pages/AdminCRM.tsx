@@ -33,6 +33,7 @@ interface Customer {
   totalBookings: number;
   totalSpent: number;
   lastBooking: string | null;
+  ltvCategory?: "VIP" | "Fiel" | "Novo";
 }
 
 interface CustomerDocument {
@@ -309,6 +310,7 @@ const AdminCRM = () => {
         totalBookings: bookingsByCustomer[c.id]?.count || 0,
         totalSpent: bookingsByCustomer[c.id]?.total || 0,
         lastBooking: bookingsByCustomer[c.id]?.lastDate || null,
+        ltvCategory: (bookingsByCustomer[c.id]?.total || 0) > 500000 ? "VIP" : (bookingsByCustomer[c.id]?.count || 0) >= 3 ? "Fiel" : "Novo"
       })));
     }
     setLoading(false);
@@ -826,12 +828,12 @@ const AdminCRM = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-border text-muted-foreground">
-                      <th className="text-left py-3 font-medium">{filter === "dependents" ? "Dependente" : "Cliente"}</th>
-                      <th className="text-left py-3 font-medium hidden sm:table-cell">{filter === "dependents" ? "Titular" : "Telefone"}</th>
-                      <th className="text-right py-3 font-medium">{filter === "dependents" ? "Idade" : "Reservas"}</th>
-                      <th className="text-right py-3 font-medium hidden sm:table-cell">{filter === "dependents" ? "Parentesco" : "Total Gasto"}</th>
-                      <th className="text-right py-3 font-medium">Ações</th>
+                    <tr className="border-b border-border text-muted-foreground bg-muted/30">
+                      <th className="text-left py-3 px-4 font-bold uppercase text-[10px] tracking-widest">{filter === "dependents" ? "Dependente" : "Cliente"}</th>
+                      <th className="text-left py-3 px-2 font-bold uppercase text-[10px] tracking-widest hidden sm:table-cell">{filter === "dependents" ? "Titular" : "Contato"}</th>
+                      <th className="text-center py-3 px-2 font-bold uppercase text-[10px] tracking-widest">{filter === "dependents" ? "Idade" : "Histórico"}</th>
+                      <th className="text-right py-3 px-2 font-bold uppercase text-[10px] tracking-widest hidden sm:table-cell">{filter === "dependents" ? "Parentesco" : "Faturamento"}</th>
+                      <th className="text-right py-3 px-4 font-bold uppercase text-[10px] tracking-widest">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -881,37 +883,60 @@ const AdminCRM = () => {
                     ) : (
                       filtered.map((c) => {
                         const hasDependents = allDependents.some(d => d.customer_id === c.id);
+                        const ltvColor = c.ltvCategory === "VIP" ? "bg-purple-100 text-purple-700 border-purple-200" : c.ltvCategory === "Fiel" ? "bg-blue-100 text-blue-700 border-blue-200" : "bg-muted text-muted-foreground border-border";
+                        
                         return (
-          <tr
-            key={c.id}
-            className={`border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer ${selectedCustomer?.id === c.id ? "bg-muted/80" : ""}`}
-            onClick={() => selectCustomer(c)}
-          >
-            <td className="py-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0 shadow-sm">
-                  {c.name.trim() ? c.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
-                </div>
-                <div className="min-w-0">
-                  <p className="font-semibold text-foreground truncate flex items-center gap-2">
-                    {c.name}
-                    {c.status !== "regular" && (
-                      <Badge variant="outline" className={`text-[8px] px-1 py-0 uppercase ${customerStatusConfig[c.status]?.className || ""}`}>
-                        {customerStatusConfig[c.status]?.label || c.status}
-                      </Badge>
-                    )}
-                    {hasDependents && (
-                      <Users size={12} className="text-muted-foreground" />
-                    )}
-                  </p>
-                  <p className="text-xs text-muted-foreground truncate">{c.email}</p>
-                </div>
-              </div>
-            </td>
-                          <td className="py-3 text-muted-foreground hidden sm:table-cell">{c.phone ? maskPhone(c.phone) : "—"}</td>
-                          <td className="py-3 text-right text-foreground font-medium">{c.totalBookings}</td>
-                          <td className="py-3 text-right font-semibold text-foreground hidden sm:table-cell">{fmt(c.totalSpent)}</td>
-                          <td className="py-3 text-right">
+                          <tr
+                            key={c.id}
+                            className={`border-b border-border last:border-0 hover:bg-primary/5 transition-all cursor-pointer group ${selectedCustomer?.id === c.id ? "bg-primary/5" : ""}`}
+                            onClick={() => selectCustomer(c)}
+                          >
+                            <td className="py-4 px-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-xs font-black shrink-0 shadow-sm group-hover:bg-primary group-hover:text-white transition-all">
+                                  {c.name.trim() ? c.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="font-bold text-foreground truncate flex items-center gap-2 group-hover:text-primary transition-colors">
+                                    {c.name}
+                                    {c.ltvCategory && (
+                                      <Badge variant="outline" className={`text-[8px] px-1.5 py-0 font-black uppercase tracking-tighter ${ltvColor}`}>
+                                        {c.ltvCategory}
+                                      </Badge>
+                                    )}
+                                  </p>
+                                  <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-medium">
+                                    <Mail size={10} />
+                                    {c.email}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-4 px-2 hidden sm:table-cell">
+                              <div className="flex flex-col">
+                                <span className="text-xs font-semibold text-foreground flex items-center gap-1">
+                                  <Smartphone size={10} className="text-primary" />
+                                  {c.phone ? maskPhone(c.phone) : "—"}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                  <MapPin size={10} />
+                                  {c.city || "N/A"}/{c.state || "N/A"}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="py-4 px-2 text-center">
+                              <div className="flex flex-col items-center">
+                                <span className="text-sm font-bold">{c.totalBookings}</span>
+                                <span className="text-[9px] uppercase font-black text-muted-foreground tracking-tighter">Reservas</span>
+                              </div>
+                            </td>
+                            <td className="py-4 px-2 text-right hidden sm:table-cell">
+                              <div className="flex flex-col items-end">
+                                <span className="text-sm font-black text-foreground">{fmt(c.totalSpent)}</span>
+                                <span className="text-[9px] uppercase font-bold text-primary tracking-widest">LTV TOTAL</span>
+                              </div>
+                            </td>
+                            <td className="py-4 px-4 text-right">
                             <div className="flex gap-1 justify-end">
                               {c.phone && (
                                 <a
@@ -948,64 +973,68 @@ const AdminCRM = () => {
           <div className="bg-card border border-border rounded-2xl p-6">
             {selectedCustomer ? (
               <div className="space-y-6">
-                <div className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xl font-bold mx-auto mb-3">
+                <div className="text-center bg-muted/20 p-6 rounded-3xl border border-border/50">
+                  <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground text-2xl font-black mx-auto mb-4 shadow-xl">
                     {selectedCustomer.name.trim() ? selectedCustomer.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
                   </div>
-                  <h3 className="font-display text-lg font-bold text-foreground">{selectedCustomer.name}</h3>
-                  <Badge variant="outline" className={`mt-2 uppercase text-[9px] ${customerStatusConfig[selectedCustomer.status]?.className || ""}`}>
-                    {customerStatusConfig[selectedCustomer.status]?.label || selectedCustomer.status}
-                  </Badge>
-                  <p className="text-[10px] text-muted-foreground mt-2">
-                    Cliente desde {new Date(selectedCustomer.created_at).toLocaleDateString("pt-BR")}
+                  <h3 className="font-display text-xl font-black text-foreground">{selectedCustomer.name}</h3>
+                  <div className="flex items-center justify-center gap-2 mt-3">
+                    <Badge variant="outline" className={`uppercase text-[10px] font-black tracking-widest px-3 py-1 ${customerStatusConfig[selectedCustomer.status]?.className || ""}`}>
+                      {customerStatusConfig[selectedCustomer.status]?.label || selectedCustomer.status}
+                    </Badge>
+                    {selectedCustomer.ltvCategory && (
+                      <Badge variant="secondary" className="uppercase text-[10px] font-black tracking-widest px-3 py-1 bg-primary text-white">
+                        {selectedCustomer.ltvCategory}
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-[10px] font-bold text-muted-foreground mt-4 uppercase tracking-widest">
+                    Parceiro Lençóis Tour desde {new Date(selectedCustomer.created_at).toLocaleDateString("pt-BR")}
                   </p>
                 </div>
 
-                <div className="space-y-3 bg-muted/30 p-4 rounded-xl">
-                  <div className="flex items-center gap-3 text-sm">
-                    <Mail size={16} className="text-primary shrink-0" />
-                    <span className="text-muted-foreground truncate">{selectedCustomer.email}</span>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 text-center">
+                    <p className="text-2xl font-black text-primary leading-none">{selectedCustomer.totalBookings}</p>
+                    <p className="text-[10px] uppercase font-bold text-muted-foreground mt-2 tracking-widest">Viagens</p>
+                  </div>
+                  <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 text-center">
+                    <p className="text-2xl font-black text-foreground leading-none">{fmt(selectedCustomer.totalSpent)}</p>
+                    <p className="text-[10px] uppercase font-bold text-muted-foreground mt-2 tracking-widest">LTV Acumulado</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 bg-muted/10 p-5 rounded-2xl border border-border/50 shadow-inner">
+                  <div className="flex items-center gap-4 text-sm font-semibold">
+                    <div className="p-2 rounded-lg bg-background border border-border"><Mail size={16} className="text-primary" /></div>
+                    <span className="text-foreground truncate">{selectedCustomer.email}</span>
                   </div>
                   {selectedCustomer.phone && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <Phone size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground">{maskPhone(selectedCustomer.phone)}</span>
-                    </div>
-                  )}
-                  {selectedCustomer.country === "Brasil" && selectedCustomer.cpf && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <Globe size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground">CPF: {maskCPF(selectedCustomer.cpf)}</span>
-                    </div>
-                  )}
-                  {selectedCustomer.country !== "Brasil" && selectedCustomer.passport && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <Globe size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground">Passaporte: {selectedCustomer.passport}</span>
+                    <div className="flex items-center gap-4 text-sm font-semibold">
+                      <div className="p-2 rounded-lg bg-background border border-border"><Smartphone size={16} className="text-primary" /></div>
+                      <span className="text-foreground">{maskPhone(selectedCustomer.phone)}</span>
                     </div>
                   )}
                   {selectedCustomer.address && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <MapPin size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground text-[10px] leading-tight">
-                        {selectedCustomer.address}{selectedCustomer.number ? `, ${selectedCustomer.number}` : ""}
-                        <br />
-                        {selectedCustomer.neighborhood ? `${selectedCustomer.neighborhood}, ` : ""}{selectedCustomer.city} - {selectedCustomer.state}
-                        <br />
-                        {selectedCustomer.country === "Brasil" ? `CEP: ${selectedCustomer.cep}` : `Código Postal: ${selectedCustomer.cep}`}
-                      </span>
-                    </div>
-                  )}
-                  {selectedCustomer.birth_date && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <Calendar size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground">Nascimento: {new Date(selectedCustomer.birth_date + "T00:00:00").toLocaleDateString("pt-BR")}</span>
+                    <div className="flex items-start gap-4 text-sm font-semibold">
+                      <div className="p-2 rounded-lg bg-background border border-border shrink-0"><MapPin size={16} className="text-primary" /></div>
+                      <div className="flex flex-col">
+                        <span className="text-foreground text-xs leading-tight">
+                          {selectedCustomer.address}{selectedCustomer.number ? `, ${selectedCustomer.number}` : ""}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter mt-1">
+                          {selectedCustomer.neighborhood ? `${selectedCustomer.neighborhood}, ` : ""}{selectedCustomer.city} - {selectedCustomer.state}
+                        </span>
+                      </div>
                     </div>
                   )}
                   {selectedCustomer.lastBooking && (
-                    <div className="flex items-center gap-3 text-sm border-t border-border pt-3 mt-3">
-                      <RefreshCw size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground text-xs">Última reserva: {new Date(selectedCustomer.lastBooking).toLocaleDateString("pt-BR")}</span>
+                    <div className="flex items-center gap-4 text-sm border-t border-border pt-4 mt-2">
+                      <div className="p-2 rounded-lg bg-primary/10"><Calendar size={16} className="text-primary" /></div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Última Viagem</span>
+                        <span className="text-xs font-bold">{new Date(selectedCustomer.lastBooking).toLocaleDateString("pt-BR", { dateStyle: 'long' })}</span>
+                      </div>
                     </div>
                   )}
                 </div>
