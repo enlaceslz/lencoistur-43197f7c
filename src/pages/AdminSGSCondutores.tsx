@@ -32,8 +32,40 @@ const AdminSGSCondutores = () => {
     let res;
     if (editId) res = await supabase.from("sgs_condutores").update(payload).eq("id", editId);
     else res = await supabase.from("sgs_condutores").insert(payload);
-    if (res.error) toast({ title: "Erro", description: res.error.message, variant: "destructive" });
-    else { toast({ title: editId ? "Condutor atualizado!" : "Condutor cadastrado!" }); setForm(emptyForm); setShowForm(false); setEditId(null); load(); }
+    
+    if (res.error) {
+      toast({ title: "Erro", description: res.error.message, variant: "destructive" });
+    } else {
+      // Sincronização inversa: Atualiza ou cria o parceiro correspondente
+      const partnerPayload = {
+        name: form.nome.trim(),
+        type: "motorista", // Default para condutores do SGS
+        phone: form.telefone.trim() || null,
+        email: form.email.trim() || null,
+        cpf_cnpj: form.cpf || null,
+        cnh: form.cnh_numero || null,
+        cnh_validade: form.cnh_validade || null,
+        active: form.status === "ativo"
+      };
+
+      const { data: existingPartner } = await supabase
+        .from("partners")
+        .select("id")
+        .or(`name.eq."${form.nome.trim()}"${form.cpf ? `,cpf_cnpj.eq."${form.cpf.trim()}"` : ""}`)
+        .maybeSingle();
+
+      if (existingPartner) {
+        await supabase.from("partners").update(partnerPayload).eq("id", existingPartner.id);
+      } else {
+        await supabase.from("partners").insert(partnerPayload);
+      }
+
+      toast({ title: editId ? "Condutor atualizado!" : "Condutor cadastrado!" });
+      setForm(emptyForm);
+      setShowForm(false);
+      setEditId(null);
+      load();
+    }
   };
 
   const openEdit = (c: any) => {
