@@ -33,6 +33,7 @@ interface Customer {
   totalBookings: number;
   totalSpent: number;
   lastBooking: string | null;
+  ltvCategory?: "VIP" | "Fiel" | "Novo";
 }
 
 interface CustomerDocument {
