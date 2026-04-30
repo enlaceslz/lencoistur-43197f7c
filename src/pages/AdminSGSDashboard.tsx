@@ -278,7 +278,13 @@ const AdminSGSDashboard = () => {
 
   return (
     <AdminLayout title="SGS - Dashboard de Segurança">
-      <div className="space-y-6">
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-32 space-y-4">
+          <Loader2 className="animate-spin text-primary" size={40} />
+          <p className="text-muted-foreground animate-pulse font-black uppercase text-xs tracking-widest">Sincronizando Gestão de Segurança...</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
         {/* Quick Actions Bar */}
         <div className="bg-card border border-border rounded-2xl p-4">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Ações Rápidas</p>
