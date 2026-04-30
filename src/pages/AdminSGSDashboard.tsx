@@ -140,7 +140,7 @@ const AdminSGSDashboard = () => {
     const months: Record<string, number> = {};
     const reportDate = new Date();
     for (let i = 5; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const d = new Date(reportDate.getFullYear(), reportDate.getMonth() - i, 1);
       months[`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`] = 0;
     }
     incidents.forEach((inc: any) => { const key = inc.date?.slice(0, 7); if (key && key in months) months[key]++; });
