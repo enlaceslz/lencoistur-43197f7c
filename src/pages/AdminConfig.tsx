@@ -1098,7 +1098,7 @@ const AdminConfig = () => {
                   ))
                 )}
               </div>
-              <p className="text-xs text-muted-foreground italic">* Arraste para reordenar (em breve) ou use legendas para SEO. Lembre-se de clicar em salvar.</p>
+              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-6">* Use legendas para melhorar o SEO das imagens no Google.</p>
             </CardContent>
           </Card>
         </TabsContent>
