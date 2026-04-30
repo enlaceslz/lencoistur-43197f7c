@@ -1,13 +1,15 @@
 import { useState, useEffect, useMemo } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   DollarSign, TrendingUp, TrendingDown, CreditCard, Wallet, Receipt,
-  Loader2, Download, Printer, LayoutDashboard, FileText
+  Loader2, Download, Printer, LayoutDashboard, FileText, Search
 } from "lucide-react";
 import FinanceiroStats from "@/components/financeiro/FinanceiroStats";
 import FluxoCaixaTab from "@/components/financeiro/FluxoCaixaTab";
@@ -54,6 +56,7 @@ const AdminFinanceiro = () => {
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const load = async () => {
@@ -191,6 +194,7 @@ const AdminFinanceiro = () => {
     doc.text(fmt(lucroMes), 155, 88);
 
     // Main Table - Unified view of transactions
+    const q = searchTerm.toLowerCase();
     const tableData = [
       ...monthBookings.map(b => [
         fmtDate(b.created_at),
@@ -206,7 +210,10 @@ const AdminFinanceiro = () => {
         `(${fmt(c.valor)})`,
         c.status === "pago" ? "PAGO" : "PENDENTE"
       ])
-    ].sort((a, b) => {
+    ].filter(row => {
+      if (!q) return true;
+      return row.some(cell => String(cell).toLowerCase().includes(q));
+    }).sort((a, b) => {
       try {
         const dateA = new Date(a[0].split('/').reverse().join('-'));
         const dateB = new Date(b[0].split('/').reverse().join('-'));
@@ -298,6 +305,18 @@ const AdminFinanceiro = () => {
             </div>
           </div>
           
+          <div className="flex-1 max-w-md hidden md:block">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+              <Input 
+                placeholder="Pesquisar nas exportações..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 h-11 bg-muted/30 border-none rounded-xl"
+              />
+            </div>
+          </div>
+          
           <div className="flex items-center gap-3">
             <Button 
               variant="outline" 
@@ -352,7 +371,85 @@ const AdminFinanceiro = () => {
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.2 }}
             >
-              {tab === "fluxo" && <FluxoCaixaTab bookings={bookings} contasPagar={contasPagar} selectedMonth={selectedMonth} selectedYear={selectedYear} />}
+              {tab === "fluxo" && (
+                <div className="space-y-8">
+                  <FluxoCaixaTab bookings={bookings} contasPagar={contasPagar} selectedMonth={selectedMonth} selectedYear={selectedYear} />
+                  
+                  <Card className="border-none shadow-sm bg-card overflow-hidden">
+                    <CardHeader className="p-6 border-b border-border/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div>
+                        <CardTitle className="text-lg font-bold">Detalhamento das Transações</CardTitle>
+                        <p className="text-sm text-muted-foreground">Listagem consolidada do período selecionado</p>
+                      </div>
+                      <div className="md:hidden">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                          <Input 
+                            placeholder="Pesquisar..." 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10 h-10 bg-muted/30 border-none rounded-xl"
+                          />
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-0 overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border bg-muted/30">
+                            <th className="text-left px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Data</th>
+                            <th className="text-left px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Descrição / Origem</th>
+                            <th className="text-left px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Meio</th>
+                            <th className="text-right px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Valor</th>
+                            <th className="text-center px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/50">
+                          {[
+                            ...monthBookings.map(b => ({
+                              date: b.created_at,
+                              desc: `[ENTRADA] ${b.item_name} - ${b.customers?.name || "N/A"}`,
+                              method: (b.pay_method || "N/A").toUpperCase(),
+                              value: b.final_total,
+                              status: b.payment_status === "pago" ? "PAGO" : "PENDENTE",
+                              type: 'in'
+                            })),
+                            ...monthContasPagar.map(c => ({
+                              date: c.vencimento,
+                              desc: `[SAÍDA] ${c.descricao} - ${c.fornecedor || "N/A"}`,
+                              method: "TRANSFERÊNCIA",
+                              value: -c.valor,
+                              status: c.status === "pago" ? "PAGO" : "PENDENTE",
+                              type: 'out'
+                            }))
+                          ].filter(t => {
+                            if (!searchTerm) return true;
+                            const q = searchTerm.toLowerCase();
+                            return t.desc.toLowerCase().includes(q) || t.method.toLowerCase().includes(q) || t.status.toLowerCase().includes(q);
+                          }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((t, i) => (
+                            <tr key={i} className="hover:bg-muted/30 transition-colors">
+                              <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">{fmtDate(t.date)}</td>
+                              <td className="px-6 py-4 font-medium">{t.desc}</td>
+                              <td className="px-6 py-4 text-xs font-mono text-muted-foreground">{t.method}</td>
+                              <td className={cn("px-6 py-4 text-right font-bold", t.type === 'in' ? "text-emerald-600" : "text-rose-600")}>
+                                {t.type === 'in' ? "" : "-"} {fmt(Math.abs(t.value))}
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                <span className={cn(
+                                  "px-2 py-1 rounded-full text-[10px] font-bold uppercase",
+                                  t.status === "PAGO" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40" : "bg-amber-100 text-amber-700 dark:bg-amber-900/40"
+                                )}>
+                                  {t.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
               {tab === "pagar" && <ContasPagarTab company={company} />}
               {tab === "receber" && <ContasReceberTab company={company} />}
               {tab === "dre" && <DRETab bookings={bookings} contasPagar={contasPagar} selectedMonth={selectedMonth} selectedYear={selectedYear} company={company} />}
