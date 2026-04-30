@@ -158,46 +158,78 @@ const RemarketingTab = ({ rules, onRefresh }: RemarketingTabProps) => {
         </Dialog>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-5">
         {rules.map((r) => (
-          <Card key={r.id} className={`border-border transition-opacity ${!r.active ? "opacity-60" : ""}`}>
-            <CardContent className="p-5">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 space-y-3">
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <h3 className="font-display font-bold text-foreground">{r.trigger_name}</h3>
-                    <Badge variant="outline" className={r.active ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-muted text-muted-foreground"}>
-                      {r.active ? "Ativa" : "Inativa"}
-                    </Badge>
-                    <Badge variant="outline" className="bg-muted text-muted-foreground">{r.channel}</Badge>
+          <Card key={r.id} className={`border-none shadow-sm transition-all bg-card/50 backdrop-blur-sm group hover:shadow-md ${!r.active ? "grayscale opacity-60" : ""}`}>
+            <CardContent className="p-0">
+              <div className="flex flex-col sm:flex-row items-stretch">
+                <div className={`w-2 sm:w-3 ${r.active ? "bg-primary" : "bg-muted"} rounded-l-2xl transition-colors`} />
+                <div className="flex-1 p-6 space-y-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <h3 className="font-display font-black text-lg text-foreground tracking-tight group-hover:text-primary transition-colors">{r.trigger_name}</h3>
+                        <Badge variant="outline" className={`font-black uppercase text-[10px] tracking-widest px-2.5 py-0.5 border ${r.active ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground"}`}>
+                          {r.active ? "🔥 Ativa" : "💤 Pausada"}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-4 text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                        <span className="flex items-center gap-1.5"><Clock size={12} className="text-primary" /> Aguardar {r.delay}</span>
+                        <span className="flex items-center gap-1.5"><TrendingUp size={12} className="text-primary" /> {r.conversions} Conversões</span>
+                        <span className="flex items-center gap-1.5 bg-primary/10 text-primary px-2 py-0.5 rounded-full lowercase tracking-tight">{r.channel}</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-3 items-end">
+                      <Switch checked={r.active} onCheckedChange={() => handleToggle(r.id, r.active)} className="data-[state=checked]:bg-primary" />
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-primary/10 hover:text-primary transition-all" title="Duplicar Regra" onClick={() => handleDuplicate(r)}>
+                          <Copy size={16} />
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-destructive hover:bg-destructive/10 transition-all">
+                              <Trash2 size={16} />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="rounded-2xl border-none shadow-2xl">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="font-black text-xl">Remover automação?</AlertDialogTitle>
+                              <AlertDialogDescription className="font-medium">
+                                Esta regra de remarketing será removida permanentemente do seu fluxo de marketing.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel className="rounded-xl font-bold">Manter Regra</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDelete(r.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl font-bold">
+                                Sim, Remover
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1"><Clock size={14} /> Delay: {r.delay}</span>
-                    <span className="flex items-center gap-1"><TrendingUp size={14} /> {r.conversions} conversões</span>
+                  <div className="bg-muted/40 rounded-2xl p-4 border border-border/50 relative overflow-hidden group-hover:bg-muted/60 transition-colors">
+                    <div className="absolute top-0 right-0 p-2 opacity-5 group-hover:opacity-10 transition-opacity">
+                      <Plus size={40} className="text-primary" />
+                    </div>
+                    <p className="text-sm text-foreground font-medium italic leading-relaxed">
+                      "{r.message}"
+                    </p>
                   </div>
-                  <div className="bg-muted rounded-xl p-3">
-                    <p className="text-sm text-foreground italic">"{r.message}"</p>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2 shrink-0 items-center">
-                  <Switch checked={r.active} onCheckedChange={() => handleToggle(r.id, r.active)} />
-                  <Button variant="ghost" size="icon" className="h-8 w-8" title="Duplicar" onClick={() => handleDuplicate(r)}>
-                    <Copy size={16} className="text-muted-foreground" />
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><Trash2 size={14} className="text-destructive" /></Button></AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader><AlertDialogTitle>Remover automação?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader>
-                      <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => handleDelete(r.id)}>Remover</AlertDialogAction></AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
                 </div>
               </div>
             </CardContent>
           </Card>
         ))}
         {rules.length === 0 && (
-          <Card><CardContent className="p-8 text-center text-muted-foreground">Nenhuma automação cadastrada.</CardContent></Card>
+          <Card className="border-dashed border-2 bg-transparent">
+            <CardContent className="p-12 text-center text-muted-foreground">
+              <Plus size={40} className="mx-auto mb-4 opacity-20" />
+              <p className="font-bold text-lg">Pronto para começar?</p>
+              <p className="text-sm">Crie sua primeira automação para recuperar clientes hoje.</p>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>
