@@ -383,14 +383,17 @@ const TermoAssinatura = () => {
       const filePath = `termos_assinados/${fileName}`;
 
       // 3. Upload to Storage
-      const { error: uploadError } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from("customer-documents")
         .upload(filePath, pdfBlob, {
           contentType: 'application/pdf',
           cacheControl: '3600'
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error("Storage upload error:", uploadError);
+        // Continue even if storage fails, we still have the record
+      }
 
       // 4. Save to CRM Customer Documents
       const customerId = booking?.customer_id || term?.customer_id;
