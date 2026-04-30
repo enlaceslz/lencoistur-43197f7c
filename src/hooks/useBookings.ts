@@ -134,6 +134,7 @@ export function useBookings() {
           passport: data.passport,
           country: data.country,
           birthDate: data.birthDate,
+          companions: data.companions,
         },
       });
 
