@@ -309,6 +309,7 @@ const AdminCRM = () => {
         totalBookings: bookingsByCustomer[c.id]?.count || 0,
         totalSpent: bookingsByCustomer[c.id]?.total || 0,
         lastBooking: bookingsByCustomer[c.id]?.lastDate || null,
+        ltvCategory: (bookingsByCustomer[c.id]?.total || 0) > 500000 ? "VIP" : (bookingsByCustomer[c.id]?.count || 0) >= 3 ? "Fiel" : "Novo"
       })));
     }
     setLoading(false);
