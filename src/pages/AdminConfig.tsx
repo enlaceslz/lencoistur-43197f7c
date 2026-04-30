@@ -547,64 +547,113 @@ const AdminConfig = () => {
           </Card>
         </TabsContent>
 
-                <div className="space-y-3 border-t border-border pt-4 mt-4">
-                  <Label className="text-sm font-semibold">Banner Principal (Hero)</Label>
-                  <div className="flex flex-col gap-4">
-                    <div className="w-full aspect-video rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-muted overflow-hidden">
-                      {site.bannerUrl ? (
-                        <img src={site.bannerUrl} alt="Banner" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="text-center">
-                          <Image size={48} className="text-muted-foreground mx-auto mb-2" />
-                          <p className="text-xs text-muted-foreground">Nenhum banner configurado</p>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} />
-                      <Button type="button" variant="outline" size="sm" onClick={() => bannerInputRef.current?.click()} disabled={uploadingBanner} className="rounded-lg">
-                        {uploadingBanner ? <Loader2 size={14} className="animate-spin mr-1" /> : <UploadCloud size={14} className="mr-1" />}
-                        {site.bannerUrl ? "Trocar Banner" : "Enviar Banner"}
-                      </Button>
-                      {site.bannerUrl && (
-                        <Button type="button" variant="ghost" size="sm" onClick={() => setSite({ ...site, bannerUrl: null })} className="text-destructive rounded-lg">
-                          <Trash2 size={14} className="mr-1" /> Remover
+        <TabsContent value="site">
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-8 space-y-8">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+                  <Globe size={32} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-foreground">Aparência do Website</h3>
+                  <p className="text-sm text-muted-foreground">Personalize a identidade visual voltada ao cliente.</p>
+                </div>
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-10">
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Logotipo da Marca</Label>
+                    <div className="flex items-center gap-6 p-4 rounded-2xl bg-muted/30 border border-border/50">
+                      <div className="w-24 h-24 rounded-xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center bg-background overflow-hidden shrink-0">
+                        {site.logoUrl ? (
+                          <img src={site.logoUrl} alt="Logo" className="w-full h-full object-contain p-2" />
+                        ) : (
+                          <Image size={32} className="text-muted-foreground/20" />
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                        <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo} className="rounded-xl font-bold h-9">
+                          {uploadingLogo ? <Loader2 size={14} className="animate-spin mr-2" /> : <Upload size={14} className="mr-2" />}
+                          {site.logoUrl ? "Alterar Logo" : "Fazer Upload"}
                         </Button>
-                      )}
-                      <p className="text-[10px] text-muted-foreground">Recomendado: 1920x1080px. Máx. 5MB.</p>
+                        {site.logoUrl && (
+                          <Button type="button" variant="ghost" size="sm" onClick={() => setSite({ ...site, logoUrl: null })} className="text-destructive rounded-lg h-9">
+                            <X size={14} className="mr-1" /> Remover
+                          </Button>
+                        )}
+                        <p className="text-[10px] text-muted-foreground font-medium italic">Sugerido: PNG transparente, máx 2MB.</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs">URL do Banner</Label>
-                    <Input placeholder="https://exemplo.com/banner.jpg" value={site.bannerUrl || ""} onChange={(e) => setSite({ ...site, bannerUrl: e.target.value || null })} maxLength={500} className="h-8 text-xs" />
+
+                  <div className="space-y-3 border-t border-border pt-6">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Banner Principal (Hero)</Label>
+                    <div className="flex flex-col gap-4">
+                      <div className="w-full aspect-video rounded-2xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center bg-muted/30 overflow-hidden relative group">
+                        {site.bannerUrl ? (
+                          <img src={site.bannerUrl} alt="Banner" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="text-center">
+                            <Image size={48} className="text-muted-foreground/20 mx-auto mb-2" />
+                            <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest opacity-40">Sem banner configurado</p>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} />
+                        <Button type="button" variant="outline" size="sm" onClick={() => bannerInputRef.current?.click()} disabled={uploadingBanner} className="rounded-xl font-bold h-9">
+                          {uploadingBanner ? <Loader2 size={14} className="animate-spin mr-2" /> : <UploadCloud size={14} className="mr-2" />}
+                          {site.bannerUrl ? "Alterar Banner" : "Enviar Banner"}
+                        </Button>
+                        {site.bannerUrl && (
+                          <Button type="button" variant="ghost" size="sm" onClick={() => setSite({ ...site, bannerUrl: null })} className="text-destructive h-9">
+                            <Trash2 size={14} className="mr-2" /> Remover
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Título do Site (SEO)</Label>
+                    <Input 
+                      value={site.titulo} 
+                      onChange={(e) => setSite({ ...site, titulo: e.target.value })} 
+                      className="h-12 rounded-xl border-muted-foreground/20 font-bold"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Meta Descrição (SEO)</Label>
+                    <Textarea 
+                      value={site.metaDescricao} 
+                      onChange={(e) => setSite({ ...site, metaDescricao: e.target.value })} 
+                      className="rounded-2xl border-muted-foreground/20 resize-none h-32 p-4 font-medium"
+                    />
+                    <p className="text-[10px] text-muted-foreground text-right italic font-bold">{site.metaDescricao.length}/300 caracteres</p>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4 border-t border-border pt-6">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Instagram</Label>
+                      <Input value={site.instagram} onChange={(e) => setSite({ ...site, instagram: e.target.value })} className="h-11 rounded-xl border-muted-foreground/20" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">WhatsApp (Botão)</Label>
+                      <Input value={site.whatsappUrl} onChange={(e) => setSite({ ...site, whatsappUrl: e.target.value })} className="h-11 rounded-xl border-muted-foreground/20" />
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Título do Site (SEO)</Label>
-                  <Input value={site.titulo} onChange={(e) => setSite({ ...site, titulo: e.target.value })} maxLength={100} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Meta Descrição (SEO)</Label>
-                  <Textarea value={site.metaDescricao} onChange={(e) => setSite({ ...site, metaDescricao: e.target.value })} maxLength={300} rows={3} />
-                  <p className="text-xs text-muted-foreground">{site.metaDescricao.length}/300 caracteres</p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>URL WhatsApp (CTA)</Label>
-                    <Input value={site.whatsappUrl} onChange={(e) => setSite({ ...site, whatsappUrl: e.target.value })} maxLength={100} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Instagram</Label>
-                    <Input value={site.instagram} onChange={(e) => setSite({ ...site, instagram: e.target.value })} maxLength={100} />
-                  </div>
-                </div>
+
+              <div className="mt-6 pt-6 border-t border-border flex justify-end">
+                <Button onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Site")} disabled={saving} className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20">
+                  {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
+                  Salvar Frontend
+                </Button>
               </div>
-              <Button onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Site")} disabled={saving} className="rounded-xl">
-                {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
-                Salvar
-              </Button>
             </CardContent>
           </Card>
         </TabsContent>
