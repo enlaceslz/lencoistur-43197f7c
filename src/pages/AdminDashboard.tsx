@@ -100,10 +100,10 @@ const AdminDashboard = () => {
     const countChange = lastCount > 0 ? (((thisCount - lastCount) / lastCount) * 100).toFixed(0) : "0";
 
     const stats = [
-      { label: "Reservas Hoje", value: String(todayBookings.length), change: `${todayBookings.length}`, up: todayBookings.length > 0, icon: Calendar },
-      { label: "Faturamento (Mês)", value: fmt(thisRevenue), change: `${Number(revChange) >= 0 ? "+" : ""}${revChange}%`, up: Number(revChange) >= 0, icon: DollarSign },
-      { label: "Riscos Críticos (SGS)", value: String(sgsStats.criticalRisks), change: `${sgsStats.pendingActions} pendentes`, up: sgsStats.criticalRisks === 0, icon: ShieldAlert, isSgs: true },
-      { label: "Reservas (Mês)", value: String(thisCount), change: `${Number(countChange) >= 0 ? "+" : ""}${countChange}%`, up: Number(countChange) >= 0, icon: TrendingUp },
+      { label: "Reservas Hoje", value: String(todayBookings.length), change: `${todayBookings.length}`, up: todayBookings.length > 0, icon: Calendar, path: "/admin/reservas" },
+      { label: "Faturamento (Mês)", value: fmt(thisRevenue), change: `${Number(revChange) >= 0 ? "+" : ""}${revChange}%`, up: Number(revChange) >= 0, icon: DollarSign, path: "/admin/financeiro" },
+      { label: "Riscos Críticos (SGS)", value: String(sgsStats.criticalRisks), change: `${sgsStats.pendingActions} pendentes`, up: sgsStats.criticalRisks === 0, icon: ShieldAlert, isSgs: true, path: "/admin/sgs/riscos" },
+      { label: "Clientes Ativos", value: String(customerCount), change: "Total acumulado", up: true, icon: Users, path: "/admin/crm" },
     ];
 
     // Revenue by month (last 7 months)
@@ -173,20 +173,24 @@ const AdminDashboard = () => {
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat: any) => (
-            <div key={stat.label} className={`bg-card border border-border rounded-2xl p-5 ${stat.isSgs && stat.value !== "0" ? "ring-2 ring-destructive/50" : ""}`}>
+            <div 
+              key={stat.label} 
+              onClick={() => stat.path && navigate(stat.path)}
+              className={`bg-card border border-border rounded-2xl p-5 cursor-pointer hover:shadow-md hover:border-primary/50 transition-all ${stat.isSgs && stat.value !== "0" ? "ring-2 ring-destructive/50" : ""}`}
+            >
               <div className="flex items-center justify-between mb-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.isSgs && stat.value !== "0" ? "bg-destructive/10" : "bg-muted"}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.isSgs && stat.value !== "0" ? "bg-destructive/10" : "bg-primary/10"}`}>
                   <stat.icon size={20} className={stat.isSgs && stat.value !== "0" ? "text-destructive" : "text-primary"} />
                 </div>
                 {stat.change && (
-                  <span className={`flex items-center gap-1 text-xs font-semibold ${stat.up ? "text-primary" : "text-destructive"}`}>
-                    {!stat.isSgs && (stat.up ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />)}
+                  <span className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-tight ${stat.up ? "text-primary" : "text-destructive"}`}>
+                    {!stat.isSgs && stat.change.includes('%') && (stat.up ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />)}
                     {stat.change}
                   </span>
                 )}
               </div>
-              <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-              <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
+              <p className="text-2xl font-black text-foreground">{stat.value}</p>
+              <p className="text-xs font-medium text-muted-foreground mt-1 uppercase tracking-wider">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -267,29 +271,41 @@ const AdminDashboard = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border text-muted-foreground">
-                    <th className="text-left py-3 font-medium">Código</th>
-                    <th className="text-left py-3 font-medium">Cliente</th>
-                    <th className="text-left py-3 font-medium">Passeio</th>
-                    <th className="text-left py-3 font-medium">Data</th>
-                    <th className="text-right py-3 font-medium">Total</th>
-                    <th className="text-right py-3 font-medium">Status</th>
+                  <tr className="border-b border-border text-muted-foreground bg-muted/30">
+                    <th className="text-left py-3 px-4 font-bold uppercase text-[10px] tracking-widest">Código</th>
+                    <th className="text-left py-3 px-2 font-bold uppercase text-[10px] tracking-widest">Cliente</th>
+                    <th className="text-left py-3 px-2 font-bold uppercase text-[10px] tracking-widest">Passeio</th>
+                    <th className="text-left py-3 px-2 font-bold uppercase text-[10px] tracking-widest text-center">Data</th>
+                    <th className="text-right py-3 px-2 font-bold uppercase text-[10px] tracking-widest">Total</th>
+                    <th className="text-right py-3 px-4 font-bold uppercase text-[10px] tracking-widest">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {recentBookings.length === 0 ? (
-                    <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">Nenhuma reserva encontrada</td></tr>
+                    <tr><td colSpan={6} className="py-12 text-center text-muted-foreground font-medium italic">Nenhuma reserva recente encontrada</td></tr>
                   ) : recentBookings.map((b) => {
                     const s = statusMap[b.status] || { label: b.status, className: "bg-muted text-muted-foreground" };
                     return (
-                      <tr key={b.id} className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors">
-                        <td className="py-3 font-mono text-xs text-muted-foreground">{b.id}</td>
-                        <td className="py-3 font-semibold text-foreground">{b.client}</td>
-                        <td className="py-3 text-muted-foreground">{b.tour}</td>
-                        <td className="py-3 text-muted-foreground">{b.date}</td>
-                        <td className="py-3 text-right font-semibold text-foreground">{fmt(b.total)}</td>
-                        <td className="py-3 text-right">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${s.className}`}>{s.label}</span>
+                      <tr 
+                        key={b.id} 
+                        onClick={() => navigate("/admin/reservas")}
+                        className="border-b border-border/50 last:border-0 hover:bg-primary/5 transition-colors cursor-pointer group"
+                      >
+                        <td className="py-4 px-4 font-mono text-[10px] text-primary font-bold">
+                          <span className="bg-primary/5 px-2 py-1 rounded">{b.id}</span>
+                        </td>
+                        <td className="py-4 px-2">
+                          <p className="font-bold text-foreground group-hover:text-primary transition-colors">{b.client}</p>
+                        </td>
+                        <td className="py-4 px-2 text-muted-foreground text-xs font-medium">{b.tour}</td>
+                        <td className="py-4 px-2 text-muted-foreground text-xs text-center font-semibold">
+                          {b.date ? new Date(b.date + "T12:00:00").toLocaleDateString("pt-BR") : "—"}
+                        </td>
+                        <td className="py-4 px-2 text-right font-black text-foreground">{fmt(b.total)}</td>
+                        <td className="py-4 px-4 text-right">
+                          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter border ${s.className}`}>
+                            {s.label}
+                          </span>
                         </td>
                       </tr>
                     );
