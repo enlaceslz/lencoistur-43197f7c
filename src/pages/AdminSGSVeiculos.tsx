@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Car, Plus, Search, AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   ativo: { label: "Ativo", color: "bg-primary/10 text-primary" },
@@ -100,16 +101,22 @@ const AdminSGSVeiculos = () => {
 
   return (
     <AdminLayout title="SGS — Veículos / Frota">
-      <div className="space-y-6">
-        <div className="flex flex-wrap gap-3 items-center justify-between">
-          <div className="relative flex-1 min-w-[200px] max-w-sm">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar veículo..." className="w-full pl-9 pr-4 py-2 rounded-xl border border-border bg-background text-sm focus:ring-2 focus:ring-primary/30 outline-none" />
+      <TooltipProvider>
+        <div className="space-y-6">
+          <div className="flex flex-wrap gap-3 items-center justify-between">
+            <div className="relative flex-1 min-w-[200px] max-w-sm">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar veículo..." className="w-full pl-9 pr-4 py-2 rounded-xl border border-border bg-background text-sm focus:ring-2 focus:ring-primary/30 outline-none" />
+            </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button onClick={() => { setForm(emptyForm); setEditId(null); setShowForm(!showForm); }} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:opacity-90">
+                  <Plus size={16} /> Novo Veículo
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Cadastrar novo veículo na frota</TooltipContent>
+            </Tooltip>
           </div>
-          <button onClick={() => { setForm(emptyForm); setEditId(null); setShowForm(!showForm); }} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:opacity-90">
-            <Plus size={16} /> Novo Veículo
-          </button>
-        </div>
 
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
@@ -219,7 +226,8 @@ const AdminSGSVeiculos = () => {
             })}
           </div>
         )}
-      </div>
+        </div>
+      </TooltipProvider>
     </AdminLayout>
   );
 };

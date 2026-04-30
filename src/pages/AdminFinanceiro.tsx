@@ -11,6 +11,7 @@ import {
   DollarSign, TrendingUp, TrendingDown, CreditCard, Wallet, Receipt,
   Loader2, Download, Printer, LayoutDashboard, FileText, Search
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import FinanceiroStats from "@/components/financeiro/FinanceiroStats";
 import FluxoCaixaTab from "@/components/financeiro/FluxoCaixaTab";
 import ContasPagarTab from "@/components/financeiro/ContasPagarTab";
@@ -322,7 +323,8 @@ const AdminFinanceiro = () => {
 
   return (
     <AdminLayout title="Painel Financeiro">
-      <div className="space-y-8 pb-10">
+      <TooltipProvider>
+        <div className="space-y-8 pb-10">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-card p-6 rounded-2xl border border-border/50 shadow-sm">
           <div className="space-y-2">
@@ -380,24 +382,35 @@ const AdminFinanceiro = () => {
           </div>
           
           <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              size="default" 
-              onClick={exportCSV}
-              className="rounded-xl border-primary/20 hover:border-primary/50 hover:bg-primary/5 text-primary transition-all"
-            >
-              <Download size={18} className="mr-2" /> 
-              Excel / CSV
-            </Button>
-            <Button 
-              variant="default" 
-              size="default" 
-              onClick={exportPDF}
-              className="rounded-xl shadow-md transition-all"
-            >
-              <Printer size={18} className="mr-2" /> 
-              Relatório PDF
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="default" 
+                  onClick={exportCSV}
+                  className="rounded-xl border-primary/20 hover:border-primary/50 hover:bg-primary/5 text-primary transition-all"
+                >
+                  <Download size={18} className="mr-2" /> 
+                  Excel / CSV
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Exportar transações do período para Excel/CSV</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="default" 
+                  size="default" 
+                  onClick={exportPDF}
+                  className="rounded-xl shadow-md transition-all"
+                >
+                  <Printer size={18} className="mr-2" /> 
+                  Relatório PDF
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Gerar relatório financeiro detalhado em PDF</TooltipContent>
+            </Tooltip>
           </div>
         </div>
 

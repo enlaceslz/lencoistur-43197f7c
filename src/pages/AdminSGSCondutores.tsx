@@ -5,6 +5,7 @@ import { toast } from "@/hooks/use-toast";
 import { maskCPF, maskPhone } from "@/lib/masks";
 import { Badge } from "@/components/ui/badge";
 import { UserCheck, Plus, Search, AlertTriangle, Pencil, Trash2, Loader2, CheckCircle } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const emptyForm = { nome: "", cpf: "", cnh_numero: "", cnh_categoria: "B", cnh_validade: "", telefone: "", email: "", primeiros_socorros: false, off_road: false, status: "ativo" as const, observacoes: "" };
 
@@ -110,16 +111,22 @@ const AdminSGSCondutores = () => {
 
   return (
     <AdminLayout title="SGS — Condutores">
-      <div className="space-y-6">
-        <div className="flex flex-wrap gap-3 items-center justify-between">
-          <div className="relative flex-1 min-w-[200px] max-w-sm">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar condutor..." className="w-full pl-9 pr-4 py-2 rounded-xl border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" />
+      <TooltipProvider>
+        <div className="space-y-6">
+          <div className="flex flex-wrap gap-3 items-center justify-between">
+            <div className="relative flex-1 min-w-[200px] max-w-sm">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar condutor..." className="w-full pl-9 pr-4 py-2 rounded-xl border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button onClick={() => { setForm(emptyForm); setEditId(null); setShowForm(!showForm); }} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:opacity-90">
+                  <Plus size={16} /> Novo Condutor
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Cadastrar novo motorista ou guia</TooltipContent>
+            </Tooltip>
           </div>
-          <button onClick={() => { setForm(emptyForm); setEditId(null); setShowForm(!showForm); }} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:opacity-90">
-            <Plus size={16} /> Novo Condutor
-          </button>
-        </div>
 
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
@@ -189,12 +196,23 @@ const AdminSGSCondutores = () => {
                         {c.status}
                       </Badge>
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                        <button onClick={() => openEdit(c)} className="p-1.5 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors">
-                          <Pencil size={14} />
-                        </button>
-                        <button onClick={() => handleDelete(c.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
-                          <Trash2 size={14} />
-                        </button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button onClick={() => openEdit(c)} className="p-1.5 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors">
+                              <Pencil size={14} />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>Editar dados do condutor</TooltipContent>
+                        </Tooltip>
+                        
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button onClick={() => handleDelete(c.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                              <Trash2 size={14} />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>Remover condutor do sistema</TooltipContent>
+                        </Tooltip>
                       </div>
                     </div>
                   </div>
@@ -232,7 +250,8 @@ const AdminSGSCondutores = () => {
             })}
           </div>
         )}
-      </div>
+        </div>
+      </TooltipProvider>
     </AdminLayout>
   );
 };
