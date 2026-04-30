@@ -379,15 +379,27 @@ const AdminConfig = () => {
   return (
     <AdminLayout title="Configurações">
       <Tabs defaultValue="empresa" className="space-y-6">
-        <TabsList className="bg-muted flex-wrap h-auto gap-1 p-1">
-          <TabsTrigger value="empresa"><Building2 size={14} className="mr-1" /> Empresa</TabsTrigger>
-          <TabsTrigger value="site"><Globe size={14} className="mr-1" /> Site</TabsTrigger>
-          <TabsTrigger value="pagamento"><CreditCard size={14} className="mr-1" /> Pagamento</TabsTrigger>
-          <TabsTrigger value="notificacoes"><Bell size={14} className="mr-1" /> Notificações</TabsTrigger>
-          <TabsTrigger value="seguranca"><Shield size={14} className="mr-1" /> Segurança</TabsTrigger>
-          <TabsTrigger value="backup"><Database size={14} className="mr-1" /> Backup</TabsTrigger>
-          <TabsTrigger value="galeria"><Image size={14} className="mr-1" /> Galeria</TabsTrigger>
-        </TabsList>
+        <div className="bg-card border border-border p-2 rounded-2xl shadow-sm overflow-x-auto no-scrollbar">
+          <TabsList className="bg-transparent flex-nowrap h-auto gap-1">
+            {[
+              { value: "empresa", icon: Building2, label: "Agência" },
+              { value: "site", icon: Globe, label: "Frontend" },
+              { value: "pagamento", icon: CreditCard, label: "Financeiro" },
+              { value: "notificacoes", icon: Bell, label: "Alertas" },
+              { value: "seguranca", icon: Shield, label: "Acesso" },
+              { value: "backup", icon: Database, label: "Backup" },
+              { value: "galeria", icon: Image, label: "Mídia" },
+            ].map((tab) => (
+              <TabsTrigger 
+                key={tab.value}
+                value={tab.value} 
+                className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all"
+              >
+                <tab.icon size={14} className="mr-2" /> {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
 
         {/* EMPRESA */}
         <TabsContent value="empresa">
