@@ -4,9 +4,12 @@ import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { 
   TrendingUp, TrendingDown, DollarSign, PieChart, 
-  ArrowUpRight, ArrowDownRight, Info, Target, LayoutDashboard
+  ArrowUpRight, ArrowDownRight, Info, Target, LayoutDashboard, Printer
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const MONTH_LABELS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 const fmt = (v: number) => formatCurrency(v);
@@ -22,12 +25,14 @@ export default function DRETab({
   bookings, 
   contasPagar = [], 
   selectedMonth, 
-  selectedYear 
+  selectedYear,
+  company
 }: { 
   bookings: BookingRow[], 
   contasPagar?: any[], 
   selectedMonth?: number, 
-  selectedYear?: number 
+  selectedYear?: number,
+  company?: any
 }) {
   const currentYear = selectedYear ?? new Date().getFullYear();
   const currentMonth = selectedMonth ?? new Date().getMonth();
