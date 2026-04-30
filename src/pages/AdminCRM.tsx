@@ -870,12 +870,19 @@ const AdminCRM = () => {
                             </td>
                             <td className="py-3 text-right">
                               <div className="flex gap-1 justify-end">
-                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
-                                  const parent = customers.find(c => c.id === d.customer_id);
-                                  if (parent) selectCustomer(parent);
-                                }}>
-                                  <Eye size={14} className="text-primary" />
-                                </Button>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
+                                      const parent = customers.find(c => c.id === d.customer_id);
+                                      if (parent) selectCustomer(parent);
+                                    }}>
+                                      <Eye size={14} className="text-primary" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Ver Responsável</p>
+                                  </TooltipContent>
+                                </Tooltip>
                               </div>
                             </td>
                           </tr>
