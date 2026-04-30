@@ -476,34 +476,13 @@ const AdminFinanceiro = () => {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-border/50">
-                          {[
-                            ...monthBookings.map(b => ({
-                              date: b.created_at,
-                              desc: `[ENTRADA] ${b.item_name} - ${b.customers?.name || "N/A"}`,
-                              method: (b.pay_method || "N/A").toUpperCase(),
-                              value: b.final_total,
-                              status: b.payment_status === "pago" ? "PAGO" : "PENDENTE",
-                              type: 'in'
-                            })),
-                            ...monthContasPagar.map(c => ({
-                              date: c.vencimento,
-                              desc: `[SAÍDA] ${c.descricao} - ${c.fornecedor || "N/A"}`,
-                              method: "TRANSFERÊNCIA",
-                              value: -c.valor,
-                              status: c.status === "pago" ? "PAGO" : "PENDENTE",
-                              type: 'out'
-                            }))
-                          ].filter(t => {
-                            if (!searchTerm) return true;
-                            const q = searchTerm.toLowerCase();
-                            return t.desc.toLowerCase().includes(q) || t.method.toLowerCase().includes(q) || t.status.toLowerCase().includes(q);
-                          }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((t, i) => (
+                          {filteredTransactions.map((t, i) => (
                             <tr key={i} className="hover:bg-muted/30 transition-colors">
                               <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">{fmtDate(t.date)}</td>
                               <td className="px-6 py-4 font-medium">{t.desc}</td>
                               <td className="px-6 py-4 text-xs font-mono text-muted-foreground">{t.method}</td>
-                              <td className={cn("px-6 py-4 text-right font-bold", t.type === 'in' ? "text-emerald-600" : "text-rose-600")}>
-                                {t.type === 'in' ? "" : "-"} {fmt(Math.abs(t.value))}
+                              <td className={cn("px-6 py-4 text-right font-bold", t.type === 'entrada' ? "text-emerald-600" : "text-rose-600")}>
+                                {t.type === 'entrada' ? "" : "-"} {fmt(Math.abs(t.value))}
                               </td>
                               <td className="px-6 py-4 text-center">
                                 <span className={cn(
