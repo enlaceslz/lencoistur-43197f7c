@@ -9,29 +9,38 @@ const AdminSGSPesquisas = () => {
   const [surveys, setSurveys] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [bookings, setBookings] = useState<any[]>([]);
   const [form, setForm] = useState({
-    felt_safe: 5, guide_explained_risks: true, danger_situations: false,
+    booking_id: "", felt_safe: 5, guide_explained_risks: true, danger_situations: false,
     danger_description: "", overall_rating: 5, comments: "",
   });
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); loadBookings(); }, []);
+
+  const loadBookings = async () => {
+    const { data } = await supabase.from("bookings").select("id, booking_code, item_name, customer_name").order("created_at", { ascending: false }).limit(50);
+    setBookings(data || []);
+  };
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("sgs_safety_surveys").select("*").order("created_at", { ascending: false });
+    const { data } = await supabase.from("sgs_safety_surveys").select("*, bookings(booking_code, item_name, customer_name)").order("created_at", { ascending: false });
     setSurveys(data || []);
     setLoading(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.from("sgs_safety_surveys").insert(form);
+    const payload = { ...form };
+    if (!payload.booking_id) delete (payload as any).booking_id;
+
+    const { error } = await supabase.from("sgs_safety_surveys").insert(payload);
     if (error) {
       toast({ title: "Erro ao registrar pesquisa", variant: "destructive" });
     } else {
       toast({ title: "Pesquisa de segurança registrada!" });
       setShowForm(false);
-      setForm({ felt_safe: 5, guide_explained_risks: true, danger_situations: false, danger_description: "", overall_rating: 5, comments: "" });
+      setForm({ booking_id: "", felt_safe: 5, guide_explained_risks: true, danger_situations: false, danger_description: "", overall_rating: 5, comments: "" });
       load();
     }
   };
