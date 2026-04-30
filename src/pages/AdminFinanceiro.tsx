@@ -282,6 +282,33 @@ const AdminFinanceiro = () => {
     doc.save(`Financeiro_Consolidado_${monthName}_${selectedYear}.pdf`);
   };
 
+  const exportCSV = () => {
+    const headers = ["Data", "Descrição", "Método", "Valor", "Status", "Tipo"];
+    const rows = filteredTransactions.map(t => [
+      fmtDate(t.date),
+      t.desc.replace(/,/g, " "),
+      t.method,
+      t.value.toString(),
+      t.status,
+      t.type
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(r => r.join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Financeiro_${selectedMonth + 1}_${selectedYear}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (loading) {
     return (
       <AdminLayout title="Financeiro">
