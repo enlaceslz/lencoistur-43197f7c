@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, Pencil, Trash2, X, Save, UserPlus, Baby, FileText, Printer, Paperclip, Upload } from "lucide-react";
 import jsPDF from "jspdf";
@@ -1629,7 +1629,7 @@ const AdminCRMContent = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </React.Fragment>
   );
 };
 
