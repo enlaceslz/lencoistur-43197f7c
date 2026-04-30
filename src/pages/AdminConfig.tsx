@@ -875,10 +875,19 @@ const AdminConfig = () => {
 
         {/* SEGURANÇA */}
         <TabsContent value="seguranca">
-          <Card className="border-border">
-            <CardContent className="p-6 space-y-5">
-              <h3 className="font-display font-bold text-foreground text-lg">Alterar Senha</h3>
-              <div className="space-y-4 max-w-md">
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-8 space-y-8">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-slate-500/10 text-slate-600">
+                  <Shield size={32} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-foreground">Acesso e Segurança</h3>
+                  <p className="text-sm text-muted-foreground">Gestão de credenciais do painel administrativo.</p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
                 <div className="space-y-2">
                   <Label>Nova Senha</Label>
                   <div className="relative">
