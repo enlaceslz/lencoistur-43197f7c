@@ -318,19 +318,19 @@ const modules: ModuleGuide[] = [
 
 const flowDiagrams = [
   {
-    title: "Fluxo de Reserva Online",
+    title: "Ciclo de Vida da Reserva",
     icon: Workflow,
-    steps: ["Cliente acessa o site", "Escolhe passeio ou translado", "Seleciona data e quantidade", "Preenche dados pessoais", "Escolhe forma de pagamento", "Recebe código da reserva", "Admin confirma pagamento", "Reserva confirmada ✅"],
+    steps: ["Cliente escolhe no site", "Preenchimento de dados e dependentes", "Pagamento (PIX/Cartão)", "Confirmação automática/manual", "Geração de registro no Financeiro", "Check-in e Briefing de Segurança", "Realização do passeio ✅"],
   },
   {
-    title: "Fluxo Financeiro",
+    title: "Gestão Financeira Integrada",
     icon: Zap,
-    steps: ["Reserva confirmada", "Conta a Receber gerada", "Admin registra despesas", "Fluxo de Caixa atualiza", "DRE calculado automaticamente", "Relatório disponível 📊"],
+    steps: ["Venda realizada (Receita)", "Lançamento automático no Contas a Receber", "Registro de custos (Combustível/Guias)", "Cálculo de comissões de parceiros", "Fechamento de Caixa", "Análise de DRE e Lucratividade 📊"],
   },
   {
-    title: "Fluxo de Segurança (SGS)",
+    title: "Segurança e Conformidade (SGS)",
     icon: Shield,
-    steps: ["Cadastrar riscos na matriz", "Criar checklists de veículos", "Registrar condutores e treinamentos", "Briefing antes do passeio", "Termo de risco assinado", "Em caso de incidente → registrar", "Ação corretiva se necessário", "Auditoria periódica 🔍"],
+    steps: ["Matriz de Riscos atualizada", "Verificação de equipamentos e veículos", "Briefing obrigatório com turistas", "Coleta de Termo de Responsabilidade", "Execução segura com condutor habilitado", "Registro de feedback ou incidentes 🔍"],
   },
 ];
 
