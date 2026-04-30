@@ -332,7 +332,7 @@ const AdminFinanceiro = () => {
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.2 }}
             >
-              {tab === "fluxo" && <FluxoCaixaTab bookings={bookings} contasPagar={contasPagar} />}
+              {tab === "fluxo" && <FluxoCaixaTab bookings={bookings} contasPagar={contasPagar} selectedMonth={selectedMonth} selectedYear={selectedYear} />}
               {tab === "pagar" && <ContasPagarTab company={company} />}
               {tab === "receber" && <ContasReceberTab company={company} />}
               {tab === "dre" && <DRETab bookings={bookings} contasPagar={contasPagar} />}
