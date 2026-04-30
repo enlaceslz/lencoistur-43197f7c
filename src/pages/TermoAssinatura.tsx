@@ -315,8 +315,9 @@ const TermoAssinatura = () => {
         currentY += 12;
       }
 
-      // Risks
+      // Risks section with high contrast
       doc.setFontSize(14);
+      doc.setTextColor(0, 102, 204);
       doc.text("Ciência de Riscos e Segurança", 14, currentY);
       currentY += 5;
       const risksRows = acceptedRisks.map(r => [`[X] ${r}`]);
@@ -324,7 +325,7 @@ const TermoAssinatura = () => {
         startY: currentY,
         body: risksRows,
         theme: 'plain',
-        styles: { fontSize: 9, cellPadding: 1 }
+        styles: { fontSize: 9, cellPadding: 1, textColor: [51, 51, 51] }
       });
       
       currentY = (doc as any).lastAutoTable.finalY + 15;
