@@ -128,6 +128,7 @@ const CheckoutPage = () => {
         passport: nationality === "foreign" ? passport : undefined,
         country: nationality === "foreign" ? country : "Brasil",
         birthDate: birthDate || undefined,
+        companions: companions.filter(c => c.name.trim() !== ""),
       });
       setConfirmedBooking(booking);
     } catch (error) {
