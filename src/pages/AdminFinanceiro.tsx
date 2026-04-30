@@ -230,32 +230,13 @@ const AdminFinanceiro = () => {
     doc.text(fmt(lucroMes), 155, 88);
 
     // Main Table - Unified view of transactions
-    const q = searchTerm.toLowerCase();
-    const tableData = [
-      ...monthBookings.map(b => [
-        fmtDate(b.created_at),
-        `[ENTRADA] ${b.item_name} - ${b.customers?.name || "N/A"}`,
-        (b.pay_method || "N/A").toUpperCase(),
-        fmt(b.final_total),
-        b.payment_status === "pago" ? "PAGO" : "PENDENTE"
-      ]),
-      ...monthContasPagar.map(c => [
-        fmtDate(c.vencimento),
-        `[SAÍDA] ${c.descricao} - ${c.fornecedor || "N/A"}`,
-        "TRANSFERÊNCIA",
-        `(${fmt(c.valor)})`,
-        c.status === "pago" ? "PAGO" : "PENDENTE"
-      ])
-    ].filter(row => {
-      if (!q) return true;
-      return row.some(cell => String(cell).toLowerCase().includes(q));
-    }).sort((a, b) => {
-      try {
-        const dateA = new Date(a[0].split('/').reverse().join('-'));
-        const dateB = new Date(b[0].split('/').reverse().join('-'));
-        return dateA.getTime() - dateB.getTime();
-      } catch { return 0; }
-    });
+    const tableData = filteredTransactions.map(t => [
+      fmtDate(t.date),
+      t.desc,
+      t.method,
+      t.value < 0 ? `(${fmt(Math.abs(t.value))})` : fmt(t.value),
+      t.status
+    ]);
 
     autoTable(doc, {
       startY: 115,
