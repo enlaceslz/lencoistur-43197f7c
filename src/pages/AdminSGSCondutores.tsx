@@ -128,42 +128,76 @@ const AdminSGSCondutores = () => {
           </form>
         )}
 
-        {loading ? <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div> : filtered.length === 0 ? (
-          <div className="text-center py-16 text-muted-foreground"><UserCheck size={40} className="mx-auto mb-3 opacity-40" /><p>Nenhum condutor cadastrado</p></div>
+        {loading ? <div className="flex justify-center py-16"><Loader2 className="animate-spin text-primary" size={32} /></div> : filtered.length === 0 ? (
+          <div className="text-center py-20 bg-card border border-dashed rounded-3xl">
+            <UserCheck size={48} className="mx-auto mb-4 opacity-20" />
+            <p className="font-bold text-lg">Nenhum condutor encontrado</p>
+            <p className="text-sm text-muted-foreground">Cadastre motoristas e guias para gerenciar escalas e treinamentos.</p>
+          </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map(c => (
-              <div key={c.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold text-foreground text-sm">{c.nome}</span>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${c.status === "ativo" ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}>{c.status}</span>
-                    <div className="flex gap-1">
-                      <button onClick={() => openEdit(c)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors">
-                        <Pencil size={14} />
-                      </button>
-                      <button onClick={() => handleDelete(c.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
-                        <Trash2 size={14} />
-                      </button>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filtered.map(c => {
+              const isCnhExpired = cnhExpired(c.cnh_validade);
+              return (
+                <div key={c.id} className="bg-card border border-border rounded-3xl p-6 hover:shadow-xl hover:border-primary/30 transition-all group relative overflow-hidden">
+                  <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${c.status === "ativo" ? "bg-emerald-500" : c.status === "bloqueado" ? "bg-destructive" : "bg-muted"}`} />
+                  
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                        <UserCheck size={24} />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-black text-foreground group-hover:text-primary transition-colors leading-tight truncate">{c.nome}</h4>
+                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-0.5">{c.email || 'Sem e-mail'}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2 items-end">
+                      <Badge variant="outline" className={`font-black text-[9px] uppercase px-2.5 py-0.5 rounded-lg border ${c.status === "ativo" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground"}`}>
+                        {c.status}
+                      </Badge>
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                        <button onClick={() => openEdit(c)} className="p-1.5 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors">
+                          <Pencil size={14} />
+                        </button>
+                        <button onClick={() => handleDelete(c.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="text-xs text-muted-foreground space-y-1">
-                  {c.cpf && <p>CPF: {c.cpf}</p>}
-                  {c.cnh_numero && <p>CNH: {c.cnh_numero} ({c.cnh_categoria})</p>}
-                  {c.cnh_validade && (
-                    <p className={cnhExpired(c.cnh_validade) ? "text-destructive font-medium" : ""}>
-                      {cnhExpired(c.cnh_validade) && <AlertTriangle size={12} className="inline mr-1" />}
-                      Validade: {new Date(c.cnh_validade + "T12:00").toLocaleDateString("pt-BR")} {cnhExpired(c.cnh_validade) && "(VENCIDA)"}
-                    </p>
-                  )}
-                  <div className="flex gap-2 mt-3">
-                    {c.primeiros_socorros && <span className="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-full border border-primary/20">1º Socorros</span>}
-                    {c.off_road && <span className="bg-secondary/10 text-secondary text-[10px] px-2 py-0.5 rounded-full border border-secondary/20">Off-Road</span>}
+
+                  <div className="space-y-3 mb-5">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-muted-foreground font-bold uppercase tracking-tighter">CNH ({c.cnh_categoria})</span>
+                      <span className="text-foreground font-mono font-bold">{c.cnh_numero || '—'}</span>
+                    </div>
+                    <div className={`flex items-center justify-between p-2 rounded-lg transition-colors ${isCnhExpired ? "bg-destructive/5 text-destructive" : "bg-muted/30 text-muted-foreground"}`}>
+                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase">
+                        {isCnhExpired ? <AlertTriangle size={12} /> : <CheckCircle size={12} className="text-emerald-500" />}
+                        Validade CNH
+                      </div>
+                      <span className={`text-[10px] font-black ${isCnhExpired ? 'animate-pulse' : ''}`}>
+                        {c.cnh_validade ? new Date(c.cnh_validade + "T12:00").toLocaleDateString("pt-BR") : "N/A"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 pt-4 border-t border-border/50">
+                    {c.primeiros_socorros && (
+                      <Badge variant="secondary" className="bg-primary/5 text-primary border-primary/10 text-[8px] font-black uppercase py-0 px-1.5">
+                        🚑 1º Socorros
+                      </Badge>
+                    )}
+                    {c.off_road && (
+                      <Badge variant="secondary" className="bg-secondary/5 text-secondary border-secondary/10 text-[8px] font-black uppercase py-0 px-1.5">
+                        🚜 Off-Road
+                      </Badge>
+                    )}
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
