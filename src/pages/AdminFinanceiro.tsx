@@ -365,11 +365,20 @@ const AdminFinanceiro = () => {
             <Button 
               variant="outline" 
               size="default" 
-              onClick={exportPDF}
+              onClick={exportCSV}
               className="rounded-xl border-primary/20 hover:border-primary/50 hover:bg-primary/5 text-primary transition-all"
             >
+              <Download size={18} className="mr-2" /> 
+              Excel / CSV
+            </Button>
+            <Button 
+              variant="default" 
+              size="default" 
+              onClick={exportPDF}
+              className="rounded-xl shadow-md transition-all"
+            >
               <Printer size={18} className="mr-2" /> 
-              Exportar Relatório
+              Relatório PDF
             </Button>
           </div>
         </div>
