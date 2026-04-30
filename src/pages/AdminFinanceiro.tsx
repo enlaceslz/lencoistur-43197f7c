@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import jsPDF from "jspdf";
@@ -375,9 +376,9 @@ const AdminFinanceiro = () => {
                   <FluxoCaixaTab bookings={bookings} contasPagar={contasPagar} selectedMonth={selectedMonth} selectedYear={selectedYear} />
                   
                   <Card className="border-none shadow-sm bg-card overflow-hidden">
-                    <div className="p-6 border-b border-border/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <CardHeader className="p-6 border-b border-border/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div>
-                        <h3 className="text-lg font-bold">Detalhamento das Transações</h3>
+                        <CardTitle className="text-lg font-bold">Detalhamento das Transações</CardTitle>
                         <p className="text-sm text-muted-foreground">Listagem consolidada do período selecionado</p>
                       </div>
                       <div className="md:hidden">
@@ -391,8 +392,8 @@ const AdminFinanceiro = () => {
                           />
                         </div>
                       </div>
-                    </div>
-                    <div className="overflow-x-auto">
+                    </CardHeader>
+                    <CardContent className="p-0 overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-border bg-muted/30">
@@ -445,7 +446,7 @@ const AdminFinanceiro = () => {
                           ))}
                         </tbody>
                       </table>
-                    </div>
+                    </CardContent>
                   </Card>
                 </div>
               )}
