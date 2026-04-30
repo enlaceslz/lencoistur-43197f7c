@@ -532,7 +532,8 @@ const AdminSGSDashboard = () => {
             </div>
           </div>
         </details>
-      </div>
+        </div>
+      )}
     </AdminLayout>
   );
 };
