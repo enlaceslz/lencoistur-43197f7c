@@ -57,6 +57,8 @@ const AdminFinanceiro = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"todos" | "pago" | "pendente">("todos");
+  const [typeFilter, setTypeFilter] = useState<"todos" | "entrada" | "saida">("todos");
 
   useEffect(() => {
     const load = async () => {
@@ -91,6 +93,40 @@ const AdminFinanceiro = () => {
     }),
     [contasPagar, selectedMonth, selectedYear]
   );
+
+  const filteredTransactions = useMemo(() => {
+    const all = [
+      ...monthBookings.map(b => ({
+        date: b.created_at,
+        desc: `[ENTRADA] ${b.item_name} - ${b.customers?.name || "N/A"}`,
+        method: (b.pay_method || "N/A").toUpperCase(),
+        value: b.final_total,
+        status: b.payment_status === "pago" ? "PAGO" : "PENDENTE",
+        type: 'entrada' as const
+      })),
+      ...monthContasPagar.map(c => ({
+        date: c.vencimento,
+        desc: `[SAÍDA] ${c.descricao} - ${c.fornecedor || "N/A"}`,
+        method: "TRANSFERÊNCIA",
+        value: -c.valor,
+        status: c.status === "pago" ? "PAGO" : "PENDENTE",
+        type: 'saida' as const
+      }))
+    ];
+
+    return all.filter(t => {
+      const q = searchTerm.toLowerCase();
+      const matchesSearch = !q || 
+        t.desc.toLowerCase().includes(q) || 
+        t.method.toLowerCase().includes(q) || 
+        t.status.toLowerCase().includes(q);
+      
+      const matchesStatus = statusFilter === "todos" || t.status.toLowerCase() === statusFilter;
+      const matchesType = typeFilter === "todos" || t.type === typeFilter;
+
+      return matchesSearch && matchesStatus && matchesType;
+    }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, [monthBookings, monthContasPagar, searchTerm, statusFilter, typeFilter]);
 
   const receitaPaga = monthBookings.filter(b => b.payment_status === "pago").reduce((s, b) => s + b.final_total, 0);
   const despesasMes = monthContasPagar.filter(c => c.status === "pago").reduce((s, c) => s + c.valor, 0);
@@ -194,32 +230,13 @@ const AdminFinanceiro = () => {
     doc.text(fmt(lucroMes), 155, 88);
 
     // Main Table - Unified view of transactions
-    const q = searchTerm.toLowerCase();
-    const tableData = [
-      ...monthBookings.map(b => [
-        fmtDate(b.created_at),
-        `[ENTRADA] ${b.item_name} - ${b.customers?.name || "N/A"}`,
-        (b.pay_method || "N/A").toUpperCase(),
-        fmt(b.final_total),
-        b.payment_status === "pago" ? "PAGO" : "PENDENTE"
-      ]),
-      ...monthContasPagar.map(c => [
-        fmtDate(c.vencimento),
-        `[SAÍDA] ${c.descricao} - ${c.fornecedor || "N/A"}`,
-        "TRANSFERÊNCIA",
-        `(${fmt(c.valor)})`,
-        c.status === "pago" ? "PAGO" : "PENDENTE"
-      ])
-    ].filter(row => {
-      if (!q) return true;
-      return row.some(cell => String(cell).toLowerCase().includes(q));
-    }).sort((a, b) => {
-      try {
-        const dateA = new Date(a[0].split('/').reverse().join('-'));
-        const dateB = new Date(b[0].split('/').reverse().join('-'));
-        return dateA.getTime() - dateB.getTime();
-      } catch { return 0; }
-    });
+    const tableData = filteredTransactions.map(t => [
+      fmtDate(t.date),
+      t.desc,
+      t.method,
+      t.value < 0 ? `(${fmt(Math.abs(t.value))})` : fmt(t.value),
+      t.status
+    ]);
 
     autoTable(doc, {
       startY: 115,
@@ -265,6 +282,33 @@ const AdminFinanceiro = () => {
     doc.save(`Financeiro_Consolidado_${monthName}_${selectedYear}.pdf`);
   };
 
+  const exportCSV = () => {
+    const headers = ["Data", "Descrição", "Método", "Valor", "Status", "Tipo"];
+    const rows = filteredTransactions.map(t => [
+      fmtDate(t.date),
+      t.desc.replace(/,/g, " "),
+      t.method,
+      t.value.toString(),
+      t.status,
+      t.type
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(r => r.join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Financeiro_${selectedMonth + 1}_${selectedYear}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (loading) {
     return (
       <AdminLayout title="Financeiro">
@@ -305,27 +349,54 @@ const AdminFinanceiro = () => {
             </div>
           </div>
           
-          <div className="flex-1 max-w-md hidden md:block">
-            <div className="relative">
+          <div className="flex-1 flex gap-2 max-w-2xl">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
               <Input 
-                placeholder="Pesquisar nas exportações..." 
+                placeholder="Pesquisar..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 h-11 bg-muted/30 border-none rounded-xl"
               />
             </div>
+            <select 
+              value={statusFilter} 
+              onChange={(e) => setStatusFilter(e.target.value as any)}
+              className="bg-muted/50 border-none rounded-xl px-3 h-11 text-sm font-semibold focus:ring-2 focus:ring-primary transition-all cursor-pointer"
+            >
+              <option value="todos">Status: Todos</option>
+              <option value="pago">Apenas Pagos</option>
+              <option value="pendente">Apenas Pendentes</option>
+            </select>
+            <select 
+              value={typeFilter} 
+              onChange={(e) => setTypeFilter(e.target.value as any)}
+              className="bg-muted/50 border-none rounded-xl px-3 h-11 text-sm font-semibold focus:ring-2 focus:ring-primary transition-all cursor-pointer"
+            >
+              <option value="todos">Tipo: Todos</option>
+              <option value="entrada">Entradas (+)</option>
+              <option value="saida">Saídas (-)</option>
+            </select>
           </div>
           
           <div className="flex items-center gap-3">
             <Button 
               variant="outline" 
               size="default" 
-              onClick={exportPDF}
+              onClick={exportCSV}
               className="rounded-xl border-primary/20 hover:border-primary/50 hover:bg-primary/5 text-primary transition-all"
             >
+              <Download size={18} className="mr-2" /> 
+              Excel / CSV
+            </Button>
+            <Button 
+              variant="default" 
+              size="default" 
+              onClick={exportPDF}
+              className="rounded-xl shadow-md transition-all"
+            >
               <Printer size={18} className="mr-2" /> 
-              Exportar Relatório
+              Relatório PDF
             </Button>
           </div>
         </div>
@@ -405,34 +476,13 @@ const AdminFinanceiro = () => {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-border/50">
-                          {[
-                            ...monthBookings.map(b => ({
-                              date: b.created_at,
-                              desc: `[ENTRADA] ${b.item_name} - ${b.customers?.name || "N/A"}`,
-                              method: (b.pay_method || "N/A").toUpperCase(),
-                              value: b.final_total,
-                              status: b.payment_status === "pago" ? "PAGO" : "PENDENTE",
-                              type: 'in'
-                            })),
-                            ...monthContasPagar.map(c => ({
-                              date: c.vencimento,
-                              desc: `[SAÍDA] ${c.descricao} - ${c.fornecedor || "N/A"}`,
-                              method: "TRANSFERÊNCIA",
-                              value: -c.valor,
-                              status: c.status === "pago" ? "PAGO" : "PENDENTE",
-                              type: 'out'
-                            }))
-                          ].filter(t => {
-                            if (!searchTerm) return true;
-                            const q = searchTerm.toLowerCase();
-                            return t.desc.toLowerCase().includes(q) || t.method.toLowerCase().includes(q) || t.status.toLowerCase().includes(q);
-                          }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map((t, i) => (
+                          {filteredTransactions.map((t, i) => (
                             <tr key={i} className="hover:bg-muted/30 transition-colors">
                               <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">{fmtDate(t.date)}</td>
                               <td className="px-6 py-4 font-medium">{t.desc}</td>
                               <td className="px-6 py-4 text-xs font-mono text-muted-foreground">{t.method}</td>
-                              <td className={cn("px-6 py-4 text-right font-bold", t.type === 'in' ? "text-emerald-600" : "text-rose-600")}>
-                                {t.type === 'in' ? "" : "-"} {fmt(Math.abs(t.value))}
+                              <td className={cn("px-6 py-4 text-right font-bold", t.type === 'entrada' ? "text-emerald-600" : "text-rose-600")}>
+                                {t.type === 'entrada' ? "" : "-"} {fmt(Math.abs(t.value))}
                               </td>
                               <td className="px-6 py-4 text-center">
                                 <span className={cn(
