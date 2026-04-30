@@ -279,43 +279,23 @@ const AdminPasseios = () => {
 
   return (
     <AdminLayout title="Passeios">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <Card>
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-muted text-primary"><Compass size={22} /></div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{tours.length}</p>
-              <p className="text-xs text-muted-foreground">Total Passeios</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-muted text-green-600"><Eye size={22} /></div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{activeCount}</p>
-              <p className="text-xs text-muted-foreground">Ativos</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-muted text-amber-600"><Star size={22} /></div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{avgRating}</p>
-              <p className="text-xs text-muted-foreground">Avaliação Média</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-muted text-blue-600"><Users size={22} /></div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{tours.reduce((a, t) => a + (t.reviews_count || 0), 0)}</p>
-              <p className="text-xs text-muted-foreground">Avaliações</p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        {[
+          { label: "Catálogo", value: tours.length, icon: Compass, color: "text-primary", bg: "bg-primary/10" },
+          { label: "Visíveis", value: activeCount, icon: Eye, color: "text-emerald-600", bg: "bg-emerald-100" },
+          { label: "Rating Médio", value: avgRating, icon: Star, color: "text-amber-600", bg: "bg-amber-100" },
+          { label: "Feedback", value: tours.reduce((a, t) => a + (t.reviews_count || 0), 0), icon: Users, color: "text-blue-600", bg: "bg-blue-100" },
+        ].map((stat, i) => (
+          <Card key={i} className="border-none shadow-sm bg-card hover:shadow-md transition-all">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} shadow-inner`}><stat.icon size={24} strokeWidth={2.5} /></div>
+              <div>
+                <p className="text-2xl font-black text-foreground leading-none">{stat.value}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-2">{stat.label}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-8 p-6 bg-card border border-border rounded-3xl shadow-sm">
