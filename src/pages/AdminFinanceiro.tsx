@@ -192,6 +192,7 @@ const AdminFinanceiro = () => {
     doc.text(fmt(lucroMes), 155, 88);
 
     // Main Table - Unified view of transactions
+    const q = searchTerm.toLowerCase();
     const tableData = [
       ...monthBookings.map(b => [
         fmtDate(b.created_at),
@@ -207,7 +208,10 @@ const AdminFinanceiro = () => {
         `(${fmt(c.valor)})`,
         c.status === "pago" ? "PAGO" : "PENDENTE"
       ])
-    ].sort((a, b) => {
+    ].filter(row => {
+      if (!q) return true;
+      return row.some(cell => String(cell).toLowerCase().includes(q));
+    }).sort((a, b) => {
       try {
         const dateA = new Date(a[0].split('/').reverse().join('-'));
         const dateB = new Date(b[0].split('/').reverse().join('-'));
