@@ -520,7 +520,8 @@ const AdminFinanceiro = () => {
             </motion.div>
           </AnimatePresence>
         </div>
-      </div>
+        </div>
+      </TooltipProvider>
     </AdminLayout>
   );
 };
