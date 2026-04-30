@@ -134,42 +134,52 @@ const AdminSGSPesquisas = () => {
           </form>
         )}
 
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {loading ? (
-            <p className="text-center text-muted-foreground py-8">Carregando...</p>
+            <div className="col-span-full py-12 text-center text-muted-foreground animate-pulse">Carregando pesquisas...</div>
           ) : surveys.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">Nenhuma pesquisa registrada</p>
+            <div className="col-span-full py-12 text-center text-muted-foreground bg-muted/30 rounded-3xl border-2 border-dashed border-border">
+              Nenhuma pesquisa registrada pós-passeio.
+            </div>
           ) : surveys.map(s => (
-            <div key={s.id} className={`bg-card border rounded-2xl p-5 ${s.danger_situations ? "border-destructive" : "border-border"}`}>
-              <div className="flex justify-between items-start gap-4">
+            <div key={s.id} className={`bg-card border border-border rounded-3xl p-6 hover:shadow-xl transition-all group relative overflow-hidden flex flex-col ${s.danger_situations ? "border-destructive/30" : "hover:border-primary/30"}`}>
+              <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${s.danger_situations ? "bg-destructive" : "bg-primary"}`} />
+              
+              <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                  {s.danger_situations ? (
-                    <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
-                      <AlertTriangle size={20} className="text-destructive" />
-                    </div>
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Star size={20} className="text-primary" />
-                    </div>
-                  )}
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.danger_situations ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"}`}>
+                    {s.danger_situations ? <AlertTriangle size={20} /> : <Star size={20} />}
+                  </div>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-foreground">Segurança: {s.felt_safe}/5</span>
-                      <span className="text-sm text-muted-foreground">•</span>
-                      <span className="text-sm font-bold text-foreground">Geral: {s.overall_rating}/5</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(s.created_at).toLocaleDateString("pt-BR")} •
-                      Guia explicou riscos: {s.guide_explained_risks ? "Sim" : "Não"}
+                    <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
+                      Pesquisa #{s.id.slice(0, 4).toUpperCase()}
+                      {s.danger_situations && <Badge variant="destructive" className="text-[8px] font-black uppercase py-0 px-1">Alerta</Badge>}
+                    </h4>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-0.5">
+                      {new Date(s.created_at).toLocaleDateString("pt-BR")} • Guia explicou riscos: {s.guide_explained_risks ? "Sim" : "Não"}
                     </p>
                   </div>
                 </div>
-                <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                <button onClick={() => handleDelete(s.id)} className="p-2 rounded-xl hover:bg-destructive/10 text-destructive opacity-0 group-hover:opacity-100 transition-all">
                   <Trash2 size={16} />
                 </button>
               </div>
+
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="bg-muted/30 p-2.5 rounded-xl border border-border/50 text-center">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter mb-0.5">Segurança</p>
+                  <p className="text-xl font-black text-primary font-display">{s.felt_safe}/5</p>
+                </div>
+                <div className="bg-muted/30 p-2.5 rounded-xl border border-border/50 text-center">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter mb-0.5">Geral</p>
+                  <p className="text-xl font-black text-secondary font-display">{s.overall_rating}/5</p>
+                </div>
+              </div>
+
               {(s.comments || s.danger_description) && (
-                <p className="mt-2 text-sm text-muted-foreground">{s.danger_description || s.comments}</p>
+                <div className={`flex-1 p-3 rounded-2xl text-xs leading-relaxed italic ${s.danger_situations ? "bg-destructive/5 text-destructive border border-destructive/10" : "bg-muted/20 text-muted-foreground"}`}>
+                  "{s.danger_description || s.comments}"
+                </div>
               )}
             </div>
           ))}
