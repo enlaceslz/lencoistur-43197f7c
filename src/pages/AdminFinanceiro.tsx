@@ -94,6 +94,40 @@ const AdminFinanceiro = () => {
     [contasPagar, selectedMonth, selectedYear]
   );
 
+  const filteredTransactions = useMemo(() => {
+    const all = [
+      ...monthBookings.map(b => ({
+        date: b.created_at,
+        desc: `[ENTRADA] ${b.item_name} - ${b.customers?.name || "N/A"}`,
+        method: (b.pay_method || "N/A").toUpperCase(),
+        value: b.final_total,
+        status: b.payment_status === "pago" ? "PAGO" : "PENDENTE",
+        type: 'entrada' as const
+      })),
+      ...monthContasPagar.map(c => ({
+        date: c.vencimento,
+        desc: `[SAÍDA] ${c.descricao} - ${c.fornecedor || "N/A"}`,
+        method: "TRANSFERÊNCIA",
+        value: -c.valor,
+        status: c.status === "pago" ? "PAGO" : "PENDENTE",
+        type: 'saida' as const
+      }))
+    ];
+
+    return all.filter(t => {
+      const q = searchTerm.toLowerCase();
+      const matchesSearch = !q || 
+        t.desc.toLowerCase().includes(q) || 
+        t.method.toLowerCase().includes(q) || 
+        t.status.toLowerCase().includes(q);
+      
+      const matchesStatus = statusFilter === "todos" || t.status.toLowerCase() === statusFilter;
+      const matchesType = typeFilter === "todos" || t.type === typeFilter;
+
+      return matchesSearch && matchesStatus && matchesType;
+    }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, [monthBookings, monthContasPagar, searchTerm, statusFilter, typeFilter]);
+
   const receitaPaga = monthBookings.filter(b => b.payment_status === "pago").reduce((s, b) => s + b.final_total, 0);
   const despesasMes = monthContasPagar.filter(c => c.status === "pago").reduce((s, c) => s + c.valor, 0);
   const lucroMes = receitaPaga - despesasMes;
