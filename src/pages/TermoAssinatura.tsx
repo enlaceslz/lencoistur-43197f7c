@@ -343,7 +343,7 @@ const TermoAssinatura = () => {
       // Companions
       if (companions.length > 0) {
         doc.setFontSize(14);
-        doc.text("Acompanhantes", 14, currentY);
+        doc.text("Autorização para Dependentes", 14, currentY);
         currentY += 5;
         const companionsRows = companions.map(c => [
           c.full_name, 
