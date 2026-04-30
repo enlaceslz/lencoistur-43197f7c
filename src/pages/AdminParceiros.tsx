@@ -231,16 +231,51 @@ const AdminParceiros = () => {
       remuneration_value: Number(form.remuneration_value) || 0,
     };
 
-    if (editPartner) {
-      const { error } = await supabase.from("partners").update(payload).eq("id", editPartner.id);
-      if (error) toast.error("Erro ao atualizar."); else toast.success("Parceiro atualizado!");
-    } else {
-      const { error } = await supabase.from("partners").insert(payload);
-      if (error) toast.error("Erro ao cadastrar."); else toast.success("Parceiro cadastrado!");
+    try {
+      let res;
+      if (editPartner) {
+        res = await supabase.from("partners").update(payload).eq("id", editPartner.id);
+      } else {
+        res = await supabase.from("partners").insert(payload);
+      }
+      
+      if (res.error) throw res.error;
+
+      // Sincronização com SGS — Condutores quando o parceiro for motorista ou guia
+      if (form.type === "motorista" || form.type === "guia") {
+        const condutorPayload = {
+          nome: form.name.trim(),
+          cpf: form.cpf_cnpj.trim() || null,
+          telefone: form.phone.trim() || null,
+          email: form.email.trim() || null,
+          cnh_numero: form.cnh.trim() || null,
+          cnh_validade: form.cnh_validade || null,
+          status: "ativo",
+          observacoes: `Sincronizado automaticamente do módulo Parceiros (${form.type})`
+        };
+
+        // Verifica se já existe um condutor com esse nome ou CPF
+        const { data: existing } = await supabase
+          .from("sgs_condutores")
+          .select("id")
+          .or(`nome.eq."${form.name.trim()}"${form.cpf_cnpj ? `,cpf.eq."${form.cpf_cnpj.trim()}"` : ""}`)
+          .maybeSingle();
+
+        if (existing) {
+          await supabase.from("sgs_condutores").update(condutorPayload).eq("id", existing.id);
+        } else {
+          await supabase.from("sgs_condutores").insert(condutorPayload);
+        }
+      }
+
+      toast.success(editPartner ? "Parceiro atualizado!" : "Parceiro cadastrado!");
+      setDialogOpen(false);
+      fetchPartners();
+    } catch (error: any) {
+      toast.error(`Erro: ${error.message}`);
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
-    setDialogOpen(false);
-    fetchPartners();
   };
 
   const confirmDelete = async () => {
