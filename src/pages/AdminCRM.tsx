@@ -883,37 +883,60 @@ const AdminCRM = () => {
                     ) : (
                       filtered.map((c) => {
                         const hasDependents = allDependents.some(d => d.customer_id === c.id);
+                        const ltvColor = c.ltvCategory === "VIP" ? "bg-purple-100 text-purple-700 border-purple-200" : c.ltvCategory === "Fiel" ? "bg-blue-100 text-blue-700 border-blue-200" : "bg-muted text-muted-foreground border-border";
+                        
                         return (
-          <tr
-            key={c.id}
-            className={`border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer ${selectedCustomer?.id === c.id ? "bg-muted/80" : ""}`}
-            onClick={() => selectCustomer(c)}
-          >
-            <td className="py-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0 shadow-sm">
-                  {c.name.trim() ? c.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
-                </div>
-                <div className="min-w-0">
-                  <p className="font-semibold text-foreground truncate flex items-center gap-2">
-                    {c.name}
-                    {c.status !== "regular" && (
-                      <Badge variant="outline" className={`text-[8px] px-1 py-0 uppercase ${customerStatusConfig[c.status]?.className || ""}`}>
-                        {customerStatusConfig[c.status]?.label || c.status}
-                      </Badge>
-                    )}
-                    {hasDependents && (
-                      <Users size={12} className="text-muted-foreground" />
-                    )}
-                  </p>
-                  <p className="text-xs text-muted-foreground truncate">{c.email}</p>
-                </div>
-              </div>
-            </td>
-                          <td className="py-3 text-muted-foreground hidden sm:table-cell">{c.phone ? maskPhone(c.phone) : "—"}</td>
-                          <td className="py-3 text-right text-foreground font-medium">{c.totalBookings}</td>
-                          <td className="py-3 text-right font-semibold text-foreground hidden sm:table-cell">{fmt(c.totalSpent)}</td>
-                          <td className="py-3 text-right">
+                          <tr
+                            key={c.id}
+                            className={`border-b border-border last:border-0 hover:bg-primary/5 transition-all cursor-pointer group ${selectedCustomer?.id === c.id ? "bg-primary/5" : ""}`}
+                            onClick={() => selectCustomer(c)}
+                          >
+                            <td className="py-4 px-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-xs font-black shrink-0 shadow-sm group-hover:bg-primary group-hover:text-white transition-all">
+                                  {c.name.trim() ? c.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="font-bold text-foreground truncate flex items-center gap-2 group-hover:text-primary transition-colors">
+                                    {c.name}
+                                    {c.ltvCategory && (
+                                      <Badge variant="outline" className={`text-[8px] px-1.5 py-0 font-black uppercase tracking-tighter ${ltvColor}`}>
+                                        {c.ltvCategory}
+                                      </Badge>
+                                    )}
+                                  </p>
+                                  <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-medium">
+                                    <Mail size={10} />
+                                    {c.email}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-4 px-2 hidden sm:table-cell">
+                              <div className="flex flex-col">
+                                <span className="text-xs font-semibold text-foreground flex items-center gap-1">
+                                  <Smartphone size={10} className="text-primary" />
+                                  {c.phone ? maskPhone(c.phone) : "—"}
+                                </span>
+                                <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                  <MapPin size={10} />
+                                  {c.city || "N/A"}/{c.state || "N/A"}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="py-4 px-2 text-center">
+                              <div className="flex flex-col items-center">
+                                <span className="text-sm font-bold">{c.totalBookings}</span>
+                                <span className="text-[9px] uppercase font-black text-muted-foreground tracking-tighter">Reservas</span>
+                              </div>
+                            </td>
+                            <td className="py-4 px-2 text-right hidden sm:table-cell">
+                              <div className="flex flex-col items-end">
+                                <span className="text-sm font-black text-foreground">{fmt(c.totalSpent)}</span>
+                                <span className="text-[9px] uppercase font-bold text-primary tracking-widest">LTV TOTAL</span>
+                              </div>
+                            </td>
+                            <td className="py-4 px-4 text-right">
                             <div className="flex gap-1 justify-end">
                               {c.phone && (
                                 <a
