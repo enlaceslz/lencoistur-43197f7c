@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { ClipboardCheck, Plus, CheckCircle, Circle, Trash2, Calendar, User } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ClipboardCheck, Plus, CheckCircle, Circle, Trash2, Calendar, User, Loader2 } from "lucide-react";
 
 const CHECKLIST_TEMPLATES: Record<string, string[]> = {
   veiculo_diario: ["Nível de óleo", "Nível de água/radiador", "Pressão dos pneus", "Estado dos pneus (desgaste)", "Freios (teste)", "Luzes (farol/lanterna/seta)", "Limpador/lavador de para-brisa", "Cinto de segurança (todos)", "Extintor de incêndio (validade)", "Triângulo de sinalização", "Macaco e chave de roda", "Estepe calibrado", "Kit primeiros socorros", "Documentação do veículo", "Combustível suficiente"],
@@ -140,67 +141,73 @@ const AdminSGSChecklists = () => {
         {loading ? <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div> : checklists.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground"><ClipboardCheck size={40} className="mx-auto mb-3 opacity-40" /><p>Nenhum checklist realizado</p></div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {checklists.map(cl => {
               const progress = getProgress(cl.id);
               const clItems = getItems(cl.id);
               return (
-                <div key={cl.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-all group border-l-4 border-l-primary/10 hover:border-l-primary transition-all">
-                  <div className="flex items-center justify-between mb-4">
+                <div key={cl.id} className="bg-card border border-border rounded-3xl p-6 hover:shadow-xl hover:border-primary/30 transition-all group relative overflow-hidden flex flex-col">
+                  <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${cl.status === "concluido" ? "bg-primary" : "bg-secondary"}`} />
+                  
+                  <div className="flex items-start justify-between mb-6">
                     <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-xl ${cl.status === "concluido" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary shadow-sm shadow-secondary/10"}`}>
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-inner ${cl.status === "concluido" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
                         <ClipboardCheck size={24} />
                       </div>
-                      <div>
-                        <h4 className="font-bold text-foreground text-base mb-1">{cl.titulo}</h4>
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                          <span className="text-[11px] flex items-center gap-1.5 text-muted-foreground font-medium">
-                            <Calendar size={12} className="text-primary" /> {new Date(cl.created_at).toLocaleDateString("pt-BR")}
-                          </span>
-                          {cl.responsavel && (
-                            <span className="text-[11px] flex items-center gap-1.5 text-muted-foreground font-medium">
-                              <User size={12} className="text-primary" /> {cl.responsavel}
-                            </span>
-                          )}
-                          <span className="text-[11px] px-2 py-0.5 rounded-md bg-muted text-muted-foreground font-bold uppercase tracking-wider">
+                      <div className="min-w-0">
+                        <h4 className="font-black text-foreground group-hover:text-primary transition-colors leading-tight truncate">{cl.titulo}</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="secondary" className="bg-muted text-muted-foreground font-black text-[8px] uppercase px-1.5 py-0 rounded border">
                             {cl.tipo.replace('_', ' ')}
+                          </Badge>
+                          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">
+                            {new Date(cl.created_at).toLocaleDateString("pt-BR")}
                           </span>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-widest ${cl.status === "concluido" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"}`}>
-                        {cl.status === "concluido" ? "Concluído" : "Em andamento"}
-                      </span>
-                      <button onClick={() => handleDelete(cl.id)} className="p-2 rounded-xl hover:bg-destructive/10 text-destructive transition-colors" title="Excluir">
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                      <button onClick={() => handleDelete(cl.id)} className="p-2 rounded-xl hover:bg-destructive/10 text-destructive transition-colors">
                         <Trash2 size={16} />
                       </button>
                     </div>
                   </div>
-                  {/* Progress bar */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between items-center text-[11px] font-bold uppercase tracking-wider">
-                      <span className="text-muted-foreground">Progresso da Inspeção</span>
+
+                  <div className="bg-muted/30 p-4 rounded-2xl border border-border/50 mb-6">
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest mb-2">
+                      <span className="text-muted-foreground italic flex items-center gap-1.5">
+                        <User size={12} className="text-primary" /> {cl.responsavel || "Responsável não informado"}
+                      </span>
                       <span className={progress === 100 ? "text-primary" : "text-secondary"}>{progress}%</span>
                     </div>
-                    <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden">
-                      <div className={`h-full rounded-full transition-all duration-500 ${progress === 100 ? "bg-primary" : "bg-secondary"}`} style={{ width: `${progress}%` }} />
+                    <div className="w-full h-2 bg-muted rounded-full overflow-hidden shadow-inner">
+                      <div className={`h-full rounded-full transition-all duration-700 ${progress === 100 ? "bg-primary" : "bg-secondary"}`} style={{ width: `${progress}%` }} />
                     </div>
-                    <p className="text-[11px] text-muted-foreground font-medium italic">
-                      {clItems.filter(i => i.conforme).length} de {clItems.length} itens em conformidade
-                    </p>
                   </div>
-                  {clItems.length > 0 && (
-                    <div className="grid sm:grid-cols-2 gap-1">
-                      {clItems.map(item => (
-                        <button key={item.id} onClick={() => toggleChecklistItem(item.id, item.conforme)}
-                          className={`flex items-center gap-2 px-2 py-1.5 rounded text-xs text-left transition-colors ${item.conforme ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}>
+
+                  <div className="flex-1 space-y-1.5 max-h-[160px] overflow-y-auto pr-2 custom-scrollbar">
+                    {clItems.map(item => (
+                      <button 
+                        key={item.id} 
+                        onClick={() => toggleChecklistItem(item.id, item.conforme)}
+                        className={`w-full flex items-center gap-3 p-2.5 rounded-xl text-[11px] font-bold text-left transition-all border border-transparent hover:border-primary/10 ${item.conforme ? "bg-primary/5 text-primary" : "bg-muted/10 text-muted-foreground hover:bg-muted/20"}`}
+                      >
+                        <div className={`shrink-0 transition-colors ${item.conforme ? "text-primary" : "text-muted-foreground/30"}`}>
                           {item.conforme ? <CheckCircle size={14} /> : <Circle size={14} />}
-                          {item.item_nome}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                        </div>
+                        <span className="truncate">{item.item_nome}</span>
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-6 pt-4 border-t border-border/50 flex justify-between items-center">
+                    <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg border ${cl.status === "concluido" ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-amber-50 text-amber-700 border-amber-100"}`}>
+                      {cl.status === "concluido" ? "Aprovado" : "Pendente"}
+                    </span>
+                    <button className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline flex items-center gap-1">
+                      Visualizar Laudo Completo
+                    </button>
+                  </div>
                 </div>
               );
             })}

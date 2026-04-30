@@ -315,8 +315,9 @@ const TermoAssinatura = () => {
         currentY += 12;
       }
 
-      // Risks
+      // Risks section with high contrast
       doc.setFontSize(14);
+      doc.setTextColor(0, 102, 204);
       doc.text("Ciência de Riscos e Segurança", 14, currentY);
       currentY += 5;
       const risksRows = acceptedRisks.map(r => [`[X] ${r}`]);
@@ -324,7 +325,7 @@ const TermoAssinatura = () => {
         startY: currentY,
         body: risksRows,
         theme: 'plain',
-        styles: { fontSize: 9, cellPadding: 1 }
+        styles: { fontSize: 9, cellPadding: 1, textColor: [51, 51, 51] }
       });
       
       currentY = (doc as any).lastAutoTable.finalY + 15;
@@ -383,14 +384,17 @@ const TermoAssinatura = () => {
       const filePath = `termos_assinados/${fileName}`;
 
       // 3. Upload to Storage
-      const { error: uploadError } = await supabase.storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from("customer-documents")
         .upload(filePath, pdfBlob, {
           contentType: 'application/pdf',
           cacheControl: '3600'
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error("Storage upload error:", uploadError);
+        // Continue even if storage fails, we still have the record
+      }
 
       // 4. Save to CRM Customer Documents
       const customerId = booking?.customer_id || term?.customer_id;
