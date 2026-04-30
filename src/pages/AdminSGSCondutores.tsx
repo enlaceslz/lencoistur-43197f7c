@@ -68,7 +68,7 @@ const AdminSGSCondutores = () => {
     }
   };
 
-  const openEdit = (c: any) => {
+  const openEdit = async (c: any) => {
     setForm({
       nome: c.nome,
       cpf: c.cpf || "",
