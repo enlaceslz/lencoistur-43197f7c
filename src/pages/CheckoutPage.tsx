@@ -9,6 +9,7 @@ import { useBookings, type BookingItem } from "@/hooks/useBookings";
 import { toast } from "@/hooks/use-toast";
 import { maskCPF, maskPhone } from "@/lib/masks";
 import { formatCurrency } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 const CheckoutPage = () => {
 
