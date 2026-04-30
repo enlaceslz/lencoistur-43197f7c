@@ -367,7 +367,7 @@ const TermoAssinatura = () => {
       doc.text("Declaração", 14, currentY);
       currentY += 7;
       doc.setFontSize(9);
-      const declaration = `Declaro que fui informado sobre os riscos inerentes à atividade, bem como sobre os procedimentos de segurança. Comprometo-me a seguir as orientações da equipe técnica e assumo a responsabilidade por meus atos durante a execução do passeio.`;
+      const declaration = `Declaro que fui informado sobre os riscos inerentes à atividade, bem como sobre os procedimentos de segurança. Comprometo-me a seguir as orientações da equipe técnica e assumo a responsabilidade por meus atos durante a execução do passeio. Observação: Esta operação segue as normas da ABNT NBR ISO 21103 e demais legislações pertinentes ao turismo de aventura. É de responsabilidade do contratante comunicar aos demais participantes que virão em sua companhia, todas as informações contidas neste documento.`;
       doc.text(doc.splitTextToSize(declaration, pageWidth - 28), 14, currentY);
       
       currentY += 25;
