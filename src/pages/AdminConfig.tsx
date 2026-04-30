@@ -1022,12 +1022,17 @@ const AdminConfig = () => {
 
         {/* GALERIA */}
         <TabsContent value="galeria">
-          <Card className="border-border">
-            <CardContent className="p-6 space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-display font-bold text-foreground text-lg">Galeria de Fotos</h3>
-                  <p className="text-sm text-muted-foreground">Gerencie as imagens da seção "Momentos Inesquecíveis"</p>
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-8 space-y-8">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-600">
+                    <Image size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-foreground">Acervo de Mídia</h3>
+                    <p className="text-sm text-muted-foreground">Galeria "Momentos Inesquecíveis" do website.</p>
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <input
@@ -1042,18 +1047,18 @@ const AdminConfig = () => {
                     onClick={() => galleryInputRef.current?.click()}
                     disabled={uploadingGallery}
                     variant="outline"
-                    className="rounded-xl"
+                    className="rounded-xl font-bold"
                   >
                     {uploadingGallery ? <Loader2 size={16} className="animate-spin mr-2" /> : <UploadCloud size={16} className="mr-2" />}
-                    Adicionar Fotos
+                    Fazer Upload
                   </Button>
                   <Button
                     onClick={() => saveSetting("gallery", gallery as unknown as Record<string, unknown>, "Galeria")}
                     disabled={saving}
-                    className="rounded-xl"
+                    className="rounded-xl font-black uppercase tracking-widest bg-primary text-white shadow-lg shadow-primary/20 h-10 px-6"
                   >
                     {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
-                    Salvar Galeria
+                    Publicar Galeria
                   </Button>
                 </div>
               </div>
