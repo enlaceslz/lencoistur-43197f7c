@@ -797,20 +797,24 @@ const AdminConfig = () => {
                   <Switch checked={pagamentos.transferencia} onCheckedChange={(v) => setPagamentos({ ...pagamentos, transferencia: v })} />
                 </div>
               </div>
-              <Button
-                onClick={() => {
-                  if (pagamentos.pix) {
-                    const v = validatePixKey(pagamentos.pixChave, pagamentos.pixTipo);
-                    if (!v.valid) { toast.error("Chave PIX inválida: " + v.message); return; }
-                  }
-                  saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Pagamento");
-                }}
-                disabled={saving}
-                className="rounded-xl"
-              >
-                {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
-                Salvar
-              </Button>
+              </div>
+              
+              <div className="mt-6 pt-6 border-t border-border flex justify-end">
+                <Button
+                  onClick={() => {
+                    if (pagamentos.pix) {
+                      const v = validatePixKey(pagamentos.pixChave, pagamentos.pixTipo);
+                      if (!v.valid) { toast.error("Chave PIX inválida: " + v.message); return; }
+                    }
+                    saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Pagamento");
+                  }}
+                  disabled={saving}
+                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white"
+                >
+                  {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
+                  Atualizar Financeiro
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
