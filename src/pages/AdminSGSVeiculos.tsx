@@ -64,24 +64,22 @@ const AdminSGSVeiculos = () => {
         res = await supabase.from("sgs_veiculos").insert(payload);
       }
 
-      if (res.error) {
-        console.error("Erro ao salvar veículo:", res.error);
-        toast({ 
-          title: "Erro ao salvar", 
-          description: res.error.message, 
-          variant: "destructive" 
-        });
-      } else {
-        toast({ title: editId ? "Veículo atualizado!" : "Veículo cadastrado!" });
-        setForm(emptyForm);
-        setShowForm(false);
-        setEditId(null);
-        load();
-      }
+      if (res.error) throw res.error;
+
+      // Sincronização com Parceiros: Se for um veículo terceirizado, pode ser interessante 
+      // ter um parceiro vinculado, mas como a estrutura de parceiros é focada em pessoas/empresas,
+      // aqui focamos em garantir que o status e dados básicos estejam consistentes se houver integração.
+      // Por enquanto, apenas confirmamos o sucesso no SGS.
+
+      toast({ title: editId ? "Veículo atualizado!" : "Veículo cadastrado!" });
+      setForm(emptyForm);
+      setShowForm(false);
+      setEditId(null);
+      load();
     } catch (err: any) {
-      console.error("Erro inesperado:", err);
+      console.error("Erro ao salvar veículo:", err);
       toast({ 
-        title: "Erro inesperado", 
+        title: "Erro ao salvar", 
         description: err.message, 
         variant: "destructive" 
       });
