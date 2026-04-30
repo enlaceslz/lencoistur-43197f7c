@@ -70,6 +70,30 @@ const AdminSGSDashboard = () => {
       procedures: (proceduresRes.data || []).length,
     });
 
+    // Fleet Alerts
+    const alerts: any[] = [];
+    const now = new Date();
+    const soon = new Date();
+    soon.setDate(now.getDate() + 30);
+
+    const isExpired = (d: string | null) => d && new Date(d) < now;
+    const isExpiring = (d: string | null) => d && new Date(d) >= now && new Date(d) <= soon;
+
+    (veiculosRes.data || []).forEach((v: any) => {
+      if (isExpired(v.seguro_validade)) alerts.push({ type: 'veiculo', title: `Seguro Vencido: ${v.placa}`, desc: v.marca + ' ' + v.modelo, severity: 'alta', link: '/admin/sgs/veiculos' });
+      else if (isExpiring(v.seguro_validade)) alerts.push({ type: 'veiculo', title: `Seguro Vencendo: ${v.placa}`, desc: v.marca + ' ' + v.modelo, severity: 'media', link: '/admin/sgs/veiculos' });
+      
+      if (isExpired(v.licenciamento_validade)) alerts.push({ type: 'veiculo', title: `Licenciamento Vencido: ${v.placa}`, desc: v.marca + ' ' + v.modelo, severity: 'alta', link: '/admin/sgs/veiculos' });
+      else if (isExpiring(v.licenciamento_validade)) alerts.push({ type: 'veiculo', title: `Licenciamento Vencendo: ${v.placa}`, desc: v.marca + ' ' + v.modelo, severity: 'media', link: '/admin/sgs/veiculos' });
+    });
+
+    (condutoresRes.data || []).forEach((c: any) => {
+      if (isExpired(c.cnh_validade)) alerts.push({ type: 'condutor', title: `CNH Vencida: ${c.nome}`, desc: 'Categoria ' + c.cnh_categoria, severity: 'alta', link: '/admin/sgs/condutores' });
+      else if (isExpiring(c.cnh_validade)) alerts.push({ type: 'condutor', title: `CNH Vencendo: ${c.nome}`, desc: 'Categoria ' + c.cnh_categoria, severity: 'media', link: '/admin/sgs/condutores' });
+    });
+
+    setFleetAlerts(alerts.sort((a, b) => a.severity === 'alta' ? -1 : 1).slice(0, 6));
+
     // Recent activity from incidents
     const recent: any[] = [];
     incidents.slice(0, 3).forEach((inc: any) => {
