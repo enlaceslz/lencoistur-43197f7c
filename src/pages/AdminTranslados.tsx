@@ -10,6 +10,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Car, MapPin, Clock, Users, Plus, Pencil, Trash2, X, Check, Search, Loader2, Percent, Eye, ArrowRight, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -163,7 +164,14 @@ const AdminTranslados = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
             <Input placeholder="Buscar por origem, destino ou veículo..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
           </div>
-          <Button onClick={openNew} className="shrink-0"><Plus size={16} className="mr-1" /> Nova Rota</Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button onClick={openNew} className="shrink-0"><Plus size={16} className="mr-1" /> Nova Rota</Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Cadastrar novo trecho de translado</p>
+            </TooltipContent>
+          </Tooltip>
         </CardContent>
       </Card>
 
@@ -227,11 +235,26 @@ const AdminTranslados = () => {
               <span className="text-sm font-medium text-foreground">Rota ativa</span>
             </label>
             <div className="flex gap-3">
-              <Button type="submit" disabled={saving}>
-                {saving ? <Loader2 className="animate-spin mr-1" size={16} /> : null}
-                {editingId ? "Atualizar" : "Criar Rota"}
-              </Button>
-              <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button type="submit" disabled={saving}>
+                    {saving ? <Loader2 className="animate-spin mr-1" size={16} /> : null}
+                    {editingId ? "Atualizar" : "Criar Rota"}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{editingId ? "Salvar alterações na rota" : "Finalizar cadastro da rota"}</p>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Sair sem salvar</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </form>
         </DialogContent>
