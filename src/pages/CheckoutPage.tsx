@@ -72,6 +72,23 @@ const CheckoutPage = () => {
   const [pixCopied, setPixCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (guests > 1) {
+      const count = guests - 1;
+      setCompanions(prev => {
+        const newCompanions = [...prev];
+        if (newCompanions.length < count) {
+          for (let i = newCompanions.length; i < count; i++) {
+            newCompanions.push({ name: "", cpf: "", birthDate: "" });
+          }
+        }
+        return newCompanions.slice(0, count);
+      });
+    } else {
+      setCompanions([]);
+    }
+  }, [guests]);
+
   if (!tour && !transfer && !pkg) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
