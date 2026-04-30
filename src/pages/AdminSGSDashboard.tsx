@@ -145,6 +145,7 @@ const AdminSGSDashboard = () => {
     }
     incidents.forEach((inc: any) => { const key = inc.date?.slice(0, 7); if (key && key in months) months[key]++; });
     setIncidentsByMonth(Object.entries(months).map(([month, count]) => ({ name: month.slice(5), incidentes: count })));
+    setLoading(false);
   };
 
   const generateP1Report = async () => {
