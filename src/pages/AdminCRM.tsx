@@ -184,11 +184,9 @@ const calculateAge = (birthDate: string | null) => {
 
 const AdminCRM = () => {
   return (
-    <AdminLayout title="CRM">
-      <TooltipProvider>
-        <AdminCRMContent />
-      </TooltipProvider>
-    </AdminLayout>
+    <TooltipProvider>
+      <AdminCRMContent />
+    </TooltipProvider>
   );
 };
 
@@ -1629,7 +1627,7 @@ const AdminCRMContent = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </React.Fragment>
+    </AdminLayout>
   );
 };
 
