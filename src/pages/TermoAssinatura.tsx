@@ -814,7 +814,7 @@ const TermoAssinatura = () => {
             {/* Declaration */}
             <div className="bg-secondary/5 border border-secondary/20 rounded-2xl p-4">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Ao assinar este termo, declaro que li todas as informações e recomendações, que respondi as questões com total veracidade e que todas as minhas dúvidas foram sanadas. Comprometo-me a cumprir rigorosamente com os procedimentos de segurança e seguir as orientações da equipe da <strong>{company?.nome_fantasia || 'LENÇÓIS TOUR'}</strong>. Tenho plena ciência de que minha segurança e a do grupo dependem do cumprimento destas normas, e assumo a corresponsabilidade por meus atos durante a atividade.
+                Ao assinar este termo, declaro que li todas as informações e recomendações, que respondi as questões com total veracidade e que todas as minhas dúvidas foram sanadas. Comprometo-me a cumprir rigorosamente com os procedimentos de segurança e seguir as orientações da equipe da <strong>{company?.nome_fantasia || 'LENÇÓIS TOUR'}</strong>. Tenho plena ciência de que minha segurança e a do grupo dependem do cumprimento destas normas, e assumo a corresponsabilidade por meus atos durante a atividade. <strong>Observação:</strong> Esta operação segue as normas da ABNT NBR ISO 21103 e demais legislações pertinentes ao turismo de aventura. É de responsabilidade do contratante comunicar aos demais participantes que virão em sua companhia, todas as informações contidas neste documento.
               </p>
             </div>
 

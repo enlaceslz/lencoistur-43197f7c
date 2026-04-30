@@ -433,7 +433,7 @@ const AdminSGSTermos = () => {
             Tenho plena ciência dos riscos mencionados e assumo a responsabilidade por atos próprios que contrariem as normas de segurança estabelecidas. Confirmo estar em condições físicas e psicológicas adequadas para a realização da atividade.
           </p>
           <p style="font-size: 10px; color: #444;">
-            <strong>Observação:</strong> Esta operação segue as normas da ABNT NBR ISO 21103 e demais legislações pertinentes ao turismo de aventura.
+            <strong>Observação:</strong> Esta operação segue as normas da ABNT NBR ISO 21103 e demais legislações pertinentes ao turismo de aventura. É de responsabilidade do contratante comunicar aos demais participantes que virão em sua companhia, todas as informações contidas neste documento.
           </p>
         </div>
 
