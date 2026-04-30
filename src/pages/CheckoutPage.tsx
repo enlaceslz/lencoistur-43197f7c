@@ -67,6 +67,7 @@ const CheckoutPage = () => {
   const [passport, setPassport] = useState("");
   const [country, setCountry] = useState("Brasil");
   const [birthDate, setBirthDate] = useState("");
+  const [companions, setCompanions] = useState<{ name: string; cpf: string; birthDate: string }[]>([]);
   const [confirmedBooking, setConfirmedBooking] = useState<BookingItem | null>(null);
   const [pixCopied, setPixCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
