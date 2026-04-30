@@ -54,18 +54,27 @@ const AdminSGSPesquisas = () => {
     <AdminLayout title="SGS - Pesquisas de Segurança">
       <div className="space-y-6">
         {/* KPIs */}
-        <div className="grid sm:grid-cols-3 gap-4">
-          <div className="bg-card border border-border rounded-2xl p-5 text-center">
-            <p className="text-3xl font-bold text-primary">{avgSafe}</p>
-            <p className="text-sm text-muted-foreground">Sensação de Segurança (1-5)</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="bg-card border border-border rounded-3xl p-6 hover:shadow-lg transition-all flex flex-col items-center text-center">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-3">
+              <Shield size={24} />
+            </div>
+            <p className="text-3xl font-black text-foreground font-display">{avgSafe}</p>
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">Sensação de Segurança (1-5)</p>
           </div>
-          <div className="bg-card border border-border rounded-2xl p-5 text-center">
-            <p className="text-3xl font-bold text-secondary">{avgRating}</p>
-            <p className="text-sm text-muted-foreground">Avaliação Geral (1-5)</p>
+          <div className="bg-card border border-border rounded-3xl p-6 hover:shadow-lg transition-all flex flex-col items-center text-center">
+            <div className="w-12 h-12 rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary mb-3">
+              <Star size={24} />
+            </div>
+            <p className="text-3xl font-black text-foreground font-display">{avgRating}</p>
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">Avaliação Geral (1-5)</p>
           </div>
-          <div className="bg-card border border-border rounded-2xl p-5 text-center">
-            <p className="text-3xl font-bold text-destructive">{dangerPct}%</p>
-            <p className="text-sm text-muted-foreground">Relataram Perigo</p>
+          <div className="bg-card border border-border rounded-3xl p-6 hover:shadow-lg transition-all flex flex-col items-center text-center">
+            <div className="w-12 h-12 rounded-2xl bg-destructive/10 flex items-center justify-center text-destructive mb-3">
+              <AlertTriangle size={24} />
+            </div>
+            <p className="text-3xl font-black text-foreground font-display">{dangerPct}%</p>
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">Relataram Perigo</p>
           </div>
         </div>
 
