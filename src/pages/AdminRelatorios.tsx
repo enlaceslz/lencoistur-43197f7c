@@ -220,7 +220,7 @@ const AdminRelatorios = () => {
                 <option value="365">Último ano</option>
               </select>
             </div>
-            <Tooltip>
+            <UITooltip>
               <TooltipTrigger asChild>
                 <button onClick={printReport} className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all active:scale-95">
                   <Printer size={16} /> Imprimir
@@ -229,7 +229,7 @@ const AdminRelatorios = () => {
               <TooltipContent>
                 <p>Gerar versão para impressão ou PDF deste relatório</p>
               </TooltipContent>
-            </Tooltip>
+            </UITooltip>
           </div>
         </div>
 
@@ -303,7 +303,7 @@ const AdminRelatorios = () => {
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                         <XAxis dataKey="date" fontSize={10} tick={{fill: '#9ca3af'}} axisLine={false} tickLine={false} />
                         <YAxis fontSize={10} tick={{fill: '#9ca3af'}} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v/100}`} />
-                        <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}} formatter={(v: number) => fmt(v)} />
+                        <ChartTooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}} formatter={(v: number) => fmt(v)} />
                         <Area type="monotone" dataKey="total" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
                       </AreaChart>
                     </ResponsiveContainer>
@@ -314,7 +314,7 @@ const AdminRelatorios = () => {
                         <Pie data={data.byStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={8}>
                           {data.byStatus?.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                         </Pie>
-                        <Tooltip />
+                        <ChartTooltip />
                         <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}} />
                       </RePieChart>
                     </ResponsiveContainer>
@@ -329,7 +329,7 @@ const AdminRelatorios = () => {
                         <Pie data={data.receitas} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={8}>
                           {data.receitas?.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                         </Pie>
-                        <Tooltip formatter={(v: number) => fmt(v)} />
+                        <ChartTooltip formatter={(v: number) => fmt(v)} />
                         <Legend iconType="circle" wrapperStyle={{paddingTop: '20px'}} />
                       </RePieChart>
                     </ResponsiveContainer>
@@ -340,7 +340,7 @@ const AdminRelatorios = () => {
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                         <XAxis dataKey="name" axisLine={false} tickLine={false} />
                         <YAxis fontSize={10} axisLine={false} tickLine={false} tickFormatter={(v) => `R$ ${(v/100).toLocaleString('pt-BR')}`} />
-                        <Tooltip formatter={(v: number) => fmt(v)} />
+                        <ChartTooltip formatter={(v: number) => fmt(v)} />
                         <Bar dataKey="recebido" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                         <Bar dataKey="pago" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
                       </BarChart>
@@ -356,7 +356,7 @@ const AdminRelatorios = () => {
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                         <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
                         <YAxis fontSize={10} axisLine={false} tickLine={false} tickFormatter={(v) => `R$ ${(v/100).toLocaleString('pt-BR')}`} />
-                        <Tooltip formatter={(v: number) => fmt(v)} />
+                        <ChartTooltip formatter={(v: number) => fmt(v)} />
                         <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Receita" />
                       </BarChart>
                     </ResponsiveContainer>
