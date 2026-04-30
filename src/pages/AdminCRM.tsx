@@ -1629,7 +1629,9 @@ const AdminCRMContent = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+      </>
+    );
+  };
   );
 };
 
