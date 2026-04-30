@@ -271,29 +271,41 @@ const AdminDashboard = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border text-muted-foreground">
-                    <th className="text-left py-3 font-medium">Código</th>
-                    <th className="text-left py-3 font-medium">Cliente</th>
-                    <th className="text-left py-3 font-medium">Passeio</th>
-                    <th className="text-left py-3 font-medium">Data</th>
-                    <th className="text-right py-3 font-medium">Total</th>
-                    <th className="text-right py-3 font-medium">Status</th>
+                  <tr className="border-b border-border text-muted-foreground bg-muted/30">
+                    <th className="text-left py-3 px-4 font-bold uppercase text-[10px] tracking-widest">Código</th>
+                    <th className="text-left py-3 px-2 font-bold uppercase text-[10px] tracking-widest">Cliente</th>
+                    <th className="text-left py-3 px-2 font-bold uppercase text-[10px] tracking-widest">Passeio</th>
+                    <th className="text-left py-3 px-2 font-bold uppercase text-[10px] tracking-widest text-center">Data</th>
+                    <th className="text-right py-3 px-2 font-bold uppercase text-[10px] tracking-widest">Total</th>
+                    <th className="text-right py-3 px-4 font-bold uppercase text-[10px] tracking-widest">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {recentBookings.length === 0 ? (
-                    <tr><td colSpan={6} className="py-8 text-center text-muted-foreground">Nenhuma reserva encontrada</td></tr>
+                    <tr><td colSpan={6} className="py-12 text-center text-muted-foreground font-medium italic">Nenhuma reserva recente encontrada</td></tr>
                   ) : recentBookings.map((b) => {
                     const s = statusMap[b.status] || { label: b.status, className: "bg-muted text-muted-foreground" };
                     return (
-                      <tr key={b.id} className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors">
-                        <td className="py-3 font-mono text-xs text-muted-foreground">{b.id}</td>
-                        <td className="py-3 font-semibold text-foreground">{b.client}</td>
-                        <td className="py-3 text-muted-foreground">{b.tour}</td>
-                        <td className="py-3 text-muted-foreground">{b.date}</td>
-                        <td className="py-3 text-right font-semibold text-foreground">{fmt(b.total)}</td>
-                        <td className="py-3 text-right">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${s.className}`}>{s.label}</span>
+                      <tr 
+                        key={b.id} 
+                        onClick={() => navigate("/admin/reservas")}
+                        className="border-b border-border/50 last:border-0 hover:bg-primary/5 transition-colors cursor-pointer group"
+                      >
+                        <td className="py-4 px-4 font-mono text-[10px] text-primary font-bold">
+                          <span className="bg-primary/5 px-2 py-1 rounded">{b.id}</span>
+                        </td>
+                        <td className="py-4 px-2">
+                          <p className="font-bold text-foreground group-hover:text-primary transition-colors">{b.client}</p>
+                        </td>
+                        <td className="py-4 px-2 text-muted-foreground text-xs font-medium">{b.tour}</td>
+                        <td className="py-4 px-2 text-muted-foreground text-xs text-center font-semibold">
+                          {b.date ? new Date(b.date + "T12:00:00").toLocaleDateString("pt-BR") : "—"}
+                        </td>
+                        <td className="py-4 px-2 text-right font-black text-foreground">{fmt(b.total)}</td>
+                        <td className="py-4 px-4 text-right">
+                          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter border ${s.className}`}>
+                            {s.label}
+                          </span>
                         </td>
                       </tr>
                     );
