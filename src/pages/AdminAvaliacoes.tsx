@@ -203,12 +203,17 @@ const AdminAvaliacoes = () => {
             ))}
           </SelectContent>
         </Select>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <Tooltip>
+            <TooltipTrigger asChild>
               <DialogTrigger asChild>
                 <Button onClick={resetForm}><Plus size={16} className="mr-1" /> Nova Avaliação</Button>
               </DialogTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Cadastrar avaliação manual de cliente</p>
+            </TooltipContent>
+          </Tooltip>
           <DialogContent>
             <DialogHeader><DialogTitle>Nova Avaliação</DialogTitle></DialogHeader>
             <div className="space-y-4">
@@ -251,11 +256,7 @@ const AdminAvaliacoes = () => {
               </Button>
             </div>
             </DialogContent>
-          </Dialog>
-          <TooltipContent>
-            <p>Cadastrar avaliação manual de cliente</p>
-          </TooltipContent>
-        </Tooltip>
+        </Dialog>
       </div>
 
       {/* List */}
