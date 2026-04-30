@@ -3,8 +3,8 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { maskCPF, maskPhone } from "@/lib/masks";
-
-import { UserCheck, Plus, Search, AlertTriangle, Pencil, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { UserCheck, Plus, Search, AlertTriangle, Pencil, Trash2, Loader2, CheckCircle } from "lucide-react";
 
 const emptyForm = { nome: "", cpf: "", cnh_numero: "", cnh_categoria: "B", cnh_validade: "", telefone: "", email: "", primeiros_socorros: false, off_road: false, status: "ativo" as const, observacoes: "" };
 
