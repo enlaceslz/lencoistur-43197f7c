@@ -122,7 +122,11 @@ const AdminFinanceiro = () => {
     const address = company?.endereco || "";
     const phone = company?.telefone || "";
 
-    // Logo
+    // Header Background
+    doc.setFillColor(33, 150, 243);
+    doc.rect(0, 0, 210, 40, "F");
+
+    // Logo (if exists)
     if (company?.logo_url) {
       try {
         const img = new Image();
@@ -131,97 +135,114 @@ const AdminFinanceiro = () => {
           img.onload = resolve;
           img.onerror = resolve;
         });
-        doc.addImage(img, 'PNG', 14, 10, 25, 25);
+        doc.addImage(img, 'PNG', 14, 8, 24, 24);
       } catch (e) {
         console.error("Error loading logo for PDF", e);
       }
     }
 
-    // Company Info
-    doc.setFontSize(18);
-    doc.setTextColor(15, 23, 42); // slate-900
+    // Company Info in Header
+    doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
-    doc.text(brandName, 45, 18);
+    doc.setFontSize(22);
+    doc.text(brandName.toUpperCase(), 45, 18);
     
     doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 116, 139); // slate-500
-    doc.text(`CNPJ: ${cnpj}`, 45, 23);
-    doc.text(`${address}`, 45, 28);
-    doc.text(`Contato: ${phone}`, 45, 33);
+    doc.text(`CNPJ: ${cnpj} | Contato: ${phone}`, 45, 25);
+    doc.text(`${address}`, 45, 30);
 
     // Title & Period
-    doc.setFontSize(14);
+    doc.setFontSize(16);
     doc.setTextColor(33, 150, 243);
     doc.setFont("helvetica", "bold");
-    doc.text("RELATÓRIO FINANCEIRO MENSAL", 14, 50);
+    doc.text("RELATÓRIO FINANCEIRO CONSOLIDADO", 14, 55);
     
     doc.setFontSize(10);
-    doc.setTextColor(71, 85, 105); // slate-600
-    doc.text(`Período: ${monthName} de ${selectedYear}`, 14, 56);
-    doc.text(`Gerado em: ${dateStr}`, 150, 56);
+    doc.setTextColor(100);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Competência: ${monthName} de ${selectedYear}`, 14, 62);
+    doc.text(`Data de Emissão: ${dateStr}`, 150, 62);
 
-    // Divider
-    doc.setDrawColor(226, 232, 240);
-    doc.line(14, 60, 196, 60);
+    // Summary Box
+    doc.setFillColor(245, 247, 250);
+    doc.roundedRect(14, 70, 182, 35, 3, 3, "F");
 
-    // Summary Cards Section
-    doc.setFillColor(248, 250, 252);
-    doc.roundedRect(14, 65, 182, 30, 3, 3, "F");
-
-    doc.setFontSize(9);
-    doc.setTextColor(100, 116, 139);
-    doc.text("RESUMO DO PERÍODO", 20, 72);
-
-    doc.setFontSize(11);
-    doc.setTextColor(15, 23, 42);
-    doc.text("Receita Bruta:", 20, 80);
-    doc.text(fmt(receitaPaga), 60, 80);
-
-    doc.text("Despesas:", 20, 87);
-    doc.text(fmt(despesasMes), 60, 87);
-
-    doc.setFontSize(12);
+    doc.setFontSize(10);
+    doc.setTextColor(71, 85, 105);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(lucroMes >= 0 ? 22 : 220, lucroMes >= 0 ? 163 : 38, lucroMes >= 0 ? 74 : 38);
-    doc.text("Resultado Líquido:", 110, 84);
-    doc.text(fmt(lucroMes), 155, 84);
+    doc.text("RESUMO EXECUTIVO", 20, 78);
 
-    // Table
-    const tableData = monthBookings.map(b => [
-      b.booking_code,
-      b.customers?.name || "N/A",
-      b.item_name,
-      fmt(b.final_total),
-      b.payment_status === "pago" ? "Pago" : "Pendente",
-      fmtDate(b.created_at)
-    ]);
+    doc.setFont("helvetica", "normal");
+    doc.text("Total de Receitas Pagas:", 20, 85);
+    doc.setTextColor(22, 163, 74); // Emerald
+    doc.text(fmt(receitaPaga), 75, 85);
+
+    doc.setTextColor(71, 85, 105);
+    doc.text("Total de Despesas Pagas:", 20, 92);
+    doc.setTextColor(220, 38, 38); // Rose
+    doc.text(fmt(despesasMes), 75, 92);
+
+    doc.setTextColor(71, 85, 105);
+    doc.setFont("helvetica", "bold");
+    doc.text("RESULTADO LÍQUIDO:", 115, 88);
+    doc.setFontSize(14);
+    doc.setTextColor(lucroMes >= 0 ? 33 : 220, lucroMes >= 0 ? 150 : 38, lucroMes >= 0 ? 243 : 38);
+    doc.text(fmt(lucroMes), 155, 88);
+
+    // Main Table - Unified view of transactions
+    const tableData = [
+      ...monthBookings.map(b => [
+        fmtDate(b.created_at),
+        `[ENTRADA] ${b.item_name} - ${b.customers?.name || "N/A"}`,
+        (b.pay_method || "N/A").toUpperCase(),
+        fmt(b.final_total),
+        b.payment_status === "pago" ? "PAGO" : "PENDENTE"
+      ]),
+      ...monthContasPagar.map(c => [
+        fmtDate(c.vencimento),
+        `[SAÍDA] ${c.descricao} - ${c.fornecedor || "N/A"}`,
+        "TRANSFERÊNCIA",
+        `(${fmt(c.valor)})`,
+        c.status === "pago" ? "PAGO" : "PENDENTE"
+      ])
+    ].sort((a, b) => {
+      try {
+        const dateA = new Date(a[0].split('/').reverse().join('-'));
+        const dateB = new Date(b[0].split('/').reverse().join('-'));
+        return dateA.getTime() - dateB.getTime();
+      } catch { return 0; }
+    });
 
     autoTable(doc, {
-      startY: 100,
-      head: [["Código", "Cliente", "Serviço", "Valor", "Status", "Data"]],
+      startY: 115,
+      head: [["Data", "Descrição / Origem", "Meio", "Valor", "Status"]],
       body: tableData,
-      theme: "grid",
+      theme: "striped",
       headStyles: { 
         fillColor: [33, 150, 243], 
         textColor: 255, 
-        fontSize: 9, 
-        fontStyle: 'bold',
-        halign: 'center'
+        fontSize: 10,
+        fontStyle: 'bold'
       },
       styles: { 
-        fontSize: 8, 
-        cellPadding: 3,
-        textColor: 51,
-        lineColor: [226, 232, 240]
+        fontSize: 8,
+        cellPadding: 4,
+        textColor: 50
       },
       columnStyles: {
-        3: { halign: 'right' },
-        4: { halign: 'center' },
-        5: { halign: 'center' }
+        3: { halign: 'right', fontStyle: 'bold' },
+        4: { halign: 'center' }
       },
-      alternateRowStyles: {
-        fillColor: [249, 250, 251]
+      didParseCell: (data) => {
+        if (data.section === 'body' && data.column.index === 3) {
+          const val = String(data.cell.text[0] || "");
+          if (val.includes('(')) {
+            data.cell.styles.textColor = [220, 38, 38];
+          } else {
+            data.cell.styles.textColor = [22, 163, 74];
+          }
+        }
       }
     });
 
@@ -230,12 +251,11 @@ const AdminFinanceiro = () => {
     for(let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(8);
-      doc.setTextColor(148, 163, 184);
-      doc.text(`Página ${i} de ${pageCount}`, 105, 285, { align: "center" });
-      doc.text("Lençóis Tour - Gestão Profissional de Turismo", 14, 285);
+      doc.setTextColor(150);
+      doc.text(`Lençóis Tour - Sistema de Gestão Financeira | Página ${i} de ${pageCount}`, 105, 285, { align: "center" });
     }
 
-    doc.save(`Relatorio_Financeiro_${monthName}_${selectedYear}.pdf`);
+    doc.save(`Financeiro_Consolidado_${monthName}_${selectedYear}.pdf`);
   };
 
   if (loading) {
