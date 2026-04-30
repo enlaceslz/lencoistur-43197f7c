@@ -264,6 +264,9 @@ const AdminPasseios = () => {
     load();
   };
 
+  const sortedTours = [...tours].sort((a, b) => (b.reviews_count || 0) - (a.reviews_count || 0));
+  const topSellingThreshold = sortedTours.length > 3 ? sortedTours[2].reviews_count : 10;
+
   const filtered = tours.filter(t =>
     t.name.toLowerCase().includes(search.toLowerCase())
   );
