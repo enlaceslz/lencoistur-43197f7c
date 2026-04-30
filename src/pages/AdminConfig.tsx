@@ -797,7 +797,6 @@ const AdminConfig = () => {
                   <Switch checked={pagamentos.transferencia} onCheckedChange={(v) => setPagamentos({ ...pagamentos, transferencia: v })} />
                 </div>
               </div>
-              </div>
               
               <div className="mt-6 pt-6 border-t border-border flex justify-end">
                 <Button
