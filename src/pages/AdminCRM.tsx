@@ -1632,6 +1632,5 @@ const AdminCRMContent = () => {
     </>
   );
 };
-};
 
 export default AdminCRM;
