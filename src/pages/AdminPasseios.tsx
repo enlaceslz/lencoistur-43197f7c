@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -9,7 +10,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Search, Plus, Pencil, Trash2, Eye, EyeOff, Compass, Users, Clock, Star, X, Upload, Link as LinkIcon, Image as ImageIcon, GripVertical, Percent, MapPin, CheckCircle, Sparkles, Copy, Shield,
+  Search, Plus, Pencil, Trash2, Eye, EyeOff, Compass, Users, Clock, Star, X, Upload, Link as LinkIcon, Image as ImageIcon, GripVertical, Percent, MapPin, CheckCircle, Sparkles, Copy, Shield, Loader2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -263,6 +264,9 @@ const AdminPasseios = () => {
     await supabase.from("tours").update({ active: !current }).eq("id", id);
     load();
   };
+
+  const sortedTours = [...tours].sort((a, b) => (b.reviews_count || 0) - (a.reviews_count || 0));
+  const topSellingThreshold = sortedTours.length > 3 ? sortedTours[2].reviews_count : 10;
 
   const filtered = tours.filter(t =>
     t.name.toLowerCase().includes(search.toLowerCase())
@@ -562,100 +566,124 @@ const AdminPasseios = () => {
       </Dialog>
 
 
-      <Card>
+      <Card className="border-none shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Passeio</TableHead>
-              <TableHead>Categoria</TableHead>
-              <TableHead>Duração</TableHead>
-              <TableHead>Preços / Modalidades</TableHead>
-              <TableHead>Desc. PIX</TableHead>
-              <TableHead>SGS</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
+            <TableRow className="bg-muted/30">
+              <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest pl-6">Passeio / Localização</TableHead>
+              <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Categoria</TableHead>
+              <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Preços & Modalidades</TableHead>
+              <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Segurança & Avaliação</TableHead>
+              <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest text-center">Status</TableHead>
+              <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest text-right pr-6">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow><TableCell colSpan={8} className="text-center py-8 text-muted-foreground">Carregando...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center py-20"><Loader2 className="animate-spin text-primary mx-auto" size={32} /></TableCell></TableRow>
             ) : filtered.length === 0 ? (
-              <TableRow><TableCell colSpan={8} className="text-center py-8 text-muted-foreground">Nenhum passeio encontrado</TableCell></TableRow>
-            ) : filtered.map((t) => (
-              <TableRow key={t.id} className={!t.active ? "opacity-50" : ""}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    {t.images?.[0] ? (
-                      <img src={t.images[0]} alt={t.name} className="w-12 h-12 rounded-lg object-cover" />
-                    ) : (
-                      <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center"><Compass size={20} className="text-muted-foreground" /></div>
-                    )}
-                    <div className="cursor-pointer" onClick={() => openEdit(t)}>
-                      <p className="font-semibold text-foreground text-sm hover:text-primary transition-colors">{t.name}</p>
-                      <p className="text-xs text-muted-foreground">{t.location}</p>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell><Badge variant="secondary">{t.category}</Badge></TableCell>
-                <TableCell className="text-muted-foreground">
-                  <span className="flex items-center gap-1"><Clock size={13} /> {t.duration}</span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-col gap-1">
-                    {t.mode_collective_enabled && (
-                      <div className="flex items-center gap-1.5" title="Coletivo">
-                        <Users size={12} className="text-primary" />
-                        <span className="text-sm font-medium">{fmt(t.price)}</span>
-                      </div>
-                    )}
-                    {t.mode_private_enabled && (
-                      <div className="flex items-center gap-1.5" title="Privativo">
-                        <Shield size={12} className="text-secondary" />
-                        <span className="text-sm font-medium text-secondary">{fmt(t.private_price || 1300)}</span>
-                      </div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">
-                    {t.pix_discount}%
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-1.5" title="SGS ISO 21101/03">
-                      <Shield size={12} className="text-primary" />
-                      <span className="text-[10px] font-bold text-primary">ISO COMPLIANT</span>
-                    </div>
-                    <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                      <Star size={11} className="text-amber-500 fill-amber-500" /> {Number(t.rating).toFixed(1)} ({t.reviews_count || 0})
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <button onClick={() => toggleActive(t.id, t.active)}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${t.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                    {t.active ? "Ativo" : "Inativo"}
-                  </button>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <button onClick={() => setDetailTour(t)} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-primary transition-colors" title="Ver detalhes">
-                      <Eye size={16} />
-                    </button>
-                    <button onClick={() => handleDuplicate(t)} className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-blue-500 transition-colors" title="Duplicar">
-                      <Copy size={16} />
-                    </button>
-                    <button onClick={() => openEdit(t)} className="p-2 rounded-lg bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all shadow-sm border border-primary/10" title="Editar">
-                      <Pencil size={16} />
-                    </button>
-                    <button onClick={() => handleDelete(t.id)} className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
-                      <Trash2 size={16} />
-                    </button>
+              <TableRow>
+                <TableCell colSpan={6} className="py-20 text-center text-muted-foreground">
+                  <div className="flex flex-col items-center gap-2 opacity-50">
+                    <Compass size={40} />
+                    <p className="font-bold">Nenhum passeio encontrado</p>
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filtered.map((t) => {
+                const isTopSeller = t.reviews_count >= topSellingThreshold && t.active;
+                return (
+                  <TableRow key={t.id} className={`group hover:bg-primary/5 transition-all border-b border-border/50 ${!t.active ? "opacity-60 grayscale" : ""}`}>
+                    <TableCell className="pl-6 py-4">
+                      <div className="flex items-center gap-4">
+                        <div className="relative shrink-0">
+                          {t.images?.[0] ? (
+                            <img src={t.images[0]} className="w-14 h-14 rounded-2xl object-cover shadow-sm group-hover:scale-105 transition-transform" />
+                          ) : (
+                            <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground">
+                              <Compass size={24} />
+                            </div>
+                          )}
+                          {isTopSeller && (
+                            <div className="absolute -top-2 -right-2 bg-amber-500 text-white p-1 rounded-full shadow-lg border-2 border-background animate-bounce">
+                              <Sparkles size={10} />
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-black text-foreground group-hover:text-primary transition-colors flex items-center gap-2">
+                            {t.name}
+                            {isTopSeller && <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[8px] font-black uppercase py-0 px-1.5">Best Seller</Badge>}
+                          </p>
+                          <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-bold uppercase tracking-tighter mt-0.5">
+                            <MapPin size={10} className="text-primary/60" /> {t.location}
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" className="bg-muted text-muted-foreground font-black text-[9px] uppercase px-2 py-0.5 rounded-lg border">
+                        {t.category}
+                      </Badge>
+                      <div className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1 font-medium">
+                        <Clock size={10} /> {t.duration}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1.5">
+                        {t.mode_collective_enabled && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-black text-foreground">{fmt(t.price)}</span>
+                            <span className="text-[9px] font-bold text-muted-foreground uppercase bg-muted/50 px-1.5 rounded">Coletivo</span>
+                          </div>
+                        )}
+                        {t.mode_private_enabled && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-primary">{fmt(t.private_price || 130000)}</span>
+                            <span className="text-[9px] font-bold text-primary/60 uppercase bg-primary/5 px-1.5 rounded">Privativo</span>
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded-lg w-fit">
+                          <Shield size={10} className="fill-emerald-700/20" />
+                          <span className="text-[9px] font-black uppercase">SGS COMPLIANT</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-[11px] font-black text-amber-500">
+                          <Star size={12} fill="currentColor" /> {Number(t.rating).toFixed(1)} 
+                          <span className="text-muted-foreground font-bold text-[9px] ml-1">({t.reviews_count || 0} reviews)</span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <button onClick={() => toggleActive(t.id, t.active)}
+                        className={`font-black text-[9px] uppercase px-3 py-1 rounded-xl border transition-all active:scale-95 ${t.active ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200"}`}>
+                        {t.active ? "Publicado" : "Pausado"}
+                      </button>
+                    </TableCell>
+                    <TableCell className="text-right pr-6">
+                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary" onClick={(e) => { e.stopPropagation(); setDetailTour(t); }}>
+                          <Eye size={16} />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-blue-100 hover:text-blue-600" onClick={(e) => { e.stopPropagation(); handleDuplicate(t); }}>
+                          <Copy size={16} />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary" onClick={(e) => { e.stopPropagation(); openEdit(t); }}>
+                          <Pencil size={16} />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-destructive hover:bg-destructive/10" onClick={(e) => { e.stopPropagation(); handleDelete(t.id); }}>
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
           </TableBody>
         </Table>
       </Card>
