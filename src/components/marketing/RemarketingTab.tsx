@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Clock, TrendingUp, Copy, Trash2 } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -87,7 +88,14 @@ const RemarketingTab = ({ rules, onRefresh }: RemarketingTabProps) => {
       <div className="flex items-center justify-between">
         <h2 className="font-display font-bold text-lg text-foreground">Automações de Remarketing</h2>
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild><Button><Plus size={16} className="mr-1" /> Nova Automação</Button></DialogTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DialogTrigger asChild><Button><Plus size={16} className="mr-1" /> Nova Automação</Button></DialogTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Configurar nova regra de disparo automático</p>
+            </TooltipContent>
+          </Tooltip>
           <DialogContent className="sm:max-w-lg">
             <DialogHeader><DialogTitle>Nova Automação</DialogTitle></DialogHeader>
             <div className="space-y-5 py-4">
@@ -182,15 +190,29 @@ const RemarketingTab = ({ rules, onRefresh }: RemarketingTabProps) => {
                     <div className="flex flex-col gap-3 items-end">
                       <Switch checked={r.active} onCheckedChange={() => handleToggle(r.id, r.active)} className="data-[state=checked]:bg-primary" />
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-primary/10 hover:text-primary transition-all" title="Duplicar Regra" onClick={() => handleDuplicate(r)}>
-                          <Copy size={16} />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-destructive hover:bg-destructive/10 transition-all">
-                              <Trash2 size={16} />
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-primary/10 hover:text-primary transition-all" onClick={() => handleDuplicate(r)}>
+                              <Copy size={16} />
                             </Button>
-                          </AlertDialogTrigger>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Duplicar esta regra</p>
+                          </TooltipContent>
+                        </Tooltip>
+                        <AlertDialog>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-destructive hover:bg-destructive/10 transition-all">
+                                <Trash2 size={16} />
+                              </Button>
+                            </AlertDialogTrigger>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Remover permanentemente</p>
+                          </TooltipContent>
+                        </Tooltip>
                           <AlertDialogContent className="rounded-2xl border-none shadow-2xl">
                             <AlertDialogHeader>
                               <AlertDialogTitle className="font-black text-xl">Remover automação?</AlertDialogTitle>
