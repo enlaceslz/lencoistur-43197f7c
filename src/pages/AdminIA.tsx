@@ -12,6 +12,7 @@ import {
   Bot, Brain, MessageSquare, TrendingUp, Zap, Settings,
   BarChart3, ThumbsUp, Save, Loader2, RefreshCw, Sparkles,
 } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
@@ -232,10 +233,17 @@ const AdminIA = () => {
               <h3 className="font-display font-bold text-lg text-foreground flex items-center gap-2">
                 <Brain size={20} className="text-primary" /> Análise Inteligente
               </h3>
-              <Button onClick={generateAIAnalysis} disabled={aiLoading}>
-                {aiLoading ? <Loader2 size={16} className="animate-spin mr-1" /> : <Sparkles size={16} className="mr-1" />}
-                {aiAnalysis ? "Atualizar Análise" : "Gerar Análise"}
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button onClick={generateAIAnalysis} disabled={aiLoading}>
+                    {aiLoading ? <Loader2 size={16} className="animate-spin mr-1" /> : <Sparkles size={16} className="mr-1" />}
+                    {aiAnalysis ? "Atualizar Análise" : "Gerar Análise"}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Usar inteligência artificial para extrair insights dos dados atuais</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
 
             {aiLoading && !aiAnalysis && (
@@ -276,9 +284,16 @@ const AdminIA = () => {
         <TabsContent value="demanda">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-display font-bold text-lg text-foreground">Demanda por Passeio (Mês Atual)</h3>
-            <Button variant="outline" size="sm" onClick={loadData} disabled={loading}>
-              <RefreshCw size={14} className={loading ? "animate-spin mr-1" : "mr-1"} /> Atualizar
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="sm" onClick={loadData} disabled={loading}>
+                  <RefreshCw size={14} className={loading ? "animate-spin mr-1" : "mr-1"} /> Atualizar
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Recarregar dados de demanda</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
 
           {loading ? (
@@ -344,10 +359,17 @@ const AdminIA = () => {
                     <Textarea rows={4} value={instructions} onChange={(e) => setInstructions(e.target.value)} maxLength={500} />
                     <p className="text-xs text-muted-foreground">{instructions.length}/500</p>
                   </div>
-                  <Button onClick={handleSaveConfig} disabled={saving}>
-                    {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
-                    Salvar
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button onClick={handleSaveConfig} disabled={saving}>
+                        {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
+                        Salvar
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Salvar configurações de personalidade e instruções do chatbot</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               </CardContent>
             </Card>
