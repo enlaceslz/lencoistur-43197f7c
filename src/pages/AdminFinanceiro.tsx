@@ -349,16 +349,34 @@ const AdminFinanceiro = () => {
             </div>
           </div>
           
-          <div className="flex-1 max-w-md hidden md:block">
-            <div className="relative">
+          <div className="flex-1 flex gap-2 max-w-2xl">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
               <Input 
-                placeholder="Pesquisar nas exportações..." 
+                placeholder="Pesquisar..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 h-11 bg-muted/30 border-none rounded-xl"
               />
             </div>
+            <select 
+              value={statusFilter} 
+              onChange={(e) => setStatusFilter(e.target.value as any)}
+              className="bg-muted/50 border-none rounded-xl px-3 h-11 text-sm font-semibold focus:ring-2 focus:ring-primary transition-all cursor-pointer"
+            >
+              <option value="todos">Status: Todos</option>
+              <option value="pago">Apenas Pagos</option>
+              <option value="pendente">Apenas Pendentes</option>
+            </select>
+            <select 
+              value={typeFilter} 
+              onChange={(e) => setTypeFilter(e.target.value as any)}
+              className="bg-muted/50 border-none rounded-xl px-3 h-11 text-sm font-semibold focus:ring-2 focus:ring-primary transition-all cursor-pointer"
+            >
+              <option value="todos">Tipo: Todos</option>
+              <option value="entrada">Entradas (+)</option>
+              <option value="saida">Saídas (-)</option>
+            </select>
           </div>
           
           <div className="flex items-center gap-3">
