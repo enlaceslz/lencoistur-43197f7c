@@ -316,8 +316,47 @@ const AdminSGSDashboard = () => {
           ))}
         </div>
 
-        {/* Recent Activity + Charts Row */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-4 gap-6">
+          {/* Fleet Alerts - NEW */}
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display font-black text-foreground text-sm flex items-center gap-2">
+                <Truck size={18} className="text-primary" /> Alertas de Frota
+              </h3>
+              {fleetAlerts.length > 0 && <Badge variant="destructive" className="animate-pulse">{fleetAlerts.length}</Badge>}
+            </div>
+            {fleetAlerts.length === 0 ? (
+              <div className="text-center py-12">
+                <CheckCircle size={32} className="mx-auto text-emerald-500/20 mb-2" />
+                <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Documentação em dia</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {fleetAlerts.map((a, i) => (
+                  <button
+                    key={i}
+                    onClick={() => navigate(a.link)}
+                    className="w-full text-left flex items-start gap-3 p-3 rounded-xl hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group"
+                  >
+                    <div className={`p-2 rounded-lg shrink-0 ${a.severity === 'alta' ? 'bg-destructive/10 text-destructive' : 'bg-amber-100 text-amber-700'}`}>
+                      {a.type === 'veiculo' ? <Car size={14} /> : <UserCheck2 size={14} />}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-black text-foreground leading-tight group-hover:text-primary transition-colors">{a.title}</p>
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase mt-0.5">{a.desc}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+            <button 
+              onClick={() => navigate('/admin/sgs/veiculos')}
+              className="w-full mt-4 py-2 text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/5 rounded-lg transition-colors border border-primary/10"
+            >
+              Gerenciar Frota
+            </button>
+          </div>
+
           {/* Recent Activity */}
           <div className="bg-card border border-border rounded-2xl p-5">
             <div className="flex items-center justify-between mb-4">
@@ -357,9 +396,9 @@ const AdminSGSDashboard = () => {
           <div className="bg-card border border-border rounded-2xl p-5">
             <h3 className="font-display font-bold text-foreground text-sm mb-4">Distribuição de Riscos</h3>
             {risksByLevel.length > 0 && risksByLevel.some(r => r.value > 0) ? (
-              <ResponsiveContainer width="100%" height={200}>
+              <ResponsiveContainer width="100%" height={160}>
                 <PieChart>
-                  <Pie data={risksByLevel} cx="50%" cy="50%" outerRadius={70} innerRadius={35} dataKey="value" label={({ name, value }) => `${value}`}>
+                  <Pie data={risksByLevel} cx="50%" cy="50%" outerRadius={60} innerRadius={30} dataKey="value">
                     {risksByLevel.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
                   </Pie>
                   <Tooltip />
@@ -369,12 +408,11 @@ const AdminSGSDashboard = () => {
               <div className="flex flex-col items-center justify-center py-8">
                 <AlertTriangle size={28} className="text-muted-foreground/30 mb-2" />
                 <p className="text-xs text-muted-foreground">Nenhum risco cadastrado</p>
-                <button onClick={() => navigate("/admin/sgs/riscos")} className="text-xs text-primary hover:underline mt-1">+ Cadastrar risco</button>
               </div>
             )}
-            <div className="flex justify-center gap-4 mt-2">
+            <div className="flex flex-wrap justify-center gap-3 mt-2">
               {risksByLevel.map(r => (
-                <div key={r.name} className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                <div key={r.name} className="flex items-center gap-1.5 text-[9px] font-bold text-muted-foreground uppercase">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: r.fill }} />
                   {r.name}
                 </div>
@@ -384,14 +422,14 @@ const AdminSGSDashboard = () => {
 
           {/* Incidents Timeline */}
           <div className="bg-card border border-border rounded-2xl p-5">
-            <h3 className="font-display font-bold text-foreground text-sm mb-4">Incidentes (6 meses)</h3>
-            <ResponsiveContainer width="100%" height={200}>
+            <h3 className="font-display font-bold text-foreground text-sm mb-4">Tendência de Incidentes</h3>
+            <ResponsiveContainer width="100%" height={160}>
               <LineChart data={incidentsByMonth}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border)/0.5)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={10} />
+                <YAxis axisLine={false} tickLine={false} fontSize={10} />
                 <Tooltip />
-                <Line type="monotone" dataKey="incidentes" stroke="hsl(var(--destructive))" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="incidentes" stroke="hsl(var(--destructive))" strokeWidth={3} dot={{ r: 4, strokeWidth: 0, fill: "hsl(var(--destructive))" }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
