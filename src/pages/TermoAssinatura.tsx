@@ -343,7 +343,7 @@ const TermoAssinatura = () => {
       // Companions
       if (companions.length > 0) {
         doc.setFontSize(14);
-        doc.text("Acompanhantes", 14, currentY);
+        doc.text("Autorização para Dependentes", 14, currentY);
         currentY += 5;
         const companionsRows = companions.map(c => [
           c.full_name, 
@@ -653,7 +653,7 @@ const TermoAssinatura = () => {
               <div className="space-y-4 border-t border-border pt-6">
                 <div className="flex items-center gap-2 text-foreground">
                   <Users size={18} className="text-primary" />
-                  <h3 className="font-bold">Acompanhantes</h3>
+                  <h3 className="font-bold">Autorização para Dependentes</h3>
                 </div>
                 <div className="space-y-3">
                   {companions.map(companion => (
