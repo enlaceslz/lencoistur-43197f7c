@@ -138,7 +138,7 @@ const AdminSGSDashboard = () => {
     setRisksByStage(Object.entries(stageMap).map(([stage, count]) => ({ name: stageLabels[stage] || stage, riscos: count })));
 
     const months: Record<string, number> = {};
-    const now = new Date();
+    const reportDate = new Date();
     for (let i = 5; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       months[`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`] = 0;
