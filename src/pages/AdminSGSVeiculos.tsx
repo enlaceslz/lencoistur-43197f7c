@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Car, Plus, Search, AlertTriangle, CheckCircle } from "lucide-react";
+import { Car, Plus, Search, AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   ativo: { label: "Ativo", color: "bg-primary/10 text-primary" },
