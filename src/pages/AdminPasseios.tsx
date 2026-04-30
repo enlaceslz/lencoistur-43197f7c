@@ -318,15 +318,24 @@ const AdminPasseios = () => {
         </Card>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-6">
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-          <Input placeholder="Buscar passeio..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-8 p-6 bg-card border border-border rounded-3xl shadow-sm">
+        <div className="relative flex-1 w-full group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
+          <Input 
+            placeholder="Buscar passeio pelo nome, categoria ou localização..." 
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)} 
+            className="pl-12 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30 transition-all text-sm font-medium" 
+          />
         </div>
-        <button onClick={openNew}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 whitespace-nowrap">
-          <Plus size={16} /> Novo Passeio
-        </button>
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <button 
+            onClick={openNew}
+            className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+          >
+            <Plus size={20} strokeWidth={3} /> Novo Passeio
+          </button>
+        </div>
       </div>
 
       <Dialog open={showForm} onOpenChange={(open) => !open && setShowForm(false)}>
