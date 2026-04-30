@@ -403,39 +403,71 @@ const AdminConfig = () => {
 
         {/* EMPRESA */}
         <TabsContent value="empresa">
-          <Card className="border-border">
-            <CardContent className="p-6 space-y-5">
-              <h3 className="font-display font-bold text-foreground text-lg">Dados da Empresa</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Nome da Empresa</Label>
-                  <Input value={empresa.nome} onChange={(e) => setEmpresa({ ...empresa, nome: e.target.value })} maxLength={100} />
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-8">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+                  <Building2 size={32} />
                 </div>
-                <div className="space-y-2">
-                  <Label>CNPJ</Label>
-                  <Input value={empresa.cnpj} onChange={(e) => setEmpresa({ ...empresa, cnpj: maskCNPJ(e.target.value) })} maxLength={18} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Telefone</Label>
-                  <Input value={empresa.telefone} onChange={(e) => setEmpresa({ ...empresa, telefone: maskPhone(e.target.value) })} maxLength={15} />
-                </div>
-                <div className="space-y-2">
-                  <Label>WhatsApp</Label>
-                  <Input value={empresa.whatsapp} onChange={(e) => setEmpresa({ ...empresa, whatsapp: maskPhone(e.target.value) })} maxLength={15} />
-                </div>
-                <div className="space-y-2">
-                  <Label>E-mail</Label>
-                  <Input type="email" value={empresa.email} onChange={(e) => setEmpresa({ ...empresa, email: e.target.value })} maxLength={100} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Endereço</Label>
-                  <Input value={empresa.endereco} onChange={(e) => setEmpresa({ ...empresa, endereco: e.target.value })} maxLength={200} />
+                <div>
+                  <h3 className="text-xl font-black text-foreground">Identidade da Agência</h3>
+                  <p className="text-sm text-muted-foreground">Dados institucionais utilizados em termos, vouchers e notas.</p>
                 </div>
               </div>
-              <Button onClick={() => saveSetting("empresa", empresa, "Empresa")} disabled={saving} className="rounded-xl">
-                {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
-                Salvar Alterações
-              </Button>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Nome Fantasia</Label>
+                  <Input 
+                    value={empresa.nome} 
+                    onChange={e => setEmpresa({ ...empresa, nome: e.target.value })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary font-bold"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">CNPJ / Identificação</Label>
+                  <Input 
+                    value={empresa.cnpj} 
+                    onChange={e => setEmpresa({ ...empresa, cnpj: maskCNPJ(e.target.value) })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary font-mono"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">WhatsApp Operacional</Label>
+                  <Input 
+                    value={empresa.whatsapp} 
+                    onChange={e => setEmpresa({ ...empresa, whatsapp: maskPhone(e.target.value) })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary font-bold text-green-600"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">E-mail de Contato</Label>
+                  <Input 
+                    value={empresa.email} 
+                    onChange={e => setEmpresa({ ...empresa, email: e.target.value })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary"
+                  />
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Endereço Completo (Sede)</Label>
+                  <Input 
+                    value={empresa.endereco} 
+                    onChange={e => setEmpresa({ ...empresa, endereco: e.target.value })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-10 pt-6 border-t border-border flex justify-end">
+                <Button 
+                  onClick={() => saveSetting("empresa", empresa, "Empresa")} 
+                  disabled={saving}
+                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20"
+                >
+                  {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save size={18} className="mr-2" />}
+                  Atualizar Dados
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
