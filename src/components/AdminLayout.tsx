@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import {
   Home, Compass, Car, Users, UserCheck, CreditCard, Settings,
   LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot,
@@ -205,7 +206,8 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   };
 
   return (
-    <div className="min-h-screen bg-[hsl(220,20%,96%)] flex">
+    <TooltipProvider>
+      <div className="min-h-screen bg-[hsl(220,20%,96%)] flex">
       {/* === SIDEBAR === */}
       <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[80px]" : "w-[260px]"} admin-sidebar transform transition-all duration-200 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
         {/* Brand */}
@@ -425,7 +427,8 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           {children}
         </div>
       </main>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 };
 
