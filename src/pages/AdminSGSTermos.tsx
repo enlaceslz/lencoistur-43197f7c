@@ -732,7 +732,7 @@ const AdminSGSTermos = () => {
             </div>
 
             <div className="space-y-4">
-              <h4 className="text-sm font-bold flex items-center gap-2 border-t pt-4"><Users size={16} /> Acompanhantes</h4>
+              <h4 className="text-sm font-bold flex items-center gap-2 border-t pt-4"><Users size={16} /> Autorização para Dependentes</h4>
               <div className="bg-muted p-4 rounded-2xl space-y-4">
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   <input 
