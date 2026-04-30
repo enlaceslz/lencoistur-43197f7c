@@ -7,9 +7,10 @@ import {
   CreditCard, Calendar, Filter, Printer, PieChart, Activity, MapPin, Mail, Phone
 } from "lucide-react";
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer,
   PieChart as RePieChart, Pie, Cell, LineChart, Line, Legend, AreaChart, Area
 } from "recharts";
+import { Tooltip as UITooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
