@@ -18,9 +18,19 @@ interface BookingRow {
   created_at: string;
 }
 
-export default function DRETab({ bookings, contasPagar = [] }: { bookings: BookingRow[], contasPagar?: any[] }) {
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth();
+export default function DRETab({ 
+  bookings, 
+  contasPagar = [], 
+  selectedMonth, 
+  selectedYear 
+}: { 
+  bookings: BookingRow[], 
+  contasPagar?: any[], 
+  selectedMonth?: number, 
+  selectedYear?: number 
+}) {
+  const currentYear = selectedYear ?? new Date().getFullYear();
+  const currentMonth = selectedMonth ?? new Date().getMonth();
 
   const monthBookings = useMemo(
     () => bookings.filter(b => b.status !== "cancelada").filter((b) => {
