@@ -25,6 +25,7 @@ const AdminSGSDashboard = () => {
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
+    setLoading(true);
     const [risksRes, incidentsRes, actionsRes, staffRes, surveysRes, briefingsRes, termsRes, veiculosRes, condutoresRes, checklistsRes, bookingsRes, equipmentRes, proceduresRes] = await Promise.all([
       supabase.from("sgs_risks").select("*"),
       supabase.from("sgs_incidents").select("*").order("created_at", { ascending: false }),
@@ -33,8 +34,8 @@ const AdminSGSDashboard = () => {
       supabase.from("sgs_safety_surveys").select("felt_safe"),
       supabase.from("sgs_briefings").select("id"),
       supabase.from("sgs_risk_terms").select("booking_id"),
-      supabase.from("sgs_veiculos").select("id").eq("status", "ativo"),
-      supabase.from("sgs_condutores").select("id").eq("status", "ativo"),
+      supabase.from("sgs_veiculos").select("*"),
+      supabase.from("sgs_condutores").select("*"),
       supabase.from("sgs_checklists").select("id, created_at").order("created_at", { ascending: false }).limit(1),
       supabase.from("bookings").select("id").not("status", "eq", "cancelada"),
       supabase.from("sgs_equipment").select("id"),
