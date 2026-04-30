@@ -400,7 +400,7 @@ const AdminSGSTermos = () => {
         </div>
 
         <div class="section">
-          <div class="section-title">Autorização para Menores</div>
+          <div class="section-title">Autorização para Dependentes</div>
           ${minorsHtml}
         </div>
 
