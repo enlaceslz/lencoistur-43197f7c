@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Map, Plus, Search, Pencil, Trash2, Clock, Footprints } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Map, Plus, Search, Pencil, Trash2, Clock, Footprints, Loader2 } from "lucide-react";
 
 const DIFICULDADE: Record<string, { label: string; color: string }> = {
   facil: { label: "Fácil", color: "bg-primary/10 text-primary" },
