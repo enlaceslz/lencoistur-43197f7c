@@ -193,11 +193,36 @@ export function useBookings() {
   }, []);
 
   const completeBooking = useCallback(async (id: string) => {
-    const { error } = await supabase
+    const { data: booking, error: fetchError } = await supabase
+      .from("bookings")
+      .select("*, customers(name)")
+      .eq("id", id)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    const { error: updateError } = await supabase
       .from("bookings")
       .update({ status: "concluida" })
       .eq("id", id);
-    if (error) throw error;
+    
+    if (updateError) throw updateError;
+
+    // Se houver um parceiro/motorista vinculado (futuro), aqui geraria a comissão no Contas a Pagar.
+    // Por enquanto, vamos registrar o custo operacional estimado para fins de DRE
+    const { error: costError } = await supabase
+      .from("contas_pagar")
+      .insert({
+        descricao: `Custo Operacional: ${booking.item_name} (Reserva ${booking.booking_code})`,
+        valor: Math.round(booking.final_total * 0.4), // Estimativa de 40% de custo operacional
+        vencimento: new Date().toISOString().slice(0, 10),
+        status: "pendente",
+        categoria: "operacional",
+        fornecedor: "Operação Interna",
+        observacoes: `Gerado automaticamente na conclusão da reserva ${booking.booking_code}`
+      });
+
+    if (costError) console.error("Erro ao gerar custo operacional:", costError);
   }, []);
 
   const updateBookingNotes = useCallback(async (id: string, notes: string) => {
