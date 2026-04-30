@@ -219,9 +219,16 @@ const AdminRelatorios = () => {
                 <option value="365">Último ano</option>
               </select>
             </div>
-            <button onClick={printReport} className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all active:scale-95">
-              <Printer size={16} /> Imprimir
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button onClick={printReport} className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all active:scale-95">
+                  <Printer size={16} /> Imprimir
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Gerar versão para impressão ou PDF deste relatório</p>
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
 
