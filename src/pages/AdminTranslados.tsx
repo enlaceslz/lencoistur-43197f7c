@@ -406,16 +406,46 @@ const AdminTranslados = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <button onClick={() => toggleActive(t.id, t.active)}
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${t.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                        {t.active ? "Ativa" : "Inativa"}
-                      </button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button onClick={() => toggleActive(t.id, t.active)}
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${t.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                            {t.active ? "Ativa" : "Inativa"}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{t.active ? "Desativar esta rota para vendas" : "Ativar esta rota para vendas"}</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => setDetailRoute(t)} title="Ver detalhes"><Eye size={16} /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => openEdit(t)}><Pencil size={16} /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => setDeleteId(t.id)} className="hover:text-destructive"><Trash2 size={16} /></Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={() => setDetailRoute(t)}><Eye size={16} /></Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Ver detalhes completos</p>
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={() => openEdit(t)}><Pencil size={16} /></Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Editar informações da rota</p>
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={() => setDeleteId(t.id)} className="hover:text-destructive"><Trash2 size={16} /></Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Excluir permanentemente</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     </TableCell>
                   </TableRow>
