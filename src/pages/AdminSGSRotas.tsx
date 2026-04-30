@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Map, Plus, Search, Pencil, Trash2, Clock, Footprints } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Map, Plus, Search, Pencil, Trash2, Clock, Footprints, Loader2 } from "lucide-react";
 
 const DIFICULDADE: Record<string, { label: string; color: string }> = {
   facil: { label: "Fácil", color: "bg-primary/10 text-primary" },
@@ -109,22 +110,29 @@ const AdminSGSRotas = () => {
         {loading ? <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div> : filtered.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground"><Map size={40} className="mx-auto mb-3 opacity-40" /><p>Nenhuma rota cadastrada</p></div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map(r => {
               const dif = DIFICULDADE[r.dificuldade] || DIFICULDADE.moderado;
               return (
-                <div key={r.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-shadow">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 bg-muted rounded-lg">
-                        <Map size={18} className="text-primary" />
+                <div key={r.id} className="bg-card border border-border rounded-3xl p-6 hover:shadow-xl hover:border-primary/30 transition-all group relative overflow-hidden flex flex-col">
+                  <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${r.status === 'ativa' ? 'bg-primary' : 'bg-muted'}`} />
+                  
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                        <Map size={24} />
                       </div>
-                      <span className="font-bold text-foreground text-sm">{r.nome}</span>
+                      <div className="min-w-0">
+                        <h4 className="font-black text-foreground group-hover:text-primary transition-colors leading-tight truncate">{r.nome}</h4>
+                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-0.5">{r.tipo.replace("_", " ")}</p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${dif.color}`}>{dif.label}</span>
-                      <div className="flex gap-1">
-                        <button onClick={() => openEdit(r)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors">
+                    <div className="flex flex-col gap-2 items-end">
+                      <Badge variant="outline" className={`font-black text-[9px] uppercase px-2.5 py-0.5 rounded-lg border ${dif.color}`}>
+                        {dif.label}
+                      </Badge>
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                        <button onClick={() => openEdit(r)} className="p-1.5 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors">
                           <Pencil size={14} />
                         </button>
                         <button onClick={() => handleDelete(r.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
@@ -133,27 +141,35 @@ const AdminSGSRotas = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="text-xs text-muted-foreground space-y-2">
-                    <div className="flex flex-wrap gap-x-3 gap-y-1">
-                      <span className="flex items-center gap-1 capitalize">
-                        <Footprints size={12} /> {r.tipo.replace("_", " ")}
-                      </span>
-                      {r.distancia_km && (
-                        <span className="flex items-center gap-1">
-                          📍 {r.distancia_km} km
-                        </span>
-                      )}
-                      {r.duracao_estimada && (
-                        <span className="flex items-center gap-1">
-                          <Clock size={12} /> {r.duracao_estimada}
-                        </span>
-                      )}
+
+                  <div className="grid grid-cols-2 gap-3 mb-5">
+                    <div className="bg-muted/30 p-2.5 rounded-xl border border-border/50">
+                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter mb-0.5">Distância</p>
+                      <p className="text-sm font-black text-foreground">{r.distancia_km ? `${r.distancia_km} km` : 'N/A'}</p>
                     </div>
-                    {r.descricao && <p className="line-clamp-2 italic text-[11px] leading-relaxed">"{r.descricao}"</p>}
+                    <div className="bg-muted/30 p-2.5 rounded-xl border border-border/50">
+                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter mb-0.5">Duração</p>
+                      <p className="text-sm font-black text-foreground">{r.duracao_estimada || 'N/A'}</p>
+                    </div>
                   </div>
-                  <div className="mt-3 pt-3 border-t border-border flex items-center justify-between">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${r.status === "ativa" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{r.status}</span>
-                    {r.capacidade_maxima && <span className="text-[10px] text-muted-foreground font-medium">Capacidade: {r.capacidade_maxima}</span>}
+
+                  <div className="flex-1">
+                    {r.descricao && (
+                      <p className="text-xs text-muted-foreground font-medium italic leading-relaxed line-clamp-2">
+                        "{r.descricao}"
+                      </p>
+                    )}
+                  </div>
+                  
+                  <div className="mt-5 pt-4 border-t border-border/50 flex justify-between items-center">
+                    <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg border ${r.status === "ativa" ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-muted text-muted-foreground"}`}>
+                      {r.status}
+                    </span>
+                    {r.capacidade_maxima && (
+                      <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+                        Pax Máx: {r.capacidade_maxima}
+                      </span>
+                    )}
                   </div>
                 </div>
               );

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, ClipboardCheck, CheckCircle, XCircle } from "lucide-react";
+import { Plus, ClipboardCheck, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const CATEGORIES: Record<string, string> = {
@@ -113,40 +113,61 @@ const AdminSGSAuditorias = () => {
         )}
 
         {/* Audit list */}
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {loading ? (
-            <p className="text-center text-muted-foreground py-8">Carregando...</p>
+            <div className="col-span-full py-20 text-center"><Loader2 className="animate-spin text-primary mx-auto" size={32} /></div>
           ) : audits.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">Nenhuma auditoria realizada</p>
+            <div className="col-span-full py-20 text-center bg-card border border-dashed rounded-3xl">
+              <ClipboardCheck size={48} className="mx-auto mb-4 opacity-20" />
+              <p className="font-bold text-lg">Nenhuma auditoria realizada</p>
+              <p className="text-sm text-muted-foreground">Inicie auditorias periódicas para manter a conformidade ISO.</p>
+            </div>
           ) : audits.map((audit) => {
             const items = getAuditItems(audit.id);
-            const scoreColor = audit.score >= 80 ? "text-primary" : audit.score >= 50 ? "text-secondary" : "text-destructive";
+            const scoreColor = audit.score >= 80 ? "text-primary border-primary/20 bg-primary/5" : audit.score >= 50 ? "text-secondary border-secondary/20 bg-secondary/5" : "text-destructive border-destructive/20 bg-destructive/5";
             return (
-              <div key={audit.id} className="bg-card border border-border rounded-2xl p-5">
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <ClipboardCheck size={18} className="text-primary" />
-                      <span className="font-mono text-xs text-muted-foreground">{audit.audit_code}</span>
+              <div key={audit.id} className="bg-card border border-border rounded-3xl p-6 hover:shadow-xl hover:border-primary/30 transition-all group relative overflow-hidden flex flex-col">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                      <ClipboardCheck size={24} />
                     </div>
-                    <p className="text-sm text-foreground">Auditor: <strong>{audit.auditor}</strong></p>
-                    <p className="text-xs text-muted-foreground">{new Date(audit.date).toLocaleDateString("pt-BR")}</p>
+                    <div>
+                      <h4 className="font-black text-foreground group-hover:text-primary transition-colors leading-tight">{audit.audit_code}</h4>
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-0.5">Auditor: {audit.auditor}</p>
+                    </div>
                   </div>
                   <div className="text-right">
-                    <p className={`text-3xl font-bold font-display ${scoreColor}`}>{audit.score}%</p>
-                    <p className="text-xs text-muted-foreground">Score</p>
+                    <div className={`px-4 py-2 rounded-2xl border ${scoreColor} transition-all`}>
+                      <p className="text-2xl font-black font-display leading-none">{audit.score}%</p>
+                      <p className="text-[8px] font-black uppercase tracking-widest mt-1">Conformidade</p>
+                    </div>
                   </div>
                 </div>
-                {items.length > 0 && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+
+                <div className="flex-1 space-y-3 mb-6">
+                  <div className="grid grid-cols-2 gap-2">
                     {items.map((item) => (
-                      <div key={item.id} className="flex items-center gap-1.5 text-xs">
-                        {item.compliant ? <CheckCircle size={14} className="text-primary" /> : <XCircle size={14} className="text-destructive" />}
-                        <span className="text-foreground">{CATEGORIES[item.category] || item.item_name}</span>
+                      <div key={item.id} className="flex items-center gap-2 p-2 rounded-xl bg-muted/30 border border-border/50">
+                        {item.compliant ? (
+                          <CheckCircle size={14} className="text-emerald-500 shrink-0" />
+                        ) : (
+                          <XCircle size={14} className="text-destructive shrink-0" />
+                        )}
+                        <span className="text-[10px] font-bold text-foreground truncate">{CATEGORIES[item.category] || item.item_name}</span>
                       </div>
                     ))}
                   </div>
-                )}
+                </div>
+
+                <div className="mt-auto pt-4 border-t border-border/50 flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">
+                    Realizada em {new Date(audit.date).toLocaleDateString("pt-BR")}
+                  </span>
+                  <button className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline">
+                    Ver Laudo Técnico
+                  </button>
+                </div>
               </div>
             );
           })}

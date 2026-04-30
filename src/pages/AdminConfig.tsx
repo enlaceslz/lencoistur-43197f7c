@@ -379,157 +379,300 @@ const AdminConfig = () => {
   return (
     <AdminLayout title="Configurações">
       <Tabs defaultValue="empresa" className="space-y-6">
-        <TabsList className="bg-muted flex-wrap h-auto gap-1 p-1">
-          <TabsTrigger value="empresa"><Building2 size={14} className="mr-1" /> Empresa</TabsTrigger>
-          <TabsTrigger value="site"><Globe size={14} className="mr-1" /> Site</TabsTrigger>
-          <TabsTrigger value="pagamento"><CreditCard size={14} className="mr-1" /> Pagamento</TabsTrigger>
-          <TabsTrigger value="notificacoes"><Bell size={14} className="mr-1" /> Notificações</TabsTrigger>
-          <TabsTrigger value="seguranca"><Shield size={14} className="mr-1" /> Segurança</TabsTrigger>
-          <TabsTrigger value="backup"><Database size={14} className="mr-1" /> Backup</TabsTrigger>
-          <TabsTrigger value="galeria"><Image size={14} className="mr-1" /> Galeria</TabsTrigger>
-        </TabsList>
+        <div className="bg-card border border-border p-2 rounded-2xl shadow-sm overflow-x-auto no-scrollbar">
+          <TabsList className="bg-transparent flex-nowrap h-auto gap-1">
+            {[
+              { value: "empresa", icon: Building2, label: "Agência" },
+              { value: "site", icon: Globe, label: "Frontend" },
+              { value: "pagamento", icon: CreditCard, label: "Financeiro" },
+              { value: "notificacoes", icon: Bell, label: "Alertas" },
+              { value: "seguranca", icon: Shield, label: "Acesso" },
+              { value: "backup", icon: Database, label: "Backup" },
+              { value: "galeria", icon: Image, label: "Mídia" },
+            ].map((tab) => (
+              <TabsTrigger 
+                key={tab.value}
+                value={tab.value} 
+                className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all"
+              >
+                <tab.icon size={14} className="mr-2" /> {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
 
         {/* EMPRESA */}
         <TabsContent value="empresa">
-          <Card className="border-border">
-            <CardContent className="p-6 space-y-5">
-              <h3 className="font-display font-bold text-foreground text-lg">Dados da Empresa</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Nome da Empresa</Label>
-                  <Input value={empresa.nome} onChange={(e) => setEmpresa({ ...empresa, nome: e.target.value })} maxLength={100} />
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-8">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+                  <Building2 size={32} />
                 </div>
-                <div className="space-y-2">
-                  <Label>CNPJ</Label>
-                  <Input value={empresa.cnpj} onChange={(e) => setEmpresa({ ...empresa, cnpj: maskCNPJ(e.target.value) })} maxLength={18} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Telefone</Label>
-                  <Input value={empresa.telefone} onChange={(e) => setEmpresa({ ...empresa, telefone: maskPhone(e.target.value) })} maxLength={15} />
-                </div>
-                <div className="space-y-2">
-                  <Label>WhatsApp</Label>
-                  <Input value={empresa.whatsapp} onChange={(e) => setEmpresa({ ...empresa, whatsapp: maskPhone(e.target.value) })} maxLength={15} />
-                </div>
-                <div className="space-y-2">
-                  <Label>E-mail</Label>
-                  <Input type="email" value={empresa.email} onChange={(e) => setEmpresa({ ...empresa, email: e.target.value })} maxLength={100} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Endereço</Label>
-                  <Input value={empresa.endereco} onChange={(e) => setEmpresa({ ...empresa, endereco: e.target.value })} maxLength={200} />
+                <div>
+                  <h3 className="text-xl font-black text-foreground">Identidade da Agência</h3>
+                  <p className="text-sm text-muted-foreground">Dados institucionais utilizados em termos, vouchers e notas.</p>
                 </div>
               </div>
-              <Button onClick={() => saveSetting("empresa", empresa, "Empresa")} disabled={saving} className="rounded-xl">
-                {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
-                Salvar Alterações
-              </Button>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Nome Fantasia</Label>
+                  <Input 
+                    value={empresa.nome} 
+                    onChange={e => setEmpresa({ ...empresa, nome: e.target.value })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary font-bold"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">CNPJ / Identificação</Label>
+                  <Input 
+                    value={empresa.cnpj} 
+                    onChange={e => setEmpresa({ ...empresa, cnpj: maskCNPJ(e.target.value) })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary font-mono"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">WhatsApp Operacional</Label>
+                  <Input 
+                    value={empresa.whatsapp} 
+                    onChange={e => setEmpresa({ ...empresa, whatsapp: maskPhone(e.target.value) })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary font-bold text-green-600"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">E-mail de Contato</Label>
+                  <Input 
+                    value={empresa.email} 
+                    onChange={e => setEmpresa({ ...empresa, email: e.target.value })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary"
+                  />
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Endereço Completo (Sede)</Label>
+                  <Input 
+                    value={empresa.endereco} 
+                    onChange={e => setEmpresa({ ...empresa, endereco: e.target.value })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-10 pt-6 border-t border-border flex justify-end">
+                <Button 
+                  onClick={() => saveSetting("empresa", empresa, "Empresa")} 
+                  disabled={saving}
+                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20"
+                >
+                  {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save size={18} className="mr-2" />}
+                  Atualizar Dados
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* SITE */}
         <TabsContent value="site">
-          <Card className="border-border">
-            <CardContent className="p-6 space-y-5">
-              <h3 className="font-display font-bold text-foreground text-lg">Configurações do Site</h3>
-              <div className="space-y-3">
-                <Label className="text-sm font-semibold">Logo da Empresa</Label>
-                <div className="flex items-center gap-4">
-                  <div className="w-24 h-24 rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-muted overflow-hidden">
-                    {site.logoUrl ? (
-                      <img src={site.logoUrl} alt="Logo" className="w-full h-full object-contain p-1" />
-                    ) : (
-                      <Image size={32} className="text-muted-foreground" />
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
-                    <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo} className="rounded-lg">
-                      {uploadingLogo ? <Loader2 size={14} className="animate-spin mr-1" /> : <Upload size={14} className="mr-1" />}
-                      {site.logoUrl ? "Trocar Logo" : "Enviar Logo"}
-                    </Button>
-                    {site.logoUrl && (
-                      <Button type="button" variant="ghost" size="sm" onClick={() => setSite({ ...site, logoUrl: null })} className="text-destructive rounded-lg">
-                        <X size={14} className="mr-1" /> Remover
-                      </Button>
-                    )}
-                    <p className="text-xs text-muted-foreground">PNG, JPG ou SVG. Máx. 2MB.</p>
-                  </div>
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-8 space-y-8">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+                  <Globe size={32} />
                 </div>
-                <div className="space-y-2">
-                  <Label>Ou cole a URL da logo</Label>
-                  <Input placeholder="https://exemplo.com/logo.png" value={site.logoUrl || ""} onChange={(e) => setSite({ ...site, logoUrl: e.target.value || null })} maxLength={500} />
+                <div>
+                  <h3 className="text-xl font-black text-foreground">Aparência do Website</h3>
+                  <p className="text-sm text-muted-foreground">Personalize a identidade visual voltada ao cliente.</p>
+                </div>
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-10">
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Logotipo da Marca</Label>
+                    <div className="flex items-center gap-6 p-4 rounded-2xl bg-muted/30 border border-border/50">
+                      <div className="w-24 h-24 rounded-xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center bg-background overflow-hidden shrink-0">
+                        {site.logoUrl ? (
+                          <img src={site.logoUrl} alt="Logo" className="w-full h-full object-contain p-2" />
+                        ) : (
+                          <Image size={32} className="text-muted-foreground/20" />
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                        <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo} className="rounded-xl font-bold h-9">
+                          {uploadingLogo ? <Loader2 size={14} className="animate-spin mr-2" /> : <Upload size={14} className="mr-2" />}
+                          {site.logoUrl ? "Alterar Logo" : "Fazer Upload"}
+                        </Button>
+                        <p className="text-[10px] text-muted-foreground font-medium italic">Sugerido: PNG transparente, máx 2MB.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Título Principal do Site</Label>
+                    <Input 
+                      placeholder="Ex: Lençóis Tour - Os melhores passeios" 
+                      value={site.titulo} 
+                      onChange={(e) => setSite({ ...site, titulo: e.target.value })} 
+                      className="h-12 rounded-xl border-muted-foreground/20 font-bold"
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-3 border-t border-border pt-4 mt-4">
-                  <Label className="text-sm font-semibold">Banner Principal (Hero)</Label>
-                  <div className="flex flex-col gap-4">
-                    <div className="w-full aspect-video rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-muted overflow-hidden">
-                      {site.bannerUrl ? (
-                        <img src={site.bannerUrl} alt="Banner" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="text-center">
-                          <Image size={48} className="text-muted-foreground mx-auto mb-2" />
-                          <p className="text-xs text-muted-foreground">Nenhum banner configurado</p>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} />
-                      <Button type="button" variant="outline" size="sm" onClick={() => bannerInputRef.current?.click()} disabled={uploadingBanner} className="rounded-lg">
-                        {uploadingBanner ? <Loader2 size={14} className="animate-spin mr-1" /> : <UploadCloud size={14} className="mr-1" />}
-                        {site.bannerUrl ? "Trocar Banner" : "Enviar Banner"}
-                      </Button>
-                      {site.bannerUrl && (
-                        <Button type="button" variant="ghost" size="sm" onClick={() => setSite({ ...site, bannerUrl: null })} className="text-destructive rounded-lg">
-                          <Trash2 size={14} className="mr-1" /> Remover
-                        </Button>
-                      )}
-                      <p className="text-[10px] text-muted-foreground">Recomendado: 1920x1080px. Máx. 5MB.</p>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs">URL do Banner</Label>
-                    <Input placeholder="https://exemplo.com/banner.jpg" value={site.bannerUrl || ""} onChange={(e) => setSite({ ...site, bannerUrl: e.target.value || null })} maxLength={500} className="h-8 text-xs" />
-                  </div>
+                <div className="space-y-3">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Meta Descrição (SEO)</Label>
+                  <Textarea 
+                    rows={4}
+                    placeholder="Descrição para Google e redes sociais..." 
+                    value={site.metaDescricao} 
+                    onChange={(e) => setSite({ ...site, metaDescricao: e.target.value })} 
+                    className="rounded-2xl border-muted-foreground/20 resize-none h-[116px] p-4 font-medium text-sm"
+                  />
+                  <p className="text-[10px] text-muted-foreground text-right italic font-bold">{site.metaDescricao.length}/160 caracteres sugeridos</p>
                 </div>
               </div>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Título do Site (SEO)</Label>
-                  <Input value={site.titulo} onChange={(e) => setSite({ ...site, titulo: e.target.value })} maxLength={100} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Meta Descrição (SEO)</Label>
-                  <Textarea value={site.metaDescricao} onChange={(e) => setSite({ ...site, metaDescricao: e.target.value })} maxLength={300} rows={3} />
-                  <p className="text-xs text-muted-foreground">{site.metaDescricao.length}/300 caracteres</p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>URL WhatsApp (CTA)</Label>
-                    <Input value={site.whatsappUrl} onChange={(e) => setSite({ ...site, whatsappUrl: e.target.value })} maxLength={100} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Instagram</Label>
-                    <Input value={site.instagram} onChange={(e) => setSite({ ...site, instagram: e.target.value })} maxLength={100} />
-                  </div>
-                </div>
+
+              <div className="mt-6 pt-6 border-t border-border flex justify-end">
+                <Button 
+                  onClick={() => saveSetting("site", site, "Site")} 
+                  disabled={saving}
+                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20"
+                >
+                  {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save size={18} className="mr-2" />}
+                  Publicar Alterações
+                </Button>
               </div>
-              <Button onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Site")} disabled={saving} className="rounded-xl">
-                {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
-                Salvar
-              </Button>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* PAGAMENTO */}
+        <TabsContent value="site">
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-8 space-y-8">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+                  <Globe size={32} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-foreground">Aparência do Website</h3>
+                  <p className="text-sm text-muted-foreground">Personalize a identidade visual voltada ao cliente.</p>
+                </div>
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-10">
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Logotipo da Marca</Label>
+                    <div className="flex items-center gap-6 p-4 rounded-2xl bg-muted/30 border border-border/50">
+                      <div className="w-24 h-24 rounded-xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center bg-background overflow-hidden shrink-0">
+                        {site.logoUrl ? (
+                          <img src={site.logoUrl} alt="Logo" className="w-full h-full object-contain p-2" />
+                        ) : (
+                          <Image size={32} className="text-muted-foreground/20" />
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                        <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo} className="rounded-xl font-bold h-9">
+                          {uploadingLogo ? <Loader2 size={14} className="animate-spin mr-2" /> : <Upload size={14} className="mr-2" />}
+                          {site.logoUrl ? "Alterar Logo" : "Fazer Upload"}
+                        </Button>
+                        {site.logoUrl && (
+                          <Button type="button" variant="ghost" size="sm" onClick={() => setSite({ ...site, logoUrl: null })} className="text-destructive rounded-lg h-9">
+                            <X size={14} className="mr-1" /> Remover
+                          </Button>
+                        )}
+                        <p className="text-[10px] text-muted-foreground font-medium italic">Sugerido: PNG transparente, máx 2MB.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 border-t border-border pt-6">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Banner Principal (Hero)</Label>
+                    <div className="flex flex-col gap-4">
+                      <div className="w-full aspect-video rounded-2xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center bg-muted/30 overflow-hidden relative group">
+                        {site.bannerUrl ? (
+                          <img src={site.bannerUrl} alt="Banner" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="text-center">
+                            <Image size={48} className="text-muted-foreground/20 mx-auto mb-2" />
+                            <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest opacity-40">Sem banner configurado</p>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} />
+                        <Button type="button" variant="outline" size="sm" onClick={() => bannerInputRef.current?.click()} disabled={uploadingBanner} className="rounded-xl font-bold h-9">
+                          {uploadingBanner ? <Loader2 size={14} className="animate-spin mr-2" /> : <UploadCloud size={14} className="mr-2" />}
+                          {site.bannerUrl ? "Alterar Banner" : "Enviar Banner"}
+                        </Button>
+                        {site.bannerUrl && (
+                          <Button type="button" variant="ghost" size="sm" onClick={() => setSite({ ...site, bannerUrl: null })} className="text-destructive h-9">
+                            <Trash2 size={14} className="mr-2" /> Remover
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Título do Site (SEO)</Label>
+                    <Input 
+                      value={site.titulo} 
+                      onChange={(e) => setSite({ ...site, titulo: e.target.value })} 
+                      className="h-12 rounded-xl border-muted-foreground/20 font-bold"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Meta Descrição (SEO)</Label>
+                    <Textarea 
+                      value={site.metaDescricao} 
+                      onChange={(e) => setSite({ ...site, metaDescricao: e.target.value })} 
+                      className="rounded-2xl border-muted-foreground/20 resize-none h-32 p-4 font-medium"
+                    />
+                    <p className="text-[10px] text-muted-foreground text-right italic font-bold">{site.metaDescricao.length}/300 caracteres</p>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4 border-t border-border pt-6">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Instagram</Label>
+                      <Input value={site.instagram} onChange={(e) => setSite({ ...site, instagram: e.target.value })} className="h-11 rounded-xl border-muted-foreground/20" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">WhatsApp (Botão)</Label>
+                      <Input value={site.whatsappUrl} onChange={(e) => setSite({ ...site, whatsappUrl: e.target.value })} className="h-11 rounded-xl border-muted-foreground/20" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-border flex justify-end">
+                <Button onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Site")} disabled={saving} className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20">
+                  {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
+                  Salvar Frontend
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* FINANCEIRO / PAGAMENTO */}
         <TabsContent value="pagamento">
-          <Card className="border-border">
-            <CardContent className="p-6 space-y-5">
-              <h3 className="font-display font-bold text-foreground text-lg">Métodos de Pagamento</h3>
-              <div className="space-y-4">
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-8 space-y-8">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600">
+                  <CreditCard size={32} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-foreground">Configurações Financeiras</h3>
+                  <p className="text-sm text-muted-foreground">Gerencie métodos de recebimento e chaves PIX.</p>
+                </div>
+              </div>
+
+              <div className="grid gap-4">
                 {/* PIX */}
                 <div className="flex items-center justify-between p-4 border border-border rounded-xl">
                   <div className="flex items-center gap-3">
@@ -654,30 +797,42 @@ const AdminConfig = () => {
                   <Switch checked={pagamentos.transferencia} onCheckedChange={(v) => setPagamentos({ ...pagamentos, transferencia: v })} />
                 </div>
               </div>
-              <Button
-                onClick={() => {
-                  if (pagamentos.pix) {
-                    const v = validatePixKey(pagamentos.pixChave, pagamentos.pixTipo);
-                    if (!v.valid) { toast.error("Chave PIX inválida: " + v.message); return; }
-                  }
-                  saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Pagamento");
-                }}
-                disabled={saving}
-                className="rounded-xl"
-              >
-                {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
-                Salvar
-              </Button>
+              
+              <div className="mt-6 pt-6 border-t border-border flex justify-end">
+                <Button
+                  onClick={() => {
+                    if (pagamentos.pix) {
+                      const v = validatePixKey(pagamentos.pixChave, pagamentos.pixTipo);
+                      if (!v.valid) { toast.error("Chave PIX inválida: " + v.message); return; }
+                    }
+                    saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Pagamento");
+                  }}
+                  disabled={saving}
+                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white"
+                >
+                  {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
+                  Atualizar Financeiro
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* NOTIFICAÇÕES */}
         <TabsContent value="notificacoes">
-          <Card className="border-border">
-            <CardContent className="p-6 space-y-5">
-              <h3 className="font-display font-bold text-foreground text-lg">Canais de Notificação</h3>
-              <div className="space-y-3">
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-8 space-y-8">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-600">
+                  <Bell size={32} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-foreground">Alertas e Notificações</h3>
+                  <p className="text-sm text-muted-foreground">Configure como e quando a agência será avisada.</p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
                 {([
                   { key: "email" as const, label: "E-mail", desc: "Receber notificações por e-mail" },
                   { key: "whatsapp" as const, label: "WhatsApp", desc: "Alertas de reservas via WhatsApp" },
@@ -708,20 +863,31 @@ const AdminConfig = () => {
                   </div>
                 ))}
               </div>
-              <Button onClick={() => saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações")} disabled={saving} className="rounded-xl">
-                {saving ? <Loader2 size={16} className="animate-spin mr-1" /> : <Save size={16} className="mr-1" />}
-                Salvar
-              </Button>
+              <div className="mt-6 pt-6 border-t border-border flex justify-end">
+                <Button onClick={() => saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações")} disabled={saving} className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 bg-amber-600 hover:bg-amber-700 text-white">
+                  {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
+                  Atualizar Alertas
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* SEGURANÇA */}
         <TabsContent value="seguranca">
-          <Card className="border-border">
-            <CardContent className="p-6 space-y-5">
-              <h3 className="font-display font-bold text-foreground text-lg">Alterar Senha</h3>
-              <div className="space-y-4 max-w-md">
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-8 space-y-8">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-slate-500/10 text-slate-600">
+                  <Shield size={32} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-foreground">Acesso e Segurança</h3>
+                  <p className="text-sm text-muted-foreground">Gestão de credenciais do painel administrativo.</p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
                 <div className="space-y-2">
                   <Label>Nova Senha</Label>
                   <div className="relative">
@@ -744,10 +910,12 @@ const AdminConfig = () => {
                 {novaSenha && novaSenha.length < 8 && <p className="text-xs text-destructive">A senha deve ter pelo menos 8 caracteres.</p>}
                 {confirmarSenha && novaSenha !== confirmarSenha && <p className="text-xs text-destructive">As senhas não conferem.</p>}
               </div>
-              <Button onClick={handleChangePassword} disabled={changingPassword} className="rounded-xl">
-                {changingPassword ? <Loader2 size={16} className="animate-spin mr-1" /> : <Shield size={16} className="mr-1" />}
-                Alterar Senha
-              </Button>
+              <div className="mt-6 pt-6 border-t border-border flex justify-end">
+                <Button onClick={handleChangePassword} disabled={changingPassword} className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-slate-500/20 bg-slate-700 hover:bg-slate-800 text-white">
+                  {changingPassword ? <Loader2 size={16} className="animate-spin mr-2" /> : <Shield size={16} className="mr-2" />}
+                  Atualizar Senha
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -854,12 +1022,17 @@ const AdminConfig = () => {
 
         {/* GALERIA */}
         <TabsContent value="galeria">
-          <Card className="border-border">
-            <CardContent className="p-6 space-y-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-display font-bold text-foreground text-lg">Galeria de Fotos</h3>
-                  <p className="text-sm text-muted-foreground">Gerencie as imagens da seção "Momentos Inesquecíveis"</p>
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-8 space-y-8">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-600">
+                    <Image size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-foreground">Acervo de Mídia</h3>
+                    <p className="text-sm text-muted-foreground">Galeria "Momentos Inesquecíveis" do website.</p>
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <input
@@ -874,18 +1047,18 @@ const AdminConfig = () => {
                     onClick={() => galleryInputRef.current?.click()}
                     disabled={uploadingGallery}
                     variant="outline"
-                    className="rounded-xl"
+                    className="rounded-xl font-bold"
                   >
                     {uploadingGallery ? <Loader2 size={16} className="animate-spin mr-2" /> : <UploadCloud size={16} className="mr-2" />}
-                    Adicionar Fotos
+                    Fazer Upload
                   </Button>
                   <Button
                     onClick={() => saveSetting("gallery", gallery as unknown as Record<string, unknown>, "Galeria")}
                     disabled={saving}
-                    className="rounded-xl"
+                    className="rounded-xl font-black uppercase tracking-widest bg-primary text-white shadow-lg shadow-primary/20 h-10 px-6"
                   >
                     {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
-                    Salvar Galeria
+                    Publicar Galeria
                   </Button>
                 </div>
               </div>
@@ -925,7 +1098,7 @@ const AdminConfig = () => {
                   ))
                 )}
               </div>
-              <p className="text-xs text-muted-foreground italic">* Arraste para reordenar (em breve) ou use legendas para SEO. Lembre-se de clicar em salvar.</p>
+              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-6">* Use legendas para melhorar o SEO das imagens no Google.</p>
             </CardContent>
           </Card>
         </TabsContent>

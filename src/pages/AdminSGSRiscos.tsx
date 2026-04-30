@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, AlertTriangle, Search, Info, Pencil, Trash2, Printer } from "lucide-react";
+import { Plus, AlertTriangle, Search, Info, Pencil, Trash2, Printer, CheckCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 
 // P2 - Etapas conforme Devolutiva VATTI
@@ -373,70 +374,100 @@ const AdminSGSRiscos = () => {
         )}
 
         {/* Table */}
-        <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50 border-b border-border">
-                <tr>
-                  <th className="text-left px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">Código</th>
-                  <th className="text-left px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">Etapa / Atividade</th>
-                  <th className="text-left px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">Perigo / Danos</th>
-                  <th className="text-center px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">NR (P x C)</th>
-                  <th className="text-left px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">Responsável</th>
-                  <th className="text-right px-4 py-4 font-semibold text-muted-foreground uppercase text-[10px] tracking-wider">Ações</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {filtered.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground italic">
-                      Nenhum risco encontrado com os filtros atuais.
-                    </td>
-                  </tr>
-                ) : filtered.map((r) => {
-                  const rc = riskClass(r.risk_level);
-                  return (
-                    <tr key={r.id} className="hover:bg-muted/30 transition-colors group">
-                      <td className="px-4 py-4 font-mono text-[11px] text-muted-foreground">{r.risk_code}</td>
-                      <td className="px-4 py-4">
-                        <p className="font-bold text-foreground">{r.activity}</p>
-                        <p className="text-[10px] text-muted-foreground uppercase font-semibold">{STAGES[r.stage]}</p>
-                      </td>
-                      <td className="px-4 py-4 text-muted-foreground">{r.hazard}</td>
-                      <td className="px-4 py-4">
-                        <div className="flex flex-col items-center">
-                          <span className={`px-2 py-1 rounded-lg font-bold text-xs min-w-[30px] text-center ${rc.color}`}>
-                            {r.risk_level}
-                          </span>
-                          <span className="text-[9px] mt-1 text-muted-foreground font-medium">{rc.label}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 text-foreground font-medium">{r.responsible}</td>
-                      <td className="px-4 py-4">
-                        <div className="flex justify-end gap-2">
-                          <button 
-                            onClick={() => openEdit(r)}
-                            className="p-2 hover:bg-secondary/10 text-secondary rounded-lg transition-colors"
-                            title="Editar"
-                          >
-                            <Pencil size={16} />
-                          </button>
-                          <button 
-                            onClick={() => handleDelete(r.id)}
-                            className="p-2 hover:bg-destructive/10 text-destructive rounded-xl transition-colors"
-                            title="Excluir"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
+      <div className="grid gap-6">
+        {filtered.map((r) => {
+          const rc = riskClass(r.risk_level);
+          return (
+            <div key={r.id} className="bg-card border border-border rounded-3xl p-6 hover:shadow-xl hover:border-primary/30 transition-all group relative overflow-hidden flex flex-col">
+              <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${rc.label === 'Inaceitável' ? 'bg-destructive' : rc.label === 'Aceitável' ? 'bg-primary' : 'bg-secondary'}`} />
+              
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-inner ${rc.label === 'Inaceitável' ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary'}`}>
+                    <AlertTriangle size={24} />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="font-black text-foreground group-hover:text-primary transition-colors leading-tight truncate">{r.activity}</h4>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="secondary" className="bg-muted text-muted-foreground font-black text-[8px] uppercase px-1.5 py-0 rounded border">
+                        {STAGES[r.stage] || r.stage}
+                      </Badge>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter font-mono">
+                        {r.risk_code}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 items-end">
+                  <Badge className={`font-black text-[9px] uppercase px-2.5 py-1 rounded-lg border shadow-sm ${rc.color}`}>
+                    NR {r.risk_level} — {rc.label}
+                  </Badge>
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                    <button onClick={() => openEdit(r)} className="p-2 rounded-xl hover:bg-primary/10 hover:text-primary transition-colors">
+                      <Pencil size={16} />
+                    </button>
+                    <button onClick={() => handleDelete(r.id)} className="p-2 rounded-xl hover:bg-destructive/10 text-destructive transition-colors">
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                <div className="space-y-4">
+                  <div className="bg-muted/30 p-4 rounded-2xl border border-border/50">
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2">Danos Potenciais / Perigo</p>
+                    <p className="text-sm font-bold text-foreground leading-relaxed">{r.hazard}</p>
+                  </div>
+                  <div className="flex gap-4">
+                    <div className="flex-1 bg-muted/20 p-3 rounded-xl border border-border/30">
+                      <p className="text-[8px] font-black text-muted-foreground uppercase tracking-tighter">Probabilidade</p>
+                      <p className="text-xs font-bold">{r.probability} - {PROB_LABELS[r.probability]}</p>
+                    </div>
+                    <div className="flex-1 bg-muted/20 p-3 rounded-xl border border-border/30">
+                      <p className="text-[8px] font-black text-muted-foreground uppercase tracking-tighter">Consequência</p>
+                      <p className="text-xs font-bold">{r.impact} - {CONS_LABELS[r.impact].split('—')[0]}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100">
+                    <p className="text-[10px] font-black text-emerald-800 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                      <CheckCircle size={12} /> Medidas de Controle
+                    </p>
+                    <p className="text-xs font-medium text-emerald-900 leading-relaxed line-clamp-3">
+                      {r.control_measures || "Nenhuma medida cadastrada"}
+                    </p>
+                  </div>
+                  {r.treatment_measures && (
+                    <div className="bg-amber-50/50 p-4 rounded-2xl border border-amber-100">
+                      <p className="text-[10px] font-black text-amber-800 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                        <Info size={12} /> Plano de Tratamento
+                      </p>
+                      <p className="text-xs font-medium text-amber-900 leading-relaxed line-clamp-2">
+                        {r.treatment_measures}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="mt-auto pt-4 border-t border-border/50 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[10px] font-black">
+                    {r.responsible?.charAt(0).toUpperCase() || 'R'}
+                  </div>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Resp: {r.responsible}</span>
+                </div>
+                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg border ${STATUS_COLORS[r.status] || ''}`}>
+                  {r.status}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
       </div>
     </AdminLayout>
   );
