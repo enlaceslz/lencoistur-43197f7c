@@ -910,10 +910,12 @@ const AdminConfig = () => {
                 {novaSenha && novaSenha.length < 8 && <p className="text-xs text-destructive">A senha deve ter pelo menos 8 caracteres.</p>}
                 {confirmarSenha && novaSenha !== confirmarSenha && <p className="text-xs text-destructive">As senhas não conferem.</p>}
               </div>
-              <Button onClick={handleChangePassword} disabled={changingPassword} className="rounded-xl">
-                {changingPassword ? <Loader2 size={16} className="animate-spin mr-1" /> : <Shield size={16} className="mr-1" />}
-                Alterar Senha
-              </Button>
+              <div className="mt-6 pt-6 border-t border-border flex justify-end">
+                <Button onClick={handleChangePassword} disabled={changingPassword} className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-slate-500/20 bg-slate-700 hover:bg-slate-800 text-white">
+                  {changingPassword ? <Loader2 size={16} className="animate-spin mr-2" /> : <Shield size={16} className="mr-2" />}
+                  Atualizar Senha
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
