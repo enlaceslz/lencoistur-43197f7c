@@ -4,9 +4,12 @@ import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { 
   TrendingUp, TrendingDown, DollarSign, PieChart, 
-  ArrowUpRight, ArrowDownRight, Info, Target, LayoutDashboard
+  ArrowUpRight, ArrowDownRight, Info, Target, LayoutDashboard, Printer
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const MONTH_LABELS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 const fmt = (v: number) => formatCurrency(v);
@@ -22,12 +25,14 @@ export default function DRETab({
   bookings, 
   contasPagar = [], 
   selectedMonth, 
-  selectedYear 
+  selectedYear,
+  company
 }: { 
   bookings: BookingRow[], 
   contasPagar?: any[], 
   selectedMonth?: number, 
-  selectedYear?: number 
+  selectedYear?: number,
+  company?: any
 }) {
   const currentYear = selectedYear ?? new Date().getFullYear();
   const currentMonth = selectedMonth ?? new Date().getMonth();
@@ -63,31 +68,105 @@ export default function DRETab({
   const lucroOp = lucroBruto - totalDespesasOp;
   const margemOp = receitaBruta > 0 ? (lucroOp / receitaBruta) * 100 : 0;
 
+  const exportDRE = async () => {
+    const doc = new jsPDF();
+    const now = new Date();
+    const dateStr = now.toLocaleDateString("pt-BR");
+    const monthName = MONTH_LABELS[currentMonth];
+    
+    // Header
+    doc.setFillColor(15, 23, 42); // slate-900
+    doc.rect(0, 0, 210, 40, "F");
+
+    if (company?.logo_url) {
+      try {
+        const img = new Image();
+        img.src = company.logo_url;
+        await new Promise((resolve) => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+        doc.addImage(img, 'PNG', 14, 8, 24, 24);
+      } catch (e) {}
+    }
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text(company?.nome_fantasia?.toUpperCase() || "DEMONSTRATIVO DE RESULTADO", 45, 18);
+    
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Relatório de Lucratividade Consolidado`, 45, 25);
+    doc.text(`${monthName} / ${currentYear}`, 45, 30);
+
+    // DRE Content
+    doc.setTextColor(15, 23, 42);
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("DEMONSTRATIVO DE RESULTADO (DRE)", 14, 55);
+
+    autoTable(doc, {
+      startY: 65,
+      head: [["Item do Demonstrativo", "Valor (R$)", "% sobre Receita"]],
+      body: [
+        ["(+) RECEITA BRUTA", fmt(receitaBruta), "100%"],
+        ["(-) Descontos e Abatimentos", `(${fmt(descontosMes)})`, `${receitaBruta > 0 ? ((descontosMes/receitaBruta)*100).toFixed(1) : 0}%`],
+        ["(=) RECEITA LÍQUIDA", fmt(receitaLiquida), `${receitaBruta > 0 ? ((receitaLiquida/receitaBruta)*100).toFixed(1) : 0}%`],
+        ["(-) Custos Operacionais", `(${fmt(custosOp)})`, `${receitaBruta > 0 ? ((custosOp/receitaBruta)*100).toFixed(1) : 0}%`],
+        ["(=) LUCRO BRUTO", fmt(lucroBruto), `${receitaBruta > 0 ? ((lucroBruto/receitaBruta)*100).toFixed(1) : 0}%`],
+        ["(-) Despesas Administrativas", `(${fmt(despesasAdmin)})`, `${receitaBruta > 0 ? ((despesasAdmin/receitaBruta)*100).toFixed(1) : 0}%`],
+        ["(-) Despesas Marketing", `(${fmt(despesasMkt)})`, `${receitaBruta > 0 ? ((despesasMkt/receitaBruta)*100).toFixed(1) : 0}%`],
+        ["(-) Despesas Tecnologia", `(${fmt(despesasTech)})`, `${receitaBruta > 0 ? ((despesasTech/receitaBruta)*100).toFixed(1) : 0}%`],
+        ["(-) Outras Despesas", `(${fmt(outrasDespesas)})`, `${receitaBruta > 0 ? ((outrasDespesas/receitaBruta)*100).toFixed(1) : 0}%`],
+        ["(=) RESULTADO OPERACIONAL LÍQUIDO", fmt(lucroOp), `${margemOp.toFixed(1)}%`],
+      ],
+      theme: "grid",
+      headStyles: { fillColor: [15, 23, 42] },
+      styles: { fontSize: 10, cellPadding: 5 },
+      didParseCell: (data) => {
+        if (data.row.index === 2 || data.row.index === 4 || data.row.index === 9) {
+          data.cell.styles.fontStyle = 'bold';
+          if (data.row.index === 9) data.cell.styles.fillColor = [241, 245, 249];
+        }
+      }
+    });
+
+    doc.save(`DRE_${monthName}_${currentYear}.pdf`);
+  };
+
   return (
-    <div className="grid lg:grid-cols-3 gap-6">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="lg:col-span-2"
-      >
-        <Card className="border-none shadow-sm bg-card overflow-hidden">
-          <CardHeader className="bg-muted/30 pb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-xl font-bold flex items-center gap-2">
-                  <LayoutDashboard className="text-primary" size={20} />
-                  Demonstrativo de Resultado (DRE)
-                </CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">Análise detalhada de lucratividade — {MONTH_LABELS[currentMonth]} {currentYear}</p>
+    <div className="space-y-6">
+      <div className="flex justify-end">
+        <Button onClick={exportDRE} variant="outline" className="rounded-xl gap-2">
+          <Printer size={16} /> Exportar DRE (PDF)
+        </Button>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="lg:col-span-2"
+        >
+          <Card className="border-none shadow-sm bg-card overflow-hidden">
+            <CardHeader className="bg-muted/30 pb-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl font-bold flex items-center gap-2">
+                    <LayoutDashboard className="text-primary" size={20} />
+                    Demonstrativo de Resultado (DRE)
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">Análise detalhada de lucratividade — {MONTH_LABELS[currentMonth]} {currentYear}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Margem Operacional</p>
+                  <p className={`text-2xl font-black ${margemOp >= 20 ? "text-emerald-500" : margemOp > 0 ? "text-amber-500" : "text-rose-500"}`}>
+                    {margemOp.toFixed(1)}%
+                  </p>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Margem Operacional</p>
-                <p className={`text-2xl font-black ${margemOp >= 20 ? "text-emerald-500" : margemOp > 0 ? "text-amber-500" : "text-rose-500"}`}>
-                  {margemOp.toFixed(1)}%
-                </p>
-              </div>
-            </div>
-          </CardHeader>
+            </CardHeader>
           <CardContent className="p-0">
             <div className="divide-y divide-border/50">
               {/* Receitas */}
@@ -233,5 +312,6 @@ export default function DRETab({
         </motion.div>
       </div>
     </div>
+  </div>
   );
 }

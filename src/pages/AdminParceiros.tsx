@@ -80,6 +80,7 @@ const AdminParceiros = () => {
   const [deleteTypeId, setDeleteTypeId] = useState<string | null>(null);
   const [cnpjLoading, setCnpjLoading] = useState(false);
   const [viewPartner, setViewPartner] = useState<Partner | null>(null);
+  const [company, setCompany] = useState<any>(null);
   
   const [form, setForm] = useState({
     name: "", type: "hotel", contact_name: "", phone: "", email: "",
@@ -97,8 +98,13 @@ const AdminParceiros = () => {
 
   const fetchInitialData = async () => {
     setLoading(true);
-    await Promise.all([fetchPartners(), fetchTypes()]);
+    await Promise.all([fetchPartners(), fetchTypes(), fetchCompany()]);
     setLoading(false);
+  };
+
+  const fetchCompany = async () => {
+    const { data } = await supabase.from("sgs_empresa").select("*").limit(1).maybeSingle();
+    if (data) setCompany(data);
   };
 
   const fetchPartners = async () => {
@@ -250,27 +256,57 @@ const AdminParceiros = () => {
     else { toast.success(p.active ? "Parceiro desativado." : "Parceiro ativado."); fetchPartners(); }
   };
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
     const doc = new jsPDF();
     const now = new Date();
     const dateStr = now.toLocaleDateString("pt-BR");
     
-    // Header
-    doc.setFontSize(18);
+    // Header background
+    doc.setFillColor(33, 150, 243);
+    doc.rect(0, 0, 210, 40, "F");
+
+    // Company Logo
+    if (company?.logo_url) {
+      try {
+        const img = new Image();
+        img.src = company.logo_url;
+        await new Promise((resolve) => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+        doc.addImage(img, 'PNG', 14, 8, 24, 24);
+      } catch (e) {}
+    }
+
+    // Company Info
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text(company?.nome_fantasia?.toUpperCase() || "RELATÓRIO DE PARCEIROS", 45, 18);
+    
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.text(`CNPJ: ${company?.cnpj || "—"} | Contato: ${company?.telefone || "—"}`, 45, 25);
+    doc.text(`${company?.endereco || "—"}`, 45, 30);
+
+    // Title
+    doc.setFontSize(16);
     doc.setTextColor(33, 150, 243);
-    doc.text("Relatório de Parceiros - Lençóis Tour", 14, 20);
+    doc.setFont("helvetica", "bold");
+    doc.text("RELAÇÃO DE PARCEIROS E FORNECEDORES", 14, 55);
     
     doc.setFontSize(10);
     doc.setTextColor(100);
-    doc.text(`Data de geração: ${dateStr}`, 14, 28);
-    doc.text(`Total de parceiros: ${partners.length} (${activeCount} ativos)`, 14, 33);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Total de parceiros: ${partners.length} (${activeCount} ativos)`, 14, 62);
+    doc.text(`Gerado em: ${dateStr}`, 150, 62);
 
     // Table
     const tableData = filtered.map(p => {
       let remStr = "";
       if (p.remuneration_type === "comissao_percent") remStr = `${p.remuneration_value || 0}%`;
-      else if (p.remuneration_type === "valor_por_passeio") remStr = `R$ ${p.remuneration_value || 0} / passeio`;
-      else if (p.remuneration_type === "valor_mensal") remStr = `R$ ${p.remuneration_value || 0} / mês`;
+      else if (p.remuneration_type === "valor_por_passeio") remStr = `R$ ${p.remuneration_value || 0}/pass.`;
+      else if (p.remuneration_type === "valor_mensal") remStr = `R$ ${p.remuneration_value || 0}/mês`;
       else remStr = `${p.commission_rate || 0}%`;
 
       return [
@@ -284,15 +320,27 @@ const AdminParceiros = () => {
     });
 
     autoTable(doc, {
-      startY: 40,
+      startY: 70,
       head: [["Nome", "Tipo", "CPF/CNPJ", "Contato", "Remuneração", "Status"]],
       body: tableData,
       theme: "striped",
-      headStyles: { fillColor: [33, 150, 243] },
-      styles: { fontSize: 8 },
+      headStyles: { 
+        fillColor: [33, 150, 243],
+        textColor: 255,
+        fontSize: 10,
+        fontStyle: 'bold'
+      },
+      styles: { 
+        fontSize: 8,
+        cellPadding: 4
+      },
+      columnStyles: {
+        4: { halign: 'center' },
+        5: { halign: 'center' }
+      }
     });
 
-    doc.save(`parceiros_${now.toISOString().slice(0, 10)}.pdf`);
+    doc.save(`Relatorio_Parceiros_${now.toISOString().slice(0, 10)}.pdf`);
   };
 
   const filtered = partners.filter((p) => {
