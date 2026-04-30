@@ -312,5 +312,6 @@ export default function DRETab({
         </motion.div>
       </div>
     </div>
+  </div>
   );
 }
