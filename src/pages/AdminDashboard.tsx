@@ -173,20 +173,24 @@ const AdminDashboard = () => {
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat: any) => (
-            <div key={stat.label} className={`bg-card border border-border rounded-2xl p-5 ${stat.isSgs && stat.value !== "0" ? "ring-2 ring-destructive/50" : ""}`}>
+            <div 
+              key={stat.label} 
+              onClick={() => stat.path && navigate(stat.path)}
+              className={`bg-card border border-border rounded-2xl p-5 cursor-pointer hover:shadow-md hover:border-primary/50 transition-all ${stat.isSgs && stat.value !== "0" ? "ring-2 ring-destructive/50" : ""}`}
+            >
               <div className="flex items-center justify-between mb-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.isSgs && stat.value !== "0" ? "bg-destructive/10" : "bg-muted"}`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.isSgs && stat.value !== "0" ? "bg-destructive/10" : "bg-primary/10"}`}>
                   <stat.icon size={20} className={stat.isSgs && stat.value !== "0" ? "text-destructive" : "text-primary"} />
                 </div>
                 {stat.change && (
-                  <span className={`flex items-center gap-1 text-xs font-semibold ${stat.up ? "text-primary" : "text-destructive"}`}>
-                    {!stat.isSgs && (stat.up ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />)}
+                  <span className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-tight ${stat.up ? "text-primary" : "text-destructive"}`}>
+                    {!stat.isSgs && stat.change.includes('%') && (stat.up ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />)}
                     {stat.change}
                   </span>
                 )}
               </div>
-              <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-              <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
+              <p className="text-2xl font-black text-foreground">{stat.value}</p>
+              <p className="text-xs font-medium text-muted-foreground mt-1 uppercase tracking-wider">{stat.label}</p>
             </div>
           ))}
         </div>
