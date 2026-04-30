@@ -1,13 +1,14 @@
 import { useState, useEffect, useMemo } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   DollarSign, TrendingUp, TrendingDown, CreditCard, Wallet, Receipt,
-  Loader2, Download, Printer, LayoutDashboard, FileText
+  Loader2, Download, Printer, LayoutDashboard, FileText, Search
 } from "lucide-react";
 import FinanceiroStats from "@/components/financeiro/FinanceiroStats";
 import FluxoCaixaTab from "@/components/financeiro/FluxoCaixaTab";
@@ -300,6 +301,18 @@ const AdminFinanceiro = () => {
                   <option key={y} value={y}>{y}</option>
                 ))}
               </select>
+            </div>
+          </div>
+          
+          <div className="flex-1 max-w-md hidden md:block">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+              <Input 
+                placeholder="Pesquisar nas exportações..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 h-11 bg-muted/30 border-none rounded-xl"
+              />
             </div>
           </div>
           
