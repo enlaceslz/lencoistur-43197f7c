@@ -18,6 +18,7 @@ import {
   Plus, Copy, Pencil, Car, Compass,
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { PrintReceiptButton, type ReceiptData } from "@/components/BookingReceipt";
 import { supabase } from "@/integrations/supabase/client";
@@ -450,9 +451,16 @@ const AdminReservas = () => {
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground whitespace-nowrap">{fmtDateTime(b.createdAt)}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full group-hover:bg-primary group-hover:text-white transition-all">
-                          <Eye size={14} />
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full group-hover:bg-primary group-hover:text-white transition-all">
+                              <Eye size={14} />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Ver Detalhes</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   );

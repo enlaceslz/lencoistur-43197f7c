@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
 interface Customer {
@@ -869,12 +870,19 @@ const AdminCRM = () => {
                             </td>
                             <td className="py-3 text-right">
                               <div className="flex gap-1 justify-end">
-                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
-                                  const parent = customers.find(c => c.id === d.customer_id);
-                                  if (parent) selectCustomer(parent);
-                                }}>
-                                  <Eye size={14} className="text-primary" />
-                                </Button>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
+                                      const parent = customers.find(c => c.id === d.customer_id);
+                                      if (parent) selectCustomer(parent);
+                                    }}>
+                                      <Eye size={14} className="text-primary" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Ver Responsável</p>
+                                  </TooltipContent>
+                                </Tooltip>
                               </div>
                             </td>
                           </tr>
@@ -939,23 +947,44 @@ const AdminCRM = () => {
                             <td className="py-4 px-4 text-right">
                             <div className="flex gap-1 justify-end">
                               {c.phone && (
-                                <a
-                                  href={`https://wa.me/55${c.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${c.name.split(" ")[0]}! Tudo bem?`)}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-green-100 dark:hover:bg-green-900/30">
-                                    <Smartphone size={14} className="text-green-600" />
-                                  </Button>
-                                </a>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <a
+                                      href={`https://wa.me/55${c.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${c.name.split(" ")[0]}! Tudo bem?`)}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-green-100 dark:hover:bg-green-900/30">
+                                        <Smartphone size={14} className="text-green-600" />
+                                      </Button>
+                                    </a>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Enviar WhatsApp</p>
+                                  </TooltipContent>
+                                </Tooltip>
                               )}
-                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); openEditModal(c); }}>
-                                <Pencil size={14} className="text-muted-foreground" />
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10" onClick={(e) => { e.stopPropagation(); setDeleteConfirm(c.id); }}>
-                                <Trash2 size={14} className="text-destructive" />
-                              </Button>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => { e.stopPropagation(); openEditModal(c); }}>
+                                    <Pencil size={14} className="text-muted-foreground" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Editar Cliente</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10" onClick={(e) => { e.stopPropagation(); setDeleteConfirm(c.id); }}>
+                                    <Trash2 size={14} className="text-destructive" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Excluir Cliente</p>
+                                </TooltipContent>
+                              </Tooltip>
                             </div>
                           </td>
                         </tr>

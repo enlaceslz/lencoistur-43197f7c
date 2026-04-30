@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { maskCPF } from "@/lib/masks";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 import { Users, Plus, Search, AlertTriangle, CheckCircle, MapPin, Calendar, Pencil } from "lucide-react";
 
@@ -184,7 +185,16 @@ const AdminSGSCondutoresVisitantes = () => {
                       <button onClick={() => updateStatus(v.id, "encerrado")} className="w-full text-[10px] font-black uppercase tracking-widest py-2 bg-muted text-muted-foreground rounded-xl hover:bg-muted/80 transition-all">Encerrar Visita</button>
                     )}
                     <div className="flex w-full gap-1">
-                      <button onClick={() => openEdit(v)} className="flex-1 py-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors flex items-center justify-center"><Pencil size={14} /></button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button onClick={() => openEdit(v)} className="flex-1 py-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors flex items-center justify-center">
+                            <Pencil size={14} />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Editar Visitante</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   </div>
                 </div>

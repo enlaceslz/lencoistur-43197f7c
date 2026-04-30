@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import {
   Home, Compass, Car, Users, UserCheck, CreditCard, Settings,
   LogOut, Star, ShoppingCart, Menu, X, Bell, Megaphone, Bot,
@@ -205,7 +206,8 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   };
 
   return (
-    <div className="min-h-screen bg-[hsl(220,20%,96%)] flex">
+    <TooltipProvider>
+      <div className="min-h-screen bg-[hsl(220,20%,96%)] flex">
       {/* === SIDEBAR === */}
       <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[80px]" : "w-[260px]"} admin-sidebar transform transition-all duration-200 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
         {/* Brand */}
@@ -296,13 +298,19 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
                   <p className="text-xs font-medium text-white/80 truncate">{user?.email || "Admin"}</p>
                   <p className="text-[10px] text-[hsl(220,15%,45%)]">Administrador</p>
                 </div>
-                <button
-                  onClick={async () => { await signOut(); navigate("/admin/login"); }}
-                  className="p-1.5 rounded-lg text-[hsl(220,15%,50%)] hover:text-white hover:bg-white/[0.08] transition-colors"
-                  title="Sair"
-                >
-                  <LogOut size={16} />
-                </button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={async () => { await signOut(); navigate("/admin/login"); }}
+                      className="p-1.5 rounded-lg text-[hsl(220,15%,50%)] hover:text-white hover:bg-white/[0.08] transition-colors"
+                    >
+                      <LogOut size={16} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p>Sair do Sistema</p>
+                  </TooltipContent>
+                </Tooltip>
               </>
             )}
           </div>
@@ -319,18 +327,25 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
         {/* Header */}
         <header className="bg-white border-b border-[hsl(220,20%,92%)] px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_3px_hsl(220,20%,90%)]">
           <div className="flex items-center gap-3">
-            <button 
-              onClick={() => {
-                if (window.innerWidth >= 1024) {
-                  setSidebarCollapsed(!sidebarCollapsed);
-                } else {
-                  setSidebarOpen(true);
-                }
-              }} 
-              className="p-1.5 rounded-lg text-[hsl(220,15%,40%)] hover:bg-[hsl(220,20%,96%)]"
-            >
-              <Menu size={22} />
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button 
+                  onClick={() => {
+                    if (window.innerWidth >= 1024) {
+                      setSidebarCollapsed(!sidebarCollapsed);
+                    } else {
+                      setSidebarOpen(true);
+                    }
+                  }} 
+                  className="p-1.5 rounded-lg text-[hsl(220,15%,40%)] hover:bg-[hsl(220,20%,96%)]"
+                >
+                  <Menu size={22} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>{sidebarCollapsed ? "Expandir Menu" : "Recolher Menu"}</p>
+              </TooltipContent>
+            </Tooltip>
 
             <div className="hidden sm:flex items-center gap-1.5 text-xs text-[hsl(220,15%,55%)]">
               {breadcrumbs.map((crumb, i) => (
@@ -350,17 +365,24 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           <div className="flex items-center gap-2">
             {/* Notifications */}
             <div className="relative" ref={notifRef}>
-              <button
-                onClick={() => setNotifOpen(!notifOpen)}
-                className={`relative p-2 rounded-lg transition-colors ${notifOpen ? "bg-[hsl(220,20%,94%)] text-[hsl(220,25%,20%)]" : "text-[hsl(220,15%,50%)] hover:text-[hsl(220,25%,20%)] hover:bg-[hsl(220,20%,96%)]"}`}
-              >
-                <Bell size={19} />
-                {activeNotifs.length > 0 && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setNotifOpen(!notifOpen)}
+                    className={`relative p-2 rounded-lg transition-colors ${notifOpen ? "bg-[hsl(220,20%,94%)] text-[hsl(220,25%,20%)]" : "text-[hsl(220,15%,50%)] hover:text-[hsl(220,25%,20%)] hover:bg-[hsl(220,20%,96%)]"}`}
+                  >
+                    <Bell size={19} />
+                    {activeNotifs.length > 0 && (
                   <span className={`absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 rounded-full text-[9px] text-white flex items-center justify-center font-bold ${errorCount > 0 ? "bg-red-500" : "bg-amber-500"}`}>
                     {activeNotifs.length}
                   </span>
-                )}
-              </button>
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Notificações</p>
+              </TooltipContent>
+            </Tooltip>
 
               {notifOpen && (
                 <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-[hsl(220,20%,92%)] rounded-xl shadow-xl overflow-hidden z-50">
@@ -425,7 +447,8 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           {children}
         </div>
       </main>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 };
 

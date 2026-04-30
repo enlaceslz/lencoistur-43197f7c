@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, RefreshCw, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { maskCPF, maskCNPJ, maskPhone } from "@/lib/masks";
 
@@ -1074,13 +1075,19 @@ const AdminConfig = () => {
                     <div key={index} className="relative group aspect-square rounded-xl overflow-hidden border border-border shadow-sm">
                       <img src={img.src} alt={img.alt} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                        <button
-                          onClick={() => removeGalleryImage(index)}
-                          className="p-2 bg-destructive text-destructive-foreground rounded-full hover:scale-110 transition-transform"
-                          title="Remover imagem"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              onClick={() => removeGalleryImage(index)}
+                              className="p-2 bg-destructive text-destructive-foreground rounded-full hover:scale-110 transition-transform"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Remover imagem</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                       <div className="absolute bottom-0 left-0 right-0 p-1 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity">
                         <input
