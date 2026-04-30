@@ -15,10 +15,12 @@ import "jspdf-autotable";
 const AdminSGSDashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({ risks: 0, incidents: 0, actions: 0, expiring: 0, surveyAvg: 0, briefings: 0, terms: 0, pendingTerms: 0, veiculos: 0, condutores: 0, checklists: 0, equipment: 0, procedures: 0 });
+  const [loading, setLoading] = useState(true);
   const [risksByLevel, setRisksByLevel] = useState<any[]>([]);
   const [incidentsByMonth, setIncidentsByMonth] = useState<any[]>([]);
   const [risksByStage, setRisksByStage] = useState<any[]>([]);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [fleetAlerts, setFleetAlerts] = useState<any[]>([]);
 
   useEffect(() => { loadData(); }, []);
 
