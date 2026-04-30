@@ -57,6 +57,8 @@ const AdminFinanceiro = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"todos" | "pago" | "pendente">("todos");
+  const [typeFilter, setTypeFilter] = useState<"todos" | "entrada" | "saida">("todos");
 
   useEffect(() => {
     const load = async () => {
