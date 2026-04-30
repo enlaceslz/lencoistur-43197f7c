@@ -196,6 +196,16 @@ Deno.serve(async (req) => {
         console.error("Error inserting booking:", bookingErr);
         return null;
       }
+      if (companions && Array.isArray(companions) && companions.length > 0) {
+        const dependents = companions.map(c => ({
+          customer_id: customerId,
+          name: c.name,
+          cpf: c.cpf || null,
+          birth_date: c.birthDate || null,
+          relationship: c.relationship || 'Acompanhante'
+        }));
+        await supabaseAdmin.from("dependents").insert(dependents);
+      }
       return booking;
     };
 
