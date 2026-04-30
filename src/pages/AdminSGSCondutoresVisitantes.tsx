@@ -3,8 +3,9 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { maskCPF } from "@/lib/masks";
+import { Badge } from "@/components/ui/badge";
 
-import { Users, Plus, Search, AlertTriangle } from "lucide-react";
+import { Users, Plus, Search, AlertTriangle, CheckCircle, MapPin, Calendar, Pencil } from "lucide-react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   autorizado: { label: "Autorizado", color: "bg-primary/10 text-primary" },
