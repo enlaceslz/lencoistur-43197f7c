@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Car, Plus, Search, AlertTriangle, CheckCircle } from "lucide-react";
+import { Car, Plus, Search, AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   ativo: { label: "Ativo", color: "bg-primary/10 text-primary" },
@@ -153,43 +154,67 @@ const AdminSGSVeiculos = () => {
           </form>
         )}
 
-        {loading ? <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div> : filtered.length === 0 ? (
-          <div className="text-center py-16 text-muted-foreground"><Car size={40} className="mx-auto mb-3 opacity-40" /><p>Nenhum veículo cadastrado</p></div>
+        {loading ? <div className="flex justify-center py-16"><Loader2 className="animate-spin text-primary" size={32} /></div> : filtered.length === 0 ? (
+          <div className="text-center py-20 bg-card border border-dashed rounded-3xl">
+            <Car size={48} className="mx-auto mb-4 opacity-20" />
+            <p className="font-bold text-lg">Nenhum veículo na frota</p>
+            <p className="text-sm text-muted-foreground">Cadastre seus veículos para gerenciar seguros e manutenções.</p>
+          </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map(v => {
               const st = STATUS_LABELS[v.status] || STATUS_LABELS.ativo;
               const seguroExp = isExpired(v.seguro_validade);
               const seguroWarn = isExpiring(v.seguro_validade);
               const licExp = isExpired(v.licenciamento_validade);
               const licWarn = isExpiring(v.licenciamento_validade);
+              
               return (
-                <div key={v.id} className="bg-card border border-border rounded-2xl p-5 cursor-pointer hover:shadow-md transition-shadow" onClick={() => openEdit(v)}>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Car size={18} className="text-primary" />
-                      <span className="font-bold text-foreground text-sm">{v.marca} {v.modelo}</span>
+                <div key={v.id} className="bg-card border border-border rounded-3xl p-6 cursor-pointer hover:shadow-xl hover:border-primary/30 transition-all group relative overflow-hidden" onClick={() => openEdit(v)}>
+                  <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${st.label === 'Ativo' ? 'bg-primary' : st.label === 'Manutenção' ? 'bg-secondary' : 'bg-destructive'}`} />
+                  
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                        <Car size={24} />
+                      </div>
+                      <div>
+                        <h4 className="font-black text-foreground group-hover:text-primary transition-colors leading-tight">{v.marca}</h4>
+                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{v.modelo}</p>
+                      </div>
                     </div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${st.color}`}>{st.label}</span>
+                    <Badge variant="outline" className={`font-black text-[9px] uppercase px-2.5 py-1 rounded-lg border ${st.color}`}>
+                      {st.label}
+                    </Badge>
                   </div>
-                  <div className="text-xs text-muted-foreground space-y-1">
-                    <p><span className="font-semibold text-foreground">Placa:</span> {v.placa} {v.ano ? `· ${v.ano}` : ""}</p>
-                    <p><span className="font-semibold text-foreground">Tipo:</span> {v.tipo} · {v.combustivel} · {v.capacidade} passageiros</p>
-                    {v.quilometragem > 0 && <p><span className="font-semibold text-foreground">KM:</span> {v.quilometragem.toLocaleString()}</p>}
+
+                  <div className="grid grid-cols-2 gap-3 mb-5">
+                    <div className="bg-muted/30 p-2.5 rounded-xl border border-border/50">
+                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter mb-0.5">Placa</p>
+                      <p className="text-sm font-black text-foreground font-mono">{v.placa}</p>
+                    </div>
+                    <div className="bg-muted/30 p-2.5 rounded-xl border border-border/50">
+                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter mb-0.5">KM Atual</p>
+                      <p className="text-sm font-black text-foreground">{v.quilometragem?.toLocaleString() || '0'}</p>
+                    </div>
                   </div>
-                  <div className="mt-3 space-y-1">
-                    {v.seguro_validade && (
-                      <div className={`flex items-center gap-1 text-xs ${seguroExp ? "text-destructive" : seguroWarn ? "text-secondary" : "text-muted-foreground"}`}>
-                        {seguroExp ? <AlertTriangle size={12} /> : <CheckCircle size={12} />}
-                        Seguro: {v.seguro_validade} {seguroExp && "(VENCIDO)"}
+
+                  <div className="space-y-2 pt-2 border-t border-border/50">
+                    <div className={`flex items-center justify-between p-2 rounded-lg transition-colors ${seguroExp ? "bg-destructive/5 text-destructive" : seguroWarn ? "bg-amber-50 text-amber-700" : "bg-muted/20 text-muted-foreground"}`}>
+                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase">
+                        {seguroExp ? <AlertTriangle size={12} /> : <CheckCircle size={12} className={!seguroExp && !seguroWarn ? "text-emerald-500" : ""} />}
+                        Seguro
                       </div>
-                    )}
-                    {v.licenciamento_validade && (
-                      <div className={`flex items-center gap-1 text-xs ${licExp ? "text-destructive" : licWarn ? "text-secondary" : "text-muted-foreground"}`}>
-                        {licExp ? <AlertTriangle size={12} /> : <CheckCircle size={12} />}
-                        Licenciamento: {v.licenciamento_validade} {licExp && "(VENCIDO)"}
+                      <span className="text-[10px] font-black">{v.seguro_validade ? new Date(v.seguro_validade + "T12:00").toLocaleDateString("pt-BR") : "N/A"}</span>
+                    </div>
+
+                    <div className={`flex items-center justify-between p-2 rounded-lg transition-colors ${licExp ? "bg-destructive/5 text-destructive" : licWarn ? "bg-amber-50 text-amber-700" : "bg-muted/20 text-muted-foreground"}`}>
+                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase">
+                        {licExp ? <AlertTriangle size={12} /> : <CheckCircle size={12} className={!licExp && !licWarn ? "text-emerald-500" : ""} />}
+                        Licenciamento
                       </div>
-                    )}
+                      <span className="text-[10px] font-black">{v.licenciamento_validade ? new Date(v.licenciamento_validade + "T12:00").toLocaleDateString("pt-BR") : "N/A"}</span>
+                    </div>
                   </div>
                 </div>
               );

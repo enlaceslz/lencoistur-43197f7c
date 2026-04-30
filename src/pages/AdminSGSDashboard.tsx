@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
 import {
   Shield, AlertTriangle, CheckCircle, Users, TrendingUp, Activity, Phone, Building2,
   Plus, ArrowRight, Clock, FileText, ClipboardCheck, Car, UserCheck2, Map, Truck, Star,
-  Wrench, ClipboardList
+  Wrench, ClipboardList, AlertCircle, Loader2
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import { jsPDF } from "jspdf";
@@ -14,14 +15,17 @@ import "jspdf-autotable";
 const AdminSGSDashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({ risks: 0, incidents: 0, actions: 0, expiring: 0, surveyAvg: 0, briefings: 0, terms: 0, pendingTerms: 0, veiculos: 0, condutores: 0, checklists: 0, equipment: 0, procedures: 0 });
+  const [loading, setLoading] = useState(true);
   const [risksByLevel, setRisksByLevel] = useState<any[]>([]);
   const [incidentsByMonth, setIncidentsByMonth] = useState<any[]>([]);
   const [risksByStage, setRisksByStage] = useState<any[]>([]);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [fleetAlerts, setFleetAlerts] = useState<any[]>([]);
 
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
+    setLoading(true);
     const [risksRes, incidentsRes, actionsRes, staffRes, surveysRes, briefingsRes, termsRes, veiculosRes, condutoresRes, checklistsRes, bookingsRes, equipmentRes, proceduresRes] = await Promise.all([
       supabase.from("sgs_risks").select("*"),
       supabase.from("sgs_incidents").select("*").order("created_at", { ascending: false }),
@@ -30,8 +34,8 @@ const AdminSGSDashboard = () => {
       supabase.from("sgs_safety_surveys").select("felt_safe"),
       supabase.from("sgs_briefings").select("id"),
       supabase.from("sgs_risk_terms").select("booking_id"),
-      supabase.from("sgs_veiculos").select("id").eq("status", "ativo"),
-      supabase.from("sgs_condutores").select("id").eq("status", "ativo"),
+      supabase.from("sgs_veiculos").select("*"),
+      supabase.from("sgs_condutores").select("*"),
       supabase.from("sgs_checklists").select("id, created_at").order("created_at", { ascending: false }).limit(1),
       supabase.from("bookings").select("id").not("status", "eq", "cancelada"),
       supabase.from("sgs_equipment").select("id"),
@@ -65,6 +69,30 @@ const AdminSGSDashboard = () => {
       equipment: (equipmentRes.data || []).length,
       procedures: (proceduresRes.data || []).length,
     });
+
+    // Fleet Alerts
+    const alerts: any[] = [];
+    const now = new Date();
+    const soon = new Date();
+    soon.setDate(now.getDate() + 30);
+
+    const isExpired = (d: string | null) => d && new Date(d) < now;
+    const isExpiring = (d: string | null) => d && new Date(d) >= now && new Date(d) <= soon;
+
+    (veiculosRes.data || []).forEach((v: any) => {
+      if (isExpired(v.seguro_validade)) alerts.push({ type: 'veiculo', title: `Seguro Vencido: ${v.placa}`, desc: v.marca + ' ' + v.modelo, severity: 'alta', link: '/admin/sgs/veiculos' });
+      else if (isExpiring(v.seguro_validade)) alerts.push({ type: 'veiculo', title: `Seguro Vencendo: ${v.placa}`, desc: v.marca + ' ' + v.modelo, severity: 'media', link: '/admin/sgs/veiculos' });
+      
+      if (isExpired(v.licenciamento_validade)) alerts.push({ type: 'veiculo', title: `Licenciamento Vencido: ${v.placa}`, desc: v.marca + ' ' + v.modelo, severity: 'alta', link: '/admin/sgs/veiculos' });
+      else if (isExpiring(v.licenciamento_validade)) alerts.push({ type: 'veiculo', title: `Licenciamento Vencendo: ${v.placa}`, desc: v.marca + ' ' + v.modelo, severity: 'media', link: '/admin/sgs/veiculos' });
+    });
+
+    (condutoresRes.data || []).forEach((c: any) => {
+      if (isExpired(c.cnh_validade)) alerts.push({ type: 'condutor', title: `CNH Vencida: ${c.nome}`, desc: 'Categoria ' + c.cnh_categoria, severity: 'alta', link: '/admin/sgs/condutores' });
+      else if (isExpiring(c.cnh_validade)) alerts.push({ type: 'condutor', title: `CNH Vencendo: ${c.nome}`, desc: 'Categoria ' + c.cnh_categoria, severity: 'media', link: '/admin/sgs/condutores' });
+    });
+
+    setFleetAlerts(alerts.sort((a, b) => a.severity === 'alta' ? -1 : 1).slice(0, 6));
 
     // Recent activity from incidents
     const recent: any[] = [];
@@ -110,13 +138,14 @@ const AdminSGSDashboard = () => {
     setRisksByStage(Object.entries(stageMap).map(([stage, count]) => ({ name: stageLabels[stage] || stage, riscos: count })));
 
     const months: Record<string, number> = {};
-    const now = new Date();
+    const reportDate = new Date();
     for (let i = 5; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const d = new Date(reportDate.getFullYear(), reportDate.getMonth() - i, 1);
       months[`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`] = 0;
     }
     incidents.forEach((inc: any) => { const key = inc.date?.slice(0, 7); if (key && key in months) months[key]++; });
     setIncidentsByMonth(Object.entries(months).map(([month, count]) => ({ name: month.slice(5), incidentes: count })));
+    setLoading(false);
   };
 
   const generateP1Report = async () => {
@@ -238,10 +267,9 @@ const AdminSGSDashboard = () => {
     { label: "Riscos Ativos", value: stats.risks, icon: AlertTriangle, color: "text-secondary", path: "/admin/sgs/riscos", urgent: stats.risks > 0 },
     { label: "Incidentes Abertos", value: stats.incidents, icon: Activity, color: "text-destructive", path: "/admin/sgs/incidentes", urgent: stats.incidents > 0 },
     { label: "Ações Pendentes", value: stats.actions, icon: CheckCircle, color: "text-primary", path: "/admin/sgs/acoes", urgent: stats.actions > 0 },
+    { label: "Frota / Alertas", value: fleetAlerts.length, icon: Truck, color: "text-primary", path: "/admin/sgs/veiculos", urgent: fleetAlerts.length > 0 },
     { label: "Veículos Ativos", value: stats.veiculos, icon: Car, color: "text-primary", path: "/admin/sgs/veiculos" },
     { label: "Condutores Ativos", value: stats.condutores, icon: UserCheck2, color: "text-primary", path: "/admin/sgs/condutores" },
-    { label: "Briefings", value: stats.briefings, icon: Shield, color: "text-primary", path: "/admin/sgs/briefings" },
-    { label: "Termos Assinados", value: stats.terms, icon: FileText, color: "text-primary", path: "/admin/sgs/termos" },
     { label: "Termos Pendentes", value: stats.pendingTerms, icon: Shield, color: "text-destructive", path: "/admin/sgs/termos", urgent: stats.pendingTerms > 0 },
     { label: "Avaliação Segurança", value: `${stats.surveyAvg}/5`, icon: Star, color: "text-primary", path: "/admin/sgs/pesquisas" },
     { label: "Equipamentos (P5)", value: stats.equipment, icon: Wrench, color: "text-primary", path: "/admin/sgs/controles" },
@@ -250,7 +278,13 @@ const AdminSGSDashboard = () => {
 
   return (
     <AdminLayout title="SGS - Dashboard de Segurança">
-      <div className="space-y-6">
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-32 space-y-4">
+          <Loader2 className="animate-spin text-primary" size={40} />
+          <p className="text-muted-foreground animate-pulse font-black uppercase text-xs tracking-widest">Sincronizando Gestão de Segurança...</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
         {/* Quick Actions Bar */}
         <div className="bg-card border border-border rounded-2xl p-4">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Ações Rápidas</p>
@@ -288,8 +322,47 @@ const AdminSGSDashboard = () => {
           ))}
         </div>
 
-        {/* Recent Activity + Charts Row */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-4 gap-6">
+          {/* Fleet Alerts - NEW */}
+          <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display font-black text-foreground text-sm flex items-center gap-2">
+                <Truck size={18} className="text-primary" /> Alertas de Frota
+              </h3>
+              {fleetAlerts.length > 0 && <Badge variant="destructive" className="animate-pulse">{fleetAlerts.length}</Badge>}
+            </div>
+            {fleetAlerts.length === 0 ? (
+              <div className="text-center py-12">
+                <CheckCircle size={32} className="mx-auto text-emerald-500/20 mb-2" />
+                <p className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">Documentação em dia</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {fleetAlerts.map((a, i) => (
+                  <button
+                    key={i}
+                    onClick={() => navigate(a.link)}
+                    className="w-full text-left flex items-start gap-3 p-3 rounded-xl hover:bg-primary/5 border border-transparent hover:border-primary/20 transition-all group"
+                  >
+                    <div className={`p-2 rounded-lg shrink-0 ${a.severity === 'alta' ? 'bg-destructive/10 text-destructive' : 'bg-amber-100 text-amber-700'}`}>
+                      {a.type === 'veiculo' ? <Car size={14} /> : <UserCheck2 size={14} />}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-black text-foreground leading-tight group-hover:text-primary transition-colors">{a.title}</p>
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase mt-0.5">{a.desc}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+            <button 
+              onClick={() => navigate('/admin/sgs/veiculos')}
+              className="w-full mt-4 py-2 text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/5 rounded-lg transition-colors border border-primary/10"
+            >
+              Gerenciar Frota
+            </button>
+          </div>
+
           {/* Recent Activity */}
           <div className="bg-card border border-border rounded-2xl p-5">
             <div className="flex items-center justify-between mb-4">
@@ -329,9 +402,9 @@ const AdminSGSDashboard = () => {
           <div className="bg-card border border-border rounded-2xl p-5">
             <h3 className="font-display font-bold text-foreground text-sm mb-4">Distribuição de Riscos</h3>
             {risksByLevel.length > 0 && risksByLevel.some(r => r.value > 0) ? (
-              <ResponsiveContainer width="100%" height={200}>
+              <ResponsiveContainer width="100%" height={160}>
                 <PieChart>
-                  <Pie data={risksByLevel} cx="50%" cy="50%" outerRadius={70} innerRadius={35} dataKey="value" label={({ name, value }) => `${value}`}>
+                  <Pie data={risksByLevel} cx="50%" cy="50%" outerRadius={60} innerRadius={30} dataKey="value">
                     {risksByLevel.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
                   </Pie>
                   <Tooltip />
@@ -341,12 +414,11 @@ const AdminSGSDashboard = () => {
               <div className="flex flex-col items-center justify-center py-8">
                 <AlertTriangle size={28} className="text-muted-foreground/30 mb-2" />
                 <p className="text-xs text-muted-foreground">Nenhum risco cadastrado</p>
-                <button onClick={() => navigate("/admin/sgs/riscos")} className="text-xs text-primary hover:underline mt-1">+ Cadastrar risco</button>
               </div>
             )}
-            <div className="flex justify-center gap-4 mt-2">
+            <div className="flex flex-wrap justify-center gap-3 mt-2">
               {risksByLevel.map(r => (
-                <div key={r.name} className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                <div key={r.name} className="flex items-center gap-1.5 text-[9px] font-bold text-muted-foreground uppercase">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: r.fill }} />
                   {r.name}
                 </div>
@@ -356,14 +428,14 @@ const AdminSGSDashboard = () => {
 
           {/* Incidents Timeline */}
           <div className="bg-card border border-border rounded-2xl p-5">
-            <h3 className="font-display font-bold text-foreground text-sm mb-4">Incidentes (6 meses)</h3>
-            <ResponsiveContainer width="100%" height={200}>
+            <h3 className="font-display font-bold text-foreground text-sm mb-4">Tendência de Incidentes</h3>
+            <ResponsiveContainer width="100%" height={160}>
               <LineChart data={incidentsByMonth}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border)/0.5)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={10} />
+                <YAxis axisLine={false} tickLine={false} fontSize={10} />
                 <Tooltip />
-                <Line type="monotone" dataKey="incidentes" stroke="hsl(var(--destructive))" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="incidentes" stroke="hsl(var(--destructive))" strokeWidth={3} dot={{ r: 4, strokeWidth: 0, fill: "hsl(var(--destructive))" }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -460,7 +532,8 @@ const AdminSGSDashboard = () => {
             </div>
           </div>
         </details>
-      </div>
+        </div>
+      )}
     </AdminLayout>
   );
 };
