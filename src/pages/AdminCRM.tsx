@@ -828,12 +828,12 @@ const AdminCRM = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-border text-muted-foreground">
-                      <th className="text-left py-3 font-medium">{filter === "dependents" ? "Dependente" : "Cliente"}</th>
-                      <th className="text-left py-3 font-medium hidden sm:table-cell">{filter === "dependents" ? "Titular" : "Telefone"}</th>
-                      <th className="text-right py-3 font-medium">{filter === "dependents" ? "Idade" : "Reservas"}</th>
-                      <th className="text-right py-3 font-medium hidden sm:table-cell">{filter === "dependents" ? "Parentesco" : "Total Gasto"}</th>
-                      <th className="text-right py-3 font-medium">Ações</th>
+                    <tr className="border-b border-border text-muted-foreground bg-muted/30">
+                      <th className="text-left py-3 px-4 font-bold uppercase text-[10px] tracking-widest">{filter === "dependents" ? "Dependente" : "Cliente"}</th>
+                      <th className="text-left py-3 px-2 font-bold uppercase text-[10px] tracking-widest hidden sm:table-cell">{filter === "dependents" ? "Titular" : "Contato"}</th>
+                      <th className="text-center py-3 px-2 font-bold uppercase text-[10px] tracking-widest">{filter === "dependents" ? "Idade" : "Histórico"}</th>
+                      <th className="text-right py-3 px-2 font-bold uppercase text-[10px] tracking-widest hidden sm:table-cell">{filter === "dependents" ? "Parentesco" : "Faturamento"}</th>
+                      <th className="text-right py-3 px-4 font-bold uppercase text-[10px] tracking-widest">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
