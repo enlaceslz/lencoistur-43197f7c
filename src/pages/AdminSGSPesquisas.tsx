@@ -172,11 +172,14 @@ const AdminSGSPesquisas = () => {
                   </div>
                   <div>
                     <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
-                      Pesquisa #{s.id.slice(0, 4).toUpperCase()}
+                      {s.bookings?.customer_name ? `Pesquisa: ${s.bookings.customer_name}` : `Pesquisa #${s.id.slice(0, 4).toUpperCase()}`}
                       {s.danger_situations && <Badge variant="destructive" className="text-[8px] font-black uppercase py-0 px-1">Alerta</Badge>}
                     </h4>
                     <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-0.5">
-                      {new Date(s.created_at).toLocaleDateString("pt-BR")} • Guia explicou riscos: {s.guide_explained_risks ? "Sim" : "Não"}
+                      {new Date(s.created_at).toLocaleDateString("pt-BR")} • {s.bookings?.item_name || "Passeio Geral"}
+                    </p>
+                    <p className="text-[9px] font-medium text-muted-foreground">
+                      Guia explicou riscos: {s.guide_explained_risks ? "Sim" : "Não"}
                     </p>
                   </div>
                 </div>
