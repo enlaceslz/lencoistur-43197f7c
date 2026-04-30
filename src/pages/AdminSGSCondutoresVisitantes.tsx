@@ -3,8 +3,9 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { maskCPF } from "@/lib/masks";
+import { Badge } from "@/components/ui/badge";
 
-import { Users, Plus, Search, AlertTriangle } from "lucide-react";
+import { Users, Plus, Search, AlertTriangle, CheckCircle, MapPin, Calendar, Pencil } from "lucide-react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   autorizado: { label: "Autorizado", color: "bg-primary/10 text-primary" },
@@ -116,35 +117,76 @@ const AdminSGSCondutoresVisitantes = () => {
         {loading ? <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div> : filtered.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground"><Users size={40} className="mx-auto mb-3 opacity-40" /><p>Nenhum visitante registrado</p></div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map(v => {
               const st = STATUS_LABELS[v.status] || STATUS_LABELS.pendente;
+              const isCnhExpired = cnhExpired(v.cnh_validade);
               return (
-                <div key={v.id} className="bg-card border border-border rounded-2xl p-5">
-                  <div className="flex items-center justify-between mb-2">
+                <div key={v.id} className="bg-card border border-border rounded-3xl p-6 hover:shadow-xl hover:border-primary/30 transition-all group relative overflow-hidden flex flex-col">
+                  <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${v.status === 'autorizado' ? 'bg-primary' : v.status === 'negado' ? 'bg-destructive' : 'bg-secondary'}`} />
+                  
+                  <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <span className="font-bold text-foreground text-sm">{v.nome}</span>
-                      {v.empresa_instituicao && <span className="text-xs text-muted-foreground">({v.empresa_instituicao})</span>}
+                      <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                        <Users size={24} />
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="font-black text-foreground group-hover:text-primary transition-colors leading-tight truncate">{v.nome}</h4>
+                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-0.5">{v.empresa_instituicao || 'Visitante Avulso'}</p>
+                      </div>
                     </div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${st.color}`}>{st.label}</span>
+                    <Badge variant="outline" className={`font-black text-[9px] uppercase px-2.5 py-1 rounded-lg border ${st.color}`}>
+                      {st.label}
+                    </Badge>
                   </div>
-                  <div className="grid sm:grid-cols-3 gap-2 text-xs text-muted-foreground">
-                    {v.cpf && <p>CPF: {v.cpf}</p>}
-                    {v.cnh_numero && <p>CNH: {v.cnh_numero} {v.cnh_categoria && `(${v.cnh_categoria})`}</p>}
-                    {v.cnh_validade && <p className={cnhExpired(v.cnh_validade) ? "text-destructive font-semibold" : ""}>{cnhExpired(v.cnh_validade) && <AlertTriangle size={12} className="inline mr-1" />}CNH Val.: {v.cnh_validade}</p>}
-                    {v.veiculo_placa && <p>Veículo: {v.veiculo_descricao} · {v.veiculo_placa}</p>}
-                    {v.destino_uc && <p>Destino: {v.destino_uc}</p>}
-                    <p>Período: {v.data_entrada} → {v.data_saida || "em aberto"}</p>
-                  </div>
-                  {v.status === "pendente" && (
-                    <div className="flex gap-2 mt-3">
-                      <button onClick={() => updateStatus(v.id, "autorizado")} className="text-xs px-3 py-1 bg-primary/10 text-primary rounded-lg hover:bg-primary/20">Autorizar</button>
-                      <button onClick={() => updateStatus(v.id, "negado")} className="text-xs px-3 py-1 bg-destructive/10 text-destructive rounded-lg hover:bg-destructive/20">Negar</button>
+
+                  <div className="space-y-3 mb-5 flex-1">
+                    <div className="grid grid-cols-2 gap-2 text-[11px]">
+                      <div className="bg-muted/30 p-2 rounded-xl border border-border/50">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter mb-0.5">CPF</p>
+                        <p className="font-bold text-foreground truncate">{v.cpf || '—'}</p>
+                      </div>
+                      <div className="bg-muted/30 p-2 rounded-xl border border-border/50">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter mb-0.5">CNH</p>
+                        <p className="font-bold text-foreground truncate">{v.cnh_numero || '—'} {v.cnh_categoria && `(${v.cnh_categoria})`}</p>
+                      </div>
                     </div>
-                  )}
-                  {v.status === "autorizado" && (
-                    <button onClick={() => updateStatus(v.id, "encerrado")} className="mt-3 text-xs px-3 py-1 bg-muted text-muted-foreground rounded-lg hover:bg-muted/80">Encerrar Visita</button>
-                  )}
+
+                    <div className={`flex items-center justify-between p-2 rounded-lg transition-colors ${isCnhExpired ? "bg-destructive/5 text-destructive" : "bg-muted/20 text-muted-foreground"}`}>
+                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase">
+                        {isCnhExpired ? <AlertTriangle size={12} /> : <CheckCircle size={12} className="text-emerald-500" />}
+                        Validade CNH
+                      </div>
+                      <span className="text-[10px] font-black">{v.cnh_validade ? new Date(v.cnh_validade + "T12:00").toLocaleDateString("pt-BR") : "N/A"}</span>
+                    </div>
+
+                    {v.veiculo_placa && (
+                      <div className="bg-muted/20 p-2 rounded-xl border border-border/30">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter mb-0.5">Veículo</p>
+                        <p className="text-[11px] font-bold text-foreground truncate">{v.veiculo_descricao} • {v.veiculo_placa}</p>
+                      </div>
+                    )}
+
+                    <div className="text-[11px] text-muted-foreground pt-2 border-t border-border/50">
+                      <p className="flex items-center gap-1.5"><MapPin size={10} className="text-primary" /> <strong>Destino:</strong> {v.destino_uc || 'Não informado'}</p>
+                      <p className="mt-1 flex items-center gap-1.5"><Calendar size={10} className="text-primary" /> {new Date(v.data_entrada + "T12:00").toLocaleDateString("pt-BR")} → {v.data_saida ? new Date(v.data_saida + "T12:00").toLocaleDateString("pt-BR") : "em aberto"}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-auto pt-4 border-t border-border/50 flex flex-wrap gap-2">
+                    {v.status === "pendente" && (
+                      <>
+                        <button onClick={() => updateStatus(v.id, "autorizado")} className="flex-1 text-[10px] font-black uppercase tracking-widest py-2 bg-primary/10 text-primary rounded-xl hover:bg-primary hover:text-white transition-all">Autorizar</button>
+                        <button onClick={() => updateStatus(v.id, "negado")} className="flex-1 text-[10px] font-black uppercase tracking-widest py-2 bg-destructive/10 text-destructive rounded-xl hover:bg-destructive hover:text-white transition-all">Negar</button>
+                      </>
+                    )}
+                    {v.status === "autorizado" && (
+                      <button onClick={() => updateStatus(v.id, "encerrado")} className="w-full text-[10px] font-black uppercase tracking-widest py-2 bg-muted text-muted-foreground rounded-xl hover:bg-muted/80 transition-all">Encerrar Visita</button>
+                    )}
+                    <div className="flex w-full gap-1">
+                      <button onClick={() => openEdit(v)} className="flex-1 py-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors flex items-center justify-center"><Pencil size={14} /></button>
+                    </div>
+                  </div>
                 </div>
               );
             })}
