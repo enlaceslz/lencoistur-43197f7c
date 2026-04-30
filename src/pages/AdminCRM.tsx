@@ -973,64 +973,68 @@ const AdminCRM = () => {
           <div className="bg-card border border-border rounded-2xl p-6">
             {selectedCustomer ? (
               <div className="space-y-6">
-                <div className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xl font-bold mx-auto mb-3">
+                <div className="text-center bg-muted/20 p-6 rounded-3xl border border-border/50">
+                  <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground text-2xl font-black mx-auto mb-4 shadow-xl">
                     {selectedCustomer.name.trim() ? selectedCustomer.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
                   </div>
-                  <h3 className="font-display text-lg font-bold text-foreground">{selectedCustomer.name}</h3>
-                  <Badge variant="outline" className={`mt-2 uppercase text-[9px] ${customerStatusConfig[selectedCustomer.status]?.className || ""}`}>
-                    {customerStatusConfig[selectedCustomer.status]?.label || selectedCustomer.status}
-                  </Badge>
-                  <p className="text-[10px] text-muted-foreground mt-2">
-                    Cliente desde {new Date(selectedCustomer.created_at).toLocaleDateString("pt-BR")}
+                  <h3 className="font-display text-xl font-black text-foreground">{selectedCustomer.name}</h3>
+                  <div className="flex items-center justify-center gap-2 mt-3">
+                    <Badge variant="outline" className={`uppercase text-[10px] font-black tracking-widest px-3 py-1 ${customerStatusConfig[selectedCustomer.status]?.className || ""}`}>
+                      {customerStatusConfig[selectedCustomer.status]?.label || selectedCustomer.status}
+                    </Badge>
+                    {selectedCustomer.ltvCategory && (
+                      <Badge variant="secondary" className="uppercase text-[10px] font-black tracking-widest px-3 py-1 bg-primary text-white">
+                        {selectedCustomer.ltvCategory}
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-[10px] font-bold text-muted-foreground mt-4 uppercase tracking-widest">
+                    Parceiro Lençóis Tour desde {new Date(selectedCustomer.created_at).toLocaleDateString("pt-BR")}
                   </p>
                 </div>
 
-                <div className="space-y-3 bg-muted/30 p-4 rounded-xl">
-                  <div className="flex items-center gap-3 text-sm">
-                    <Mail size={16} className="text-primary shrink-0" />
-                    <span className="text-muted-foreground truncate">{selectedCustomer.email}</span>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 text-center">
+                    <p className="text-2xl font-black text-primary leading-none">{selectedCustomer.totalBookings}</p>
+                    <p className="text-[10px] uppercase font-bold text-muted-foreground mt-2 tracking-widest">Viagens</p>
+                  </div>
+                  <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 text-center">
+                    <p className="text-2xl font-black text-foreground leading-none">{fmt(selectedCustomer.totalSpent)}</p>
+                    <p className="text-[10px] uppercase font-bold text-muted-foreground mt-2 tracking-widest">LTV Acumulado</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 bg-muted/10 p-5 rounded-2xl border border-border/50 shadow-inner">
+                  <div className="flex items-center gap-4 text-sm font-semibold">
+                    <div className="p-2 rounded-lg bg-background border border-border"><Mail size={16} className="text-primary" /></div>
+                    <span className="text-foreground truncate">{selectedCustomer.email}</span>
                   </div>
                   {selectedCustomer.phone && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <Phone size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground">{maskPhone(selectedCustomer.phone)}</span>
-                    </div>
-                  )}
-                  {selectedCustomer.country === "Brasil" && selectedCustomer.cpf && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <Globe size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground">CPF: {maskCPF(selectedCustomer.cpf)}</span>
-                    </div>
-                  )}
-                  {selectedCustomer.country !== "Brasil" && selectedCustomer.passport && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <Globe size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground">Passaporte: {selectedCustomer.passport}</span>
+                    <div className="flex items-center gap-4 text-sm font-semibold">
+                      <div className="p-2 rounded-lg bg-background border border-border"><Smartphone size={16} className="text-primary" /></div>
+                      <span className="text-foreground">{maskPhone(selectedCustomer.phone)}</span>
                     </div>
                   )}
                   {selectedCustomer.address && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <MapPin size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground text-[10px] leading-tight">
-                        {selectedCustomer.address}{selectedCustomer.number ? `, ${selectedCustomer.number}` : ""}
-                        <br />
-                        {selectedCustomer.neighborhood ? `${selectedCustomer.neighborhood}, ` : ""}{selectedCustomer.city} - {selectedCustomer.state}
-                        <br />
-                        {selectedCustomer.country === "Brasil" ? `CEP: ${selectedCustomer.cep}` : `Código Postal: ${selectedCustomer.cep}`}
-                      </span>
-                    </div>
-                  )}
-                  {selectedCustomer.birth_date && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <Calendar size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground">Nascimento: {new Date(selectedCustomer.birth_date + "T00:00:00").toLocaleDateString("pt-BR")}</span>
+                    <div className="flex items-start gap-4 text-sm font-semibold">
+                      <div className="p-2 rounded-lg bg-background border border-border shrink-0"><MapPin size={16} className="text-primary" /></div>
+                      <div className="flex flex-col">
+                        <span className="text-foreground text-xs leading-tight">
+                          {selectedCustomer.address}{selectedCustomer.number ? `, ${selectedCustomer.number}` : ""}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter mt-1">
+                          {selectedCustomer.neighborhood ? `${selectedCustomer.neighborhood}, ` : ""}{selectedCustomer.city} - {selectedCustomer.state}
+                        </span>
+                      </div>
                     </div>
                   )}
                   {selectedCustomer.lastBooking && (
-                    <div className="flex items-center gap-3 text-sm border-t border-border pt-3 mt-3">
-                      <RefreshCw size={16} className="text-primary shrink-0" />
-                      <span className="text-muted-foreground text-xs">Última reserva: {new Date(selectedCustomer.lastBooking).toLocaleDateString("pt-BR")}</span>
+                    <div className="flex items-center gap-4 text-sm border-t border-border pt-4 mt-2">
+                      <div className="p-2 rounded-lg bg-primary/10"><Calendar size={16} className="text-primary" /></div>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Última Viagem</span>
+                        <span className="text-xs font-bold">{new Date(selectedCustomer.lastBooking).toLocaleDateString("pt-BR", { dateStyle: 'long' })}</span>
+                      </div>
                     </div>
                   )}
                 </div>
