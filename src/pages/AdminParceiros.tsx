@@ -98,8 +98,13 @@ const AdminParceiros = () => {
 
   const fetchInitialData = async () => {
     setLoading(true);
-    await Promise.all([fetchPartners(), fetchTypes()]);
+    await Promise.all([fetchPartners(), fetchTypes(), fetchCompany()]);
     setLoading(false);
+  };
+
+  const fetchCompany = async () => {
+    const { data } = await supabase.from("sgs_empresa").select("*").limit(1).maybeSingle();
+    if (data) setCompany(data);
   };
 
   const fetchPartners = async () => {
