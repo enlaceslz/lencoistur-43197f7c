@@ -11,6 +11,9 @@ const categoryKeys = ["boat", "eco", "gastro", "cultural", "kayak", "trekking"] 
 const HeroSection = () => {
   const { t } = useTranslation();
   const [heroImg, setHeroImg] = useState(HERO_IMG_DEFAULT);
+  const [banners, setBanners] = useState<Array<{ url: string; id: string }>>([]);
+  const [transition, setTransition] = useState<"fade" | "slide">("fade");
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -20,12 +23,26 @@ const HeroSection = () => {
         .eq("key", "site")
         .maybeSingle();
       
-      if (data && (data.value as any)?.bannerUrl) {
-        setHeroImg((data.value as any).bannerUrl);
+      if (data) {
+        const val = data.value as any;
+        if (val?.banners && val.banners.length > 0) {
+          setBanners(val.banners);
+          setTransition(val.bannerTransition || "fade");
+        } else if (val?.bannerUrl) {
+          setHeroImg(val.bannerUrl);
+        }
       }
     };
     loadSettings();
   }, []);
+
+  useEffect(() => {
+    if (banners.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % banners.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [banners.length]);
 
   return (
     <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
