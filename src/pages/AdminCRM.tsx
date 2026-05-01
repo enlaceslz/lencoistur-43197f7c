@@ -137,6 +137,7 @@ const emptyDependentForm: DependentForm = {
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 // Helper masks already defined above
+const fmtPrice = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 
 const isValidCPF = (cpf: string) => {
@@ -1046,7 +1047,7 @@ const AdminCRMContent = () => {
               <div className="space-y-6">
                 <div className="text-center bg-muted/20 p-6 rounded-3xl border border-border/50">
                   <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground text-2xl font-black mx-auto mb-4 shadow-xl">
-                    {selectedCustomer.name.trim() ? selectedCustomer.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
+                    {selectedCustomer.name.trim() ? selectedCustomer.name.trim().split(" ").filter(Boolean).map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
                   </div>
                   <h3 className="font-display text-xl font-black text-foreground">{selectedCustomer.name}</h3>
                   <div className="flex items-center justify-center gap-2 mt-3">
