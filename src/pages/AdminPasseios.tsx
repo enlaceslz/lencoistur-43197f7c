@@ -83,7 +83,7 @@ const AdminPasseios = () => {
     setEditingId(t.id);
     setForm({
       name: t.name, slug: t.slug, location: t.location || "",
-      duration: t.duration || "", price: t.price, private_price: t.private_price || 1300,
+      duration: t.duration || "", price: t.price, private_price: t.private_price || 130000,
       vehicle_capacity: t.vehicle_capacity || 9, pix_discount: t.pix_discount || 0,
       tag: t.tag || "",
       description: t.description || "", category: t.category || "Ecoturismo",

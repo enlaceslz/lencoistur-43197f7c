@@ -23,13 +23,15 @@ interface BookingRow {
 
 export default function DRETab({ 
   bookings, 
-  contasPagar = [], 
-  selectedMonth, 
+  contasPagar = [],
+  contasReceber = [],
+  selectedMonth,
   selectedYear,
   company
 }: { 
   bookings: BookingRow[], 
-  contasPagar?: any[], 
+  contasPagar?: any[],
+  contasReceber?: any[],
   selectedMonth?: number, 
   selectedYear?: number,
   company?: any
@@ -53,9 +55,21 @@ export default function DRETab({
     [contasPagar, currentMonth, currentYear]
   );
 
+  const monthContasReceber = useMemo(
+    () => contasReceber.filter(c => {
+      const d = new Date(c.vencimento + "T12:00:00");
+      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    }),
+    [contasReceber, currentMonth, currentYear]
+  );
+
   const receitaBruta = monthBookings.reduce((s, b) => s + b.total, 0);
   const descontosMes = monthBookings.reduce((s, b) => s + b.discount, 0);
-  const receitaLiquida = receitaBruta - descontosMes;
+  
+  // Somar outras receitas que não vêm de bookings (para evitar duplicidade)
+  const outrasReceitas = monthContasReceber.filter(c => !c.booking_id && c.status === "recebido").reduce((s, c) => s + c.valor, 0);
+  
+  const receitaLiquida = (receitaBruta - descontosMes) + outrasReceitas;
   
   const custosOp = monthContasPagar.filter(c => c.categoria === "operacional" || c.categoria === "combustivel" || c.categoria === "manutencao").reduce((s, c) => s + c.valor, 0);
   const despesasAdmin = monthContasPagar.filter(c => c.categoria === "administrativo" || c.categoria === "pessoal").reduce((s, c) => s + c.valor, 0);

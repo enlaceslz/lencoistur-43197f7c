@@ -53,6 +53,7 @@ const AdminFinanceiro = () => {
   const [tab, setTab] = useState<Tab>("fluxo");
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [contasPagar, setContasPagar] = useState<any[]>([]);
+  const [contasReceber, setContasReceber] = useState<any[]>([]);
   const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
@@ -64,13 +65,15 @@ const AdminFinanceiro = () => {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const [{ data: bkData }, { data: cpData }, { data: compData }] = await Promise.all([
+      const [{ data: bkData }, { data: cpData }, { data: crData }, { data: compData }] = await Promise.all([
         supabase.from("bookings").select("*, customers(name, email, phone)").order("created_at", { ascending: false }),
         supabase.from("contas_pagar").select("*"),
+        supabase.from("contas_receber").select("*"),
         supabase.from("sgs_empresa").select("*").limit(1).maybeSingle()
       ]);
       if (bkData) setBookings(bkData as any);
       if (cpData) setContasPagar(cpData);
+      if (crData) setContasReceber(crData);
       if (compData) setCompany(compData);
       setLoading(false);
     };
@@ -515,7 +518,7 @@ const AdminFinanceiro = () => {
               )}
               {tab === "pagar" && <ContasPagarTab company={company} />}
               {tab === "receber" && <ContasReceberTab company={company} />}
-              {tab === "dre" && <DRETab bookings={bookings} contasPagar={contasPagar} selectedMonth={selectedMonth} selectedYear={selectedYear} company={company} />}
+              {tab === "dre" && <DRETab bookings={bookings} contasPagar={contasPagar} contasReceber={contasReceber} selectedMonth={selectedMonth} selectedYear={selectedYear} company={company} />}
               {tab === "notas" && <NotasFiscaisTab bookings={bookings} />}
             </motion.div>
           </AnimatePresence>
