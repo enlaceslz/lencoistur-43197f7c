@@ -519,7 +519,7 @@ const AdminFinanceiro = () => {
               {tab === "pagar" && <ContasPagarTab company={company} />}
               {tab === "receber" && <ContasReceberTab company={company} />}
               {tab === "dre" && <DRETab bookings={bookings} contasPagar={contasPagar} contasReceber={contasReceber} selectedMonth={selectedMonth} selectedYear={selectedYear} company={company} />}
-              {tab === "notas" && <NotasFiscaisTab bookings={bookings} company={company} />}
+              {tab === "notas" && <NotasFiscaisTab bookings={bookings} />}
             </motion.div>
           </AnimatePresence>
         </div>
