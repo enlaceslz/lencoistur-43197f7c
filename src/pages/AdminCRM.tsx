@@ -1402,7 +1402,7 @@ const AdminCRMContent = () => {
                   <Input
                     id="customer-cpf"
                     value={form.cpf}
-                    onChange={(e) => setForm({ ...form, cpf: e.target.value })}
+                    onChange={(e) => setForm({ ...form, cpf: maskCPF(e.target.value) })}
                     placeholder="000.000.000-00"
                     maxLength={14}
                     className="rounded-xl"
