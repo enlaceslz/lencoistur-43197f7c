@@ -57,7 +57,7 @@ const HeroSection = () => {
             <img
               src={banner.url}
               alt={`Banner ${index + 1}`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover sm:object-center"
               width={1920}
               height={1080}
             />
@@ -67,7 +67,7 @@ const HeroSection = () => {
         <img
           src={heroImg}
           alt="Vista aérea dos Lençóis Maranhenses com lagoas azuis e dunas brancas - Santo Amaro MA"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover sm:object-center"
           width={1920}
           height={1080}
         />
