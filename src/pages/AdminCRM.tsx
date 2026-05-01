@@ -432,7 +432,7 @@ const AdminCRMContent = () => {
     setSaving(true);
     const payload = {
       name: form.name.trim(),
-      email: form.email.trim().toLowerCase(),
+      email: form.email.trim() ? form.email.trim().toLowerCase() : null,
       phone: form.phone.replace(/\D/g, "") || null,
       cpf: form.country === "Brasil" ? (form.cpf.replace(/\D/g, "") || null) : null,
       passport: form.country !== "Brasil" ? (form.passport || null) : null,
