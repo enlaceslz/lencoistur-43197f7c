@@ -617,7 +617,7 @@ const AdminSGSTermos = () => {
                             id: d.id
                           }))
                         }));
-                        toast({ title: `${deps.length} acompanhantes importados automaticamente` });
+                        toast({ title: `${deps.length} dependentes importados automaticamente` });
                       }
                     } else {
                       setForm(f => ({ ...f, booking_id: bid }));
