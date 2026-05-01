@@ -307,7 +307,7 @@ const AdminSGSTermos = () => {
         </p>
         ${m.signature_data ? `<div style="margin-top: 5px;"><img src="${m.signature_data}" style="height: 40px;" /><br/><span style="font-size: 8px;">Assinado em ${format(new Date(m.signed_at), "dd/MM/yyyy HH:mm")}</span></div>` : ""}
       </div>
-    `).join("") || "Nenhum acompanhante declarado.";
+    `).join("") || "Nenhum dependente declarado.";
 
     const healthResponse = (val: boolean) => val ? "S" : "N";
 
@@ -617,7 +617,7 @@ const AdminSGSTermos = () => {
                             id: d.id
                           }))
                         }));
-                        toast({ title: `${deps.length} acompanhantes importados automaticamente` });
+                        toast({ title: `${deps.length} dependentes importados automaticamente` });
                       }
                     } else {
                       setForm(f => ({ ...f, booking_id: bid }));
@@ -799,7 +799,7 @@ const AdminSGSTermos = () => {
                         {/* Option 2: Other adult companions already added */}
                         {form.minors.filter(m => m.is_adult).map(adult => (
                           <option key={adult.id} value={adult.full_name}>
-                            {adult.full_name} (Acompanhante Adulto)
+                            {adult.full_name} (Dependente Adulto)
                           </option>
                         ))}
                       </select>
@@ -810,7 +810,7 @@ const AdminSGSTermos = () => {
                         onClick={addMinor}
                         className="w-full bg-primary text-primary-foreground py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2"
                       >
-                        <UserPlus size={16} /> Adicionar Acompanhante
+                        <UserPlus size={16} /> Adicionar Dependente
                       </button>
                     </div>
                   </div>
@@ -823,7 +823,7 @@ const AdminSGSTermos = () => {
                       onClick={addMinor}
                       className="bg-primary text-primary-foreground px-6 py-2 rounded-xl text-xs font-bold flex items-center gap-2"
                     >
-                      <UserPlus size={16} /> Adicionar Acompanhante Adulto
+                      <UserPlus size={16} /> Adicionar Dependente Adulto
                     </button>
                   </div>
                 )}

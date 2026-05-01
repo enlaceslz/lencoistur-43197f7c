@@ -206,7 +206,7 @@ const TermoAssinatura = () => {
     const adultCompanions = companions.filter(c => c.is_adult);
     for (const companion of adultCompanions) {
       if (!signatures[companion.id] && !companion.signature_data) {
-        toast({ title: "Assinatura pendente", description: `O acompanhante ${companion.full_name} deve assinar.`, variant: "destructive" });
+        toast({ title: "Assinatura pendente", description: `O dependente ${companion.full_name} deve assinar.`, variant: "destructive" });
         return;
       }
     }
@@ -678,7 +678,7 @@ const TermoAssinatura = () => {
 
                       {companion.is_adult && !companion.signature_data && (
                         <div className="mt-3 space-y-2">
-                          <p className="text-[10px] font-bold text-muted-foreground uppercase">Assinatura do Acompanhante:</p>
+                          <p className="text-[10px] font-bold text-muted-foreground uppercase">Assinatura do Dependente:</p>
                           <div className="bg-white rounded-xl border border-border overflow-hidden h-32 relative">
                             <canvas 
                               id={`canvas-${companion.id}`}
