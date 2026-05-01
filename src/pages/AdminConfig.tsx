@@ -622,36 +622,94 @@ const AdminConfig = () => {
 
                   <div className="space-y-3 border-t border-border pt-6">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Banner Principal (Hero)</Label>
-                    <div className="flex flex-col gap-4">
-                      <div className="w-full aspect-video rounded-2xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center bg-muted/30 overflow-hidden relative group">
-                        {site.bannerUrl ? (
-                          <img src={site.bannerUrl} alt="Banner" className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="text-center">
-                            <Image size={48} className="text-muted-foreground/20 mx-auto mb-2" />
-                            <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest opacity-40">Sem banner configurado</p>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {site.banners?.map((b, i) => (
+                          <div key={b.id || i} className="aspect-video rounded-xl border border-border bg-muted/30 overflow-hidden relative group">
+                            <img src={b.url} alt={`Banner ${i+1}`} className="w-full h-full object-cover" />
+                            <button 
+                              onClick={() => {
+                                const newBanners = site.banners.filter((_, idx) => idx !== i);
+                                setSite({ ...site, banners: newBanners, bannerUrl: newBanners[0]?.url || null });
+                              }}
+                              className="absolute top-2 right-2 p-1.5 bg-destructive text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                            <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-black/50 text-[10px] text-white rounded-md font-bold">
+                              #{i + 1}
+                            </div>
                           </div>
-                        )}
+                        ))}
+                        
+                        <button 
+                          type="button"
+                          onClick={() => bannerInputRef.current?.click()}
+                          disabled={uploadingBanner}
+                          className="aspect-video rounded-xl border-2 border-dashed border-muted-foreground/20 flex flex-col items-center justify-center bg-muted/10 hover:bg-muted/20 transition-colors"
+                        >
+                          {uploadingBanner ? (
+                            <Loader2 size={24} className="animate-spin text-muted-foreground" />
+                          ) : (
+                            <>
+                              <Plus size={24} className="text-muted-foreground mb-1" />
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Adicionar</span>
+                            </>
+                          )}
+                        </button>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerUpload} />
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button type="button" variant="outline" size="sm" onClick={() => bannerInputRef.current?.click()} disabled={uploadingBanner} className="rounded-xl font-bold h-9">
-                              {uploadingBanner ? <Loader2 size={14} className="animate-spin mr-2" /> : <UploadCloud size={14} className="mr-2" />}
-                              {site.bannerUrl ? "Alterar Banner" : "Enviar Banner"}
+
+                      {site.banners?.length > 1 && (
+                        <div className="flex flex-col gap-3 p-4 rounded-2xl bg-muted/30 border border-border/50">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Efeito de Transição</Label>
+                          <div className="flex gap-2">
+                            <Button 
+                              type="button" 
+                              variant={site.bannerTransition === "fade" ? "default" : "outline"}
+                              size="sm"
+                              className="rounded-lg font-bold"
+                              onClick={() => setSite({ ...site, bannerTransition: "fade" })}
+                            >
+                              Esmaecer (Fade)
                             </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>{site.bannerUrl ? "Substituir banner principal" : "Fazer upload do banner de destaque"}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                        {site.bannerUrl && (
-                          <Button type="button" variant="ghost" size="sm" onClick={() => setSite({ ...site, bannerUrl: null })} className="text-destructive h-9">
-                            <Trash2 size={14} className="mr-2" /> Remover
-                          </Button>
-                        )}
-                      </div>
+                            <Button 
+                              type="button" 
+                              variant={site.bannerTransition === "slide" ? "default" : "outline"}
+                              size="sm"
+                              className="rounded-lg font-bold"
+                              onClick={() => setSite({ ...site, bannerTransition: "slide" })}
+                            >
+                              Deslizar (Slide)
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        if (!file.type.startsWith("image/")) { toast.error("Selecione um arquivo de imagem válido."); return; }
+                        if (file.size > 5 * 1024 * 1024) { toast.error("A imagem deve ter no máximo 5MB."); return; }
+
+                        setUploadingBanner(true);
+                        const ext = file.name.split(".").pop() || "jpg";
+                        const path = `banners/banner-${Date.now()}.${ext}`;
+
+                        const { error } = await supabase.storage.from("tour-images").upload(path, file, { upsert: true });
+                        if (error) { toast.error("Erro ao enviar banner: " + error.message); setUploadingBanner(false); return; }
+
+                        const { data: urlData } = supabase.storage.from("tour-images").getPublicUrl(path);
+                        const newBanner = { url: urlData.publicUrl, id: crypto.randomUUID() };
+                        const updatedBanners = [...(site.banners || []), newBanner];
+                        
+                        setSite((prev) => ({ 
+                          ...prev, 
+                          banners: updatedBanners,
+                          bannerUrl: updatedBanners[0]?.url || null 
+                        }));
+                        setUploadingBanner(false);
+                        toast.success("Imagem adicionada ao banner!");
+                      }} />
                     </div>
                   </div>
                 </div>
