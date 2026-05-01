@@ -154,6 +154,41 @@ Acesse: `http://localhost:8080`
 
 ---
 
+## 🌐 Deploy em VPS (Ubuntu/Debian)
+
+Caso seja necessário hospedar o frontend fora da Lovable Cloud em um servidor próprio:
+
+### 1. Pré-requisitos
+- Node.js 20+ e NPM/Bun
+- Servidor Web (Nginx recomendado)
+
+### 2. Build do Projeto
+```bash
+npm install
+npm run build
+```
+Os arquivos estáticos serão gerados na pasta `dist/`.
+
+### 3. Configuração do Nginx
+Crie um arquivo em `/etc/nginx/sites-available/lencoistur`:
+```nginx
+server {
+    listen 80;
+    server_name seu-dominio.com;
+    root /var/www/lencoistur/dist;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+
+### 4. Variáveis de Ambiente
+Certifique-se de que as variáveis `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` estão configuradas no ambiente de build ou no arquivo `.env.production`.
+
+---
+
 ## 📋 Normas de Referência
 
 - **ABNT NBR ISO 21101** – Sistema de Gestão de Segurança para Turismo de Aventura
