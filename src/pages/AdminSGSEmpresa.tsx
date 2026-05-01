@@ -51,10 +51,6 @@ const AdminSGSEmpresa = () => {
         endereco: data.endereco || "",
         cidade: data.cidade || "",
         estado: data.estado || "MA",
-        uc_nome: data.uc_nome || "",
-        uc_tipo: data.uc_tipo || "",
-        icmbio_autorizacao: data.icmbio_autorizacao || "",
-        icmbio_validade: data.icmbio_validade || "",
         observacoes: data.observacoes || "",
         logo_url: data.logo_url || "",
       });
