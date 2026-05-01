@@ -63,7 +63,7 @@ const GallerySection = () => {
               <img
                 src={img.src}
                 alt={img.alt}
-                className={`w-full object-cover group-hover:scale-110 transition-transform duration-500 ${i === 0 ? "h-full min-h-[300px]" : "h-48 md:h-56"}`}
+                className={`w-full object-cover aspect-square md:aspect-auto group-hover:scale-110 transition-transform duration-500 ${i === 0 ? "h-full min-h-[300px]" : "h-48 md:h-56"}`}
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors duration-300" />

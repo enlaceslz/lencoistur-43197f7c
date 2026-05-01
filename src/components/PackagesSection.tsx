@@ -74,7 +74,7 @@ const PackagesSection = () => {
                   {pkgTours.slice(0, 3).map((tour: any) => (
                     <div key={tour.id} className="flex-1 overflow-hidden">
                       {tour.images?.[0] ? (
-                        <img src={tour.images[0]} alt={tour.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                        <img src={tour.images[0]} alt={tour.name} className="w-full h-full object-cover aspect-[4/3] group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                       ) : (
                         <div className="w-full h-full bg-muted" />
                       )}

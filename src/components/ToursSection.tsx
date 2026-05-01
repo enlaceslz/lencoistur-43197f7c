@@ -69,7 +69,7 @@ const ToursSection = () => {
                 <div className="relative h-64 overflow-hidden">
                   {image ? (
                     <img src={image} alt={tour.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-cover aspect-video group-hover:scale-110 transition-transform duration-500"
                       loading="lazy" />
                   ) : (
                     <div className="w-full h-full bg-muted" />
