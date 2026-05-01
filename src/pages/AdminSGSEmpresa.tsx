@@ -259,16 +259,6 @@ const AdminSGSEmpresa = () => {
           </div>
         </div>
 
-        {/* UC / ICMBio */}
-        <div className="bg-card border border-border rounded-2xl p-6">
-          <h3 className="font-display font-bold text-foreground mb-4">Unidade de Conservação</h3>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Nome da UC" field="uc_nome" />
-            <Field label="Tipo da UC" field="uc_tipo" />
-            <Field label="Autorização ICMBio" field="icmbio_autorizacao" />
-            <Field label="Validade Autorização" field="icmbio_validade" type="date" />
-          </div>
-        </div>
 
         {/* Observações */}
         <div className="bg-card border border-border rounded-2xl p-6">
