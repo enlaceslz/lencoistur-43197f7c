@@ -886,17 +886,20 @@ const AdminConfig = () => {
                 </div>
               </div>
               
-              <div className="mt-6 pt-6 border-t border-border flex justify-end">
+              <div className="mt-6 pt-6 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
+                <p className="text-[10px] text-muted-foreground italic font-medium">
+                  {pagamentos.pix ? "PIX ativado. Certifique-se de que a chave está correta." : "PIX desativado."}
+                </p>
                 <Button
                   onClick={() => {
                     if (pagamentos.pix) {
                       const v = validatePixKey(pagamentos.pixChave, pagamentos.pixTipo);
                       if (!v.valid) { toast.error("Chave PIX inválida: " + v.message); return; }
                     }
-                    saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Pagamento");
+                    saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Financeiro");
                   }}
                   disabled={saving}
-                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white"
+                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white w-full md:w-auto"
                 >
                   {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
                   Atualizar Financeiro
