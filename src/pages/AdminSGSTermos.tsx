@@ -810,7 +810,7 @@ const AdminSGSTermos = () => {
                         onClick={addMinor}
                         className="w-full bg-primary text-primary-foreground py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2"
                       >
-                        <UserPlus size={16} /> Adicionar Acompanhante
+                        <UserPlus size={16} /> Adicionar Dependente
                       </button>
                     </div>
                   </div>
