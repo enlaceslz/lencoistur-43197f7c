@@ -131,42 +131,57 @@ const maskPhone = (v: string) => {
 
 const maskCPF = (v: string) => {
   v = v.replace(/\D/g, "");
-  return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  if (v.length <= 11) {
+    return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  }
+  return v;
 };
 
-const payStatusConfig: Record<string, { label: string; className: string }> = {
-  pago: { label: "Pago", className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" },
-  pendente: { label: "Pendente", className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" },
-};
+const isValidCPF = (cpf: string) => {
+  const digits = cpf.replace(/\D/g, "");
+  if (digits.length !== 11) return false;
+  if (/^(\d)\1+$/.test(digits)) return false;
 
-const statusConfig: Record<string, { label: string; className: string }> = {
-  pendente: { label: "Pendente", className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" },
-  confirmada: { label: "Confirmada", className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" },
-  cancelada: { label: "Cancelada", className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
-};
+  let sum = 0;
+  for (let i = 1; i <= 9; i++) {
+    sum += parseInt(digits.substring(i - 1, i)) * (11 - i);
+  }
+  let remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(digits.substring(9, 10))) return false;
 
-const customerStatusConfig: Record<string, { label: string; className: string }> = {
-  regular: { label: "Regular", className: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" },
-  vip: { label: "VIP", className: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" },
-  bloqueado: { label: "Bloqueado", className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
+  sum = 0;
+  for (let i = 1; i <= 10; i++) {
+    sum += parseInt(digits.substring(i - 1, i)) * (12 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(digits.substring(10, 11))) return false;
+
+  return true;
 };
 
 const validateForm = (form: CustomerForm): string | null => {
   const name = form.name.trim();
   if (!name || name.length < 2 || name.length > 120) return "Nome deve ter entre 2 e 120 caracteres.";
+  
   const email = form.email.trim().toLowerCase();
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) return "E-mail inválido.";
+  if (email && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255)) {
+    return "E-mail informado é inválido.";
+  }
+
   if (form.phone) {
     const digits = form.phone.replace(/\D/g, "");
     if (digits.length < 10 && form.country === "Brasil") return "Telefone deve ter 10 ou 11 dígitos.";
   }
-  if (form.country === "Brasil" && form.cpf) {
-    const cpfDigits = form.cpf.replace(/\D/g, "");
-    if (cpfDigits.length !== 11) return "CPF deve ter 11 dígitos.";
-  }
-  if (form.country !== "Brasil" && !form.passport) {
+
+  if (form.country === "Brasil") {
+    if (!form.cpf) return "CPF é obrigatório para brasileiros.";
+    if (!isValidCPF(form.cpf)) return "CPF inválido.";
+  } else if (!form.passport) {
     return "Passaporte é obrigatório para estrangeiros.";
   }
+
   return null;
 };
 
