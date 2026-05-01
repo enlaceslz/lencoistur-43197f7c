@@ -678,7 +678,7 @@ const TermoAssinatura = () => {
 
                       {companion.is_adult && !companion.signature_data && (
                         <div className="mt-3 space-y-2">
-                          <p className="text-[10px] font-bold text-muted-foreground uppercase">Assinatura do Acompanhante:</p>
+                          <p className="text-[10px] font-bold text-muted-foreground uppercase">Assinatura do Dependente:</p>
                           <div className="bg-white rounded-xl border border-border overflow-hidden h-32 relative">
                             <canvas 
                               id={`canvas-${companion.id}`}
