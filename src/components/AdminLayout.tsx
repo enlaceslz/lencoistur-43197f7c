@@ -62,39 +62,39 @@ const sgsGroups = [
   {
     title: null,
     items: [
-      { icon: Shield, label: "Dashboard", path: "/admin/sgs" },
+      { icon: BarChart3, label: "Painel de Controle", path: "/admin/sgs" },
     ],
   },
   {
-    title: "Operação",
+    title: "Documentação e Conformidade",
     items: [
-      { icon: Car, label: "Veículos / Frota", path: "/admin/sgs/veiculos" },
-      { icon: UserCheck2, label: "Condutores", path: "/admin/sgs/condutores" },
-      { icon: Users, label: "Visitantes", path: "/admin/sgs/condutores-visitantes" },
-      { icon: Map, label: "Rotas / Trilhas", path: "/admin/sgs/rotas" },
-      { icon: ClipboardCheck, label: "Checklists", path: "/admin/sgs/checklists" },
-      { icon: ClipboardList, label: "Controles Internos (P5)", path: "/admin/sgs/controles" },
-      { icon: Shield, label: "Briefings", path: "/admin/sgs/briefings" },
-    ],
-  },
-  {
-    title: "Gestão de Riscos",
-    items: [
-      { icon: AlertTriangle, label: "Matriz de Riscos", path: "/admin/sgs/riscos" },
-      { icon: Activity, label: "Ocorrências", path: "/admin/sgs/incidentes" },
-      { icon: ClipboardCheck, label: "Ações Corretivas", path: "/admin/sgs/acoes" },
-      { icon: FileText, label: "Termos de Risco", path: "/admin/sgs/termos" },
-      { icon: Star, label: "Pesquisas", path: "/admin/sgs/pesquisas" },
-    ],
-  },
-  {
-    title: "Conformidade",
-    items: [
-      { icon: Building2, label: "Empresa", path: "/admin/sgs/empresa" },
+      { icon: Building2, label: "Dados da Empresa", path: "/admin/sgs/empresa" },
       { icon: UserCheck, label: "Equipe (ISO 21102)", path: "/admin/sgs/equipe" },
       { icon: Truck, label: "Fornecedores", path: "/admin/sgs/fornecedores" },
-      { icon: ClipboardCheck, label: "Auditorias", path: "/admin/sgs/auditorias" },
       { icon: FileText, label: "PGSAT (ICMBio)", path: "/admin/sgs/pgsat" },
+      { icon: ClipboardCheck, label: "Auditorias", path: "/admin/sgs/auditorias" },
+    ],
+  },
+  {
+    title: "Operação e Segurança",
+    items: [
+      { icon: Car, label: "Frota de Veículos", path: "/admin/sgs/veiculos" },
+      { icon: UserCheck2, label: "Condutores", path: "/admin/sgs/condutores" },
+      { icon: Users, label: "Visitantes", path: "/admin/sgs/condutores-visitantes" },
+      { icon: Map, label: "Rotas e Trilhas", path: "/admin/sgs/rotas" },
+      { icon: ClipboardCheck, label: "Checklists Operacionais", path: "/admin/sgs/checklists" },
+      { icon: Shield, label: "Briefings de Segurança", path: "/admin/sgs/briefings" },
+      { icon: ClipboardList, label: "Controles Internos (P5)", path: "/admin/sgs/controles" },
+    ],
+  },
+  {
+    title: "Monitoramento e Riscos",
+    items: [
+      { icon: AlertTriangle, label: "Matriz de Riscos", path: "/admin/sgs/riscos" },
+      { icon: Activity, label: "Relatos de Ocorrências", path: "/admin/sgs/incidentes" },
+      { icon: ClipboardCheck, label: "Plano de Ações", path: "/admin/sgs/acoes" },
+      { icon: FileText, label: "Termos de Risco", path: "/admin/sgs/termos" },
+      { icon: Star, label: "Avaliação de Segurança", path: "/admin/sgs/pesquisas" },
     ],
   },
 ];
