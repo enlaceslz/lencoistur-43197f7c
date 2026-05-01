@@ -123,7 +123,20 @@ const AdminConfig = () => {
         for (const row of data) {
           const val = row.value as Record<string, unknown>;
           if (row.key === "empresa") setEmpresa({ ...DEFAULTS.empresa, ...val });
-          if (row.key === "site") setSite({ ...DEFAULTS.site, ...val });
+          if (row.key === "site") {
+            const siteVal = { ...DEFAULTS.site, ...val };
+            // Ensure bannerUrl reflects the first banner if available
+            if (siteVal.banners && siteVal.banners.length > 0 && !siteVal.bannerUrl) {
+              siteVal.bannerUrl = siteVal.banners[0].url;
+            }
+            setSite(siteVal);
+            
+            // Apply theme color if present
+            if (siteVal.corPrimaria) {
+              document.documentElement.style.setProperty('--primary', siteVal.corPrimaria);
+              // Simple way to adjust primary-foreground based on brightness could be added here
+            }
+          }
           if (row.key === "pagamentos") setPagamentos({ ...DEFAULTS.pagamentos, ...val, pixTipo: (val as any).pixTipo && PIX_KEY_TYPES.some(t => t.value === (val as any).pixTipo) ? (val as any).pixTipo : DEFAULTS.pagamentos.pixTipo });
           if (row.key === "notificacoes") setNotifications({ ...DEFAULTS.notificacoes, ...val });
           if (row.key === "gallery") setGallery({ ...DEFAULTS.gallery, ...val });
@@ -146,6 +159,12 @@ const AdminConfig = () => {
         .update({ value: value as any, updated_at: new Date().toISOString() })
         .eq("key", key);
       if (error) throw error;
+      
+      // If saving site settings, update the live theme color
+      if (key === "site" && value.corPrimaria) {
+        document.documentElement.style.setProperty('--primary', value.corPrimaria as string);
+      }
+      
       toast.success(`Configurações de ${label} salvas com sucesso!`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Erro desconhecido";
@@ -716,39 +735,59 @@ const AdminConfig = () => {
 
                 <div className="space-y-6">
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Título do Site (SEO)</Label>
-                    <Input 
-                      value={site.titulo} 
-                      onChange={(e) => setSite({ ...site, titulo: e.target.value })} 
-                      className="h-12 rounded-xl border-muted-foreground/20 font-bold"
-                    />
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Cor Primária da Marca</Label>
+                    <div className="flex items-center gap-4 p-4 rounded-2xl bg-muted/30 border border-border/50">
+                      <div 
+                        className="w-12 h-12 rounded-xl border border-border shadow-inner shrink-0" 
+                        style={{ backgroundColor: site.corPrimaria || "#2563eb" }}
+                      />
+                      <Input 
+                        type="color" 
+                        value={site.corPrimaria || "#2563eb"} 
+                        onChange={(e) => setSite({ ...site, corPrimaria: e.target.value })}
+                        className="w-16 h-10 p-1 rounded-lg border-none bg-transparent cursor-pointer"
+                      />
+                      <Input 
+                        type="text" 
+                        value={site.corPrimaria || "#2563eb"} 
+                        onChange={(e) => setSite({ ...site, corPrimaria: e.target.value })}
+                        className="h-10 rounded-xl border-muted-foreground/20 font-mono text-sm"
+                        placeholder="#000000"
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-3">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Meta Descrição (SEO)</Label>
-                    <Textarea 
-                      value={site.metaDescricao} 
-                      onChange={(e) => setSite({ ...site, metaDescricao: e.target.value })} 
-                      className="rounded-2xl border-muted-foreground/20 resize-none h-32 p-4 font-medium"
-                    />
-                    <p className="text-[10px] text-muted-foreground text-right italic font-bold">{site.metaDescricao.length}/300 caracteres</p>
-                  </div>
+
                   <div className="grid md:grid-cols-2 gap-4 border-t border-border pt-6">
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Instagram</Label>
-                      <Input value={site.instagram} onChange={(e) => setSite({ ...site, instagram: e.target.value })} className="h-11 rounded-xl border-muted-foreground/20" />
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Instagram (URL)</Label>
+                      <Input 
+                        value={site.instagram} 
+                        placeholder="https://instagram.com/sua-agencia"
+                        onChange={(e) => setSite({ ...site, instagram: e.target.value })} 
+                        className="h-11 rounded-xl border-muted-foreground/20" 
+                      />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">WhatsApp (Botão)</Label>
-                      <Input value={site.whatsappUrl} onChange={(e) => setSite({ ...site, whatsappUrl: e.target.value })} className="h-11 rounded-xl border-muted-foreground/20" />
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">WhatsApp do Site (URL)</Label>
+                      <Input 
+                        value={site.whatsappUrl} 
+                        placeholder="https://wa.me/5598..."
+                        onChange={(e) => setSite({ ...site, whatsappUrl: e.target.value })} 
+                        className="h-11 rounded-xl border-muted-foreground/20" 
+                      />
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="mt-6 pt-6 border-t border-border flex justify-end">
-                <Button onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Site")} disabled={saving} className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20">
+                <Button 
+                  onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
+                  disabled={saving} 
+                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20"
+                >
                   {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
-                  Salvar Frontend
+                  Publicar Frontend
                 </Button>
               </div>
             </CardContent>
