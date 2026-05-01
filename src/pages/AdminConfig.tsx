@@ -123,7 +123,20 @@ const AdminConfig = () => {
         for (const row of data) {
           const val = row.value as Record<string, unknown>;
           if (row.key === "empresa") setEmpresa({ ...DEFAULTS.empresa, ...val });
-          if (row.key === "site") setSite({ ...DEFAULTS.site, ...val });
+          if (row.key === "site") {
+            const siteVal = { ...DEFAULTS.site, ...val };
+            // Ensure bannerUrl reflects the first banner if available
+            if (siteVal.banners && siteVal.banners.length > 0 && !siteVal.bannerUrl) {
+              siteVal.bannerUrl = siteVal.banners[0].url;
+            }
+            setSite(siteVal);
+            
+            // Apply theme color if present
+            if (siteVal.corPrimaria) {
+              document.documentElement.style.setProperty('--primary', siteVal.corPrimaria);
+              // Simple way to adjust primary-foreground based on brightness could be added here
+            }
+          }
           if (row.key === "pagamentos") setPagamentos({ ...DEFAULTS.pagamentos, ...val, pixTipo: (val as any).pixTipo && PIX_KEY_TYPES.some(t => t.value === (val as any).pixTipo) ? (val as any).pixTipo : DEFAULTS.pagamentos.pixTipo });
           if (row.key === "notificacoes") setNotifications({ ...DEFAULTS.notificacoes, ...val });
           if (row.key === "gallery") setGallery({ ...DEFAULTS.gallery, ...val });
