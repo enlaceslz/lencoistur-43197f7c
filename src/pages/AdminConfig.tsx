@@ -165,13 +165,17 @@ const AdminConfig = () => {
   const saveSetting = async (key: string, value: Record<string, unknown>, label: string) => {
     setSaving(true);
     try {
+      // Use upsert to handle cases where the key might not exist yet
       const { error } = await supabase
         .from("site_settings")
-        .update({ value: value as any, updated_at: new Date().toISOString() })
-        .eq("key", key);
+        .upsert({ 
+          key, 
+          value: value as any, 
+          updated_at: new Date().toISOString() 
+        }, { onConflict: 'key' });
+
       if (error) throw error;
       
-      // If saving site settings, update the live theme color
       if (key === "site" && value.corPrimaria) {
         document.documentElement.style.setProperty('--primary', value.corPrimaria as string);
       }
@@ -180,6 +184,7 @@ const AdminConfig = () => {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Erro desconhecido";
       toast.error("Erro ao salvar: " + msg);
+      console.error(`Error saving ${key}:`, err);
     } finally {
       setSaving(false);
     }
