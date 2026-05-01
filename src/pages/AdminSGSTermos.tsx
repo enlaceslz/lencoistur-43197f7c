@@ -799,7 +799,7 @@ const AdminSGSTermos = () => {
                         {/* Option 2: Other adult companions already added */}
                         {form.minors.filter(m => m.is_adult).map(adult => (
                           <option key={adult.id} value={adult.full_name}>
-                            {adult.full_name} (Acompanhante Adulto)
+                            {adult.full_name} (Dependente Adulto)
                           </option>
                         ))}
                       </select>
