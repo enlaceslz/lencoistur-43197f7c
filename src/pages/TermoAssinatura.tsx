@@ -206,7 +206,7 @@ const TermoAssinatura = () => {
     const adultCompanions = companions.filter(c => c.is_adult);
     for (const companion of adultCompanions) {
       if (!signatures[companion.id] && !companion.signature_data) {
-        toast({ title: "Assinatura pendente", description: `O acompanhante ${companion.full_name} deve assinar.`, variant: "destructive" });
+        toast({ title: "Assinatura pendente", description: `O dependente ${companion.full_name} deve assinar.`, variant: "destructive" });
         return;
       }
     }
