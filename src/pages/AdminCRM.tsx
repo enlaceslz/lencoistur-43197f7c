@@ -1130,7 +1130,7 @@ const AdminCRMContent = () => {
                   {selectedCustomer.phone && (
                     <div className="flex gap-2">
                       <a
-                        href={`https://wa.me/55${selectedCustomer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selectedCustomer.name.split(" ")[0]}! Tudo bem?`)}`}
+                        href={`https://wa.me/${selectedCustomer.country === "Brasil" ? "55" : ""}${selectedCustomer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selectedCustomer.name.split(" ")[0]}! Tudo bem?`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex-1"
@@ -1634,7 +1634,7 @@ const AdminCRMContent = () => {
               <Input
                 id="dep-cpf"
                 value={depForm.cpf}
-                onChange={(e) => setDepForm({ ...depForm, cpf: e.target.value })}
+                onChange={(e) => setDepForm({ ...depForm, cpf: maskCPF(e.target.value) })}
                 placeholder="000.000.000-00"
                 maxLength={14}
                 className="rounded-xl"
