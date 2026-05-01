@@ -55,7 +55,14 @@ interface TransferOption { id: string; label: string; price: number; pix_discoun
 const formatPhone = (v: string) => {
   const n = v.replace(/\D/g, "");
   if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
-  return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  if (n.length === 11) return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  return v;
+};
+
+const formatCPF = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  if (n.length <= 11) return n.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  return n;
 };
 
 const AdminReservas = () => {
@@ -499,7 +506,7 @@ const AdminReservas = () => {
                   )}
                   {selected.cpf && (
                     <span className="flex items-center gap-2 text-muted-foreground text-xs">
-                      <FileText size={12} /> CPF: {selected.cpf}
+                      <FileText size={12} /> CPF: {formatCPF(selected.cpf)}
                     </span>
                   )}
                   {selected.passport && (

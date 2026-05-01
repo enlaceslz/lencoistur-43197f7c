@@ -71,6 +71,19 @@ interface BookingRow {
   type: string;
 }
 
+const maskCPF = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  if (n.length <= 11) return n.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  return n;
+};
+
+const maskPhone = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+  if (n.length === 11) return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  return v;
+};
+
 interface CustomerForm {
   name: string;
   email: string;

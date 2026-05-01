@@ -20,6 +20,12 @@ const HEALTH_QUESTIONS_LIST = [
   { id: "takes_medication", label: "Toma algum tipo de medicamento?", detailKey: "medication_details" },
 ];
 
+const maskCPF = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  if (n.length <= 11) return n.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  return n;
+};
+
 const AdminSGSTermos = () => {
   const [terms, setTerms] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
