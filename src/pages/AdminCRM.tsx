@@ -1149,12 +1149,14 @@ const AdminCRMContent = () => {
                       </a>
                     </div>
                   )}
-                  <Button variant="outline" className="w-full rounded-xl" onClick={() => openEditModal(selectedCustomer)}>
-                    <Pencil size={14} /> Editar Dados
-                  </Button>
-                  <Button variant="outline" className="w-full rounded-xl border-primary/20 text-primary hover:bg-primary/5" onClick={() => exportClientPDF(selectedCustomer)}>
-                    <Printer size={14} /> Imprimir Ficha PDF
-                  </Button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button variant="outline" className="w-full rounded-xl h-11" onClick={() => openEditModal(selectedCustomer)}>
+                      <Pencil size={14} /> Editar
+                    </Button>
+                    <Button variant="outline" className="w-full rounded-xl border-primary/20 text-primary hover:bg-primary/5 h-11" onClick={() => exportClientPDF(selectedCustomer)}>
+                      <Printer size={14} /> Ficha PDF
+                    </Button>
+                  </div>
                 </div>
                 <div className="border-t border-border pt-6">
                   <div className="flex items-center justify-between mb-3">
