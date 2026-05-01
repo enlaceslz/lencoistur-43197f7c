@@ -961,11 +961,22 @@ const AdminConfig = () => {
                   </div>
                 ))}
               </div>
-              <div className="mt-6 pt-6 border-t border-border flex justify-end">
-                <Button onClick={() => saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações")} disabled={saving} className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 bg-amber-600 hover:bg-amber-700 text-white">
-                  {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
-                  Atualizar Alertas
-                </Button>
+              <div className="mt-10 pt-6 border-t border-border flex justify-end">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      onClick={() => saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações")} 
+                      disabled={saving} 
+                      className="rounded-xl px-10 h-12 font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 bg-amber-600 hover:bg-amber-700 text-white transition-all active:scale-95"
+                    >
+                      {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
+                      Atualizar Alertas
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Salvar configurações de notificações</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </CardContent>
           </Card>
