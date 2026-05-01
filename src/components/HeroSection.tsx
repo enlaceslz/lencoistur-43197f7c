@@ -46,13 +46,32 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
-      <img
-        src={heroImg}
-        alt="Vista aérea dos Lençóis Maranhenses com lagoas azuis e dunas brancas - Santo Amaro MA"
-        className="absolute inset-0 w-full h-full object-cover"
-        width={1920}
-        height={1080}
-      />
+      {banners.length > 0 ? (
+        banners.map((banner, index) => (
+          <div
+            key={banner.id || index}
+            className={`absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out ${
+              currentIndex === index ? "opacity-100 translate-x-0" : "opacity-0 " + (transition === "slide" ? "translate-x-full" : "")
+            }`}
+          >
+            <img
+              src={banner.url}
+              alt={`Banner ${index + 1}`}
+              className="w-full h-full object-cover"
+              width={1920}
+              height={1080}
+            />
+          </div>
+        ))
+      ) : (
+        <img
+          src={heroImg}
+          alt="Vista aérea dos Lençóis Maranhenses com lagoas azuis e dunas brancas - Santo Amaro MA"
+          className="absolute inset-0 w-full h-full object-cover"
+          width={1920}
+          height={1080}
+        />
+      )}
       <div className="absolute inset-0 bg-gradient-hero" />
 
       <div className="relative z-10 container mx-auto px-4 text-center">
