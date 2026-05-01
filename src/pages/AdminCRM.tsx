@@ -1116,34 +1116,47 @@ const AdminCRMContent = () => {
                 )}
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-muted rounded-xl p-3 text-center">
-                    <p className="text-lg font-bold text-foreground">{selectedCustomer.totalBookings}</p>
-                    <p className="text-xs text-muted-foreground">Reservas</p>
+                  <div className="bg-primary/5 border border-primary/10 rounded-xl p-3 text-center transition-all hover:bg-primary/10">
+                    <p className="text-xl font-bold text-foreground">{selectedCustomer.totalBookings}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Reservas</p>
                   </div>
-                  <div className="bg-muted rounded-xl p-3 text-center">
-                    <p className="text-lg font-bold text-primary">{fmt(selectedCustomer.totalSpent)}</p>
-                    <p className="text-xs text-muted-foreground">Total Gasto</p>
+                  <div className="bg-primary/5 border border-primary/10 rounded-xl p-3 text-center transition-all hover:bg-primary/10">
+                    <p className="text-xl font-bold text-primary">{fmt(selectedCustomer.totalSpent)}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">LTV Total</p>
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-2">
                   {selectedCustomer.phone && (
-                    <a
-                      href={`https://wa.me/55${selectedCustomer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selectedCustomer.name.split(" ")[0]}! Tudo bem?`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Button className="w-full rounded-xl bg-green-600 hover:bg-green-700 text-white shadow-sm">
-                        <Smartphone size={16} /> WhatsApp
-                      </Button>
-                    </a>
+                    <div className="flex gap-2">
+                      <a
+                        href={`https://wa.me/55${selectedCustomer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selectedCustomer.name.split(" ")[0]}! Tudo bem?`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1"
+                      >
+                        <Button className="w-full rounded-xl bg-green-600 hover:bg-green-700 text-white shadow-sm h-11">
+                          <Smartphone size={16} /> WhatsApp
+                        </Button>
+                      </a>
+                      <a
+                        href={`tel:${selectedCustomer.phone.replace(/\D/g, "")}`}
+                        className="shrink-0"
+                      >
+                        <Button variant="outline" className="rounded-xl h-11 w-11 p-0">
+                          <Phone size={16} />
+                        </Button>
+                      </a>
+                    </div>
                   )}
-                  <Button variant="outline" className="w-full rounded-xl" onClick={() => openEditModal(selectedCustomer)}>
-                    <Pencil size={14} /> Editar Dados
-                  </Button>
-                  <Button variant="outline" className="w-full rounded-xl border-primary/20 text-primary hover:bg-primary/5" onClick={() => exportClientPDF(selectedCustomer)}>
-                    <Printer size={14} /> Imprimir Ficha PDF
-                  </Button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button variant="outline" className="w-full rounded-xl h-11" onClick={() => openEditModal(selectedCustomer)}>
+                      <Pencil size={14} /> Editar
+                    </Button>
+                    <Button variant="outline" className="w-full rounded-xl border-primary/20 text-primary hover:bg-primary/5 h-11" onClick={() => exportClientPDF(selectedCustomer)}>
+                      <Printer size={14} /> Ficha PDF
+                    </Button>
+                  </div>
                 </div>
                 <div className="border-t border-border pt-6">
                   <div className="flex items-center justify-between mb-3">
@@ -1533,7 +1546,7 @@ const AdminCRMContent = () => {
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
                 placeholder="Notas internas sobre o cliente..."
-                className="w-full min-h-[80px] rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="w-full min-h-[120px] rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all focus:min-h-[160px]"
               />
             </div>
           </div>
