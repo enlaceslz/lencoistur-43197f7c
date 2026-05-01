@@ -454,7 +454,7 @@ const AdminCRMContent = () => {
         .update(payload)
         .eq("id", editingCustomer.id);
       if (error) {
-        toast.error(error.message.includes("customers_email_unique") ? "E-mail já cadastrado." : "Erro ao atualizar cliente.");
+        toast.error(error.message.includes("customers_email_unique") ? "E-mail já cadastrado." : error.message.includes("customers_cpf_key") ? "CPF já cadastrado." : "Erro ao atualizar cliente.");
         setSaving(false);
         return;
       }
