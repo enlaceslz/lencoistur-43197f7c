@@ -21,20 +21,42 @@ interface Notification {
   time: string;
 }
 
-const mainItems = [
-  { icon: Home, label: "Dashboard", path: "/admin" },
-  { icon: Compass, label: "Passeios", path: "/admin/passeios" },
-  { icon: ShoppingCart, label: "Reservas", path: "/admin/reservas" },
-  { icon: Car, label: "Translados", path: "/admin/translados" },
-  { icon: Users, label: "Clientes (CRM)", path: "/admin/crm" },
-  { icon: UserCheck, label: "Parceiros", path: "/admin/parceiros" },
-  { icon: CreditCard, label: "Financeiro", path: "/admin/financeiro" },
-  { icon: Star, label: "Avaliações", path: "/admin/avaliacoes" },
-  { icon: Megaphone, label: "Marketing", path: "/admin/marketing" },
-  { icon: Bot, label: "Inteligência Artificial", path: "/admin/ia" },
-  { icon: FileText, label: "Documentação", path: "/admin/documentos" },
-  { icon: BarChart3, label: "Relatórios", path: "/admin/relatorios" },
+const mainGroups = [
+  {
+    title: "Gestão",
+    items: [
+      { icon: Home, label: "Dashboard", path: "/admin" },
+      { icon: Compass, label: "Passeios", path: "/admin/passeios" },
+      { icon: ShoppingCart, label: "Reservas", path: "/admin/reservas" },
+      { icon: Car, label: "Translados", path: "/admin/translados" },
+    ],
+  },
+  {
+    title: "Relacionamento",
+    items: [
+      { icon: Users, label: "Clientes (CRM)", path: "/admin/crm" },
+      { icon: UserCheck, label: "Parceiros", path: "/admin/parceiros" },
+      { icon: Star, label: "Avaliações", path: "/admin/avaliacoes" },
+    ],
+  },
+  {
+    title: "Administrativo",
+    items: [
+      { icon: CreditCard, label: "Financeiro", path: "/admin/financeiro" },
+      { icon: Megaphone, label: "Marketing", path: "/admin/marketing" },
+      { icon: FileText, label: "Documentação", path: "/admin/documentos" },
+      { icon: BarChart3, label: "Relatórios", path: "/admin/relatorios" },
+    ],
+  },
+  {
+    title: "Tecnologia",
+    items: [
+      { icon: Bot, label: "IA Gateway", path: "/admin/ia" },
+    ],
+  },
 ];
+
+const mainItems = mainGroups.flatMap(g => g.items);
 
 const sgsGroups = [
   {
@@ -238,11 +260,19 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5 scrollbar-thin">
-          {!sidebarCollapsed && <p className="px-4 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,40%)]">Principal</p>}
-          {mainItems.map(item => <SidebarLink key={item.path} {...item} />)}
+          {mainGroups.map((group, idx) => (
+            <div key={idx} className={idx > 0 ? "pt-2" : ""}>
+              {!sidebarCollapsed && (
+                <p className="px-4 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,45%)] opacity-80">
+                  {group.title}
+                </p>
+              )}
+              {group.items.map(item => <SidebarLink key={item.path} {...item} />)}
+            </div>
+          ))}
 
           {/* SGS Section */}
-          <div className="pt-3">
+          <div className="pt-2 border-t border-white/[0.05] mt-2">
             <button
               onClick={() => setSgsOpen(!sgsOpen)}
               className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 ${
