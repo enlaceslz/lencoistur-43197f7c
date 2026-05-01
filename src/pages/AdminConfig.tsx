@@ -508,12 +508,12 @@ const AdminConfig = () => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button 
-                      onClick={() => saveSetting("empresa", empresa, "Empresa")} 
+                      onClick={() => saveSetting("empresa", empresa, "Agência")} 
                       disabled={saving}
-                      className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20"
+                      className="rounded-xl px-10 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95"
                     >
                       {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save size={18} className="mr-2" />}
-                      Atualizar Dados
+                      Atualizar Agência
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
