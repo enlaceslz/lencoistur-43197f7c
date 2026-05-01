@@ -732,15 +732,22 @@ const AdminConfig = () => {
                 </div>
               </div>
 
-              <div className="mt-6 pt-6 border-t border-border flex justify-end">
-                <Button 
-                  onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
-                  disabled={saving} 
-                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20"
-                >
-                  {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
-                  Publicar Frontend
-                </Button>
+              <div className="mt-10 pt-6 border-t border-border flex justify-end">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
+                      disabled={saving} 
+                      className="rounded-xl px-10 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95"
+                    >
+                      {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
+                      Publicar Frontend
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Aplicar alterações de aparência no site público</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
             </CardContent>
           </Card>
