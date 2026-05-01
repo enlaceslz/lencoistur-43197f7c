@@ -1164,7 +1164,7 @@ const AdminConfig = () => {
                         className="rounded-xl font-bold"
                       >
                         {uploadingGallery ? <Loader2 size={16} className="animate-spin mr-2" /> : <UploadCloud size={16} className="mr-2" />}
-                        Fazer Upload
+                        {uploadingGallery ? "Enviando..." : "Fazer Upload"}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
