@@ -465,7 +465,7 @@ const AdminCRMContent = () => {
     } else {
       const { error } = await supabase.from("customers").insert(payload);
       if (error) {
-        toast.error(error.message.includes("customers_email_unique") ? "E-mail já cadastrado." : "Erro ao cadastrar cliente.");
+        toast.error(error.message.includes("customers_email_unique") ? "E-mail já cadastrado." : error.message.includes("customers_cpf_key") ? "CPF já cadastrado." : "Erro ao cadastrar cliente.");
         setSaving(false);
         return;
       }
