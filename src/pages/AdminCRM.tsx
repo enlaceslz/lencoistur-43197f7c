@@ -131,7 +131,34 @@ const maskPhone = (v: string) => {
 
 const maskCPF = (v: string) => {
   v = v.replace(/\D/g, "");
-  return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  if (v.length <= 11) {
+    return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  }
+  return v;
+};
+
+const isValidCPF = (cpf: string) => {
+  const digits = cpf.replace(/\D/g, "");
+  if (digits.length !== 11) return false;
+  if (/^(\d)\1+$/.test(digits)) return false;
+
+  let sum = 0;
+  for (let i = 1; i <= 9; i++) {
+    sum += parseInt(digits.substring(i - 1, i)) * (11 - i);
+  }
+  let remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(digits.substring(9, 10))) return false;
+
+  sum = 0;
+  for (let i = 1; i <= 10; i++) {
+    sum += parseInt(digits.substring(i - 1, i)) * (12 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(digits.substring(10, 11))) return false;
+
+  return true;
 };
 
 const payStatusConfig: Record<string, { label: string; className: string }> = {
@@ -154,19 +181,24 @@ const customerStatusConfig: Record<string, { label: string; className: string }>
 const validateForm = (form: CustomerForm): string | null => {
   const name = form.name.trim();
   if (!name || name.length < 2 || name.length > 120) return "Nome deve ter entre 2 e 120 caracteres.";
+  
   const email = form.email.trim().toLowerCase();
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) return "E-mail inválido.";
+  if (email && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255)) {
+    return "E-mail informado é inválido.";
+  }
+
   if (form.phone) {
     const digits = form.phone.replace(/\D/g, "");
     if (digits.length < 10 && form.country === "Brasil") return "Telefone deve ter 10 ou 11 dígitos.";
   }
-  if (form.country === "Brasil" && form.cpf) {
-    const cpfDigits = form.cpf.replace(/\D/g, "");
-    if (cpfDigits.length !== 11) return "CPF deve ter 11 dígitos.";
-  }
-  if (form.country !== "Brasil" && !form.passport) {
+
+  if (form.country === "Brasil") {
+    if (!form.cpf) return "CPF é obrigatório para brasileiros.";
+    if (!isValidCPF(form.cpf)) return "CPF inválido.";
+  } else if (!form.passport) {
     return "Passaporte é obrigatório para estrangeiros.";
   }
+
   return null;
 };
 
@@ -400,7 +432,7 @@ const AdminCRMContent = () => {
     setSaving(true);
     const payload = {
       name: form.name.trim(),
-      email: form.email.trim().toLowerCase(),
+      email: form.email.trim() ? form.email.trim().toLowerCase() : null,
       phone: form.phone.replace(/\D/g, "") || null,
       cpf: form.country === "Brasil" ? (form.cpf.replace(/\D/g, "") || null) : null,
       passport: form.country !== "Brasil" ? (form.passport || null) : null,
@@ -422,7 +454,7 @@ const AdminCRMContent = () => {
         .update(payload)
         .eq("id", editingCustomer.id);
       if (error) {
-        toast.error(error.message.includes("customers_email_unique") ? "E-mail já cadastrado." : "Erro ao atualizar cliente.");
+        toast.error(error.message.includes("customers_email_unique") ? "E-mail já cadastrado." : error.message.includes("customers_cpf_key") ? "CPF já cadastrado." : "Erro ao atualizar cliente.");
         setSaving(false);
         return;
       }
@@ -433,7 +465,7 @@ const AdminCRMContent = () => {
     } else {
       const { error } = await supabase.from("customers").insert(payload);
       if (error) {
-        toast.error(error.message.includes("customers_email_unique") ? "E-mail já cadastrado." : "Erro ao cadastrar cliente.");
+        toast.error(error.message.includes("customers_email_unique") ? "E-mail já cadastrado." : error.message.includes("customers_cpf_key") ? "CPF já cadastrado." : "Erro ao cadastrar cliente.");
         setSaving(false);
         return;
       }
@@ -1341,15 +1373,14 @@ const AdminCRMContent = () => {
               </select>
             </div>
             <div>
-              <Label htmlFor="customer-email">E-mail *</Label>
+              <Label htmlFor="customer-email">E-mail</Label>
               <Input
                 id="customer-email"
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="email@exemplo.com"
+                placeholder="email@exemplo.com (opcional)"
                 maxLength={255}
-                required
                 className="rounded-xl"
               />
             </div>
@@ -1367,7 +1398,7 @@ const AdminCRMContent = () => {
             <div>
               {form.country === "Brasil" ? (
                 <>
-                  <Label htmlFor="customer-cpf">CPF</Label>
+                  <Label htmlFor="customer-cpf">CPF *</Label>
                   <Input
                     id="customer-cpf"
                     value={form.cpf}
@@ -1375,6 +1406,7 @@ const AdminCRMContent = () => {
                     placeholder="000.000.000-00"
                     maxLength={14}
                     className="rounded-xl"
+                    required
                   />
                 </>
               ) : (
