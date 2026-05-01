@@ -143,6 +143,17 @@ Módulo de segurança em conformidade com **ABNT NBR ISO 21101, 21102, 21103** e
 
 ---
 
+## 🏗️ Arquitetura Técnica
+
+O sistema utiliza uma arquitetura **Serverless** centrada no ecossistema Supabase:
+
+1.  **Frontend SPA:** Construído com Vite + React, garantindo carregamento instantâneo e SEO otimizado.
+2.  **Segurança (RLS):** Toda a lógica de acesso a dados é definida diretamente no banco (Row Level Security), impedindo acessos não autorizados mesmo se o frontend for comprometido.
+3.  **Hooks Customizados:** Centralização da lógica de negócios em `src/hooks/` (ex: `useBookings`) para facilitar a manutenção e testes.
+4.  **Componentização UI:** Utiliza a biblioteca baseada em Radix UI para garantir acessibilidade (WAI-ARIA) e consistência visual.
+
+---
+
 ## 🚀 Como Executar
 
 ```bash
@@ -151,6 +162,41 @@ npm run dev
 ```
 
 Acesse: `http://localhost:8080`
+
+---
+
+## 🌐 Deploy em VPS (Ubuntu/Debian)
+
+Caso seja necessário hospedar o frontend fora da Lovable Cloud em um servidor próprio:
+
+### 1. Pré-requisitos
+- Node.js 20+ e NPM/Bun
+- Servidor Web (Nginx recomendado)
+
+### 2. Build do Projeto
+```bash
+npm install
+npm run build
+```
+Os arquivos estáticos serão gerados na pasta `dist/`.
+
+### 3. Configuração do Nginx
+Crie um arquivo em `/etc/nginx/sites-available/lencoistur`:
+```nginx
+server {
+    listen 80;
+    server_name seu-dominio.com;
+    root /var/www/lencoistur/dist;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+
+### 4. Variáveis de Ambiente
+Certifique-se de que as variáveis `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` estão configuradas no ambiente de build ou no arquivo `.env.production`.
 
 ---
 
