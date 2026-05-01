@@ -153,13 +153,14 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
       soon.setDate(soon.getDate() + 30);
 
       try {
-        const [pendingBookings, overdueActions, expiringDocs, expiredTrainings, openIncidents, blockedSuppliers] = await Promise.all([
+        const [pendingBookings, overdueActions, expiringDocs, expiredTrainings, openIncidents, blockedSuppliers, pendingSgsTerms] = await Promise.all([
           supabase.from("bookings").select("id").eq("status", "pendente").eq("payment_status", "pendente").limit(5),
           supabase.from("sgs_corrective_actions").select("id").in("status", ["pendente", "em_andamento"]).lt("due_date", now.toISOString().split("T")[0]),
           supabase.from("documents").select("id, name, expiry_date").not("expiry_date", "is", null).lte("expiry_date", soon.toISOString().split("T")[0]).eq("status", "vigente"),
           supabase.from("sgs_staff_trainings").select("id").eq("status", "vencido"),
           supabase.from("sgs_incidents").select("id").eq("status", "aberto"),
           supabase.from("sgs_supplier_compliance").select("id").eq("blocked", true),
+          supabase.from("sgs_risk_terms").select("id").eq("accepted", false),
         ]);
 
         if (pendingBookings.data?.length) notifs.push({ id: "pending_bookings", type: "warning", title: "Reservas Pendentes", message: `${pendingBookings.data.length} reserva(s) aguardando pagamento.`, link: "/admin/reservas", time: "Agora" });
@@ -175,6 +176,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
         if (expiredTrainings.data?.length) notifs.push({ id: "expired_trainings", type: "warning", title: "Treinamentos Vencidos", message: `${expiredTrainings.data.length} treinamento(s) vencido(s).`, link: "/admin/sgs/equipe", time: "Atenção" });
         if (openIncidents.data?.length) notifs.push({ id: "open_incidents", type: "info", title: "Incidentes Abertos", message: `${openIncidents.data.length} incidente(s) em aberto.`, link: "/admin/sgs/incidentes", time: "Info" });
         if (blockedSuppliers.data?.length) notifs.push({ id: "blocked_suppliers", type: "error", title: "Fornecedores Bloqueados", message: `${blockedSuppliers.data.length} fornecedor(es) bloqueado(s).`, link: "/admin/sgs/fornecedores", time: "Alerta" });
+        if (pendingSgsTerms.data?.length) notifs.push({ id: "pending_sgs_terms", type: "warning", title: "Termos Pendentes", message: `${pendingSgsTerms.data.length} termo(s) de risco pendente(s) de assinatura.`, link: "/admin/sgs/termos", time: "Atenção" });
       } catch (err) {
         console.error("Error loading notifications:", err);
       }
