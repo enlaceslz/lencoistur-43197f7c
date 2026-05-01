@@ -71,6 +71,19 @@ interface BookingRow {
   type: string;
 }
 
+const maskCPF = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  if (n.length <= 11) return n.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  return n;
+};
+
+const maskPhone = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+  if (n.length === 11) return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  return v;
+};
+
 interface CustomerForm {
   name: string;
   email: string;
@@ -123,19 +136,9 @@ const emptyDependentForm: DependentForm = {
 
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-const maskPhone = (v: string) => {
-  v = v.replace(/\D/g, "");
-  if (v.length <= 10) return v.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
-  return v.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-};
+// Helper masks already defined above
+const fmtPrice = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-const maskCPF = (v: string) => {
-  v = v.replace(/\D/g, "");
-  if (v.length <= 11) {
-    return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-  }
-  return v;
-};
 
 const isValidCPF = (cpf: string) => {
   const digits = cpf.replace(/\D/g, "");
@@ -1044,7 +1047,7 @@ const AdminCRMContent = () => {
               <div className="space-y-6">
                 <div className="text-center bg-muted/20 p-6 rounded-3xl border border-border/50">
                   <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground text-2xl font-black mx-auto mb-4 shadow-xl">
-                    {selectedCustomer.name.trim() ? selectedCustomer.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
+                    {selectedCustomer.name.trim() ? selectedCustomer.name.trim().split(" ").filter(Boolean).map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
                   </div>
                   <h3 className="font-display text-xl font-black text-foreground">{selectedCustomer.name}</h3>
                   <div className="flex items-center justify-center gap-2 mt-3">

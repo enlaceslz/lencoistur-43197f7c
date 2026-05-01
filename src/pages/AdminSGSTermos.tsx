@@ -20,6 +20,12 @@ const HEALTH_QUESTIONS_LIST = [
   { id: "takes_medication", label: "Toma algum tipo de medicamento?", detailKey: "medication_details" },
 ];
 
+const maskCPF = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  if (n.length <= 11) return n.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  return n;
+};
+
 const AdminSGSTermos = () => {
   const [terms, setTerms] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
@@ -83,8 +89,14 @@ const AdminSGSTermos = () => {
       supabase.from("bookings").select("id, booking_code, item_name, customer_id").order("created_at", { ascending: false }),
     ]);
 
-    setTerms(termsRes.data || []);
-    setCustomers(customersRes.data || []);
+    setTerms((termsRes.data || []).map(t => ({
+      ...t,
+      customers: t.customers ? { ...t.customers, cpf: t.customers.cpf ? maskCPF(t.customers.cpf) : null } : null
+    })));
+    setCustomers((customersRes.data || []).map(c => ({
+      ...c,
+      cpf: c.cpf ? maskCPF(c.cpf) : null
+    })));
     setTours(toursRes.data || []);
     setVehicles(vehiclesRes.data || []);
     setBookings(bookingsRes.data || []);
