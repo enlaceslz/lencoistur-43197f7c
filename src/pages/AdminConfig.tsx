@@ -1094,9 +1094,9 @@ const AdminConfig = () => {
                         variant="outline"
                         onClick={() => restoreInputRef.current?.click()}
                         disabled={restoreLoading}
-                        className="rounded-xl"
+                        className="rounded-xl px-6 h-11 font-bold border-2 border-amber-500/30 hover:bg-amber-50"
                       >
-                        {restoreLoading ? <Loader2 size={16} className="animate-spin mr-1" /> : <UploadCloud size={16} className="mr-1" />}
+                        {restoreLoading ? <Loader2 size={18} className="animate-spin mr-2" /> : <UploadCloud size={18} className="mr-2" />}
                         {restoreLoading ? "Restaurando..." : "Selecionar Arquivo de Backup"}
                       </Button>
                     </TooltipTrigger>
