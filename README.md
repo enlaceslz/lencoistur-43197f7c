@@ -143,6 +143,17 @@ Módulo de segurança em conformidade com **ABNT NBR ISO 21101, 21102, 21103** e
 
 ---
 
+## 🏗️ Arquitetura Técnica
+
+O sistema utiliza uma arquitetura **Serverless** centrada no ecossistema Supabase:
+
+1.  **Frontend SPA:** Construído com Vite + React, garantindo carregamento instantâneo e SEO otimizado.
+2.  **Segurança (RLS):** Toda a lógica de acesso a dados é definida diretamente no banco (Row Level Security), impedindo acessos não autorizados mesmo se o frontend for comprometido.
+3.  **Hooks Customizados:** Centralização da lógica de negócios em `src/hooks/` (ex: `useBookings`) para facilitar a manutenção e testes.
+4.  **Componentização UI:** Utiliza a biblioteca baseada em Radix UI para garantir acessibilidade (WAI-ARIA) e consistência visual.
+
+---
+
 ## 🚀 Como Executar
 
 ```bash
