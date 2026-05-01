@@ -159,6 +159,12 @@ const AdminConfig = () => {
         .update({ value: value as any, updated_at: new Date().toISOString() })
         .eq("key", key);
       if (error) throw error;
+      
+      // If saving site settings, update the live theme color
+      if (key === "site" && value.corPrimaria) {
+        document.documentElement.style.setProperty('--primary', value.corPrimaria as string);
+      }
+      
       toast.success(`Configurações de ${label} salvas com sucesso!`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Erro desconhecido";
