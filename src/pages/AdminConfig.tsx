@@ -1049,8 +1049,12 @@ const AdminConfig = () => {
                 <div className="flex flex-wrap gap-3">
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button onClick={handleBackup} disabled={backupLoading} className="rounded-xl">
-                        {backupLoading ? <Loader2 size={16} className="animate-spin mr-1" /> : <Download size={16} className="mr-1" />}
+                      <Button 
+                        onClick={handleBackup} 
+                        disabled={backupLoading} 
+                        className="rounded-xl px-6 h-11 font-bold shadow-sm"
+                      >
+                        {backupLoading ? <Loader2 size={18} className="animate-spin mr-2" /> : <Download size={18} className="mr-2" />}
                         {backupLoading ? "Gerando backup..." : "Gerar Backup Completo"}
                       </Button>
                     </TooltipTrigger>
