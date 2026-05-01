@@ -1402,7 +1402,7 @@ const AdminCRMContent = () => {
               <Input
                 id="customer-phone"
                 value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                onChange={(e) => setForm({ ...form, phone: maskPhone(e.target.value) })}
                 placeholder={form.country === "Brasil" ? "(99) 99999-9999" : "Telefone com DDI"}
                 maxLength={20}
                 className="rounded-xl"
