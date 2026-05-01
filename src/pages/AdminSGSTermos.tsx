@@ -307,7 +307,7 @@ const AdminSGSTermos = () => {
         </p>
         ${m.signature_data ? `<div style="margin-top: 5px;"><img src="${m.signature_data}" style="height: 40px;" /><br/><span style="font-size: 8px;">Assinado em ${format(new Date(m.signed_at), "dd/MM/yyyy HH:mm")}</span></div>` : ""}
       </div>
-    `).join("") || "Nenhum acompanhante declarado.";
+    `).join("") || "Nenhum dependente declarado.";
 
     const healthResponse = (val: boolean) => val ? "S" : "N";
 
