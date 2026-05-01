@@ -27,10 +27,6 @@ const AdminSGSEmpresa = () => {
     endereco: "",
     cidade: "",
     estado: "MA",
-    uc_nome: "",
-    uc_tipo: "",
-    icmbio_autorizacao: "",
-    icmbio_validade: "",
     observacoes: "",
     logo_url: "",
   });
