@@ -1128,15 +1128,26 @@ const AdminCRMContent = () => {
 
                 <div className="flex flex-col gap-2">
                   {selectedCustomer.phone && (
-                    <a
-                      href={`https://wa.me/55${selectedCustomer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selectedCustomer.name.split(" ")[0]}! Tudo bem?`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Button className="w-full rounded-xl bg-green-600 hover:bg-green-700 text-white shadow-sm">
-                        <Smartphone size={16} /> WhatsApp
-                      </Button>
-                    </a>
+                    <div className="flex gap-2">
+                      <a
+                        href={`https://wa.me/55${selectedCustomer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selectedCustomer.name.split(" ")[0]}! Tudo bem?`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1"
+                      >
+                        <Button className="w-full rounded-xl bg-green-600 hover:bg-green-700 text-white shadow-sm h-11">
+                          <Smartphone size={16} /> WhatsApp
+                        </Button>
+                      </a>
+                      <a
+                        href={`tel:${selectedCustomer.phone.replace(/\D/g, "")}`}
+                        className="shrink-0"
+                      >
+                        <Button variant="outline" className="rounded-xl h-11 w-11 p-0">
+                          <Phone size={16} />
+                        </Button>
+                      </a>
+                    </div>
                   )}
                   <Button variant="outline" className="w-full rounded-xl" onClick={() => openEditModal(selectedCustomer)}>
                     <Pencil size={14} /> Editar Dados
