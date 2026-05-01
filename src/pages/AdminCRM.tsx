@@ -1373,15 +1373,14 @@ const AdminCRMContent = () => {
               </select>
             </div>
             <div>
-              <Label htmlFor="customer-email">E-mail *</Label>
+              <Label htmlFor="customer-email">E-mail</Label>
               <Input
                 id="customer-email"
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="email@exemplo.com"
+                placeholder="email@exemplo.com (opcional)"
                 maxLength={255}
-                required
                 className="rounded-xl"
               />
             </div>
@@ -1399,7 +1398,7 @@ const AdminCRMContent = () => {
             <div>
               {form.country === "Brasil" ? (
                 <>
-                  <Label htmlFor="customer-cpf">CPF</Label>
+                  <Label htmlFor="customer-cpf">CPF *</Label>
                   <Input
                     id="customer-cpf"
                     value={form.cpf}
@@ -1407,6 +1406,7 @@ const AdminCRMContent = () => {
                     placeholder="000.000.000-00"
                     maxLength={14}
                     className="rounded-xl"
+                    required
                   />
                 </>
               ) : (
