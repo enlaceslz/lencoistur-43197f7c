@@ -178,7 +178,7 @@ const customerStatusConfig: Record<string, { label: string; className: string }>
   bloqueado: { label: "Bloqueado", className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
 };
 
-
+const validateForm = (form: CustomerForm): string | null => {
   const name = form.name.trim();
   if (!name || name.length < 2 || name.length > 120) return "Nome deve ter entre 2 e 120 caracteres.";
   
