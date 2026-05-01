@@ -30,9 +30,11 @@ const AdminSGSFornecedores = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const isExpired = form.certification_expiry && new Date(form.certification_expiry) < new Date();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const isExpired = form.certification_expiry && new Date(form.certification_expiry + "T12:00:00") < today;
     const status = isExpired ? "vencido" : (!form.documentation_ok ? "irregular" : "regular");
-    const blocked = status === "vencido" || !form.documentation_ok;
+    const blocked = status === "vencido" || !form.documentation_ok || !form.vehicle_inspection_ok;
 
     const { error } = await supabase.from("sgs_supplier_compliance").insert({
       ...form, status, blocked,

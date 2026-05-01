@@ -22,8 +22,21 @@ const HEALTH_QUESTIONS_LIST = [
 
 const maskCPF = (v: string) => {
   const n = v.replace(/\D/g, "");
-  if (n.length <= 11) return n.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+  if (n.length === 11) return n.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
   return n;
+};
+
+const formatPhone = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  if (n.startsWith("55") && n.length >= 12) {
+    const ddd = n.substring(2, 4);
+    const rest = n.substring(4);
+    if (rest.length === 9) return `+55 (${ddd}) ${rest.substring(0, 5)}-${rest.substring(5)}`;
+    if (rest.length === 8) return `+55 (${ddd}) ${rest.substring(0, 4)}-${rest.substring(4)}`;
+  }
+  if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+  if (n.length === 11) return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  return v.startsWith("+") ? v : (v ? `+${v}` : "");
 };
 
 const AdminSGSTermos = () => {
