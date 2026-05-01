@@ -136,19 +136,8 @@ const emptyDependentForm: DependentForm = {
 
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-const maskPhone = (v: string) => {
-  v = v.replace(/\D/g, "");
-  if (v.length <= 10) return v.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
-  return v.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-};
+// Helper masks already defined above
 
-const maskCPF = (v: string) => {
-  v = v.replace(/\D/g, "");
-  if (v.length <= 11) {
-    return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-  }
-  return v;
-};
 
 const isValidCPF = (cpf: string) => {
   const digits = cpf.replace(/\D/g, "");
