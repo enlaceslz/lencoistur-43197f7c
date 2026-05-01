@@ -118,29 +118,40 @@ const AdminConfig = () => {
       const { data, error } = await supabase
         .from("site_settings")
         .select("key, value");
-      if (error) throw error;
+      
+      if (error) {
+        toast.error("Erro ao carregar configurações: " + error.message);
+        throw error;
+      }
+
       if (data) {
-        for (const row of data) {
-          const val = row.value as Record<string, unknown>;
-          if (row.key === "empresa") setEmpresa({ ...DEFAULTS.empresa, ...val });
-          if (row.key === "site") {
-            const siteVal = { ...DEFAULTS.site, ...val };
-            // Ensure bannerUrl reflects the first banner if available
-            if (siteVal.banners && siteVal.banners.length > 0 && !siteVal.bannerUrl) {
-              siteVal.bannerUrl = siteVal.banners[0].url;
-            }
-            setSite(siteVal);
-            
-            // Apply theme color if present
-            if (siteVal.corPrimaria) {
-              document.documentElement.style.setProperty('--primary', siteVal.corPrimaria);
-              // Simple way to adjust primary-foreground based on brightness could be added here
-            }
+        const settingsMap: Record<string, any> = {};
+        data.forEach(row => { settingsMap[row.key] = row.value; });
+
+        if (settingsMap.empresa) setEmpresa({ ...DEFAULTS.empresa, ...settingsMap.empresa });
+        
+        if (settingsMap.site) {
+          const siteVal = { ...DEFAULTS.site, ...settingsMap.site };
+          if (siteVal.banners?.length > 0 && !siteVal.bannerUrl) {
+            siteVal.bannerUrl = siteVal.banners[0].url;
           }
-          if (row.key === "pagamentos") setPagamentos({ ...DEFAULTS.pagamentos, ...val, pixTipo: (val as any).pixTipo && PIX_KEY_TYPES.some(t => t.value === (val as any).pixTipo) ? (val as any).pixTipo : DEFAULTS.pagamentos.pixTipo });
-          if (row.key === "notificacoes") setNotifications({ ...DEFAULTS.notificacoes, ...val });
-          if (row.key === "gallery") setGallery({ ...DEFAULTS.gallery, ...val });
+          setSite(siteVal);
+          if (siteVal.corPrimaria) {
+            document.documentElement.style.setProperty('--primary', siteVal.corPrimaria);
+          }
         }
+
+        if (settingsMap.pagamentos) {
+          const p = settingsMap.pagamentos;
+          setPagamentos({ 
+            ...DEFAULTS.pagamentos, 
+            ...p, 
+            pixTipo: p.pixTipo && PIX_KEY_TYPES.some(t => t.value === p.pixTipo) ? p.pixTipo : DEFAULTS.pagamentos.pixTipo 
+          });
+        }
+
+        if (settingsMap.notificacoes) setNotifications({ ...DEFAULTS.notificacoes, ...settingsMap.notificacoes });
+        if (settingsMap.gallery) setGallery({ ...DEFAULTS.gallery, ...settingsMap.gallery });
       }
     } catch (err) {
       console.error("Error loading settings:", err);
@@ -154,13 +165,17 @@ const AdminConfig = () => {
   const saveSetting = async (key: string, value: Record<string, unknown>, label: string) => {
     setSaving(true);
     try {
+      // Use upsert to handle cases where the key might not exist yet
       const { error } = await supabase
         .from("site_settings")
-        .update({ value: value as any, updated_at: new Date().toISOString() })
-        .eq("key", key);
+        .upsert({ 
+          key, 
+          value: value as any, 
+          updated_at: new Date().toISOString() 
+        }, { onConflict: 'key' });
+
       if (error) throw error;
       
-      // If saving site settings, update the live theme color
       if (key === "site" && value.corPrimaria) {
         document.documentElement.style.setProperty('--primary', value.corPrimaria as string);
       }
@@ -169,6 +184,7 @@ const AdminConfig = () => {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Erro desconhecido";
       toast.error("Erro ao salvar: " + msg);
+      console.error(`Error saving ${key}:`, err);
     } finally {
       setSaving(false);
     }
@@ -870,17 +886,20 @@ const AdminConfig = () => {
                 </div>
               </div>
               
-              <div className="mt-6 pt-6 border-t border-border flex justify-end">
+              <div className="mt-6 pt-6 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
+                <p className="text-[10px] text-muted-foreground italic font-medium">
+                  {pagamentos.pix ? "PIX ativado. Certifique-se de que a chave está correta." : "PIX desativado."}
+                </p>
                 <Button
                   onClick={() => {
                     if (pagamentos.pix) {
                       const v = validatePixKey(pagamentos.pixChave, pagamentos.pixTipo);
                       if (!v.valid) { toast.error("Chave PIX inválida: " + v.message); return; }
                     }
-                    saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Pagamento");
+                    saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Financeiro");
                   }}
                   disabled={saving}
-                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white"
+                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white w-full md:w-auto"
                 >
                   {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
                   Atualizar Financeiro
