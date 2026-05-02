@@ -251,7 +251,7 @@ const AdminReservas = () => {
     .reduce((a, b) => a + b.finalTotal, 0);
 
   const stats = [
-    { icon: ShoppingCart, label: "Total Reservas", value: bookings.length, color: "text-primary" },
+    { icon: ShoppingCart, label: "Total Reservas", value: bookings.length, color: "text-indigo-600" },
     { icon: CheckCircle, label: "Confirmadas", value: bookings.filter((b) => b.status === "confirmada").length, color: "text-green-600" },
     { icon: Clock, label: "Pendentes", value: bookings.filter((b) => b.status === "pendente").length, color: "text-amber-600" },
     { icon: DollarSign, label: "Faturamento Pago", value: fmt(totalPago), color: "text-blue-600" },
