@@ -14,7 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Users, Search, Plus, Edit, Trash2, Loader2, Phone, Mail, User, Wallet, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileText, History
+  Users, Search, Plus, Edit, Trash2, Loader2, Phone, Mail, User, Wallet, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileText, History, LayoutGrid, List, Settings2, Trash
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -48,6 +48,13 @@ interface Collaborator {
   created_at: string;
 }
 
+interface CollabType {
+  id: string;
+  name: string;
+  description: string | null;
+  color: string;
+}
+
 interface Payment {
   id: string;
   collaborator_id: string;
@@ -62,15 +69,20 @@ interface Payment {
 
 const AdminColaboradores = () => {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
+  const [collabTypes, setCollabTypes] = useState<CollabType[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [typesDialogOpen, setTypesDialogOpen] = useState(false);
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [selectedCollab, setSelectedCollab] = useState<Collaborator | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const [typeForm, setTypeForm] = useState({ name: "", description: "", color: "#3b82f6" });
 
   const [form, setForm] = useState({
     name: "", email: "", phone: "", document: "",
@@ -86,7 +98,13 @@ const AdminColaboradores = () => {
 
   useEffect(() => {
     fetchCollaborators();
+    fetchCollabTypes();
   }, []);
+
+  const fetchCollabTypes = async () => {
+    const { data, error } = await supabase.from("collaborator_types").select("*").order("name");
+    if (!error) setCollabTypes(data as CollabType[]);
+  };
 
   const fetchCollaborators = async () => {
     setLoading(true);
@@ -206,6 +224,28 @@ const AdminColaboradores = () => {
       }
     }
     setSaving(false);
+  };
+
+  const handleSaveType = async () => {
+    if (!typeForm.name) return;
+    setSaving(true);
+    const { error } = await supabase.from("collaborator_types").insert(typeForm);
+    if (error) toast.error("Erro ao salvar tipo");
+    else {
+      toast.success("Tipo cadastrado!");
+      setTypeForm({ name: "", description: "", color: "#3b82f6" });
+      fetchCollabTypes();
+    }
+    setSaving(false);
+  };
+
+  const deleteType = async (id: string) => {
+    const { error } = await supabase.from("collaborator_types").delete().eq("id", id);
+    if (error) toast.error("Erro ao remover tipo");
+    else {
+      toast.success("Tipo removido!");
+      fetchCollabTypes();
+    }
   };
 
   const confirmDelete = async () => {
@@ -376,11 +416,9 @@ const AdminColaboradores = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Guia">Guia</SelectItem>
-                  <SelectItem value="Motorista">Motorista</SelectItem>
-                  <SelectItem value="Vendedor">Vendedor</SelectItem>
-                  <SelectItem value="Freelancer">Freelancer</SelectItem>
-                  <SelectItem value="Outro">Outro</SelectItem>
+                  {collabTypes.map(t => (
+                    <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
