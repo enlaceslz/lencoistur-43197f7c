@@ -165,7 +165,16 @@ const AdminConfig = () => {
   const saveSetting = async (key: string, value: Record<string, unknown>, label: string) => {
     setSaving(true);
     try {
-      // Use upsert to handle cases where the key might not exist yet
+      // Validations
+      if (key === "pagamentos" && (value as any).pix) {
+        const v = validatePixKey((value as any).pixChave, (value as any).pixTipo);
+        if (!v.valid) {
+          toast.error(`Chave PIX inválida: ${v.message}`);
+          setSaving(false);
+          return;
+        }
+      }
+
       const { error } = await supabase
         .from("site_settings")
         .upsert({ 
@@ -769,13 +778,7 @@ const AdminConfig = () => {
                   </div>
                 </div>
                 <Button
-                  onClick={() => {
-                    if (pagamentos.pix) {
-                      const v = validatePixKey(pagamentos.pixChave, pagamentos.pixTipo);
-                      if (!v.valid) { toast.error("Chave PIX inválida: " + v.message); return; }
-                    }
-                    saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Financeiro");
-                  }}
+                  onClick={() => saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Financeiro")}
                   disabled={saving}
                   className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
@@ -1271,9 +1274,14 @@ const AdminConfig = () => {
             else toast.info("Selecione uma aba para salvar");
           }}
           disabled={saving}
-          className="w-14 h-14 rounded-full shadow-2xl bg-primary text-white hover:scale-110 active:scale-95 transition-all p-0 flex items-center justify-center"
+          className="w-16 h-16 rounded-full shadow-2xl bg-primary text-white hover:scale-110 active:scale-95 transition-all p-0 flex flex-col items-center justify-center gap-1 border-4 border-background"
         >
-          {saving ? <Loader2 size={24} className="animate-spin" /> : <Save size={24} />}
+          {saving ? <Loader2 size={24} className="animate-spin" /> : (
+            <>
+              <Save size={24} />
+              <span className="text-[8px] font-black uppercase tracking-tighter">Salvar</span>
+            </>
+          )}
         </Button>
       </div>
     </AdminLayout>
