@@ -452,7 +452,6 @@ const AdminColaboradores = () => {
             <Card key={c.id} className="overflow-hidden border-none shadow-md hover:shadow-xl transition-all group relative bg-background/60 backdrop-blur-sm">
               <div className="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
               <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 rounded-2xl overflow-hidden bg-muted border border-border flex items-center justify-center font-bold text-xl shadow-inner group-hover:scale-105 transition-transform duration-300">
                     {c.avatar_url ? (
