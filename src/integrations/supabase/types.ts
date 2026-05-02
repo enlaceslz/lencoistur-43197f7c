@@ -221,6 +221,7 @@ export type Database = {
       collaborators: {
         Row: {
           address: string | null
+          avatar_url: string | null
           birth_date: string | null
           cadastur: string | null
           cnh: string | null
@@ -242,6 +243,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          avatar_url?: string | null
           birth_date?: string | null
           cadastur?: string | null
           cnh?: string | null
@@ -263,6 +265,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          avatar_url?: string | null
           birth_date?: string | null
           cadastur?: string | null
           cnh?: string | null

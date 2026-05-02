@@ -14,7 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Users, Search, Plus, Edit, Trash2, Loader2, Phone, Mail, User, Wallet, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileText, History, LayoutGrid, List, Settings2, Trash
+  Users, Search, Plus, Edit, Trash2, Loader2, Phone, Mail, User, Wallet, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileText, History, LayoutGrid, List, Settings2, Trash, Camera, Upload
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -32,7 +32,7 @@ interface Collaborator {
   name: string;
   email: string | null;
   phone: string | null;
-  document: string; // Changed to required
+  document: string;
   pix_key: string | null;
   pix_type: string | null;
   status: 'active' | 'inactive';
@@ -45,6 +45,7 @@ interface Collaborator {
   address: string | null;
   cnh: string | null;
   cadastur: string | null;
+  avatar_url: string | null;
   created_at: string;
 }
 
@@ -78,8 +79,10 @@ const AdminColaboradores = () => {
   const [typesDialogOpen, setTypesDialogOpen] = useState(false);
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [selectedCollab, setSelectedCollab] = useState<Collaborator | null>(null);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const [typeForm, setTypeForm] = useState({ name: "", description: "", color: "#3b82f6" });
@@ -89,7 +92,7 @@ const AdminColaboradores = () => {
     pix_key: "", pix_type: "cpf", status: "active",
     payment_type: "daily", payment_value: "0", observation: "",
     type: "Outro", birth_date: "", zip_code: "", address: "",
-    cnh: "", cadastur: ""
+    cnh: "", cadastur: "", avatar_url: ""
   });
 
   const [paymentForm, setPaymentForm] = useState({
@@ -131,7 +134,7 @@ const AdminColaboradores = () => {
       pix_key: "", pix_type: "cpf", status: "active",
       payment_type: "daily", payment_value: "R$ 0,00", observation: "",
       type: "Outro", birth_date: "", zip_code: "", address: "",
-      cnh: "", cadastur: ""
+      cnh: "", cadastur: "", avatar_url: ""
     });
     setDialogOpen(true);
   };
@@ -149,9 +152,15 @@ const AdminColaboradores = () => {
       zip_code: c.zip_code || "", 
       address: c.address || "",
       cnh: c.cnh || "", 
-      cadastur: c.cadastur || ""
+      cadastur: c.cadastur || "",
+      avatar_url: c.avatar_url || ""
     });
     setDialogOpen(true);
+  };
+
+  const openDetails = (c: Collaborator) => {
+    setSelectedCollab(c);
+    setDetailsDialogOpen(true);
   };
 
   const openHistory = (c: Collaborator) => {
@@ -185,6 +194,34 @@ const AdminColaboradores = () => {
       } catch (error) {
         console.error("Erro ao buscar CEP:", error);
       }
+    }
+  };
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${Math.random()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      setForm(prev => ({ ...prev, avatar_url: publicUrl }));
+      toast.success("Foto carregada com sucesso!");
+    } catch (error: any) {
+      toast.error("Erro no upload: " + error.message);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -366,11 +403,15 @@ const AdminColaboradores = () => {
               <div className="p-5">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
-                      {c.name.substring(0, 2).toUpperCase()}
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+                      {c.avatar_url ? (
+                        <img src={c.avatar_url} alt={c.name} className="w-full h-full object-cover" />
+                      ) : (
+                        c.name.substring(0, 2).toUpperCase()
+                      )}
                     </div>
                     <div>
-                      <h3 className="font-bold text-slate-900">{c.name}</h3>
+                      <h3 className="font-bold text-slate-900 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => openDetails(c)}>{c.name}</h3>
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary" className="text-[10px] h-4">
                           {c.type || "Outro"}
@@ -448,11 +489,15 @@ const AdminColaboradores = () => {
                     <TableRow key={c.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
-                            {c.name.substring(0, 2).toUpperCase()}
+                          <div className="w-8 h-8 rounded-full overflow-hidden bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
+                            {c.avatar_url ? (
+                              <img src={c.avatar_url} alt={c.name} className="w-full h-full object-cover" />
+                            ) : (
+                              c.name.substring(0, 2).toUpperCase()
+                            )}
                           </div>
                           <div>
-                            <p className="font-bold text-sm">{c.name}</p>
+                            <p className="font-bold text-sm cursor-pointer hover:text-blue-600 transition-colors" onClick={() => openDetails(c)}>{c.name}</p>
                             <div className="flex gap-2">
                               <Badge variant="outline" className="text-[9px] h-4 px-1 leading-none bg-slate-50">
                                 {c.type || "Outro"}
@@ -517,6 +562,27 @@ const AdminColaboradores = () => {
             <DialogTitle>{selectedCollab ? "Editar Colaborador" : "Novo Colaborador"}</DialogTitle>
           </DialogHeader>
           <div className="grid md:grid-cols-2 gap-4 py-4">
+            <div className="md:col-span-2 flex flex-col items-center justify-center space-y-4 mb-4 pb-4 border-b">
+              <div className="relative group">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-100 border-2 border-slate-200 flex items-center justify-center">
+                  {form.avatar_url ? (
+                    <img src={form.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <User size={64} className="text-slate-300" />
+                  )}
+                </div>
+                <label className="absolute bottom-0 right-0 p-2 bg-blue-600 rounded-full text-white cursor-pointer hover:bg-blue-700 transition-colors shadow-lg group-hover:scale-110 transition-transform">
+                  <Camera size={18} />
+                  <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} disabled={uploading} />
+                </label>
+                {uploading && (
+                  <div className="absolute inset-0 bg-white/60 rounded-full flex items-center justify-center">
+                    <Loader2 className="animate-spin text-blue-600" size={32} />
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">Clique na câmera para enviar uma foto</p>
+            </div>
             <div className="space-y-2">
               <Label>Nome Completo</Label>
               <Input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} />
@@ -797,6 +863,84 @@ const AdminColaboradores = () => {
               </Table>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Collaborator Details Dialog */}
+      <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Detalhes do Colaborador</DialogTitle>
+          </DialogHeader>
+          {selectedCollab && (
+            <div className="space-y-6 py-4">
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-100 border-2 border-slate-200">
+                  {selectedCollab.avatar_url ? (
+                    <img src={selectedCollab.avatar_url} alt={selectedCollab.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-600 font-bold text-4xl">
+                      {selectedCollab.name.substring(0, 2).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h2 className="text-2xl font-bold text-slate-900">{selectedCollab.name}</h2>
+                  <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-2">
+                    <Badge className={selectedCollab.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}>
+                      {selectedCollab.status === 'active' ? 'Ativo' : 'Inativo'}
+                    </Badge>
+                    <Badge variant="secondary">{selectedCollab.type || "Outro"}</Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 pt-4 border-t">
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">Documento (CPF)</p>
+                  <p className="text-sm font-medium">{selectedCollab.document}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">Data de Nascimento</p>
+                  <p className="text-sm font-medium">{selectedCollab.birth_date ? format(new Date(selectedCollab.birth_date), "dd/MM/yyyy") : "—"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">Telefone</p>
+                  <p className="text-sm font-medium">{selectedCollab.phone || "—"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">E-mail</p>
+                  <p className="text-sm font-medium">{selectedCollab.email || "—"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">Endereço</p>
+                  <p className="text-sm font-medium">{selectedCollab.address || "—"} {selectedCollab.zip_code ? `(${selectedCollab.zip_code})` : ""}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">Remuneração</p>
+                  <p className="text-sm font-medium">{getPaymentTypeLabel(selectedCollab.payment_type)}: {selectedCollab.payment_type === 'commission' ? `${selectedCollab.payment_value}%` : formatCurrency(selectedCollab.payment_value)}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">PIX ({selectedCollab.pix_type})</p>
+                  <p className="text-sm font-medium">{selectedCollab.pix_key || "—"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">CNH / CADASTUR</p>
+                  <p className="text-sm font-medium">{selectedCollab.cnh || "—"} / {selectedCollab.cadastur || "—"}</p>
+                </div>
+                {selectedCollab.observation && (
+                  <div className="md:col-span-2 space-y-1">
+                    <p className="text-xs text-muted-foreground uppercase font-semibold">Observações</p>
+                    <p className="text-sm font-medium">{selectedCollab.observation}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDetailsDialogOpen(false)}>Fechar</Button>
+            <Button onClick={() => { setDetailsDialogOpen(false); openEdit(selectedCollab!); }} className="bg-blue-600">Editar</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
