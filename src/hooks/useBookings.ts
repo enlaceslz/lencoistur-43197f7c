@@ -75,6 +75,7 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
     invoiceUrl: row.invoice_url || undefined,
     voucherUrl: row.voucher_url || undefined,
     collaboratorId: row.collaborator_id || undefined,
+    collaboratorName: row.collaborators?.name || undefined,
   };
 }
 
