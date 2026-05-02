@@ -561,6 +561,27 @@ const AdminColaboradores = () => {
             <DialogTitle>{selectedCollab ? "Editar Colaborador" : "Novo Colaborador"}</DialogTitle>
           </DialogHeader>
           <div className="grid md:grid-cols-2 gap-4 py-4">
+            <div className="md:col-span-2 flex flex-col items-center justify-center space-y-4 mb-4 pb-4 border-b">
+              <div className="relative group">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-100 border-2 border-slate-200 flex items-center justify-center">
+                  {form.avatar_url ? (
+                    <img src={form.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <User size={64} className="text-slate-300" />
+                  )}
+                </div>
+                <label className="absolute bottom-0 right-0 p-2 bg-blue-600 rounded-full text-white cursor-pointer hover:bg-blue-700 transition-colors shadow-lg group-hover:scale-110 transition-transform">
+                  <Camera size={18} />
+                  <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} disabled={uploading} />
+                </label>
+                {uploading && (
+                  <div className="absolute inset-0 bg-white/60 rounded-full flex items-center justify-center">
+                    <Loader2 className="animate-spin text-blue-600" size={32} />
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">Clique na câmera para enviar uma foto</p>
+            </div>
             <div className="space-y-2">
               <Label>Nome Completo</Label>
               <Input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} />
