@@ -447,89 +447,93 @@ const AdminColaboradores = () => {
       </Card>
 
       {viewMode === 'cards' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filtered.map(c => (
-            <Card key={c.id} className="overflow-hidden border-none shadow-md hover:shadow-xl transition-all group relative bg-background/60 backdrop-blur-sm">
-              <div className="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
-              <div className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-2xl overflow-hidden bg-muted border border-border flex items-center justify-center font-bold text-xl shadow-inner group-hover:scale-105 transition-transform duration-300">
-                    {c.avatar_url ? (
-                      <img src={c.avatar_url} alt={c.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-primary/60">{c.name.substring(0, 2).toUpperCase()}</span>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-lg text-foreground truncate cursor-pointer hover:text-primary transition-colors flex items-center gap-1.5" onClick={() => openDetails(c)}>
-                      {c.name}
-                    </h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-wider h-5 px-2 bg-primary/10 text-primary border-none">
-                        {c.type || "Outro"}
+            <Card key={c.id} className="overflow-hidden border-none shadow-md hover:shadow-2xl transition-all duration-500 group relative bg-white flex flex-col h-full rounded-3xl">
+              <div className="absolute top-0 left-0 w-full h-2 bg-slate-100 group-hover:bg-primary/20 transition-colors" />
+              
+              <div className="p-6 flex-1">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="relative">
+                    <div className="w-20 h-20 rounded-3xl overflow-hidden bg-slate-50 border-2 border-slate-100 flex items-center justify-center font-bold text-2xl shadow-inner group-hover:scale-105 transition-transform duration-500 group-hover:border-primary/20">
+                      {c.avatar_url ? (
+                        <img src={c.avatar_url} alt={c.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-primary/40 group-hover:text-primary transition-colors">{c.name.substring(0, 2).toUpperCase()}</span>
+                      )}
+                    </div>
+                    <div className="absolute -bottom-2 -right-2">
+                      <Badge variant={c.status === 'active' ? 'default' : 'secondary'} className={`rounded-full w-6 h-6 p-0 flex items-center justify-center border-2 border-white shadow-sm ${c.status === 'active' ? 'bg-green-500' : 'bg-slate-300'}`}>
+                        {c.status === 'active' ? <CheckCircle2 size={12} className="text-white" /> : <XCircle size={12} className="text-white" />}
                       </Badge>
-                      <span className="text-xs text-muted-foreground font-mono">{c.document}</span>
                     </div>
                   </div>
+                  
+                  <div className="flex flex-col items-end gap-2">
+                    <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 bg-slate-100 text-slate-600 border-none rounded-full group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                      {c.type || "Outro"}
+                    </Badge>
+                    <span className="text-[10px] text-muted-foreground font-mono bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">{c.document}</span>
+                  </div>
                 </div>
-                <div className="absolute top-4 right-4">
-                  <Badge variant={c.status === 'active' ? 'default' : 'secondary'} className={`rounded-full px-3 py-0.5 text-[10px] font-black uppercase tracking-widest ${c.status === 'active' ? 'bg-green-500 text-white shadow-sm shadow-green-200' : 'bg-slate-200 text-slate-600'}`}>
-                    {c.status === 'active' ? 'Ativo' : 'Inativo'}
-                  </Badge>
+
+                <h3 className="font-black text-xl text-slate-800 truncate cursor-pointer hover:text-primary transition-colors mb-4 group-hover:translate-x-1 duration-300" onClick={() => openDetails(c)}>
+                  {c.name}
+                </h3>
+
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center gap-3 text-slate-600 group/item">
+                    <div className="p-2 rounded-xl bg-slate-50 text-slate-400 group-hover/item:bg-primary/10 group-hover/item:text-primary transition-colors">
+                      <Phone size={14} />
+                    </div>
+                    <span className="text-sm font-semibold">{c.phone || "—"}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-slate-600 group/item">
+                    <div className="p-2 rounded-xl bg-slate-50 text-slate-400 group-hover/item:bg-primary/10 group-hover/item:text-primary transition-colors">
+                      <Mail size={14} />
+                    </div>
+                    <span className="text-sm font-semibold truncate max-w-[180px]">{c.email || "—"}</span>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 p-4 rounded-2xl border border-slate-100 group-hover:border-primary/10 transition-colors">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] text-slate-400 uppercase font-black tracking-wider">{getPaymentTypeLabel(c.payment_type)}</span>
+                    <Wallet size={12} className="text-slate-300 group-hover:text-primary/40" />
+                  </div>
+                  <p className="text-lg font-black text-slate-700 group-hover:text-primary transition-colors leading-none">
+                    {c.payment_type === 'commission' ? `${c.payment_value}%` : formatCurrency(c.payment_value)}
+                  </p>
                 </div>
               </div>
 
-              <div className="px-6 pb-6 pt-0">
-                <div className="grid grid-cols-1 gap-2.5 mb-6">
-                  <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-colors">
-                    <div className="p-2 rounded-lg bg-primary/5 text-primary">
-                      <Phone size={14} />
-                    </div>
-                    <span className="text-sm font-medium text-muted-foreground">{c.phone || "Não informado"}</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-colors">
-                    <div className="p-2 rounded-lg bg-primary/5 text-primary">
-                      <Mail size={14} />
-                    </div>
-                    <span className="text-sm font-medium text-muted-foreground truncate">{c.email || "Não informado"}</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-2 rounded-xl bg-primary/5 border border-primary/10">
-                    <div className="p-2 rounded-lg bg-primary text-primary-foreground">
-                      <Wallet size={14} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-primary/70 uppercase font-black leading-none mb-1">{getPaymentTypeLabel(c.payment_type)}</p>
-                      <p className="text-sm font-bold text-primary leading-none">
-                        {c.payment_type === 'commission' ? `${c.payment_value}%` : formatCurrency(c.payment_value)}
-                      </p>
-                    </div>
-                  </div>
+              <div className="p-4 bg-slate-50/50 flex items-center justify-between border-t border-slate-100 rounded-b-3xl">
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-emerald-50 hover:text-emerald-600 transition-all text-slate-400" onClick={() => openNewPayment(c)} title="Lançar Pagamento">
+                    <Banknote size={18} />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-blue-50 hover:text-blue-600 transition-all text-slate-400" onClick={() => openHistory(c)} title="Histórico">
+                    <History size={18} />
+                  </Button>
                 </div>
-
-                <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-emerald-100 bg-emerald-50/50 hover:bg-emerald-50 hover:border-emerald-200 transition-all" onClick={() => openNewPayment(c)} title="Lançar Pagamento">
-                      <Banknote size={16} className="text-emerald-600" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-blue-100 bg-blue-50/50 hover:bg-blue-50 hover:border-blue-200 transition-all" onClick={() => openHistory(c)} title="Histórico">
-                      <History size={16} className="text-blue-600" />
-                    </Button>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-muted" onClick={() => openEdit(c)} title="Editar">
-                      <Edit size={16} className="text-muted-foreground hover:text-foreground" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-red-50 hover:text-red-600 transition-colors" onClick={() => setDeleteId(c.id)} title="Excluir">
-                      <Trash2 size={16} className="text-red-400" />
-                    </Button>
-                  </div>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-slate-200 transition-all text-slate-400 hover:text-slate-900" onClick={() => openEdit(c)} title="Editar">
+                    <Edit size={18} />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all text-slate-400" onClick={() => setDeleteId(c.id)} title="Excluir">
+                    <Trash2 size={18} />
+                  </Button>
                 </div>
               </div>
             </Card>
           ))}
           {filtered.length === 0 && (
-            <div className="col-span-full py-20 text-center text-slate-500 bg-slate-50 rounded-xl border-2 border-dashed">
-              Nenhum colaborador encontrado.
+            <div className="col-span-full py-32 text-center bg-white rounded-3xl border-2 border-dashed border-slate-200 shadow-sm">
+              <div className="inline-flex p-6 rounded-full bg-slate-50 mb-4">
+                <Users size={48} className="text-slate-200" />
+              </div>
+              <p className="text-lg font-bold text-slate-400">Nenhum colaborador encontrado.</p>
+              <Button variant="link" onClick={() => setSearch("")} className="mt-2 text-primary">Limpar filtros</Button>
             </div>
           )}
         </div>
