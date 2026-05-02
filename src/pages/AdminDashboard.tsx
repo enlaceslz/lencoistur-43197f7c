@@ -130,7 +130,7 @@ const AdminDashboard = () => {
     for (let i = 6; i >= 0; i--) {
       const d = new Date(currentYear, currentMonth - i, 1);
       const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
-      monthlyMap.set(key, { revenue: 0, bookings: 0, expenses: 0 });
+      monthlyMap.set(key, { revenue: 0, bookings: 0, expenses: 0, profit: 0 });
     }
     bookings.forEach((b) => {
       if (b.status === "cancelada") return;
