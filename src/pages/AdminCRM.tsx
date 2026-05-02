@@ -77,7 +77,12 @@ const maskCPF = (v: string) => {
   return n;
 };
 
-const maskPhone = (v: string) => {
+const maskCEP = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  if (n.length <= 8) return n.replace(/(\d{5})(\d{3})/, "$1-$2");
+  return n;
+};
+
   const n = v.replace(/\D/g, "");
   if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
   if (n.length === 11) return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
@@ -1413,14 +1418,13 @@ const AdminCRMContent = () => {
                 </>
               ) : (
                 <>
-                  <Label htmlFor="customer-passport">Passaporte *</Label>
+                  <Label htmlFor=\"customer-passport\">Passaporte *</Label>
                   <Input
-                    id="customer-passport"
+                    id=\"customer-passport\"
                     value={form.passport}
                     onChange={(e) => setForm({ ...form, passport: e.target.value })}
-                    placeholder="Número do Passaporte"
-                    className="rounded-xl"
-                    required
+                    placeholder=\"Número do Passaporte\"
+                    className=\"rounded-xl\"
                   />
                 </>
               )}
@@ -1460,17 +1464,18 @@ const AdminCRMContent = () => {
                   </Label>
                   <div className="flex gap-2">
                     <Input
-                      id="customer-cep"
+                      id=\"customer-cep\"
                       value={form.cep}
                       onChange={(e) => {
-                        const val = e.target.value;
+                        const val = form.country === \"Brasil\" ? maskCEP(e.target.value) : e.target.value;
                         setForm({ ...form, cep: val });
-                        if (form.country === "Brasil" && val.replace(/\D/g, "").length === 8) {
+                        if (form.country === \"Brasil\" && val.replace(/\D/g, \"\").length === 8) {
                           handleCepSearch(val);
                         }
                       }}
-                      placeholder={form.country === "Brasil" ? "00000-000" : "Postal Code"}
-                      className="rounded-xl"
+                      placeholder={form.country === \"Brasil\" ? \"00000-000\" : \"Postal Code\"}
+                      maxLength={form.country === \"Brasil\" ? 9 : undefined}
+                      className=\"rounded-xl\"
                     />
                     {fetchingCep && <Loader2 size={16} className="animate-spin self-center" />}
                   </div>
