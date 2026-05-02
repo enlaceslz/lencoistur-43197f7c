@@ -106,8 +106,8 @@ const AdminDashboard = () => {
     const stats = [
       { label: "Reservas Hoje", value: String(todayBookings.length), change: `${todayBookings.length}`, up: todayBookings.length > 0, icon: Calendar, path: "/admin/reservas" },
       { label: "Receita Confirmada (Mês)", value: fmt(thisRevenue), change: `${Number(revChange) >= 0 ? "+" : ""}${revChange}%`, up: Number(revChange) >= 0, icon: DollarSign, path: "/admin/financeiro" },
+      { label: "Colaboradores", value: String(collabCount), change: "Equipe", up: true, icon: Briefcase, path: "/admin/colaboradores" },
       { label: "Conformidade SGS", value: String(sgsStats.criticalRisks === 0 ? "100%" : "Risco"), change: `${sgsStats.pendingActions} alertas`, up: sgsStats.criticalRisks === 0, icon: ShieldAlert, isSgs: true, path: "/admin/sgs" },
-      { label: "LTV da Base", value: customerCount > 0 ? fmt(bookings.reduce((s, b) => s + (b.status !== 'cancelada' ? b.final_total : 0), 0) / customerCount) : "R$ 0", change: `${customerCount} clientes`, up: true, icon: Users, path: "/admin/crm" },
     ];
 
     // Revenue by month (last 7 months)
