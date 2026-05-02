@@ -189,6 +189,7 @@ Deno.serve(async (req) => {
           pix_code: pixCode,
           notes: notes || null,
           booking_code: generateBookingCode(),
+          collaborator_id: collaboratorId || null,
         })
         .select("*, customers(*)")
         .single();
