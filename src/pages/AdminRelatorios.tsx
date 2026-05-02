@@ -151,14 +151,29 @@ const AdminRelatorios = () => {
           bySource: Object.entries(bySource).map(([name, value]) => ({ name, value })),
         });
       } else if (activeTab === "parceiros") {
-        const { data: partners } = await supabase.from("partners").select("*");
-        const p = partners || [];
+        const [partners, bookings] = await Promise.all([
+          supabase.from("partners").select("*"),
+          supabase.from("bookings").select("final_total, partner_id").not("partner_id", "is", null).gte("created_at", since)
+        ]);
+        const p = partners.data || [];
+        const b = bookings.data || [];
+        
         const byType: Record<string, number> = {};
         p.forEach((pt: any) => { byType[pt.type] = (byType[pt.type] || 0) + 1; });
+        
+        const partnerRevenue: Record<string, number> = {};
+        b.forEach((res: any) => {
+          partnerRevenue[res.partner_id] = (partnerRevenue[res.partner_id] || 0) + (res.final_total || 0);
+        });
+
         setData({
           total: p.length,
           active: p.filter((x: any) => x.active).length,
           byType: Object.entries(byType).map(([name, value]) => ({ name, value })),
+          topPartners: p.map(partner => ({
+            name: partner.name,
+            revenue: partnerRevenue[partner.id] || 0
+          })).sort((a, b) => b.revenue - a.revenue).slice(0, 5)
         });
       } else if (activeTab === "usuarios") {
         const { data: users } = await supabase.from("user_management").select("*");
