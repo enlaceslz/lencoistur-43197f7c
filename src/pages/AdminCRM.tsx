@@ -1085,7 +1085,7 @@ const AdminCRMContent = () => {
                 <div className="space-y-4 bg-muted/10 p-5 rounded-2xl border border-border/50 shadow-inner">
                   <div className="flex items-center gap-4 text-sm font-semibold">
                     <div className="p-2 rounded-lg bg-background border border-border"><Mail size={16} className="text-primary" /></div>
-                    <span className="text-foreground truncate">{selectedCustomer.email}</span>
+                    <span className="text-foreground truncate">{selectedCustomer.email || "Sem e-mail cadastrado"}</span>
                   </div>
                   {selectedCustomer.phone && (
                     <div className="flex items-center gap-4 text-sm font-semibold">
