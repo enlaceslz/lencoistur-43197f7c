@@ -536,7 +536,7 @@ const AdminConfig = () => {
           </Card>
         </TabsContent>
 
-        {/* SITE */}
+        {/* SITE / FRONTEND */}
         <TabsContent value="site">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
             <CardContent className="p-8 space-y-8">
@@ -547,25 +547,18 @@ const AdminConfig = () => {
                   </div>
                   <div>
                     <h3 className="text-xl font-black text-foreground">Aparência do Website</h3>
-                    <p className="text-sm text-muted-foreground">Personalize a identidade visual e banners do site público.</p>
+                    <p className="text-sm text-muted-foreground">Personalize a identidade visual, banners e seções do site público.</p>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button 
-                        onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
-                        disabled={saving} 
-                        className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95"
-                      >
-                        {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
-                        Publicar Frontend
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Aplicar alterações de aparência no site público</p>
-                    </TooltipContent>
-                  </Tooltip>
+                <div className="flex gap-2 relative z-10">
+                  <Button 
+                    onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
+                    disabled={saving} 
+                    className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95 flex items-center gap-2"
+                  >
+                    {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                    Salvar Alterações Frontend
+                  </Button>
                 </div>
               </div>
 
