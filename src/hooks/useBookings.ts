@@ -87,7 +87,7 @@ export function useBookings() {
     setLoading(true);
     const { data: bookingsData } = await supabase
       .from("bookings")
-      .select("*, customers(*), collaborators(name)")
+      .select("*, customers!fk_bookings_customer(*), collaborators(name)")
       .order("created_at", { ascending: false });
 
     if (bookingsData) {
@@ -158,7 +158,7 @@ export function useBookings() {
   const confirmPayment = useCallback(async (id: string) => {
     const { data: booking, error: fetchError } = await supabase
       .from("bookings")
-      .select("*, customers(name)")
+      .select("*, customers!fk_bookings_customer(name)")
       .eq("id", id)
       .single();
 
@@ -203,7 +203,7 @@ export function useBookings() {
   const completeBooking = useCallback(async (id: string) => {
     const { data: booking, error: fetchError } = await supabase
       .from("bookings")
-      .select("*, customers(name)")
+      .select("*, customers!fk_bookings_customer(name)")
       .eq("id", id)
       .single();
 
