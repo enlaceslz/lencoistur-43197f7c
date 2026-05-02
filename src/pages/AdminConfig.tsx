@@ -1155,7 +1155,7 @@ const AdminConfig = () => {
         <TabsContent value="galeria">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
             <CardContent className="p-8 space-y-8">
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-600">
                     <Image size={32} />
