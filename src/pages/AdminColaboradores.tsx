@@ -197,7 +197,34 @@ const AdminColaboradores = () => {
     }
   };
 
-  const handleSave = async () => {
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${Math.random()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      setForm(prev => ({ ...prev, avatar_url: publicUrl }));
+      toast.success("Foto carregada com sucesso!");
+    } catch (error: any) {
+      toast.error("Erro no upload: " + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
     if (!form.name) { toast.error("Nome é obrigatório"); return; }
     if (!form.document) { toast.error("CPF é obrigatório"); return; }
     if (!validateCPF(form.document)) { toast.error("CPF inválido"); return; }
