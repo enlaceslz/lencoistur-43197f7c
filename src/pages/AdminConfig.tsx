@@ -573,7 +573,7 @@ const AdminConfig = () => {
                   <Button 
                     onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
                     disabled={saving} 
-                    className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95 flex items-center gap-2"
+                    className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95 flex items-center gap-2"
                   >
                     {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                     Salvar Alterações Frontend
