@@ -132,11 +132,30 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
+  const [userRole, setUserRole] = useState<string>("operador");
+  const [userPermissions, setUserPermissions] = useState<Record<string, boolean>>({});
   const notifRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
   const { settings } = useSiteSettings();
+
+  useEffect(() => {
+    const fetchUserPermissions = async () => {
+      if (!user?.id) return;
+      const { data, error } = await supabase
+        .from("user_management")
+        .select("role, permissions")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      
+      if (data) {
+        setUserRole(data.role);
+        setUserPermissions(data.permissions || {});
+      }
+    };
+    fetchUserPermissions();
+  }, [user]);
 
   useEffect(() => {
     localStorage.setItem("admin-sidebar-collapsed", String(sidebarCollapsed));
