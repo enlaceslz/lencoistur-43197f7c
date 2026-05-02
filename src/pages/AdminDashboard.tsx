@@ -51,6 +51,10 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
     const load = async () => {
       const [bRes, cRes, rRes, aRes, collabRes, cpRes] = await Promise.all([
         supabase.from("bookings").select("*, customers(name, email)").order("created_at", { ascending: false }),
