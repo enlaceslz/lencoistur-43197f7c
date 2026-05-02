@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, RefreshCw, Trash2, Plus, Users, UserPlus, ShieldCheck, Mail, Lock, Key } from "lucide-react";
+import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, RefreshCw, Trash2, Plus, Users, UserPlus, ShieldCheck, Mail, Lock, Key, LayoutDashboard, Compass, ShoppingCart, Car, UserCheck, UserCheck2, Megaphone, FileText, BarChart3, Settings, Edit, Fingerprint } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -117,6 +117,24 @@ const AdminConfig = () => {
   const [usersLoading, setUsersLoading] = useState(false);
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [newUser, setNewUser] = useState({ full_name: "", email: "", role: "operador", password: "" });
+  const [editingUser, setEditingUser] = useState<any>(null);
+  const [isEditingPermissions, setIsEditingPermissions] = useState(false);
+
+  const MODULES = [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "passeios", label: "Passeios", icon: Compass },
+    { id: "reservas", label: "Reservas", icon: ShoppingCart },
+    { id: "translados", label: "Translados", icon: Car },
+    { id: "crm", label: "CRM / Clientes", icon: Users },
+    { id: "parceiros", label: "Parceiros", icon: UserCheck },
+    { id: "colaboradores", label: "Colaboradores", icon: UserCheck2 },
+    { id: "financeiro", label: "Financeiro", icon: CreditCard },
+    { id: "marketing", label: "Marketing", icon: Megaphone },
+    { id: "documentos", label: "Documentação", icon: FileText },
+    { id: "relatorios", label: "Relatórios", icon: BarChart3 },
+    { id: "sgs", label: "Segurança (SGS)", icon: Shield },
+    { id: "configuracoes", label: "Configurações", icon: Settings },
+  ];
 
   const loadSettings = useCallback(async () => {
     setLoading(true);
@@ -514,6 +532,34 @@ const AdminConfig = () => {
     } catch (err: any) {
       toast.error("Erro ao atualizar cargo: " + err.message);
     }
+  };
+
+  const handleUpdatePermissions = async () => {
+    if (!editingUser) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("user_management")
+        .update({ permissions: editingUser.permissions })
+        .eq("id", editingUser.id);
+      
+      if (error) throw error;
+      toast.success("Permissões de acesso sincronizadas!");
+      setIsEditingPermissions(false);
+      setEditingUser(null);
+      loadUsers();
+    } catch (err: any) {
+      toast.error("Erro ao salvar permissões: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const togglePermission = (moduleId: string) => {
+    if (!editingUser) return;
+    const currentPermissions = { ...(editingUser.permissions || {}) };
+    currentPermissions[moduleId] = !currentPermissions[moduleId];
+    setEditingUser({ ...editingUser, permissions: currentPermissions });
   };
   if (loading) {
     return (
