@@ -24,6 +24,7 @@ const REPORT_TABS: { id: ReportType; label: string; icon: any }[] = [
   { id: "passeios", label: "Passeios", icon: BarChart3 },
   { id: "sgs", label: "Segurança (SGS)", icon: Shield },
   { id: "marketing", label: "Marketing", icon: TrendingUp },
+  { id: "parceiros", label: "Parceiros", icon: UserPlus },
 ];
 
 const COLORS = [
