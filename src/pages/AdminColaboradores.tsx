@@ -325,7 +325,8 @@ const AdminColaboradores = () => {
   const filtered = collaborators.filter(c => 
     c.name.toLowerCase().includes(search.toLowerCase()) || 
     (c.email || "").toLowerCase().includes(search.toLowerCase()) ||
-    (c.document || "").includes(search)
+    (c.document || "").includes(search) ||
+    (c.type || "").toLowerCase().includes(search.toLowerCase())
   );
 
   const getPaymentTypeLabel = (type: string) => {
