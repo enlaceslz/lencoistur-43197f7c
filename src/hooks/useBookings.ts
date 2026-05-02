@@ -117,6 +117,7 @@ export function useBookings() {
         passport?: string;
         country?: string;
         birthDate?: string;
+        notes?: string;
         companions?: { name: string; cpf?: string; birthDate?: string; relationship?: string }[];
       }
     ): Promise<BookingItem> => {
@@ -134,6 +135,7 @@ export function useBookings() {
           passport: data.passport,
           country: data.country,
           birthDate: data.birthDate,
+          notes: data.notes,
           companions: data.companions,
         },
       });
