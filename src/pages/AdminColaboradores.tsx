@@ -79,8 +79,10 @@ const AdminColaboradores = () => {
   const [typesDialogOpen, setTypesDialogOpen] = useState(false);
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [selectedCollab, setSelectedCollab] = useState<Collaborator | null>(null);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const [typeForm, setTypeForm] = useState({ name: "", description: "", color: "#3b82f6" });
