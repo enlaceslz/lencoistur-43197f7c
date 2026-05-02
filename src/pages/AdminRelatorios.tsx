@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-type ReportType = "reservas" | "financeiro" | "clientes" | "passeios" | "sgs" | "marketing" | "parceiros";
+type ReportType = "reservas" | "financeiro" | "clientes" | "passeios" | "sgs" | "marketing" | "parceiros" | "usuarios";
 
 const REPORT_TABS: { id: ReportType; label: string; icon: any }[] = [
   { id: "reservas", label: "Reservas", icon: ShoppingCart },
@@ -318,6 +318,12 @@ const AdminRelatorios = () => {
                   <KPICard label="Parceiros Ativos" value={data.active || 0} icon={Activity} color="text-secondary" />
                 </>
               )}
+              {activeTab === "usuarios" && (
+                <>
+                  <KPICard label="Total de Usuários" value={data.total || 0} icon={Users} color="text-primary" />
+                  <KPICard label="Usuários Ativos" value={data.active || 0} icon={Activity} color="text-emerald-500" />
+                </>
+              )}
             </div>
 
             {/* Charts Section */}
@@ -396,6 +402,21 @@ const AdminRelatorios = () => {
                   <ChartCard title="Parceiros por Tipo">
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={data.byType}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                        <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
+                        <YAxis fontSize={10} axisLine={false} tickLine={false} />
+                        <ChartTooltip />
+                        <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Quantidade" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+              )}
+              {activeTab === "usuarios" && (
+                <div className="col-span-2">
+                  <ChartCard title="Distribuição de Hierarquia">
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={data.byRole}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                         <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
                         <YAxis fontSize={10} axisLine={false} tickLine={false} />
