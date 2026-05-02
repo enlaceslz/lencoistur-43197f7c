@@ -1047,7 +1047,7 @@ const AdminCRMContent = () => {
                   <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{(filter === "dependents" ? filteredDependents : filtered).length} registro(s)</p>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
 
