@@ -536,6 +536,7 @@ const AdminConfig = () => {
               { value: "site", icon: Globe, label: "Frontend" },
               { value: "pagamento", icon: CreditCard, label: "Financeiro" },
               { value: "notificacoes", icon: Bell, label: "Alertas" },
+              { value: "usuarios", icon: Users, label: "Usuários" },
               { value: "seguranca", icon: Shield, label: "Acesso" },
               { value: "backup", icon: Database, label: "Backup" },
               { value: "galeria", icon: Image, label: "Mídia" },
