@@ -81,7 +81,8 @@ const DEFAULTS = {
     logoUrl: null as string | null, 
     bannerUrl: null as string | null,
     banners: [] as Array<{ url: string; id: string }>,
-    bannerTransition: "fade" as "fade" | "slide"
+    bannerTransition: "fade" as "fade" | "slide",
+    exibirParceiros: true
   },
   pagamentos: { pix: true, cartao: true, boleto: false, dinheiro: true, transferencia: false, pixChave: "12.345.678/0001-90", pixTipo: "cnpj" as PixKeyType },
   notificacoes: { email: true, whatsapp: true, push: false, novaReserva: true, cancelamento: true, pagamento: true },
