@@ -165,7 +165,16 @@ const AdminConfig = () => {
   const saveSetting = async (key: string, value: Record<string, unknown>, label: string) => {
     setSaving(true);
     try {
-      // Use upsert to handle cases where the key might not exist yet
+      // Validations
+      if (key === "pagamentos" && (value as any).pix) {
+        const v = validatePixKey((value as any).pixChave, (value as any).pixTipo);
+        if (!v.valid) {
+          toast.error(`Chave PIX inválida: ${v.message}`);
+          setSaving(false);
+          return;
+        }
+      }
+
       const { error } = await supabase
         .from("site_settings")
         .upsert({ 
