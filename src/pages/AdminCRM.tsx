@@ -831,7 +831,7 @@ const AdminCRMContent = () => {
                     className="bg-transparent w-full outline-none text-foreground text-sm placeholder:text-muted-foreground font-medium"
                   />
                 </div>
-              <div className="flex gap-2">
+                <div className="flex gap-2">
                 <Button size="sm" className="rounded-xl" onClick={openCreateModal}>
                   <Plus size={14} /> Novo Cliente
                 </Button>
@@ -1050,8 +1050,6 @@ const AdminCRMContent = () => {
               </div>
             )}
           </div>
-        </div>
-
           {/* Client Detail */}
           <div className="bg-card border border-border rounded-2xl p-6">
             {selectedCustomer ? (
