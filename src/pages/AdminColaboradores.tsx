@@ -353,28 +353,44 @@ const AdminColaboradores = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
           <p className="text-sm text-muted-foreground">
-            Gerencie sua equipe, pagamentos e integrações financeiras.
+            <span className="font-semibold text-foreground">{collaborators.length}</span> colaboradores cadastrados · <span className="font-semibold text-green-600">{collaborators.filter(c => c.status === 'active').length}</span> ativos
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setTypesDialogOpen(true)} className="border-slate-200">
-            <Settings2 size={16} className="mr-2" /> Tipos
+          <Button variant="outline" size="sm" onClick={() => setTypesDialogOpen(true)}>
+            <Settings2 size={16} className="mr-1.5" /> Gerenciar Tipos
           </Button>
-          <Button onClick={openNew} className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20">
-            <Plus size={16} className="mr-2" /> Novo Colaborador
+          <Button onClick={openNew} size="sm">
+            <Plus size={16} className="mr-1.5" /> Novo Colaborador
           </Button>
         </div>
       </div>
 
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        {collabTypes.map((t) => (
+          <Card key={t.id} className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setSearch(t.name)}>
+            <CardContent className="p-5 flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                <Users size={22} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{collaborators.filter((c) => c.type === t.name).length}</p>
+                <p className="text-xs text-muted-foreground">{t.name}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
       <Card className="mb-6">
-        <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="relative w-full max-w-md">
+        <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
             <Input 
               placeholder="Buscar por nome, e-mail ou documento..." 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
-              className="pl-10" 
+              className="pl-10 h-10" 
             />
           </div>
           <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
@@ -382,17 +398,17 @@ const AdminColaboradores = () => {
               variant={viewMode === 'cards' ? 'secondary' : 'ghost'} 
               size="sm" 
               onClick={() => setViewMode('cards')}
-              className={viewMode === 'cards' ? 'bg-white shadow-sm' : ''}
+              className={`h-8 ${viewMode === 'cards' ? 'bg-white shadow-sm' : ''}`}
             >
-              <LayoutGrid size={16} className="mr-2" /> Cards
+              <LayoutGrid size={14} className="mr-1.5" /> Cards
             </Button>
             <Button 
               variant={viewMode === 'table' ? 'secondary' : 'ghost'} 
               size="sm" 
               onClick={() => setViewMode('table')}
-              className={viewMode === 'table' ? 'bg-white shadow-sm' : ''}
+              className={`h-8 ${viewMode === 'table' ? 'bg-white shadow-sm' : ''}`}
             >
-              <List size={16} className="mr-2" /> Tabela
+              <List size={14} className="mr-1.5" /> Tabela
             </Button>
           </div>
         </CardContent>
