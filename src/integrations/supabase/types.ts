@@ -196,8 +196,12 @@ export type Database = {
       }
       collaborators: {
         Row: {
+          address: string | null
+          birth_date: string | null
+          cadastur: string | null
+          cnh: string | null
           created_at: string
-          document: string | null
+          document: string
           email: string | null
           id: string
           name: string
@@ -208,11 +212,17 @@ export type Database = {
           pix_key: string | null
           pix_type: string | null
           status: string
+          type: string | null
           updated_at: string
+          zip_code: string | null
         }
         Insert: {
+          address?: string | null
+          birth_date?: string | null
+          cadastur?: string | null
+          cnh?: string | null
           created_at?: string
-          document?: string | null
+          document: string
           email?: string | null
           id?: string
           name: string
@@ -223,11 +233,17 @@ export type Database = {
           pix_key?: string | null
           pix_type?: string | null
           status?: string
+          type?: string | null
           updated_at?: string
+          zip_code?: string | null
         }
         Update: {
+          address?: string | null
+          birth_date?: string | null
+          cadastur?: string | null
+          cnh?: string | null
           created_at?: string
-          document?: string | null
+          document?: string
           email?: string | null
           id?: string
           name?: string
@@ -238,7 +254,9 @@ export type Database = {
           pix_key?: string | null
           pix_type?: string | null
           status?: string
+          type?: string | null
           updated_at?: string
+          zip_code?: string | null
         }
         Relationships: []
       }
