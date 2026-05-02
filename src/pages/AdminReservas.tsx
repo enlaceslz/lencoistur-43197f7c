@@ -88,7 +88,7 @@ const AdminReservas = () => {
   const [newLoading, setNewLoading] = useState(false);
   const [tours, setTours] = useState<TourOption[]>([]);
   const [transfers, setTransfers] = useState<TransferOption[]>([]);
-  const [existingCustomers, setExistingCustomers] = useState<{ id: string; name: string; email: string; phone: string | null }[]>([]);
+  const [existingCustomers, setExistingCustomers] = useState<{ id: string; name: string; email: string; phone: string | null; cpf?: string; passport?: string; country?: string; birth_date?: string }[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
   const [customerSearch, setCustomerSearch] = useState("");
   const [newForm, setNewForm] = useState({
@@ -105,6 +105,7 @@ const AdminReservas = () => {
     passport: "",
     country: "Brasil",
     birthDate: "",
+    notes: "",
   });
 
   useEffect(() => {
@@ -113,7 +114,7 @@ const AdminReservas = () => {
       const [{ data: t }, { data: tr }, { data: cust }] = await Promise.all([
         supabase.from("tours").select("id, name, price, private_price, pix_discount").eq("active", true).order("name"),
         supabase.from("transfer_routes").select("id, origin, destination, price, pix_discount").eq("active", true).order("origin"),
-        supabase.from("customers").select("id, name, email, phone").order("name"),
+        supabase.from("customers").select("id, name, email, phone, cpf, passport, country, birth_date").order("name"),
       ]);
       if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price, private_price: r.private_price, pix_discount: r.pix_discount })));
       if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price, pix_discount: r.pix_discount })));
@@ -141,6 +142,7 @@ const AdminReservas = () => {
       passport: b.passport || "",
       country: b.country || "Brasil",
       birthDate: b.birthDate || "",
+      notes: b.notes || "",
     });
     setSelectedCustomerId(b.customerId || "");
     setShowNewForm(true);
@@ -150,7 +152,7 @@ const AdminReservas = () => {
     setNewForm({
       type: "tour", tourMode: "coletivo", itemName: "", date: "", guests: 2, payMethod: "pix",
       customerName: "", customerEmail: "", customerPhone: "",
-      cpf: "", passport: "", country: "Brasil", birthDate: ""
+      cpf: "", passport: "", country: "Brasil", birthDate: "", notes: ""
     });
     setSelectedCustomerId("");
     setCustomerSearch("");
@@ -201,6 +203,7 @@ const AdminReservas = () => {
         passport: newForm.passport.trim() || undefined,
         country: newForm.country.trim(),
         birthDate: newForm.birthDate || undefined,
+        notes: newForm.notes.trim() || undefined,
         unitPrice,
         total,
         discount,
@@ -251,7 +254,7 @@ const AdminReservas = () => {
     { icon: ShoppingCart, label: "Total Reservas", value: bookings.length, color: "text-primary" },
     { icon: CheckCircle, label: "Confirmadas", value: bookings.filter((b) => b.status === "confirmada").length, color: "text-green-600" },
     { icon: Clock, label: "Pendentes", value: bookings.filter((b) => b.status === "pendente").length, color: "text-amber-600" },
-    { icon: DollarSign, label: "Receita Total", value: fmt(totalPago), color: "text-blue-600" },
+    { icon: DollarSign, label: "Faturamento Pago", value: fmt(totalPago), color: "text-blue-600" },
   ];
 
   const handleAction = async (action: () => Promise<void>, successMsg: string, isCancellation = false) => {
@@ -386,13 +389,13 @@ const AdminReservas = () => {
                 <TableRow className="bg-muted/50">
                   <TableHead className="font-bold">Código</TableHead>
                   <TableHead className="font-bold">Cliente</TableHead>
-                  <TableHead className="font-bold">Passeio/Translado</TableHead>
+                  <TableHead className="font-bold">Serviço</TableHead>
                   <TableHead className="font-bold text-center">Data</TableHead>
                   <TableHead className="font-bold text-center">Pax</TableHead>
-                  <TableHead className="font-bold text-right">Total</TableHead>
+                  <TableHead className="font-bold text-right">Valor Total</TableHead>
                   <TableHead className="font-bold text-center">Pagamento</TableHead>
                   <TableHead className="font-bold text-center">Status</TableHead>
-                  <TableHead className="font-bold">Criado em</TableHead>
+                  <TableHead className="font-bold">Solicitação</TableHead>
                   <TableHead className="w-12"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -431,12 +434,12 @@ const AdminReservas = () => {
                           <span className="text-[10px] text-muted-foreground">{b.customerEmail}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="max-w-[200px] truncate">
+                      <TableCell>
                         <div className="flex flex-col">
-                          <span className="text-sm font-medium">{b.itemName}</span>
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                            {b.type === 'transfer' ? <Car size={10} /> : <Compass size={10} />}
-                            {b.type.toUpperCase()}
+                          <span className="text-sm font-semibold text-foreground">{b.itemName}</span>
+                          <span className="text-[10px] text-muted-foreground flex items-center gap-1 uppercase font-bold tracking-wider">
+                            {b.type === 'transfer' ? <Car size={10} className="text-primary" /> : <Compass size={10} className="text-primary" />}
+                            {b.type === 'transfer' ? 'Translado' : b.type === 'package' ? 'Pacote' : 'Passeio'}
                           </span>
                         </div>
                       </TableCell>
@@ -792,6 +795,10 @@ const AdminReservas = () => {
                           customerName: cust.name,
                           customerEmail: cust.email,
                           customerPhone: cust.phone || "",
+                          cpf: cust.cpf || "",
+                          passport: cust.passport || "",
+                          country: cust.country || "Brasil",
+                          birthDate: cust.birth_date || "",
                         }));
                       }
                     } else {
@@ -847,6 +854,17 @@ const AdminReservas = () => {
                     <Input value={newForm.country} onChange={(e) => setNewForm(f => ({ ...f, country: e.target.value }))} placeholder="Ex: Brasil" disabled={!!selectedCustomerId && !editingId} />
                   </div>
                 </div>
+              </div>
+
+              <div className="mt-3">
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Observações Internas</label>
+                <Textarea 
+                  value={newForm.notes} 
+                  onChange={(e) => setNewForm(f => ({ ...f, notes: e.target.value }))} 
+                  placeholder="Instruções para a equipe, restrições alimentares, etc." 
+                  rows={2}
+                  className="text-sm"
+                />
               </div>
             </div>
 
