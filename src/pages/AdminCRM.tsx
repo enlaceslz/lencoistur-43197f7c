@@ -1046,9 +1046,8 @@ const AdminCRMContent = () => {
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/50">
                   <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Lençóis Tour CRM</p>
                   <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{(filter === "dependents" ? filteredDependents : filtered).length} registro(s)</p>
-            </div>
-          </div>
-        </div>
+                </div>
+              </div>
             )}
           </div>
 
