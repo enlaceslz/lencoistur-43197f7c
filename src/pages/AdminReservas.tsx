@@ -89,6 +89,7 @@ const AdminReservas = () => {
   const [tours, setTours] = useState<TourOption[]>([]);
   const [transfers, setTransfers] = useState<TransferOption[]>([]);
   const [existingCustomers, setExistingCustomers] = useState<{ id: string; name: string; email: string; phone: string | null; cpf?: string; passport?: string; country?: string; birth_date?: string }[]>([]);
+  const [collaborators, setCollaborators] = useState<{ id: string; name: string }[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
   const [customerSearch, setCustomerSearch] = useState("");
   const [newForm, setNewForm] = useState({
@@ -106,6 +107,7 @@ const AdminReservas = () => {
     country: "Brasil",
     birthDate: "",
     notes: "",
+    collaboratorId: "",
   });
 
   useEffect(() => {
