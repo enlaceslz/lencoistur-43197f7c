@@ -946,6 +946,17 @@ const AdminConfig = () => {
                 </div>
               </div>
               
+              <div className="flex justify-end pt-8 border-t border-border">
+                <Button
+                  onClick={() => saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Financeiro")}
+                  disabled={saving}
+                  className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white transition-all active:scale-95 flex items-center gap-2"
+                >
+                  {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                  Salvar Configurações Financeiras
+                </Button>
+              </div>
+
             </CardContent>
           </Card>
         </TabsContent>
