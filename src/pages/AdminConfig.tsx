@@ -778,13 +778,7 @@ const AdminConfig = () => {
                   </div>
                 </div>
                 <Button
-                  onClick={() => {
-                    if (pagamentos.pix) {
-                      const v = validatePixKey(pagamentos.pixChave, pagamentos.pixTipo);
-                      if (!v.valid) { toast.error("Chave PIX inválida: " + v.message); return; }
-                    }
-                    saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Financeiro");
-                  }}
+                  onClick={() => saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Financeiro")}
                   disabled={saving}
                   className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
