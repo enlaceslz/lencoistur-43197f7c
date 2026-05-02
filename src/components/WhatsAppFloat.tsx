@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { X, MessageSquare } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const WhatsAppFloat = () => {
   const { t } = useTranslation();
+  const { site: settings } = useSiteSettings();
   const [showBubble, setShowBubble] = useState(false);
   const [msgIndex, setMsgIndex] = useState(0);
   const [dismissed, setDismissed] = useState(false);
@@ -35,7 +37,7 @@ const WhatsAppFloat = () => {
           </button>
           <p className="text-sm font-semibold text-foreground mb-2">{smartMessages[msgIndex]}</p>
           <a
-            href="https://wa.me/5598985880954?text=Olá! Vi a promoção no site e gostaria de mais informações!"
+            href={settings?.whatsappUrl ? `${settings.whatsappUrl}${settings.whatsappUrl.includes('?') ? '&' : '?'}text=${encodeURIComponent("Olá! Vi a promoção no site e gostaria de mais informações!")}` : "https://wa.me/5598985880954?text=Olá! Vi a promoção no site e gostaria de mais informações!"}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-whatsapp hover:bg-whatsapp-hover text-primary-foreground px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
@@ -46,7 +48,7 @@ const WhatsAppFloat = () => {
       )}
 
       <a
-        href="https://wa.me/5598985880954?text=Olá! Gostaria de informações sobre passeios nos Lençóis Maranhenses."
+        href={settings?.whatsappUrl ? `${settings.whatsappUrl}${settings.whatsappUrl.includes('?') ? '&' : '?'}text=${encodeURIComponent("Olá! Gostaria de informações sobre passeios nos Lençóis Maranhenses.")}` : "https://wa.me/5598985880954?text=Olá! Gostaria de informações sobre passeios nos Lençóis Maranhenses."}
         target="_blank"
         rel="noopener noreferrer"
         className="bg-whatsapp hover:bg-whatsapp-hover text-primary-foreground w-16 h-16 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-all duration-300"

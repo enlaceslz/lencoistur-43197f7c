@@ -6,7 +6,7 @@ import { useSiteSettings } from "@/hooks/useSiteSettings";
 const Footer = () => {
   const { t } = useTranslation();
   const tourLinks = t("footer.tourLinks", { returnObjects: true }) as string[];
-  const { settings } = useSiteSettings();
+  const { site: settings, empresa } = useSiteSettings();
 
   return (
     <footer id="contato" className="bg-foreground text-primary-foreground border-t border-primary-foreground/10">
@@ -21,14 +21,14 @@ const Footer = () => {
                   className="h-12 md:h-14 w-auto object-contain" 
                 />
               ) : (
-                <>Lençóis<span className="text-secondary">Tour</span></>
+                <>{empresa?.nome ? empresa.nome : <>Lençóis<span className="text-secondary">Tour</span></>}</>
               )}
             </h3>
             <p className="text-primary-foreground/60 text-sm leading-relaxed mb-4">
               {t("footer.desc")}
             </p>
             <a
-              href="https://wa.me/5598985880954"
+              href={settings?.whatsappUrl || "https://wa.me/5598985880954"}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-whatsapp hover:bg-whatsapp-hover text-primary-foreground px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
@@ -61,10 +61,20 @@ const Footer = () => {
           <div>
             <h4 className="font-display font-bold text-lg mb-4">{t("footer.contactTitle")}</h4>
             <ul className="space-y-3 text-primary-foreground/60 text-sm">
-              <li className="flex items-center gap-2"><MapPin size={16} className="text-secondary" />Santo Amaro do Maranhão, MA</li>
-              <li className="flex items-center gap-2"><Phone size={16} className="text-secondary" />(98) 98588-0954</li>
-              <li className="flex items-center gap-2"><Mail size={16} className="text-secondary" />contato@lencoisexperience.com</li>
-              <li className="flex items-center gap-2"><Instagram size={16} className="text-secondary" />@lencoisexperience</li>
+              <li className="flex items-center gap-2"><MapPin size={16} className="text-secondary" />{empresa?.endereco || "Santo Amaro do Maranhão, MA"}</li>
+              <li className="flex items-center gap-2"><Phone size={16} className="text-secondary" />{empresa?.telefone || "(98) 98588-0954"}</li>
+              <li className="flex items-center gap-2"><Mail size={16} className="text-secondary" />{empresa?.email || "contato@lencoisexperience.com"}</li>
+              <li className="flex items-center gap-2">
+                <Instagram size={16} className="text-secondary" />
+                <a 
+                  href={settings?.instagram || "https://instagram.com/lencoisexperience"} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-secondary transition-colors"
+                >
+                  {settings?.instagram ? (settings.instagram.split('/').filter(Boolean).pop()?.startsWith('@') ? settings.instagram.split('/').filter(Boolean).pop() : `@${settings.instagram.split('/').filter(Boolean).pop()}`) : "@lencoisexperience"}
+                </a>
+              </li>
             </ul>
 
             <div className="mt-6">

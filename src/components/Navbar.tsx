@@ -10,7 +10,7 @@ const Navbar = () => {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const { t } = useTranslation();
-  const { settings } = useSiteSettings();
+  const { site: settings, empresa } = useSiteSettings();
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 ${isHome ? "bg-foreground/10" : "bg-card/95 shadow-sm"} backdrop-blur-md border-b ${isHome ? "border-white/10" : "border-border"}`}>
@@ -23,7 +23,7 @@ const Navbar = () => {
               className="h-10 md:h-12 w-auto object-contain"
             />
           ) : (
-            <>Lençóis<span className="text-secondary">Tour</span></>
+            <>{empresa?.nome ? empresa.nome : <>Lençóis<span className="text-secondary">Tour</span></>}</>
           )}
         </Link>
 
