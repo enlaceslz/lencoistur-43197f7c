@@ -101,7 +101,7 @@ const AdminDashboard = () => {
 
     const stats = [
       { label: "Reservas Hoje", value: String(todayBookings.length), change: `${todayBookings.length}`, up: todayBookings.length > 0, icon: Calendar, path: "/admin/reservas" },
-      { label: "Receita Paga (Mês)", value: fmt(thisRevenue), change: `${Number(revChange) >= 0 ? "+" : ""}${revChange}%`, up: Number(revChange) >= 0, icon: DollarSign, path: "/admin/financeiro" },
+      { label: "Receita Confirmada (Mês)", value: fmt(thisRevenue), change: `${Number(revChange) >= 0 ? "+" : ""}${revChange}%`, up: Number(revChange) >= 0, icon: DollarSign, path: "/admin/financeiro" },
       { label: "Conformidade SGS", value: String(sgsStats.criticalRisks === 0 ? "100%" : "Risco"), change: `${sgsStats.pendingActions} alertas`, up: sgsStats.criticalRisks === 0, icon: ShieldAlert, isSgs: true, path: "/admin/sgs" },
       { label: "LTV da Base", value: customerCount > 0 ? fmt(bookings.reduce((s, b) => s + (b.status !== 'cancelada' ? b.final_total : 0), 0) / customerCount) : "R$ 0", change: `${customerCount} clientes`, up: true, icon: Users, path: "/admin/crm" },
     ];
@@ -276,7 +276,7 @@ const AdminDashboard = () => {
                     <th className="text-left py-3 px-2 font-bold uppercase text-[10px] tracking-widest">Cliente</th>
                     <th className="text-left py-3 px-2 font-bold uppercase text-[10px] tracking-widest">Passeio</th>
                     <th className="text-left py-3 px-2 font-bold uppercase text-[10px] tracking-widest text-center">Data</th>
-                    <th className="text-right py-3 px-2 font-bold uppercase text-[10px] tracking-widest">Total</th>
+                    <th className="text-right py-3 px-2 font-bold uppercase text-[10px] tracking-widest">Valor</th>
                     <th className="text-right py-3 px-4 font-bold uppercase text-[10px] tracking-widest">Status</th>
                   </tr>
                 </thead>
