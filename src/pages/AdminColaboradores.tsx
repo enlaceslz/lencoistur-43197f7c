@@ -542,31 +542,31 @@ const AdminColaboradores = () => {
           )}
         </div>
       ) : (
-        <Card>
+        <Card className="border-none shadow-xl bg-white/80 backdrop-blur-md rounded-3xl overflow-hidden">
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Colaborador</TableHead>
-                  <TableHead>Contato</TableHead>
-                  <TableHead>Remuneração</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
+              <TableHeader className="bg-slate-50/50">
+                <TableRow className="hover:bg-transparent border-slate-100">
+                  <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6 pl-8">Especialista</TableHead>
+                  <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6">Contato</TableHead>
+                  <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6">Remuneração</TableHead>
+                  <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6">Status</TableHead>
+                  <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6 pr-8 text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtered.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
+                    <TableCell colSpan={5} className="text-center py-20 text-slate-400 font-medium">
                       Nenhum colaborador encontrado.
                     </TableCell>
                   </TableRow>
                 ) : (
                   filtered.map((c) => (
-                    <TableRow key={c.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full overflow-hidden bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
+                    <TableRow key={c.id} className="group hover:bg-slate-50/50 transition-colors border-slate-100">
+                      <TableCell className="py-4 pl-8">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl overflow-hidden bg-slate-100 text-slate-400 flex items-center justify-center font-bold text-sm shadow-inner group-hover:scale-110 transition-transform duration-300">
                             {c.avatar_url ? (
                               <img src={c.avatar_url} alt={c.name} className="w-full h-full object-cover" />
                             ) : (
@@ -574,55 +574,54 @@ const AdminColaboradores = () => {
                             )}
                           </div>
                           <div>
-                            <p className="font-bold text-sm cursor-pointer hover:text-blue-600 transition-colors flex items-center gap-1" onClick={() => openDetails(c)}>
+                            <p className="font-black text-slate-700 group-hover:text-primary transition-colors cursor-pointer" onClick={() => openDetails(c)}>
                               {c.name}
-                              <FileText size={12} className="text-slate-400" />
                             </p>
-                            <div className="flex gap-2">
-                              <Badge variant="outline" className="text-[9px] h-4 px-1 leading-none bg-slate-50">
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <Badge variant="secondary" className="text-[9px] h-4 px-1.5 font-bold uppercase tracking-tighter bg-slate-100 text-slate-500 border-none group-hover:bg-primary group-hover:text-white transition-colors">
                                 {c.type || "Outro"}
                               </Badge>
-                              <p className="text-[10px] text-muted-foreground">{c.document || "S/ Documento"}</p>
+                              <p className="text-[10px] font-mono text-slate-400">{c.document || "S/ Documento"}</p>
                             </div>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="space-y-0.5">
-                          <div className="flex items-center gap-1.5 text-xs">
-                            <Phone size={10} className="text-muted-foreground" /> {c.phone || "—"}
+                      <TableCell className="py-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
+                            <Phone size={12} className="text-slate-300" /> {c.phone || "—"}
                           </div>
-                          <div className="flex items-center gap-1.5 text-xs">
-                            <Mail size={10} className="text-muted-foreground" /> {c.email || "—"}
+                          <div className="flex items-center gap-2 text-[10px] font-medium text-slate-400">
+                            <Mail size={12} className="text-slate-300" /> {c.email || "—"}
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="space-y-0.5">
-                          <p className="text-xs font-medium">{getPaymentTypeLabel(c.payment_type)}</p>
-                          <p className="text-xs text-blue-600 font-bold">
+                      <TableCell className="py-4">
+                        <div className="bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100 inline-block group-hover:border-primary/20 transition-colors">
+                          <p className="text-[9px] font-black text-slate-400 uppercase leading-none mb-1">{getPaymentTypeLabel(c.payment_type)}</p>
+                          <p className="text-sm font-black text-slate-700 leading-none">
                             {c.payment_type === 'commission' ? `${c.payment_value}%` : formatCurrency(c.payment_value)}
                           </p>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant={c.status === 'active' ? 'default' : 'secondary'} className={c.status === 'active' ? 'bg-green-100 text-green-700' : ''}>
+                      <TableCell className="py-4">
+                        <Badge variant={c.status === 'active' ? 'default' : 'secondary'} className={`rounded-full px-3 py-0.5 text-[10px] font-black uppercase tracking-widest ${c.status === 'active' ? 'bg-green-500 text-white shadow-sm' : 'bg-slate-200 text-slate-500'}`}>
                           {c.status === 'active' ? 'Ativo' : 'Inativo'}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" title="Lançar Pagamento" onClick={() => openNewPayment(c)}>
-                            <Banknote size={16} className="text-emerald-600" />
+                      <TableCell className="py-4 pr-8 text-right">
+                        <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-emerald-50 hover:text-emerald-600 transition-all text-slate-400" title="Lançar Pagamento" onClick={() => openNewPayment(c)}>
+                            <Banknote size={16} />
                           </Button>
-                          <Button variant="ghost" size="icon" title="Histórico" onClick={() => openHistory(c)}>
-                            <History size={16} className="text-blue-600" />
+                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all text-slate-400" title="Histórico" onClick={() => openHistory(c)}>
+                            <History size={16} />
                           </Button>
-                          <Button variant="ghost" size="icon" title="Editar" onClick={() => openEdit(c)}>
-                            <Edit size={16} className="text-slate-600" />
+                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-slate-200 transition-all text-slate-400 hover:text-slate-900" title="Editar" onClick={() => openEdit(c)}>
+                            <Edit size={16} />
                           </Button>
-                          <Button variant="ghost" size="icon" title="Excluir" onClick={() => setDeleteId(c.id)}>
-                            <Trash2 size={16} className="text-red-500" />
+                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all text-slate-400" title="Excluir" onClick={() => setDeleteId(c.id)}>
+                            <Trash2 size={16} />
                           </Button>
                         </div>
                       </TableCell>
