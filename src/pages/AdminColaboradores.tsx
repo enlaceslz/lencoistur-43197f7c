@@ -22,8 +22,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { maskCPF, maskPhone, maskCEP } from "@/lib/masks";
-import { formatCurrency } from "@/lib/utils";
+import { maskCPF, maskPhone, maskCEP, maskCurrency, parseCurrencyToNumber } from "@/lib/masks";
+import { formatCurrency, validateCPF } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -129,7 +129,7 @@ const AdminColaboradores = () => {
     setForm({
       name: "", email: "", phone: "", document: "",
       pix_key: "", pix_type: "cpf", status: "active",
-      payment_type: "daily", payment_value: "0", observation: "",
+      payment_type: "daily", payment_value: "R$ 0,00", observation: "",
       type: "Outro", birth_date: "", zip_code: "", address: "",
       cnh: "", cadastur: ""
     });
@@ -141,7 +141,9 @@ const AdminColaboradores = () => {
     setForm({
       name: c.name, email: c.email || "", phone: c.phone || "", document: c.document || "",
       pix_key: c.pix_key || "", pix_type: c.pix_type || "cpf", status: c.status,
-      payment_type: c.payment_type, payment_value: String(c.payment_value), observation: c.observation || "",
+      payment_type: c.payment_type, 
+      payment_value: c.payment_type === 'commission' ? String(c.payment_value) : maskCurrency(String(c.payment_value)), 
+      observation: c.observation || "",
       type: c.type || "Outro", 
       birth_date: c.birth_date || "", 
       zip_code: c.zip_code || "", 
@@ -161,20 +163,44 @@ const AdminColaboradores = () => {
   const openNewPayment = (c: Collaborator) => {
     setSelectedCollab(c);
     setPaymentForm({
-      amount: String(c.payment_value),
+      amount: maskCurrency(String(c.payment_value)),
       description: `Pagamento ${c.payment_type === 'daily' ? 'Diária' : c.payment_type === 'monthly' ? 'Mensal' : 'Serviço'}`,
       due_date: format(new Date(), "yyyy-MM-dd")
     });
     setPaymentDialogOpen(true);
   };
 
+  const handleCepSearch = async (cep: string) => {
+    const cleanCep = cep.replace(/\D/g, "");
+    if (cleanCep.length === 8) {
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+        const data = await response.json();
+        if (!data.erro) {
+          setForm(prev => ({
+            ...prev,
+            address: `${data.logradouro}${data.bairro ? `, ${data.bairro}` : ""}${data.localidade ? ` - ${data.localidade}/${data.uf}` : ""}`
+          }));
+        }
+      } catch (error) {
+        console.error("Erro ao buscar CEP:", error);
+      }
+    }
+  };
+
   const handleSave = async () => {
     if (!form.name) { toast.error("Nome é obrigatório"); return; }
     if (!form.document) { toast.error("CPF é obrigatório"); return; }
+    if (!validateCPF(form.document)) { toast.error("CPF inválido"); return; }
+    
     setSaving(true);
+    const paymentValue = form.payment_type === 'commission' 
+      ? Number(form.payment_value.replace(",", ".")) 
+      : parseCurrencyToNumber(form.payment_value);
+
     const payload = {
       ...form,
-      payment_value: Number(form.payment_value),
+      payment_value: paymentValue,
       birth_date: form.birth_date || null
     };
 
@@ -194,9 +220,10 @@ const AdminColaboradores = () => {
   const handleSavePayment = async () => {
     if (!selectedCollab) return;
     setSaving(true);
+    const amount = parseCurrencyToNumber(paymentForm.amount);
     const payload = {
       collaborator_id: selectedCollab.id,
-      amount: Number(paymentForm.amount),
+      amount: amount,
       description: paymentForm.description,
       due_date: paymentForm.due_date,
       status: 'pending'
@@ -211,7 +238,7 @@ const AdminColaboradores = () => {
       // Then, launch into financial (contas_pagar)
       const { error: finError } = await supabase.from("contas_pagar").insert({
         descricao: `Colaborador: ${selectedCollab.name} - ${paymentForm.description}`,
-        valor: Number(paymentForm.amount),
+        valor: parseCurrencyToNumber(paymentForm.amount),
         vencimento: paymentForm.due_date,
         categoria: "Mão de Obra",
         status: "pendente"
@@ -527,7 +554,11 @@ const AdminColaboradores = () => {
               <Label>CEP</Label>
               <Input 
                 value={form.zip_code} 
-                onChange={(e) => setForm({...form, zip_code: maskCEP(e.target.value)})} 
+                onChange={(e) => {
+                  const masked = maskCEP(e.target.value);
+                  setForm({...form, zip_code: masked});
+                  if (masked.length === 9) handleCepSearch(masked);
+                }} 
                 placeholder="00000-000"
               />
             </div>
@@ -559,7 +590,17 @@ const AdminColaboradores = () => {
             </div>
             <div className="space-y-2">
               <Label>Valor Base (R$ ou %)</Label>
-              <Input type="number" value={form.payment_value} onChange={(e) => setForm({...form, payment_value: e.target.value})} />
+              <Input 
+                value={form.payment_value} 
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (form.payment_type === 'commission') {
+                    setForm({...form, payment_value: val.replace(/[^0-9,.]/g, '')});
+                  } else {
+                    setForm({...form, payment_value: maskCurrency(val)});
+                  }
+                }} 
+              />
             </div>
             <div className="space-y-2">
               <Label>Chave PIX</Label>
@@ -644,7 +685,10 @@ const AdminColaboradores = () => {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label>Valor do Pagamento</Label>
-              <Input type="number" value={paymentForm.amount} onChange={(e) => setPaymentForm({...paymentForm, amount: e.target.value})} />
+              <Input 
+                value={paymentForm.amount} 
+                onChange={(e) => setPaymentForm({...paymentForm, amount: maskCurrency(e.target.value)})} 
+              />
             </div>
             <div className="space-y-2">
               <Label>Descrição / Referência</Label>

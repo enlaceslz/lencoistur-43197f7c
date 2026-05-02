@@ -47,3 +47,17 @@ export const maskCEP = (value: string) => {
     .replace(/(\d{5})(\d)/, "$1-$2")
     .replace(/(-\d{3})\d+?$/, "$1");
 };
+
+export const maskCurrency = (value: string) => {
+  const digits = value.replace(/\D/g, "");
+  const numberValue = Number(digits) / 100;
+  return numberValue.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+};
+
+export const parseCurrencyToNumber = (value: string) => {
+  const digits = value.replace(/\D/g, "");
+  return Number(digits); // Returns value in cents
+};
