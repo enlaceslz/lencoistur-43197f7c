@@ -253,6 +253,8 @@ export function useBookings() {
             status: "pendente",
             categoria: "comissão",
             fornecedor: collab.name,
+            booking_id: booking.id,
+            collaborator_id: collab.id,
             observacoes: `Gerado automaticamente na conclusão da reserva ${booking.booking_code}`
           });
         }
@@ -270,6 +272,7 @@ export function useBookings() {
           status: "pendente",
           categoria: "operacional",
           fornecedor: "Operação Interna",
+          booking_id: booking.id,
           observacoes: `Gerado automaticamente na conclusão da reserva ${booking.booking_code}`
         });
 

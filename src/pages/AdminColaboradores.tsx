@@ -279,7 +279,8 @@ const AdminColaboradores = () => {
         valor: parseCurrencyToNumber(paymentForm.amount),
         vencimento: paymentForm.due_date,
         categoria: "Mão de Obra",
-        status: "pendente"
+        status: "pendente",
+        collaborator_id: selectedCollab.id
       });
 
       if (finError) toast.error("Erro ao integrar com financeiro");
