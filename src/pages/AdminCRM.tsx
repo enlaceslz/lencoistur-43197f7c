@@ -869,12 +869,13 @@ const AdminCRMContent = () => {
             </div>
 
             <div className="bg-card border border-border rounded-2xl p-6 overflow-hidden">
-              <div className="text-center py-12 text-muted-foreground">
-                <Users className="mx-auto mb-3 opacity-40" size={40} />
-                <p className="font-medium">Nenhum {filter === "dependents" ? "dependente" : "cliente"} encontrado</p>
-                <p className="text-sm mt-1">Clique em "Novo Cliente" para cadastrar.</p>
-              </div>
-            ) : (
+              {(filter === "dependents" ? filteredDependents : filtered).length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Users className="mx-auto mb-3 opacity-40" size={40} />
+                  <p className="font-medium">Nenhum {filter === "dependents" ? "dependente" : "cliente"} encontrado</p>
+                  <p className="text-sm mt-1">Clique em "Novo Cliente" para cadastrar.</p>
+                </div>
+              ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -1047,7 +1048,7 @@ const AdminCRMContent = () => {
                   <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{(filter === "dependents" ? filteredDependents : filtered).length} registro(s)</p>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
