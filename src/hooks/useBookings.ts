@@ -214,21 +214,65 @@ export function useBookings() {
     
     if (updateError) throw updateError;
 
-    // Se houver um parceiro/motorista vinculado (futuro), aqui geraria a comissão no Contas a Pagar.
-    // Por enquanto, vamos registrar o custo operacional estimado para fins de DRE
-    const { error: costError } = await supabase
-      .from("contas_pagar")
-      .insert({
-        descricao: `Custo Operacional: ${booking.item_name} (Reserva ${booking.booking_code})`,
-        valor: Math.round(booking.final_total * 0.4), // Estimativa de 40% de custo operacional
-        vencimento: new Date().toISOString().slice(0, 10),
-        status: "pendente",
-        categoria: "operacional",
-        fornecedor: "Operação Interna",
-        observacoes: `Gerado automaticamente na conclusão da reserva ${booking.booking_code}`
-      });
+    // Se houver um colaborador vinculado, gerar a comissão/pagamento
+    if (booking.collaborator_id) {
+      const { data: collab } = await supabase
+        .from("collaborators")
+        .select("*")
+        .eq("id", booking.collaborator_id)
+        .single();
 
-    if (costError) console.error("Erro ao gerar custo operacional:", costError);
+      if (collab) {
+        let commissionAmount = 0;
+        if (collab.payment_type === "commission") {
+          commissionAmount = Math.round((booking.final_total * collab.payment_value) / 100);
+        } else if (collab.payment_type === "per_tour" || collab.payment_type === "daily") {
+          commissionAmount = collab.payment_value * 100; // converter para centavos
+        }
+
+        if (commissionAmount > 0) {
+          const description = `Comissão/Pagamento: ${booking.item_name} (Reserva ${booking.booking_code})`;
+          
+          // Registrar no histórico de pagamentos do colaborador
+          await supabase.from("collaborator_payments").insert({
+            collaborator_id: collab.id,
+            booking_id: booking.id,
+            amount: commissionAmount / 100,
+            description,
+            due_date: new Date().toISOString().slice(0, 10),
+            status: "pending"
+          });
+
+          // Registrar no financeiro (Contas a Pagar)
+          await supabase.from("contas_pagar").insert({
+            descricao: `Colaborador: ${collab.name} - ${description}`,
+            valor: commissionAmount / 100,
+            vencimento: new Date().toISOString().slice(0, 10),
+            status: "pendente",
+            categoria: "comissão",
+            fornecedor: collab.name,
+            observacoes: `Gerado automaticamente na conclusão da reserva ${booking.booking_code}`
+          });
+        }
+      }
+    }
+
+    // Registrar o custo operacional base se não houver colaborador (ou adicionalmente)
+    if (!booking.collaborator_id) {
+      const { error: costError } = await supabase
+        .from("contas_pagar")
+        .insert({
+          descricao: `Custo Operacional: ${booking.item_name} (Reserva ${booking.booking_code})`,
+          valor: Math.round(booking.final_total * 0.4) / 100, // Estimativa de 40% de custo operacional
+          vencimento: new Date().toISOString().slice(0, 10),
+          status: "pendente",
+          categoria: "operacional",
+          fornecedor: "Operação Interna",
+          observacoes: `Gerado automaticamente na conclusão da reserva ${booking.booking_code}`
+        });
+
+      if (costError) console.error("Erro ao gerar custo operacional:", costError);
+    }
   }, []);
 
   const updateBookingNotes = useCallback(async (id: string, notes: string) => {
