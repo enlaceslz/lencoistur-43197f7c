@@ -1032,9 +1032,6 @@ const AdminConfig = () => {
             </CardContent>
           </Card>
         </TabsContent>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         {/* BACKUP & RESTAURAÇÃO */}
         <TabsContent value="backup">
