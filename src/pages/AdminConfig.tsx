@@ -434,6 +434,80 @@ const AdminConfig = () => {
       }
 
       if (errors > 0) {
+        toast.error(`Restauração concluída com ${errors} erros. ${restored} registros restaurados.`);
+      } else {
+        toast.success(`Sistema restaurado com sucesso! ${restored} registros importados.`);
+        loadSettings();
+        loadUsers();
+      }
+    } catch (err) {
+      toast.error("Erro ao processar arquivo de backup: " + (err instanceof Error ? err.message : "Erro desconhecido"));
+    } finally {
+      setRestoreLoading(false);
+      if (e.target) e.target.value = "";
+    }
+  };
+
+  const handleAddUser = async () => {
+    if (!newUser.full_name || !newUser.email || !newUser.password) {
+      toast.error("Preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const { data, error } = await supabase
+        .from("user_management")
+        .insert([{
+          full_name: newUser.full_name,
+          email: newUser.email,
+          role: newUser.role,
+          status: 'ativo'
+        }]);
+
+      if (error) throw error;
+
+      toast.success("Usuário registrado com sucesso!");
+      setIsAddingUser(false);
+      setNewUser({ full_name: "", email: "", role: "operador", password: "" });
+      loadUsers();
+    } catch (err: any) {
+      toast.error("Erro ao adicionar usuário: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleUpdateUserStatus = async (userId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'ativo' ? 'inativo' : 'ativo';
+    try {
+      const { error } = await supabase
+        .from("user_management")
+        .update({ status: newStatus })
+        .eq("id", userId);
+      
+      if (error) throw error;
+      toast.success(`Usuário ${newStatus === 'ativo' ? 'ativado' : 'desativado'} com sucesso.`);
+      loadUsers();
+    } catch (err: any) {
+      toast.error("Erro ao atualizar status: " + err.message);
+    }
+  };
+
+  const handleUpdateUserRole = async (userId: string, newRole: string) => {
+    try {
+      const { error } = await supabase
+        .from("user_management")
+        .update({ role: newRole })
+        .eq("id", userId);
+      
+      if (error) throw error;
+      toast.success(`Hierarquia atualizada para ${newRole}.`);
+      loadUsers();
+    } catch (err: any) {
+      toast.error("Erro ao atualizar cargo: " + err.message);
+    }
+  };
         toast.warning(`Restauração parcial: ${restored} registros restaurados com ${errors} erro(s). Verifique o console.`);
       } else {
         toast.success(`Restauração completa! ${restored} registros restaurados com sucesso.`);
