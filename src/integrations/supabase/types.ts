@@ -133,6 +133,105 @@ export type Database = {
           },
         ]
       }
+      collaborator_payments: {
+        Row: {
+          amount: number
+          booking_id: string | null
+          collaborator_id: string | null
+          created_at: string
+          description: string | null
+          due_date: string
+          id: string
+          paid_at: string | null
+          status: string
+        }
+        Insert: {
+          amount: number
+          booking_id?: string | null
+          collaborator_id?: string | null
+          created_at?: string
+          description?: string | null
+          due_date: string
+          id?: string
+          paid_at?: string | null
+          status?: string
+        }
+        Update: {
+          amount?: number
+          booking_id?: string | null
+          collaborator_id?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string
+          id?: string
+          paid_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collaborator_payments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collaborator_payments_collaborator_id_fkey"
+            columns: ["collaborator_id"]
+            isOneToOne: false
+            referencedRelation: "collaborators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collaborators: {
+        Row: {
+          created_at: string
+          document: string | null
+          email: string | null
+          id: string
+          name: string
+          observation: string | null
+          payment_type: string
+          payment_value: number
+          phone: string | null
+          pix_key: string | null
+          pix_type: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          document?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          observation?: string | null
+          payment_type: string
+          payment_value?: number
+          phone?: string | null
+          pix_key?: string | null
+          pix_type?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          document?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          observation?: string | null
+          payment_type?: string
+          payment_value?: number
+          phone?: string | null
+          pix_key?: string | null
+          pix_type?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contas_pagar: {
         Row: {
           categoria: string
