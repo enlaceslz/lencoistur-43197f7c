@@ -1023,6 +1023,17 @@ const AdminConfig = () => {
                   </div>
                 ))}
               </div>
+
+              <div className="flex justify-end pt-8 border-t border-border mt-8">
+                <Button 
+                  onClick={() => saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações")} 
+                  disabled={saving} 
+                  className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 bg-amber-600 hover:bg-amber-700 text-white transition-all active:scale-95 flex items-center gap-2"
+                >
+                  {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                  Salvar Preferências de Alerta
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
