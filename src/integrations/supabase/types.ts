@@ -47,6 +47,7 @@ export type Database = {
       bookings: {
         Row: {
           booking_code: string
+          collaborator_id: string | null
           created_at: string
           customer_id: string
           date: string | null
@@ -73,6 +74,7 @@ export type Database = {
         }
         Insert: {
           booking_code: string
+          collaborator_id?: string | null
           created_at?: string
           customer_id: string
           date?: string | null
@@ -99,6 +101,7 @@ export type Database = {
         }
         Update: {
           booking_code?: string
+          collaborator_id?: string | null
           created_at?: string
           customer_id?: string
           date?: string | null
@@ -124,6 +127,13 @@ export type Database = {
           voucher_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "bookings_collaborator_id_fkey"
+            columns: ["collaborator_id"]
+            isOneToOne: false
+            referencedRelation: "collaborators"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "bookings_customer_id_fkey"
             columns: ["customer_id"]
