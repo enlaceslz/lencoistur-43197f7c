@@ -411,7 +411,10 @@ const AdminColaboradores = () => {
                       )}
                     </div>
                     <div>
-                      <h3 className="font-bold text-slate-900 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => openDetails(c)}>{c.name}</h3>
+                      <h3 className="font-bold text-slate-900 cursor-pointer hover:text-blue-600 transition-colors flex items-center gap-1.5" onClick={() => openDetails(c)}>
+                        {c.name}
+                        <FileText size={14} className="text-slate-400" />
+                      </h3>
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary" className="text-[10px] h-4">
                           {c.type || "Outro"}
@@ -497,7 +500,10 @@ const AdminColaboradores = () => {
                             )}
                           </div>
                           <div>
-                            <p className="font-bold text-sm cursor-pointer hover:text-blue-600 transition-colors" onClick={() => openDetails(c)}>{c.name}</p>
+                            <p className="font-bold text-sm cursor-pointer hover:text-blue-600 transition-colors flex items-center gap-1" onClick={() => openDetails(c)}>
+                              {c.name}
+                              <FileText size={12} className="text-slate-400" />
+                            </p>
                             <div className="flex gap-2">
                               <Badge variant="outline" className="text-[9px] h-4 px-1 leading-none bg-slate-50">
                                 {c.type || "Outro"}
