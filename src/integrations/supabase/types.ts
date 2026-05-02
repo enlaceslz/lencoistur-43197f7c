@@ -59,6 +59,7 @@ export type Database = {
           invoice_number: string | null
           invoice_url: string | null
           item_name: string
+          marketing_campaign_id: string | null
           notes: string | null
           pay_method: string
           payment_status: string
@@ -86,6 +87,7 @@ export type Database = {
           invoice_number?: string | null
           invoice_url?: string | null
           item_name: string
+          marketing_campaign_id?: string | null
           notes?: string | null
           pay_method: string
           payment_status?: string
@@ -113,6 +115,7 @@ export type Database = {
           invoice_number?: string | null
           invoice_url?: string | null
           item_name?: string
+          marketing_campaign_id?: string | null
           notes?: string | null
           pay_method?: string
           payment_status?: string
@@ -139,6 +142,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_marketing_campaign_id_fkey"
+            columns: ["marketing_campaign_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_campaigns"
             referencedColumns: ["id"]
           },
           {
@@ -687,6 +697,7 @@ export type Database = {
       }
       marketing_leads: {
         Row: {
+          converted_customer_id: string | null
           created_at: string
           email: string | null
           id: string
@@ -700,6 +711,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          converted_customer_id?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -713,6 +725,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          converted_customer_id?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -725,7 +738,15 @@ export type Database = {
           status?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "marketing_leads_converted_customer_id_fkey"
+            columns: ["converted_customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       partner_types: {
         Row: {
@@ -956,6 +977,7 @@ export type Database = {
         Row: {
           audit_code: string
           auditor: string
+          auditor_id: string | null
           created_at: string
           date: string
           id: string
@@ -968,6 +990,7 @@ export type Database = {
         Insert: {
           audit_code: string
           auditor: string
+          auditor_id?: string | null
           created_at?: string
           date?: string
           id?: string
@@ -980,6 +1003,7 @@ export type Database = {
         Update: {
           audit_code?: string
           auditor?: string
+          auditor_id?: string | null
           created_at?: string
           date?: string
           id?: string
@@ -989,7 +1013,15 @@ export type Database = {
           status?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sgs_audits_auditor_id_fkey"
+            columns: ["auditor_id"]
+            isOneToOne: false
+            referencedRelation: "collaborators"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sgs_briefings: {
         Row: {
@@ -1097,6 +1129,7 @@ export type Database = {
       }
       sgs_checklists: {
         Row: {
+          booking_id: string | null
           condutor_id: string | null
           created_at: string
           data: string
@@ -1110,6 +1143,7 @@ export type Database = {
           veiculo_id: string | null
         }
         Insert: {
+          booking_id?: string | null
           condutor_id?: string | null
           created_at?: string
           data?: string
@@ -1123,6 +1157,7 @@ export type Database = {
           veiculo_id?: string | null
         }
         Update: {
+          booking_id?: string | null
           condutor_id?: string | null
           created_at?: string
           data?: string
@@ -1136,6 +1171,27 @@ export type Database = {
           veiculo_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_sgs_checklists_condutor"
+            columns: ["condutor_id"]
+            isOneToOne: false
+            referencedRelation: "sgs_condutores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_sgs_checklists_veiculo"
+            columns: ["veiculo_id"]
+            isOneToOne: false
+            referencedRelation: "sgs_veiculos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sgs_checklists_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sgs_checklists_condutor_id_fkey"
             columns: ["condutor_id"]
