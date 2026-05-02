@@ -975,23 +975,6 @@ const AdminConfig = () => {
                   </div>
                 ))}
               </div>
-              <div className="mt-10 pt-6 border-t border-border flex justify-end">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      onClick={() => saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações")} 
-                      disabled={saving} 
-                      className="rounded-xl px-10 h-12 font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 bg-amber-600 hover:bg-amber-700 text-white transition-all active:scale-95"
-                    >
-                      {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
-                      Atualizar Alertas
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Salvar configurações de notificações</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -1000,14 +983,27 @@ const AdminConfig = () => {
         <TabsContent value="seguranca">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
             <CardContent className="p-8 space-y-8">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-2xl bg-slate-500/10 text-slate-600">
-                  <Shield size={32} />
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-2xl bg-slate-500/10 text-slate-600">
+                    <Shield size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-foreground">Acesso e Segurança</h3>
+                    <p className="text-sm text-muted-foreground">Gestão de credenciais do painel administrativo.</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-black text-foreground">Acesso e Segurança</h3>
-                  <p className="text-sm text-muted-foreground">Gestão de credenciais do painel administrativo.</p>
-                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button onClick={handleChangePassword} disabled={changingPassword} className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-slate-500/20 bg-slate-700 hover:bg-slate-800 text-white">
+                      {changingPassword ? <Loader2 size={16} className="animate-spin mr-2" /> : <Shield size={16} className="mr-2" />}
+                      Salvar Senha
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Salvar nova senha de acesso</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
 
               <div className="space-y-6">
