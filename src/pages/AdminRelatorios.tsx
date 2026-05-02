@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import {
   BarChart3, Download, TrendingUp, Users, ShoppingCart, Shield,
-  CreditCard, Calendar, Filter, Printer, PieChart, Activity, MapPin, Mail, Phone
+  CreditCard, Calendar, Filter, Printer, PieChart, Activity, MapPin, Mail, Phone, UserPlus
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer,
