@@ -464,7 +464,7 @@ const AdminConfig = () => {
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+                  <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600">
                     <Building2 size={32} />
                   </div>
                   <div>
