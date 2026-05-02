@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, RefreshCw, Trash2, Plus } from "lucide-react";
+import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, RefreshCw, Trash2, Plus, Users, UserPlus, ShieldCheck, Mail, Lock, Key } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -112,6 +112,10 @@ const AdminConfig = () => {
   const [backupLoading, setBackupLoading] = useState(false);
   const [restoreLoading, setRestoreLoading] = useState(false);
   const [backupHistory, setBackupHistory] = useState<Array<{ date: string; tables: number; records: number; size: string }>>([]);
+  const [systemUsers, setSystemUsers] = useState<any[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [isAddingUser, setIsAddingUser] = useState(false);
+  const [newUser, setNewUser] = useState({ full_name: "", email: "", role: "operador", password: "" });
 
   const loadSettings = useCallback(async () => {
     setLoading(true);
@@ -161,7 +165,27 @@ const AdminConfig = () => {
     }
   }, []);
 
-  useEffect(() => { loadSettings(); }, [loadSettings]);
+  const loadUsers = useCallback(async () => {
+    setUsersLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("user_management")
+        .select("*")
+        .order("created_at", { ascending: false });
+      
+      if (error) throw error;
+      setSystemUsers(data || []);
+    } catch (err) {
+      console.error("Error loading users:", err);
+    } finally {
+      setUsersLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { 
+    loadSettings(); 
+    loadUsers();
+  }, [loadSettings, loadUsers]);
 
   const saveSetting = async (key: string, value: Record<string, unknown>, label: string) => {
     setSaving(true);
