@@ -383,7 +383,10 @@ const AdminColaboradores = () => {
         {collabTypes.map((t) => (
           <Card key={t.id} className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setSearch(t.name)}>
             <CardContent className="p-5 flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+              <div 
+                className="p-3 rounded-xl"
+                style={{ backgroundColor: `${t.color}20`, color: t.color }}
+              >
                 <Users size={22} />
               </div>
               <div>
@@ -395,7 +398,7 @@ const AdminColaboradores = () => {
         ))}
       </div>
 
-      <Card className="mb-6">
+      <Card className="mb-6 border-none shadow-sm bg-muted/30">
         <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
@@ -403,35 +406,41 @@ const AdminColaboradores = () => {
               placeholder="Buscar por nome, e-mail ou documento..." 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
-              className="pl-10 h-10" 
+              className="pl-10 h-10 bg-background border-border/50" 
             />
           </div>
           <div className="flex gap-2 flex-wrap">
-            <Button variant={!search ? "default" : "outline"} size="sm" onClick={() => setSearch("")}>
+            <Button variant={!search ? "default" : "outline"} size="sm" onClick={() => setSearch("")} className="rounded-full px-4">
               Todos
             </Button>
             {collabTypes.map((t) => (
-              <Button key={t.id} variant={search === t.name ? "default" : "outline"} size="sm" onClick={() => setSearch(t.name)}>
+              <Button 
+                key={t.id} 
+                variant={search === t.name ? "default" : "outline"} 
+                size="sm" 
+                onClick={() => setSearch(t.name)}
+                className="rounded-full px-4"
+              >
                 {t.name}
               </Button>
             ))}
           </div>
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+          <div className="flex items-center gap-1 bg-background/50 border border-border/50 p-1 rounded-full shadow-inner">
             <Button 
               variant={viewMode === 'cards' ? 'secondary' : 'ghost'} 
               size="sm" 
               onClick={() => setViewMode('cards')}
-              className={`h-8 ${viewMode === 'cards' ? 'bg-white shadow-sm' : ''}`}
+              className={`h-8 w-8 p-0 rounded-full ${viewMode === 'cards' ? 'bg-primary text-primary-foreground shadow-md' : ''}`}
             >
-              <LayoutGrid size={14} className="mr-1.5" /> Cards
+              <LayoutGrid size={14} />
             </Button>
             <Button 
               variant={viewMode === 'table' ? 'secondary' : 'ghost'} 
               size="sm" 
               onClick={() => setViewMode('table')}
-              className={`h-8 ${viewMode === 'table' ? 'bg-white shadow-sm' : ''}`}
+              className={`h-8 w-8 p-0 rounded-full ${viewMode === 'table' ? 'bg-primary text-primary-foreground shadow-md' : ''}`}
             >
-              <List size={14} className="mr-1.5" /> Tabela
+              <List size={14} />
             </Button>
           </div>
         </CardContent>
