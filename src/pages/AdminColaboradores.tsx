@@ -225,7 +225,7 @@ const AdminColaboradores = () => {
     }
   };
 
-    if (!form.name) { toast.error("Nome é obrigatório"); return; }
+    const handleSave = async () => {
     if (!form.document) { toast.error("CPF é obrigatório"); return; }
     if (!validateCPF(form.document)) { toast.error("CPF inválido"); return; }
     
