@@ -157,7 +157,7 @@ const AdminReservas = () => {
     setNewForm({
       type: "tour", tourMode: "coletivo", itemName: "", date: "", guests: 2, payMethod: "pix",
       customerName: "", customerEmail: "", customerPhone: "",
-      cpf: "", passport: "", country: "Brasil", birthDate: "", notes: ""
+      cpf: "", passport: "", country: "Brasil", birthDate: "", notes: "", collaboratorId: ""
     });
     setSelectedCustomerId("");
     setCustomerSearch("");
