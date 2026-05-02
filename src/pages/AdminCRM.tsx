@@ -83,6 +83,7 @@ const maskCEP = (v: string) => {
   return n;
 };
 
+const maskPhone = (v: string) => {
   const n = v.replace(/\D/g, "");
   if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
   if (n.length === 11) return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
@@ -1477,7 +1478,7 @@ const AdminCRMContent = () => {
                       maxLength={form.country === \"Brasil\" ? 9 : undefined}
                       className=\"rounded-xl\"
                     />
-                    {fetchingCep && <Loader2 size={16} className="animate-spin self-center" />}
+                    {fetchingCep && <Loader2 size={16} className=\"animate-spin self-center\" />}
                   </div>
                 </div>
                 <div className="md:col-span-2">
