@@ -603,8 +603,32 @@ const AdminColaboradores = () => {
               />
             </div>
             <div className="space-y-2">
+              <Label>Tipo de Chave PIX</Label>
+              <Select value={form.pix_type} onValueChange={(v: any) => setForm({...form, pix_type: v})}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cpf">CPF</SelectItem>
+                  <SelectItem value="cnpj">CNPJ</SelectItem>
+                  <SelectItem value="email">E-mail</SelectItem>
+                  <SelectItem value="phone">Telefone</SelectItem>
+                  <SelectItem value="random">Chave Aleatória</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label>Chave PIX</Label>
-              <Input value={form.pix_key} onChange={(e) => setForm({...form, pix_key: e.target.value})} />
+              <Input 
+                value={form.pix_key} 
+                onChange={(e) => {
+                  let val = e.target.value;
+                  if (form.pix_type === 'cpf') val = maskCPF(val);
+                  else if (form.pix_type === 'phone') val = maskPhone(val);
+                  setForm({...form, pix_key: val});
+                }} 
+                placeholder={form.pix_type === 'cpf' ? "000.000.000-00" : form.pix_type === 'phone' ? "(00) 00000-0000" : "Digite a chave"}
+              />
             </div>
             <div className="space-y-2">
               <Label>Status</Label>
