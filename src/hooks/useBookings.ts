@@ -30,6 +30,7 @@ export interface BookingItem {
   voucherUrl?: string;
   collaboratorId?: string;
   collaboratorName?: string;
+  partnerId?: string;
 }
 
 function generateBookingCode(): string {
@@ -76,6 +77,7 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
     voucherUrl: row.voucher_url || undefined,
     collaboratorId: row.collaborator_id || undefined,
     collaboratorName: row.collaborators?.name || undefined,
+    partnerId: row.partner_id || undefined,
   };
 }
 
@@ -123,6 +125,7 @@ export function useBookings() {
         birthDate?: string;
         notes?: string;
         companions?: { name: string; cpf?: string; birthDate?: string; relationship?: string }[];
+        partnerId?: string;
       }
     ): Promise<BookingItem> => {
       const { data: result, error } = await supabase.functions.invoke("create-booking", {
@@ -141,6 +144,7 @@ export function useBookings() {
           birthDate: data.birthDate,
           notes: data.notes,
           companions: data.companions,
+          partner_id: data.partnerId,
         },
       });
 
@@ -315,9 +319,10 @@ export function useBookings() {
         unit_price: data.unitPrice,
         total: data.total,
         discount: data.discount,
-        final_total: data.finalTotal,
+         final_total: data.finalTotal,
         notes: data.notes,
         collaborator_id: data.collaboratorId || null,
+        partner_id: data.partnerId || null,
       })
       .eq("id", id);
       

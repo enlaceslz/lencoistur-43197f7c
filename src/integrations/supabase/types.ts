@@ -61,6 +61,7 @@ export type Database = {
           item_name: string
           marketing_campaign_id: string | null
           notes: string | null
+          partner_id: string | null
           pay_method: string
           payment_status: string
           pix_code: string | null
@@ -89,6 +90,7 @@ export type Database = {
           item_name: string
           marketing_campaign_id?: string | null
           notes?: string | null
+          partner_id?: string | null
           pay_method: string
           payment_status?: string
           pix_code?: string | null
@@ -117,6 +119,7 @@ export type Database = {
           item_name?: string
           marketing_campaign_id?: string | null
           notes?: string | null
+          partner_id?: string | null
           pay_method?: string
           payment_status?: string
           pix_code?: string | null
@@ -149,6 +152,13 @@ export type Database = {
             columns: ["marketing_campaign_id"]
             isOneToOne: false
             referencedRelation: "marketing_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
             referencedColumns: ["id"]
           },
           {
@@ -315,6 +325,7 @@ export type Database = {
           id: string
           observacoes: string | null
           pago_em: string | null
+          partner_id: string | null
           status: string
           updated_at: string
           valor: number
@@ -330,6 +341,7 @@ export type Database = {
           id?: string
           observacoes?: string | null
           pago_em?: string | null
+          partner_id?: string | null
           status?: string
           updated_at?: string
           valor?: number
@@ -345,6 +357,7 @@ export type Database = {
           id?: string
           observacoes?: string | null
           pago_em?: string | null
+          partner_id?: string | null
           status?: string
           updated_at?: string
           valor?: number
@@ -363,6 +376,13 @@ export type Database = {
             columns: ["collaborator_id"]
             isOneToOne: false
             referencedRelation: "collaborators"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contas_pagar_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
             referencedColumns: ["id"]
           },
         ]
@@ -2310,6 +2330,7 @@ export type Database = {
           images: string[] | null
           includes: string[] | null
           location: string | null
+          main_operator_id: string | null
           mode_collective_enabled: boolean
           mode_private_enabled: boolean
           name: string
@@ -2339,6 +2360,7 @@ export type Database = {
           images?: string[] | null
           includes?: string[] | null
           location?: string | null
+          main_operator_id?: string | null
           mode_collective_enabled?: boolean
           mode_private_enabled?: boolean
           name: string
@@ -2368,6 +2390,7 @@ export type Database = {
           images?: string[] | null
           includes?: string[] | null
           location?: string | null
+          main_operator_id?: string | null
           mode_collective_enabled?: boolean
           mode_private_enabled?: boolean
           name?: string
@@ -2382,7 +2405,15 @@ export type Database = {
           updated_at?: string
           vehicle_capacity?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tours_main_operator_id_fkey"
+            columns: ["main_operator_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transfer_routes: {
         Row: {
@@ -2395,6 +2426,7 @@ export type Database = {
           id: string
           origin: string
           pix_discount: number
+          preferred_partner_id: string | null
           price: number
           seats: number | null
           updated_at: string
@@ -2410,6 +2442,7 @@ export type Database = {
           id?: string
           origin: string
           pix_discount?: number
+          preferred_partner_id?: string | null
           price: number
           seats?: number | null
           updated_at?: string
@@ -2425,12 +2458,21 @@ export type Database = {
           id?: string
           origin?: string
           pix_discount?: number
+          preferred_partner_id?: string | null
           price?: number
           seats?: number | null
           updated_at?: string
           vehicle_type?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "transfer_routes_preferred_partner_id_fkey"
+            columns: ["preferred_partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_management: {
         Row: {

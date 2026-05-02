@@ -151,14 +151,29 @@ const AdminRelatorios = () => {
           bySource: Object.entries(bySource).map(([name, value]) => ({ name, value })),
         });
       } else if (activeTab === "parceiros") {
-        const { data: partners } = await supabase.from("partners").select("*");
-        const p = partners || [];
+        const [partners, bookings] = await Promise.all([
+          supabase.from("partners").select("*"),
+          supabase.from("bookings").select("final_total, partner_id").not("partner_id", "is", null).gte("created_at", since)
+        ]);
+        const p = partners.data || [];
+        const b = bookings.data || [];
+        
         const byType: Record<string, number> = {};
         p.forEach((pt: any) => { byType[pt.type] = (byType[pt.type] || 0) + 1; });
+        
+        const partnerRevenue: Record<string, number> = {};
+        b.forEach((res: any) => {
+          partnerRevenue[res.partner_id] = (partnerRevenue[res.partner_id] || 0) + (res.final_total || 0);
+        });
+
         setData({
           total: p.length,
           active: p.filter((x: any) => x.active).length,
           byType: Object.entries(byType).map(([name, value]) => ({ name, value })),
+          topPartners: p.map(partner => ({
+            name: partner.name,
+            revenue: partnerRevenue[partner.id] || 0
+          })).sort((a, b) => b.revenue - a.revenue).slice(0, 5)
         });
       } else if (activeTab === "usuarios") {
         const { data: users } = await supabase.from("user_management").select("*");
@@ -398,19 +413,34 @@ const AdminRelatorios = () => {
                 </div>
               )}
               {activeTab === "parceiros" && (
-                <div className="col-span-2">
-                  <ChartCard title="Parceiros por Tipo">
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={data.byType}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                        <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
-                        <YAxis fontSize={10} axisLine={false} tickLine={false} />
-                        <ChartTooltip />
-                        <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Quantidade" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </ChartCard>
-                </div>
+                <>
+                  <div className="col-span-1">
+                    <ChartCard title="Parceiros por Tipo">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={data.byType}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                          <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
+                          <YAxis fontSize={10} axisLine={false} tickLine={false} />
+                          <ChartTooltip />
+                          <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Quantidade" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </ChartCard>
+                  </div>
+                  <div className="col-span-1">
+                    <ChartCard title="Receita por Parceiro (Top 5)">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={data.topPartners} layout="vertical" margin={{ left: 20 }}>
+                          <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e5e7eb" />
+                          <XAxis type="number" fontSize={10} tickFormatter={(v) => `R$${v/100}`} />
+                          <YAxis dataKey="name" type="category" fontSize={10} width={80} />
+                          <ChartTooltip formatter={(v: any) => fmt(v)} />
+                          <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </ChartCard>
+                  </div>
+                </>
               )}
               {activeTab === "usuarios" && (
                 <div className="col-span-2">
