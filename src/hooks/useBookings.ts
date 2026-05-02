@@ -85,7 +85,7 @@ export function useBookings() {
     setLoading(true);
     const { data: bookingsData } = await supabase
       .from("bookings")
-      .select("*, customers(*)")
+      .select("*, customers(*), collaborators(name)")
       .order("created_at", { ascending: false });
 
     if (bookingsData) {
