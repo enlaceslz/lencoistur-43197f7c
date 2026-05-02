@@ -10,8 +10,18 @@ export interface SiteSettings {
   logoUrl: string | null;
 }
 
+export interface EmpresaSettings {
+  nome: string;
+  cnpj: string;
+  telefone: string;
+  whatsapp: string;
+  endereco: string;
+  email: string;
+}
+
 export const useSiteSettings = () => {
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [site, setSite] = useState<SiteSettings | null>(null);
+  const [empresa, setEmpresa] = useState<EmpresaSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,13 +29,16 @@ export const useSiteSettings = () => {
       try {
         const { data, error } = await supabase
           .from("site_settings")
-          .select("value")
-          .eq("key", "site")
-          .single();
+          .select("key, value");
 
         if (error) throw error;
-        if (data && data.value) {
-          setSettings(data.value as unknown as SiteSettings);
+        
+        if (data) {
+          const siteData = data.find(s => s.key === "site")?.value as unknown as SiteSettings;
+          const empresaData = data.find(s => s.key === "empresa")?.value as unknown as EmpresaSettings;
+          
+          if (siteData) setSite(siteData);
+          if (empresaData) setEmpresa(empresaData);
         }
       } catch (err) {
         console.error("Error fetching site settings:", err);
@@ -37,5 +50,5 @@ export const useSiteSettings = () => {
     fetchSettings();
   }, []);
 
-  return { settings, loading };
+  return { site, settings: site, empresa, loading };
 };
