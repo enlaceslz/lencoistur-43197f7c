@@ -301,6 +301,12 @@ const AdminRelatorios = () => {
                   <KPICard label="Total Clientes" value={data.total || 0} icon={Users} color="text-primary" />
                 </>
               )}
+              {activeTab === "parceiros" && (
+                <>
+                  <KPICard label="Total Parceiros" value={data.total || 0} icon={UserPlus} color="text-primary" />
+                  <KPICard label="Parceiros Ativos" value={data.active || 0} icon={Activity} color="text-secondary" />
+                </>
+              )}
             </div>
 
             {/* Charts Section */}
