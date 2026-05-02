@@ -770,7 +770,7 @@ const AdminColaboradores = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Data</TableHead>
-                  <TableHead>Descrição</TableHead>
+                  <TableHead>Referência</TableHead>
                   <TableHead>Valor</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
@@ -783,10 +783,19 @@ const AdminColaboradores = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  payments.map((p) => (
+                  payments.map((p: any) => (
                     <TableRow key={p.id}>
                       <TableCell className="text-xs">{format(new Date(p.due_date), "dd/MM/yyyy")}</TableCell>
-                      <TableCell className="text-xs">{p.description}</TableCell>
+                      <TableCell className="text-xs">
+                        <div className="flex flex-col">
+                          <span>{p.description}</span>
+                          {p.bookings?.booking_code && (
+                            <span className="text-[10px] text-primary font-mono font-bold flex items-center gap-1 mt-0.5">
+                              <ExternalLink size={10} /> {p.bookings.booking_code}
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell className="text-xs font-bold">{formatCurrency(p.amount)}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className={p.status === 'paid' ? 'border-green-500 text-green-600' : 'border-amber-500 text-amber-600'}>
