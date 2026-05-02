@@ -818,19 +818,18 @@ const AdminCRMContent = () => {
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Client List */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-card border border-border rounded-2xl p-6">
-              <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                <div className="flex items-center gap-2 flex-1 bg-muted rounded-xl px-4 py-2.5 group focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                  <Search size={16} className="text-muted-foreground group-focus-within:text-primary transition-colors" />
-                  <input
-                    type="text"
-                    placeholder="Buscar por nome, email, telefone ou CPF..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="bg-transparent w-full outline-none text-foreground text-sm placeholder:text-muted-foreground font-medium"
-                  />
-                </div>
+          <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-6">
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+              <div className="flex items-center gap-2 flex-1 bg-muted rounded-xl px-4 py-2.5">
+                <Search size={16} className="text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Buscar por nome, email, telefone ou CPF..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="bg-transparent w-full outline-none text-foreground text-sm placeholder:text-muted-foreground"
+                />
+              </div>
                 <div className="flex gap-2">
                 <Button size="sm" className="rounded-xl" onClick={openCreateModal}>
                   <Plus size={14} /> Novo Cliente
@@ -1048,7 +1047,7 @@ const AdminCRMContent = () => {
                   <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{(filter === "dependents" ? filteredDependents : filtered).length} registro(s)</p>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
 
@@ -1327,7 +1326,6 @@ const AdminCRMContent = () => {
           </div>
         </div>
       </div>
-
       {/* Delete Document Confirmation */}
       <Dialog open={!!deleteDocConfirm} onOpenChange={() => setDeleteDocConfirm(null)}>
         <DialogContent className="sm:max-w-sm">
