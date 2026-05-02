@@ -738,6 +738,68 @@ const AdminColaboradores = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Manage Types Dialog */}
+      <Dialog open={typesDialogOpen} onOpenChange={setTypesDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Gerenciar Tipos de Colaborador</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="flex gap-2">
+              <div className="flex-1 space-y-2">
+                <Label>Novo Tipo</Label>
+                <Input 
+                  placeholder="Ex: Guia, Motorista..." 
+                  value={typeForm.name} 
+                  onChange={(e) => setTypeForm({...typeForm, name: e.target.value})} 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Cor</Label>
+                <Input 
+                  type="color" 
+                  className="w-12 h-10 p-1" 
+                  value={typeForm.color} 
+                  onChange={(e) => setTypeForm({...typeForm, color: e.target.value})} 
+                />
+              </div>
+              <div className="flex items-end">
+                <Button onClick={handleSaveType} disabled={saving} size="icon">
+                  {saving ? <Loader2 className="animate-spin" size={16} /> : <Plus size={16} />}
+                </Button>
+              </div>
+            </div>
+
+            <div className="border rounded-md overflow-hidden">
+              <Table>
+                <TableBody>
+                  {collabTypes.map((t) => (
+                    <TableRow key={t.id}>
+                      <TableCell className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: t.color }} />
+                        <span className="font-medium">{t.name}</span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="icon" onClick={() => deleteType(t.id)}>
+                          <Trash size={14} className="text-red-500" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {collabTypes.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center py-4 text-muted-foreground text-xs">
+                        Nenhum tipo cadastrado.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
