@@ -549,21 +549,23 @@ const AdminConfig = () => {
                     <p className="text-sm text-muted-foreground">Personalize a identidade visual e banners do site público.</p>
                   </div>
                 </div>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
-                      disabled={saving} 
-                      className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95"
-                    >
-                      {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
-                      Publicar Frontend
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Aplicar alterações de aparência no site público</p>
-                  </TooltipContent>
-                </Tooltip>
+                <div className="flex gap-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
+                        disabled={saving} 
+                        className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95"
+                      >
+                        {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
+                        Publicar Frontend
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Aplicar alterações de aparência no site público</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
               </div>
 
               <div className="grid lg:grid-cols-2 gap-10">
@@ -1261,7 +1263,7 @@ const AdminConfig = () => {
       </Tabs>
 
       {/* Floating Save Button for Mobile */}
-      <div className="fixed bottom-6 right-6 lg:hidden z-50">
+      <div className="fixed bottom-6 right-6 lg:hidden z-[60]">
         <Button
           onClick={() => {
             const activeTab = document.querySelector('[data-state="active"][role="tab"]')?.getAttribute('value');
@@ -1274,7 +1276,7 @@ const AdminConfig = () => {
             else toast.info("Selecione uma aba para salvar");
           }}
           disabled={saving}
-          className="w-16 h-16 rounded-full shadow-2xl bg-primary text-white hover:scale-110 active:scale-95 transition-all p-0 flex flex-col items-center justify-center gap-1 border-4 border-background"
+          className="w-16 h-16 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.3)] bg-primary text-white hover:scale-110 active:scale-95 transition-all p-0 flex flex-col items-center justify-center gap-1 border-4 border-background"
         >
           {saving ? <Loader2 size={24} className="animate-spin" /> : (
             <>
