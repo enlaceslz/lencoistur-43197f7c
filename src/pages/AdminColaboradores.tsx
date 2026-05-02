@@ -800,6 +800,7 @@ const AdminColaboradores = () => {
         </DialogContent>
       </Dialog>
 
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir Colaborador?</AlertDialogTitle>
