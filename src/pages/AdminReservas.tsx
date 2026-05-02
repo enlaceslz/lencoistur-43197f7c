@@ -315,12 +315,12 @@ const AdminReservas = () => {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {stats.map((s) => (
-          <Card key={s.label}>
+          <Card key={s.label} className="border-none shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="p-5 flex items-center gap-4">
-              <div className={`p-3 rounded-xl bg-muted ${s.color}`}><s.icon size={22} /></div>
+              <div className={`p-3 rounded-2xl bg-muted/50 ${s.color} ring-1 ring-border/50`}><s.icon size={22} /></div>
               <div>
-                <p className="text-2xl font-bold text-foreground">{s.value}</p>
-                <p className="text-xs text-muted-foreground">{s.label}</p>
+                <p className="text-2xl font-black text-foreground tracking-tight">{s.value}</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{s.label}</p>
               </div>
             </CardContent>
           </Card>
