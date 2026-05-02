@@ -263,6 +263,7 @@ export function useBookings() {
         total: data.total,
         discount: data.discount,
         final_total: data.finalTotal,
+        notes: data.notes,
       })
       .eq("id", id);
       
