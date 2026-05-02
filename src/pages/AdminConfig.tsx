@@ -451,14 +451,31 @@ const AdminConfig = () => {
         <TabsContent value="empresa">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
             <CardContent className="p-8">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="p-3 rounded-2xl bg-primary/10 text-primary">
-                  <Building2 size={32} />
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+                    <Building2 size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-foreground">Identidade da Agência</h3>
+                    <p className="text-sm text-muted-foreground">Dados institucionais utilizados em termos, vouchers e notas.</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-black text-foreground">Identidade da Agência</h3>
-                  <p className="text-sm text-muted-foreground">Dados institucionais utilizados em termos, vouchers e notas.</p>
-                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      onClick={() => saveSetting("empresa", empresa, "Agência")} 
+                      disabled={saving}
+                      className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95"
+                    >
+                      {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save size={18} className="mr-2" />}
+                      Salvar Alterações
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Salvar alterações nas informações da agência</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
