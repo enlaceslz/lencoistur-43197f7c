@@ -1051,6 +1051,7 @@ const AdminCRMContent = () => {
             )}
           </div>
         </div>
+        </div>
 
         <div className="bg-card border border-border rounded-2xl p-6">
             {selectedCustomer ? (
