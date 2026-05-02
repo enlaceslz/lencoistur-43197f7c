@@ -32,7 +32,7 @@ interface Collaborator {
   name: string;
   email: string | null;
   phone: string | null;
-  document: string; // Changed to required
+  document: string;
   pix_key: string | null;
   pix_type: string | null;
   status: 'active' | 'inactive';
@@ -45,6 +45,7 @@ interface Collaborator {
   address: string | null;
   cnh: string | null;
   cadastur: string | null;
+  avatar_url: string | null;
   created_at: string;
 }
 
