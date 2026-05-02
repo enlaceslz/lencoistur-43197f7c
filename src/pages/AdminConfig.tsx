@@ -909,25 +909,6 @@ const AdminConfig = () => {
                 </div>
               </div>
               
-              <div className="mt-6 pt-6 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
-                <p className="text-[10px] text-muted-foreground italic font-medium">
-                  {pagamentos.pix ? "PIX ativado. Certifique-se de que a chave está correta." : "PIX desativado."}
-                </p>
-                <Button
-                  onClick={() => {
-                    if (pagamentos.pix) {
-                      const v = validatePixKey(pagamentos.pixChave, pagamentos.pixTipo);
-                      if (!v.valid) { toast.error("Chave PIX inválida: " + v.message); return; }
-                    }
-                    saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Financeiro");
-                  }}
-                  disabled={saving}
-                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white w-full md:w-auto"
-                >
-                  {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
-                  Atualizar Financeiro
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -936,14 +917,31 @@ const AdminConfig = () => {
         <TabsContent value="notificacoes">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
             <CardContent className="p-8 space-y-8">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-600">
-                  <Bell size={32} />
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-600">
+                    <Bell size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-foreground">Alertas e Notificações</h3>
+                    <p className="text-sm text-muted-foreground">Configure como e quando a agência será avisada.</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-black text-foreground">Alertas e Notificações</h3>
-                  <p className="text-sm text-muted-foreground">Configure como e quando a agência será avisada.</p>
-                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      onClick={() => saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações")} 
+                      disabled={saving} 
+                      className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 bg-amber-600 hover:bg-amber-700 text-white transition-all active:scale-95"
+                    >
+                      {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
+                      Salvar Alertas
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Salvar configurações de notificações</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
 
               <div className="space-y-6">
