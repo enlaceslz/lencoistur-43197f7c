@@ -187,7 +187,7 @@ const AdminDashboard = () => {
     }));
 
     return { stats, revenueData, tourPopularity, recentBookings };
-  }, [bookings, customerCount, currentMonth, currentYear, todayStr]);
+  }, [bookings, expenses, totalExpenses, customerCount, collabCount, sgsStats, currentMonth, currentYear, todayStr]);
 
   if (loading) {
     return (
