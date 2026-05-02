@@ -351,14 +351,18 @@ const AdminColaboradores = () => {
 
   return (
     <AdminLayout title="Colaboradores">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>
-          <p className="text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">{collaborators.length}</span> colaboradores cadastrados · <span className="font-semibold text-green-600">{collaborators.filter(c => c.status === 'active').length}</span> ativos
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Colaboradores</h1>
+          <p className="text-slate-500 font-medium flex items-center gap-2">
+            <Users size={18} className="text-primary" />
+            <span className="font-bold text-slate-900">{collaborators.length}</span> especialistas cadastrados 
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-300 mx-1" />
+            <span className="font-bold text-green-600">{collaborators.filter(c => c.status === 'active').length}</span> prontos para o serviço
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="rounded-full h-9 border-slate-200" onClick={() => {
+        <div className="flex flex-wrap gap-3">
+          <Button variant="outline" size="sm" className="rounded-2xl h-12 px-6 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm" onClick={() => {
             const header = "Nome,Email,Telefone,Documento,Tipo,Status,Remuneração\n";
             const rows = filtered.map(c => `"${c.name}","${c.email || ''}","${c.phone || ''}","${c.document}","${c.type}","${c.status}","${getPaymentTypeLabel(c.payment_type)}: ${formatCurrency(c.payment_value)}"`).join("\n");
             const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
@@ -368,13 +372,13 @@ const AdminColaboradores = () => {
             a.download = `colaboradores_${new Date().toISOString().slice(0, 10)}.csv`;
             a.click();
           }}>
-            <Download size={16} className="mr-1.5" /> Exportar CSV
+            <Download size={18} className="mr-2" /> Exportar
           </Button>
-          <Button variant="outline" size="sm" className="rounded-full h-9 border-slate-200" onClick={() => setTypesDialogOpen(true)}>
-            <Settings2 size={16} className="mr-1.5" /> Gerenciar Tipos
+          <Button variant="outline" size="sm" className="rounded-2xl h-12 px-6 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm" onClick={() => setTypesDialogOpen(true)}>
+            <Settings2 size={18} className="mr-2" /> Categorias
           </Button>
-          <Button onClick={openNew} size="sm" className="rounded-full h-9 px-5 bg-primary hover:bg-primary/90 shadow-md transition-all">
-            <Plus size={16} className="mr-1.5" /> Novo Colaborador
+          <Button onClick={openNew} size="sm" className="rounded-2xl h-12 px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white hover:scale-105 active:scale-95">
+            <Plus size={20} className="mr-2" /> Novo Especialista
           </Button>
         </div>
       </div>
