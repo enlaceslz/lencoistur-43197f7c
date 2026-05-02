@@ -1029,19 +1029,9 @@ const AdminConfig = () => {
                 {novaSenha && novaSenha.length < 8 && <p className="text-xs text-destructive">A senha deve ter pelo menos 8 caracteres.</p>}
                 {confirmarSenha && novaSenha !== confirmarSenha && <p className="text-xs text-destructive">As senhas não conferem.</p>}
               </div>
-              <div className="mt-6 pt-6 border-t border-border flex justify-end">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button onClick={handleChangePassword} disabled={changingPassword} className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-slate-500/20 bg-slate-700 hover:bg-slate-800 text-white">
-                      {changingPassword ? <Loader2 size={16} className="animate-spin mr-2" /> : <Shield size={16} className="mr-2" />}
-                      Atualizar Senha
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Salvar nova senha de acesso</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
             </CardContent>
           </Card>
         </TabsContent>
