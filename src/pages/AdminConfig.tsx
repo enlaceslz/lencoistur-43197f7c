@@ -752,6 +752,32 @@ const AdminConfig = () => {
                       />
                     </div>
                   </div>
+
+                  <div className="border-t border-border pt-6 space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Seções do Website</Label>
+                    <div className="flex items-center justify-between p-4 border border-border rounded-xl bg-muted/20">
+                      <div>
+                        <p className="font-bold text-sm text-foreground">Seção "Seja um Parceiro"</p>
+                        <p className="text-xs text-muted-foreground">Habilitar formulário de captação de novos parceiros no site.</p>
+                        <p className="text-[10px] text-secondary font-black uppercase mt-1">Os cadastros cairão em Marketing {">"} Leads</p>
+                      </div>
+                      <Switch 
+                        checked={site.exibirParceiros} 
+                        onCheckedChange={(v) => setSite({ ...site, exibirParceiros: v })} 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-6 border-t border-border">
+                    <Button 
+                      onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
+                      disabled={saving} 
+                      className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95 flex items-center gap-2"
+                    >
+                      {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                      Salvar Tudo no Frontend
+                    </Button>
+                  </div>
                 </div>
               </div>
 
