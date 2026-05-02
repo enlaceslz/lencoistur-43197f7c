@@ -402,8 +402,12 @@ const AdminColaboradores = () => {
               <div className="p-5">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
-                      {c.name.substring(0, 2).toUpperCase()}
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+                      {c.avatar_url ? (
+                        <img src={c.avatar_url} alt={c.name} className="w-full h-full object-cover" />
+                      ) : (
+                        c.name.substring(0, 2).toUpperCase()
+                      )}
                     </div>
                     <div>
                       <h3 className="font-bold text-slate-900">{c.name}</h3>
