@@ -1274,9 +1274,14 @@ const AdminConfig = () => {
             else toast.info("Selecione uma aba para salvar");
           }}
           disabled={saving}
-          className="w-14 h-14 rounded-full shadow-2xl bg-primary text-white hover:scale-110 active:scale-95 transition-all p-0 flex items-center justify-center"
+          className="w-16 h-16 rounded-full shadow-2xl bg-primary text-white hover:scale-110 active:scale-95 transition-all p-0 flex flex-col items-center justify-center gap-1 border-4 border-background"
         >
-          {saving ? <Loader2 size={24} className="animate-spin" /> : <Save size={24} />}
+          {saving ? <Loader2 size={24} className="animate-spin" /> : (
+            <>
+              <Save size={24} />
+              <span className="text-[8px] font-black uppercase tracking-tighter">Salvar</span>
+            </>
+          )}
         </Button>
       </div>
     </AdminLayout>
