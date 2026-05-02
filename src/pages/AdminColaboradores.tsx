@@ -14,7 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Users, Search, Plus, Edit, Trash2, Loader2, Phone, Mail, User, Wallet, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileText, History, LayoutGrid, List, Settings2, Trash, Camera, Upload
+  Users, Search, Plus, Edit, Trash2, Loader2, Phone, Mail, User, Wallet, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileText, History, LayoutGrid, List, Settings2, Trash, Camera, Upload, ExternalLink, Download
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -121,11 +121,11 @@ const AdminColaboradores = () => {
   const fetchPayments = async (collabId: string) => {
     const { data, error } = await supabase
       .from("collaborator_payments")
-      .select("*")
+      .select("*, bookings(booking_code, item_name)")
       .eq("collaborator_id", collabId)
       .order("created_at", { ascending: false });
     if (error) toast.error("Erro ao carregar histórico");
-    else setPayments(data as Payment[]);
+    else setPayments(data as any[]);
   };
 
   const openNew = () => {
@@ -325,7 +325,8 @@ const AdminColaboradores = () => {
   const filtered = collaborators.filter(c => 
     c.name.toLowerCase().includes(search.toLowerCase()) || 
     (c.email || "").toLowerCase().includes(search.toLowerCase()) ||
-    (c.document || "").includes(search)
+    (c.document || "").includes(search) ||
+    (c.type || "").toLowerCase().includes(search.toLowerCase())
   );
 
   const getPaymentTypeLabel = (type: string) => {
@@ -353,28 +354,56 @@ const AdminColaboradores = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
           <p className="text-sm text-muted-foreground">
-            Gerencie sua equipe, pagamentos e integrações financeiras.
+            <span className="font-semibold text-foreground">{collaborators.length}</span> colaboradores cadastrados · <span className="font-semibold text-green-600">{collaborators.filter(c => c.status === 'active').length}</span> ativos
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setTypesDialogOpen(true)} className="border-slate-200">
-            <Settings2 size={16} className="mr-2" /> Tipos
+          <Button variant="outline" size="sm" onClick={() => {
+            const header = "Nome,Email,Telefone,Documento,Tipo,Status,Remuneração\n";
+            const rows = filtered.map(c => `"${c.name}","${c.email || ''}","${c.phone || ''}","${c.document}","${c.type}","${c.status}","${getPaymentTypeLabel(c.payment_type)}: ${formatCurrency(c.payment_value)}"`).join("\n");
+            const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `colaboradores_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+          }}>
+            <Download size={16} className="mr-1.5" /> Exportar CSV
           </Button>
-          <Button onClick={openNew} className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20">
-            <Plus size={16} className="mr-2" /> Novo Colaborador
+          <Button variant="outline" size="sm" onClick={() => setTypesDialogOpen(true)}>
+            <Settings2 size={16} className="mr-1.5" /> Gerenciar Tipos
+          </Button>
+          <Button onClick={openNew} size="sm">
+            <Plus size={16} className="mr-1.5" /> Novo Colaborador
           </Button>
         </div>
       </div>
 
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        {collabTypes.map((t) => (
+          <Card key={t.id} className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setSearch(t.name)}>
+            <CardContent className="p-5 flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                <Users size={22} />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{collaborators.filter((c) => c.type === t.name).length}</p>
+                <p className="text-xs text-muted-foreground">{t.name}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
       <Card className="mb-6">
-        <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="relative w-full max-w-md">
+        <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
             <Input 
               placeholder="Buscar por nome, e-mail ou documento..." 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
-              className="pl-10" 
+              className="pl-10 h-10" 
             />
           </div>
           <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
@@ -382,17 +411,17 @@ const AdminColaboradores = () => {
               variant={viewMode === 'cards' ? 'secondary' : 'ghost'} 
               size="sm" 
               onClick={() => setViewMode('cards')}
-              className={viewMode === 'cards' ? 'bg-white shadow-sm' : ''}
+              className={`h-8 ${viewMode === 'cards' ? 'bg-white shadow-sm' : ''}`}
             >
-              <LayoutGrid size={16} className="mr-2" /> Cards
+              <LayoutGrid size={14} className="mr-1.5" /> Cards
             </Button>
             <Button 
               variant={viewMode === 'table' ? 'secondary' : 'ghost'} 
               size="sm" 
               onClick={() => setViewMode('table')}
-              className={viewMode === 'table' ? 'bg-white shadow-sm' : ''}
+              className={`h-8 ${viewMode === 'table' ? 'bg-white shadow-sm' : ''}`}
             >
-              <List size={16} className="mr-2" /> Tabela
+              <List size={14} className="mr-1.5" /> Tabela
             </Button>
           </div>
         </CardContent>
@@ -401,11 +430,11 @@ const AdminColaboradores = () => {
       {viewMode === 'cards' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map(c => (
-            <Card key={c.id} className="overflow-hidden hover:shadow-md transition-shadow">
+            <Card key={c.id} className="overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all group relative">
               <div className="p-5">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full overflow-hidden bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xl shadow-inner border border-blue-100 group-hover:scale-105 transition-transform">
                       {c.avatar_url ? (
                         <img src={c.avatar_url} alt={c.name} className="w-full h-full object-cover" />
                       ) : (
@@ -413,9 +442,8 @@ const AdminColaboradores = () => {
                       )}
                     </div>
                     <div>
-                      <h3 className="font-bold text-slate-900 cursor-pointer hover:text-blue-600 transition-colors flex items-center gap-1.5" onClick={() => openDetails(c)}>
+                      <h3 className="font-black text-slate-900 cursor-pointer hover:text-blue-600 transition-colors flex items-center gap-1.5 leading-tight" onClick={() => openDetails(c)}>
                         {c.name}
-                        <FileText size={14} className="text-slate-400" />
                       </h3>
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary" className="text-[10px] h-4">
@@ -742,7 +770,7 @@ const AdminColaboradores = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Data</TableHead>
-                  <TableHead>Descrição</TableHead>
+                  <TableHead>Referência</TableHead>
                   <TableHead>Valor</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
@@ -755,10 +783,19 @@ const AdminColaboradores = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  payments.map((p) => (
+                  payments.map((p: any) => (
                     <TableRow key={p.id}>
                       <TableCell className="text-xs">{format(new Date(p.due_date), "dd/MM/yyyy")}</TableCell>
-                      <TableCell className="text-xs">{p.description}</TableCell>
+                      <TableCell className="text-xs">
+                        <div className="flex flex-col">
+                          <span>{p.description}</span>
+                          {p.bookings?.booking_code && (
+                            <span className="text-[10px] text-primary font-mono font-bold flex items-center gap-1 mt-0.5">
+                              <ExternalLink size={10} /> {p.bookings.booking_code}
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell className="text-xs font-bold">{formatCurrency(p.amount)}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className={p.status === 'paid' ? 'border-green-500 text-green-600' : 'border-amber-500 text-amber-600'}>
