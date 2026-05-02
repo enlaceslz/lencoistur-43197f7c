@@ -853,7 +853,12 @@ const AdminReservas = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <label className="text-sm text-muted-foreground mb-1 block">CPF</label>
-                    <Input value={newForm.cpf} onChange={(e) => setNewForm(f => ({ ...f, cpf: e.target.value }))} placeholder="000.000.000-00" disabled={!!selectedCustomerId && !editingId} />
+                    <Input 
+                      value={newForm.cpf} 
+                      onChange={(e) => setNewForm(f => ({ ...f, cpf: maskCPF(e.target.value) }))} 
+                      placeholder="000.000.000-00" 
+                      disabled={!!selectedCustomerId && !editingId} 
+                    />
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground mb-1 block">Passaporte</label>
