@@ -29,6 +29,7 @@ export interface BookingItem {
   invoiceUrl?: string;
   voucherUrl?: string;
   collaboratorId?: string;
+  collaboratorName?: string;
 }
 
 function generateBookingCode(): string {
