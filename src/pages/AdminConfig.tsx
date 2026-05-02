@@ -477,7 +477,7 @@ const AdminConfig = () => {
                     <Button 
                       onClick={() => saveSetting("empresa", empresa, "Agência")} 
                       disabled={saving}
-                      className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95"
+                      className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95"
                     >
                       {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save size={18} className="mr-2" />}
                       Salvar Alterações
