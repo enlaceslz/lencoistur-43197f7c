@@ -411,7 +411,10 @@ const AdminColaboradores = () => {
                       )}
                     </div>
                     <div>
-                      <h3 className="font-bold text-slate-900 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => openDetails(c)}>{c.name}</h3>
+                      <h3 className="font-bold text-slate-900 cursor-pointer hover:text-blue-600 transition-colors flex items-center gap-1.5" onClick={() => openDetails(c)}>
+                        {c.name}
+                        <FileText size={14} className="text-slate-400" />
+                      </h3>
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary" className="text-[10px] h-4">
                           {c.type || "Outro"}
