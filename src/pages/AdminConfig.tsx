@@ -1274,7 +1274,7 @@ const AdminConfig = () => {
                       <Button
                         onClick={() => saveSetting("gallery", gallery as unknown as Record<string, unknown>, "Galeria")}
                         disabled={saving}
-                        className="rounded-xl font-black uppercase tracking-widest bg-primary text-white shadow-lg shadow-primary/20 h-10 px-8"
+                        className="rounded-xl font-black uppercase tracking-widest bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 h-10 px-8"
                       >
                         {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
                         Publicar Galeria
