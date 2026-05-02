@@ -134,7 +134,7 @@ const AdminColaboradores = () => {
       pix_key: "", pix_type: "cpf", status: "active",
       payment_type: "daily", payment_value: "R$ 0,00", observation: "",
       type: "Outro", birth_date: "", zip_code: "", address: "",
-      cnh: "", cadastur: ""
+      cnh: "", cadastur: "", avatar_url: ""
     });
     setDialogOpen(true);
   };
@@ -152,9 +152,15 @@ const AdminColaboradores = () => {
       zip_code: c.zip_code || "", 
       address: c.address || "",
       cnh: c.cnh || "", 
-      cadastur: c.cadastur || ""
+      cadastur: c.cadastur || "",
+      avatar_url: c.avatar_url || ""
     });
     setDialogOpen(true);
+  };
+
+  const openDetails = (c: Collaborator) => {
+    setSelectedCollab(c);
+    setDetailsDialogOpen(true);
   };
 
   const openHistory = (c: Collaborator) => {
