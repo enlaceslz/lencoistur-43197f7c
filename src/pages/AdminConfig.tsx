@@ -508,19 +508,15 @@ const AdminConfig = () => {
       toast.error("Erro ao atualizar cargo: " + err.message);
     }
   };
-        toast.warning(`Restauração parcial: ${restored} registros restaurados com ${errors} erro(s). Verifique o console.`);
-      } else {
-        toast.success(`Restauração completa! ${restored} registros restaurados com sucesso.`);
-      }
-    } catch (err) {
-      toast.error("Erro ao processar arquivo: " + (err instanceof Error ? err.message : "Formato inválido"));
-    } finally {
-      setRestoreLoading(false);
-      e.target.value = "";
-    }
-  };
-
   if (loading) {
+    return (
+      <AdminLayout title="Configurações">
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="animate-spin text-primary" size={32} />
+        </div>
+      </AdminLayout>
+    );
+  }
     return (
       <AdminLayout title="Configurações">
         <div className="flex items-center justify-center py-20">
