@@ -379,69 +379,69 @@ const AdminColaboradores = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="flex flex-wrap gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+        <Button 
+          variant={!search ? "default" : "outline"} 
+          size="sm" 
+          onClick={() => setSearch("")} 
+          className={`rounded-full px-6 h-10 shadow-sm transition-all duration-300 ${!search ? "bg-primary text-primary-foreground scale-105" : "hover:bg-primary/5 hover:border-primary/30"}`}
+        >
+          Todos
+        </Button>
         {collabTypes.map((t) => (
-          <Card key={t.id} className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setSearch(t.name)}>
-            <CardContent className="p-5 flex items-center gap-4">
-              <div 
-                className="p-3 rounded-xl"
-                style={{ backgroundColor: `${t.color}20`, color: t.color }}
-              >
-                <Users size={22} />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">{collaborators.filter((c) => c.type === t.name).length}</p>
-                <p className="text-xs text-muted-foreground">{t.name}</p>
-              </div>
-            </CardContent>
-          </Card>
+          <Button 
+            key={t.id} 
+            variant={search === t.name ? "default" : "outline"} 
+            size="sm" 
+            onClick={() => setSearch(t.name)}
+            className={`rounded-full px-6 h-10 shadow-sm transition-all duration-300 ${search === t.name ? "scale-105" : "hover:bg-primary/5 hover:border-primary/30"}`}
+            style={search === t.name ? { backgroundColor: t.color, borderColor: t.color } : {}}
+          >
+            <Users size={14} className="mr-2 opacity-70" />
+            {t.name}
+            <span className="ml-2 bg-black/10 px-2 py-0.5 rounded-full text-[10px]">
+              {collaborators.filter(c => c.type === t.name).length}
+            </span>
+          </Button>
         ))}
       </div>
 
-      <Card className="mb-6 border-none shadow-sm bg-muted/30">
-        <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+      <Card className="mb-8 border-none shadow-lg bg-white/80 backdrop-blur-md overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
+        <CardContent className="p-6 flex flex-col md:flex-row gap-6 items-center justify-between">
+          <div className="relative flex-1 w-full group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
             <Input 
               placeholder="Buscar por nome, e-mail ou documento..." 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
-              className="pl-10 h-10 bg-background border-border/50" 
+              className="pl-12 h-12 bg-white border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all rounded-2xl shadow-sm" 
             />
           </div>
-          <div className="flex gap-2 flex-wrap">
-            <Button variant={!search ? "default" : "outline"} size="sm" onClick={() => setSearch("")} className="rounded-full px-4">
-              Todos
-            </Button>
-            {collabTypes.map((t) => (
+          
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            <div className="h-10 w-px bg-slate-200 hidden md:block" />
+            
+            <div className="flex items-center gap-1 bg-slate-100/80 p-1.5 rounded-2xl shadow-inner w-full md:w-auto justify-center">
               <Button 
-                key={t.id} 
-                variant={search === t.name ? "default" : "outline"} 
+                variant={viewMode === 'cards' ? 'secondary' : 'ghost'} 
                 size="sm" 
-                onClick={() => setSearch(t.name)}
-                className="rounded-full px-4"
+                onClick={() => setViewMode('cards')}
+                className={`h-9 px-4 rounded-xl transition-all duration-300 ${viewMode === 'cards' ? 'bg-white text-primary shadow-sm font-bold' : 'text-slate-500'}`}
               >
-                {t.name}
+                <LayoutGrid size={16} className="mr-2" />
+                Cards
               </Button>
-            ))}
-          </div>
-          <div className="flex items-center gap-1 bg-background/50 border border-border/50 p-1 rounded-full shadow-inner">
-            <Button 
-              variant={viewMode === 'cards' ? 'secondary' : 'ghost'} 
-              size="sm" 
-              onClick={() => setViewMode('cards')}
-              className={`h-8 w-8 p-0 rounded-full ${viewMode === 'cards' ? 'bg-primary text-primary-foreground shadow-md' : ''}`}
-            >
-              <LayoutGrid size={14} />
-            </Button>
-            <Button 
-              variant={viewMode === 'table' ? 'secondary' : 'ghost'} 
-              size="sm" 
-              onClick={() => setViewMode('table')}
-              className={`h-8 w-8 p-0 rounded-full ${viewMode === 'table' ? 'bg-primary text-primary-foreground shadow-md' : ''}`}
-            >
-              <List size={14} />
-            </Button>
+              <Button 
+                variant={viewMode === 'table' ? 'secondary' : 'ghost'} 
+                size="sm" 
+                onClick={() => setViewMode('table')}
+                className={`h-9 px-4 rounded-xl transition-all duration-300 ${viewMode === 'table' ? 'bg-white text-primary shadow-sm font-bold' : 'text-slate-500'}`}
+              >
+                <List size={16} className="mr-2" />
+                Lista
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
