@@ -77,6 +77,12 @@ const maskCPF = (v: string) => {
   return n;
 };
 
+const maskCEP = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  if (n.length <= 8) return n.replace(/(\d{5})(\d{3})/, "$1-$2");
+  return n;
+};
+
 const maskPhone = (v: string) => {
   const n = v.replace(/\D/g, "");
   if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
@@ -1408,7 +1414,6 @@ const AdminCRMContent = () => {
                     placeholder="000.000.000-00"
                     maxLength={14}
                     className="rounded-xl"
-                    required
                   />
                 </>
               ) : (
@@ -1420,7 +1425,6 @@ const AdminCRMContent = () => {
                     onChange={(e) => setForm({ ...form, passport: e.target.value })}
                     placeholder="Número do Passaporte"
                     className="rounded-xl"
-                    required
                   />
                 </>
               )}
@@ -1463,13 +1467,14 @@ const AdminCRMContent = () => {
                       id="customer-cep"
                       value={form.cep}
                       onChange={(e) => {
-                        const val = e.target.value;
+                        const val = form.country === "Brasil" ? maskCEP(e.target.value) : e.target.value;
                         setForm({ ...form, cep: val });
                         if (form.country === "Brasil" && val.replace(/\D/g, "").length === 8) {
                           handleCepSearch(val);
                         }
                       }}
                       placeholder={form.country === "Brasil" ? "00000-000" : "Postal Code"}
+                      maxLength={form.country === "Brasil" ? 9 : undefined}
                       className="rounded-xl"
                     />
                     {fetchingCep && <Loader2 size={16} className="animate-spin self-center" />}
