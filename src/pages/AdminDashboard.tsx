@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import {
   DollarSign, TrendingUp, Users, Calendar,
-  ArrowUpRight, ArrowDownRight, Loader2, ShieldAlert
+  ArrowUpRight, ArrowDownRight, Loader2, ShieldAlert,
+  PieChart as PieChartIcon, LayoutDashboard, Briefcase
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -43,20 +44,23 @@ interface BookingRow {
 const AdminDashboard = () => {
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [customerCount, setCustomerCount] = useState(0);
+  const [collabCount, setCollabCount] = useState(0);
   const [sgsStats, setSgsStats] = useState({ activeRisks: 0, criticalRisks: 0, pendingActions: 0 });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const load = async () => {
-      const [bRes, cRes, rRes, aRes] = await Promise.all([
+      const [bRes, cRes, rRes, aRes, collabRes] = await Promise.all([
         supabase.from("bookings").select("*, customers(name, email)").order("created_at", { ascending: false }),
         supabase.from("customers").select("id", { count: "exact", head: true }),
         supabase.from("sgs_risks").select("risk_level"),
         supabase.from("sgs_corrective_actions").select("id").eq("status", "pendente"),
+        supabase.from("collaborators").select("id", { count: "exact", head: true }),
       ]);
       setBookings((bRes.data as any[]) || []);
       setCustomerCount(cRes.count || 0);
+      setCollabCount(collabRes.count || 0);
       
       const risks = (rRes.data as any[]) || [];
       setSgsStats({
@@ -102,8 +106,8 @@ const AdminDashboard = () => {
     const stats = [
       { label: "Reservas Hoje", value: String(todayBookings.length), change: `${todayBookings.length}`, up: todayBookings.length > 0, icon: Calendar, path: "/admin/reservas" },
       { label: "Receita Confirmada (Mês)", value: fmt(thisRevenue), change: `${Number(revChange) >= 0 ? "+" : ""}${revChange}%`, up: Number(revChange) >= 0, icon: DollarSign, path: "/admin/financeiro" },
+      { label: "Colaboradores", value: String(collabCount), change: "Equipe", up: true, icon: Briefcase, path: "/admin/colaboradores" },
       { label: "Conformidade SGS", value: String(sgsStats.criticalRisks === 0 ? "100%" : "Risco"), change: `${sgsStats.pendingActions} alertas`, up: sgsStats.criticalRisks === 0, icon: ShieldAlert, isSgs: true, path: "/admin/sgs" },
-      { label: "LTV da Base", value: customerCount > 0 ? fmt(bookings.reduce((s, b) => s + (b.status !== 'cancelada' ? b.final_total : 0), 0) / customerCount) : "R$ 0", change: `${customerCount} clientes`, up: true, icon: Users, path: "/admin/crm" },
     ];
 
     // Revenue by month (last 7 months)
