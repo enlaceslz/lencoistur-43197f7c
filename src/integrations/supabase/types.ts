@@ -296,7 +296,9 @@ export type Database = {
       }
       contas_pagar: {
         Row: {
+          booking_id: string | null
           categoria: string
+          collaborator_id: string | null
           created_at: string
           descricao: string
           fornecedor: string | null
@@ -309,7 +311,9 @@ export type Database = {
           vencimento: string
         }
         Insert: {
+          booking_id?: string | null
           categoria?: string
+          collaborator_id?: string | null
           created_at?: string
           descricao: string
           fornecedor?: string | null
@@ -322,7 +326,9 @@ export type Database = {
           vencimento: string
         }
         Update: {
+          booking_id?: string | null
           categoria?: string
+          collaborator_id?: string | null
           created_at?: string
           descricao?: string
           fornecedor?: string | null
@@ -334,7 +340,22 @@ export type Database = {
           valor?: number
           vencimento?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "contas_pagar_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contas_pagar_collaborator_id_fkey"
+            columns: ["collaborator_id"]
+            isOneToOne: false
+            referencedRelation: "collaborators"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       contas_receber: {
         Row: {
@@ -836,9 +857,11 @@ export type Database = {
         Row: {
           author: string
           avatar: string | null
+          booking_id: string | null
           comment: string | null
           country: string | null
           created_at: string
+          customer_id: string | null
           id: string
           rating: number
           tour_id: string | null
@@ -846,9 +869,11 @@ export type Database = {
         Insert: {
           author: string
           avatar?: string | null
+          booking_id?: string | null
           comment?: string | null
           country?: string | null
           created_at?: string
+          customer_id?: string | null
           id?: string
           rating: number
           tour_id?: string | null
@@ -856,14 +881,30 @@ export type Database = {
         Update: {
           author?: string
           avatar?: string | null
+          booking_id?: string | null
           comment?: string | null
           country?: string | null
           created_at?: string
+          customer_id?: string | null
           id?: string
           rating?: number
           tour_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "reviews_tour_id_fkey"
             columns: ["tour_id"]
@@ -1951,6 +1992,7 @@ export type Database = {
           block_reason: string | null
           blocked: boolean
           certifications: string[] | null
+          collaborator_id: string | null
           created_at: string
           document: string | null
           email: string | null
@@ -1966,6 +2008,7 @@ export type Database = {
           block_reason?: string | null
           blocked?: boolean
           certifications?: string[] | null
+          collaborator_id?: string | null
           created_at?: string
           document?: string | null
           email?: string | null
@@ -1981,6 +2024,7 @@ export type Database = {
           block_reason?: string | null
           blocked?: boolean
           certifications?: string[] | null
+          collaborator_id?: string | null
           created_at?: string
           document?: string | null
           email?: string | null
@@ -1991,7 +2035,15 @@ export type Database = {
           role?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sgs_staff_collaborator_id_fkey"
+            columns: ["collaborator_id"]
+            isOneToOne: false
+            referencedRelation: "collaborators"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sgs_staff_trainings: {
         Row: {
