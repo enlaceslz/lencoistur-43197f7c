@@ -449,7 +449,7 @@ const AdminConfig = () => {
               <TabsTrigger 
                 key={tab.value}
                 value={tab.value} 
-                className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 whitespace-nowrap"
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 whitespace-nowrap"
               >
                 <tab.icon size={14} className="shrink-0" /> 
                 <span>{tab.label}</span>
@@ -477,7 +477,7 @@ const AdminConfig = () => {
                     <Button 
                       onClick={() => saveSetting("empresa", empresa, "Agência")} 
                       disabled={saving}
-                      className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95"
+                      className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95"
                     >
                       {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save size={18} className="mr-2" />}
                       Salvar Alterações
@@ -544,7 +544,7 @@ const AdminConfig = () => {
                 <Button 
                   onClick={() => saveSetting("empresa", empresa, "Agência")} 
                   disabled={saving}
-                  className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95 flex items-center gap-2"
+                  className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95 flex items-center gap-2"
                 >
                   {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
                   Salvar Dados da Agência
@@ -573,7 +573,7 @@ const AdminConfig = () => {
                   <Button 
                     onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
                     disabled={saving} 
-                    className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95 flex items-center gap-2"
+                    className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95 flex items-center gap-2"
                   >
                     {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                     Salvar Alterações Frontend
@@ -791,7 +791,7 @@ const AdminConfig = () => {
                     <Button 
                       onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
                       disabled={saving} 
-                      className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95 flex items-center gap-2"
+                      className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95 flex items-center gap-2"
                     >
                       {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                       Salvar Tudo no Frontend
@@ -1274,7 +1274,7 @@ const AdminConfig = () => {
                       <Button
                         onClick={() => saveSetting("gallery", gallery as unknown as Record<string, unknown>, "Galeria")}
                         disabled={saving}
-                        className="rounded-xl font-black uppercase tracking-widest bg-primary text-white shadow-lg shadow-primary/20 h-10 px-8"
+                        className="rounded-xl font-black uppercase tracking-widest bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 h-10 px-8"
                       >
                         {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
                         Publicar Galeria
@@ -1348,7 +1348,7 @@ const AdminConfig = () => {
             else toast.info("Selecione uma aba para salvar");
           }}
           disabled={saving}
-          className="w-16 h-16 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.3)] bg-primary text-white hover:scale-110 active:scale-95 transition-all p-0 flex flex-col items-center justify-center gap-1 border-4 border-background"
+          className="w-16 h-16 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.3)] bg-blue-600 hover:bg-blue-700 text-white hover:scale-110 active:scale-95 transition-all p-0 flex flex-col items-center justify-center gap-1 border-4 border-background"
         >
           {saving ? <Loader2 size={24} className="animate-spin" /> : (
             <>
