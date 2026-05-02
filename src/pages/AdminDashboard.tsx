@@ -44,6 +44,7 @@ interface BookingRow {
 const AdminDashboard = () => {
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [customerCount, setCustomerCount] = useState(0);
+  const [collabCount, setCollabCount] = useState(0);
   const [sgsStats, setSgsStats] = useState({ activeRisks: 0, criticalRisks: 0, pendingActions: 0 });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
