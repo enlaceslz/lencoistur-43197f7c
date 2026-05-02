@@ -92,7 +92,7 @@ const AdminColaboradores = () => {
     pix_key: "", pix_type: "cpf", status: "active",
     payment_type: "daily", payment_value: "0", observation: "",
     type: "Outro", birth_date: "", zip_code: "", address: "",
-    cnh: "", cadastur: ""
+    cnh: "", cadastur: "", avatar_url: ""
   });
 
   const [paymentForm, setPaymentForm] = useState({
