@@ -29,8 +29,8 @@ const AdminSGSChecklists = () => {
     const [cl, ci, vRes, cRes, bRes] = await Promise.all([
       supabase.from("sgs_checklists").select("*").order("created_at", { ascending: false }),
       supabase.from("sgs_checklist_items").select("*"),
-      supabase.from("sgs_veiculos").select("id, placa, modelo").eq("active", true),
-      supabase.from("sgs_condutores").select("id, name").eq("active", true),
+      supabase.from("sgs_veiculos").select("id, placa, modelo").eq("status", "ativo"),
+      supabase.from("sgs_condutores").select("id, nome").eq("status", "ativo"),
       supabase.from("bookings").select("id, booking_code, item_name").order("created_at", { ascending: false }).limit(20)
     ]);
     setChecklists(cl.data || []);
@@ -142,7 +142,7 @@ const AdminSGSChecklists = () => {
                 <label className="block text-xs font-medium text-muted-foreground mb-1">Condutor (se aplicável)</label>
                 <select value={form.condutor_id} onChange={e => setForm(p => ({ ...p, condutor_id: e.target.value }))} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm">
                   <option value="">Nenhum</option>
-                  {condutores.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {condutores.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
                 </select>
               </div>
               <div>
