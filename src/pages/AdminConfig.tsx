@@ -1256,6 +1256,26 @@ const AdminConfig = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Floating Save Button for Mobile */}
+      <div className="fixed bottom-6 right-6 lg:hidden z-50">
+        <Button
+          onClick={() => {
+            const activeTab = document.querySelector('[data-state="active"][role="tab"]')?.getAttribute('value');
+            if (activeTab === 'empresa') saveSetting("empresa", empresa, "Agência");
+            else if (activeTab === 'site') saveSetting("site", site as unknown as Record<string, unknown>, "Frontend");
+            else if (activeTab === 'pagamento') saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Financeiro");
+            else if (activeTab === 'notificacoes') saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações");
+            else if (activeTab === 'seguranca') handleChangePassword();
+            else if (activeTab === 'galeria') saveSetting("gallery", gallery as unknown as Record<string, unknown>, "Galeria");
+            else toast.info("Selecione uma aba para salvar");
+          }}
+          disabled={saving}
+          className="w-14 h-14 rounded-full shadow-2xl bg-primary text-white hover:scale-110 active:scale-95 transition-all p-0 flex items-center justify-center"
+        >
+          {saving ? <Loader2 size={24} className="animate-spin" /> : <Save size={24} />}
+        </Button>
+      </div>
     </AdminLayout>
   );
 };
