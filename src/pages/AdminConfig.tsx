@@ -855,7 +855,7 @@ const AdminConfig = () => {
                               onClick={() => setPagamentos({ ...pagamentos, pixTipo: t.value, pixChave: "" })}
                               className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
                                 pagamentos.pixTipo === t.value
-                                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                                  ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
                                   : "bg-muted text-muted-foreground border-border hover:bg-accent"
                               }`}
                             >
