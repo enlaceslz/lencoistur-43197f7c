@@ -507,6 +507,14 @@ const AdminConfig = () => {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Telefone Fixo / Comercial</Label>
+                  <Input 
+                    value={empresa.telefone} 
+                    onChange={e => setEmpresa({ ...empresa, telefone: maskPhone(e.target.value) })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary font-bold"
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">WhatsApp Operacional</Label>
                   <Input 
                     value={empresa.whatsapp} 
