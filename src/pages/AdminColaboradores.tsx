@@ -940,6 +940,34 @@ const AdminColaboradores = () => {
                     <p className="text-sm font-medium">{selectedCollab.observation}</p>
                   </div>
                 )}
+                {selectedCollab && (
+                  <div className="md:col-span-2 pt-4 border-t">
+                    <p className="text-xs text-muted-foreground uppercase font-semibold mb-3">Últimos Lançamentos</p>
+                    <div className="max-h-[200px] overflow-y-auto rounded-md border">
+                      <Table>
+                        <TableBody>
+                          {payments.slice(0, 5).map((p) => (
+                            <TableRow key={p.id}>
+                              <TableCell className="py-2 text-[10px]">{format(new Date(p.due_date), "dd/MM/yy")}</TableCell>
+                              <TableCell className="py-2 text-[10px] truncate max-w-[150px]">{p.description}</TableCell>
+                              <TableCell className="py-2 text-[10px] font-bold text-right">{formatCurrency(p.amount)}</TableCell>
+                              <TableCell className="py-2 text-right">
+                                <Badge variant="outline" className={`text-[8px] h-4 px-1 ${p.status === 'paid' ? 'border-green-500 text-green-600' : 'border-amber-500 text-amber-600'}`}>
+                                  {p.status === 'paid' ? 'Pago' : 'Pend'}
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                          {payments.length === 0 && (
+                            <TableRow>
+                              <TableCell colSpan={4} className="text-center py-4 text-xs text-muted-foreground">Nenhum lançamento.</TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
