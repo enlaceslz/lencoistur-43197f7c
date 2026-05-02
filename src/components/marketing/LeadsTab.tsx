@@ -7,8 +7,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Smartphone, Trash2, Search } from "lucide-react";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Plus, Smartphone, Trash2, Search, UserPlus, Loader2 } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { statusColors } from "./statusColors";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -48,6 +48,7 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
   const [score, setScore] = useState("50");
   const [status, setStatus] = useState("morno");
   const [saving, setSaving] = useState(false);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
 
   const handleCreate = async () => {
     if (!name.trim() || (!phone.trim() && !email.trim())) {
@@ -80,6 +81,40 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
     else { toast.success("Lead removido."); onRefresh(); }
   };
 
+  const handleApproveAsPartner = async (lead: Lead) => {
+    setApprovingId(lead.id);
+    try {
+      // 1. Create the partner
+      const { error: partnerError } = await supabase.from("partners").insert({
+        name: lead.name,
+        email: lead.email,
+        phone: lead.phone,
+        active: true,
+        type: lead.interest?.toLowerCase().includes("guia") ? "guia" : 
+              lead.interest?.toLowerCase().includes("motorista") ? "motorista" : "hotel",
+        contact_name: lead.name.split(" ")[0],
+      });
+
+      if (partnerError) throw partnerError;
+
+      // 2. Update lead status to "convertido"
+      const { error: leadError } = await supabase
+        .from("marketing_leads")
+        .update({ status: "convertido", score: 100 })
+        .eq("id", lead.id);
+
+      if (leadError) throw leadError;
+
+      toast.success(`"${lead.name}" agora é um parceiro oficial!`);
+      onRefresh();
+    } catch (err: any) {
+      console.error("Erro ao aprovar parceiro:", err);
+      toast.error("Erro ao converter lead em parceiro.");
+    } finally {
+      setApprovingId(null);
+    }
+  };
+
   const filtered = leads.filter((l) => {
     if (!search) return true;
     const s = search.toLowerCase();
@@ -96,14 +131,16 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
             <Input placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DialogTrigger asChild><Button><Plus size={16} className="mr-1" /> Lead</Button></DialogTrigger>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Adicionar lead manualmente</p>
-              </TooltipContent>
-            </Tooltip>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DialogTrigger asChild><Button><Plus size={16} className="mr-1" /> Lead</Button></DialogTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Adicionar lead manualmente</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <DialogContent className="sm:max-w-lg">
               <DialogHeader><DialogTitle>Adicionar Lead</DialogTitle></DialogHeader>
               <div className="space-y-4 py-2">
@@ -123,6 +160,7 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
                         <SelectItem value="Google Ads">Google Ads</SelectItem>
                         <SelectItem value="Indicação">Indicação</SelectItem>
                         <SelectItem value="Manual">Manual</SelectItem>
+                        <SelectItem value="Seja um Parceiro">Seja um Parceiro</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -168,7 +206,16 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
           <TableBody>
             {filtered.map((l) => (
               <TableRow key={l.id}>
-                <TableCell className="font-semibold text-foreground">{l.name}</TableCell>
+                <TableCell className="font-semibold text-foreground">
+                  <div className="flex flex-col">
+                    <span>{l.name}</span>
+                    {l.source === "Seja um Parceiro" && (
+                      <span className="text-[10px] font-black uppercase text-secondary tracking-widest bg-secondary/10 px-1.5 py-0.5 rounded w-fit mt-1">
+                        Candidato a Parceiro
+                      </span>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>
                   <div className="text-sm">
                     {l.phone && <p className="text-foreground">{l.phone}</p>}
@@ -183,27 +230,52 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-1">
+                    {l.source === "Seja um Parceiro" && l.status !== "convertido" && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-secondary hover:text-secondary hover:bg-secondary/10"
+                              onClick={() => handleApproveAsPartner(l)}
+                              disabled={approvingId === l.id}
+                            >
+                              {approvingId === l.id ? <Loader2 size={16} className="animate-spin" /> : <UserPlus size={16} />}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Aprovar como Parceiro Oficial</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
+                    
                     {l.phone && (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <a href={`https://wa.me/55${l.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${l.name.split(" ")[0]}! Tudo bem?`)}`} target="_blank" rel="noopener noreferrer">
-                            <Button variant="ghost" size="icon" className="h-8 w-8"><Smartphone size={16} className="text-green-600" /></Button>
-                          </a>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Iniciar conversa no WhatsApp</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <a href={`https://wa.me/55${l.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${l.name.split(" ")[0]}! Tudo bem?`)}`} target="_blank" rel="noopener noreferrer">
+                              <Button variant="ghost" size="icon" className="h-8 w-8"><Smartphone size={16} className="text-green-600" /></Button>
+                            </a>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Iniciar conversa no WhatsApp</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     )}
                     <AlertDialog>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <AlertDialogTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><Trash2 size={14} className="text-destructive" /></Button></AlertDialogTrigger>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Remover permanentemente</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <AlertDialogTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><Trash2 size={14} className="text-destructive" /></Button></AlertDialogTrigger>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Remover permanentemente</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                       <AlertDialogContent>
                         <AlertDialogHeader><AlertDialogTitle>Remover lead?</AlertDialogTitle><AlertDialogDescription>"{l.name}" será removido permanentemente.</AlertDialogDescription></AlertDialogHeader>
                         <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => handleDelete(l.id)}>Remover</AlertDialogAction></AlertDialogFooter>
