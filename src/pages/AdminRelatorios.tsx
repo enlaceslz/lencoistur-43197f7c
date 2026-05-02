@@ -380,6 +380,21 @@ const AdminRelatorios = () => {
                   </ChartCard>
                 </div>
               )}
+              {activeTab === "parceiros" && (
+                <div className="col-span-2">
+                  <ChartCard title="Parceiros por Tipo">
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={data.byType}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                        <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
+                        <YAxis fontSize={10} axisLine={false} tickLine={false} />
+                        <ChartTooltip />
+                        <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Quantidade" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+              )}
             </div>
 
             {/* Professional Footer for Print */}
