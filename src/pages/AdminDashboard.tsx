@@ -43,6 +43,7 @@ interface BookingRow {
 
 const AdminDashboard = () => {
   const [bookings, setBookings] = useState<BookingRow[]>([]);
+  const [expenses, setExpenses] = useState<any[]>([]);
   const [customerCount, setCustomerCount] = useState(0);
   const [collabCount, setCollabCount] = useState(0);
   const [totalExpenses, setTotalExpenses] = useState(0);
