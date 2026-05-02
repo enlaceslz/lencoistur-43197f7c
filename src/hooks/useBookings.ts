@@ -268,6 +268,7 @@ export function useBookings() {
         discount: data.discount,
         final_total: data.finalTotal,
         notes: data.notes,
+        collaborator_id: data.collaboratorId || null,
       })
       .eq("id", id);
       
