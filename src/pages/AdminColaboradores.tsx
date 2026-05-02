@@ -358,6 +358,18 @@ const AdminColaboradores = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => {
+            const header = "Nome,Email,Telefone,Documento,Tipo,Status,Remuneração\n";
+            const rows = filtered.map(c => `"${c.name}","${c.email || ''}","${c.phone || ''}","${c.document}","${c.type}","${c.status}","${getPaymentTypeLabel(c.payment_type)}: ${formatCurrency(c.payment_value)}"`).join("\n");
+            const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `colaboradores_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+          }}>
+            <Download size={16} className="mr-1.5" /> Exportar CSV
+          </Button>
           <Button variant="outline" size="sm" onClick={() => setTypesDialogOpen(true)}>
             <Settings2 size={16} className="mr-1.5" /> Gerenciar Tipos
           </Button>
