@@ -149,6 +149,16 @@ const AdminRelatorios = () => {
           hotLeads: l.filter((x: any) => x.status === "quente").length,
           bySource: Object.entries(bySource).map(([name, value]) => ({ name, value })),
         });
+      } else if (activeTab === "parceiros") {
+        const { data: partners } = await supabase.from("partners").select("*");
+        const p = partners || [];
+        const byType: Record<string, number> = {};
+        p.forEach((pt: any) => { byType[pt.type] = (byType[pt.type] || 0) + 1; });
+        setData({
+          total: p.length,
+          active: p.filter((x: any) => x.active).length,
+          byType: Object.entries(byType).map(([name, value]) => ({ name, value })),
+        });
       }
     } catch (err) {
       console.error("Error loading report:", err);
