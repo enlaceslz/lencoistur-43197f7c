@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, RefreshCw, Trash2, Plus } from "lucide-react";
+import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, RefreshCw, Trash2, Plus, Users, UserPlus, ShieldCheck, Mail, Lock, Key } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -112,6 +112,10 @@ const AdminConfig = () => {
   const [backupLoading, setBackupLoading] = useState(false);
   const [restoreLoading, setRestoreLoading] = useState(false);
   const [backupHistory, setBackupHistory] = useState<Array<{ date: string; tables: number; records: number; size: string }>>([]);
+  const [systemUsers, setSystemUsers] = useState<any[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [isAddingUser, setIsAddingUser] = useState(false);
+  const [newUser, setNewUser] = useState({ full_name: "", email: "", role: "operador", password: "" });
 
   const loadSettings = useCallback(async () => {
     setLoading(true);
@@ -161,7 +165,27 @@ const AdminConfig = () => {
     }
   }, []);
 
-  useEffect(() => { loadSettings(); }, [loadSettings]);
+  const loadUsers = useCallback(async () => {
+    setUsersLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("user_management")
+        .select("*")
+        .order("created_at", { ascending: false });
+      
+      if (error) throw error;
+      setSystemUsers(data || []);
+    } catch (err) {
+      console.error("Error loading users:", err);
+    } finally {
+      setUsersLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { 
+    loadSettings(); 
+    loadUsers();
+  }, [loadSettings, loadUsers]);
 
   const saveSetting = async (key: string, value: Record<string, unknown>, label: string) => {
     setSaving(true);
@@ -410,18 +434,80 @@ const AdminConfig = () => {
       }
 
       if (errors > 0) {
-        toast.warning(`Restauração parcial: ${restored} registros restaurados com ${errors} erro(s). Verifique o console.`);
+        toast.error(`Restauração concluída com ${errors} erros. ${restored} registros restaurados.`);
       } else {
-        toast.success(`Restauração completa! ${restored} registros restaurados com sucesso.`);
+        toast.success(`Sistema restaurado com sucesso! ${restored} registros importados.`);
+        loadSettings();
+        loadUsers();
       }
     } catch (err) {
-      toast.error("Erro ao processar arquivo: " + (err instanceof Error ? err.message : "Formato inválido"));
+      toast.error("Erro ao processar arquivo de backup: " + (err instanceof Error ? err.message : "Erro desconhecido"));
     } finally {
       setRestoreLoading(false);
-      e.target.value = "";
+      if (e.target) e.target.value = "";
     }
   };
 
+  const handleAddUser = async () => {
+    if (!newUser.full_name || !newUser.email || !newUser.password) {
+      toast.error("Preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const { data, error } = await supabase
+        .from("user_management")
+        .insert([{
+          full_name: newUser.full_name,
+          email: newUser.email,
+          role: newUser.role,
+          status: 'ativo'
+        }]);
+
+      if (error) throw error;
+
+      toast.success("Usuário registrado com sucesso!");
+      setIsAddingUser(false);
+      setNewUser({ full_name: "", email: "", role: "operador", password: "" });
+      loadUsers();
+    } catch (err: any) {
+      toast.error("Erro ao adicionar usuário: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleUpdateUserStatus = async (userId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'ativo' ? 'inativo' : 'ativo';
+    try {
+      const { error } = await supabase
+        .from("user_management")
+        .update({ status: newStatus })
+        .eq("id", userId);
+      
+      if (error) throw error;
+      toast.success(`Usuário ${newStatus === 'ativo' ? 'ativado' : 'desativado'} com sucesso.`);
+      loadUsers();
+    } catch (err: any) {
+      toast.error("Erro ao atualizar status: " + err.message);
+    }
+  };
+
+  const handleUpdateUserRole = async (userId: string, newRole: string) => {
+    try {
+      const { error } = await supabase
+        .from("user_management")
+        .update({ role: newRole })
+        .eq("id", userId);
+      
+      if (error) throw error;
+      toast.success(`Hierarquia atualizada para ${newRole}.`);
+      loadUsers();
+    } catch (err: any) {
+      toast.error("Erro ao atualizar cargo: " + err.message);
+    }
+  };
   if (loading) {
     return (
       <AdminLayout title="Configurações">
@@ -442,6 +528,7 @@ const AdminConfig = () => {
               { value: "site", icon: Globe, label: "Frontend" },
               { value: "pagamento", icon: CreditCard, label: "Financeiro" },
               { value: "notificacoes", icon: Bell, label: "Alertas" },
+              { value: "usuarios", icon: Users, label: "Usuários" },
               { value: "seguranca", icon: Shield, label: "Acesso" },
               { value: "backup", icon: Database, label: "Backup" },
               { value: "galeria", icon: Image, label: "Mídia" },
@@ -1227,6 +1314,194 @@ const AdminConfig = () => {
               </Card>
             )}
           </div>
+        </TabsContent>
+
+        {/* USUÁRIOS */}
+        <TabsContent value="usuarios">
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-8 space-y-8">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-2xl bg-teal-500/10 text-teal-600">
+                    <Users size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-foreground">Gestão de Usuários</h3>
+                    <p className="text-sm text-muted-foreground">Administre quem pode acessar o sistema e seus níveis de permissão.</p>
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => setIsAddingUser(true)}
+                  className="rounded-xl px-6 h-12 font-black uppercase tracking-widest shadow-lg shadow-teal-500/20 bg-teal-600 hover:bg-teal-700 text-white flex items-center gap-2"
+                >
+                  <UserPlus size={18} />
+                  Novo Usuário
+                </Button>
+              </div>
+
+              {isAddingUser && (
+                <div className="bg-muted/50 p-6 rounded-2xl border border-border space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-bold text-foreground flex items-center gap-2">
+                      <UserPlus size={16} /> Cadastrar Novo Usuário do Sistema
+                    </h4>
+                    <Button variant="ghost" size="icon" onClick={() => setIsAddingUser(false)}>
+                      <X size={18} />
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="space-y-2">
+                      <Label>Nome Completo</Label>
+                      <Input 
+                        placeholder="Ex: João da Silva" 
+                        value={newUser.full_name}
+                        onChange={e => setNewUser({...newUser, full_name: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>E-mail (Login)</Label>
+                      <Input 
+                        type="email" 
+                        placeholder="joao@lencoistour.com" 
+                        value={newUser.email}
+                        onChange={e => setNewUser({...newUser, email: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Senha Inicial</Label>
+                      <Input 
+                        type="password" 
+                        placeholder="••••••••" 
+                        value={newUser.password}
+                        onChange={e => setNewUser({...newUser, password: e.target.value})}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Hierarquia</Label>
+                      <select 
+                        className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        value={newUser.role}
+                        onChange={e => setNewUser({...newUser, role: e.target.value})}
+                      >
+                        <option value="operador">Operador (Reservas)</option>
+                        <option value="financeiro">Financeiro</option>
+                        <option value="gerente">Gerente</option>
+                        <option value="administrador">Administrador</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex justify-end pt-2">
+                    <Button 
+                      onClick={handleAddUser}
+                      disabled={saving}
+                      className="bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold px-8"
+                    >
+                      {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
+                      Salvar Usuário
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <div className="border border-border rounded-2xl overflow-hidden bg-card">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-muted/50 border-b border-border">
+                      <th className="p-4 text-xs font-black uppercase tracking-widest text-muted-foreground">Usuário</th>
+                      <th className="p-4 text-xs font-black uppercase tracking-widest text-muted-foreground">E-mail</th>
+                      <th className="p-4 text-xs font-black uppercase tracking-widest text-muted-foreground">Hierarquia</th>
+                      <th className="p-4 text-xs font-black uppercase tracking-widest text-muted-foreground">Status</th>
+                      <th className="p-4 text-xs font-black uppercase tracking-widest text-muted-foreground text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {usersLoading ? (
+                      <tr>
+                        <td colSpan={5} className="p-12 text-center">
+                          <Loader2 size={32} className="animate-spin text-primary mx-auto mb-2" />
+                          <p className="text-muted-foreground">Carregando usuários...</p>
+                        </td>
+                      </tr>
+                    ) : systemUsers.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="p-12 text-center">
+                          <Users size={32} className="text-muted-foreground opacity-20 mx-auto mb-2" />
+                          <p className="text-muted-foreground">Nenhum usuário cadastrado.</p>
+                        </td>
+                      </tr>
+                    ) : (
+                      systemUsers.map((user) => (
+                        <tr key={user.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                          <td className="p-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-teal-500/10 text-teal-600 flex items-center justify-center font-bold text-xs">
+                                {user.full_name?.charAt(0).toUpperCase() || 'U'}
+                              </div>
+                              <span className="font-bold text-foreground">{user.full_name}</span>
+                            </div>
+                          </td>
+                          <td className="p-4 text-sm text-muted-foreground">{user.email}</td>
+                          <td className="p-4">
+                            <select 
+                              className="bg-transparent text-sm font-medium focus:outline-none cursor-pointer hover:text-primary transition-colors"
+                              value={user.role}
+                              onChange={(e) => handleUpdateUserRole(user.id, e.target.value)}
+                            >
+                              <option value="operador">Operador</option>
+                              <option value="financeiro">Financeiro</option>
+                              <option value="gerente">Gerente</option>
+                              <option value="administrador">Administrador</option>
+                            </select>
+                          </td>
+                          <td className="p-4">
+                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                              user.status === 'ativo' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-rose-500/10 text-rose-600'
+                            }`}>
+                              {user.status}
+                            </span>
+                          </td>
+                          <td className="p-4 text-right">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className={`h-8 px-3 rounded-lg font-bold text-xs ${user.status === 'ativo' ? 'text-rose-600 hover:text-rose-700 hover:bg-rose-50' : 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50'}`}
+                              onClick={() => handleUpdateUserStatus(user.id, user.status)}
+                            >
+                              {user.status === 'ativo' ? 'Bloquear' : 'Ativar'}
+                            </Button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 flex gap-4">
+                  <ShieldCheck className="text-amber-600 shrink-0" size={24} />
+                  <div>
+                    <h5 className="font-bold text-amber-900 text-sm">Política de Hierarquia</h5>
+                    <p className="text-xs text-amber-800/80 leading-relaxed mt-1">
+                      <strong>Administrador:</strong> Acesso total ao sistema.<br />
+                      <strong>Gerente:</strong> Visão completa de relatórios e gestão de passeios.<br />
+                      <strong>Operador:</strong> Foco exclusivo em reservas e atendimento.<br />
+                      <strong>Financeiro:</strong> Acesso aos módulos de contas e faturamento.
+                    </p>
+                  </div>
+                </div>
+                <div className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/20 flex gap-4">
+                  <Key className="text-blue-600 shrink-0" size={24} />
+                  <div>
+                    <h5 className="font-bold text-blue-900 text-sm">Segurança de Acesso</h5>
+                    <p className="text-xs text-blue-800/80 leading-relaxed mt-1">
+                      A criação de usuários aqui registra o perfil operacional. Para o primeiro acesso, o usuário deve realizar o cadastro via login com o e-mail autorizado ou utilizar a senha temporária definida.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* GALERIA */}
