@@ -30,6 +30,7 @@ export interface BookingItem {
   voucherUrl?: string;
   collaboratorId?: string;
   collaboratorName?: string;
+  partnerId?: string;
 }
 
 function generateBookingCode(): string {
@@ -76,6 +77,7 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
     voucherUrl: row.voucher_url || undefined,
     collaboratorId: row.collaborator_id || undefined,
     collaboratorName: row.collaborators?.name || undefined,
+    partnerId: row.partner_id || undefined,
   };
 }
 
@@ -315,9 +317,10 @@ export function useBookings() {
         unit_price: data.unitPrice,
         total: data.total,
         discount: data.discount,
-        final_total: data.finalTotal,
+         final_total: data.finalTotal,
         notes: data.notes,
         collaborator_id: data.collaboratorId || null,
+        partner_id: data.partnerId || null,
       })
       .eq("id", id);
       
