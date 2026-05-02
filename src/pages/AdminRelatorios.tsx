@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-type ReportType = "reservas" | "financeiro" | "clientes" | "passeios" | "sgs" | "marketing";
+type ReportType = "reservas" | "financeiro" | "clientes" | "passeios" | "sgs" | "marketing" | "parceiros";
 
 const REPORT_TABS: { id: ReportType; label: string; icon: any }[] = [
   { id: "reservas", label: "Reservas", icon: ShoppingCart },
