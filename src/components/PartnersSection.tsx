@@ -1,6 +1,6 @@
 import { Building2, Users, Car, Compass, Loader2, CheckCircle2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -21,6 +21,7 @@ const PartnersSection = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   
   const [form, setForm] = useState({
     name: "",
@@ -29,6 +30,24 @@ const PartnersSection = () => {
     type: "hotels",
     message: ""
   });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "site")
+        .maybeSingle();
+      
+      if (data?.value && typeof data.value === 'object') {
+        const siteSettings = data.value as any;
+        if (siteSettings.exibirParceiros !== undefined) {
+          setIsVisible(siteSettings.exibirParceiros);
+        }
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +84,8 @@ const PartnersSection = () => {
       setLoading(false);
     }
   };
+
+  if (!isVisible) return null;
 
   return (
     <section id="parceiros" className="py-20 md:py-28 bg-foreground text-primary-foreground">

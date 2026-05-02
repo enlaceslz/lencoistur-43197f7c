@@ -81,7 +81,8 @@ const DEFAULTS = {
     logoUrl: null as string | null, 
     bannerUrl: null as string | null,
     banners: [] as Array<{ url: string; id: string }>,
-    bannerTransition: "fade" as "fade" | "slide"
+    bannerTransition: "fade" as "fade" | "slide",
+    exibirParceiros: true
   },
   pagamentos: { pix: true, cartao: true, boleto: false, dinheiro: true, transferencia: false, pixChave: "12.345.678/0001-90", pixTipo: "cnpj" as PixKeyType },
   notificacoes: { email: true, whatsapp: true, push: false, novaReserva: true, cancelamento: true, pagamento: true },
@@ -506,6 +507,14 @@ const AdminConfig = () => {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Telefone Fixo / Comercial</Label>
+                  <Input 
+                    value={empresa.telefone} 
+                    onChange={e => setEmpresa({ ...empresa, telefone: maskPhone(e.target.value) })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary font-bold"
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">WhatsApp Operacional</Label>
                   <Input 
                     value={empresa.whatsapp} 
@@ -531,11 +540,22 @@ const AdminConfig = () => {
                 </div>
               </div>
 
+              <div className="flex justify-end pt-8 border-t border-border mt-8">
+                <Button 
+                  onClick={() => saveSetting("empresa", empresa, "Agência")} 
+                  disabled={saving}
+                  className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95 flex items-center gap-2"
+                >
+                  {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Salvar Dados da Agência
+                </Button>
+              </div>
+
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* SITE */}
+        {/* SITE / FRONTEND */}
         <TabsContent value="site">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
             <CardContent className="p-8 space-y-8">
@@ -546,25 +566,18 @@ const AdminConfig = () => {
                   </div>
                   <div>
                     <h3 className="text-xl font-black text-foreground">Aparência do Website</h3>
-                    <p className="text-sm text-muted-foreground">Personalize a identidade visual e banners do site público.</p>
+                    <p className="text-sm text-muted-foreground">Personalize a identidade visual, banners e seções do site público.</p>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button 
-                        onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
-                        disabled={saving} 
-                        className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95"
-                      >
-                        {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
-                        Publicar Frontend
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Aplicar alterações de aparência no site público</p>
-                    </TooltipContent>
-                  </Tooltip>
+                <div className="flex gap-2 relative z-10">
+                  <Button 
+                    onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
+                    disabled={saving} 
+                    className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95 flex items-center gap-2"
+                  >
+                    {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                    Salvar Alterações Frontend
+                  </Button>
                 </div>
               </div>
 
@@ -758,6 +771,32 @@ const AdminConfig = () => {
                       />
                     </div>
                   </div>
+
+                  <div className="border-t border-border pt-6 space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Seções do Website</Label>
+                    <div className="flex items-center justify-between p-4 border border-border rounded-xl bg-muted/20">
+                      <div>
+                        <p className="font-bold text-sm text-foreground">Seção "Seja um Parceiro"</p>
+                        <p className="text-xs text-muted-foreground">Habilitar formulário de captação de novos parceiros no site.</p>
+                        <p className="text-[10px] text-secondary font-black uppercase mt-1">Os cadastros cairão em Marketing {">"} Leads</p>
+                      </div>
+                      <Switch 
+                        checked={site.exibirParceiros} 
+                        onCheckedChange={(v) => setSite({ ...site, exibirParceiros: v })} 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-6 border-t border-border">
+                    <Button 
+                      onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
+                      disabled={saving} 
+                      className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95 flex items-center gap-2"
+                    >
+                      {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                      Salvar Tudo no Frontend
+                    </Button>
+                  </div>
                 </div>
               </div>
 
@@ -915,6 +954,17 @@ const AdminConfig = () => {
                 </div>
               </div>
               
+              <div className="flex justify-end pt-8 border-t border-border">
+                <Button
+                  onClick={() => saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Financeiro")}
+                  disabled={saving}
+                  className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white transition-all active:scale-95 flex items-center gap-2"
+                >
+                  {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                  Salvar Configurações Financeiras
+                </Button>
+              </div>
+
             </CardContent>
           </Card>
         </TabsContent>
@@ -981,6 +1031,17 @@ const AdminConfig = () => {
                   </div>
                 ))}
               </div>
+
+              <div className="flex justify-end pt-8 border-t border-border mt-8">
+                <Button 
+                  onClick={() => saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações")} 
+                  disabled={saving} 
+                  className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 bg-amber-600 hover:bg-amber-700 text-white transition-all active:scale-95 flex items-center gap-2"
+                >
+                  {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                  Salvar Preferências de Alerta
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -1034,6 +1095,17 @@ const AdminConfig = () => {
                 </div>
                 {novaSenha && novaSenha.length < 8 && <p className="text-xs text-destructive">A senha deve ter pelo menos 8 caracteres.</p>}
                 {confirmarSenha && novaSenha !== confirmarSenha && <p className="text-xs text-destructive">As senhas não conferem.</p>}
+              </div>
+
+              <div className="flex justify-end pt-8 border-t border-border mt-8">
+                <Button 
+                  onClick={handleChangePassword} 
+                  disabled={changingPassword || !novaSenha} 
+                  className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-slate-500/20 bg-slate-700 hover:bg-slate-800 text-white transition-all active:scale-95 flex items-center gap-2"
+                >
+                  {changingPassword ? <Loader2 size={18} className="animate-spin" /> : <Shield size={18} />}
+                  Atualizar Senha de Acesso
+                </Button>
               </div>
             </CardContent>
           </Card>
