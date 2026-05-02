@@ -1263,7 +1263,7 @@ const AdminConfig = () => {
       </Tabs>
 
       {/* Floating Save Button for Mobile */}
-      <div className="fixed bottom-6 right-6 lg:hidden z-50">
+      <div className="fixed bottom-6 right-6 lg:hidden z-[60]">
         <Button
           onClick={() => {
             const activeTab = document.querySelector('[data-state="active"][role="tab"]')?.getAttribute('value');
@@ -1276,7 +1276,7 @@ const AdminConfig = () => {
             else toast.info("Selecione uma aba para salvar");
           }}
           disabled={saving}
-          className="w-16 h-16 rounded-full shadow-2xl bg-primary text-white hover:scale-110 active:scale-95 transition-all p-0 flex flex-col items-center justify-center gap-1 border-4 border-background"
+          className="w-16 h-16 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.3)] bg-primary text-white hover:scale-110 active:scale-95 transition-all p-0 flex flex-col items-center justify-center gap-1 border-4 border-background"
         >
           {saving ? <Loader2 size={24} className="animate-spin" /> : (
             <>
