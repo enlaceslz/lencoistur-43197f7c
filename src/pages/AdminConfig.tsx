@@ -524,22 +524,36 @@ const AdminConfig = () => {
             </CardContent>
           </Card>
         </TabsContent>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         {/* SITE */}
         <TabsContent value="site">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
             <CardContent className="p-8 space-y-8">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-2xl bg-primary/10 text-primary">
-                  <Globe size={32} />
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+                    <Globe size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-foreground">Aparência do Website</h3>
+                    <p className="text-sm text-muted-foreground">Personalize a identidade visual e banners do site público.</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-black text-foreground">Aparência do Website</h3>
-                  <p className="text-sm text-muted-foreground">Personalize a identidade visual e banners do site público.</p>
-                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
+                      disabled={saving} 
+                      className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95"
+                    >
+                      {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
+                      Publicar Frontend
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Aplicar alterações de aparência no site público</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
 
               <div className="grid lg:grid-cols-2 gap-10">
