@@ -28,11 +28,12 @@ const STATUS_COLORS: Record<string, string> = {
 
 const emptyForm = {
   type: "incidente", location: "", guide_name: "", description: "", severity: "media",
-  people_involved: "", action_taken: "", tour_id: "" as string,
+  people_involved: "", action_taken: "", tour_id: "" as string, booking_id: "" as string,
   date: new Date().toISOString().slice(0, 16),
 };
 
 interface TourOpt { id: string; name: string; }
+interface BookingOpt { id: string; booking_code: string; item_name: string; }
 
 const AdminSGSIncidentes = () => {
   const [incidents, setIncidents] = useState<any[]>([]);
@@ -47,14 +48,18 @@ const AdminSGSIncidentes = () => {
   useEffect(() => { load(); }, []);
   useEffect(() => {
     if (!showForm) return;
-    supabase.from("tours").select("id, name").eq("active", true).order("name").then(({ data }) => {
-      if (data) setTours(data);
+    Promise.all([
+      supabase.from("tours").select("id, name").eq("active", true).order("name"),
+      supabase.from("bookings").select("id, booking_code, item_name").order("created_at", { ascending: false }).limit(50)
+    ]).then(([{ data: tData }, { data: bData }]) => {
+      if (tData) setTours(tData);
+      if (bData) setBookings(bData.map(b => ({ id: b.id, booking_code: b.booking_code, item_name: b.item_name })));
     });
   }, [showForm]);
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("sgs_incidents").select("*, tours(name)").order("date", { ascending: false });
+    const { data } = await supabase.from("sgs_incidents").select("*, tours(name), bookings(booking_code)").order("date", { ascending: false });
     setIncidents(data || []);
     setLoading(false);
   };
@@ -66,6 +71,7 @@ const AdminSGSIncidentes = () => {
       description: inc.description, severity: inc.severity,
       people_involved: inc.people_involved || "", action_taken: inc.action_taken || "",
       tour_id: inc.tour_id || "",
+      booking_id: inc.booking_id || "",
       date: new Date(inc.date).toISOString().slice(0, 16),
     });
     setShowForm(true);
@@ -88,6 +94,7 @@ const AdminSGSIncidentes = () => {
     e.preventDefault();
     const submitData: any = { ...form };
     if (!submitData.tour_id) delete submitData.tour_id;
+    if (!submitData.booking_id) delete submitData.booking_id;
 
     if (editing) {
       const { error } = await supabase.from("sgs_incidents").update(submitData).eq("id", editing.id);
@@ -195,6 +202,14 @@ const AdminSGSIncidentes = () => {
                 </select>
               </div>
               <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Reserva Relacionada</label>
+                <select value={form.booking_id} onChange={(e) => setForm({ ...form, booking_id: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  <option value="">Nenhuma</option>
+                  {bookings.map(b => <option key={b.id} value={b.id}>{b.booking_code} - {b.item_name}</option>)}
+                </select>
+              </div>
+              <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Local do Incidente *</label>
                 <input required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })}
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Ex: Lagoa Azul, Dunas" />
@@ -256,6 +271,7 @@ const AdminSGSIncidentes = () => {
                   <p className="text-foreground font-medium">{inc.description}</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     {inc.tours?.name && <><MapPin size={10} className="inline mr-1" />{inc.tours.name} • </>}
+                    {inc.bookings?.booking_code && <span className="text-primary font-bold">Reserva: {inc.bookings.booking_code} • </span>}
                     📍 {inc.location} {inc.guide_name && `• Condutor: ${inc.guide_name}`}
                   </p>
                   {inc.people_involved && <p className="text-xs text-muted-foreground">👥 Envolvidos: {inc.people_involved}</p>}
