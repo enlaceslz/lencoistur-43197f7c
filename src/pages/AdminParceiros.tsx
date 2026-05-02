@@ -224,9 +224,9 @@ const AdminParceiros = () => {
       contact_name: form.contact_name.trim() || null, phone: form.phone.trim() || null,
       email: form.email.trim() || null, commission_rate: Number(form.commission_rate) || 0,
       cpf_cnpj: form.cpf_cnpj.trim() || null, address: form.address.trim() || null,
-      cnh: form.type === "motorista" ? (form.cnh.trim() || null) : null,
-      cnh_validade: form.type === "motorista" && form.cnh_validade ? form.cnh_validade : null,
-      cadastur: form.type === "guia" ? (form.cadastur.trim() || null) : null,
+      cnh: form.type === "motorista" || form.type === "fretista" ? (form.cnh.trim() || null) : null,
+      cnh_validade: (form.type === "motorista" || form.type === "fretista") && form.cnh_validade ? form.cnh_validade : null,
+      cadastur: form.type === "guia" || form.type === "agencia" ? (form.cadastur.trim() || null) : null,
       remuneration_type: form.remuneration_type,
       remuneration_value: Number(form.remuneration_value) || 0,
     };
@@ -242,7 +242,7 @@ const AdminParceiros = () => {
       if (res.error) throw res.error;
 
       // Sincronização com SGS — Condutores quando o parceiro for motorista ou guia
-      if (form.type === "motorista" || form.type === "guia") {
+      if (form.type === "motorista" || form.type === "guia" || form.type === "fretista") {
         const condutorPayload = {
           nome: form.name.trim(),
           cpf: form.cpf_cnpj.trim() || null,
