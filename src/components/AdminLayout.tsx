@@ -151,7 +151,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
       
       if (data) {
         setUserRole(data.role);
-        setUserPermissions(data.permissions || {});
+        setUserPermissions((data.permissions as Record<string, boolean>) || {});
       }
     };
     fetchUserPermissions();
