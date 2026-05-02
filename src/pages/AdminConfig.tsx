@@ -449,7 +449,7 @@ const AdminConfig = () => {
               <TabsTrigger 
                 key={tab.value}
                 value={tab.value} 
-                className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 whitespace-nowrap"
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 whitespace-nowrap"
               >
                 <tab.icon size={14} className="shrink-0" /> 
                 <span>{tab.label}</span>
