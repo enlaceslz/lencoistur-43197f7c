@@ -68,10 +68,11 @@ const AdminDashboard = () => {
       setBookings((bRes.data as any[]) || []);
       setCustomerCount(cRes.count || 0);
       setCollabCount(collabRes.count || 0);
+      setExpenses((cpRes.data as any[]) || []);
 
-      const expenses = (cpRes.data as any[]) || [];
+      const expensesData = (cpRes.data as any[]) || [];
       const monthStart = new Date(currentYear, currentMonth, 1).toISOString();
-      const thisMonthExpenses = expenses
+      const thisMonthExpenses = expensesData
         .filter(e => e.vencimento >= monthStart && e.status === 'pago')
         .reduce((sum, e) => sum + Number(e.valor), 0);
       setTotalExpenses(thisMonthExpenses);
