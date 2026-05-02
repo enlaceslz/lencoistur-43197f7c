@@ -213,6 +213,7 @@ const AdminReservas = () => {
         total,
         discount,
         finalTotal,
+        collaboratorId: newForm.collaboratorId || undefined,
       };
 
       if (editingId) {
