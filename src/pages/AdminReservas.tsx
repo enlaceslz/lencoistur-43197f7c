@@ -888,7 +888,7 @@ const AdminReservas = () => {
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={newLoading || !newForm.itemName}>
+            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white" disabled={newLoading || !newForm.itemName}>
               {newLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : (editingId ? <Pencil size={16} className="mr-2" /> : <Plus size={16} className="mr-2" />)}
               {editingId ? "Salvar Alterações" : "Criar Reserva"}
             </Button>
