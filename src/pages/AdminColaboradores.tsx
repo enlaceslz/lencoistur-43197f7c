@@ -865,6 +865,84 @@ const AdminColaboradores = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Collaborator Details Dialog */}
+      <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Detalhes do Colaborador</DialogTitle>
+          </DialogHeader>
+          {selectedCollab && (
+            <div className="space-y-6 py-4">
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-100 border-2 border-slate-200">
+                  {selectedCollab.avatar_url ? (
+                    <img src={selectedCollab.avatar_url} alt={selectedCollab.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-600 font-bold text-4xl">
+                      {selectedCollab.name.substring(0, 2).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h2 className="text-2xl font-bold text-slate-900">{selectedCollab.name}</h2>
+                  <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-2">
+                    <Badge className={selectedCollab.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}>
+                      {selectedCollab.status === 'active' ? 'Ativo' : 'Inativo'}
+                    </Badge>
+                    <Badge variant="secondary">{selectedCollab.type || "Outro"}</Badge>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 pt-4 border-t">
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">Documento (CPF)</p>
+                  <p className="text-sm font-medium">{selectedCollab.document}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">Data de Nascimento</p>
+                  <p className="text-sm font-medium">{selectedCollab.birth_date ? format(new Date(selectedCollab.birth_date), "dd/MM/yyyy") : "—"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">Telefone</p>
+                  <p className="text-sm font-medium">{selectedCollab.phone || "—"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">E-mail</p>
+                  <p className="text-sm font-medium">{selectedCollab.email || "—"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">Endereço</p>
+                  <p className="text-sm font-medium">{selectedCollab.address || "—"} {selectedCollab.zip_code ? `(${selectedCollab.zip_code})` : ""}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">Remuneração</p>
+                  <p className="text-sm font-medium">{getPaymentTypeLabel(selectedCollab.payment_type)}: {selectedCollab.payment_type === 'commission' ? `${selectedCollab.payment_value}%` : formatCurrency(selectedCollab.payment_value)}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">PIX ({selectedCollab.pix_type})</p>
+                  <p className="text-sm font-medium">{selectedCollab.pix_key || "—"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase font-semibold">CNH / CADASTUR</p>
+                  <p className="text-sm font-medium">{selectedCollab.cnh || "—"} / {selectedCollab.cadastur || "—"}</p>
+                </div>
+                {selectedCollab.observation && (
+                  <div className="md:col-span-2 space-y-1">
+                    <p className="text-xs text-muted-foreground uppercase font-semibold">Observações</p>
+                    <p className="text-sm font-medium">{selectedCollab.observation}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDetailsDialogOpen(false)}>Fechar</Button>
+            <Button onClick={() => { setDetailsDialogOpen(false); openEdit(selectedCollab!); }} className="bg-blue-600">Editar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
