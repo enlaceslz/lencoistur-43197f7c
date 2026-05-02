@@ -126,7 +126,7 @@ const AdminDashboard = () => {
     ];
 
     // Revenue by month (last 7 months)
-    const monthlyMap = new Map<string, { revenue: number; bookings: number; expenses: number }>();
+    const monthlyMap = new Map<string, { revenue: number; bookings: number; expenses: number; profit: number }>();
     for (let i = 6; i >= 0; i--) {
       const d = new Date(currentYear, currentMonth - i, 1);
       const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
