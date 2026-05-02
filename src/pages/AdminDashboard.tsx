@@ -51,14 +51,16 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const load = async () => {
-      const [bRes, cRes, rRes, aRes] = await Promise.all([
+      const [bRes, cRes, rRes, aRes, collabRes] = await Promise.all([
         supabase.from("bookings").select("*, customers(name, email)").order("created_at", { ascending: false }),
         supabase.from("customers").select("id", { count: "exact", head: true }),
         supabase.from("sgs_risks").select("risk_level"),
         supabase.from("sgs_corrective_actions").select("id").eq("status", "pendente"),
+        supabase.from("collaborators").select("id", { count: "exact", head: true }),
       ]);
       setBookings((bRes.data as any[]) || []);
       setCustomerCount(cRes.count || 0);
+      setCollabCount(collabRes.count || 0);
       
       const risks = (rRes.data as any[]) || [];
       setSgsStats({
