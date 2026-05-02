@@ -862,6 +862,20 @@ const AdminReservas = () => {
               </div>
 
               <div className="mt-3">
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Colaborador / Vendedor</label>
+                <select
+                  value={newForm.collaboratorId}
+                  onChange={(e) => setNewForm(f => ({ ...f, collaboratorId: e.target.value }))}
+                  className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+                >
+                  <option value="">Nenhum</option>
+                  {collaborators.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mt-3">
                 <label className="text-sm font-semibold text-foreground mb-1.5 block">Observações Internas</label>
                 <Textarea 
                   value={newForm.notes} 
