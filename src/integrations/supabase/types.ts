@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           automations: Json | null
           bot_name: string | null
+          context_window: number | null
           id: string
           instructions: string | null
           tone: string | null
@@ -27,6 +28,7 @@ export type Database = {
         Insert: {
           automations?: Json | null
           bot_name?: string | null
+          context_window?: number | null
           id?: string
           instructions?: string | null
           tone?: string | null
@@ -36,6 +38,7 @@ export type Database = {
         Update: {
           automations?: Json | null
           bot_name?: string | null
+          context_window?: number | null
           id?: string
           instructions?: string | null
           tone?: string | null
@@ -1152,6 +1155,7 @@ export type Database = {
           booking_id: string | null
           condutor_id: string | null
           created_at: string
+          created_by: string | null
           data: string
           id: string
           observacoes: string | null
@@ -1166,6 +1170,7 @@ export type Database = {
           booking_id?: string | null
           condutor_id?: string | null
           created_at?: string
+          created_by?: string | null
           data?: string
           id?: string
           observacoes?: string | null
@@ -1180,6 +1185,7 @@ export type Database = {
           booking_id?: string | null
           condutor_id?: string | null
           created_at?: string
+          created_by?: string | null
           data?: string
           id?: string
           observacoes?: string | null
@@ -1536,6 +1542,7 @@ export type Database = {
           action_taken: string | null
           booking_id: string | null
           created_at: string
+          created_by: string | null
           date: string
           description: string
           guide_name: string | null
@@ -1554,6 +1561,7 @@ export type Database = {
           action_taken?: string | null
           booking_id?: string | null
           created_at?: string
+          created_by?: string | null
           date?: string
           description: string
           guide_name?: string | null
@@ -1572,6 +1580,7 @@ export type Database = {
           action_taken?: string | null
           booking_id?: string | null
           created_at?: string
+          created_by?: string | null
           date?: string
           description?: string
           guide_name?: string | null
@@ -1907,6 +1916,7 @@ export type Database = {
           activity: string
           control_measures: string | null
           created_at: string
+          created_by: string | null
           hazard: string
           id: string
           impact: number
@@ -1924,6 +1934,7 @@ export type Database = {
           activity: string
           control_measures?: string | null
           created_at?: string
+          created_by?: string | null
           hazard: string
           id?: string
           impact: number
@@ -1941,6 +1952,7 @@ export type Database = {
           activity?: string
           control_measures?: string | null
           created_at?: string
+          created_by?: string | null
           hazard?: string
           id?: string
           impact?: number
@@ -2298,18 +2310,21 @@ export type Database = {
           id: string
           key: string
           updated_at: string
+          updated_by: string | null
           value: Json
         }
         Insert: {
           id?: string
           key: string
           updated_at?: string
+          updated_by?: string | null
           value?: Json
         }
         Update: {
           id?: string
           key?: string
           updated_at?: string
+          updated_by?: string | null
           value?: Json
         }
         Relationships: []
@@ -2331,6 +2346,8 @@ export type Database = {
           includes: string[] | null
           location: string | null
           main_operator_id: string | null
+          meta_description: string | null
+          meta_title: string | null
           mode_collective_enabled: boolean
           mode_private_enabled: boolean
           name: string
@@ -2361,6 +2378,8 @@ export type Database = {
           includes?: string[] | null
           location?: string | null
           main_operator_id?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
           mode_collective_enabled?: boolean
           mode_private_enabled?: boolean
           name: string
@@ -2391,6 +2410,8 @@ export type Database = {
           includes?: string[] | null
           location?: string | null
           main_operator_id?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
           mode_collective_enabled?: boolean
           mode_private_enabled?: boolean
           name?: string
