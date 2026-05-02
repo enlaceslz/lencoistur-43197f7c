@@ -90,6 +90,7 @@ const DEFAULTS = {
 };
 
 const AdminConfig = () => {
+  const [activeTab, setActiveTab] = useState("empresa");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [empresa, setEmpresa] = useState(DEFAULTS.empresa);
@@ -180,6 +181,12 @@ const AdminConfig = () => {
     } finally {
       setUsersLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    if (tab) setActiveTab(tab);
   }, []);
 
   useEffect(() => { 
@@ -520,7 +527,7 @@ const AdminConfig = () => {
 
   return (
     <AdminLayout title="Configurações">
-      <Tabs defaultValue="empresa" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <div className="bg-card border border-border p-2 rounded-2xl shadow-sm overflow-x-auto no-scrollbar min-h-[60px]">
           <TabsList className="bg-transparent flex-nowrap h-auto gap-1">
             {[

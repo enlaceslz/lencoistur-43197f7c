@@ -25,6 +25,7 @@ const REPORT_TABS: { id: ReportType; label: string; icon: any }[] = [
   { id: "sgs", label: "Segurança (SGS)", icon: Shield },
   { id: "marketing", label: "Marketing", icon: TrendingUp },
   { id: "parceiros", label: "Parceiros", icon: UserPlus },
+  { id: "usuarios", label: "Acessos (Logs)", icon: Users },
 ];
 
 const COLORS = [
@@ -158,6 +159,16 @@ const AdminRelatorios = () => {
           total: p.length,
           active: p.filter((x: any) => x.active).length,
           byType: Object.entries(byType).map(([name, value]) => ({ name, value })),
+        });
+      } else if (activeTab === "usuarios") {
+        const { data: users } = await supabase.from("user_management").select("*");
+        const u = users || [];
+        const byRole: Record<string, number> = {};
+        u.forEach((us: any) => { byRole[us.role] = (byRole[us.role] || 0) + 1; });
+        setData({
+          total: u.length,
+          active: u.filter((x: any) => x.status === "ativo").length,
+          byRole: Object.entries(byRole).map(([name, value]) => ({ name, value })),
         });
       }
     } catch (err) {

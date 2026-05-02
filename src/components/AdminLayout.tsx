@@ -313,6 +313,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
 
           <div className="pt-3">
             {!sidebarCollapsed && <p className="px-4 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,40%)]">Sistema</p>}
+            <SidebarLink icon={Users} label="Usuários" path="/admin/config?tab=usuarios" />
             <SidebarLink icon={Settings} label="Configurações" path="/admin/config" />
             <SidebarLink icon={HelpCircle} label="Ajuda" path="/admin/ajuda" />
           </div>
