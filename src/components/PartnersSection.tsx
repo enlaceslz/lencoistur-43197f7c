@@ -85,6 +85,8 @@ const PartnersSection = () => {
     }
   };
 
+  if (!isVisible) return null;
+
   return (
     <section id="parceiros" className="py-20 md:py-28 bg-foreground text-primary-foreground">
       <div className="container mx-auto px-4">
