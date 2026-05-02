@@ -1085,7 +1085,7 @@ const AdminCRMContent = () => {
                 <div className="space-y-4 bg-muted/10 p-5 rounded-2xl border border-border/50 shadow-inner">
                   <div className="flex items-center gap-4 text-sm font-semibold">
                     <div className="p-2 rounded-lg bg-background border border-border"><Mail size={16} className="text-primary" /></div>
-                    <span className="text-foreground truncate">{selectedCustomer.email}</span>
+                    <span className="text-foreground truncate">{selectedCustomer.email || "Sem e-mail cadastrado"}</span>
                   </div>
                   {selectedCustomer.phone && (
                     <div className="flex items-center gap-4 text-sm font-semibold">
@@ -1622,17 +1622,17 @@ const AdminCRMContent = () => {
                   </p>
                 )}
               </div>
-            </div>
-            <div>
-              <Label htmlFor="dep-cpf">CPF</Label>
-              <Input
-                id="dep-cpf"
-                value={depForm.cpf}
-                onChange={(e) => setDepForm({ ...depForm, cpf: maskCPF(e.target.value) })}
-                placeholder="000.000.000-00"
-                maxLength={14}
-                className="rounded-xl"
-              />
+              <div className="col-span-2">
+                <Label htmlFor="dep-cpf">CPF</Label>
+                <Input
+                  id="dep-cpf"
+                  value={depForm.cpf}
+                  onChange={(e) => setDepForm({ ...depForm, cpf: maskCPF(e.target.value) })}
+                  placeholder="000.000.000-00"
+                  maxLength={14}
+                  className="rounded-xl"
+                />
+              </div>
             </div>
           </div>
           <DialogFooter>
