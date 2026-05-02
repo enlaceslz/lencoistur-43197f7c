@@ -447,10 +447,11 @@ const AdminColaboradores = () => {
       </Card>
 
       {viewMode === 'cards' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map(c => (
-            <Card key={c.id} className="overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all group relative">
-              <div className="p-5">
+            <Card key={c.id} className="overflow-hidden border-none shadow-md hover:shadow-xl transition-all group relative bg-background/60 backdrop-blur-sm">
+              <div className="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
+              <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
                     <div className="w-14 h-14 rounded-2xl overflow-hidden bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xl shadow-inner border border-blue-100 group-hover:scale-105 transition-transform">
