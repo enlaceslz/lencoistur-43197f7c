@@ -370,10 +370,10 @@ const AdminColaboradores = () => {
           }}>
             <Download size={16} className="mr-1.5" /> Exportar CSV
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setTypesDialogOpen(true)}>
+          <Button variant="outline" size="sm" className="rounded-full h-9 border-slate-200" onClick={() => setTypesDialogOpen(true)}>
             <Settings2 size={16} className="mr-1.5" /> Gerenciar Tipos
           </Button>
-          <Button onClick={openNew} size="sm">
+          <Button onClick={openNew} size="sm" className="rounded-full h-9 px-5 bg-primary hover:bg-primary/90 shadow-md transition-all">
             <Plus size={16} className="mr-1.5" /> Novo Colaborador
           </Button>
         </div>
