@@ -749,23 +749,6 @@ const AdminConfig = () => {
                 </div>
               </div>
 
-              <div className="mt-10 pt-6 border-t border-border flex justify-end">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
-                      disabled={saving} 
-                      className="rounded-xl px-10 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95"
-                    >
-                      {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
-                      Publicar Frontend
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Aplicar alterações de aparência no site público</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -774,14 +757,30 @@ const AdminConfig = () => {
         <TabsContent value="pagamento">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
             <CardContent className="p-8 space-y-8">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600">
-                  <CreditCard size={32} />
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600">
+                    <CreditCard size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-foreground">Configurações Financeiras</h3>
+                    <p className="text-sm text-muted-foreground">Gerencie métodos de recebimento e chaves PIX.</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-black text-foreground">Configurações Financeiras</h3>
-                  <p className="text-sm text-muted-foreground">Gerencie métodos de recebimento e chaves PIX.</p>
-                </div>
+                <Button
+                  onClick={() => {
+                    if (pagamentos.pix) {
+                      const v = validatePixKey(pagamentos.pixChave, pagamentos.pixTipo);
+                      if (!v.valid) { toast.error("Chave PIX inválida: " + v.message); return; }
+                    }
+                    saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Financeiro");
+                  }}
+                  disabled={saving}
+                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white"
+                >
+                  {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
+                  Salvar Financeiro
+                </Button>
               </div>
 
               <div className="grid gap-4">
