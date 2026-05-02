@@ -44,6 +44,7 @@ const AdminSGSIncidentes = () => {
   const [editing, setEditing] = useState<any>(null);
   const [form, setForm] = useState(emptyForm);
   const [tours, setTours] = useState<TourOpt[]>([]);
+  const [bookings, setBookings] = useState<BookingOpt[]>([]);
 
   useEffect(() => { load(); }, []);
   useEffect(() => {
