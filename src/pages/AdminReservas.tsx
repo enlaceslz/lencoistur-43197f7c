@@ -147,6 +147,7 @@ const AdminReservas = () => {
       country: b.country || "Brasil",
       birthDate: b.birthDate || "",
       notes: b.notes || "",
+      collaboratorId: b.collaboratorId || "",
     });
     setSelectedCustomerId(b.customerId || "");
     setShowNewForm(true);
