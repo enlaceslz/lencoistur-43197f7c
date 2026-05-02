@@ -425,7 +425,7 @@ const AdminConfig = () => {
   return (
     <AdminLayout title="Configurações">
       <Tabs defaultValue="empresa" className="space-y-6">
-        <div className="bg-card border border-border p-2 rounded-2xl shadow-sm overflow-x-auto no-scrollbar">
+        <div className="bg-card border border-border p-2 rounded-2xl shadow-sm overflow-x-auto no-scrollbar min-h-[60px]">
           <TabsList className="bg-transparent flex-nowrap h-auto gap-1">
             {[
               { value: "empresa", icon: Building2, label: "Agência" },
@@ -439,9 +439,10 @@ const AdminConfig = () => {
               <TabsTrigger 
                 key={tab.value}
                 value={tab.value} 
-                className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all"
+                className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 whitespace-nowrap"
               >
-                <tab.icon size={14} className="mr-2" /> {tab.label}
+                <tab.icon size={14} className="shrink-0" /> 
+                <span>{tab.label}</span>
               </TabsTrigger>
             ))}
           </TabsList>
