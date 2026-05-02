@@ -238,12 +238,22 @@ const AdminDashboard = () => {
                     <stop offset="5%" stopColor="hsl(174, 62%, 38%)" stopOpacity={0.3} />
                     <stop offset="95%" stopColor="hsl(174, 62%, 38%)" stopOpacity={0} />
                   </linearGradient>
+                  <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(35, 80%, 55%)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(35, 80%, 55%)" stopOpacity={0} />
+                  </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="month" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
                 <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => `R$${(v / 100).toFixed(0)}`} />
-                <Tooltip formatter={(value: number) => [fmt(value), "Faturamento"]} />
+                <Tooltip 
+                  formatter={(value: number, name: string) => [
+                    fmt(value), 
+                    name === "revenue" ? "Faturamento" : name === "profit" ? "Lucro" : "Despesas"
+                  ]} 
+                />
                 <Area type="monotone" dataKey="revenue" stroke="hsl(174, 62%, 38%)" fill="url(#colorRevenue)" strokeWidth={2} />
+                <Area type="monotone" dataKey="profit" stroke="hsl(35, 80%, 55%)" fill="url(#colorProfit)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
