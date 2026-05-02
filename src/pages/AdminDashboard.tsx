@@ -43,24 +43,39 @@ interface BookingRow {
 
 const AdminDashboard = () => {
   const [bookings, setBookings] = useState<BookingRow[]>([]);
+  const [expenses, setExpenses] = useState<any[]>([]);
   const [customerCount, setCustomerCount] = useState(0);
   const [collabCount, setCollabCount] = useState(0);
+  const [totalExpenses, setTotalExpenses] = useState(0);
   const [sgsStats, setSgsStats] = useState({ activeRisks: 0, criticalRisks: 0, pendingActions: 0 });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
     const load = async () => {
-      const [bRes, cRes, rRes, aRes, collabRes] = await Promise.all([
+      const [bRes, cRes, rRes, aRes, collabRes, cpRes] = await Promise.all([
         supabase.from("bookings").select("*, customers(name, email)").order("created_at", { ascending: false }),
         supabase.from("customers").select("id", { count: "exact", head: true }),
         supabase.from("sgs_risks").select("risk_level"),
         supabase.from("sgs_corrective_actions").select("id").eq("status", "pendente"),
         supabase.from("collaborators").select("id", { count: "exact", head: true }),
+        supabase.from("contas_pagar").select("valor, status, vencimento")
       ]);
       setBookings((bRes.data as any[]) || []);
       setCustomerCount(cRes.count || 0);
       setCollabCount(collabRes.count || 0);
+      setExpenses((cpRes.data as any[]) || []);
+
+      const expensesData = (cpRes.data as any[]) || [];
+      const monthStart = new Date(currentYear, currentMonth, 1).toISOString();
+      const thisMonthExpenses = expensesData
+        .filter(e => e.vencimento >= monthStart && e.status === 'pago')
+        .reduce((sum, e) => sum + Number(e.valor), 0);
+      setTotalExpenses(thisMonthExpenses);
       
       const risks = (rRes.data as any[]) || [];
       setSgsStats({
@@ -105,17 +120,17 @@ const AdminDashboard = () => {
 
     const stats = [
       { label: "Reservas Hoje", value: String(todayBookings.length), change: `${todayBookings.length}`, up: todayBookings.length > 0, icon: Calendar, path: "/admin/reservas" },
-      { label: "Receita Confirmada (Mês)", value: fmt(thisRevenue), change: `${Number(revChange) >= 0 ? "+" : ""}${revChange}%`, up: Number(revChange) >= 0, icon: DollarSign, path: "/admin/financeiro" },
-      { label: "Colaboradores", value: String(collabCount), change: "Equipe", up: true, icon: Briefcase, path: "/admin/colaboradores" },
+      { label: "Lucro Líquido (Mês)", value: fmt(thisRevenue - totalExpenses), change: `Gasto: ${fmt(totalExpenses)}`, up: (thisRevenue - totalExpenses) > 0, icon: DollarSign, path: "/admin/financeiro" },
+      { label: "Colaboradores", value: String(collabCount), change: "Equipe Ativa", up: true, icon: Briefcase, path: "/admin/colaboradores" },
       { label: "Conformidade SGS", value: String(sgsStats.criticalRisks === 0 ? "100%" : "Risco"), change: `${sgsStats.pendingActions} alertas`, up: sgsStats.criticalRisks === 0, icon: ShieldAlert, isSgs: true, path: "/admin/sgs" },
     ];
 
     // Revenue by month (last 7 months)
-    const monthlyMap = new Map<string, { revenue: number; bookings: number }>();
+    const monthlyMap = new Map<string, { revenue: number; bookings: number; expenses: number }>();
     for (let i = 6; i >= 0; i--) {
       const d = new Date(currentYear, currentMonth - i, 1);
       const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
-      monthlyMap.set(key, { revenue: 0, bookings: 0 });
+      monthlyMap.set(key, { revenue: 0, bookings: 0, expenses: 0 });
     }
     bookings.forEach((b) => {
       if (b.status === "cancelada") return;
@@ -127,10 +142,23 @@ const AdminDashboard = () => {
         entry.bookings += 1;
       }
     });
+    
+    expenses.forEach((e) => {
+      if (e.status !== "pago") return;
+      const d = new Date(e.vencimento);
+      const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
+      const entry = monthlyMap.get(key);
+      if (entry) {
+        entry.expenses += Number(e.valor);
+      }
+    });
+
     const revenueData = Array.from(monthlyMap.entries()).map(([key, val]) => ({
       month: MONTH_LABELS[parseInt(key.split("-")[1])],
       revenue: val.revenue,
       bookings: val.bookings,
+      expenses: val.expenses,
+      profit: val.revenue - val.expenses
     }));
 
     // Tour popularity
@@ -159,7 +187,7 @@ const AdminDashboard = () => {
     }));
 
     return { stats, revenueData, tourPopularity, recentBookings };
-  }, [bookings, customerCount, currentMonth, currentYear, todayStr]);
+  }, [bookings, expenses, totalExpenses, customerCount, collabCount, sgsStats, currentMonth, currentYear, todayStr]);
 
   if (loading) {
     return (
@@ -210,12 +238,22 @@ const AdminDashboard = () => {
                     <stop offset="5%" stopColor="hsl(174, 62%, 38%)" stopOpacity={0.3} />
                     <stop offset="95%" stopColor="hsl(174, 62%, 38%)" stopOpacity={0} />
                   </linearGradient>
+                  <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(35, 80%, 55%)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(35, 80%, 55%)" stopOpacity={0} />
+                  </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="month" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
                 <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => `R$${(v / 100).toFixed(0)}`} />
-                <Tooltip formatter={(value: number) => [fmt(value), "Faturamento"]} />
+                <Tooltip 
+                  formatter={(value: number, name: string) => [
+                    fmt(value), 
+                    name === "revenue" ? "Faturamento" : name === "profit" ? "Lucro" : "Despesas"
+                  ]} 
+                />
                 <Area type="monotone" dataKey="revenue" stroke="hsl(174, 62%, 38%)" fill="url(#colorRevenue)" strokeWidth={2} />
+                <Area type="monotone" dataKey="profit" stroke="hsl(35, 80%, 55%)" fill="url(#colorProfit)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
