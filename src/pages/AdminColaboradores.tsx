@@ -14,7 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Users, Search, Plus, Edit, Trash2, Loader2, Phone, Mail, User, Wallet, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileText, History
+  Users, Search, Plus, Edit, Trash2, Loader2, Phone, Mail, User, Wallet, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileText, History, LayoutGrid, List, Settings2, Trash
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -48,6 +48,13 @@ interface Collaborator {
   created_at: string;
 }
 
+interface CollabType {
+  id: string;
+  name: string;
+  description: string | null;
+  color: string;
+}
+
 interface Payment {
   id: string;
   collaborator_id: string;
@@ -62,15 +69,20 @@ interface Payment {
 
 const AdminColaboradores = () => {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
+  const [collabTypes, setCollabTypes] = useState<CollabType[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('cards');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [typesDialogOpen, setTypesDialogOpen] = useState(false);
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [selectedCollab, setSelectedCollab] = useState<Collaborator | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const [typeForm, setTypeForm] = useState({ name: "", description: "", color: "#3b82f6" });
 
   const [form, setForm] = useState({
     name: "", email: "", phone: "", document: "",
@@ -86,7 +98,13 @@ const AdminColaboradores = () => {
 
   useEffect(() => {
     fetchCollaborators();
+    fetchCollabTypes();
   }, []);
+
+  const fetchCollabTypes = async () => {
+    const { data, error } = await supabase.from("collaborator_types").select("*").order("name");
+    if (!error) setCollabTypes(data as CollabType[]);
+  };
 
   const fetchCollaborators = async () => {
     setLoading(true);
@@ -208,6 +226,28 @@ const AdminColaboradores = () => {
     setSaving(false);
   };
 
+  const handleSaveType = async () => {
+    if (!typeForm.name) return;
+    setSaving(true);
+    const { error } = await supabase.from("collaborator_types").insert(typeForm);
+    if (error) toast.error("Erro ao salvar tipo");
+    else {
+      toast.success("Tipo cadastrado!");
+      setTypeForm({ name: "", description: "", color: "#3b82f6" });
+      fetchCollabTypes();
+    }
+    setSaving(false);
+  };
+
+  const deleteType = async (id: string) => {
+    const { error } = await supabase.from("collaborator_types").delete().eq("id", id);
+    if (error) toast.error("Erro ao remover tipo");
+    else {
+      toast.success("Tipo removido!");
+      fetchCollabTypes();
+    }
+  };
+
   const confirmDelete = async () => {
     if (!deleteId) return;
     const { error } = await supabase.from("collaborators").delete().eq("id", deleteId);
@@ -250,13 +290,18 @@ const AdminColaboradores = () => {
             Gerencie sua equipe, pagamentos e integrações financeiras.
           </p>
         </div>
-        <Button onClick={openNew} className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20">
-          <Plus size={16} className="mr-2" /> Novo Colaborador
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setTypesDialogOpen(true)} className="border-slate-200">
+            <Settings2 size={16} className="mr-2" /> Tipos
+          </Button>
+          <Button onClick={openNew} className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20">
+            <Plus size={16} className="mr-2" /> Novo Colaborador
+          </Button>
+        </div>
       </div>
 
       <Card className="mb-6">
-        <CardContent className="p-4">
+        <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="relative w-full max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
             <Input 
@@ -266,93 +311,177 @@ const AdminColaboradores = () => {
               className="pl-10" 
             />
           </div>
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+            <Button 
+              variant={viewMode === 'cards' ? 'secondary' : 'ghost'} 
+              size="sm" 
+              onClick={() => setViewMode('cards')}
+              className={viewMode === 'cards' ? 'bg-white shadow-sm' : ''}
+            >
+              <LayoutGrid size={16} className="mr-2" /> Cards
+            </Button>
+            <Button 
+              variant={viewMode === 'table' ? 'secondary' : 'ghost'} 
+              size="sm" 
+              onClick={() => setViewMode('table')}
+              className={viewMode === 'table' ? 'bg-white shadow-sm' : ''}
+            >
+              <List size={16} className="mr-2" /> Tabela
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Colaborador</TableHead>
-                <TableHead>Contato</TableHead>
-                <TableHead>Remuneração</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.length === 0 ? (
+      {viewMode === 'cards' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filtered.map(c => (
+            <Card key={c.id} className="overflow-hidden hover:shadow-md transition-shadow">
+              <div className="p-5">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+                      {c.name.substring(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-900">{c.name}</h3>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-[10px] h-4">
+                          {c.type || "Outro"}
+                        </Badge>
+                        <span className="text-xs text-slate-500">{c.document}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Badge className={c.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}>
+                    {c.status === 'active' ? 'Ativo' : 'Inativo'}
+                  </Badge>
+                </div>
+
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2 text-sm text-slate-600">
+                    <Phone size={14} className="text-slate-400" /> {c.phone || "Não informado"}
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-slate-600">
+                    <Mail size={14} className="text-slate-400" /> {c.email || "Não informado"}
+                  </div>
+                  <div className="flex items-center gap-2 text-sm font-medium text-blue-700">
+                    <Wallet size={14} className="text-blue-400" /> {getPaymentTypeLabel(c.payment_type)}: {c.payment_type === 'commission' ? `${c.payment_value}%` : formatCurrency(c.payment_value)}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" onClick={() => openNewPayment(c)} title="Lançar Pagamento">
+                      <Banknote size={18} className="text-emerald-600" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => openHistory(c)} title="Histórico">
+                      <History size={18} className="text-blue-600" />
+                    </Button>
+                  </div>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" onClick={() => openEdit(c)} title="Editar">
+                      <Edit size={18} className="text-slate-600" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => setDeleteId(c.id)} title="Excluir">
+                      <Trash2 size={18} className="text-red-500" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))}
+          {filtered.length === 0 && (
+            <div className="col-span-full py-20 text-center text-slate-500 bg-slate-50 rounded-xl border-2 border-dashed">
+              Nenhum colaborador encontrado.
+            </div>
+          )}
+        </div>
+      ) : (
+        <Card>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
-                    Nenhum colaborador encontrado.
-                  </TableCell>
+                  <TableHead>Colaborador</TableHead>
+                  <TableHead>Contato</TableHead>
+                  <TableHead>Remuneração</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
-              ) : (
-                filtered.map((c) => (
-                  <TableRow key={c.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
-                          {c.name.substring(0, 2).toUpperCase()}
-                        </div>
-                        <div>
-                          <p className="font-bold text-sm">{c.name}</p>
-                          <div className="flex gap-2">
-                            <Badge variant="outline" className="text-[9px] h-4 px-1 leading-none bg-slate-50">
-                              {c.type || "Outro"}
-                            </Badge>
-                            <p className="text-[10px] text-muted-foreground">{c.document || "S/ Documento"}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-0.5">
-                        <div className="flex items-center gap-1.5 text-xs">
-                          <Phone size={10} className="text-muted-foreground" /> {c.phone || "—"}
-                        </div>
-                        <div className="flex items-center gap-1.5 text-xs">
-                          <Mail size={10} className="text-muted-foreground" /> {c.email || "—"}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-0.5">
-                        <p className="text-xs font-medium">{getPaymentTypeLabel(c.payment_type)}</p>
-                        <p className="text-xs text-blue-600 font-bold">
-                          {c.payment_type === 'commission' ? `${c.payment_value}%` : formatCurrency(c.payment_value)}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={c.status === 'active' ? 'default' : 'secondary'} className={c.status === 'active' ? 'bg-green-100 text-green-700' : ''}>
-                        {c.status === 'active' ? 'Ativo' : 'Inativo'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="icon" title="Lançar Pagamento" onClick={() => openNewPayment(c)}>
-                          <Banknote size={16} className="text-emerald-600" />
-                        </Button>
-                        <Button variant="ghost" size="icon" title="Histórico" onClick={() => openHistory(c)}>
-                          <History size={16} className="text-blue-600" />
-                        </Button>
-                        <Button variant="ghost" size="icon" title="Editar" onClick={() => openEdit(c)}>
-                          <Edit size={16} className="text-slate-600" />
-                        </Button>
-                        <Button variant="ghost" size="icon" title="Excluir" onClick={() => setDeleteId(c.id)}>
-                          <Trash2 size={16} className="text-red-500" />
-                        </Button>
-                      </div>
+              </TableHeader>
+              <TableBody>
+                {filtered.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
+                      Nenhum colaborador encontrado.
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </Card>
+                ) : (
+                  filtered.map((c) => (
+                    <TableRow key={c.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
+                            {c.name.substring(0, 2).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm">{c.name}</p>
+                            <div className="flex gap-2">
+                              <Badge variant="outline" className="text-[9px] h-4 px-1 leading-none bg-slate-50">
+                                {c.type || "Outro"}
+                              </Badge>
+                              <p className="text-[10px] text-muted-foreground">{c.document || "S/ Documento"}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <Phone size={10} className="text-muted-foreground" /> {c.phone || "—"}
+                          </div>
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <Mail size={10} className="text-muted-foreground" /> {c.email || "—"}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-0.5">
+                          <p className="text-xs font-medium">{getPaymentTypeLabel(c.payment_type)}</p>
+                          <p className="text-xs text-blue-600 font-bold">
+                            {c.payment_type === 'commission' ? `${c.payment_value}%` : formatCurrency(c.payment_value)}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={c.status === 'active' ? 'default' : 'secondary'} className={c.status === 'active' ? 'bg-green-100 text-green-700' : ''}>
+                          {c.status === 'active' ? 'Ativo' : 'Inativo'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="icon" title="Lançar Pagamento" onClick={() => openNewPayment(c)}>
+                            <Banknote size={16} className="text-emerald-600" />
+                          </Button>
+                          <Button variant="ghost" size="icon" title="Histórico" onClick={() => openHistory(c)}>
+                            <History size={16} className="text-blue-600" />
+                          </Button>
+                          <Button variant="ghost" size="icon" title="Editar" onClick={() => openEdit(c)}>
+                            <Edit size={16} className="text-slate-600" />
+                          </Button>
+                          <Button variant="ghost" size="icon" title="Excluir" onClick={() => setDeleteId(c.id)}>
+                            <Trash2 size={16} className="text-red-500" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </Card>
+      )}
 
       {/* Collaborator Form Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -376,11 +505,9 @@ const AdminColaboradores = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Guia">Guia</SelectItem>
-                  <SelectItem value="Motorista">Motorista</SelectItem>
-                  <SelectItem value="Vendedor">Vendedor</SelectItem>
-                  <SelectItem value="Freelancer">Freelancer</SelectItem>
-                  <SelectItem value="Outro">Outro</SelectItem>
+                  {collabTypes.map(t => (
+                    <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
