@@ -337,7 +337,7 @@ const AdminReservas = () => {
             </div>
             <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
               {["todos", "confirmada", "pendente", "cancelada", "concluida"].map((s) => (
-                <Button key={s} variant={statusFilter === s ? "default" : "outline"} size="sm" onClick={() => setStatusFilter(s)} className="capitalize whitespace-nowrap">
+                <Button key={s} variant={statusFilter === s ? "default" : "outline"} size="sm" onClick={() => setStatusFilter(s)} className={`capitalize whitespace-nowrap ${statusFilter === s ? "bg-blue-600 hover:bg-blue-700 text-white" : ""}`}>
                   {s === "todos" ? `Todos` : statusConfig[s]?.label}
                 </Button>
               ))}
