@@ -48,6 +48,10 @@ interface Conta {
   fornecedor: string | null;
   observacoes: string | null;
   pago_em: string | null;
+  booking_id: string | null;
+  bookings?: {
+    booking_code: string;
+  } | null;
 }
 
 const emptyForm = { descricao: "", valor: 0, vencimento: "", categoria: "operacional", fornecedor: "", observacoes: "", status: "pendente" };
@@ -65,7 +69,7 @@ export default function ContasPagarTab({ company }: { company?: any }) {
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("contas_pagar").select("*").order("vencimento", { ascending: true });
+    const { data } = await supabase.from("contas_pagar").select("*, bookings(booking_code)").order("vencimento", { ascending: true });
     if (data) setContas(data as any);
     setLoading(false);
   };
@@ -276,9 +280,16 @@ export default function ContasPagarTab({ company }: { company?: any }) {
                           <td className="px-6 py-4">
                             <div className="flex flex-col">
                               <span className="font-bold text-foreground group-hover:text-primary transition-colors">{c.descricao}</span>
-                              <span className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1 italic">
-                                {c.observacoes || "Sem observações"}
-                              </span>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-[11px] text-muted-foreground flex items-center gap-1 italic">
+                                  {c.observacoes || "Sem observações"}
+                                </span>
+                                {c.bookings?.booking_code && (
+                                  <Badge variant="secondary" className="text-[9px] h-4 px-1.5 font-mono font-bold bg-primary/5 text-primary border-primary/10">
+                                    {c.bookings.booking_code}
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
                           </td>
                           <td className="px-6 py-4">
