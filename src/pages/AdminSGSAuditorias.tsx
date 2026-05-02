@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, ClipboardCheck, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { Plus, ClipboardCheck, CheckCircle, XCircle, Loader2, User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const CATEGORIES: Record<string, string> = {
@@ -13,8 +13,9 @@ const AdminSGSAuditorias = () => {
   const [audits, setAudits] = useState<any[]>([]);
   const [auditItems, setAuditItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [collaborators, setCollaborators] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ auditor: "", observations: "" });
+  const [form, setForm] = useState({ auditor: "", auditor_id: "", observations: "" });
   const [checklist, setChecklist] = useState(
     Object.keys(CATEGORIES).map((cat) => ({ category: cat, item_name: CATEGORIES[cat], compliant: false, observation: "" }))
   );
@@ -23,12 +24,14 @@ const AdminSGSAuditorias = () => {
 
   const load = async () => {
     setLoading(true);
-    const [auditsRes, itemsRes] = await Promise.all([
+    const [auditsRes, itemsRes, collabsRes] = await Promise.all([
       supabase.from("sgs_audits").select("*").order("date", { ascending: false }),
       supabase.from("sgs_audit_items").select("*"),
+      supabase.from("collaborators").select("id, name").eq("status", "active").order("name"),
     ]);
     setAudits(auditsRes.data || []);
     setAuditItems(itemsRes.data || []);
+    setCollaborators(collabsRes.data || []);
     setLoading(false);
   };
 
@@ -39,8 +42,12 @@ const AdminSGSAuditorias = () => {
     const score = ((compliantCount / checklist.length) * 100).toFixed(1);
 
     const { data: audit, error } = await supabase.from("sgs_audits").insert({
-      audit_code: code, auditor: form.auditor, score: Number(score),
-      observations: form.observations, status: "concluida",
+      audit_code: code, 
+      auditor: form.auditor, 
+      auditor_id: form.auditor_id || null,
+      score: Number(score),
+      observations: form.observations, 
+      status: "concluida",
     }).select().single();
 
     if (error || !audit) { toast({ title: "Erro", variant: "destructive" }); return; }
@@ -51,7 +58,7 @@ const AdminSGSAuditorias = () => {
 
     toast({ title: `Auditoria concluída! Score: ${score}%` });
     setShowForm(false);
-    setForm({ auditor: "", observations: "" });
+    setForm({ auditor: "", auditor_id: "", observations: "" });
     setChecklist(Object.keys(CATEGORIES).map((cat) => ({ category: cat, item_name: CATEGORIES[cat], compliant: false, observation: "" })));
     load();
   };
@@ -72,10 +79,32 @@ const AdminSGSAuditorias = () => {
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
             <h3 className="font-display font-bold text-foreground">Nova Auditoria de Segurança</h3>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Auditor *</label>
-              <input required value={form.auditor} onChange={(e) => setForm({ ...form, auditor: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none max-w-md" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Auditor (Equipe) *</label>
+                <select 
+                  required 
+                  value={form.auditor_id} 
+                  onChange={(e) => {
+                    const collab = collaborators.find(c => c.id === e.target.value);
+                    setForm({ ...form, auditor_id: e.target.value, auditor: collab?.name || "" });
+                  }}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none"
+                >
+                  <option value="">Selecione um membro da equipe</option>
+                  {collaborators.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Auditor Externo (se aplicável)</label>
+                <input 
+                  value={form.auditor_id ? "" : form.auditor} 
+                  disabled={!!form.auditor_id}
+                  onChange={(e) => setForm({ ...form, auditor: e.target.value })}
+                  placeholder="Nome do auditor externo"
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" 
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
