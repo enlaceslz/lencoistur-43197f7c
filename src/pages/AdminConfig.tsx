@@ -1117,8 +1117,8 @@ const AdminConfig = () => {
             <Card className="border-border">
               <CardContent className="p-6 space-y-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <HardDrive size={20} className="text-primary" />
+                  <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+                    <HardDrive size={20} className="text-indigo-600" />
                   </div>
                   <div>
                     <h3 className="font-display font-bold text-foreground text-lg">Backup do Sistema</h3>
