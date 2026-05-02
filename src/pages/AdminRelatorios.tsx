@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-type ReportType = "reservas" | "financeiro" | "clientes" | "passeios" | "sgs" | "marketing" | "parceiros";
+type ReportType = "reservas" | "financeiro" | "clientes" | "passeios" | "sgs" | "marketing" | "parceiros" | "usuarios";
 
 const REPORT_TABS: { id: ReportType; label: string; icon: any }[] = [
   { id: "reservas", label: "Reservas", icon: ShoppingCart },
@@ -25,6 +25,7 @@ const REPORT_TABS: { id: ReportType; label: string; icon: any }[] = [
   { id: "sgs", label: "Segurança (SGS)", icon: Shield },
   { id: "marketing", label: "Marketing", icon: TrendingUp },
   { id: "parceiros", label: "Parceiros", icon: UserPlus },
+  { id: "usuarios", label: "Acessos (Logs)", icon: Users },
 ];
 
 const COLORS = [
@@ -158,6 +159,16 @@ const AdminRelatorios = () => {
           total: p.length,
           active: p.filter((x: any) => x.active).length,
           byType: Object.entries(byType).map(([name, value]) => ({ name, value })),
+        });
+      } else if (activeTab === "usuarios") {
+        const { data: users } = await supabase.from("user_management").select("*");
+        const u = users || [];
+        const byRole: Record<string, number> = {};
+        u.forEach((us: any) => { byRole[us.role] = (byRole[us.role] || 0) + 1; });
+        setData({
+          total: u.length,
+          active: u.filter((x: any) => x.status === "ativo").length,
+          byRole: Object.entries(byRole).map(([name, value]) => ({ name, value })),
         });
       }
     } catch (err) {
@@ -307,6 +318,12 @@ const AdminRelatorios = () => {
                   <KPICard label="Parceiros Ativos" value={data.active || 0} icon={Activity} color="text-secondary" />
                 </>
               )}
+              {activeTab === "usuarios" && (
+                <>
+                  <KPICard label="Total de Usuários" value={data.total || 0} icon={Users} color="text-primary" />
+                  <KPICard label="Usuários Ativos" value={data.active || 0} icon={Activity} color="text-emerald-500" />
+                </>
+              )}
             </div>
 
             {/* Charts Section */}
@@ -385,6 +402,21 @@ const AdminRelatorios = () => {
                   <ChartCard title="Parceiros por Tipo">
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={data.byType}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                        <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
+                        <YAxis fontSize={10} axisLine={false} tickLine={false} />
+                        <ChartTooltip />
+                        <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Quantidade" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartCard>
+                </div>
+              )}
+              {activeTab === "usuarios" && (
+                <div className="col-span-2">
+                  <ChartCard title="Distribuição de Hierarquia">
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart data={data.byRole}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                         <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
                         <YAxis fontSize={10} axisLine={false} tickLine={false} />
