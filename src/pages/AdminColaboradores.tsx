@@ -406,6 +406,16 @@ const AdminColaboradores = () => {
               className="pl-10 h-10" 
             />
           </div>
+          <div className="flex gap-2 flex-wrap">
+            <Button variant={!search ? "default" : "outline"} size="sm" onClick={() => setSearch("")}>
+              Todos
+            </Button>
+            {collabTypes.map((t) => (
+              <Button key={t.id} variant={search === t.name ? "default" : "outline"} size="sm" onClick={() => setSearch(t.name)}>
+                {t.name}
+              </Button>
+            ))}
+          </div>
           <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
             <Button 
               variant={viewMode === 'cards' ? 'secondary' : 'ghost'} 
