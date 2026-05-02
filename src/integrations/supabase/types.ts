@@ -141,6 +141,13 @@ export type Database = {
             referencedRelation: "customers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_bookings_customer"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
         ]
       }
       collaborator_payments: {
@@ -375,6 +382,13 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "contas_receber_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_contas_receber_booking"
             columns: ["booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
@@ -1403,6 +1417,7 @@ export type Database = {
       sgs_incidents: {
         Row: {
           action_taken: string | null
+          booking_id: string | null
           created_at: string
           date: string
           description: string
@@ -1420,6 +1435,7 @@ export type Database = {
         }
         Insert: {
           action_taken?: string | null
+          booking_id?: string | null
           created_at?: string
           date?: string
           description: string
@@ -1437,6 +1453,7 @@ export type Database = {
         }
         Update: {
           action_taken?: string | null
+          booking_id?: string | null
           created_at?: string
           date?: string
           description?: string
@@ -1453,6 +1470,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "sgs_incidents_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sgs_incidents_tour_id_fkey"
             columns: ["tour_id"]
