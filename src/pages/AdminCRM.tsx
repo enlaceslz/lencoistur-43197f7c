@@ -1118,7 +1118,7 @@ const AdminCRMContent = () => {
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3 mb-2">
                   <div className="bg-primary/5 border border-primary/10 rounded-xl p-3 text-center transition-all hover:bg-primary/10">
                     <p className="text-xl font-bold text-foreground">{selectedCustomer.totalBookings}</p>
                     <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Reservas</p>
@@ -1162,7 +1162,49 @@ const AdminCRMContent = () => {
                   </div>
                 </div>
                 <div className="border-t border-border pt-6">
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-display font-bold text-foreground">Dependentes / Acompanhantes</h4>
+                    <Button variant="ghost" size="sm" className="h-7 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary/20 rounded-lg" onClick={openCreateDependentModal}>
+                      <Plus size={12} className="mr-1" /> Adicionar
+                    </Button>
+                  </div>
+                  
+                  {dependents.length === 0 ? (
+                    <p className="text-[10px] text-muted-foreground italic bg-muted/20 p-3 rounded-xl border border-dashed border-border text-center mb-6">
+                      Nenhum dependente cadastrado.
+                    </p>
+                  ) : (
+                    <div className="space-y-2 mb-6">
+                      {dependents.map(d => {
+                        const age = calculateAge(d.birth_date);
+                        return (
+                          <div key={d.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-xl border border-border/50 group hover:bg-muted/50 transition-colors">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center text-muted-foreground">
+                                <Baby size={16} />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-xs font-bold text-foreground truncate">{d.name}</p>
+                                <p className="text-[9px] text-muted-foreground uppercase font-black tracking-tighter">
+                                  {d.relationship} • {age !== null ? `${age} anos` : "—"} • {d.cpf ? maskCPF(d.cpf) : "SEM CPF"}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditDependentModal(d)}>
+                                <Pencil size={12} className="text-muted-foreground" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-destructive/10" onClick={() => setDeleteDepConfirm(d.id)}>
+                                <Trash2 size={12} className="text-destructive" />
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between mb-3 border-t border-border pt-4">
                     <h4 className="font-display font-bold text-foreground">Documentos e Anexos</h4>
                     <div className="flex gap-2">
                       <select 
@@ -1227,62 +1269,6 @@ const AdminCRMContent = () => {
                           </div>
                         </div>
                       ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Dependentes */}
-                <div className="border-t border-border pt-6 mt-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-display font-bold text-foreground">Dependentes</h4>
-                    <Button variant="ghost" size="sm" className="h-7 text-[10px] gap-1 px-2 rounded-lg" onClick={openCreateDependentModal}>
-                      <UserPlus size={12} /> Adicionar
-                    </Button>
-                  </div>
-                  {dependents.length === 0 ? (
-                    <p className="text-xs text-muted-foreground italic">Nenhum dependente cadastrado.</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {dependents.map((d) => {
-                        const age = calculateAge(d.birth_date);
-                        return (
-                          <div key={d.id} className="bg-muted/50 rounded-xl p-3 relative group">
-                            <div className="flex items-start justify-between">
-                              <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
-                                  <Baby size={14} />
-                                </div>
-                                <div>
-                                  <p className="text-sm font-semibold text-foreground leading-none">{d.name}</p>
-                                  <div className="flex items-center gap-2 mt-1">
-                                    <Badge variant="outline" className="text-[8px] px-1 py-0 uppercase bg-primary/5 text-primary border-primary/20">
-                                      {d.relationship}
-                                    </Badge>
-                                    {age !== null && (
-                                      <span className="text-[10px] text-muted-foreground">
-                                        {age} anos {age < 18 ? "(Menor)" : "(Maior)"}
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openEditDependentModal(d)}>
-                                  <Pencil size={10} />
-                                </Button>
-                                <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-destructive/10" onClick={() => setDeleteDepConfirm(d.id)}>
-                                  <Trash2 size={10} className="text-destructive" />
-                                </Button>
-                              </div>
-                            </div>
-                            {d.cpf && (
-                              <p className="text-[10px] text-muted-foreground mt-2 ml-11">
-                                CPF: {maskCPF(d.cpf)}
-                              </p>
-                            )}
-                          </div>
-                        );
-                      })}
                     </div>
                   )}
                 </div>
