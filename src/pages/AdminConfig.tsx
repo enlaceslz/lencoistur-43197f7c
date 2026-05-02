@@ -1088,6 +1088,17 @@ const AdminConfig = () => {
                 {novaSenha && novaSenha.length < 8 && <p className="text-xs text-destructive">A senha deve ter pelo menos 8 caracteres.</p>}
                 {confirmarSenha && novaSenha !== confirmarSenha && <p className="text-xs text-destructive">As senhas não conferem.</p>}
               </div>
+
+              <div className="flex justify-end pt-8 border-t border-border mt-8">
+                <Button 
+                  onClick={handleChangePassword} 
+                  disabled={changingPassword || !novaSenha} 
+                  className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-slate-500/20 bg-slate-700 hover:bg-slate-800 text-white transition-all active:scale-95 flex items-center gap-2"
+                >
+                  {changingPassword ? <Loader2 size={18} className="animate-spin" /> : <Shield size={18} />}
+                  Atualizar Senha de Acesso
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
