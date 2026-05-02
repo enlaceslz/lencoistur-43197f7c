@@ -488,8 +488,12 @@ const AdminColaboradores = () => {
                     <TableRow key={c.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
-                            {c.name.substring(0, 2).toUpperCase()}
+                          <div className="w-8 h-8 rounded-full overflow-hidden bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
+                            {c.avatar_url ? (
+                              <img src={c.avatar_url} alt={c.name} className="w-full h-full object-cover" />
+                            ) : (
+                              c.name.substring(0, 2).toUpperCase()
+                            )}
                           </div>
                           <div>
                             <p className="font-bold text-sm">{c.name}</p>
