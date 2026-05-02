@@ -381,7 +381,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
               <>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium text-white/80 truncate">{user?.email || "Admin"}</p>
-                  <p className="text-[10px] text-[hsl(220,15%,45%)]">Administrador</p>
+                  <p className="text-[10px] text-[hsl(220,15%,45%)] capitalize">{userRole}</p>
                 </div>
                 <Tooltip>
                   <TooltipTrigger asChild>
