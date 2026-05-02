@@ -298,7 +298,12 @@ const AdminColaboradores = () => {
                         </div>
                         <div>
                           <p className="font-bold text-sm">{c.name}</p>
-                          <p className="text-[10px] text-muted-foreground">{c.document || "S/ Documento"}</p>
+                          <div className="flex gap-2">
+                            <Badge variant="outline" className="text-[9px] h-4 px-1 leading-none bg-slate-50">
+                              {c.type || "Outro"}
+                            </Badge>
+                            <p className="text-[10px] text-muted-foreground">{c.document || "S/ Documento"}</p>
+                          </div>
                         </div>
                       </div>
                     </TableCell>
