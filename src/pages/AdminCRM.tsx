@@ -1622,17 +1622,17 @@ const AdminCRMContent = () => {
                   </p>
                 )}
               </div>
-            </div>
-            <div>
-              <Label htmlFor="dep-cpf">CPF</Label>
-              <Input
-                id="dep-cpf"
-                value={depForm.cpf}
-                onChange={(e) => setDepForm({ ...depForm, cpf: maskCPF(e.target.value) })}
-                placeholder="000.000.000-00"
-                maxLength={14}
-                className="rounded-xl"
-              />
+              <div className="col-span-2">
+                <Label htmlFor="dep-cpf">CPF</Label>
+                <Input
+                  id="dep-cpf"
+                  value={depForm.cpf}
+                  onChange={(e) => setDepForm({ ...depForm, cpf: maskCPF(e.target.value) })}
+                  placeholder="000.000.000-00"
+                  maxLength={14}
+                  className="rounded-xl"
+                />
+              </div>
             </div>
           </div>
           <DialogFooter>
