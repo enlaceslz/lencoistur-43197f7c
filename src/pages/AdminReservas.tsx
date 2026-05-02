@@ -447,6 +447,11 @@ const AdminReservas = () => {
                             {b.type === 'transfer' ? <Car size={10} className="text-primary" /> : <Compass size={10} className="text-primary" />}
                             {b.type === 'transfer' ? 'Translado' : b.type === 'package' ? 'Pacote' : 'Passeio'}
                           </span>
+                          {b.collaboratorName && (
+                            <span className="text-[9px] text-blue-600 font-bold uppercase mt-0.5">
+                              Vendedor: {b.collaboratorName}
+                            </span>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="text-center font-medium">
