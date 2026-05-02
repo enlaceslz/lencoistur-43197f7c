@@ -530,6 +530,12 @@ const AdminReservas = () => {
                     </span>
                   )}
                 </div>
+                {selected.collaboratorName && (
+                  <div className="mt-2 pt-2 border-t border-border/50">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Colaborador / Vendedor</p>
+                    <p className="text-sm font-medium text-blue-600">{selected.collaboratorName}</p>
+                  </div>
+                )}
               </div>
 
               {/* Booking details */}
