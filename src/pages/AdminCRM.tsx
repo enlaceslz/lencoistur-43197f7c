@@ -1118,7 +1118,7 @@ const AdminCRMContent = () => {
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3 mb-2">
                   <div className="bg-primary/5 border border-primary/10 rounded-xl p-3 text-center transition-all hover:bg-primary/10">
                     <p className="text-xl font-bold text-foreground">{selectedCustomer.totalBookings}</p>
                     <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Reservas</p>
