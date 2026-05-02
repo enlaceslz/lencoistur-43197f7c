@@ -425,7 +425,7 @@ const AdminConfig = () => {
   return (
     <AdminLayout title="Configurações">
       <Tabs defaultValue="empresa" className="space-y-6">
-        <div className="bg-card border border-border p-2 rounded-2xl shadow-sm overflow-x-auto no-scrollbar">
+        <div className="bg-card border border-border p-2 rounded-2xl shadow-sm overflow-x-auto no-scrollbar min-h-[60px]">
           <TabsList className="bg-transparent flex-nowrap h-auto gap-1">
             {[
               { value: "empresa", icon: Building2, label: "Agência" },
@@ -439,9 +439,10 @@ const AdminConfig = () => {
               <TabsTrigger 
                 key={tab.value}
                 value={tab.value} 
-                className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all"
+                className="data-[state=active]:bg-primary data-[state=active]:text-white rounded-xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 whitespace-nowrap"
               >
-                <tab.icon size={14} className="mr-2" /> {tab.label}
+                <tab.icon size={14} className="shrink-0" /> 
+                <span>{tab.label}</span>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -1255,6 +1256,26 @@ const AdminConfig = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Floating Save Button for Mobile */}
+      <div className="fixed bottom-6 right-6 lg:hidden z-50">
+        <Button
+          onClick={() => {
+            const activeTab = document.querySelector('[data-state="active"][role="tab"]')?.getAttribute('value');
+            if (activeTab === 'empresa') saveSetting("empresa", empresa, "Agência");
+            else if (activeTab === 'site') saveSetting("site", site as unknown as Record<string, unknown>, "Frontend");
+            else if (activeTab === 'pagamento') saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Financeiro");
+            else if (activeTab === 'notificacoes') saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações");
+            else if (activeTab === 'seguranca') handleChangePassword();
+            else if (activeTab === 'galeria') saveSetting("gallery", gallery as unknown as Record<string, unknown>, "Galeria");
+            else toast.info("Selecione uma aba para salvar");
+          }}
+          disabled={saving}
+          className="w-14 h-14 rounded-full shadow-2xl bg-primary text-white hover:scale-110 active:scale-95 transition-all p-0 flex items-center justify-center"
+        >
+          {saving ? <Loader2 size={24} className="animate-spin" /> : <Save size={24} />}
+        </Button>
+      </div>
     </AdminLayout>
   );
 };
