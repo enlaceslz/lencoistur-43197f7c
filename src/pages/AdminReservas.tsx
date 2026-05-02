@@ -89,6 +89,7 @@ const AdminReservas = () => {
   const [tours, setTours] = useState<TourOption[]>([]);
   const [transfers, setTransfers] = useState<TransferOption[]>([]);
   const [existingCustomers, setExistingCustomers] = useState<{ id: string; name: string; email: string; phone: string | null; cpf?: string; passport?: string; country?: string; birth_date?: string }[]>([]);
+  const [collaborators, setCollaborators] = useState<{ id: string; name: string }[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
   const [customerSearch, setCustomerSearch] = useState("");
   const [newForm, setNewForm] = useState({
@@ -106,19 +107,22 @@ const AdminReservas = () => {
     country: "Brasil",
     birthDate: "",
     notes: "",
+    collaboratorId: "",
   });
 
   useEffect(() => {
     if (!showNewForm) return;
     const loadOptions = async () => {
-      const [{ data: t }, { data: tr }, { data: cust }] = await Promise.all([
+      const [{ data: t }, { data: tr }, { data: cust }, { data: collabs }] = await Promise.all([
         supabase.from("tours").select("id, name, price, private_price, pix_discount").eq("active", true).order("name"),
         supabase.from("transfer_routes").select("id, origin, destination, price, pix_discount").eq("active", true).order("origin"),
         supabase.from("customers").select("id, name, email, phone, cpf, passport, country, birth_date").order("name"),
+        supabase.from("collaborators").select("id, name").eq("status", "active").order("name"),
       ]);
       if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price, private_price: r.private_price, pix_discount: r.pix_discount })));
       if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price, pix_discount: r.pix_discount })));
       if (cust) setExistingCustomers(cust);
+      if (collabs) setCollaborators(collabs);
     };
     loadOptions();
   }, [showNewForm]);
@@ -143,6 +147,7 @@ const AdminReservas = () => {
       country: b.country || "Brasil",
       birthDate: b.birthDate || "",
       notes: b.notes || "",
+      collaboratorId: b.collaboratorId || "",
     });
     setSelectedCustomerId(b.customerId || "");
     setShowNewForm(true);
@@ -152,7 +157,7 @@ const AdminReservas = () => {
     setNewForm({
       type: "tour", tourMode: "coletivo", itemName: "", date: "", guests: 2, payMethod: "pix",
       customerName: "", customerEmail: "", customerPhone: "",
-      cpf: "", passport: "", country: "Brasil", birthDate: "", notes: ""
+      cpf: "", passport: "", country: "Brasil", birthDate: "", notes: "", collaboratorId: ""
     });
     setSelectedCustomerId("");
     setCustomerSearch("");
@@ -208,6 +213,7 @@ const AdminReservas = () => {
         total,
         discount,
         finalTotal,
+        collaboratorId: newForm.collaboratorId || undefined,
       };
 
       if (editingId) {
@@ -441,6 +447,11 @@ const AdminReservas = () => {
                             {b.type === 'transfer' ? <Car size={10} className="text-primary" /> : <Compass size={10} className="text-primary" />}
                             {b.type === 'transfer' ? 'Translado' : b.type === 'package' ? 'Pacote' : 'Passeio'}
                           </span>
+                          {b.collaboratorName && (
+                            <span className="text-[9px] text-blue-600 font-bold uppercase mt-0.5">
+                              Vendedor: {b.collaboratorName}
+                            </span>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="text-center font-medium">
@@ -524,6 +535,12 @@ const AdminReservas = () => {
                     </span>
                   )}
                 </div>
+                {selected.collaboratorName && (
+                  <div className="mt-2 pt-2 border-t border-border/50">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Colaborador / Vendedor</p>
+                    <p className="text-sm font-medium text-blue-600">{selected.collaboratorName}</p>
+                  </div>
+                )}
               </div>
 
               {/* Booking details */}
@@ -854,6 +871,20 @@ const AdminReservas = () => {
                     <Input value={newForm.country} onChange={(e) => setNewForm(f => ({ ...f, country: e.target.value }))} placeholder="Ex: Brasil" disabled={!!selectedCustomerId && !editingId} />
                   </div>
                 </div>
+              </div>
+
+              <div className="mt-3">
+                <label className="text-sm font-semibold text-foreground mb-1.5 block">Colaborador / Vendedor</label>
+                <select
+                  value={newForm.collaboratorId}
+                  onChange={(e) => setNewForm(f => ({ ...f, collaboratorId: e.target.value }))}
+                  className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+                >
+                  <option value="">Nenhum</option>
+                  {collaborators.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
               </div>
 
               <div className="mt-3">
