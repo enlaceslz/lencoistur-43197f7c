@@ -23,7 +23,7 @@ const Navbar = () => {
               className="h-10 md:h-12 w-auto object-contain"
             />
           ) : (
-            <>{empresa?.nome || "Lençóis"}<span className="text-secondary">{!empresa?.nome && "Tour"}</span></>
+            <>{empresa?.nome ? empresa.nome : <>Lençóis<span className="text-secondary">Tour</span></>}</>
           )}
         </Link>
 

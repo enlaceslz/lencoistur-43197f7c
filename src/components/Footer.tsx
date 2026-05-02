@@ -21,7 +21,7 @@ const Footer = () => {
                   className="h-12 md:h-14 w-auto object-contain" 
                 />
               ) : (
-                <>{empresa?.nome || "Lençóis"}<span className="text-secondary">{!empresa?.nome && "Tour"}</span></>
+                <>{empresa?.nome ? empresa.nome : <>Lençóis<span className="text-secondary">Tour</span></>}</>
               )}
             </h3>
             <p className="text-primary-foreground/60 text-sm leading-relaxed mb-4">
