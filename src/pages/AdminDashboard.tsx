@@ -142,10 +142,23 @@ const AdminDashboard = () => {
         entry.bookings += 1;
       }
     });
+    
+    expenses.forEach((e) => {
+      if (e.status !== "pago") return;
+      const d = new Date(e.vencimento);
+      const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
+      const entry = monthlyMap.get(key);
+      if (entry) {
+        entry.expenses += Number(e.valor);
+      }
+    });
+
     const revenueData = Array.from(monthlyMap.entries()).map(([key, val]) => ({
       month: MONTH_LABELS[parseInt(key.split("-")[1])],
       revenue: val.revenue,
       bookings: val.bookings,
+      expenses: val.expenses,
+      profit: val.revenue - val.expenses
     }));
 
     // Tour popularity
