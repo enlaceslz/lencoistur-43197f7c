@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import {
   DollarSign, TrendingUp, Users, Calendar,
-  ArrowUpRight, ArrowDownRight, Loader2, ShieldAlert
+  ArrowUpRight, ArrowDownRight, Loader2, ShieldAlert,
+  PieChart as PieChartIcon, LayoutDashboard, Briefcase
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
