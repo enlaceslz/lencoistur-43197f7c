@@ -413,19 +413,34 @@ const AdminRelatorios = () => {
                 </div>
               )}
               {activeTab === "parceiros" && (
-                <div className="col-span-2">
-                  <ChartCard title="Parceiros por Tipo">
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={data.byType}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                        <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
-                        <YAxis fontSize={10} axisLine={false} tickLine={false} />
-                        <ChartTooltip />
-                        <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Quantidade" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </ChartCard>
-                </div>
+                <>
+                  <div className="col-span-1">
+                    <ChartCard title="Parceiros por Tipo">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={data.byType}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                          <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
+                          <YAxis fontSize={10} axisLine={false} tickLine={false} />
+                          <ChartTooltip />
+                          <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Quantidade" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </ChartCard>
+                  </div>
+                  <div className="col-span-1">
+                    <ChartCard title="Receita por Parceiro (Top 5)">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={data.topPartners} layout="vertical" margin={{ left: 20 }}>
+                          <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e5e7eb" />
+                          <XAxis type="number" fontSize={10} tickFormatter={(v) => `R$${v/100}`} />
+                          <YAxis dataKey="name" type="category" fontSize={10} width={80} />
+                          <ChartTooltip formatter={(v: any) => fmt(v)} />
+                          <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </ChartCard>
+                  </div>
+                </>
               )}
               {activeTab === "usuarios" && (
                 <div className="col-span-2">
