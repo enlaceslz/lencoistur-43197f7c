@@ -568,7 +568,7 @@ const AdminPasseios = () => {
             <div className="flex gap-3 pt-4 border-t border-border">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button type="submit" className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 transition-all">
+                  <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all">
                     {editingId ? "Salvar Alterações" : "Criar Passeio"}
                   </button>
                 </TooltipTrigger>
