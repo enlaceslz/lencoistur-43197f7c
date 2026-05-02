@@ -126,11 +126,11 @@ const AdminDashboard = () => {
     ];
 
     // Revenue by month (last 7 months)
-    const monthlyMap = new Map<string, { revenue: number; bookings: number }>();
+    const monthlyMap = new Map<string, { revenue: number; bookings: number; expenses: number }>();
     for (let i = 6; i >= 0; i--) {
       const d = new Date(currentYear, currentMonth - i, 1);
       const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
-      monthlyMap.set(key, { revenue: 0, bookings: 0 });
+      monthlyMap.set(key, { revenue: 0, bookings: 0, expenses: 0 });
     }
     bookings.forEach((b) => {
       if (b.status === "cancelada") return;
