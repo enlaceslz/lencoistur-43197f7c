@@ -12,6 +12,7 @@ import TransfersPage from "./pages/TransfersPage.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import AdminCRM from "./pages/AdminCRM.tsx";
 import AdminFinanceiro from "./pages/AdminFinanceiro.tsx";
+import AdminColaboradores from "./pages/AdminColaboradores.tsx";
 import AdminParceiros from "./pages/AdminParceiros.tsx";
 import AdminPasseios from "./pages/AdminPasseios.tsx";
 import AdminReservas from "./pages/AdminReservas.tsx";
@@ -70,6 +71,7 @@ const App = () => (
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/crm" element={<AdminRoute><AdminCRM /></AdminRoute>} />
           <Route path="/admin/financeiro" element={<AdminRoute><AdminFinanceiro /></AdminRoute>} />
+          <Route path="/admin/colaboradores" element={<AdminRoute><AdminColaboradores /></AdminRoute>} />
           <Route path="/admin/parceiros" element={<AdminRoute><AdminParceiros /></AdminRoute>} />
           <Route path="/admin/passeios" element={<AdminRoute><AdminPasseios /></AdminRoute>} />
           <Route path="/admin/reservas" element={<AdminRoute><AdminReservas /></AdminRoute>} />

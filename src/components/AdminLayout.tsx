@@ -36,6 +36,7 @@ const mainGroups = [
     items: [
       { icon: Users, label: "Clientes (CRM)", path: "/admin/crm" },
       { icon: UserCheck, label: "Parceiros", path: "/admin/parceiros" },
+      { icon: UserCheck2, label: "Colaboradores", path: "/admin/colaboradores" },
       { icon: Star, label: "Avaliações", path: "/admin/avaliacoes" },
     ],
   },
