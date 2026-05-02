@@ -121,11 +121,11 @@ const AdminColaboradores = () => {
   const fetchPayments = async (collabId: string) => {
     const { data, error } = await supabase
       .from("collaborator_payments")
-      .select("*")
+      .select("*, bookings(booking_code, item_name)")
       .eq("collaborator_id", collabId)
       .order("created_at", { ascending: false });
     if (error) toast.error("Erro ao carregar histórico");
-    else setPayments(data as Payment[]);
+    else setPayments(data as any[]);
   };
 
   const openNew = () => {
