@@ -16,19 +16,28 @@ const AdminSGSChecklists = () => {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ titulo: "", tipo: "veiculo_diario", responsavel: "", observacoes: "" });
+  const [form, setForm] = useState({ titulo: "", tipo: "veiculo_diario", responsavel: "", observacoes: "", veiculo_id: "", condutor_id: "", booking_id: "" });
+  const [veiculos, setVeiculos] = useState<any[]>([]);
+  const [condutores, setCondutores] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<any[]>([]);
   const [templateItems, setTemplateItems] = useState<{ item_nome: string; categoria: string; conforme: boolean }[]>([]);
 
   useEffect(() => { load(); }, []);
 
   const load = async () => {
     setLoading(true);
-    const [cl, ci] = await Promise.all([
+    const [cl, ci, vRes, cRes, bRes] = await Promise.all([
       supabase.from("sgs_checklists").select("*").order("created_at", { ascending: false }),
       supabase.from("sgs_checklist_items").select("*"),
+      supabase.from("sgs_veiculos").select("id, placa, modelo").eq("status", "ativo"),
+      supabase.from("sgs_condutores").select("id, nome").eq("status", "ativo"),
+      supabase.from("bookings").select("id, booking_code, item_name").order("created_at", { ascending: false }).limit(20)
     ]);
     setChecklists(cl.data || []);
     setItems(ci.data || []);
+    setVeiculos(vRes.data || []);
+    setCondutores(cRes.data || []);
+    setBookings(bRes.data || []);
     setLoading(false);
   };
 
@@ -46,13 +55,18 @@ const AdminSGSChecklists = () => {
     e.preventDefault();
     if (!form.titulo.trim()) { toast({ title: "Título obrigatório", variant: "destructive" }); return; }
     const allOk = templateItems.every(i => i.conforme);
-    const { data: cl, error } = await supabase.from("sgs_checklists").insert({ ...form, status: allOk ? "concluido" : "em_andamento" }).select().single();
+    const payload: any = { ...form, status: allOk ? "concluido" : "em_andamento" };
+    if (!payload.veiculo_id) delete payload.veiculo_id;
+    if (!payload.condutor_id) delete payload.condutor_id;
+    if (!payload.booking_id) delete payload.booking_id;
+    
+    const { data: cl, error } = await supabase.from("sgs_checklists").insert(payload).select().single();
     if (error || !cl) { toast({ title: "Erro", description: error?.message, variant: "destructive" }); return; }
     if (templateItems.length > 0) {
       await supabase.from("sgs_checklist_items").insert(templateItems.map(i => ({ ...i, checklist_id: cl.id })));
     }
     toast({ title: "Checklist criado!" });
-    setForm({ titulo: "", tipo: "veiculo_diario", responsavel: "", observacoes: "" });
+    setForm({ titulo: "", tipo: "veiculo_diario", responsavel: "", observacoes: "", veiculo_id: "", condutor_id: "", booking_id: "" });
     setTemplateItems([]);
     setShowForm(false);
     load();
@@ -113,6 +127,30 @@ const AdminSGSChecklists = () => {
               <div>
                 <label className="block text-xs font-medium text-muted-foreground mb-1">Responsável</label>
                 <input value={form.responsavel} onChange={e => setForm(p => ({ ...p, responsavel: e.target.value }))} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" />
+              </div>
+            </div>
+            
+            <div className="grid sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Veículo (se aplicável)</label>
+                <select value={form.veiculo_id} onChange={e => setForm(p => ({ ...p, veiculo_id: e.target.value }))} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm">
+                  <option value="">Nenhum</option>
+                  {veiculos.map(v => <option key={v.id} value={v.id}>{v.modelo} ({v.placa})</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Condutor (se aplicável)</label>
+                <select value={form.condutor_id} onChange={e => setForm(p => ({ ...p, condutor_id: e.target.value }))} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm">
+                  <option value="">Nenhum</option>
+                  {condutores.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Reserva Relacionada</label>
+                <select value={form.booking_id} onChange={e => setForm(p => ({ ...p, booking_id: e.target.value }))} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm">
+                  <option value="">Nenhuma</option>
+                  {bookings.map(b => <option key={b.id} value={b.id}>{b.booking_code} - {b.item_name}</option>)}
+                </select>
               </div>
             </div>
 

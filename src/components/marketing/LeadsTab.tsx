@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Smartphone, Trash2, Search, UserPlus, Loader2 } from "lucide-react";
+import { Plus, Smartphone, Trash2, Search, UserPlus, Loader2, ExternalLink } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { statusColors } from "./statusColors";
 import { useState } from "react";
@@ -24,6 +24,7 @@ interface Lead {
   status: string;
   last_contact: string | null;
   score: number;
+  converted_customer_id?: string | null;
 }
 
 interface LeadsTabProps {
@@ -213,6 +214,11 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
                       <span className="text-[10px] font-black uppercase text-secondary tracking-widest bg-secondary/10 px-1.5 py-0.5 rounded w-fit mt-1">
                         Candidato a Parceiro
                       </span>
+                    )}
+                    {l.converted_customer_id && (
+                      <a href={`/admin/crm?id=${l.converted_customer_id}`} className="text-[10px] font-black uppercase text-primary tracking-widest bg-primary/10 px-1.5 py-0.5 rounded w-fit mt-1 flex items-center gap-1 hover:underline">
+                        Cliente Convertido <ExternalLink size={8} />
+                      </a>
                     )}
                   </div>
                 </TableCell>
