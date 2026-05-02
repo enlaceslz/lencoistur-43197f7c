@@ -467,8 +467,8 @@ const AdminConfig = () => {
                     <Building2 size={32} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-foreground">Identidade da Agência</h3>
-                    <p className="text-sm text-muted-foreground">Dados institucionais utilizados em termos, vouchers e notas.</p>
+                    <h3 className="text-xl font-black text-foreground">Identidade e Contato</h3>
+                    <p className="text-sm text-muted-foreground">Dados da agência e informações de contato exibidas no site.</p>
                   </div>
                 </div>
                 <Tooltip>
