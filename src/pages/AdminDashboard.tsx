@@ -120,17 +120,17 @@ const AdminDashboard = () => {
 
     const stats = [
       { label: "Reservas Hoje", value: String(todayBookings.length), change: `${todayBookings.length}`, up: todayBookings.length > 0, icon: Calendar, path: "/admin/reservas" },
-      { label: "Lucro Líquido (Mês)", value: fmt(thisRevenue - totalExpenses), change: `Gasto: ${fmt(totalExpenses)}`, up: (thisRevenue - totalExpenses) > 0, icon: DollarSign, path: "/admin/financeiro" },
+      { label: "Lucro Líquido (Mês)", value: fmt(thisRevenue - totalExpenses), change: `Faturamento: ${fmt(thisRevenue)}`, up: (thisRevenue - totalExpenses) > 0, icon: DollarSign, path: "/admin/financeiro" },
       { label: "Colaboradores", value: String(collabCount), change: "Equipe Ativa", up: true, icon: Briefcase, path: "/admin/colaboradores" },
       { label: "Conformidade SGS", value: String(sgsStats.criticalRisks === 0 ? "100%" : "Risco"), change: `${sgsStats.pendingActions} alertas`, up: sgsStats.criticalRisks === 0, icon: ShieldAlert, isSgs: true, path: "/admin/sgs" },
     ];
 
     // Revenue by month (last 7 months)
-    const monthlyMap = new Map<string, { revenue: number; bookings: number; expenses: number }>();
+    const monthlyMap = new Map<string, { revenue: number; bookings: number; expenses: number; profit: number }>();
     for (let i = 6; i >= 0; i--) {
       const d = new Date(currentYear, currentMonth - i, 1);
       const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
-      monthlyMap.set(key, { revenue: 0, bookings: 0, expenses: 0 });
+      monthlyMap.set(key, { revenue: 0, bookings: 0, expenses: 0, profit: 0 });
     }
     bookings.forEach((b) => {
       if (b.status === "cancelada") return;

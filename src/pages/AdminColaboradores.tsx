@@ -90,7 +90,8 @@ const AdminColaboradores = () => {
   const [form, setForm] = useState({
     name: "", email: "", phone: "", document: "",
     pix_key: "", pix_type: "cpf", status: "active",
-    payment_type: "daily", payment_value: "0", observation: "",
+    payment_type: "daily" as 'commission' | 'daily' | 'monthly' | 'per_tour', 
+    payment_value: "0", observation: "",
     type: "Outro", birth_date: "", zip_code: "", address: "",
     cnh: "", cadastur: "", avatar_url: ""
   });
