@@ -358,7 +358,7 @@ const AdminColaboradores = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => {
+          <Button variant="outline" size="sm" className="rounded-full h-9 border-slate-200" onClick={() => {
             const header = "Nome,Email,Telefone,Documento,Tipo,Status,Remuneração\n";
             const rows = filtered.map(c => `"${c.name}","${c.email || ''}","${c.phone || ''}","${c.document}","${c.type}","${c.status}","${getPaymentTypeLabel(c.payment_type)}: ${formatCurrency(c.payment_value)}"`).join("\n");
             const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
