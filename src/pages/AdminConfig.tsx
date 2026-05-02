@@ -532,6 +532,17 @@ const AdminConfig = () => {
                 </div>
               </div>
 
+              <div className="flex justify-end pt-8 border-t border-border mt-8">
+                <Button 
+                  onClick={() => saveSetting("empresa", empresa, "Agência")} 
+                  disabled={saving}
+                  className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-primary/20 bg-primary text-white hover:opacity-90 transition-all active:scale-95 flex items-center gap-2"
+                >
+                  {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Salvar Dados da Agência
+                </Button>
+              </div>
+
             </CardContent>
           </Card>
         </TabsContent>
