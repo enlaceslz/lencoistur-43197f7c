@@ -282,53 +282,81 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-0.5 scrollbar-thin">
-          {mainGroups.map((group, idx) => (
-            <div key={idx} className={idx > 0 ? "pt-2" : ""}>
-              {!sidebarCollapsed && (
-                <p className="px-4 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,45%)] opacity-80">
-                  {group.title}
-                </p>
-              )}
-              {group.items.map(item => <SidebarLink key={item.path} {...item} />)}
-            </div>
-          ))}
+          {mainGroups.map((group, idx) => {
+            const filteredItems = group.items.filter(item => {
+              if (userRole === "administrador") return true;
+              
+              const moduleKey = Object.entries({
+                dashboard: "/admin",
+                passeios: "/admin/passeios",
+                reservas: "/admin/reservas",
+                translados: "/admin/translados",
+                crm: "/admin/crm",
+                parceiros: "/admin/parceiros",
+                colaboradores: "/admin/colaboradores",
+                financeiro: "/admin/financeiro",
+                marketing: "/admin/marketing",
+                documentos: "/admin/documentos",
+                relatorios: "/admin/relatorios",
+                ia: "/admin/ia",
+                configuracoes: "/admin/config"
+              }).find(([_, path]) => item.path === path)?.[0];
+
+              return !moduleKey || userPermissions[moduleKey];
+            });
+
+            if (filteredItems.length === 0) return null;
+
+            return (
+              <div key={idx} className={idx > 0 ? "pt-2" : ""}>
+                {!sidebarCollapsed && (
+                  <p className="px-4 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,45%)] opacity-80">
+                    {group.title}
+                  </p>
+                )}
+                {filteredItems.map(item => <SidebarLink key={item.path} {...item} />)}
+              </div>
+            );
+          })}
 
           {/* SGS Section */}
-          <div className="pt-2 border-t border-white/[0.05] mt-2">
-            <button
-              onClick={() => setSgsOpen(!sgsOpen)}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 ${
-                isSgsActive
-                  ? "text-[hsl(217,91%,60%)] bg-white/[0.06]"
-                  : "text-[hsl(220,15%,65%)] hover:text-white hover:bg-white/[0.06]"
-              } ${sidebarCollapsed ? "justify-center px-0" : ""}`}
-              title={sidebarCollapsed ? "SGS — Segurança" : ""}
-            >
-              <Shield size={17} className="shrink-0" />
-              {!sidebarCollapsed && (
-                <>
-                  <span className="flex-1 text-left">SGS — Segurança</span>
-                  <ChevronDown size={14} className={`transition-transform duration-200 ${sgsOpen || isSgsActive ? "rotate-180" : ""}`} />
-                </>
-              )}
-            </button>
-            {(sgsOpen || isSgsActive) && !sidebarCollapsed && (
-              <div className="mt-1 border-l border-white/[0.06] ml-6">
-                {sgsGroups.map((group, gi) => (
-                  <div key={gi}>
-                    {group.title && (
-                      <p className="px-4 pt-2.5 pb-1 text-[9px] font-semibold uppercase tracking-wider text-[hsl(220,15%,38%)]">
-                        {group.title}
-                      </p>
-                    )}
-                    <div className="space-y-0.5">
-                      {group.items.map(item => <SidebarLink key={item.path} {...item} indent />)}
+          {(userRole === "administrador" || userPermissions.sgs) && (
+            <div className="pt-2 border-t border-white/[0.05] mt-2">
+              <button
+                onClick={() => setSgsOpen(!sgsOpen)}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-[13px] font-medium transition-all duration-150 ${
+                  isSgsActive
+                    ? "text-[hsl(217,91%,60%)] bg-white/[0.06]"
+                    : "text-[hsl(220,15%,65%)] hover:text-white hover:bg-white/[0.06]"
+                } ${sidebarCollapsed ? "justify-center px-0" : ""}`}
+                title={sidebarCollapsed ? "SGS — Segurança" : ""}
+              >
+                <Shield size={17} className="shrink-0" />
+                {!sidebarCollapsed && (
+                  <>
+                    <span className="flex-1 text-left">SGS — Segurança</span>
+                    <ChevronDown size={14} className={`transition-transform duration-200 ${sgsOpen || isSgsActive ? "rotate-180" : ""}`} />
+                  </>
+                )}
+              </button>
+              {(sgsOpen || isSgsActive) && !sidebarCollapsed && (
+                <div className="mt-1 border-l border-white/[0.06] ml-6">
+                  {sgsGroups.map((group, gi) => (
+                    <div key={gi}>
+                      {group.title && (
+                        <p className="px-4 pt-2.5 pb-1 text-[9px] font-semibold uppercase tracking-wider text-[hsl(220,15%,38%)]">
+                          {group.title}
+                        </p>
+                      )}
+                      <div className="space-y-0.5">
+                        {group.items.map(item => <SidebarLink key={item.path} {...item} indent />)}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="pt-3">
             {!sidebarCollapsed && <p className="px-4 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[hsl(220,15%,40%)]">Sistema</p>}
