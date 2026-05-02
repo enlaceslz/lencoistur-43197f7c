@@ -417,11 +417,11 @@ const AdminColaboradores = () => {
       {viewMode === 'cards' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map(c => (
-            <Card key={c.id} className="overflow-hidden hover:shadow-md transition-shadow">
+            <Card key={c.id} className="overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all group relative">
               <div className="p-5">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full overflow-hidden bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xl shadow-inner border border-blue-100 group-hover:scale-105 transition-transform">
                       {c.avatar_url ? (
                         <img src={c.avatar_url} alt={c.name} className="w-full h-full object-cover" />
                       ) : (
@@ -429,9 +429,8 @@ const AdminColaboradores = () => {
                       )}
                     </div>
                     <div>
-                      <h3 className="font-bold text-slate-900 cursor-pointer hover:text-blue-600 transition-colors flex items-center gap-1.5" onClick={() => openDetails(c)}>
+                      <h3 className="font-black text-slate-900 cursor-pointer hover:text-blue-600 transition-colors flex items-center gap-1.5 leading-tight" onClick={() => openDetails(c)}>
                         {c.name}
-                        <FileText size={14} className="text-slate-400" />
                       </h3>
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary" className="text-[10px] h-4">
