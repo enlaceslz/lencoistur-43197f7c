@@ -22,7 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { maskCPF, maskPhone } from "@/lib/masks";
+import { maskCPF, maskPhone, maskCEP } from "@/lib/masks";
 import { formatCurrency } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -398,7 +398,11 @@ const AdminColaboradores = () => {
             </div>
             <div className="space-y-2">
               <Label>CEP</Label>
-              <Input value={form.zip_code} onChange={(e) => setForm({...form, zip_code: e.target.value})} />
+              <Input 
+                value={form.zip_code} 
+                onChange={(e) => setForm({...form, zip_code: maskCEP(e.target.value)})} 
+                placeholder="00000-000"
+              />
             </div>
             <div className="space-y-2">
               <Label>Endereço Completo</Label>
