@@ -1326,7 +1326,6 @@ const AdminCRMContent = () => {
           </div>
         </div>
       </div>
-
       {/* Delete Document Confirmation */}
       <Dialog open={!!deleteDocConfirm} onOpenChange={() => setDeleteDocConfirm(null)}>
         <DialogContent className="sm:max-w-sm">
