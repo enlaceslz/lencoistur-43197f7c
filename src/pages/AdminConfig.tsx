@@ -464,7 +464,7 @@ const AdminConfig = () => {
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+                  <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600">
                     <Building2 size={32} />
                   </div>
                   <div>
@@ -561,7 +561,7 @@ const AdminConfig = () => {
             <CardContent className="p-8 space-y-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+                  <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600">
                     <Globe size={32} />
                   </div>
                   <div>
@@ -855,7 +855,7 @@ const AdminConfig = () => {
                               onClick={() => setPagamentos({ ...pagamentos, pixTipo: t.value, pixChave: "" })}
                               className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
                                 pagamentos.pixTipo === t.value
-                                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                                  ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
                                   : "bg-muted text-muted-foreground border-border hover:bg-accent"
                               }`}
                             >
@@ -1117,8 +1117,8 @@ const AdminConfig = () => {
             <Card className="border-border">
               <CardContent className="p-6 space-y-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <HardDrive size={20} className="text-primary" />
+                  <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+                    <HardDrive size={20} className="text-indigo-600" />
                   </div>
                   <div>
                     <h3 className="font-display font-bold text-foreground text-lg">Backup do Sistema</h3>
@@ -1145,7 +1145,7 @@ const AdminConfig = () => {
                       <Button 
                         onClick={handleBackup} 
                         disabled={backupLoading} 
-                        className="rounded-xl px-6 h-11 font-bold shadow-sm"
+                        className="rounded-xl px-6 h-11 font-bold shadow-sm bg-blue-600 hover:bg-blue-700 text-white"
                       >
                         {backupLoading ? <Loader2 size={18} className="animate-spin mr-2" /> : <Download size={18} className="mr-2" />}
                         {backupLoading ? "Gerando backup..." : "Gerar Backup Completo"}

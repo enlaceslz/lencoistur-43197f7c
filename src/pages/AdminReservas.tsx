@@ -251,7 +251,7 @@ const AdminReservas = () => {
     .reduce((a, b) => a + b.finalTotal, 0);
 
   const stats = [
-    { icon: ShoppingCart, label: "Total Reservas", value: bookings.length, color: "text-primary" },
+    { icon: ShoppingCart, label: "Total Reservas", value: bookings.length, color: "text-indigo-600" },
     { icon: CheckCircle, label: "Confirmadas", value: bookings.filter((b) => b.status === "confirmada").length, color: "text-green-600" },
     { icon: Clock, label: "Pendentes", value: bookings.filter((b) => b.status === "pendente").length, color: "text-amber-600" },
     { icon: DollarSign, label: "Faturamento Pago", value: fmt(totalPago), color: "text-blue-600" },
@@ -304,7 +304,7 @@ const AdminReservas = () => {
     return (
       <AdminLayout title="Reservas">
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="animate-spin text-primary" size={32} />
+          <Loader2 className="animate-spin text-blue-600" size={32} />
         </div>
       </AdminLayout>
     );
@@ -337,7 +337,7 @@ const AdminReservas = () => {
             </div>
             <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
               {["todos", "confirmada", "pendente", "cancelada", "concluida"].map((s) => (
-                <Button key={s} variant={statusFilter === s ? "default" : "outline"} size="sm" onClick={() => setStatusFilter(s)} className="capitalize whitespace-nowrap">
+                <Button key={s} variant={statusFilter === s ? "default" : "outline"} size="sm" onClick={() => setStatusFilter(s)} className={`capitalize whitespace-nowrap ${statusFilter === s ? "bg-blue-600 hover:bg-blue-700 text-white" : ""}`}>
                   {s === "todos" ? `Todos` : statusConfig[s]?.label}
                 </Button>
               ))}
@@ -346,7 +346,7 @@ const AdminReservas = () => {
               <Button variant="outline" size="sm" onClick={exportCSV}>
                 <Download size={14} className="mr-1" /> CSV
               </Button>
-              <Button size="sm" onClick={() => { resetNewForm(); setShowNewForm(true); }}>
+              <Button size="sm" onClick={() => { resetNewForm(); setShowNewForm(true); }} className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20">
                 <Plus size={14} className="mr-1" /> Nova Reserva
               </Button>
             </div>
@@ -888,7 +888,7 @@ const AdminReservas = () => {
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={newLoading || !newForm.itemName}>
+            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white" disabled={newLoading || !newForm.itemName}>
               {newLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : (editingId ? <Pencil size={16} className="mr-2" /> : <Plus size={16} className="mr-2" />)}
               {editingId ? "Salvar Alterações" : "Criar Reserva"}
             </Button>
