@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, RefreshCw, Trash2, Plus, Users, UserPlus, ShieldCheck, Mail, Lock, Key } from "lucide-react";
+import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, RefreshCw, Trash2, Plus, Users, UserPlus, ShieldCheck, Mail, Lock, Key, LayoutDashboard, Compass, ShoppingCart, Car, UserCheck, UserCheck2, Megaphone, FileText, BarChart3, Settings, Edit, Fingerprint } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -117,6 +117,24 @@ const AdminConfig = () => {
   const [usersLoading, setUsersLoading] = useState(false);
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [newUser, setNewUser] = useState({ full_name: "", email: "", role: "operador", password: "" });
+  const [editingUser, setEditingUser] = useState<any>(null);
+  const [isEditingPermissions, setIsEditingPermissions] = useState(false);
+
+  const MODULES = [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "passeios", label: "Passeios", icon: Compass },
+    { id: "reservas", label: "Reservas", icon: ShoppingCart },
+    { id: "translados", label: "Translados", icon: Car },
+    { id: "crm", label: "CRM / Clientes", icon: Users },
+    { id: "parceiros", label: "Parceiros", icon: UserCheck },
+    { id: "colaboradores", label: "Colaboradores", icon: UserCheck2 },
+    { id: "financeiro", label: "Financeiro", icon: CreditCard },
+    { id: "marketing", label: "Marketing", icon: Megaphone },
+    { id: "documentos", label: "Documentação", icon: FileText },
+    { id: "relatorios", label: "Relatórios", icon: BarChart3 },
+    { id: "sgs", label: "Segurança (SGS)", icon: Shield },
+    { id: "configuracoes", label: "Configurações", icon: Settings },
+  ];
 
   const loadSettings = useCallback(async () => {
     setLoading(true);
@@ -514,6 +532,34 @@ const AdminConfig = () => {
     } catch (err: any) {
       toast.error("Erro ao atualizar cargo: " + err.message);
     }
+  };
+
+  const handleUpdatePermissions = async () => {
+    if (!editingUser) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("user_management")
+        .update({ permissions: editingUser.permissions })
+        .eq("id", editingUser.id);
+      
+      if (error) throw error;
+      toast.success("Permissões de acesso sincronizadas!");
+      setIsEditingPermissions(false);
+      setEditingUser(null);
+      loadUsers();
+    } catch (err: any) {
+      toast.error("Erro ao salvar permissões: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const togglePermission = (moduleId: string) => {
+    if (!editingUser) return;
+    const currentPermissions = { ...(editingUser.permissions || {}) };
+    currentPermissions[moduleId] = !currentPermissions[moduleId];
+    setEditingUser({ ...editingUser, permissions: currentPermissions });
   };
   if (loading) {
     return (
@@ -1410,6 +1456,62 @@ const AdminConfig = () => {
                 </div>
               )}
 
+              {isEditingPermissions && editingUser && (
+                <div className="bg-muted/50 p-6 rounded-2xl border border-border space-y-4 animate-in fade-in zoom-in-95 duration-300">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-teal-500/10 text-teal-600">
+                        <Fingerprint size={20} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-foreground">Permissões de Acesso: {editingUser.full_name}</h4>
+                        <p className="text-xs text-muted-foreground">Selecione quais módulos este usuário pode visualizar e gerenciar.</p>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => { setIsEditingPermissions(false); setEditingUser(null); }}>
+                      <X size={18} />
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                    {MODULES.map((module) => {
+                      const hasAccess = editingUser.permissions?.[module.id];
+                      return (
+                        <button
+                          key={module.id}
+                          onClick={() => togglePermission(module.id)}
+                          className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${
+                            hasAccess 
+                            ? "bg-teal-500/10 border-teal-500 text-teal-700 shadow-sm" 
+                            : "bg-background border-border text-muted-foreground hover:border-muted-foreground/30"
+                          }`}
+                        >
+                          <module.icon size={20} className={hasAccess ? "text-teal-600" : "text-muted-foreground/50"} />
+                          <span className="text-[10px] font-bold mt-2 text-center uppercase tracking-tighter leading-none">
+                            {module.label}
+                          </span>
+                          {hasAccess && (
+                            <div className="mt-1 w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex justify-end pt-4 border-t border-border/50">
+                    <Button 
+                      onClick={handleUpdatePermissions}
+                      disabled={saving}
+                      className="bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-black uppercase tracking-widest px-8 shadow-lg shadow-teal-500/20"
+                    >
+                      {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
+                      Sincronizar Acessos
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+
               <div className="border border-border rounded-2xl overflow-hidden bg-card">
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -1468,14 +1570,30 @@ const AdminConfig = () => {
                             </span>
                           </td>
                           <td className="p-4 text-right">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className={`h-8 px-3 rounded-lg font-bold text-xs ${user.status === 'ativo' ? 'text-rose-600 hover:text-rose-700 hover:bg-rose-50' : 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50'}`}
-                              onClick={() => handleUpdateUserStatus(user.id, user.status)}
-                            >
-                              {user.status === 'ativo' ? 'Bloquear' : 'Ativar'}
-                            </Button>
+                            <div className="flex items-center justify-end gap-2">
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-8 w-8 text-teal-600 hover:bg-teal-50"
+                                    onClick={() => { setEditingUser({...user}); setIsEditingPermissions(true); }}
+                                  >
+                                    <Edit size={16} />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent><p>Editar Permissões</p></TooltipContent>
+                              </Tooltip>
+
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className={`h-8 px-3 rounded-lg font-bold text-xs ${user.status === 'ativo' ? 'text-rose-600 hover:text-rose-700 hover:bg-rose-50' : 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50'}`}
+                                onClick={() => handleUpdateUserStatus(user.id, user.status)}
+                              >
+                                {user.status === 'ativo' ? 'Bloquear' : 'Ativar'}
+                              </Button>
+                            </div>
                           </td>
                         </tr>
                       ))
