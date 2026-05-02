@@ -270,7 +270,9 @@ const AdminPasseios = () => {
   const topSellingThreshold = sortedTours.length > 3 ? sortedTours[2].reviews_count : 10;
 
   const filtered = tours.filter(t =>
-    t.name.toLowerCase().includes(search.toLowerCase())
+    t.name.toLowerCase().includes(search.toLowerCase()) ||
+    t.category.toLowerCase().includes(search.toLowerCase()) ||
+    (t.location && t.location.toLowerCase().includes(search.toLowerCase()))
   );
 
   const activeCount = tours.filter(t => t.active).length;
@@ -299,7 +301,7 @@ const AdminPasseios = () => {
         ))}
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-8 p-6 bg-card border border-border rounded-3xl shadow-sm">
+      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between mb-8 p-6 bg-card border border-border rounded-3xl shadow-sm">
         <div className="relative flex-1 w-full group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
           <Input 
@@ -308,6 +310,17 @@ const AdminPasseios = () => {
             onChange={(e) => setSearch(e.target.value)} 
             className="pl-12 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30 transition-all text-sm font-medium" 
           />
+        </div>
+        
+        <div className="flex gap-2 flex-wrap justify-center">
+          <Button variant={!search ? "default" : "outline"} size="sm" onClick={() => setSearch("")} className="h-10 rounded-xl px-4 font-bold">
+            Todos
+          </Button>
+          {CATEGORIES.map((cat) => (
+            <Button key={cat} variant={search === cat ? "default" : "outline"} size="sm" onClick={() => setSearch(cat)} className="h-10 rounded-xl px-4 font-bold whitespace-nowrap">
+              {cat}
+            </Button>
+          ))}
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto">
           <Tooltip>
