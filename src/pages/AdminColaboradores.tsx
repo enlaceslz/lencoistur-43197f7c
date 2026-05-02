@@ -32,13 +32,19 @@ interface Collaborator {
   name: string;
   email: string | null;
   phone: string | null;
-  document: string | null;
+  document: string; // Changed to required
   pix_key: string | null;
   pix_type: string | null;
   status: 'active' | 'inactive';
   payment_type: 'commission' | 'daily' | 'monthly' | 'per_tour';
   payment_value: number;
   observation: string | null;
+  type: string;
+  birth_date: string | null;
+  zip_code: string | null;
+  address: string | null;
+  cnh: string | null;
+  cadastur: string | null;
   created_at: string;
 }
 
@@ -69,7 +75,9 @@ const AdminColaboradores = () => {
   const [form, setForm] = useState({
     name: "", email: "", phone: "", document: "",
     pix_key: "", pix_type: "cpf", status: "active",
-    payment_type: "daily", payment_value: "0", observation: ""
+    payment_type: "daily", payment_value: "0", observation: "",
+    type: "Outro", birth_date: "", zip_code: "", address: "",
+    cnh: "", cadastur: ""
   });
 
   const [paymentForm, setPaymentForm] = useState({
@@ -103,7 +111,9 @@ const AdminColaboradores = () => {
     setForm({
       name: "", email: "", phone: "", document: "",
       pix_key: "", pix_type: "cpf", status: "active",
-      payment_type: "daily", payment_value: "0", observation: ""
+      payment_type: "daily", payment_value: "0", observation: "",
+      type: "Outro", birth_date: "", zip_code: "", address: "",
+      cnh: "", cadastur: ""
     });
     setDialogOpen(true);
   };
@@ -113,7 +123,13 @@ const AdminColaboradores = () => {
     setForm({
       name: c.name, email: c.email || "", phone: c.phone || "", document: c.document || "",
       pix_key: c.pix_key || "", pix_type: c.pix_type || "cpf", status: c.status,
-      payment_type: c.payment_type, payment_value: String(c.payment_value), observation: c.observation || ""
+      payment_type: c.payment_type, payment_value: String(c.payment_value), observation: c.observation || "",
+      type: c.type || "Outro", 
+      birth_date: c.birth_date || "", 
+      zip_code: c.zip_code || "", 
+      address: c.address || "",
+      cnh: c.cnh || "", 
+      cadastur: c.cadastur || ""
     });
     setDialogOpen(true);
   };
@@ -136,10 +152,12 @@ const AdminColaboradores = () => {
 
   const handleSave = async () => {
     if (!form.name) { toast.error("Nome é obrigatório"); return; }
+    if (!form.document) { toast.error("CPF é obrigatório"); return; }
     setSaving(true);
     const payload = {
       ...form,
-      payment_value: Number(form.payment_value)
+      payment_value: Number(form.payment_value),
+      birth_date: form.birth_date || null
     };
 
     const { error } = selectedCollab 
@@ -333,7 +351,7 @@ const AdminColaboradores = () => {
 
       {/* Collaborator Form Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selectedCollab ? "Editar Colaborador" : "Novo Colaborador"}</DialogTitle>
           </DialogHeader>
@@ -341,6 +359,29 @@ const AdminColaboradores = () => {
             <div className="space-y-2">
               <Label>Nome Completo</Label>
               <Input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} />
+            </div>
+            <div className="space-y-2">
+              <Label>CPF (Obrigatório)</Label>
+              <Input value={form.document} onChange={(e) => setForm({...form, document: maskCPF(e.target.value)})} />
+            </div>
+            <div className="space-y-2">
+              <Label>Tipo de Colaborador</Label>
+              <Select value={form.type} onValueChange={(v: any) => setForm({...form, type: v})}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Guia">Guia</SelectItem>
+                  <SelectItem value="Motorista">Motorista</SelectItem>
+                  <SelectItem value="Vendedor">Vendedor</SelectItem>
+                  <SelectItem value="Freelancer">Freelancer</SelectItem>
+                  <SelectItem value="Outro">Outro</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Data de Nascimento</Label>
+              <Input type="date" value={form.birth_date} onChange={(e) => setForm({...form, birth_date: e.target.value})} />
             </div>
             <div className="space-y-2">
               <Label>E-mail</Label>
@@ -351,8 +392,20 @@ const AdminColaboradores = () => {
               <Input value={form.phone} onChange={(e) => setForm({...form, phone: maskPhone(e.target.value)})} />
             </div>
             <div className="space-y-2">
-              <Label>CPF / Documento</Label>
-              <Input value={form.document} onChange={(e) => setForm({...form, document: maskCPF(e.target.value)})} />
+              <Label>CEP</Label>
+              <Input value={form.zip_code} onChange={(e) => setForm({...form, zip_code: e.target.value})} />
+            </div>
+            <div className="space-y-2">
+              <Label>Endereço Completo</Label>
+              <Input value={form.address} onChange={(e) => setForm({...form, address: e.target.value})} />
+            </div>
+            <div className="space-y-2">
+              <Label>CNH</Label>
+              <Input value={form.cnh} onChange={(e) => setForm({...form, cnh: e.target.value})} />
+            </div>
+            <div className="space-y-2">
+              <Label>CADASTUR</Label>
+              <Input value={form.cadastur} onChange={(e) => setForm({...form, cadastur: e.target.value})} />
             </div>
             <div className="space-y-2">
               <Label>Tipo de Remuneração</Label>
