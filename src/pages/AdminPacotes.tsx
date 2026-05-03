@@ -176,10 +176,13 @@ const AdminPacotes = () => {
       active: pkg.active,
     });
     
-    // Map existing tours
-    const pkgTourIds = (pkg.package_tours || []).map((pt: any) => pt.tour_id);
-    const selected = tours.filter(t => pkgTourIds.includes(t.id));
-    setSelectedTours(selected);
+    // Map existing tours in correct order
+    const pkgTours = (pkg.package_tours || [])
+      .sort((a: any, b: any) => a.sort_order - b.sort_order)
+      .map((pt: any) => tours.find(t => t.id === pt.tour_id))
+      .filter(Boolean);
+      
+    setSelectedTours(pkgTours);
     setShowForm(true);
   };
 
