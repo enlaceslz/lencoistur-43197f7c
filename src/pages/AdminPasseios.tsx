@@ -607,7 +607,8 @@ const AdminPasseios = () => {
 
 
       <Card className="border-none shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
-        <Table>
+        <div className="overflow-x-auto">
+          <Table>
           <TableHeader>
             <TableRow className="bg-muted/30">
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest pl-6">Passeio / Localização</TableHead>
