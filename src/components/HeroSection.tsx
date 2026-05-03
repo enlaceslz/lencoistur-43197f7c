@@ -97,7 +97,7 @@ const HeroSection = () => {
             <Link
               key={key}
               to="/passeios"
-              className="bg-card/90 backdrop-blur-sm text-foreground hover:bg-secondary hover:text-secondary-foreground px-5 py-3 rounded-xl font-semibold text-sm transition-colors"
+              className="bg-card/90 backdrop-blur-sm text-foreground hover:bg-secondary hover:text-secondary-foreground px-4 py-2.5 md:px-5 md:py-3 rounded-xl font-semibold text-xs md:text-sm transition-colors"
             >
               {t(`hero.categories.${key}`)}
             </Link>
