@@ -458,7 +458,7 @@ const AdminColaboradores = () => {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex flex-wrap gap-2 mb-8 overflow-x-auto pb-2 no-scrollbar">
         <Button 
           variant={!search ? "default" : "outline"} 
           size="sm" 
