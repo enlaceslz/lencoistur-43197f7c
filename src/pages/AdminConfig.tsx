@@ -133,7 +133,6 @@ const AdminConfig = () => {
     { id: "documentos", label: "Documentação", icon: FileText },
     { id: "relatorios", label: "Relatórios", icon: BarChart3 },
     { id: "sgs", label: "Segurança (SGS)", icon: Shield },
-    "---",
     { id: "configuracoes", label: "Configurações", icon: Settings },
   ];
 
