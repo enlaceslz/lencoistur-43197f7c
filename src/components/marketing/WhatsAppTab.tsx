@@ -126,7 +126,8 @@ const WhatsAppTab = ({ campaigns, onRefresh }: WhatsAppTabProps) => {
       </div>
 
       <Card className="border-border overflow-hidden">
-        <Table>
+        <div className="overflow-x-auto">
+          <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="text-muted-foreground">Campanha</TableHead>
