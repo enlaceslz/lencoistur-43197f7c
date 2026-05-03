@@ -17,6 +17,18 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+const fmt = (v: number) => formatCurrency(v);
+
+const maskCurrency = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  return (Number(n) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+};
+
+const parseCurrency = (v: string) => {
+  return Number(v.replace(/\D/g, ""));
+};
 
 const AdminPacotes = () => {
   const [packages, setPackages] = useState<any[]>([]);
@@ -219,8 +231,8 @@ const AdminPacotes = () => {
                   </TableCell>
                   <TableCell>
                     <div className="space-y-0.5">
-                      <p className="text-sm font-bold text-primary">{formatCurrency(pkg.discount_price)}</p>
-                      <p className="text-xs text-muted-foreground line-through">{formatCurrency(pkg.original_price)}</p>
+                      <p className="text-sm font-bold text-primary">{fmt(pkg.discount_price)}</p>
+                      <p className="text-xs text-muted-foreground line-through">{fmt(pkg.original_price)}</p>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -270,22 +282,36 @@ const AdminPacotes = () => {
               <label className="text-sm font-bold">Descrição</label>
               <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
             </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold">Duração (dias)</label>
+              <Input type="number" min={1} value={form.days} onChange={e => setForm({ ...form, days: parseInt(e.target.value) })} />
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-bold">Preço Original</label>
+                <Input 
+                  value={maskCurrency(String(form.original_price))} 
+                  onChange={e => setForm({ ...form, original_price: parseCurrency(e.target.value) })} 
+                />
+                <p className="text-[10px] text-muted-foreground">{fmt(form.original_price)}</p>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold">Preço Promocional</label>
+                <Input 
+                  value={maskCurrency(String(form.discount_price))} 
+                  onChange={e => setForm({ ...form, discount_price: parseCurrency(e.target.value) })} 
+                />
+                <p className="text-[10px] text-muted-foreground">{fmt(form.discount_price)}</p>
+              </div>
+            </div>
 
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-bold">Duração (dias)</label>
-                <Input type="number" min={1} value={form.days} onChange={e => setForm({ ...form, days: parseInt(e.target.value) })} />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-bold">Preço Original (em centavos)</label>
-                <Input type="number" value={form.original_price} onChange={e => setForm({ ...form, original_price: parseInt(e.target.value) })} />
-                <p className="text-[10px] text-muted-foreground">{formatCurrency(form.original_price)}</p>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-bold">Preço Promocional (em centavos)</label>
-                <Input type="number" value={form.discount_price} onChange={e => setForm({ ...form, discount_price: parseInt(e.target.value) })} />
-                <p className="text-[10px] text-muted-foreground">{formatCurrency(form.discount_price)}</p>
-              </div>
+            <div className="flex items-center space-x-2 bg-muted/50 p-4 rounded-xl">
+              <Switch 
+                id="active" 
+                checked={form.active} 
+                onCheckedChange={(checked) => setForm({ ...form, active: checked })} 
+              />
+              <Label htmlFor="active" className="font-bold cursor-pointer">Pacote Ativo (visível no site)</Label>
             </div>
 
             <div className="space-y-4">
