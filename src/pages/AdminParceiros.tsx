@@ -455,7 +455,6 @@ const AdminParceiros = () => {
       </Card>
 
       <Card className="border-none shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
         {filtered.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground">
             <Users className="mx-auto mb-3 opacity-40" size={40} />
