@@ -133,14 +133,14 @@
     ]
   },
   "footer": {
-    "desc": "La plataforma líder en turismo en los Lençóis Maranhenses. Paseos, traslados y experiencias únicas en Santo Amaro do Maranhão.",
-    "toursTitle": "Paseos",
-    "tourLinks": ["Lagunas Azules", "Paseo en Barco", "Ruta Ecológica", "Descenso en Kayak", "Tour Gastronómico", "Trekking en Dunas"],
-    "companyTitle": "Empresa",
-    "companyLinks": { "about": "Sobre Nosotros", "partner": "Sé un Socio", "transfers": "Traslados", "terms": "Términos de Uso", "privacy": "Política de Privacidad" },
-    "contactTitle": "Contacto",
-    "seals": "Sellos y Certificaciones",
-    "copyright": "© 2026 LençóisTour. Todos los derechos reservados."
+    "desc": "Lençóis Tour Experience es su puerta de entrada a los Lençóis Maranhenses. Estratégicamente ubicada en Santo Amaro, ofrecemos la experiencia más auténtica y segura de la región.",
+    "toursTitle": "Experiencias",
+    "tourLinks": ["Laguna Gaivota", "Circuito Betânia", "Laguna Amizade", "Canto do Atins", "Trekking Rio Alegre", "Tour en Cuatrimoto"],
+    "companyTitle": "Institucional",
+    "companyLinks": { "about": "Nuestra Historia", "partner": "Sé un Socio", "transfers": "Traslados VIP", "terms": "Términos de Ciencia de Riesgo", "privacy": "Privacidad" },
+    "contactTitle": "Contáctenos",
+    "seals": "Seguridad y Calidad",
+    "copyright": "© 2026 Lençóis Tour Experience. Todos los derechos reservados. CNPJ: 54.493.425/0001-49"
   },
   "chatbot": {
     "greeting": "¡Hola! 👋 Soy la asistente virtual de **LençóisTour**! ¿Cómo puedo ayudarte a planificar tu aventura en los Lençóis Maranhenses? 🏖️",
