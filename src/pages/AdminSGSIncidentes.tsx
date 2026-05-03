@@ -141,7 +141,7 @@ const AdminSGSIncidentes = () => {
     <AdminLayout title="SGS - Registro de Incidentes (P5)">
       <div className="space-y-6">
         {/* Summary */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-card border border-border rounded-2xl p-4">
             <p className="text-xs text-muted-foreground">Total Registrados</p>
             <p className="text-2xl font-bold text-foreground">{summary.total}</p>
@@ -261,7 +261,7 @@ const AdminSGSIncidentes = () => {
             </div>
           ) : filtered.map((inc) => (
             <div key={inc.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-shadow">
-              <div className="flex flex-col sm:flex-row justify-between gap-3">
+              <div className="flex flex-col lg:flex-row justify-between gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className="font-mono text-xs text-muted-foreground">{inc.incident_code}</span>

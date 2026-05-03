@@ -78,7 +78,7 @@ const AdminSGSRotas = () => {
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
             <h3 className="font-display font-bold text-foreground">{editId ? "Editar Rota" : "Nova Rota"}</h3>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div><label className="block text-xs font-medium text-muted-foreground mb-1">Nome *</label><input value={form.nome} onChange={e => set("nome", e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" /></div>
               <div><label className="block text-xs font-medium text-muted-foreground mb-1">Tipo</label>
                 <select value={form.tipo} onChange={e => set("tipo", e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm">

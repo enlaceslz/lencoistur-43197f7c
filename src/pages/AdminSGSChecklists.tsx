@@ -111,7 +111,7 @@ const AdminSGSChecklists = () => {
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
             <h3 className="font-display font-bold text-foreground">Novo Checklist</h3>
-            <div className="grid sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-medium text-muted-foreground mb-1">Título *</label>
                 <input value={form.titulo} onChange={e => setForm(p => ({ ...p, titulo: e.target.value }))} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" />
@@ -130,7 +130,7 @@ const AdminSGSChecklists = () => {
               </div>
             </div>
             
-            <div className="grid sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-medium text-muted-foreground mb-1">Veículo (se aplicável)</label>
                 <select value={form.veiculo_id} onChange={e => setForm(p => ({ ...p, veiculo_id: e.target.value }))} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm">
