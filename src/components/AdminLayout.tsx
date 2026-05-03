@@ -325,6 +325,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
                 dashboard: "/admin",
                 passeios: "/admin/passeios",
                 reservas: "/admin/reservas",
+                pacotes: "/admin/pacotes",
                 translados: "/admin/translados",
                 crm: "/admin/crm",
                 parceiros: "/admin/parceiros",
