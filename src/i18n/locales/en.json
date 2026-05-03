@@ -133,14 +133,14 @@
     ]
   },
   "footer": {
-    "desc": "The leading tourism platform in the Lençóis Maranhenses. Tours, transfers and unique experiences in Santo Amaro do Maranhão.",
-    "toursTitle": "Tours",
-    "tourLinks": ["Blue Lagoons", "Boat Tour", "Eco Route", "Kayak Descent", "Food Tour", "Dune Trekking"],
-    "companyTitle": "Company",
-    "companyLinks": { "about": "About Us", "partner": "Become a Partner", "transfers": "Transfers", "terms": "Terms of Use", "privacy": "Privacy Policy" },
-    "contactTitle": "Contact",
-    "seals": "Certifications",
-    "copyright": "© 2026 LençóisTour. All rights reserved."
+    "desc": "Lençóis Tour Experience is your gateway to the Lençóis Maranhenses. Strategically located in Santo Amaro, we offer the most authentic and safe experience in the region.",
+    "toursTitle": "Experiences",
+    "tourLinks": ["Gaivota Lagoon", "Betânia Circuit", "Friendship Lagoon", "Canto do Atins", "Rio Alegre Trekking", "ATV Tour"],
+    "companyTitle": "Institutional",
+    "companyLinks": { "about": "Our Story", "partner": "Become a Partner", "transfers": "VIP Transfers", "terms": "Risk Awareness Terms", "privacy": "Privacy" },
+    "contactTitle": "Contact Us",
+    "seals": "Safety & Quality",
+    "copyright": "© 2026 Lençóis Tour Experience. All rights reserved. CNPJ: 54.493.425/0001-49"
   },
   "chatbot": {
     "greeting": "Hello! 👋 I'm the **LençóisTour** virtual assistant! How can I help you plan your adventure in the Lençóis Maranhenses? 🏖️",
