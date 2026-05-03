@@ -72,8 +72,8 @@ const PackageDetail = () => {
     );
   }
 
-  const pkgTours = pkg.tourSlugs.map(s => tours.find(t => t.slug === s)).filter(Boolean);
-  const discount = Math.round(((pkg.originalPrice - pkg.discountPrice) / pkg.originalPrice) * 100);
+  const pkgTours = (pkg.package_tours || []).map((pt: any) => pt.tour).filter(Boolean);
+  const discount = pkg.original_price > 0 ? Math.round(((pkg.original_price - pkg.discount_price) / pkg.original_price) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-background">
