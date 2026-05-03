@@ -1456,7 +1456,7 @@ const AdminConfig = () => {
                 <CardContent className="p-6 space-y-4">
                   <div className="flex items-center gap-3">
                     <Clock size={20} className="text-muted-foreground" />
-                    <h3 className="font-display font-bold text-foreground text-lg">Histórico de Backups (sessão atual)</h3>
+                    <h3 className="font-display font-bold text-foreground text-lg">Histórico de Backups (persistência local)</h3>
                   </div>
                   <div className="space-y-2">
                     {backupHistory.map((b, i) => (
