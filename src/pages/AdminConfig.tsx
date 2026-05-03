@@ -547,7 +547,7 @@ const AdminConfig = () => {
         if (!rows || !Array.isArray(rows) || rows.length === 0) continue;
 
         // Delete existing data
-        const { error: delError } = await supabase.from(table).delete().neq("id", "00000000-0000-0000-0000-000000000000" as any);
+        const { error: delError } = await supabase.from(table as any).delete().neq("id", "00000000-0000-0000-0000-000000000000" as any);
         if (delError) {
           console.error(`Erro ao limpar ${table}:`, delError.message);
           errors++;
@@ -557,7 +557,7 @@ const AdminConfig = () => {
         // Insert backup data in batches of 100
         for (let i = 0; i < rows.length; i += 100) {
           const batch = rows.slice(i, i + 100);
-          const { error: insError } = await supabase.from(table).insert(batch);
+          const { error: insError } = await supabase.from(table as any).insert(batch);
           if (insError) {
             console.error(`Erro ao restaurar ${table}:`, insError.message);
             errors++;
