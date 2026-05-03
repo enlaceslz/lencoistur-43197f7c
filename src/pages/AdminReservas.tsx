@@ -410,16 +410,16 @@ const AdminReservas = () => {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/50">
-                  <TableHead className="font-bold">Código</TableHead>
-                  <TableHead className="font-bold">Cliente</TableHead>
-                  <TableHead className="font-bold">Serviço</TableHead>
-                  <TableHead className="font-bold text-center">Data</TableHead>
-                  <TableHead className="font-bold text-center">Pax</TableHead>
-                  <TableHead className="font-bold text-right">Valor Total</TableHead>
-                  <TableHead className="font-bold text-center">Pagamento</TableHead>
-                  <TableHead className="font-bold text-center">Status</TableHead>
-                  <TableHead className="font-bold">Solicitação</TableHead>
+                <TableRow className="bg-muted/50 border-b border-border/50">
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4">Código</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4">Cliente</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4">Serviço</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4 text-center">Data</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4 text-center">Pax</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4 text-right">Valor Total</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4 text-center">Pagamento</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4 text-center">Status</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4">Solicitação</TableHead>
                   <TableHead className="w-12"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -433,9 +433,9 @@ const AdminReservas = () => {
                       className="cursor-pointer hover:bg-primary/5 transition-colors border-b border-border/50 group" 
                       onClick={() => { setSelected(b); setEditNotes(b.notes || ""); setShowNotes(false); }}
                     >
-                      <TableCell className="font-mono text-sm text-foreground">
+                      <TableCell className="font-mono text-[11px] text-foreground py-5">
                         <div className="flex items-center gap-1">
-                          <span className="bg-muted px-1.5 py-0.5 rounded text-xs group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                          <span className="bg-muted px-2 py-1 rounded-lg font-black text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors border border-border/30">
                             {b.bookingCode}
                           </span>
                           <Button 
