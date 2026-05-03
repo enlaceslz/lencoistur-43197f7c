@@ -78,7 +78,7 @@ const SortableTourItem = ({ tour, index, onRemove }: { tour: any, index: number,
     </div>
   );
 };
-const fmt = (v: number) => formatCurrency(v);
+const fmt = (v: number) => (Number(v) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const maskCurrency = (v: string) => {
   const n = v.replace(/\D/g, "");
