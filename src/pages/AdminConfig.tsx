@@ -1619,8 +1619,8 @@ const AdminConfig = () => {
               )}
 
 
-              <div className="border border-border rounded-2xl overflow-hidden bg-card">
-                <table className="w-full text-left border-collapse">
+              <div className="border border-border rounded-2xl overflow-x-auto bg-card no-scrollbar">
+                <table className="w-full text-left border-collapse min-w-[600px]">
                   <thead>
                     <tr className="bg-muted/50 border-b border-border">
                       <th className="p-4 text-xs font-black uppercase tracking-widest text-muted-foreground">Usuário</th>
