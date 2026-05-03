@@ -422,30 +422,31 @@ const AdminPacotes = () => {
                   })}
                 </div>
                 {selectedTours.length > 0 && (
-                  <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 mt-2">
-                    <p className="text-[10px] font-black uppercase text-blue-600 mb-2 tracking-widest">Ordem no Roteiro (Arraste para reordenar em breve)</p>
-                    <div className="flex flex-col gap-2">
-                      {selectedTours.map((t, i) => (
-                        <div key={t.id} className="flex items-center gap-3 bg-white p-2 rounded-lg border border-blue-100 shadow-sm">
-                          <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">{i + 1}</span>
-                          <span className="text-xs font-bold text-slate-700">{t.name}</span>
-                          <div className="ml-auto flex gap-1">
-                            <button 
-                              type="button"
-                              onClick={() => {
-                                if (i === 0) return;
-                                const newTours = [...selectedTours];
-                                [newTours[i-1], newTours[i]] = [newTours[i], newTours[i-1]];
-                                setSelectedTours(newTours);
-                              }}
-                              className="p-1 hover:bg-slate-100 rounded"
-                            >
-                              <GripVertical size={14} className="text-slate-400 rotate-90" />
-                            </button>
-                          </div>
+                  <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 mt-2">
+                    <p className="text-[10px] font-black uppercase text-blue-600 mb-4 tracking-widest">Ordem no Roteiro (Arraste para reordenar)</p>
+                    
+                    <DndContext 
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                      modifiers={[restrictToVerticalAxis]}
+                    >
+                      <SortableContext 
+                        items={selectedTours.map(t => t.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <div className="flex flex-col gap-3">
+                          {selectedTours.map((t, i) => (
+                            <SortableTourItem 
+                              key={t.id} 
+                              tour={t} 
+                              index={i} 
+                              onRemove={() => toggleTour(t)}
+                            />
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </SortableContext>
+                    </DndContext>
                   </div>
                 )}
               </div>
