@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (!["passeio", "translado"].includes(type)) {
+    if (!["passeio", "translado", "package"].includes(type)) {
       return new Response(
         JSON.stringify({ error: "Tipo inválido" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
