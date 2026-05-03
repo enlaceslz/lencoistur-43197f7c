@@ -455,7 +455,7 @@ const AdminConfig = () => {
     if (!file.name.endsWith(".json")) { toast.error("Selecione um arquivo .json de backup válido."); return; }
 
     const confirmRestore = window.confirm(
-      "⚠️ ATENÇÃO: A restauração irá SUBSTITUIR todos os dados atuais pelos dados do backup.\n\nEssa ação não pode ser desfeita.\n\nDeseja continuar?"
+      "⚠️ ATENÇÃO: A restauração irá SUBSTITUIR todos os dados atuais (incluindo imagens) pelos dados do backup.\n\nEssa ação não pode ser desfeita.\n\nDeseja continuar?"
     );
     if (!confirmRestore) { e.target.value = ""; return; }
 
@@ -474,19 +474,46 @@ const AdminConfig = () => {
         : "Data desconhecida";
 
       const confirmFinal = window.confirm(
-        `Backup de: ${backupDate}\n${parsed.metadata.total_records || "?"} registros em ${parsed.metadata.tables_count || "?"} tabelas.\n\nConfirmar restauração?`
+        `Backup de: ${backupDate}\n${parsed.metadata.total_records || "?"} registros e ${parsed.metadata.total_files || "0"} arquivos.\n\nConfirmar restauração completa?`
       );
       if (!confirmFinal) return;
 
       let restored = 0;
+      let restoredFiles = 0;
       let errors = 0;
 
+      // Restore Storage Files
+      if (parsed.storage) {
+        for (const bucket of STORAGE_BUCKETS) {
+          const files = parsed.storage[bucket];
+          if (!files || !Array.isArray(files)) continue;
+
+          for (const fileObj of files) {
+            try {
+              const response = await fetch(fileObj.data);
+              const blob = await response.blob();
+              
+              const { error: uploadError } = await supabase.storage
+                .from(bucket)
+                .upload(fileObj.name, blob, { upsert: true });
+              
+              if (uploadError) throw uploadError;
+              restoredFiles++;
+            } catch (err) {
+              console.error(`Erro ao restaurar arquivo ${fileObj.name} no bucket ${bucket}:`, err);
+              errors++;
+            }
+          }
+        }
+      }
+
+      // Restore Database Tables
       for (const table of BACKUP_TABLES) {
         const rows = parsed.data[table];
         if (!rows || !Array.isArray(rows) || rows.length === 0) continue;
 
         // Delete existing data
-        const { error: delError } = await supabase.from(table).delete().neq("id", "00000000-0000-0000-0000-000000000000");
+        const { error: delError } = await supabase.from(table).delete().neq("id", "00000000-0000-0000-0000-000000000000" as any);
         if (delError) {
           console.error(`Erro ao limpar ${table}:`, delError.message);
           errors++;
@@ -507,9 +534,9 @@ const AdminConfig = () => {
       }
 
       if (errors > 0) {
-        toast.error(`Restauração concluída com ${errors} erros. ${restored} registros restaurados.`);
+        toast.error(`Restauração concluída com ${errors} erros. ${restored} registros e ${restoredFiles} arquivos restaurados.`);
       } else {
-        toast.success(`Sistema restaurado com sucesso! ${restored} registros importados.`);
+        toast.success(`Sistema restaurado com sucesso! ${restored} registros e ${restoredFiles} arquivos importados.`);
         loadSettings();
         loadUsers();
       }
