@@ -8,6 +8,7 @@ interface StatItem {
   change: string;
   up: boolean;
   icon: React.ElementType;
+  color?: string;
 }
 
 export default function FinanceiroStats({ stats }: { stats: StatItem[] }) {
@@ -23,22 +24,21 @@ export default function FinanceiroStats({ stats }: { stats: StatItem[] }) {
           <Card className="hover:shadow-md transition-shadow border-none bg-gradient-to-br from-card to-muted/50 overflow-hidden group">
             <CardContent className="p-5 relative">
               <div className="flex items-center justify-between mb-3">
-                <div className="p-3 rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                <div className={`p-3 rounded-xl bg-muted/50 ${s.color || "text-primary"} group-hover:bg-primary group-hover:text-white transition-all duration-300`}>
                   <s.icon size={20} />
                 </div>
                 {s.change && (
-                  <span className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full ${
+                  <span className={`flex items-center gap-1 text-[10px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-lg border ${
                     s.up 
-                      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" 
-                      : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/30" 
+                      : "bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-900/30"
                   }`}>
-                    {s.up ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
                     {s.change}
                   </span>
                 )}
               </div>
-              <p className="text-2xl font-bold text-foreground tracking-tight">{s.value}</p>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-1">{s.label}</p>
+              <p className="text-2xl font-black text-foreground tracking-tight">{s.value}</p>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1 opacity-80">{s.label}</p>
               
               {/* Decorative background shape */}
               <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">

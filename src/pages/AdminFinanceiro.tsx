@@ -139,10 +139,10 @@ const AdminFinanceiro = () => {
   const ticketMedio = pagos.length > 0 ? Math.round(receitaPaga / pagos.length) : 0;
 
   const stats = [
-    { label: "Receita Paga", value: fmt(receitaPaga), change: `${pagos.length} res.`, up: true, icon: DollarSign },
-    { label: "Despesas do Mês", value: fmt(despesasMes), change: `${monthContasPagar.filter(c => c.status === "pago").length} contas`, up: false, icon: TrendingDown },
-    { label: "Lucro Estimado", value: fmt(lucroMes), change: receitaPaga > 0 ? `${Math.round((lucroMes / receitaPaga) * 100)}% margem` : "0% margem", up: lucroMes > 0, icon: TrendingUp },
-    { label: "Ticket Médio", value: fmt(ticketMedio), change: "mês atual", up: true, icon: LayoutDashboard },
+    { label: "Receita Paga", value: fmt(receitaPaga), change: `${pagos.length} reservas`, up: true, icon: DollarSign, color: "text-emerald-600" },
+    { label: "Despesas Pagas", value: fmt(despesasMes), change: `${monthContasPagar.filter(c => c.status === "pago").length} pagamentos`, up: true, icon: TrendingDown, color: "text-rose-600" },
+    { label: "Lucro Estimado", value: fmt(lucroMes), change: receitaPaga > 0 ? `${Math.round((lucroMes / receitaPaga) * 100)}% margem` : "0% margem", up: lucroMes > 0, icon: TrendingUp, color: "text-blue-600" },
+    { label: "Ticket Médio", value: fmt(ticketMedio), change: "por venda paga", up: true, icon: LayoutDashboard, color: "text-amber-600" },
   ];
 
   const tabs: { key: Tab; label: string; icon: React.ElementType }[] = [
@@ -329,90 +329,101 @@ const AdminFinanceiro = () => {
       <TooltipProvider>
         <div className="space-y-8 pb-10">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-card p-6 rounded-2xl border border-border/50 shadow-sm">
-          <div className="space-y-2">
-            <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Período de Análise</h2>
-            <div className="flex items-center gap-3">
-              <select 
-                value={selectedMonth} 
-                onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                className="bg-muted/50 border-none rounded-lg px-3 py-2 text-sm font-semibold focus:ring-2 focus:ring-primary transition-all cursor-pointer"
-              >
-                {["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"].map((m, i) => (
-                  <option key={i} value={i}>{m}</option>
-                ))}
-              </select>
-              <select 
-                value={selectedYear} 
-                onChange={(e) => setSelectedYear(Number(e.target.value))}
-                className="bg-muted/50 border-none rounded-lg px-3 py-2 text-sm font-semibold focus:ring-2 focus:ring-primary transition-all cursor-pointer"
-              >
-                {[2023, 2024, 2025, 2026].map(y => (
-                  <option key={y} value={y}>{y}</option>
-                ))}
-              </select>
+        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-4 bg-card p-6 rounded-2xl border border-border/50 shadow-sm">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="space-y-1.5">
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Período</p>
+              <div className="flex items-center gap-2">
+                <select 
+                  value={selectedMonth} 
+                  onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                  className="bg-muted/50 border border-border/50 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-tight focus:ring-2 focus:ring-primary transition-all cursor-pointer h-10"
+                >
+                  {["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"].map((m, i) => (
+                    <option key={i} value={i}>{m}</option>
+                  ))}
+                </select>
+                <select 
+                  value={selectedYear} 
+                  onChange={(e) => setSelectedYear(Number(e.target.value))}
+                  className="bg-muted/50 border border-border/50 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-tight focus:ring-2 focus:ring-primary transition-all cursor-pointer h-10"
+                >
+                  {[2024, 2025, 2026].map(y => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-1.5 flex-1 min-w-[200px]">
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Pesquisa Rápida</p>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+                <Input 
+                  placeholder="Descrição, meio, status..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9 h-10 bg-muted/30 border-border/50 rounded-xl text-xs font-medium"
+                />
+              </div>
             </div>
           </div>
           
-          <div className="flex-1 flex gap-2 max-w-2xl">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-              <Input 
-                placeholder="Pesquisar..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-11 bg-muted/30 border-none rounded-xl"
-              />
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="space-y-1.5">
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Filtros</p>
+              <div className="flex gap-2">
+                <select 
+                  value={statusFilter} 
+                  onChange={(e) => setStatusFilter(e.target.value as any)}
+                  className="bg-muted/50 border border-border/50 rounded-xl px-3 h-10 text-xs font-bold focus:ring-2 focus:ring-primary transition-all cursor-pointer"
+                >
+                  <option value="todos">Status: Todos</option>
+                  <option value="pago">Apenas Pagos</option>
+                  <option value="pendente">Pendentes</option>
+                </select>
+                <select 
+                  value={typeFilter} 
+                  onChange={(e) => setTypeFilter(e.target.value as any)}
+                  className="bg-muted/50 border border-border/50 rounded-xl px-3 h-10 text-xs font-bold focus:ring-2 focus:ring-primary transition-all cursor-pointer"
+                >
+                  <option value="todos">Tipo: Todos</option>
+                  <option value="entrada">Entradas</option>
+                  <option value="saida">Saídas</option>
+                </select>
+              </div>
             </div>
-            <select 
-              value={statusFilter} 
-              onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="bg-muted/50 border-none rounded-xl px-3 h-11 text-sm font-semibold focus:ring-2 focus:ring-primary transition-all cursor-pointer"
-            >
-              <option value="todos">Status: Todos</option>
-              <option value="pago">Apenas Pagos</option>
-              <option value="pendente">Apenas Pendentes</option>
-            </select>
-            <select 
-              value={typeFilter} 
-              onChange={(e) => setTypeFilter(e.target.value as any)}
-              className="bg-muted/50 border-none rounded-xl px-3 h-11 text-sm font-semibold focus:ring-2 focus:ring-primary transition-all cursor-pointer"
-            >
-              <option value="todos">Tipo: Todos</option>
-              <option value="entrada">Entradas (+)</option>
-              <option value="saida">Saídas (-)</option>
-            </select>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 self-end">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
                   variant="outline" 
-                  size="default" 
+                  size="sm" 
                   onClick={exportCSV}
-                  className="rounded-xl border-primary/20 hover:border-primary/50 hover:bg-primary/5 text-primary transition-all"
+                  className="rounded-xl border-border h-10 px-4 text-xs font-black uppercase tracking-widest hover:bg-primary/5 hover:text-primary transition-all"
                 >
-                  <Download size={18} className="mr-2" /> 
-                  Excel / CSV
+                  <Download size={14} className="mr-2" /> 
+                  Excel
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Exportar transações do período para Excel/CSV</TooltipContent>
+              <TooltipContent>Exportar CSV</TooltipContent>
             </Tooltip>
 
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
                   variant="default" 
-                  size="default" 
+                  size="sm" 
                   onClick={exportPDF}
-                  className="rounded-xl shadow-md transition-all"
+                  className="rounded-xl shadow-lg shadow-primary/20 h-10 px-4 text-xs font-black uppercase tracking-widest transition-all"
                 >
-                  <Printer size={18} className="mr-2" /> 
+                  <Printer size={14} className="mr-2" /> 
                   Relatório PDF
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Gerar relatório financeiro detalhado em PDF</TooltipContent>
+              <TooltipContent>Gerar Relatório</TooltipContent>
             </Tooltip>
           </div>
         </div>
