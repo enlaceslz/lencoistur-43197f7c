@@ -133,6 +133,7 @@ const AdminConfig = () => {
     { id: "documentos", label: "Documentação", icon: FileText },
     { id: "relatorios", label: "Relatórios", icon: BarChart3 },
     { id: "sgs", label: "Segurança (SGS)", icon: Shield },
+    "---",
     { id: "configuracoes", label: "Configurações", icon: Settings },
   ];
 
@@ -1552,6 +1553,7 @@ const AdminConfig = () => {
 
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
                     {MODULES.map((module) => {
+                      if (typeof module === 'string') return null;
                       const hasAccess = editingUser.permissions?.[module.id];
                       return (
                         <button
