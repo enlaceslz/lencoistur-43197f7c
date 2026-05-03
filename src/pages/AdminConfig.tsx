@@ -82,7 +82,9 @@ const DEFAULTS = {
     bannerUrl: null as string | null,
     banners: [] as Array<{ url: string; id: string }>,
     bannerTransition: "fade" as "fade" | "slide",
-    exibirParceiros: true
+    exibirParceiros: true,
+    footerDesc: "A Lençóis Tour Experience é a sua porta de entrada para os Lençóis Maranhenses. Localizada estrategicamente em Santo Amaro, oferecemos a experiência mais autêntica e segura da região.",
+    footerTours: ["Lagoa da Gaivota", "Circuito Betânia", "Circuito Emendadas", "Canto do Atins", "Circuito Ponta Verde", "Trekking nas Dunas", "Passeio de Quadriciclo", "Descida de Caiaque"]
   },
   pagamentos: { pix: true, cartao: true, boleto: false, dinheiro: true, transferencia: false, pixChave: "12.345.678/0001-90", pixTipo: "cnpj" as PixKeyType },
   notificacoes: { email: true, whatsapp: true, push: false, novaReserva: true, cancelamento: true, pagamento: true },
@@ -1033,6 +1035,31 @@ const AdminConfig = () => {
                         checked={site.exibirParceiros} 
                         onCheckedChange={(v) => setSite({ ...site, exibirParceiros: v })} 
                       />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 pt-6 border-t border-border">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Customização do Rodapé</Label>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-xs">Descrição do Rodapé (Sobre a Empresa)</Label>
+                      <Textarea 
+                        value={site.footerDesc || ""} 
+                        onChange={(e) => setSite({ ...site, footerDesc: e.target.value })} 
+                        placeholder="Breve descrição sobre a agência no rodapé..."
+                        className="rounded-xl border-muted-foreground/20 resize-none h-24 p-4 text-sm"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-xs">Experiências / Links (Separados por vírgula)</Label>
+                      <Input 
+                        value={site.footerTours?.join(", ") || ""} 
+                        onChange={(e) => setSite({ ...site, footerTours: e.target.value.split(",").map(s => s.trim()) })} 
+                        placeholder="Ex: Passeio 1, Passeio 2, Passeio 3"
+                        className="h-10 rounded-xl border-muted-foreground/20 text-sm"
+                      />
+                      <p className="text-[10px] text-muted-foreground italic">Estes nomes aparecerão na coluna "Experiências" do rodapé.</p>
                     </div>
                   </div>
 

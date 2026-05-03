@@ -5,8 +5,12 @@ import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const Footer = () => {
   const { t } = useTranslation();
-  const tourLinks = t("footer.tourLinks", { returnObjects: true }) as string[];
   const { site: settings, empresa } = useSiteSettings();
+  const defaultTourLinks = t("footer.tourLinks", { returnObjects: true }) as string[];
+  const tourLinks = settings?.footerTours && settings.footerTours.length > 0 
+    ? settings.footerTours 
+    : defaultTourLinks;
+
 
   return (
     <footer id="contato" className="bg-foreground text-primary-foreground border-t border-primary-foreground/10 pt-16 pb-8">
@@ -25,7 +29,7 @@ const Footer = () => {
               )}
             </h3>
             <p className="text-primary-foreground/60 text-sm leading-relaxed mb-4">
-              {t("footer.desc")}
+              {settings?.footerDesc || t("footer.desc")}
             </p>
             <a
               href={settings?.whatsappUrl || "https://wa.me/5598985880954"}
