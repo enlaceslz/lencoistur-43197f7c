@@ -88,8 +88,19 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-primary-foreground/10 mt-12 pt-8 text-center text-primary-foreground/40 text-sm">
-          {t("footer.copyright")}
+        <div className="border-t border-primary-foreground/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-primary-foreground/40 text-sm">
+          <p>{t("footer.copyright")}</p>
+          <div className="flex items-center gap-1">
+            <span>Desenvolvido por</span>
+            <a 
+              href="https://lovable.dev" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="font-semibold hover:text-secondary transition-colors"
+            >
+              Lovable
+            </a>
+          </div>
         </div>
       </div>
     </footer>
