@@ -186,8 +186,8 @@ const AdminSGSBriefings = () => {
           ) : briefings.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">Nenhum resumo registrado</p>
           ) : briefings.map(b => (
-            <div key={b.id} className={`bg-card border rounded-2xl p-5 ${b.completed ? "border-border" : "border-secondary"}`}>
-              <div className="flex justify-between items-center">
+            <div key={b.id} className={`bg-card border rounded-2xl p-4 sm:p-5 ${b.completed ? "border-border" : "border-secondary"}`}>
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${b.completed ? "bg-primary/10" : "bg-secondary/10 shadow-sm shadow-secondary/20"}`}>
                     {b.completed ? <CheckCircle size={20} className="text-primary" /> : <XCircle size={20} className="text-secondary" />}
