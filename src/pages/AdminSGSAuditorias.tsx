@@ -123,7 +123,7 @@ const AdminSGSAuditorias = () => {
                     const updated = [...checklist];
                     updated[i].observation = e.target.value;
                     setChecklist(updated);
-                  }} placeholder="Observação" className="bg-card border border-border rounded-lg px-2 py-1.5 text-xs text-foreground outline-none w-48" />
+                  }} placeholder="Observação" className="bg-card border border-border rounded-lg px-2 py-1.5 text-xs text-foreground outline-none w-full sm:w-48" />
                 </div>
               ))}
             </div>
