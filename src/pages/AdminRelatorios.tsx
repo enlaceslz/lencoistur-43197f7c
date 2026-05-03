@@ -271,7 +271,7 @@ const AdminRelatorios = () => {
         </div>
 
         {/* Navigation Tabs (no-print) */}
-        <div className="no-print flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="no-print flex gap-2 overflow-x-auto pb-2 no-scrollbar">
           {REPORT_TABS.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold whitespace-nowrap transition-all border shadow-sm ${
