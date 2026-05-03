@@ -180,7 +180,7 @@ const AdminSGSRiscos = () => {
         </div>
 
         {/* Header */}
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col xl:flex-row gap-6">
           {/* Heatmap Matrix */}
           <div className="bg-card border border-border rounded-2xl p-5 flex-shrink-0">
             <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
