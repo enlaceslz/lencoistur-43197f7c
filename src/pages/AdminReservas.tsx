@@ -814,40 +814,49 @@ const AdminReservas = () => {
               
               {/* Existing customer selector */}
               <div className="mb-3">
-                <label className="text-sm text-muted-foreground mb-1 block">Selecionar cliente existente</label>
-                <select
-                  value={selectedCustomerId}
-                  onChange={(e) => {
-                    const custId = e.target.value;
-                    setSelectedCustomerId(custId);
-                    if (custId) {
-                      const cust = existingCustomers.find(c => c.id === custId);
-                      if (cust) {
-                        setNewForm(f => ({
-                          ...f,
-                          customerName: cust.name,
-                          customerEmail: cust.email,
-                          customerPhone: cust.phone || "",
-                          cpf: cust.cpf || "",
-                          passport: cust.passport || "",
-                          country: cust.country || "Brasil",
-                          birthDate: cust.birth_date || "",
-                        }));
+                <label className="text-sm text-muted-foreground mb-1 block">Pesquisar cliente existente</label>
+                <div className="space-y-2">
+                  <Input 
+                    placeholder="Nome ou e-mail..." 
+                    value={customerSearch} 
+                    onChange={(e) => setCustomerSearch(e.target.value)}
+                    className="h-9"
+                  />
+                  <select
+                    value={selectedCustomerId}
+                    onChange={(e) => {
+                      const custId = e.target.value;
+                      setSelectedCustomerId(custId);
+                      if (custId) {
+                        const cust = existingCustomers.find(c => c.id === custId);
+                        if (cust) {
+                          setNewForm(f => ({
+                            ...f,
+                            customerName: cust.name,
+                            customerEmail: cust.email,
+                            customerPhone: cust.phone || "",
+                            cpf: cust.cpf || "",
+                            passport: cust.passport || "",
+                            country: cust.country || "Brasil",
+                            birthDate: cust.birth_date || "",
+                          }));
+                        }
+                      } else {
+                        setNewForm(f => ({ ...f, customerName: "", customerEmail: "", customerPhone: "", cpf: "", passport: "", country: "Brasil", birthDate: "" }));
                       }
-                    } else {
-                      setNewForm(f => ({ ...f, customerName: "", customerEmail: "", customerPhone: "" }));
+                    }}
+                    className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+                  >
+                    <option value="">— Novo cliente —</option>
+                    {existingCustomers
+                      .filter(c => !customerSearch || c.name.toLowerCase().includes(customerSearch.toLowerCase()) || c.email.toLowerCase().includes(customerSearch.toLowerCase()))
+                      .slice(0, 100) // Limit to avoid performance issues
+                      .map(c => (
+                        <option key={c.id} value={c.id}>{c.name} ({c.email})</option>
+                      ))
                     }
-                  }}
-                  className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
-                >
-                  <option value="">— Novo cliente —</option>
-                  {existingCustomers
-                    .filter(c => !customerSearch || c.name.toLowerCase().includes(customerSearch.toLowerCase()) || c.email.toLowerCase().includes(customerSearch.toLowerCase()))
-                    .map(c => (
-                      <option key={c.id} value={c.id}>{c.name} ({c.email})</option>
-                    ))
-                  }
-                </select>
+                  </select>
+                </div>
               </div>
 
               <div className="space-y-3">
