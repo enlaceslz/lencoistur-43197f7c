@@ -34,15 +34,17 @@ Sistema completo para operação de turismo de aventura na **Rota das Emoções 
 |--------|------|-----------|
 | Dashboard | `/admin` | KPIs em tempo real, gráficos de receita e reservas |
 | CRM – Clientes | `/admin/crm` | Gestão de clientes com filtros, exportação CSV, WhatsApp integrado |
-| Reservas | `/admin/reservas` | Gestão de reservas, confirmação/cancelamento, status de pagamento |
+| Reservas | `/admin/reservas` | Gestão de reservas, confirmação/cancelamento, status de pagamento. Inclui criação de reservas com relacionamento direto a clientes. |
 | Passeios | `/admin/passeios` | CRUD com upload de imagens (URL ou arquivo, alta resolução) |
 | Translados | `/admin/translados` | Gestão de rotas de transfer |
 | Financeiro | `/admin/financeiro` | Relatórios financeiros e métricas |
+| Colaboradores | `/admin/colaboradores` | Gestão de equipe, perfis e relatórios PDF profissionais (A4) com filtros |
 | Parceiros | `/admin/parceiros` | CRUD de parceiros por tipo, ativação/desativação, busca avançada |
 | Avaliações | `/admin/avaliacoes` | Reviews dos clientes |
 | Marketing | `/admin/marketing` | Campanhas WhatsApp/E-mail, gestão de leads, remarketing |
 | IA | `/admin/ia` | Configurações do chatbot IA |
 | Configurações | `/admin/config` | Senha admin, upload de logo, configurações do site |
+| Documentos | `/admin/documentos` | Repositório central de documentos e arquivos |
 
 ### SGS – Sistema de Gestão de Segurança (`/admin/sgs`)
 
@@ -118,12 +120,14 @@ Módulo de segurança em conformidade com **ABNT NBR ISO 21101, 21102, 21103** e
 | Validação de Dados | Server-side via RLS policies (preço, status, formato) |
 | Booking Code | Gerado por trigger (`LT-YYYYMMDD-XXXX`) anti-enumeração |
 | Escalação de Privilégios | INSERT/UPDATE/DELETE bloqueados na tabela `user_roles` |
-| Storage | Bucket `tour-images` público para leitura, upload restrito |
+| Storage | Buckets `tour-images` e `colaboradores` para imagens e fotos de perfil |
 
 ### Edge Functions
 | Função | Descrição |
 |--------|-----------|
 | `chat` | Chatbot IA com Lovable AI Gateway |
+| `create-booking` | Processamento seguro de novas reservas |
+| `auth-email-hook` | Envio de e-mails transacionais e de autenticação customizados |
 
 ---
 
