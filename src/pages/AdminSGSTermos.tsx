@@ -918,7 +918,7 @@ const AdminSGSTermos = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 justify-end">
                   {!t.signature_data && (
                     <button 
                       onClick={async () => {
