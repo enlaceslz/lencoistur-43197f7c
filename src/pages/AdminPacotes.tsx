@@ -1,0 +1,334 @@
+import { useEffect, useState } from "react";
+import AdminLayout from "@/components/AdminLayout";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Search, Plus, Pencil, Trash2, Package as PackageIcon, Clock, Tag, PlusCircle, X
+} from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { formatCurrency } from "@/lib/utils";
+
+const AdminPacotes = () => {
+  const [packages, setPackages] = useState<any[]>([]);
+  const [tours, setTours] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const [form, setForm] = useState({
+    name: "",
+    slug: "",
+    description: "",
+    days: 1,
+    original_price: 0,
+    discount_price: 0,
+    tag: "",
+    highlights: [] as string[],
+    active: true,
+  });
+
+  const [selectedTours, setSelectedTours] = useState<any[]>([]);
+  const [highlightInput, setHighlightInput] = useState("");
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setLoading(true);
+    const [pkgRes, tourRes] = await Promise.all([
+      supabase.from("packages").select("*, package_tours(tour_id)").order("created_at", { ascending: false }),
+      supabase.from("tours").select("id, name, slug").eq("active", true).order("name"),
+    ]);
+
+    setPackages(pkgRes.data || []);
+    setTours(tourRes.data || []);
+    setLoading(false);
+  };
+
+  const generateSlug = (name: string) =>
+    name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+  const openNew = () => {
+    setEditingId(null);
+    setForm({
+      name: "", slug: "", description: "", days: 1,
+      original_price: 0, discount_price: 0, tag: "", highlights: [], active: true
+    });
+    setSelectedTours([]);
+    setShowForm(true);
+  };
+
+  const openEdit = (pkg: any) => {
+    setEditingId(pkg.id);
+    setForm({
+      name: pkg.name,
+      slug: pkg.slug,
+      description: pkg.description || "",
+      days: pkg.days,
+      original_price: pkg.original_price,
+      discount_price: pkg.discount_price,
+      tag: pkg.tag || "",
+      highlights: pkg.highlights || [],
+      active: pkg.active,
+    });
+    
+    // Map existing tours
+    const pkgTourIds = (pkg.package_tours || []).map((pt: any) => pt.tour_id);
+    const selected = tours.filter(t => pkgTourIds.includes(t.id));
+    setSelectedTours(selected);
+    setShowForm(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const slug = form.slug || generateSlug(form.name);
+    
+    const payload = { ...form, slug };
+
+    let res;
+    if (editingId) {
+      res = await supabase.from("packages").update(payload).eq("id", editingId).select().single();
+    } else {
+      res = await supabase.from("packages").insert(payload).select().single();
+    }
+
+    if (res.error) {
+      toast.error("Erro ao salvar pacote: " + res.error.message);
+      return;
+    }
+
+    const packageId = res.data.id;
+
+    // Update package_tours
+    await supabase.from("package_tours").delete().eq("package_id", packageId);
+    
+    if (selectedTours.length > 0) {
+      const tourInserts = selectedTours.map((t, idx) => ({
+        package_id: packageId,
+        tour_id: t.id,
+        sort_order: idx
+      }));
+      await supabase.from("package_tours").insert(tourInserts);
+    }
+
+    toast.success(editingId ? "Pacote atualizado!" : "Pacote criado!");
+    setShowForm(false);
+    loadData();
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Excluir este pacote permanentemente?")) return;
+    const { error } = await supabase.from("packages").delete().eq("id", id);
+    if (error) toast.error("Erro ao excluir: " + error.message);
+    else { toast.success("Pacote excluído"); loadData(); }
+  };
+
+  const addHighlight = () => {
+    if (!highlightInput.trim()) return;
+    setForm({ ...form, highlights: [...form.highlights, highlightInput.trim()] });
+    setHighlightInput("");
+  };
+
+  const removeHighlight = (idx: number) => {
+    setForm({ ...form, highlights: form.highlights.filter((_, i) => i !== idx) });
+  };
+
+  const toggleTour = (tour: any) => {
+    if (selectedTours.some(t => t.id === tour.id)) {
+      setSelectedTours(selectedTours.filter(t => t.id !== tour.id));
+    } else {
+      setSelectedTours([...selectedTours, tour]);
+    }
+  };
+
+  const filtered = packages.filter(p => 
+    p.name.toLowerCase().includes(search.toLowerCase()) || 
+    p.tag?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <AdminLayout title="Gestão de Pacotes">
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-8 p-6 bg-card border border-border rounded-3xl shadow-sm">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+          <Input 
+            placeholder="Buscar pacotes..." 
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)} 
+            className="pl-12 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30" 
+          />
+        </div>
+        <Button onClick={openNew} className="h-12 px-8 rounded-2xl font-bold flex items-center gap-2">
+          <Plus size={20} strokeWidth={3} /> Novo Pacote
+        </Button>
+      </div>
+
+      <Card className="border-none shadow-sm overflow-hidden rounded-3xl">
+        <Table>
+          <TableHeader className="bg-muted/50">
+            <TableRow>
+              <TableHead className="font-bold">Pacote</TableHead>
+              <TableHead className="font-bold">Duração</TableHead>
+              <TableHead className="font-bold">Preço</TableHead>
+              <TableHead className="font-bold">Status</TableHead>
+              <TableHead className="text-right font-bold">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {loading ? (
+              <TableRow><TableCell colSpan={5} className="text-center py-10">Carregando...</TableCell></TableRow>
+            ) : filtered.length === 0 ? (
+              <TableRow><TableCell colSpan={5} className="text-center py-10 text-muted-foreground">Nenhum pacote encontrado.</TableCell></TableRow>
+            ) : (
+              filtered.map((pkg) => (
+                <TableRow key={pkg.id}>
+                  <TableCell className="font-medium">
+                    <div>
+                      <p className="font-bold text-foreground">{pkg.name}</p>
+                      <p className="text-xs text-muted-foreground">{pkg.slug}</p>
+                      {pkg.tag && <Badge variant="secondary" className="mt-1">{pkg.tag}</Badge>}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1.5 text-sm">
+                      <Clock size={14} className="text-muted-foreground" />
+                      {pkg.days} {pkg.days === 1 ? 'dia' : 'dias'}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-0.5">
+                      <p className="text-sm font-bold text-primary">{formatCurrency(pkg.discount_price)}</p>
+                      <p className="text-xs text-muted-foreground line-through">{formatCurrency(pkg.original_price)}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={pkg.active ? "default" : "outline"} className={pkg.active ? "bg-green-100 text-green-700 hover:bg-green-100" : ""}>
+                      {pkg.active ? "Ativo" : "Inativo"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(pkg)} className="h-8 w-8 rounded-lg text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+                        <Pencil size={16} />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(pkg.id)} className="h-8 w-8 rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50">
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </Card>
+
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <PackageIcon className="text-primary" />
+              {editingId ? "Editar Pacote" : "Novo Pacote"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="space-y-6 pt-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-bold">Nome do Pacote</label>
+                <Input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: generateSlug(e.target.value) })} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold">Slug (URL)</label>
+                <Input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-bold">Descrição</label>
+              <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-bold">Duração (dias)</label>
+                <Input type="number" min={1} value={form.days} onChange={e => setForm({ ...form, days: parseInt(e.target.value) })} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold">Preço Original (em centavos)</label>
+                <Input type="number" value={form.original_price} onChange={e => setForm({ ...form, original_price: parseInt(e.target.value) })} />
+                <p className="text-[10px] text-muted-foreground">{formatCurrency(form.original_price)}</p>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold">Preço Promocional (em centavos)</label>
+                <Input type="number" value={form.discount_price} onChange={e => setForm({ ...form, discount_price: parseInt(e.target.value) })} />
+                <p className="text-[10px] text-muted-foreground">{formatCurrency(form.discount_price)}</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <label className="text-sm font-bold block">Passeios Inclusos</label>
+              <div className="flex flex-wrap gap-2 p-4 bg-muted/30 rounded-2xl border border-dashed border-border">
+                {tours.map(tour => (
+                  <button
+                    key={tour.id}
+                    type="button"
+                    onClick={() => toggleTour(tour)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
+                      selectedTours.some(t => t.id === tour.id) 
+                      ? "bg-primary text-primary-foreground shadow-sm" 
+                      : "bg-background border border-border text-muted-foreground hover:border-primary"
+                    }`}
+                  >
+                    {selectedTours.some(t => t.id === tour.id) ? <PlusCircle size={14} className="rotate-45" /> : <PlusCircle size={14} />}
+                    {tour.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <label className="text-sm font-bold block">Destaques (Highlights)</label>
+              <div className="flex gap-2">
+                <Input value={highlightInput} onChange={e => setHighlightInput(e.target.value)} placeholder="Ex: Guia bilíngue incluso" onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addHighlight())} />
+                <Button type="button" onClick={addHighlight} variant="secondary">Adicionar</Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {form.highlights.map((h, i) => (
+                  <Badge key={i} className="pl-3 pr-1 py-1 gap-1 flex items-center bg-blue-50 text-blue-700 border-blue-200">
+                    {h}
+                    <button type="button" onClick={() => removeHighlight(i)} className="hover:bg-blue-200 rounded-full p-0.5"><X size={12} /></button>
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-4 pt-4 border-t">
+              <Button type="submit" className="flex-1 h-12 rounded-xl font-bold">
+                {editingId ? "Salvar Alterações" : "Criar Pacote"}
+              </Button>
+              <Button type="button" variant="ghost" onClick={() => setShowForm(false)} className="h-12 rounded-xl font-bold">
+                Cancelar
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </AdminLayout>
+  );
+};
+
+export default AdminPacotes;
