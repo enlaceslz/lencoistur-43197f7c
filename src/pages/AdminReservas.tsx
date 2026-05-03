@@ -349,11 +349,11 @@ const AdminReservas = () => {
                 </Button>
               ))}
             </div>
-            <div className="flex gap-2 shrink-0">
-              <Button variant="outline" size="sm" onClick={exportCSV}>
+            <div className="flex flex-wrap gap-2 w-full md:w-auto">
+              <Button variant="outline" size="sm" onClick={exportCSV} className="flex-1 md:flex-none">
                 <Download size={14} className="mr-1" /> CSV
               </Button>
-              <Button size="sm" onClick={() => { resetNewForm(); setShowNewForm(true); }} className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20">
+              <Button size="sm" onClick={() => { resetNewForm(); setShowNewForm(true); }} className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 flex-1 md:flex-none">
                 <Plus size={14} className="mr-1" /> Nova Reserva
               </Button>
             </div>

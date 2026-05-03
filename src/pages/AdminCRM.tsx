@@ -830,19 +830,21 @@ const AdminCRMContent = () => {
                   className="bg-transparent w-full outline-none text-foreground text-sm placeholder:text-muted-foreground"
                 />
               </div>
-                <div className="flex gap-2">
-                <Button size="sm" className="rounded-xl" onClick={openCreateModal}>
-                  <Plus size={14} /> Novo Cliente
+                <div className="flex flex-wrap gap-2">
+                <Button size="sm" className="rounded-xl flex-1 sm:flex-none" onClick={openCreateModal}>
+                  <Plus size={14} className="mr-1" /> Novo Cliente
                 </Button>
-                <Button variant="outline" size="sm" className="rounded-xl" onClick={() => fetchCustomers()}>
-                  <RefreshCw size={14} />
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-xl" onClick={exportCSV}>
-                  <Download size={14} /> CSV
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-xl" onClick={exportPDF}>
-                  <FileText size={14} /> PDF
-                </Button>
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <Button variant="outline" size="sm" className="rounded-xl flex-1 sm:flex-none" onClick={() => fetchCustomers()}>
+                    <RefreshCw size={14} />
+                  </Button>
+                  <Button variant="outline" size="sm" className="rounded-xl flex-1 sm:flex-none" onClick={exportCSV}>
+                    <Download size={14} /> <span className="hidden xs:inline">CSV</span>
+                  </Button>
+                  <Button variant="outline" size="sm" className="rounded-xl flex-1 sm:flex-none" onClick={exportPDF}>
+                    <FileText size={14} /> <span className="hidden xs:inline">PDF</span>
+                  </Button>
+                </div>
               </div>
             </div>
 
