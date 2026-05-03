@@ -429,6 +429,14 @@ const AdminColaboradores = () => {
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="rounded-2xl h-12 px-6 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm" 
+            onClick={generatePDF}
+          >
+            <FileDown size={18} className="mr-2 text-red-500" /> PDF
+          </Button>
           <Button variant="outline" size="sm" className="rounded-2xl h-12 px-6 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm" onClick={() => {
             const header = "Nome,Email,Telefone,Documento,Tipo,Status,Remuneração\n";
             const rows = filtered.map(c => `"${c.name}","${c.email || ''}","${c.phone || ''}","${c.document}","${c.type}","${c.status}","${getPaymentTypeLabel(c.payment_type)}: ${formatCurrency(c.payment_value)}"`).join("\n");
@@ -439,7 +447,7 @@ const AdminColaboradores = () => {
             a.download = `colaboradores_${new Date().toISOString().slice(0, 10)}.csv`;
             a.click();
           }}>
-            <Download size={18} className="mr-2" /> Exportar
+            <Download size={18} className="mr-2" /> CSV
           </Button>
           <Button variant="outline" size="sm" className="rounded-2xl h-12 px-6 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm" onClick={() => setTypesDialogOpen(true)}>
             <Settings2 size={18} className="mr-2" /> Categorias
