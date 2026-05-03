@@ -12,7 +12,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Search, Plus, Pencil, Trash2, Package as PackageIcon, Clock, Tag, PlusCircle, X
+  Search, Plus, Pencil, Trash2, Package as PackageIcon, Clock, Tag, PlusCircle, X, CheckCircle, GripVertical
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -315,23 +315,60 @@ const AdminPacotes = () => {
             </div>
 
             <div className="space-y-4">
-              <label className="text-sm font-bold block">Passeios Inclusos</label>
-              <div className="flex flex-wrap gap-2 p-4 bg-muted/30 rounded-2xl border border-dashed border-border">
-                {tours.map(tour => (
-                  <button
-                    key={tour.id}
-                    type="button"
-                    onClick={() => toggleTour(tour)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
-                      selectedTours.some(t => t.id === tour.id) 
-                      ? "bg-primary text-primary-foreground shadow-sm" 
-                      : "bg-background border border-border text-muted-foreground hover:border-primary"
-                    }`}
-                  >
-                    {selectedTours.some(t => t.id === tour.id) ? <PlusCircle size={14} className="rotate-45" /> : <PlusCircle size={14} />}
-                    {tour.name}
-                  </button>
-                ))}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-bold block">Passeios Inclusos (Clique para selecionar)</label>
+                  <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+                    {selectedTours.length} selecionados
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2 p-4 bg-muted/30 rounded-2xl border border-dashed border-border min-h-[100px]">
+                  {tours.map(tour => {
+                    const isSelected = selectedTours.some(t => t.id === tour.id);
+                    return (
+                      <button
+                        key={tour.id}
+                        type="button"
+                        onClick={() => toggleTour(tour)}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border-2 ${
+                          isSelected 
+                          ? "bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105" 
+                          : "bg-background border-transparent text-muted-foreground hover:border-primary/30"
+                        }`}
+                      >
+                        {isSelected ? <CheckCircle size={14} strokeWidth={3} /> : <PlusCircle size={14} />}
+                        {tour.name}
+                      </button>
+                    );
+                  })}
+                </div>
+                {selectedTours.length > 0 && (
+                  <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 mt-2">
+                    <p className="text-[10px] font-black uppercase text-blue-600 mb-2 tracking-widest">Ordem no Roteiro (Arraste para reordenar em breve)</p>
+                    <div className="flex flex-col gap-2">
+                      {selectedTours.map((t, i) => (
+                        <div key={t.id} className="flex items-center gap-3 bg-white p-2 rounded-lg border border-blue-100 shadow-sm">
+                          <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">{i + 1}</span>
+                          <span className="text-xs font-bold text-slate-700">{t.name}</span>
+                          <div className="ml-auto flex gap-1">
+                            <button 
+                              type="button"
+                              onClick={() => {
+                                if (i === 0) return;
+                                const newTours = [...selectedTours];
+                                [newTours[i-1], newTours[i]] = [newTours[i], newTours[i-1]];
+                                setSelectedTours(newTours);
+                              }}
+                              className="p-1 hover:bg-slate-100 rounded"
+                            >
+                              <GripVertical size={14} className="text-slate-400 rotate-90" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
