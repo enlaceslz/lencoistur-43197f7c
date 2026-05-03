@@ -707,7 +707,7 @@ const AdminConfig = () => {
         {/* EMPRESA */}
         <TabsContent value="empresa">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-8">
+            <CardContent className="p-4 md:p-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600">
@@ -804,7 +804,7 @@ const AdminConfig = () => {
         {/* SITE / FRONTEND */}
         <TabsContent value="site">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-8 space-y-8">
+            <CardContent className="p-4 md:p-8 space-y-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600">
@@ -1053,7 +1053,7 @@ const AdminConfig = () => {
         {/* FINANCEIRO / PAGAMENTO */}
         <TabsContent value="pagamento">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-8 space-y-8">
+            <CardContent className="p-4 md:p-8 space-y-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600">
@@ -1218,7 +1218,7 @@ const AdminConfig = () => {
         {/* NOTIFICAÇÕES */}
         <TabsContent value="notificacoes">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-8 space-y-8">
+            <CardContent className="p-4 md:p-8 space-y-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-600">
@@ -1295,7 +1295,7 @@ const AdminConfig = () => {
         {/* SEGURANÇA */}
         <TabsContent value="seguranca">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-8 space-y-8">
+            <CardContent className="p-4 md:p-8 space-y-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-2xl bg-slate-500/10 text-slate-600">
@@ -1478,7 +1478,7 @@ const AdminConfig = () => {
         {/* USUÁRIOS */}
         <TabsContent value="usuarios">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-8 space-y-8">
+            <CardContent className="p-4 md:p-8 space-y-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-2xl bg-teal-500/10 text-teal-600">
@@ -1739,7 +1739,7 @@ const AdminConfig = () => {
         {/* GALERIA */}
         <TabsContent value="galeria">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-8 space-y-8">
+            <CardContent className="p-4 md:p-8 space-y-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-600">
