@@ -17,7 +17,7 @@ const WhyUsSection = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
           <p className="text-secondary font-bold tracking-[0.2em] uppercase text-xs mb-4">{t("whyUs.label")}</p>
-          <h2 className="font-display text-4xl md:text-6xl font-bold leading-tight">
+          <h2 className="font-display text-3xl md:text-6xl font-bold leading-tight">
             {t("whyUs.title1")} <span className="text-secondary">{t("whyUs.title2")}</span>
           </h2>
         </div>
