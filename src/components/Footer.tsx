@@ -29,7 +29,7 @@ const Footer = () => {
               )}
             </h3>
             <p className="text-primary-foreground/60 text-sm leading-relaxed mb-4">
-              {t("footer.desc")}
+              {settings?.footerDesc || t("footer.desc")}
             </p>
             <a
               href={settings?.whatsappUrl || "https://wa.me/5598985880954"}
