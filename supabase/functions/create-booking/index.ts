@@ -191,7 +191,7 @@ Deno.serve(async (req) => {
           booking_code: generateBookingCode(),
           collaborator_id: collaboratorId || null,
         })
-        .select("*, customers(*)")
+        .select("*, customers!fk_bookings_customer(*)")
         .single();
 
       if (bookingErr || !booking) {
