@@ -463,10 +463,14 @@ const AdminConfig = () => {
       a.click();
       URL.revokeObjectURL(url);
 
-      setBackupHistory((prev) => [
-        { date: now.toISOString(), tables: BACKUP_TABLES.length, records: totalRecords, size: `${sizeMB} MB` },
-        ...prev.slice(0, 9),
-      ]);
+      setBackupHistory((prev) => {
+        const newHistory = [
+          { date: now.toISOString(), tables: BACKUP_TABLES.length, records: totalRecords, size: `${sizeMB} MB` },
+          ...prev.slice(0, 9),
+        ];
+        localStorage.setItem("backup_history", JSON.stringify(newHistory));
+        return newHistory;
+      });
 
       toast.success(`Backup realizado com sucesso! ${totalRecords} registros e ${totalFiles} arquivos salvos.`);
     } catch (err) {
