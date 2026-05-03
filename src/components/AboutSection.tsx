@@ -17,16 +17,16 @@ const AboutSection = () => {
           <p className="text-muted-foreground leading-relaxed mb-6" dangerouslySetInnerHTML={{ __html: t("about.p2") }} />
           <p className="text-muted-foreground leading-relaxed mb-8" dangerouslySetInnerHTML={{ __html: t("about.p3") }} />
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
             {[
-              { value: "8", label: t("about.stats.routes") },
+              { value: "8+", label: t("about.stats.routes") },
               { value: "7 min", label: t("about.stats.time") },
               { value: "100%", label: t("about.stats.satisfaction") },
-              { value: "Jun-Ago", label: t("about.stats.season") },
+              { value: "Jan-Dez", label: t("about.stats.season") },
             ].map((stat) => (
-              <div key={stat.label} className="bg-ocean-light rounded-2xl p-5">
-                <p className="font-display text-2xl md:text-3xl font-bold text-primary">{stat.value}</p>
-                <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
+              <div key={stat.label} className="bg-white/50 backdrop-blur-sm border border-primary/10 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                <p className="font-display text-3xl md:text-4xl font-bold text-primary">{stat.value}</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-2">{stat.label}</p>
               </div>
             ))}
           </div>

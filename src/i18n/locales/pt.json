@@ -12,8 +12,8 @@
   "hero": {
     "location": "Santo Amaro do Maranhão",
     "title1": "A Porta de Entrada Mais Rápida",
-    "title2": "para os Lençóis Maranhenses",
-    "subtitle": "Em menos de 7 minutos, você sai da cidade e já está nas famosas Lagoas Azuis! Veículos 4x4 credenciados, guias locais especializados e 8 roteiros exclusivos de ecoturismo e aventura.",
+    "title2": "para o Paraíso dos Lençóis",
+    "subtitle": "Em apenas 7 minutos, você sai da cidade e já está mergulhando nas famosas Lagoas Azuis! A Lençóis Tour Experience oferece veículos 4x4 exclusivos e guias locais para uma jornada inesquecível.",
     "categories": {
       "boat": "Passeio de Barco",
       "eco": "Roteiro Ecológico",
@@ -28,11 +28,11 @@
     "whatsapp": "📱 Agendar via WhatsApp"
   },
   "about": {
-    "label": "Sobre o Destino",
-    "title": "Santo Amaro do Maranhão",
-    "p1": "Descubra Santo Amaro do Maranhão, o roteiro turístico mais procurado e a porta de entrada mais próxima para o Parque Nacional dos Lençóis Maranhenses.",
-    "p2": "Os Lençóis Maranhenses são um tesouro natural de valor inestimável, reconhecido como <strong>Patrimônio Mundial da Humanidade</strong>. Em Santo Amaro, você encontra a essência rústica e aconchegante do interior, com uma estrutura completa de pousadas e restaurantes.",
-    "p3": "Oferecemos <strong>8 roteiros exclusivos</strong> de ecoturismo, aventura e experiência, incluindo trekking, caiaque e o famoso passeio de quadriciclo. Aproveite a rica gastronomia maranhense, com pratos típicos como o famoso <strong>camarão da Malásia</strong>.",
+    "label": "O Destino Perfeito",
+    "title": "Santo Amaro Experience",
+    "p1": "Descubra Santo Amaro do Maranhão, a joia mais preservada e a porta de entrada mais próxima para o Parque Nacional dos Lençóis Maranhenses.",
+    "p2": "Reconhecido como <strong>Patrimônio Mundial da Humanidade</strong> pela UNESCO, os Lençóis Maranhenses encontram em Santo Amaro sua expressão mais autêntica, com lagoas perenes e dunas monumentais.",
+    "p3": "Na <strong>Lençóis Tour Experience</strong>, transformamos sua visita em uma jornada personalizada com roteiros exclusivos de ecoturismo, aventura e alta gastronomia local.",
     "stats": {
       "routes": "Roteiros Exclusivos",
       "time": "Até as Lagoas",
