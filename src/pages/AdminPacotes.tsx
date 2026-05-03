@@ -23,9 +23,9 @@ const maskCurrency = (v: string) => {
   return (Number(n) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
 };
 
-const parseCurrency = (v: string) => {
-  return Number(v.replace(/\D/g, ""));
 };
+
+const AdminPacotes = () => {
   const [packages, setPackages] = useState<any[]>([]);
   const [tours, setTours] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
