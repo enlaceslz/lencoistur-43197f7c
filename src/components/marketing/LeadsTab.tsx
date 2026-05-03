@@ -192,7 +192,8 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
       </div>
 
       <Card className="border-border overflow-hidden">
-        <Table>
+        <div className="overflow-x-auto">
+          <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="text-muted-foreground">Nome</TableHead>
