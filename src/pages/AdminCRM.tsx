@@ -496,7 +496,7 @@ const AdminCRMContent = () => {
     setEditingDependent(d);
     setDepForm({
       name: d.name,
-      cpf: d.cpf || "",
+      cpf: d.cpf ? maskCPF(d.cpf) : "",
       birth_date: d.birth_date || "",
       relationship: d.relationship
     });
