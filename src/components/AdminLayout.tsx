@@ -117,7 +117,13 @@ const getBreadcrumbs = (pathname: string) => {
     } else if (parts[1]) {
       const mainItem = mainItems.find(i => i.path === pathname);
       if (mainItem) crumbs.push({ label: mainItem.label, path: mainItem.path });
-      else if (parts[1] === "config") crumbs.push({ label: "Configurações", path: "/admin/config" });
+      else if (parts[1] === "config") {
+        crumbs.push({ label: "Configurações", path: "/admin/config" });
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("tab") === "usuarios") {
+          crumbs.push({ label: "Usuários", path: "/admin/config?tab=usuarios" });
+        }
+      }
     }
   }
   return crumbs;

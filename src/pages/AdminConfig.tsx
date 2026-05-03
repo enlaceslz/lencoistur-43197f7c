@@ -133,6 +133,7 @@ const AdminConfig = () => {
     { id: "documentos", label: "Documentação", icon: FileText },
     { id: "relatorios", label: "Relatórios", icon: BarChart3 },
     { id: "sgs", label: "Segurança (SGS)", icon: Shield },
+    "---",
     { id: "configuracoes", label: "Configurações", icon: Settings },
   ];
 
@@ -347,7 +348,9 @@ const AdminConfig = () => {
     "sgs_risks", "sgs_incidents", "sgs_corrective_actions", "sgs_staff",
     "sgs_staff_trainings", "sgs_audits", "sgs_audit_items", "sgs_briefings",
     "sgs_risk_terms", "sgs_safety_surveys", "sgs_supplier_compliance",
-  ] as const;
+    "sgs_empresa", "sgs_veiculos", "sgs_condutores", "sgs_rotas", 
+    "sgs_checklists", "sgs_pgsat", "sgs_condutores_visitantes"
+  ] as any[];
 
   const STORAGE_BUCKETS = ["tour-images", "company-documents", "customer-documents", "avatars"] as const;
 
@@ -1507,7 +1510,7 @@ const AdminConfig = () => {
                     <div className="space-y-2">
                       <Label>Hierarquia</Label>
                       <select 
-                        className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="w-full h-10 px-3 rounded-xl border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-all hover:border-primary/50"
                         value={newUser.role}
                         onChange={e => setNewUser({...newUser, role: e.target.value})}
                       >
@@ -1550,6 +1553,7 @@ const AdminConfig = () => {
 
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
                     {MODULES.map((module) => {
+                      if (typeof module === 'string') return null;
                       const hasAccess = editingUser.permissions?.[module.id];
                       return (
                         <button
