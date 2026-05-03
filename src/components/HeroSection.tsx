@@ -109,11 +109,11 @@ const HeroSection = () => {
             <MapPin size={18} className="text-primary shrink-0" />
             <input type="text" placeholder={t("hero.searchWhere")} className="bg-transparent w-full outline-none text-sm md:text-base text-foreground placeholder:text-muted-foreground" />
           </div>
-          <div className="flex items-center gap-3 flex-1 px-4 py-3 bg-muted rounded-xl">
-            <Calendar size={20} className="text-primary shrink-0" />
-            <input type="text" placeholder={t("hero.searchWhen")} className="bg-transparent w-full outline-none text-foreground placeholder:text-muted-foreground" />
+          <div className="flex items-center gap-3 flex-1 px-4 py-2.5 md:py-3 bg-muted rounded-xl">
+            <Calendar size={18} className="text-primary shrink-0" />
+            <input type="text" placeholder={t("hero.searchWhen")} className="bg-transparent w-full outline-none text-sm md:text-base text-foreground placeholder:text-muted-foreground" />
           </div>
-          <Link to="/passeios" className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors">
+          <Link to="/passeios" className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-2.5 md:py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors text-sm md:text-base">
             <Search size={18} />
             {t("hero.search")}
           </Link>
