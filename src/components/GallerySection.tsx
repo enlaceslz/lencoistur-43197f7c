@@ -45,7 +45,7 @@ const GallerySection = () => {
           <p className="text-primary font-bold tracking-[0.2em] uppercase text-xs mb-4 opacity-80">
             {t("gallery.label")}
           </p>
-          <h2 className="font-display text-4xl md:text-6xl font-bold text-foreground mb-6">
+          <h2 className="font-display text-3xl md:text-6xl font-bold text-foreground mb-6">
             {t("gallery.title")}
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
