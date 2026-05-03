@@ -900,8 +900,8 @@ const AdminSGSTermos = () => {
               <p>Nenhum termo gerado ainda</p>
             </div>
           ) : filtered.map(t => (
-            <div key={t.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-shadow group">
-              <div className="flex justify-between items-start">
+            <div key={t.id} className="bg-card border border-border rounded-2xl p-4 sm:p-5 hover:shadow-md transition-shadow group">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center ${t.signature_data ? "bg-green-500/10 text-green-500" : "bg-amber-500/10 text-amber-500"}`}>
                     {t.signature_data ? <CheckCircle size={24} /> : <FileText size={24} />}
