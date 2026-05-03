@@ -84,7 +84,7 @@ const ToursPage = () => {
       </div>
 
       <div className="container mx-auto px-4 py-10">
-        <div className="flex flex-col md:flex-row gap-4 mb-8 bg-card border border-border rounded-2xl p-4">
+        <div className="flex flex-col lg:flex-row gap-4 mb-8 bg-card border border-border rounded-2xl p-4">
           <div className="flex items-center gap-3 flex-1 bg-muted rounded-xl px-4 py-3">
             <Search size={18} className="text-muted-foreground" />
             <input type="text" placeholder="Buscar passeio..." value={search}
