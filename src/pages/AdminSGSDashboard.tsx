@@ -303,21 +303,21 @@ const AdminSGSDashboard = () => {
         </div>
 
         {/* Stats - Clickable */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           {statCards.map((s) => (
             <button
               key={s.label}
               onClick={() => navigate(s.path)}
-              className={`bg-card border rounded-2xl p-4 text-left transition-all hover:shadow-md hover:border-primary/30 group ${s.urgent ? "border-destructive/30" : "border-border"}`}
+              className={`bg-card border rounded-2xl p-4 text-left transition-all hover:shadow-md hover:border-primary/30 group ${s.urgent ? "border-destructive/30 shadow-[0_0_15px_-5px_rgba(239,68,68,0.1)]" : "border-border"}`}
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <s.icon size={16} className={s.color} />
-                  <span className="text-[11px] text-muted-foreground">{s.label}</span>
+                  <span className="text-[10px] sm:text-[11px] text-muted-foreground uppercase font-black tracking-tighter truncate">{s.label}</span>
                 </div>
-                <ArrowRight size={12} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ArrowRight size={12} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
               </div>
-              <p className="text-xl font-bold text-foreground font-display">{s.value}</p>
+              <p className="text-xl sm:text-2xl font-black text-foreground font-display tracking-tight">{s.value}</p>
             </button>
           ))}
         </div>
