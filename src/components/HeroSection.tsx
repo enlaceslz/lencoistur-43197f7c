@@ -104,10 +104,10 @@ const HeroSection = () => {
           ))}
         </div>
 
-        <div className="animate-fade-up max-w-3xl mx-auto bg-card/95 backdrop-blur-sm rounded-2xl p-3 flex flex-col md:flex-row gap-3 shadow-2xl" style={{ animationDelay: "0.3s" }}>
-          <div className="flex items-center gap-3 flex-1 px-4 py-3 bg-muted rounded-xl">
-            <MapPin size={20} className="text-primary shrink-0" />
-            <input type="text" placeholder={t("hero.searchWhere")} className="bg-transparent w-full outline-none text-foreground placeholder:text-muted-foreground" />
+        <div className="animate-fade-up max-w-3xl mx-auto bg-card/95 backdrop-blur-sm rounded-2xl p-2 md:p-3 flex flex-col md:flex-row gap-2 md:gap-3 shadow-2xl" style={{ animationDelay: "0.3s" }}>
+          <div className="flex items-center gap-3 flex-1 px-4 py-2.5 md:py-3 bg-muted rounded-xl">
+            <MapPin size={18} className="text-primary shrink-0" />
+            <input type="text" placeholder={t("hero.searchWhere")} className="bg-transparent w-full outline-none text-sm md:text-base text-foreground placeholder:text-muted-foreground" />
           </div>
           <div className="flex items-center gap-3 flex-1 px-4 py-3 bg-muted rounded-xl">
             <Calendar size={20} className="text-primary shrink-0" />
