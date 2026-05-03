@@ -84,9 +84,9 @@ const Footer = () => {
             <div className="mt-6">
               <p className="text-xs text-primary-foreground/40 mb-2">{t("footer.seals")}</p>
               <div className="flex gap-3 text-xs text-primary-foreground/50">
-                <span className="border border-primary-foreground/20 px-3 py-1.5 rounded-lg">CADASTUR</span>
-                <span className="border border-primary-foreground/20 px-3 py-1.5 rounded-lg">ICMBio</span>
-                <span className="border border-primary-foreground/20 px-3 py-1.5 rounded-lg">Turismo Responsável</span>
+                <span className="border border-primary-foreground/20 px-3 py-1.5 rounded-lg whitespace-nowrap">CADASTUR</span>
+                <span className="border border-primary-foreground/20 px-3 py-1.5 rounded-lg whitespace-nowrap">ICMBio</span>
+                <span className="border border-primary-foreground/20 px-3 py-1.5 rounded-lg whitespace-nowrap">Turismo Responsável</span>
               </div>
             </div>
           </div>
