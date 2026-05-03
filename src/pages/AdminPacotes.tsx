@@ -112,6 +112,26 @@ const AdminPacotes = () => {
   const [selectedTours, setSelectedTours] = useState<any[]>([]);
   const [highlightInput, setHighlightInput] = useState("");
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      setSelectedTours((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
   useEffect(() => {
     loadData();
   }, []);
