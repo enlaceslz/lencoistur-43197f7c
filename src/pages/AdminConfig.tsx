@@ -133,6 +133,7 @@ const AdminConfig = () => {
     { id: "documentos", label: "Documentação", icon: FileText },
     { id: "relatorios", label: "Relatórios", icon: BarChart3 },
     { id: "sgs", label: "Segurança (SGS)", icon: Shield },
+    "---",
     { id: "configuracoes", label: "Configurações", icon: Settings },
   ];
 
@@ -1509,7 +1510,7 @@ const AdminConfig = () => {
                     <div className="space-y-2">
                       <Label>Hierarquia</Label>
                       <select 
-                        className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="w-full h-10 px-3 rounded-xl border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-all hover:border-primary/50"
                         value={newUser.role}
                         onChange={e => setNewUser({...newUser, role: e.target.value})}
                       >
