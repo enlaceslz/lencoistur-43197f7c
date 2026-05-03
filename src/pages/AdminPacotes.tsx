@@ -231,8 +231,8 @@ const AdminPacotes = () => {
                   </TableCell>
                   <TableCell>
                     <div className="space-y-0.5">
-                      <p className="text-sm font-bold text-primary">{formatCurrency(pkg.discount_price)}</p>
-                      <p className="text-xs text-muted-foreground line-through">{formatCurrency(pkg.original_price)}</p>
+                      <p className="text-sm font-bold text-primary">{fmt(pkg.discount_price)}</p>
+                      <p className="text-xs text-muted-foreground line-through">{fmt(pkg.original_price)}</p>
                     </div>
                   </TableCell>
                   <TableCell>
