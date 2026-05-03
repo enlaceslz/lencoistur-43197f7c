@@ -271,7 +271,7 @@ const AdminRelatorios = () => {
         </div>
 
         {/* Navigation Tabs (no-print) */}
-        <div className="no-print flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="no-print flex gap-2 overflow-x-auto pb-2 no-scrollbar">
           {REPORT_TABS.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold whitespace-nowrap transition-all border shadow-sm ${
@@ -342,7 +342,7 @@ const AdminRelatorios = () => {
             </div>
 
             {/* Charts Section */}
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {activeTab === "reservas" && (
                 <>
                   <ChartCard title="Evolução da Receita">
@@ -398,7 +398,7 @@ const AdminRelatorios = () => {
                 </>
               )}
               {activeTab === "passeios" && (
-                <div className="col-span-2">
+                <div className="md:col-span-2">
                   <ChartCard title="Performance por Passeio">
                     <ResponsiveContainer width="100%" height={350}>
                       <BarChart data={data.byTour}>
@@ -443,7 +443,7 @@ const AdminRelatorios = () => {
                 </>
               )}
               {activeTab === "usuarios" && (
-                <div className="col-span-2">
+                <div className="md:col-span-2">
                   <ChartCard title="Distribuição de Hierarquia">
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={data.byRole}>
