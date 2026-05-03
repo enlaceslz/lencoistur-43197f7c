@@ -345,15 +345,18 @@ const AdminConfig = () => {
   };
 
   const BACKUP_TABLES = [
-    "site_settings", "tours", "transfer_routes", "customers", "bookings",
-    "partners", "contas_pagar", "contas_receber", "reviews", "documents",
+    "site_settings", "ai_settings", "tours", "transfer_routes", "customers", "dependents",
+    "bookings", "packages", "package_tours", "partners", "partner_types", 
+    "contas_pagar", "contas_receber", "reviews", "documents", "document_types",
+    "collaborators", "collaborator_types", "collaborator_payments",
     "marketing_campaigns", "marketing_leads", "remarketing_rules",
     "sgs_risks", "sgs_incidents", "sgs_corrective_actions", "sgs_staff",
     "sgs_staff_trainings", "sgs_audits", "sgs_audit_items", "sgs_briefings",
-    "sgs_risk_terms", "sgs_safety_surveys", "sgs_supplier_compliance",
+    "sgs_risk_terms", "sgs_risk_term_minors", "sgs_safety_surveys", "sgs_supplier_compliance",
     "sgs_empresa", "sgs_veiculos", "sgs_condutores", "sgs_rotas", 
-    "sgs_checklists", "sgs_pgsat", "sgs_condutores_visitantes"
-  ] as any[];
+    "sgs_checklists", "sgs_checklist_items", "sgs_pgsat", "sgs_condutores_visitantes",
+    "sgs_procedures", "sgs_equipment", "customer_documents"
+  ] as string[];
 
   const STORAGE_BUCKETS = ["tour-images", "company-documents", "customer-documents", "avatars"] as const;
 
