@@ -377,27 +377,42 @@ const AdminConfig = () => {
       let totalFiles = 0;
 
       for (const bucket of STORAGE_BUCKETS) {
-        const { data: files, error: listError } = await supabase.storage.from(bucket).list("", {
-          limit: 100,
-          sortBy: { column: 'name', order: 'desc' },
-        });
+        let hasMore = true;
+        let offset = 0;
+        
+        while (hasMore) {
+          const { data: files, error: listError } = await supabase.storage.from(bucket).list("", {
+            limit: 100,
+            offset: offset,
+            sortBy: { column: 'name', order: 'desc' },
+          });
 
-        if (listError) {
-          console.error(`Erro ao listar arquivos do bucket ${bucket}:`, listError.message);
-          continue;
-        }
+          if (listError) {
+            console.error(`Erro ao listar arquivos do bucket ${bucket}:`, listError.message);
+            hasMore = false;
+            continue;
+          }
 
-        if (files) {
-          storageBackup[bucket] = [];
+          if (!files || files.length === 0) {
+            hasMore = false;
+            continue;
+          }
+
+          if (!storageBackup[bucket]) storageBackup[bucket] = [];
+          
           for (const file of files) {
-            if (file.id) { // valid file
+            if (file.id && file.name !== '.emptyFolderPlaceholder') { 
               try {
                 const { data: blob, error: downloadError } = await supabase.storage.from(bucket).download(file.name);
-                if (downloadError) throw downloadError;
+                if (downloadError) {
+                  console.warn(`Pulando arquivo ${file.name} (erro no download):`, downloadError.message);
+                  continue;
+                }
 
-                const base64 = await new Promise<string>((resolve) => {
+                const base64 = await new Promise<string>((resolve, reject) => {
                   const reader = new FileReader();
                   reader.onloadend = () => resolve(reader.result as string);
+                  reader.onerror = reject;
                   reader.readAsDataURL(blob);
                 });
 
@@ -408,9 +423,15 @@ const AdminConfig = () => {
                 });
                 totalFiles++;
               } catch (err) {
-                console.error(`Erro ao baixar arquivo ${file.name} do bucket ${bucket}:`, err);
+                console.error(`Erro ao processar arquivo ${file.name} do bucket ${bucket}:`, err);
               }
             }
+          }
+          
+          if (files.length < 100) {
+            hasMore = false;
+          } else {
+            offset += 100;
           }
         }
       }
