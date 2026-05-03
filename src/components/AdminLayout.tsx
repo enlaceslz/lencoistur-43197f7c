@@ -228,10 +228,12 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [user]);
+  }, []);
+
+  const activeNotifs = notifications.filter(n => !dismissed.has(n.id));
+  const errorCount = activeNotifs.filter(n => n.type === "error").length;
 
   const markAsRead = async (id: string) => {
-    // Only try to update if it looks like a UUID (system notifications)
     if (id.length > 20) {
       await supabase.from("notifications").update({ read: true }).eq("id", id);
     }
