@@ -188,7 +188,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           systemNotifs.data.forEach(n => {
             notifs.push({
               id: n.id,
-              type: n.type as "info" | "warning" | "error",
+              type: n.type as "info" | "warning" | "error" | "success",
               title: n.title,
               message: n.message,
               link: n.link || undefined,
