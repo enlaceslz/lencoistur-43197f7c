@@ -804,6 +804,90 @@ export type Database = {
         }
         Relationships: []
       }
+      package_tours: {
+        Row: {
+          created_at: string
+          id: string
+          package_id: string | null
+          sort_order: number
+          tour_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          package_id?: string | null
+          sort_order?: number
+          tour_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          package_id?: string | null
+          sort_order?: number
+          tour_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "package_tours_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_tours_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      packages: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          days: number
+          description: string | null
+          discount_price: number | null
+          highlights: string[] | null
+          id: string
+          name: string
+          original_price: number | null
+          slug: string
+          tag: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          days?: number
+          description?: string | null
+          discount_price?: number | null
+          highlights?: string[] | null
+          id?: string
+          name: string
+          original_price?: number | null
+          slug: string
+          tag?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          days?: number
+          description?: string | null
+          discount_price?: number | null
+          highlights?: string[] | null
+          id?: string
+          name?: string
+          original_price?: number | null
+          slug?: string
+          tag?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       partner_types: {
         Row: {
           color: string | null
