@@ -116,7 +116,7 @@ const AdminSGSControles = () => {
         </div>
 
         <Tabs defaultValue="equipamentos">
-          <TabsList className="bg-muted p-1 rounded-xl">
+          <TabsList className="bg-muted p-1 rounded-xl w-full md:w-auto overflow-x-auto no-scrollbar justify-start">
             <TabsTrigger value="equipamentos" className="rounded-lg">
               <ClipboardList size={14} className="mr-2" /> Equipamentos (EPIs/Resgate)
             </TabsTrigger>
@@ -129,7 +129,7 @@ const AdminSGSControles = () => {
             {showEquipForm && (
               <form onSubmit={handleAddEquip} className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-sm animate-in fade-in slide-in-from-top-4">
                 <h3 className="font-display font-bold text-foreground">Cadastrar Equipamento</h3>
-                <div className="grid sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div>
                     <label className="text-xs font-semibold text-muted-foreground uppercase mb-1 block">Nome do Equipamento *</label>
                     <input required value={equipForm.name} onChange={(e) => setEquipForm({ ...equipForm, name: e.target.value })}
@@ -179,7 +179,7 @@ const AdminSGSControles = () => {
               </form>
             )}
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {loading ? (
                 <div className="col-span-full py-12 text-center text-muted-foreground">Carregando...</div>
               ) : equipment.length === 0 ? (
@@ -233,7 +233,7 @@ const AdminSGSControles = () => {
             {showProcForm && (
               <form onSubmit={handleAddProc} className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-sm animate-in fade-in slide-in-from-top-4">
                 <h3 className="font-display font-bold text-foreground">Cadastrar Procedimento (POP)</h3>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="lg:col-span-2">
                     <label className="text-xs font-semibold text-muted-foreground uppercase mb-1 block">Título do Procedimento *</label>
                     <input required value={procForm.title} onChange={(e) => setProcForm({ ...procForm, title: e.target.value })}
@@ -272,7 +272,7 @@ const AdminSGSControles = () => {
                   Nenhum procedimento cadastrado.
                 </div>
               ) : procedures.map((proc) => (
-                <div key={proc.id} className="bg-card border border-border rounded-2xl p-4 flex items-center justify-between hover:border-primary/30 transition-all">
+                <div key={proc.id} className="bg-card border border-border rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between hover:border-primary/30 transition-all gap-4">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center shrink-0">
                       <FileText size={20} />
