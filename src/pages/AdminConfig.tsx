@@ -112,7 +112,10 @@ const AdminConfig = () => {
   const [uploadingBanner, setUploadingBanner] = useState(false);
   const [backupLoading, setBackupLoading] = useState(false);
   const [restoreLoading, setRestoreLoading] = useState(false);
-  const [backupHistory, setBackupHistory] = useState<Array<{ date: string; tables: number; records: number; size: string }>>([]);
+  const [backupHistory, setBackupHistory] = useState<Array<{ date: string; tables: number; records: number; size: string }>>(() => {
+    const saved = localStorage.getItem("backup_history");
+    return saved ? JSON.parse(saved) : [];
+  });
   const [systemUsers, setSystemUsers] = useState<any[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);
   const [isAddingUser, setIsAddingUser] = useState(false);
