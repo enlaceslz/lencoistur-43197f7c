@@ -8,7 +8,7 @@ const AboutSection = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-5xl mx-auto text-center">
           <p className="text-primary font-bold tracking-[0.2em] uppercase text-xs mb-4 opacity-80">{t("about.label")}</p>
-          <h2 className="font-display text-4xl md:text-6xl font-bold text-foreground mb-10 leading-tight">
+          <h2 className="font-display text-3xl md:text-6xl font-bold text-foreground mb-10 leading-tight">
             {t("about.title")}
           </h2>
           <p className="text-muted-foreground text-lg leading-relaxed mb-6">
