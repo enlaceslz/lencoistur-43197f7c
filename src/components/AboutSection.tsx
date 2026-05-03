@@ -4,7 +4,7 @@ const AboutSection = () => {
   const { t } = useTranslation();
 
   return (
-    <section className="py-20 md:py-32 bg-white relative overflow-hidden">
+    <section id="sobre" className="py-20 md:py-32 bg-white relative overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-5xl mx-auto text-center">
           <p className="text-primary font-bold tracking-[0.2em] uppercase text-xs mb-4 opacity-80">{t("about.label")}</p>
