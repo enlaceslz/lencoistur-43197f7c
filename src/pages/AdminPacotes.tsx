@@ -16,9 +16,16 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { formatCurrency } from "@/lib/utils";
+const fmt = (v: number) => formatCurrency(v);
 
-const AdminPacotes = () => {
+const maskCurrency = (v: string) => {
+  const n = v.replace(/\D/g, "");
+  return (Number(n) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+};
+
+const parseCurrency = (v: string) => {
+  return Number(v.replace(/\D/g, ""));
+};
   const [packages, setPackages] = useState<any[]>([]);
   const [tours, setTours] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
