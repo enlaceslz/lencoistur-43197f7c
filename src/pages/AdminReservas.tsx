@@ -259,7 +259,7 @@ const AdminReservas = () => {
 
   const stats = [
     { icon: ShoppingCart, label: "Total Reservas", value: bookings.length, color: "text-indigo-600" },
-    { icon: CheckCircle, label: "Confirmadas", value: bookings.filter((b) => b.status === "confirmada").length, color: "text-green-600" },
+    { icon: CheckCircle, label: "Confirmadas", value: bookings.filter((b) => b.status === "confirmada").length, color: "text-emerald-600" },
     { icon: Clock, label: "Pendentes", value: bookings.filter((b) => b.status === "pendente").length, color: "text-amber-600" },
     { icon: DollarSign, label: "Faturamento Pago", value: fmt(totalPago), color: "text-blue-600" },
   ];
@@ -335,47 +335,63 @@ const AdminReservas = () => {
       </div>
 
       {/* Filters */}
-      <Card className="mb-6">
-        <CardContent className="p-4 space-y-4">
-          <div className="flex flex-col md:flex-row gap-4 items-center">
-            <div className="relative flex-1 w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-              <Input placeholder="Buscar por cliente, passeio, email ou código..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+      <Card className="mb-8 border border-border/50 shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
+        <CardContent className="p-6 space-y-4">
+          <div className="flex flex-col xl:flex-row gap-4 items-center">
+            <div className="relative flex-1 w-full group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
+              <Input 
+                placeholder="Buscar cliente, passeio, email ou código..." 
+                value={search} 
+                onChange={(e) => setSearch(e.target.value)} 
+                className="pl-12 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30 transition-all font-medium text-sm" 
+              />
             </div>
-            <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+            
+            <div className="flex gap-1.5 w-full xl:w-auto overflow-x-auto no-scrollbar pb-1">
               {["todos", "confirmada", "pendente", "cancelada", "concluida"].map((s) => (
-                <Button key={s} variant={statusFilter === s ? "default" : "outline"} size="sm" onClick={() => setStatusFilter(s)} className={`capitalize whitespace-nowrap ${statusFilter === s ? "bg-blue-600 hover:bg-blue-700 text-white" : ""}`}>
+                <button
+                  key={s}
+                  onClick={() => setStatusFilter(s)}
+                  className={`text-[10px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all whitespace-nowrap ${
+                    statusFilter === s
+                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
                   {s === "todos" ? `Todos` : statusConfig[s]?.label}
-                </Button>
+                </button>
               ))}
             </div>
-            <div className="flex flex-wrap gap-2 w-full md:w-auto">
-              <Button variant="outline" size="sm" onClick={exportCSV} className="flex-1 md:flex-none">
-                <Download size={14} className="mr-1" /> CSV
+
+            <div className="flex items-center gap-2 w-full xl:w-auto">
+              <Button variant="outline" size="lg" onClick={exportCSV} className="rounded-2xl h-12 px-6 border-border font-black text-xs uppercase tracking-widest flex-1 xl:flex-none">
+                <Download size={16} className="mr-2" /> Exportar
               </Button>
-              <Button size="sm" onClick={() => { resetNewForm(); setShowNewForm(true); }} className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 flex-1 md:flex-none">
-                <Plus size={14} className="mr-1" /> Nova Reserva
+              <Button size="lg" onClick={() => { resetNewForm(); setShowNewForm(true); }} className="bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-sm font-black uppercase tracking-widest flex-1 xl:flex-none shadow-lg shadow-primary/20 transition-all active:scale-95">
+                <Plus size={18} strokeWidth={3} className="mr-2" /> Nova Reserva
               </Button>
             </div>
           </div>
           
-          <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border">
-            <div className="flex items-center gap-2">
-              <Calendar size={14} className="text-muted-foreground" />
-              <span className="text-xs font-medium text-muted-foreground">Filtrar por data:</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="h-8 text-xs w-32" />
-              <span className="text-muted-foreground text-xs">até</span>
-              <Input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="h-8 text-xs w-32" />
+          <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-border/50">
+            <div className="flex items-center gap-3 bg-muted/50 px-4 py-2 rounded-xl border border-border/50">
+              <Calendar size={14} className="text-primary" />
+              <div className="flex items-center gap-2">
+                <input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="bg-transparent text-[10px] font-bold uppercase tracking-widest outline-none w-28" />
+                <span className="text-muted-foreground text-[10px] font-black">ATÉ</span>
+                <input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="bg-transparent text-[10px] font-bold uppercase tracking-widest outline-none w-28" />
+              </div>
               {(dateStart || dateEnd) && (
-                <Button variant="ghost" size="sm" onClick={() => { setDateStart(""); setDateEnd(""); }} className="h-7 text-xs px-2">
+                <button onClick={() => { setDateStart(""); setDateEnd(""); }} className="ml-2 text-[10px] font-black text-destructive uppercase tracking-widest hover:underline">
                   Limpar
-                </Button>
+                </button>
               )}
             </div>
-            <div className="ml-auto text-xs text-muted-foreground">
-              Mostrando {filtered.length} de {bookings.length} reservas
+            <div className="ml-auto">
+              <Badge variant="secondary" className="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-muted text-muted-foreground border-none">
+                Mostrando {filtered.length} de {bookings.length} reservas
+              </Badge>
             </div>
           </div>
         </CardContent>
