@@ -8,6 +8,8 @@ export interface SiteSettings {
   instagram: string;
   corPrimaria: string;
   logoUrl: string | null;
+  footerDesc?: string;
+  footerTours?: string[];
 }
 
 export interface EmpresaSettings {
