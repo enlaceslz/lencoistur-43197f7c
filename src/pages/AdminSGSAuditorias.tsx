@@ -110,7 +110,7 @@ const AdminSGSAuditorias = () => {
             <div className="space-y-2">
               <h4 className="text-sm font-semibold text-foreground">Checklist de Segurança</h4>
               {checklist.map((item, i) => (
-                <div key={item.category} className="flex items-center gap-3 bg-muted rounded-xl p-3">
+                <div key={item.category} className="flex flex-col sm:flex-row sm:items-center gap-3 bg-muted rounded-xl p-3">
                   <button type="button" onClick={() => {
                     const updated = [...checklist];
                     updated[i].compliant = !updated[i].compliant;
@@ -123,7 +123,7 @@ const AdminSGSAuditorias = () => {
                     const updated = [...checklist];
                     updated[i].observation = e.target.value;
                     setChecklist(updated);
-                  }} placeholder="Observação" className="bg-card border border-border rounded-lg px-2 py-1.5 text-xs text-foreground outline-none w-48" />
+                  }} placeholder="Observação" className="bg-card border border-border rounded-lg px-2 py-1.5 text-xs text-foreground outline-none w-full sm:w-48" />
                 </div>
               ))}
             </div>

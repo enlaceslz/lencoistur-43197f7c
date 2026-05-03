@@ -286,7 +286,7 @@ const AdminDocumentos = () => {
 
 
       {/* Table */}
-      <Card>
+      <Card className="border-none shadow-sm overflow-hidden">
         <CardContent className="p-0 overflow-x-auto">
           {loading ? (
             <div className="p-8 text-center text-muted-foreground">Carregando...</div>
