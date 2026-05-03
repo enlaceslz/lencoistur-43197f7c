@@ -1038,6 +1038,31 @@ const AdminConfig = () => {
                     </div>
                   </div>
 
+                  <div className="space-y-4 pt-6 border-t border-border">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Customização do Rodapé</Label>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-xs">Descrição do Rodapé (Sobre a Empresa)</Label>
+                      <Textarea 
+                        value={site.footerDesc || ""} 
+                        onChange={(e) => setSite({ ...site, footerDesc: e.target.value })} 
+                        placeholder="Breve descrição sobre a agência no rodapé..."
+                        className="rounded-xl border-muted-foreground/20 resize-none h-24 p-4 text-sm"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-xs">Experiências / Links (Separados por vírgula)</Label>
+                      <Input 
+                        value={site.footerTours?.join(", ") || ""} 
+                        onChange={(e) => setSite({ ...site, footerTours: e.target.value.split(",").map(s => s.trim()) })} 
+                        placeholder="Ex: Passeio 1, Passeio 2, Passeio 3"
+                        className="h-10 rounded-xl border-muted-foreground/20 text-sm"
+                      />
+                      <p className="text-[10px] text-muted-foreground italic">Estes nomes aparecerão na coluna "Experiências" do rodapé.</p>
+                    </div>
+                  </div>
+
                   <div className="flex justify-end pt-6 border-t border-border">
                     <Button 
                       onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
