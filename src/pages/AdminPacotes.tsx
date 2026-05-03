@@ -19,6 +19,65 @@ import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+
+const SortableTourItem = ({ tour, index, onRemove }: { tour: any, index: number, onRemove: () => void }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: tour.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 1 : 0,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      className={`flex items-center gap-3 bg-white p-3 rounded-xl border border-blue-100 shadow-sm transition-shadow ${isDragging ? 'shadow-lg border-primary' : ''}`}
+    >
+      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-1 hover:bg-slate-100 rounded shrink-0">
+        <GripVertical size={16} className="text-slate-400" />
+      </div>
+      <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+        {index + 1}
+      </span>
+      <span className="text-sm font-bold text-slate-700 flex-1 truncate">{tour.name}</span>
+      <button 
+        type="button"
+        onClick={onRemove}
+        className="p-1.5 hover:bg-red-50 text-red-400 hover:text-red-600 rounded-lg transition-colors"
+      >
+        <X size={16} />
+      </button>
+    </div>
+  );
+};
 const fmt = (v: number) => formatCurrency(v);
 
 const maskCurrency = (v: string) => {
