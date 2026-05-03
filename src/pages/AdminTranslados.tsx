@@ -355,7 +355,7 @@ const AdminTranslados = () => {
       </Dialog>
 
       {/* Table */}
-      <Card>
+      <Card className="border-none shadow-sm overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-12"><Loader2 className="animate-spin text-primary" size={32} /></div>
         ) : filtered.length === 0 ? (
