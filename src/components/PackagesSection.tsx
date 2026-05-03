@@ -50,16 +50,16 @@ const PackagesSection = () => {
   if (dbPackages.length === 0) return null;
 
   return (
-    <section className="py-20 md:py-28 bg-background">
+    <section className="py-24 md:py-32 bg-ocean-light/30">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-14">
-          <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-3">
+        <div className="text-center mb-16">
+          <p className="text-primary font-bold tracking-[0.2em] uppercase text-xs mb-4 opacity-80">
             {t("packages.label")}
           </p>
-          <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
+          <h2 className="font-display text-4xl md:text-6xl font-bold text-foreground mb-6">
             {t("packages.title")}
           </h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             {t("packages.subtitle")}
           </p>
         </div>
