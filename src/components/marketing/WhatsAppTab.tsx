@@ -126,7 +126,8 @@ const WhatsAppTab = ({ campaigns, onRefresh }: WhatsAppTabProps) => {
       </div>
 
       <Card className="border-border overflow-hidden">
-        <Table>
+        <div className="overflow-x-auto">
+          <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="text-muted-foreground">Campanha</TableHead>
@@ -174,6 +175,7 @@ const WhatsAppTab = ({ campaigns, onRefresh }: WhatsAppTabProps) => {
             )}
           </TableBody>
         </Table>
+        </div>
       </Card>
 
       <div className="grid sm:grid-cols-3 gap-4">
