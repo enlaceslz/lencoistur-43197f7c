@@ -240,6 +240,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
     error: { bg: "bg-red-50", border: "border-l-red-500", icon: AlertTriangle, dot: "bg-red-500" },
     warning: { bg: "bg-amber-50", border: "border-l-amber-500", icon: Bell, dot: "bg-amber-500" },
     info: { bg: "bg-blue-50", border: "border-l-blue-500", icon: Activity, dot: "bg-blue-500" },
+    success: { bg: "bg-green-50", border: "border-l-green-500", icon: Check, dot: "bg-green-500" },
   };
 
   const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : "AD";
