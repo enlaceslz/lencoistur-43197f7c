@@ -19,11 +19,11 @@ const Navbar = () => {
           {settings?.logoUrl ? (
             <img 
               src={settings.logoUrl} 
-              alt={settings.titulo || "LençóisTour"} 
+              alt={settings.titulo || "Lençóis Tour Experience"} 
               className="h-10 md:h-12 w-auto object-contain"
             />
           ) : (
-            <>{empresa?.nome ? empresa.nome : <>Lençóis<span className="text-secondary">Tour</span></>}</>
+            <>{empresa?.nome ? empresa.nome : <>Lençóis Tour<span className="text-secondary"> Experience</span></>}</>
           )}
         </Link>
 

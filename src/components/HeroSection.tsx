@@ -84,9 +84,9 @@ const HeroSection = () => {
             {t("hero.location")}
           </p>
         </div>
-        <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-primary-foreground leading-tight mb-6 animate-fade-up" style={{ animationDelay: "0.1s" }}>
+        <h1 className="font-display text-4xl md:text-6xl lg:text-8xl font-bold text-primary-foreground leading-tight mb-8 animate-fade-up drop-shadow-lg" style={{ animationDelay: "0.1s" }}>
           {t("hero.title1")}<br />
-          <span className="italic font-normal">{t("hero.title2")}</span>
+          <span className="italic font-normal text-secondary drop-shadow-md">{t("hero.title2")}</span>
         </h1>
         <p className="text-primary-foreground/80 text-lg md:text-xl max-w-2xl mx-auto mb-8 animate-fade-up" style={{ animationDelay: "0.2s" }}>
           {t("hero.subtitle")}
