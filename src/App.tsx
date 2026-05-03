@@ -15,6 +15,7 @@ import AdminFinanceiro from "./pages/AdminFinanceiro.tsx";
 import AdminColaboradores from "./pages/AdminColaboradores.tsx";
 import AdminParceiros from "./pages/AdminParceiros.tsx";
 import AdminPasseios from "./pages/AdminPasseios.tsx";
+import AdminPacotes from "./pages/AdminPacotes.tsx";
 import AdminReservas from "./pages/AdminReservas.tsx";
 import AdminTranslados from "./pages/AdminTranslados.tsx";
 import AdminAvaliacoes from "./pages/AdminAvaliacoes.tsx";
