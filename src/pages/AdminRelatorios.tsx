@@ -443,7 +443,7 @@ const AdminRelatorios = () => {
                 </>
               )}
               {activeTab === "usuarios" && (
-                <div className="col-span-2">
+                <div className="md:col-span-2">
                   <ChartCard title="Distribuição de Hierarquia">
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={data.byRole}>
