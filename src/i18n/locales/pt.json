@@ -13,7 +13,7 @@
     "location": "Santo Amaro do Maranhão",
     "title1": "A Porta de Entrada Mais Rápida",
     "title2": "para o Paraíso dos Lençóis",
-    "subtitle": "Em apenas 7 minutos, você sai da cidade e já está mergulhando nas famosas Lagoas Azuis! A Lençóis Tour Experience oferece veículos 4x4 exclusivos e guias locais para uma jornada inesquecível.",
+    "subtitle": "Em apenas 7 minutos, você sai da cidade e já está nas famosas Lagoas Azuis! Veículos 4x4 licenciados, guias locais especializados e 8 roteiros exclusivos de ecoturismo e aventura.",
     "categories": {
       "boat": "Passeio de Barco",
       "eco": "Roteiro Ecológico",
@@ -136,7 +136,7 @@
   "footer": {
     "desc": "A Lençóis Tour Experience é a sua porta de entrada para os Lençóis Maranhenses. Localizada estrategicamente em Santo Amaro, oferecemos a experiência mais autêntica e segura da região.",
     "toursTitle": "Experiências",
-    "tourLinks": ["Betânia", "Emendadas", "Lagoa da Gaivota", "Ponta Verde", "América", "Passeio de Quadriciclo"],
+    "tourLinks": ["Betânia", "Emendadas", "Lagoa da Gaivota", "Ponta Verde", "América", "Passeio de Quadriciclo", "Descida de Caiaque", "Trekking nas Dunas"],
     "companyTitle": "Institucional",
     "companyLinks": { "about": "Nossa História", "safety": "Gestão de Segurança (SGS)", "partner": "Seja um Parceiro", "transfers": "Translados VIP", "terms": "Termos de Ciência de Risco", "privacy": "Privacidade" },
     "contactTitle": "Fale Conosco",
