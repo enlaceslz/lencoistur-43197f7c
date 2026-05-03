@@ -9,8 +9,8 @@ const Footer = () => {
   const { site: settings, empresa } = useSiteSettings();
 
   return (
-    <footer id="contato" className="bg-foreground text-primary-foreground border-t border-primary-foreground/10">
-      <div className="container mx-auto px-4 py-16">
+    <footer id="contato" className="bg-foreground text-primary-foreground border-t border-primary-foreground/10 pt-16 pb-8">
+      <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="md:col-span-1">
             <h3 className="font-display text-2xl font-bold mb-4">
