@@ -1045,9 +1045,14 @@ const AdminCRMContent = () => {
                     )}
                   </tbody>
                 </table>
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/50">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Lençóis Tour CRM</p>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{(filter === "dependents" ? filteredDependents : filtered).length} registro(s)</p>
+                <div className="flex items-center justify-between mt-6 pt-4 border-t border-border/50">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Lençóis Tour CRM Live</p>
+                  </div>
+                  <Badge variant="secondary" className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg">
+                    {(filter === "dependents" ? filteredDependents : filtered).length} registro(s)
+                  </Badge>
                 </div>
               </div>
             )}
@@ -1538,14 +1543,16 @@ const AdminCRMContent = () => {
               </div>
             </div>
 
-            <div className="md:col-span-2">
-              <Label htmlFor="customer-notes">Observações</Label>
+            <div className="md:col-span-2 space-y-2">
+              <Label htmlFor="customer-notes" className="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1.5">
+                <FileText size={14} /> Observações Internas (Privado)
+              </Label>
               <textarea
                 id="customer-notes"
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                placeholder="Notas internas sobre o cliente..."
-                className="w-full min-h-[120px] rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all focus:min-h-[160px]"
+                placeholder="Notas internas importantes sobre as preferências ou restrições do cliente..."
+                className="w-full min-h-[100px] rounded-2xl border border-input bg-amber-50/30 dark:bg-amber-900/10 px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/30 focus-visible:border-amber-500/50 transition-all font-medium"
               />
             </div>
           </div>
