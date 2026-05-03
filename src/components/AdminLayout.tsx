@@ -173,7 +173,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
       soon.setDate(soon.getDate() + 30);
 
       try {
-        const [pendingBookings, overdueActions, expiringDocs, expiredTrainings, openIncidents, blockedSuppliers, pendingSgsTerms] = await Promise.all([
+        const [pendingBookings, overdueActions, expiringDocs, expiredTrainings, openIncidents, blockedSuppliers, pendingSgsTerms, systemNotifs] = await Promise.all([
           supabase.from("bookings").select("id").eq("status", "pendente").eq("payment_status", "pendente").limit(5),
           supabase.from("sgs_corrective_actions").select("id").in("status", ["pendente", "em_andamento"]).lt("due_date", now.toISOString().split("T")[0]),
           supabase.from("documents").select("id, name, expiry_date").not("expiry_date", "is", null).lte("expiry_date", soon.toISOString().split("T")[0]).eq("status", "vigente"),
@@ -181,7 +181,21 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           supabase.from("sgs_incidents").select("id").eq("status", "aberto"),
           supabase.from("sgs_supplier_compliance").select("id").eq("blocked", true),
           supabase.from("sgs_risk_terms").select("id").eq("accepted", false),
+          supabase.from("notifications").select("*").eq("read", false).order("created_at", { ascending: false }).limit(10),
         ]);
+
+        if (systemNotifs.data?.length) {
+          systemNotifs.data.forEach(n => {
+            notifs.push({
+              id: n.id,
+              type: n.type as "info" | "warning" | "error",
+              title: n.title,
+              message: n.message,
+              link: n.link || undefined,
+              time: new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+          });
+        }
 
         if (pendingBookings.data?.length) notifs.push({ id: "pending_bookings", type: "warning", title: "Reservas Pendentes", message: `${pendingBookings.data.length} reserva(s) aguardando pagamento.`, link: "/admin/reservas", time: "Agora" });
         if (overdueActions.data?.length) notifs.push({ id: "overdue_actions", type: "error", title: "Ações Atrasadas", message: `${overdueActions.data.length} ação(ões) com prazo vencido.`, link: "/admin/sgs/acoes", time: "Urgente" });
