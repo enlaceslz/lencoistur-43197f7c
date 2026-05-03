@@ -283,21 +283,32 @@ const AdminPacotes = () => {
               <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
             </div>
 
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-bold">Duração (dias)</label>
-                <Input type="number" min={1} value={form.days} onChange={e => setForm({ ...form, days: parseInt(e.target.value) })} />
+                <label className="text-sm font-bold">Preço Original</label>
+                <Input 
+                  value={maskCurrency(String(form.original_price))} 
+                  onChange={e => setForm({ ...form, original_price: parseCurrency(e.target.value) })} 
+                />
+                <p className="text-[10px] text-muted-foreground">{fmt(form.original_price)}</p>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold">Preço Original (em centavos)</label>
-                <Input type="number" value={form.original_price} onChange={e => setForm({ ...form, original_price: parseInt(e.target.value) })} />
-                <p className="text-[10px] text-muted-foreground">{formatCurrency(form.original_price)}</p>
+                <label className="text-sm font-bold">Preço Promocional</label>
+                <Input 
+                  value={maskCurrency(String(form.discount_price))} 
+                  onChange={e => setForm({ ...form, discount_price: parseCurrency(e.target.value) })} 
+                />
+                <p className="text-[10px] text-muted-foreground">{fmt(form.discount_price)}</p>
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-bold">Preço Promocional (em centavos)</label>
-                <Input type="number" value={form.discount_price} onChange={e => setForm({ ...form, discount_price: parseInt(e.target.value) })} />
-                <p className="text-[10px] text-muted-foreground">{formatCurrency(form.discount_price)}</p>
-              </div>
+            </div>
+
+            <div className="flex items-center space-x-2 bg-muted/50 p-4 rounded-xl">
+              <Switch 
+                id="active" 
+                checked={form.active} 
+                onCheckedChange={(checked) => setForm({ ...form, active: checked })} 
+              />
+              <Label htmlFor="active" className="font-bold cursor-pointer">Pacote Ativo (visível no site)</Label>
             </div>
 
             <div className="space-y-4">
