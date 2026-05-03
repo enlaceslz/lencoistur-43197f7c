@@ -418,7 +418,7 @@ const AdminParceiros = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {partnerTypes.map((t) => {
           const Icon = getIcon(t.icon);
           return (
@@ -441,7 +441,7 @@ const AdminParceiros = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
             <Input placeholder="Buscar por nome, contato, email ou CPF/CNPJ..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
           </div>
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2 flex-wrap overflow-x-auto no-scrollbar pb-1">
             <Button variant={typeFilter === "todos" ? "default" : "outline"} size="sm" onClick={() => setTypeFilter("todos")}>
               Todos
             </Button>
@@ -454,7 +454,7 @@ const AdminParceiros = () => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="border-none shadow-sm overflow-hidden">
         {filtered.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground">
             <Users className="mx-auto mb-3 opacity-40" size={40} />
