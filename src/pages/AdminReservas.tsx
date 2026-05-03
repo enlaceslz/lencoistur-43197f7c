@@ -26,10 +26,10 @@ import { formatCurrency } from "@/lib/utils";
 import { maskCPF } from "@/lib/masks";
 
 const statusConfig: Record<string, { label: string; className: string; icon: typeof CheckCircle }> = {
-  confirmada: { label: "Confirmada", className: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300", icon: CheckCircle },
-  pendente: { label: "Pendente", className: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300", icon: Clock },
-  cancelada: { label: "Cancelada", className: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300", icon: XCircle },
-  concluida: { label: "Concluída", className: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300", icon: CheckCircle2 },
+  confirmada: { label: "Confirmada", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border-emerald-200", icon: CheckCircle },
+  pendente: { label: "Pendente", className: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 border-amber-200", icon: Clock },
+  cancelada: { label: "Cancelada", className: "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300 border-rose-200", icon: XCircle },
+  concluida: { label: "Concluída", className: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border-blue-200", icon: CheckCircle2 },
 };
 
 const paymentConfig: Record<string, { label: string; className: string }> = {
@@ -310,8 +310,9 @@ const AdminReservas = () => {
   if (loading) {
     return (
       <AdminLayout title="Reservas">
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="animate-spin text-blue-600" size={32} />
+        <div className="flex flex-col items-center justify-center py-32 space-y-4">
+          <Loader2 className="animate-spin text-primary" size={40} />
+          <p className="text-muted-foreground animate-pulse">Carregando reservas...</p>
         </div>
       </AdminLayout>
     );
