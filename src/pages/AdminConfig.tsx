@@ -368,7 +368,7 @@ const AdminConfig = () => {
 
       // Backup Database Tables
       for (const table of BACKUP_TABLES) {
-        const { data, error } = await supabase.from(table).select("*");
+        const { data, error } = await supabase.from(table as any).select("*");
         if (error) {
           console.error(`Erro ao exportar ${table}:`, error.message);
           backup[table] = [];
