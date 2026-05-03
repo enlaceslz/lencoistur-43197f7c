@@ -398,7 +398,7 @@ const AdminRelatorios = () => {
                 </>
               )}
               {activeTab === "passeios" && (
-                <div className="col-span-2">
+                <div className="md:col-span-2">
                   <ChartCard title="Performance por Passeio">
                     <ResponsiveContainer width="100%" height={350}>
                       <BarChart data={data.byTour}>
