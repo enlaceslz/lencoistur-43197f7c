@@ -100,18 +100,19 @@ const AdminPacotes = () => {
 
     let res;
     if (editingId) {
-          .from("packages")
-          .update(payload)
-          .eq("id", editingId)
-          .select()
-          .single();
-      } else {
-        const { data: { user } } = await supabase.auth.getUser();
-        res = await supabase.from("packages").insert({
-          ...payload,
-          created_by: user?.id
-        }).select().single();
-      }
+      res = await supabase
+        .from("packages")
+        .update(payload)
+        .eq("id", editingId)
+        .select()
+        .single();
+    } else {
+      res = await supabase
+        .from("packages")
+        .insert(payload)
+        .select()
+        .single();
+    }
 
     if (res.error) {
       toast.error("Erro ao salvar pacote: " + res.error.message);
