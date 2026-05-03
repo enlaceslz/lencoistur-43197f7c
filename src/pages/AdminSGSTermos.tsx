@@ -405,7 +405,10 @@ const AdminSGSTermos = () => {
               <li>Condutores com certificação e treinamento contínuo;</li>
               <li>Equipamentos de resgate e comunicação em todas as viaturas;</li>
               <li>Equipe preparada para Primeiros Socorros e Resgate;</li>
-              <li>Plano de Resposta a Emergências (PRE) rigorosamente seguido.</li>
+              <li>Plano de Resposta a Emergências (PRE) rigorosamente seguido;</li>
+              <li>Uso obrigatório do colete salva-vidas quando solicitado ou em situações de risco;</li>
+              <li>Permanecer em locais seguros da embarcação durante a navegação;</li>
+              <li>Não consumir bebidas alcoólicas em excesso que possam comprometer a minha segurança.</li>
             </ul>
             `}
           </div>
