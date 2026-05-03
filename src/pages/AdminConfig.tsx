@@ -1384,7 +1384,8 @@ const AdminConfig = () => {
                     <li>Dados financeiros (contas a pagar/receber)</li>
                     <li>Marketing (campanhas, leads, remarketing)</li>
                     <li>SGS (riscos, incidentes, auditorias, equipe, termos)</li>
-                    <li>Documentação da empresa</li>
+                    <li>Documentação da empresa e clientes</li>
+                    <li className="font-bold text-indigo-600 italic">Arquivos, fotos e mídias (Módulo Galeria e anexos)</li>
                   </ul>
                 </div>
 
