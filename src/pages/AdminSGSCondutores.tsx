@@ -174,7 +174,7 @@ const AdminSGSCondutores = () => {
             <p className="text-sm text-muted-foreground">Cadastre motoristas e guias para gerenciar escalas e treinamentos.</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map(c => {
               const isCnhExpired = cnhExpired(c.cnh_validade);
               return (

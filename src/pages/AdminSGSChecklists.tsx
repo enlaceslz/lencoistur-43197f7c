@@ -179,7 +179,7 @@ const AdminSGSChecklists = () => {
         {loading ? <div className="flex justify-center py-16"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div> : checklists.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground"><ClipboardCheck size={40} className="mx-auto mb-3 opacity-40" /><p>Nenhum checklist realizado</p></div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {checklists.map(cl => {
               const progress = getProgress(cl.id);
               const clItems = getItems(cl.id);
