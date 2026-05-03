@@ -141,7 +141,7 @@ const AdminSGSIncidentes = () => {
     <AdminLayout title="SGS - Registro de Incidentes (P5)">
       <div className="space-y-6">
         {/* Summary */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-card border border-border rounded-2xl p-4">
             <p className="text-xs text-muted-foreground">Total Registrados</p>
             <p className="text-2xl font-bold text-foreground">{summary.total}</p>
