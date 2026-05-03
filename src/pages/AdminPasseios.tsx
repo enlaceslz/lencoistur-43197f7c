@@ -312,7 +312,7 @@ const AdminPasseios = () => {
           />
         </div>
         
-        <div className="flex gap-2 flex-wrap justify-center">
+        <div className="flex gap-2 flex-wrap justify-center overflow-x-auto no-scrollbar pb-1">
           <Button variant={!search ? "default" : "outline"} size="sm" onClick={() => setSearch("")} className="h-10 rounded-xl px-4 font-bold">
             Todos
           </Button>
