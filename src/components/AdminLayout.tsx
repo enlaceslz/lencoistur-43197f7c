@@ -444,9 +444,9 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
       )}
 
       {/* === MAIN === */}
-      <main className={`flex-1 ${sidebarCollapsed ? "lg:ml-[80px]" : "lg:ml-[260px]"} min-h-screen flex flex-col transition-all duration-200`}>
+      <main className={`flex-1 ${sidebarCollapsed ? "lg:ml-[80px]" : "lg:ml-[260px]"} min-h-screen flex flex-col transition-all duration-200 w-full overflow-x-hidden`}>
         {/* Header */}
-        <header className="bg-white border-b border-[hsl(220,20%,92%)] px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_3px_hsl(220,20%,90%)]">
+        <header className="bg-white border-b border-[hsl(220,20%,92%)] px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_3px_hsl(220,20%,90%)] w-full">
           <div className="flex items-center gap-3">
             <Tooltip>
               <TooltipTrigger asChild>
