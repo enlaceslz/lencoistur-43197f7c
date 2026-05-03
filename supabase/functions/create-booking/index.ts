@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
         .select("price, private_price, name, pix_discount")
         .eq("name", cleanItemName)
         .eq("active", true)
-        .single();
+        .maybeSingle();
 
       if (tourErr || !tour) {
         console.error(`Tour not found: "${cleanItemName}" (original: "${itemName}")`);
@@ -127,8 +127,24 @@ Deno.serve(async (req) => {
       }
       
       const isPrivate = itemName.includes("(Privativo)");
-      unitPrice = isPrivate ? (tour.private_price || 1300) : tour.price;
+      unitPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
       pixDiscountPercent = tour.pix_discount || 0;
+    } else if (type === "package") {
+      const { data: pkg, error: pkgErr } = await supabaseAdmin
+        .from("packages")
+        .select("discount_price, name")
+        .eq("name", itemName)
+        .eq("active", true)
+        .maybeSingle();
+
+      if (pkgErr || !pkg) {
+        return new Response(
+          JSON.stringify({ error: `Pacote não encontrado ou inativo: ${itemName}` }),
+          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      unitPrice = pkg.discount_price;
+      pixDiscountPercent = 5; // Default for packages
     } else {
       // translado - itemName format: "origin → destination"
       const parts = itemName.split(" → ");
