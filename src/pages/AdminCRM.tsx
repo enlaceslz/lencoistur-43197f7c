@@ -1220,7 +1220,7 @@ const AdminCRMContent = () => {
                     <h4 className="font-display font-bold text-foreground">Documentos e Anexos</h4>
                     <div className="flex gap-2">
                       <select 
-                        className="text-[10px] bg-muted border border-border rounded px-1"
+                        className="text-[10px] bg-background border border-border rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-primary/50 font-bold uppercase tracking-tight"
                         value={docCategory}
                         onChange={(e) => setDocCategory(e.target.value)}
                       >
@@ -1292,24 +1292,24 @@ const AdminCRMContent = () => {
                   ) : (
                     <div className="space-y-2">
                       {customerBookings.map((b) => (
-                        <div key={b.id} className="bg-muted rounded-xl px-4 py-3">
-                          <div className="flex items-center justify-between mb-1">
+                        <div key={b.id} className="bg-muted/40 hover:bg-muted/60 transition-colors border border-border/50 rounded-2xl px-4 py-3 group">
+                          <div className="flex items-center justify-between mb-1.5">
                             <div className="flex items-center gap-2 flex-1 min-w-0">
-                              <span className="text-[10px] font-mono text-muted-foreground">{b.booking_code}</span>
-                              <Badge variant="outline" className="text-[9px] px-1.5 py-0">{b.type === "passeio" ? "Passeio" : "Translado"}</Badge>
+                              <span className="text-[10px] font-black font-mono text-muted-foreground bg-background px-1.5 py-0.5 rounded border border-border">{b.booking_code}</span>
+                              <Badge variant="secondary" className="text-[8px] font-black uppercase tracking-tighter px-1.5 py-0">{b.type === "passeio" ? "Passeio" : "Translado"}</Badge>
                             </div>
-                            <p className="text-sm font-bold text-primary ml-2">{fmt(b.final_total)}</p>
+                            <p className="text-sm font-black text-primary ml-2">{fmt(b.final_total)}</p>
                           </div>
-                          <p className="text-sm font-semibold text-foreground truncate">{b.item_name}</p>
-                          <div className="flex items-center justify-between mt-1">
-                            <p className="text-xs text-muted-foreground">
-                              {b.date || new Date(b.created_at).toLocaleDateString("pt-BR")} · {b.guests} pessoa(s)
+                          <p className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">{b.item_name}</p>
+                          <div className="flex items-center justify-between mt-2">
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
+                              {b.date || new Date(b.created_at).toLocaleDateString("pt-BR")} · {b.guests} {b.guests === 1 ? 'pessoa' : 'pessoas'}
                             </p>
                             <div className="flex gap-1">
-                              <Badge variant="outline" className={`text-[10px] ${statusConfig[b.status]?.className || ""}`}>
+                              <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-tighter ${statusConfig[b.status]?.className || ""}`}>
                                 {statusConfig[b.status]?.label || b.status}
                               </Badge>
-                              <Badge variant="outline" className={`text-[10px] ${payStatusConfig[b.payment_status]?.className || ""}`}>
+                              <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-tighter ${payStatusConfig[b.payment_status]?.className || ""}`}>
                                 {payStatusConfig[b.payment_status]?.label || b.payment_status}
                               </Badge>
                             </div>
