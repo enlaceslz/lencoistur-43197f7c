@@ -111,7 +111,7 @@ const PackageDetail = () => {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Atividades</p>
-                  <p className="text-lg font-bold text-foreground">{pkg.tourSlugs.length} passeios inclusos</p>
+                  <p className="text-lg font-bold text-foreground">{pkgTours.length} passeios inclusos</p>
                 </div>
               </div>
             </div>
@@ -170,12 +170,12 @@ const PackageDetail = () => {
           <div className="space-y-6">
             <div className="bg-card border border-border rounded-2xl p-6 shadow-sm sticky top-28">
               <div className="mb-6">
-                <p className="text-sm text-muted-foreground line-through">De {formatCurrency(pkg.originalPrice)}</p>
+                <p className="text-sm text-muted-foreground line-through">De {formatCurrency(pkg.original_price)}</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold text-primary font-display">{formatCurrency(pkg.discountPrice)}</span>
+                  <span className="text-4xl font-bold text-primary font-display">{formatCurrency(pkg.discount_price)}</span>
                   <span className="text-muted-foreground">/ pessoa</span>
                 </div>
-                <p className="text-xs text-green-600 font-semibold mt-1">Você economiza {formatCurrency(pkg.originalPrice - pkg.discountPrice)} neste combo!</p>
+                <p className="text-xs text-green-600 font-semibold mt-1">Você economiza {formatCurrency(pkg.original_price - pkg.discount_price)} neste combo!</p>
               </div>
 
               <div className="space-y-4 mb-6">
