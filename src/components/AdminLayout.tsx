@@ -28,6 +28,7 @@ const mainGroups = [
       { icon: Home, label: "Dashboard", path: "/admin" },
       { icon: Compass, label: "Passeios", path: "/admin/passeios" },
       { icon: ShoppingCart, label: "Reservas", path: "/admin/reservas" },
+      { icon: FileText, label: "Pacotes", path: "/admin/pacotes" },
       { icon: Car, label: "Translados", path: "/admin/translados" },
     ],
   },
