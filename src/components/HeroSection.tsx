@@ -84,11 +84,11 @@ const HeroSection = () => {
             {t("hero.location")}
           </p>
         </div>
-        <h1 className="font-display text-4xl md:text-6xl lg:text-8xl font-bold text-primary-foreground leading-tight mb-8 animate-fade-up drop-shadow-lg" style={{ animationDelay: "0.1s" }}>
+        <h1 className="font-display text-3xl md:text-6xl lg:text-8xl font-bold text-primary-foreground leading-tight mb-8 animate-fade-up drop-shadow-lg" style={{ animationDelay: "0.1s" }}>
           {t("hero.title1")}<br />
           <span className="italic font-normal text-secondary drop-shadow-md">{t("hero.title2")}</span>
         </h1>
-        <p className="text-primary-foreground/80 text-lg md:text-xl max-w-2xl mx-auto mb-8 animate-fade-up" style={{ animationDelay: "0.2s" }}>
+        <p className="text-primary-foreground/80 text-base md:text-xl max-w-2xl mx-auto mb-8 animate-fade-up px-4" style={{ animationDelay: "0.2s" }}>
           {t("hero.subtitle")}
         </p>
 
@@ -97,23 +97,23 @@ const HeroSection = () => {
             <Link
               key={key}
               to="/passeios"
-              className="bg-card/90 backdrop-blur-sm text-foreground hover:bg-secondary hover:text-secondary-foreground px-5 py-3 rounded-xl font-semibold text-sm transition-colors"
+              className="bg-card/90 backdrop-blur-sm text-foreground hover:bg-secondary hover:text-secondary-foreground px-4 py-2.5 md:px-5 md:py-3 rounded-xl font-semibold text-xs md:text-sm transition-colors"
             >
               {t(`hero.categories.${key}`)}
             </Link>
           ))}
         </div>
 
-        <div className="animate-fade-up max-w-3xl mx-auto bg-card/95 backdrop-blur-sm rounded-2xl p-3 flex flex-col md:flex-row gap-3 shadow-2xl" style={{ animationDelay: "0.3s" }}>
-          <div className="flex items-center gap-3 flex-1 px-4 py-3 bg-muted rounded-xl">
-            <MapPin size={20} className="text-primary shrink-0" />
-            <input type="text" placeholder={t("hero.searchWhere")} className="bg-transparent w-full outline-none text-foreground placeholder:text-muted-foreground" />
+        <div className="animate-fade-up max-w-3xl mx-auto bg-card/95 backdrop-blur-sm rounded-2xl p-2 md:p-3 flex flex-col md:flex-row gap-2 md:gap-3 shadow-2xl" style={{ animationDelay: "0.3s" }}>
+          <div className="flex items-center gap-3 flex-1 px-4 py-2.5 md:py-3 bg-muted rounded-xl">
+            <MapPin size={18} className="text-primary shrink-0" />
+            <input type="text" placeholder={t("hero.searchWhere")} className="bg-transparent w-full outline-none text-sm md:text-base text-foreground placeholder:text-muted-foreground" />
           </div>
-          <div className="flex items-center gap-3 flex-1 px-4 py-3 bg-muted rounded-xl">
-            <Calendar size={20} className="text-primary shrink-0" />
-            <input type="text" placeholder={t("hero.searchWhen")} className="bg-transparent w-full outline-none text-foreground placeholder:text-muted-foreground" />
+          <div className="flex items-center gap-3 flex-1 px-4 py-2.5 md:py-3 bg-muted rounded-xl">
+            <Calendar size={18} className="text-primary shrink-0" />
+            <input type="text" placeholder={t("hero.searchWhen")} className="bg-transparent w-full outline-none text-sm md:text-base text-foreground placeholder:text-muted-foreground" />
           </div>
-          <Link to="/passeios" className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors">
+          <Link to="/passeios" className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-2.5 md:py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors text-sm md:text-base">
             <Search size={18} />
             {t("hero.search")}
           </Link>

@@ -30,14 +30,15 @@ const Navbar = () => {
         <div className={`hidden md:flex items-center gap-8 text-sm font-medium ${isHome ? "text-primary-foreground/90" : "text-foreground/80"}`}>
           <Link to="/passeios" className="hover:text-secondary transition-colors">{t("nav.tours")}</Link>
           <Link to="/translados" className="hover:text-secondary transition-colors">{t("nav.transfers")}</Link>
-          <Link to="/seguranca" className="hover:text-secondary transition-colors">{t("nav.safety")}</Link>
-          <Link to="/minhas-reservas" className="hover:text-secondary transition-colors">{t("nav.myBookings")}</Link>
           {isHome && (
             <>
+              <a href="#sobre" className="hover:text-secondary transition-colors">{t("nav.about")}</a>
               <a href="#como-funciona" className="hover:text-secondary transition-colors">{t("nav.howItWorks")}</a>
               <a href="#parceiros" className="hover:text-secondary transition-colors">{t("nav.partners")}</a>
             </>
           )}
+          <Link to="/seguranca" className="hover:text-secondary transition-colors">{t("nav.safety")}</Link>
+          <Link to="/minhas-reservas" className="hover:text-secondary transition-colors">{t("nav.myBookings")}</Link>
           <LanguageSwitcher variant={isHome ? "light" : "dark"} />
           <Link to="/passeios" className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-5 py-2.5 rounded-lg font-semibold transition-colors">
             {t("nav.bookNow")}
@@ -54,10 +55,17 @@ const Navbar = () => {
 
       {open && (
         <div className={`md:hidden ${isHome ? "bg-foreground/95 text-primary-foreground" : "bg-card text-foreground"} backdrop-blur-lg border-t border-border px-6 py-6 flex flex-col gap-4`}>
-          <Link to="/passeios" onClick={() => setOpen(false)} className="py-2">{t("nav.tours")}</Link>
-          <Link to="/translados" onClick={() => setOpen(false)} className="py-2">{t("nav.transfers")}</Link>
-          <Link to="/seguranca" onClick={() => setOpen(false)} className="py-2">{t("nav.safety")}</Link>
-          <Link to="/minhas-reservas" onClick={() => setOpen(false)} className="py-2">{t("nav.myBookings")}</Link>
+          <Link to="/passeios" onClick={() => setOpen(false)} className="py-2 border-b border-border/50">{t("nav.tours")}</Link>
+          <Link to="/translados" onClick={() => setOpen(false)} className="py-2 border-b border-border/50">{t("nav.transfers")}</Link>
+          {isHome && (
+            <>
+              <a href="#sobre" onClick={() => setOpen(false)} className="py-2 border-b border-border/50">{t("nav.about")}</a>
+              <a href="#como-funciona" onClick={() => setOpen(false)} className="py-2 border-b border-border/50">{t("nav.howItWorks")}</a>
+              <a href="#parceiros" onClick={() => setOpen(false)} className="py-2 border-b border-border/50">{t("nav.partners")}</a>
+            </>
+          )}
+          <Link to="/seguranca" onClick={() => setOpen(false)} className="py-2 border-b border-border/50">{t("nav.safety")}</Link>
+          <Link to="/minhas-reservas" onClick={() => setOpen(false)} className="py-2 border-b border-border/50">{t("nav.myBookings")}</Link>
           <Link to="/" onClick={() => setOpen(false)} className="py-2">{t("nav.home")}</Link>
           <Link to="/passeios" onClick={() => setOpen(false)} className="bg-secondary text-secondary-foreground px-5 py-3 rounded-lg font-semibold mt-2 text-center">
             {t("nav.bookNow")}

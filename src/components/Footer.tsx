@@ -9,8 +9,8 @@ const Footer = () => {
   const { site: settings, empresa } = useSiteSettings();
 
   return (
-    <footer id="contato" className="bg-foreground text-primary-foreground border-t border-primary-foreground/10">
-      <div className="container mx-auto px-4 py-16">
+    <footer id="contato" className="bg-foreground text-primary-foreground border-t border-primary-foreground/10 pt-16 pb-8">
+      <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="md:col-span-1">
             <h3 className="font-display text-2xl font-bold mb-4">
@@ -41,7 +41,11 @@ const Footer = () => {
             <h4 className="font-display font-bold text-lg mb-4">{t("footer.toursTitle")}</h4>
             <ul className="space-y-2 text-primary-foreground/60 text-sm">
               {tourLinks.map((link) => (
-                <li key={link}><a href="/passeios" className="hover:text-secondary transition-colors">{link}</a></li>
+                <li key={link}>
+                  <Link to="/passeios" className="hover:text-secondary transition-colors inline-block py-1">
+                    {link}
+                  </Link>
+                </li>
               ))}
             </ul>
           </div>
@@ -49,12 +53,12 @@ const Footer = () => {
           <div>
             <h4 className="font-display font-bold text-lg mb-4">{t("footer.companyTitle")}</h4>
             <ul className="space-y-2 text-primary-foreground/60 text-sm">
-              <li><Link to="/#sobre" className="hover:text-secondary transition-colors">{t("footer.companyLinks.about")}</Link></li>
-              <li><Link to="/seguranca" className="hover:text-secondary transition-colors flex items-center gap-1.5"><Shield size={14} /> {t("footer.companyLinks.safety")}</Link></li>
-              <li><a href="/#parceiros" className="hover:text-secondary transition-colors">{t("footer.companyLinks.partner")}</a></li>
-              <li><Link to="/translados" className="hover:text-secondary transition-colors">{t("footer.companyLinks.transfers")}</Link></li>
-              <li><Link to="/assinatura-termo" className="hover:text-secondary transition-colors">{t("footer.companyLinks.terms")}</Link></li>
-              <li><Link to="#" className="hover:text-secondary transition-colors">{t("footer.companyLinks.privacy")}</Link></li>
+              <li><Link to="/#sobre" className="hover:text-secondary transition-colors inline-block py-1">{t("footer.companyLinks.about")}</Link></li>
+              <li><Link to="/seguranca" className="hover:text-secondary transition-colors flex items-center gap-1.5 py-1"><Shield size={14} /> {t("footer.companyLinks.safety")}</Link></li>
+              <li><a href="/#parceiros" className="hover:text-secondary transition-colors inline-block py-1">{t("footer.companyLinks.partner")}</a></li>
+              <li><Link to="/translados" className="hover:text-secondary transition-colors inline-block py-1">{t("footer.companyLinks.transfers")}</Link></li>
+              <li><Link to="/assinatura-termo" className="hover:text-secondary transition-colors inline-block py-1">{t("footer.companyLinks.terms")}</Link></li>
+              <li><Link to="#" className="hover:text-secondary transition-colors inline-block py-1">{t("footer.companyLinks.privacy")}</Link></li>
             </ul>
           </div>
 
@@ -79,10 +83,10 @@ const Footer = () => {
 
             <div className="mt-6">
               <p className="text-xs text-primary-foreground/40 mb-2">{t("footer.seals")}</p>
-              <div className="flex gap-3 text-xs text-primary-foreground/50">
-                <span className="border border-primary-foreground/20 px-3 py-1.5 rounded-lg">CADASTUR</span>
-                <span className="border border-primary-foreground/20 px-3 py-1.5 rounded-lg">ICMBio</span>
-                <span className="border border-primary-foreground/20 px-3 py-1.5 rounded-lg">Turismo Responsável</span>
+              <div className="flex flex-wrap gap-2 text-[10px] md:text-xs text-primary-foreground/50">
+                <span className="border border-primary-foreground/20 px-3 py-1.5 rounded-lg whitespace-nowrap">CADASTUR</span>
+                <span className="border border-primary-foreground/20 px-3 py-1.5 rounded-lg whitespace-nowrap">ICMBio</span>
+                <span className="border border-primary-foreground/20 px-3 py-1.5 rounded-lg whitespace-nowrap">Turismo Responsável</span>
               </div>
             </div>
           </div>
