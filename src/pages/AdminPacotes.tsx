@@ -100,9 +100,18 @@ const AdminPacotes = () => {
 
     let res;
     if (editingId) {
-      res = await supabase.from("packages").update(payload).eq("id", editingId).select().single();
+      res = await supabase
+        .from("packages")
+        .update(payload)
+        .eq("id", editingId)
+        .select()
+        .single();
     } else {
-      res = await supabase.from("packages").insert(payload).select().single();
+      res = await supabase
+        .from("packages")
+        .insert(payload)
+        .select()
+        .single();
     }
 
     if (res.error) {

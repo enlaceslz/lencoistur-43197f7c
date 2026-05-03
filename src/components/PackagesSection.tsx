@@ -10,43 +10,44 @@ interface Package {
   name: string;
   slug: string;
   description: string;
-  tourSlugs: string[];
   days: number;
-  originalPrice: number;
-  discountPrice: number;
+  original_price: number;
+  discount_price: number;
   tag: string;
   highlights: string[];
+  package_tours?: any[];
 }
-
-const packages: Package[] = [
-  {
-    id: "pkg-1", name: "Pacote Essencial Lençóis", slug: "essencial",
-    description: "O melhor dos Lençóis Maranhenses em 3 dias. Ideal para quem tem pouco tempo mas quer viver as experiências mais icônicas.",
-    tourSlugs: ["lagoas-azuis", "passeio-de-barco", "passeio-gastronomico"], days: 3, originalPrice: 57000, discountPrice: 45900, tag: "Mais Vendido",
-    highlights: ["Lagoas Azuis", "Rio Preguiças", "Gastronomia local", "Transfer incluso"],
-  },
-  {
-    id: "pkg-2", name: "Pacote Aventura Total", slug: "aventura",
-    description: "Para quem busca adrenalina! Caiaque, quadriciclo e trekking nas dunas mais impressionantes do Brasil.",
-    tourSlugs: ["descida-de-caiaque", "trekking-nas-dunas", "passeio-de-quadriciclo"], days: 4, originalPrice: 72000, discountPrice: 57900, tag: "Aventura",
-    highlights: ["Caiaque nos rios", "Trekking nas dunas", "Quadriciclo", "Lagoas remotas"],
-  },
-  {
-    id: "pkg-3", name: "Pacote Imersão Completa", slug: "imersao",
-    description: "A experiência definitiva: 5 dias explorando todos os cantos dos Lençóis Maranhenses com roteiros exclusivos.",
-    tourSlugs: ["lagoas-azuis", "passeio-de-barco", "roteiro-ecologico", "roteiro-cultural", "descida-de-caiaque"], days: 5, originalPrice: 106000, discountPrice: 79900, tag: "Premium",
-    highlights: ["5 passeios completos", "Roteiro ecológico", "Cultural + gastronômico", "Guia exclusivo"],
-  },
-];
 
 const PackagesSection = () => {
   const { t } = useTranslation();
-  const [tours, setTours] = useState<any[]>([]);
+  const [dbPackages, setDbPackages] = useState<Package[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.from("tours").select("id,slug,name,images").eq("active", true)
-      .then(({ data }) => setTours(data || []));
+    const fetchPackages = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("packages")
+        .select(`
+          *,
+          package_tours (
+            tour:tours (id, name, slug, images)
+          )
+        `)
+        .eq("active", true)
+        .order("created_at", { ascending: false });
+
+      if (data) {
+        setDbPackages(data);
+      }
+      setLoading(false);
+    };
+
+    fetchPackages();
   }, []);
+
+  if (loading) return null;
+  if (dbPackages.length === 0) return null;
 
   return (
     <section className="py-20 md:py-28 bg-background">
@@ -64,22 +65,26 @@ const PackagesSection = () => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {packages.map((pkg) => {
-            const discount = Math.round(((pkg.originalPrice - pkg.discountPrice) / pkg.originalPrice) * 100);
-            const pkgTours = pkg.tourSlugs.map((s) => tours.find((t) => t.slug === s)).filter(Boolean);
+          {dbPackages.map((pkg) => {
+            const discount = pkg.original_price > 0 ? Math.round(((pkg.original_price - pkg.discount_price) / pkg.original_price) * 100) : 0;
+            const pkgTours = (pkg.package_tours || []).map((pt: any) => pt.tour).filter(Boolean);
 
             return (
               <div key={pkg.id} className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl transition-shadow group">
                 <div className="relative h-48 flex">
-                  {pkgTours.slice(0, 3).map((tour: any) => (
-                    <div key={tour.id} className="flex-1 overflow-hidden">
+                  {pkgTours.length > 0 ? pkgTours.slice(0, 3).map((tour: any, idx: number) => (
+                    <div key={`${pkg.id}-${tour.id}-${idx}`} className="flex-1 overflow-hidden">
                       {tour.images?.[0] ? (
                         <img src={tour.images[0]} alt={tour.name} className="w-full h-full object-cover aspect-[4/3] group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                       ) : (
                         <div className="w-full h-full bg-muted" />
                       )}
                     </div>
-                  ))}
+                  )) : (
+                    <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground italic">
+                      {t("packages.noImages")}
+                    </div>
+                  )}
                   <div className="absolute top-3 left-3 flex gap-2">
                     <span className="bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1.5 rounded-full">{pkg.tag}</span>
                     <span className="bg-destructive text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full">-{discount}%</span>
@@ -94,7 +99,7 @@ const PackagesSection = () => {
 
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1"><Clock size={14} className="text-primary" /> {pkg.days} {t("packages.days")}</span>
-                    <span className="flex items-center gap-1"><Sparkles size={14} className="text-primary" /> {pkg.tourSlugs.length} {t("packages.toursCount")}</span>
+                    <span className="flex items-center gap-1"><Sparkles size={14} className="text-primary" /> {pkgTours.length} {t("packages.toursCount")}</span>
                   </div>
 
                   <div className="space-y-2">
@@ -109,11 +114,11 @@ const PackagesSection = () => {
                   <div className="border-t border-border pt-4 flex items-end justify-between">
                     <div>
                       <span className="text-sm text-muted-foreground line-through">
-                        {formatCurrency(pkg.originalPrice)}
+                        {formatCurrency(pkg.original_price)}
                       </span>
                       <div className="flex items-baseline gap-1">
                         <span className="font-display text-2xl font-bold text-primary">
-                          {formatCurrency(pkg.discountPrice)}
+                          {formatCurrency(pkg.discount_price)}
                         </span>
                         <span className="text-xs text-muted-foreground">{t("packages.perPerson")}</span>
                       </div>
