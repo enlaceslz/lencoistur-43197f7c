@@ -349,12 +349,15 @@ const AdminConfig = () => {
     "sgs_risk_terms", "sgs_safety_surveys", "sgs_supplier_compliance",
   ] as const;
 
+  const STORAGE_BUCKETS = ["tour-images", "company-documents", "customer-documents", "avatars"] as const;
+
   const handleBackup = async () => {
     setBackupLoading(true);
     try {
-      const backup: Record<string, unknown[]> = {};
+      const backup: Record<string, any> = {};
       let totalRecords = 0;
 
+      // Backup Database Tables
       for (const table of BACKUP_TABLES) {
         const { data, error } = await supabase.from(table).select("*");
         if (error) {
@@ -366,34 +369,79 @@ const AdminConfig = () => {
         }
       }
 
+      // Backup Storage Images/Files
+      const storageBackup: Record<string, Array<{ name: string; bucket: string; data: string }>> = {};
+      let totalFiles = 0;
+
+      for (const bucket of STORAGE_BUCKETS) {
+        const { data: files, error: listError } = await supabase.storage.from(bucket).list("", {
+          limit: 100,
+          sortBy: { column: 'name', order: 'desc' },
+        });
+
+        if (listError) {
+          console.error(`Erro ao listar arquivos do bucket ${bucket}:`, listError.message);
+          continue;
+        }
+
+        if (files) {
+          storageBackup[bucket] = [];
+          for (const file of files) {
+            if (file.id) { // valid file
+              try {
+                const { data: blob, error: downloadError } = await supabase.storage.from(bucket).download(file.name);
+                if (downloadError) throw downloadError;
+
+                const base64 = await new Promise<string>((resolve) => {
+                  const reader = new FileReader();
+                  reader.onloadend = () => resolve(reader.result as string);
+                  reader.readAsDataURL(blob);
+                });
+
+                storageBackup[bucket].push({
+                  name: file.name,
+                  bucket: bucket,
+                  data: base64
+                });
+                totalFiles++;
+              } catch (err) {
+                console.error(`Erro ao baixar arquivo ${file.name} do bucket ${bucket}:`, err);
+              }
+            }
+          }
+        }
+      }
+
       const now = new Date();
       const exportData = {
         metadata: {
-          version: "1.0",
+          version: "1.1",
           created_at: now.toISOString(),
           tables_count: BACKUP_TABLES.length,
           total_records: totalRecords,
+          total_files: totalFiles,
           app: "LençóisTour ERP",
         },
         data: backup,
+        storage: storageBackup,
       };
 
       const json = JSON.stringify(exportData, null, 2);
       const blob = new Blob([json], { type: "application/json" });
-      const sizeKB = (blob.size / 1024).toFixed(1);
+      const sizeMB = (blob.size / (1024 * 1024)).toFixed(2);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `backup-lencoistour-${format(now, "yyyy-MM-dd-HHmmss")}.json`;
+      a.download = `backup-completo-lencoistour-${format(now, "yyyy-MM-dd-HHmmss")}.json`;
       a.click();
       URL.revokeObjectURL(url);
 
       setBackupHistory((prev) => [
-        { date: now.toISOString(), tables: BACKUP_TABLES.length, records: totalRecords, size: `${sizeKB} KB` },
+        { date: now.toISOString(), tables: BACKUP_TABLES.length, records: totalRecords, size: `${sizeMB} MB` },
         ...prev.slice(0, 9),
       ]);
 
-      toast.success(`Backup realizado com sucesso! ${totalRecords} registros em ${BACKUP_TABLES.length} tabelas.`);
+      toast.success(`Backup realizado com sucesso! ${totalRecords} registros e ${totalFiles} arquivos salvos.`);
     } catch (err) {
       toast.error("Erro ao gerar backup: " + (err instanceof Error ? err.message : "Erro desconhecido"));
     } finally {
@@ -407,7 +455,7 @@ const AdminConfig = () => {
     if (!file.name.endsWith(".json")) { toast.error("Selecione um arquivo .json de backup válido."); return; }
 
     const confirmRestore = window.confirm(
-      "⚠️ ATENÇÃO: A restauração irá SUBSTITUIR todos os dados atuais pelos dados do backup.\n\nEssa ação não pode ser desfeita.\n\nDeseja continuar?"
+      "⚠️ ATENÇÃO: A restauração irá SUBSTITUIR todos os dados atuais (incluindo imagens) pelos dados do backup.\n\nEssa ação não pode ser desfeita.\n\nDeseja continuar?"
     );
     if (!confirmRestore) { e.target.value = ""; return; }
 
@@ -426,19 +474,46 @@ const AdminConfig = () => {
         : "Data desconhecida";
 
       const confirmFinal = window.confirm(
-        `Backup de: ${backupDate}\n${parsed.metadata.total_records || "?"} registros em ${parsed.metadata.tables_count || "?"} tabelas.\n\nConfirmar restauração?`
+        `Backup de: ${backupDate}\n${parsed.metadata.total_records || "?"} registros e ${parsed.metadata.total_files || "0"} arquivos.\n\nConfirmar restauração completa?`
       );
       if (!confirmFinal) return;
 
       let restored = 0;
+      let restoredFiles = 0;
       let errors = 0;
 
+      // Restore Storage Files
+      if (parsed.storage) {
+        for (const bucket of STORAGE_BUCKETS) {
+          const files = parsed.storage[bucket];
+          if (!files || !Array.isArray(files)) continue;
+
+          for (const fileObj of files) {
+            try {
+              const response = await fetch(fileObj.data);
+              const blob = await response.blob();
+              
+              const { error: uploadError } = await supabase.storage
+                .from(bucket)
+                .upload(fileObj.name, blob, { upsert: true });
+              
+              if (uploadError) throw uploadError;
+              restoredFiles++;
+            } catch (err) {
+              console.error(`Erro ao restaurar arquivo ${fileObj.name} no bucket ${bucket}:`, err);
+              errors++;
+            }
+          }
+        }
+      }
+
+      // Restore Database Tables
       for (const table of BACKUP_TABLES) {
         const rows = parsed.data[table];
         if (!rows || !Array.isArray(rows) || rows.length === 0) continue;
 
         // Delete existing data
-        const { error: delError } = await supabase.from(table).delete().neq("id", "00000000-0000-0000-0000-000000000000");
+        const { error: delError } = await supabase.from(table).delete().neq("id", "00000000-0000-0000-0000-000000000000" as any);
         if (delError) {
           console.error(`Erro ao limpar ${table}:`, delError.message);
           errors++;
@@ -459,9 +534,9 @@ const AdminConfig = () => {
       }
 
       if (errors > 0) {
-        toast.error(`Restauração concluída com ${errors} erros. ${restored} registros restaurados.`);
+        toast.error(`Restauração concluída com ${errors} erros. ${restored} registros e ${restoredFiles} arquivos restaurados.`);
       } else {
-        toast.success(`Sistema restaurado com sucesso! ${restored} registros importados.`);
+        toast.success(`Sistema restaurado com sucesso! ${restored} registros e ${restoredFiles} arquivos importados.`);
         loadSettings();
         loadUsers();
       }
