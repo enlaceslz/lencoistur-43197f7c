@@ -347,10 +347,9 @@ const AdminConfig = () => {
     "sgs_risks", "sgs_incidents", "sgs_corrective_actions", "sgs_staff",
     "sgs_staff_trainings", "sgs_audits", "sgs_audit_items", "sgs_briefings",
     "sgs_risk_terms", "sgs_safety_surveys", "sgs_supplier_compliance",
-    "sgs_empresa", "sgs_equipe", "sgs_fornecedores", "sgs_veiculos",
-    "sgs_condutores", "sgs_rotas", "sgs_checklists", "sgs_controles",
-    "sgs_acoes", "sgs_pesquisas", "sgs_incidentes", "sgs_termos"
-  ] as const;
+    "sgs_empresa", "sgs_veiculos", "sgs_condutores", "sgs_rotas", 
+    "sgs_checklists", "sgs_pgsat", "sgs_condutores_visitantes"
+  ] as any[];
 
   const STORAGE_BUCKETS = ["tour-images", "company-documents", "customer-documents", "avatars"] as const;
 
