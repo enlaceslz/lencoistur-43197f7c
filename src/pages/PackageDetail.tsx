@@ -12,46 +12,54 @@ interface Package {
   name: string;
   slug: string;
   description: string;
-  tourSlugs: string[];
   days: number;
-  originalPrice: number;
-  discountPrice: number;
+  original_price: number;
+  discount_price: number;
   tag: string;
   highlights: string[];
+  package_tours?: any[];
 }
-
-const packages: Package[] = [
-  {
-    id: "pkg-1", name: "Pacote Essencial Lençóis", slug: "essencial",
-    description: "O melhor dos Lençóis Maranhenses em 3 dias. Ideal para quem tem pouco tempo mas quer viver as experiências mais icônicas.",
-    tourSlugs: ["lagoas-azuis", "passeio-de-barco", "america"], days: 3, originalPrice: 57000, discountPrice: 45900, tag: "Mais Vendido",
-    highlights: ["Lagoas Azuis", "Rio Preguiças", "Gastronomia local", "Transfer incluso"],
-  },
-  {
-    id: "pkg-2", name: "Pacote Aventura Total", slug: "aventura",
-    description: "Para quem busca adrenalina! Caiaque, quadriciclo e trekking nas dunas mais impressionantes do Brasil.",
-    tourSlugs: ["descida-de-caiaque", "trekking-nas-dunas", "passeio-de-quadriciclo"], days: 4, originalPrice: 72000, discountPrice: 57900, tag: "Aventura",
-    highlights: ["Caiaque nos rios", "Trekking nas dunas", "Quadriciclo", "Lagoas remotas"],
-  },
-  {
-    id: "pkg-3", name: "Pacote Imersão Completa", slug: "imersao",
-    description: "A experiência definitiva: 5 dias explorando todos os cantos dos Lençóis Maranhenses com roteiros exclusivos.",
-    tourSlugs: ["lagoas-azuis", "passeio-de-barco", "roteiro-ecologico", "roteiro-cultural", "descida-de-caiaque"], days: 5, originalPrice: 106000, discountPrice: 79900, tag: "Premium",
-    highlights: ["5 passeios completos", "Roteiro ecológico", "Cultural + gastronômico", "Guia exclusivo"],
-  },
-];
 
 const PackageDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [tours, setTours] = useState<any[]>([]);
-  const pkg = packages.find(p => p.slug === slug);
+  const [pkg, setPkg] = useState<Package | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.from("tours").select("*").eq("active", true)
-      .then(({ data }) => setTours(data || []));
-  }, []);
+    const fetchPackage = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("packages")
+        .select(`
+          *,
+          package_tours (
+            tour:tours (*)
+          )
+        `)
+        .eq("slug", slug)
+        .eq("active", true)
+        .maybeSingle();
+
+      if (data) {
+        setPkg(data);
+      }
+      setLoading(false);
+    };
+
+    fetchPackage();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Carregando pacote...</h1>
+        </div>
+      </div>
+    );
+  }
 
   if (!pkg) {
     return (
