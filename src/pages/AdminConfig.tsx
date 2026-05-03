@@ -1111,7 +1111,7 @@ const AdminConfig = () => {
                           )}
                         </div>
                         {pagamentos.pixChave && (
-                          <p className={`text-xs ${validation.valid ? "text-emerald-600" : "text-destructive"}`}>
+                          <p className={`text-xs mt-1 ${validation.valid ? "text-emerald-600 font-medium" : "text-destructive font-medium"}`}>
                             {validation.message}
                           </p>
                         )}
@@ -1121,7 +1121,7 @@ const AdminConfig = () => {
                 })()}
 
                 {/* Cartão */}
-                <div className="flex items-center justify-between p-4 border border-border rounded-xl">
+                <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center"><CreditCard size={20} className="text-blue-600" /></div>
                     <div>
@@ -1133,7 +1133,7 @@ const AdminConfig = () => {
                 </div>
 
                 {/* Boleto */}
-                <div className="flex items-center justify-between p-4 border border-border rounded-xl">
+                <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center"><Landmark size={20} className="text-orange-600" /></div>
                     <div>
@@ -1145,7 +1145,7 @@ const AdminConfig = () => {
                 </div>
 
                 {/* Dinheiro */}
-                <div className="flex items-center justify-between p-4 border border-border rounded-xl">
+                <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center"><Banknote size={20} className="text-green-600" /></div>
                     <div>
@@ -1157,7 +1157,7 @@ const AdminConfig = () => {
                 </div>
 
                 {/* Transferência */}
-                <div className="flex items-center justify-between p-4 border border-border rounded-xl">
+                <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center"><Landmark size={20} className="text-purple-600" /></div>
                     <div>
