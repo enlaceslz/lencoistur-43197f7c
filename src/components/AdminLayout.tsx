@@ -14,7 +14,7 @@ import {
 
 interface Notification {
   id: string;
-  type: "warning" | "error" | "info";
+  type: "warning" | "error" | "info" | "success";
   title: string;
   message: string;
   link?: string;
