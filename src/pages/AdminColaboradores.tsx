@@ -331,12 +331,77 @@ const AdminColaboradores = () => {
     (c.type || "").toLowerCase().includes(search.toLowerCase())
   );
 
+  const generatePDF = () => {
+    try {
+      const doc = new jsPDF();
+      const dateStr = format(new Date(), "dd/MM/yyyy HH:mm");
+      
+      // Header
+      doc.setFontSize(20);
+      doc.setTextColor(15, 23, 42); // slate-900
+      doc.text("Relatório de Colaboradores", 14, 22);
+      
+      doc.setFontSize(10);
+      doc.setTextColor(100, 116, 139); // slate-500
+      doc.text(`Lençóis Tour - Gerado em ${dateStr}`, 14, 30);
+      doc.text(`Filtro atual: ${search || 'Todos'}`, 14, 35);
+      
+      const tableData = filtered.map(c => [
+        c.name,
+        c.type || "Outro",
+        c.phone || "—",
+        c.document || "—",
+        c.status === 'active' ? 'Ativo' : 'Inativo',
+        `${getPaymentTypeLabel(c.payment_type)}: ${c.payment_type === 'commission' ? `${c.payment_value}%` : formatCurrency(c.payment_value)}`
+      ]);
+
+      autoTable(doc, {
+        startY: 45,
+        head: [['Nome', 'Categoria', 'Telefone', 'Documento', 'Status', 'Remuneração']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: {
+          fillColor: [37, 99, 235], // blue-600
+          textColor: 255,
+          fontSize: 10,
+          fontStyle: 'bold',
+          halign: 'left'
+        },
+        bodyStyles: {
+          fontSize: 9,
+          textColor: 51,
+        },
+        alternateRowStyles: {
+          fillColor: [248, 250, 252], // slate-50
+        },
+        margin: { top: 45 },
+        didDrawPage: (data) => {
+          // Footer
+          const pageCount = doc.getNumberOfPages();
+          doc.setFontSize(8);
+          doc.setTextColor(148, 163, 184); // slate-400
+          doc.text(
+            `Página ${data.pageNumber} de ${pageCount}`,
+            data.settings.margin.left,
+            doc.internal.pageSize.height - 10
+          );
+        }
+      });
+
+      doc.save(`colaboradores_${format(new Date(), "dd-MM-yyyy")}.pdf`);
+      toast.success("PDF gerado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao gerar PDF:", error);
+      toast.error("Erro ao gerar PDF");
+    }
+  };
+
   const getPaymentTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
-      commission: "Comissão %",
-      daily: "Diária R$",
-      monthly: "Mensal R$",
-      per_tour: "Por Passeio R$"
+      commission: "Comissão",
+      daily: "Diária",
+      monthly: "Mensal",
+      per_tour: "Por Passeio"
     };
     return labels[type] || type;
   };
