@@ -297,6 +297,7 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
             )}
           </TableBody>
         </Table>
+        </div>
       </Card>
     </div>
   );
