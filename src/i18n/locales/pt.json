@@ -134,14 +134,14 @@
     ]
   },
   "footer": {
-    "desc": "A plataforma líder em turismo nos Lençóis Maranhenses. Passeios, translados e experiências únicas em Santo Amaro do Maranhão.",
-    "toursTitle": "Passeios",
-    "tourLinks": ["Lagoas Azuis", "Passeio de Barco", "Roteiro Ecológico", "Descida de Caiaque", "Passeio Gastronômico", "Trekking nas Dunas"],
-    "companyTitle": "Empresa",
-    "companyLinks": { "about": "Sobre Nós", "partner": "Seja Parceiro", "transfers": "Translados", "terms": "Termos de Uso", "privacy": "Política de Privacidade" },
-    "contactTitle": "Contato",
-    "seals": "Selos e Certificações",
-    "copyright": "© 2026 LençóisTour. Todos os direitos reservados."
+    "desc": "A Lençóis Tour Experience é a sua porta de entrada para os Lençóis Maranhenses. Localizada estrategicamente em Santo Amaro, oferecemos a experiência mais autêntica e segura da região.",
+    "toursTitle": "Experiências",
+    "tourLinks": ["Lagoa da Gaivota", "Circuito Betânia", "Lagoa da Amizade", "Canto do Atins", "Trekking Rio Alegre", "Passeio de Quadriciclo"],
+    "companyTitle": "Institucional",
+    "companyLinks": { "about": "Nossa História", "partner": "Seja um Parceiro", "transfers": "Translados VIP", "terms": "Termos de Ciência de Risco", "privacy": "Privacidade" },
+    "contactTitle": "Fale Conosco",
+    "seals": "Segurança e Qualidade",
+    "copyright": "© 2026 Lençóis Tour Experience. Todos os direitos reservados. CNPJ: 54.493.425/0001-49"
   },
   "chatbot": {
     "greeting": "Olá! 👋 Sou a assistente virtual da **LençóisTour**! Como posso ajudar você a planejar sua aventura nos Lençóis Maranhenses? 🏖️",
