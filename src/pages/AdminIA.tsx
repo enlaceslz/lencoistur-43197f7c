@@ -220,7 +220,7 @@ const AdminIA = () => {
       </div>
 
       <Tabs defaultValue="insights">
-        <TabsList className="mb-6 flex-wrap h-auto gap-1 p-1">
+        <TabsList className="mb-6 flex-wrap h-auto gap-1 p-1 bg-muted/30 border border-border/40 overflow-x-auto no-scrollbar">
           <TabsTrigger value="insights"><Sparkles size={14} className="mr-1" /> Análise IA</TabsTrigger>
           <TabsTrigger value="demanda"><BarChart3 size={14} className="mr-1" /> Demanda</TabsTrigger>
           <TabsTrigger value="config"><Settings size={14} className="mr-1" /> Configurações</TabsTrigger>
