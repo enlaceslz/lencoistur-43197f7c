@@ -802,14 +802,14 @@ const AdminCRMContent = () => {
     <AdminLayout title="CRM - Clientes">
       <div className="space-y-6">
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {clientStats.map((s) => (
-            <Card key={s.label}>
+            <Card key={s.label} className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-5 flex items-center gap-4">
-                <div className={`p-3 rounded-xl bg-muted ${s.color}`}><s.icon size={22} /></div>
+                <div className={`p-3 rounded-xl bg-muted/50 ${s.color}`}><s.icon size={22} /></div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{s.value}</p>
-                  <p className="text-xs text-muted-foreground">{s.label}</p>
+                  <p className="text-2xl font-black text-foreground">{s.value}</p>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{s.label}</p>
                 </div>
               </CardContent>
             </Card>
@@ -849,7 +849,7 @@ const AdminCRMContent = () => {
             </div>
 
             {/* Filter tabs */}
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-1.5 mb-6 overflow-x-auto pb-2 scrollbar-hide">
               {([
                 { key: "all" as const, label: "Titulares", count: customers.length },
                 { key: "with_bookings" as const, label: "Com Reservas", count: withBookings },
@@ -859,10 +859,10 @@ const AdminCRMContent = () => {
                 <button
                   key={f.key}
                   onClick={() => setFilter(f.key)}
-                  className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                  className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all whitespace-nowrap ${
                     filter === f.key
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground hover:text-foreground"
+                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
                   }`}
                 >
                   {f.label} ({f.count})
@@ -1045,9 +1045,14 @@ const AdminCRMContent = () => {
                     )}
                   </tbody>
                 </table>
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/50">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Lençóis Tour CRM</p>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{(filter === "dependents" ? filteredDependents : filtered).length} registro(s)</p>
+                <div className="flex items-center justify-between mt-6 pt-4 border-t border-border/50">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Lençóis Tour CRM Live</p>
+                  </div>
+                  <Badge variant="secondary" className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg">
+                    {(filter === "dependents" ? filteredDependents : filtered).length} registro(s)
+                  </Badge>
                 </div>
               </div>
             )}
@@ -1124,9 +1129,9 @@ const AdminCRMContent = () => {
                 </div>
 
                 {selectedCustomer.notes && (
-                  <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-xl border border-amber-100 dark:border-amber-900/20">
-                    <p className="text-[10px] font-bold text-amber-800 dark:text-amber-400 uppercase mb-1">Observações</p>
-                    <p className="text-xs text-amber-900 dark:text-amber-200 leading-relaxed">{selectedCustomer.notes}</p>
+                  <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-2xl border border-amber-100 dark:border-amber-900/20 shadow-sm">
+                    <p className="text-[10px] font-black text-amber-800 dark:text-amber-400 uppercase tracking-widest mb-1">Observações Internas</p>
+                    <p className="text-xs text-amber-900 dark:text-amber-200 leading-relaxed font-medium">{selectedCustomer.notes}</p>
                   </div>
                 )}
 
@@ -1220,7 +1225,7 @@ const AdminCRMContent = () => {
                     <h4 className="font-display font-bold text-foreground">Documentos e Anexos</h4>
                     <div className="flex gap-2">
                       <select 
-                        className="text-[10px] bg-muted border border-border rounded px-1"
+                        className="text-[10px] bg-background border border-border rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-primary/50 font-bold uppercase tracking-tight"
                         value={docCategory}
                         onChange={(e) => setDocCategory(e.target.value)}
                       >
@@ -1292,24 +1297,24 @@ const AdminCRMContent = () => {
                   ) : (
                     <div className="space-y-2">
                       {customerBookings.map((b) => (
-                        <div key={b.id} className="bg-muted rounded-xl px-4 py-3">
-                          <div className="flex items-center justify-between mb-1">
+                        <div key={b.id} className="bg-muted/40 hover:bg-muted/60 transition-colors border border-border/50 rounded-2xl px-4 py-3 group">
+                          <div className="flex items-center justify-between mb-1.5">
                             <div className="flex items-center gap-2 flex-1 min-w-0">
-                              <span className="text-[10px] font-mono text-muted-foreground">{b.booking_code}</span>
-                              <Badge variant="outline" className="text-[9px] px-1.5 py-0">{b.type === "passeio" ? "Passeio" : "Translado"}</Badge>
+                              <span className="text-[10px] font-black font-mono text-muted-foreground bg-background px-1.5 py-0.5 rounded border border-border">{b.booking_code}</span>
+                              <Badge variant="secondary" className="text-[8px] font-black uppercase tracking-tighter px-1.5 py-0">{b.type === "passeio" ? "Passeio" : "Translado"}</Badge>
                             </div>
-                            <p className="text-sm font-bold text-primary ml-2">{fmt(b.final_total)}</p>
+                            <p className="text-sm font-black text-primary ml-2">{fmt(b.final_total)}</p>
                           </div>
-                          <p className="text-sm font-semibold text-foreground truncate">{b.item_name}</p>
-                          <div className="flex items-center justify-between mt-1">
-                            <p className="text-xs text-muted-foreground">
-                              {b.date || new Date(b.created_at).toLocaleDateString("pt-BR")} · {b.guests} pessoa(s)
+                          <p className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">{b.item_name}</p>
+                          <div className="flex items-center justify-between mt-2">
+                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
+                              {b.date || new Date(b.created_at).toLocaleDateString("pt-BR")} · {b.guests} {b.guests === 1 ? 'pessoa' : 'pessoas'}
                             </p>
                             <div className="flex gap-1">
-                              <Badge variant="outline" className={`text-[10px] ${statusConfig[b.status]?.className || ""}`}>
+                              <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-tighter ${statusConfig[b.status]?.className || ""}`}>
                                 {statusConfig[b.status]?.label || b.status}
                               </Badge>
-                              <Badge variant="outline" className={`text-[10px] ${payStatusConfig[b.payment_status]?.className || ""}`}>
+                              <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-tighter ${payStatusConfig[b.payment_status]?.className || ""}`}>
                                 {payStatusConfig[b.payment_status]?.label || b.payment_status}
                               </Badge>
                             </div>
@@ -1538,14 +1543,16 @@ const AdminCRMContent = () => {
               </div>
             </div>
 
-            <div className="md:col-span-2">
-              <Label htmlFor="customer-notes">Observações</Label>
+            <div className="md:col-span-2 space-y-2">
+              <Label htmlFor="customer-notes" className="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1.5">
+                <FileText size={14} /> Observações Internas (Privado)
+              </Label>
               <textarea
                 id="customer-notes"
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                placeholder="Notas internas sobre o cliente..."
-                className="w-full min-h-[120px] rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all focus:min-h-[160px]"
+                placeholder="Notas internas importantes sobre as preferências ou restrições do cliente..."
+                className="w-full min-h-[100px] rounded-2xl border border-input bg-amber-50/30 dark:bg-amber-900/10 px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/30 focus-visible:border-amber-500/50 transition-all font-medium"
               />
             </div>
           </div>
