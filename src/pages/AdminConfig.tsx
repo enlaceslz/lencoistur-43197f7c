@@ -649,7 +649,7 @@ const AdminConfig = () => {
   return (
     <AdminLayout title="Configurações">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <div className="bg-card border border-border p-2 rounded-2xl shadow-sm overflow-x-auto no-scrollbar min-h-[60px]">
+        <div className="bg-card border border-border p-2 rounded-2xl shadow-sm overflow-x-auto no-scrollbar scroll-smooth">
           <TabsList className="bg-transparent flex-nowrap h-auto gap-1">
             {[
               { value: "empresa", icon: Building2, label: "Agência" },
@@ -1221,7 +1221,7 @@ const AdminConfig = () => {
                   { key: "whatsapp" as const, label: "WhatsApp", desc: "Alertas de reservas via WhatsApp" },
                   { key: "push" as const, label: "Push Notifications", desc: "Notificações no navegador" },
                 ] as const).map((item) => (
-                  <div key={item.key} className="flex items-center justify-between p-4 border border-border rounded-xl">
+                  <div key={item.key} className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
                     <div>
                       <p className="font-medium text-foreground">{item.label}</p>
                       <p className="text-sm text-muted-foreground">{item.desc}</p>
@@ -1230,14 +1230,14 @@ const AdminConfig = () => {
                   </div>
                 ))}
               </div>
-              <h3 className="font-display font-bold text-foreground text-lg pt-4">Eventos</h3>
+              <h3 className="font-display font-bold text-foreground text-lg pt-4">Eventos Críticos</h3>
               <div className="space-y-3">
                 {([
-                  { key: "novaReserva" as const, label: "Nova Reserva", desc: "Notificar quando uma nova reserva é criada" },
-                  { key: "cancelamento" as const, label: "Cancelamento", desc: "Notificar quando uma reserva é cancelada" },
-                  { key: "pagamento" as const, label: "Pagamento Confirmado", desc: "Notificar quando um pagamento é confirmado" },
+                  { key: "novaReserva" as const, label: "Nova Reserva", desc: "Avisar imediatamente sobre novas vendas" },
+                  { key: "cancelamento" as const, label: "Cancelamento", desc: "Alerta de desistência ou cancelamento" },
+                  { key: "pagamento" as const, label: "Pagamento Confirmado", desc: "Confirmação de recebimento via PIX/Cartão" },
                 ] as const).map((item) => (
-                  <div key={item.key} className="flex items-center justify-between p-4 border border-border rounded-xl">
+                  <div key={item.key} className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
                     <div>
                       <p className="font-medium text-foreground">{item.label}</p>
                       <p className="text-sm text-muted-foreground">{item.desc}</p>
