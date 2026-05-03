@@ -112,7 +112,10 @@ const AdminConfig = () => {
   const [uploadingBanner, setUploadingBanner] = useState(false);
   const [backupLoading, setBackupLoading] = useState(false);
   const [restoreLoading, setRestoreLoading] = useState(false);
-  const [backupHistory, setBackupHistory] = useState<Array<{ date: string; tables: number; records: number; size: string }>>([]);
+  const [backupHistory, setBackupHistory] = useState<Array<{ date: string; tables: number; records: number; size: string }>>(() => {
+    const saved = localStorage.getItem("backup_history");
+    return saved ? JSON.parse(saved) : [];
+  });
   const [systemUsers, setSystemUsers] = useState<any[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);
   const [isAddingUser, setIsAddingUser] = useState(false);
@@ -342,15 +345,18 @@ const AdminConfig = () => {
   };
 
   const BACKUP_TABLES = [
-    "site_settings", "tours", "transfer_routes", "customers", "bookings",
-    "partners", "contas_pagar", "contas_receber", "reviews", "documents",
+    "site_settings", "ai_settings", "tours", "transfer_routes", "customers", "dependents",
+    "bookings", "packages", "package_tours", "partners", "partner_types", 
+    "contas_pagar", "contas_receber", "reviews", "documents", "document_types",
+    "collaborators", "collaborator_types", "collaborator_payments",
     "marketing_campaigns", "marketing_leads", "remarketing_rules",
     "sgs_risks", "sgs_incidents", "sgs_corrective_actions", "sgs_staff",
     "sgs_staff_trainings", "sgs_audits", "sgs_audit_items", "sgs_briefings",
-    "sgs_risk_terms", "sgs_safety_surveys", "sgs_supplier_compliance",
+    "sgs_risk_terms", "sgs_risk_term_minors", "sgs_safety_surveys", "sgs_supplier_compliance",
     "sgs_empresa", "sgs_veiculos", "sgs_condutores", "sgs_rotas", 
-    "sgs_checklists", "sgs_pgsat", "sgs_condutores_visitantes"
-  ] as any[];
+    "sgs_checklists", "sgs_checklist_items", "sgs_pgsat", "sgs_condutores_visitantes",
+    "sgs_procedures", "sgs_equipment", "customer_documents"
+  ] as string[];
 
   const STORAGE_BUCKETS = ["tour-images", "company-documents", "customer-documents", "avatars"] as const;
 
@@ -362,7 +368,7 @@ const AdminConfig = () => {
 
       // Backup Database Tables
       for (const table of BACKUP_TABLES) {
-        const { data, error } = await supabase.from(table).select("*");
+        const { data, error } = await supabase.from(table as any).select("*");
         if (error) {
           console.error(`Erro ao exportar ${table}:`, error.message);
           backup[table] = [];
@@ -377,27 +383,42 @@ const AdminConfig = () => {
       let totalFiles = 0;
 
       for (const bucket of STORAGE_BUCKETS) {
-        const { data: files, error: listError } = await supabase.storage.from(bucket).list("", {
-          limit: 100,
-          sortBy: { column: 'name', order: 'desc' },
-        });
+        let hasMore = true;
+        let offset = 0;
+        
+        while (hasMore) {
+          const { data: files, error: listError } = await supabase.storage.from(bucket).list("", {
+            limit: 100,
+            offset: offset,
+            sortBy: { column: 'name', order: 'desc' },
+          });
 
-        if (listError) {
-          console.error(`Erro ao listar arquivos do bucket ${bucket}:`, listError.message);
-          continue;
-        }
+          if (listError) {
+            console.error(`Erro ao listar arquivos do bucket ${bucket}:`, listError.message);
+            hasMore = false;
+            continue;
+          }
 
-        if (files) {
-          storageBackup[bucket] = [];
+          if (!files || files.length === 0) {
+            hasMore = false;
+            continue;
+          }
+
+          if (!storageBackup[bucket]) storageBackup[bucket] = [];
+          
           for (const file of files) {
-            if (file.id) { // valid file
+            if (file.id && file.name !== '.emptyFolderPlaceholder') { 
               try {
                 const { data: blob, error: downloadError } = await supabase.storage.from(bucket).download(file.name);
-                if (downloadError) throw downloadError;
+                if (downloadError) {
+                  console.warn(`Pulando arquivo ${file.name} (erro no download):`, downloadError.message);
+                  continue;
+                }
 
-                const base64 = await new Promise<string>((resolve) => {
+                const base64 = await new Promise<string>((resolve, reject) => {
                   const reader = new FileReader();
                   reader.onloadend = () => resolve(reader.result as string);
+                  reader.onerror = reject;
                   reader.readAsDataURL(blob);
                 });
 
@@ -408,9 +429,15 @@ const AdminConfig = () => {
                 });
                 totalFiles++;
               } catch (err) {
-                console.error(`Erro ao baixar arquivo ${file.name} do bucket ${bucket}:`, err);
+                console.error(`Erro ao processar arquivo ${file.name} do bucket ${bucket}:`, err);
               }
             }
+          }
+          
+          if (files.length < 100) {
+            hasMore = false;
+          } else {
+            offset += 100;
           }
         }
       }
@@ -439,10 +466,14 @@ const AdminConfig = () => {
       a.click();
       URL.revokeObjectURL(url);
 
-      setBackupHistory((prev) => [
-        { date: now.toISOString(), tables: BACKUP_TABLES.length, records: totalRecords, size: `${sizeMB} MB` },
-        ...prev.slice(0, 9),
-      ]);
+      setBackupHistory((prev) => {
+        const newHistory = [
+          { date: now.toISOString(), tables: BACKUP_TABLES.length, records: totalRecords, size: `${sizeMB} MB` },
+          ...prev.slice(0, 9),
+        ];
+        localStorage.setItem("backup_history", JSON.stringify(newHistory));
+        return newHistory;
+      });
 
       toast.success(`Backup realizado com sucesso! ${totalRecords} registros e ${totalFiles} arquivos salvos.`);
     } catch (err) {
@@ -516,7 +547,7 @@ const AdminConfig = () => {
         if (!rows || !Array.isArray(rows) || rows.length === 0) continue;
 
         // Delete existing data
-        const { error: delError } = await supabase.from(table).delete().neq("id", "00000000-0000-0000-0000-000000000000" as any);
+        const { error: delError } = await supabase.from(table as any).delete().neq("id", "00000000-0000-0000-0000-000000000000" as any);
         if (delError) {
           console.error(`Erro ao limpar ${table}:`, delError.message);
           errors++;
@@ -526,7 +557,7 @@ const AdminConfig = () => {
         // Insert backup data in batches of 100
         for (let i = 0; i < rows.length; i += 100) {
           const batch = rows.slice(i, i + 100);
-          const { error: insError } = await supabase.from(table).insert(batch);
+          const { error: insError } = await supabase.from(table as any).insert(batch);
           if (insError) {
             console.error(`Erro ao restaurar ${table}:`, insError.message);
             errors++;
@@ -679,7 +710,7 @@ const AdminConfig = () => {
         {/* EMPRESA */}
         <TabsContent value="empresa">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-8">
+            <CardContent className="p-4 md:p-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600">
@@ -776,7 +807,7 @@ const AdminConfig = () => {
         {/* SITE / FRONTEND */}
         <TabsContent value="site">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-8 space-y-8">
+            <CardContent className="p-4 md:p-8 space-y-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600">
@@ -1025,7 +1056,7 @@ const AdminConfig = () => {
         {/* FINANCEIRO / PAGAMENTO */}
         <TabsContent value="pagamento">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-8 space-y-8">
+            <CardContent className="p-4 md:p-8 space-y-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600">
@@ -1190,7 +1221,7 @@ const AdminConfig = () => {
         {/* NOTIFICAÇÕES */}
         <TabsContent value="notificacoes">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-8 space-y-8">
+            <CardContent className="p-4 md:p-8 space-y-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-600">
@@ -1267,7 +1298,7 @@ const AdminConfig = () => {
         {/* SEGURANÇA */}
         <TabsContent value="seguranca">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-8 space-y-8">
+            <CardContent className="p-4 md:p-8 space-y-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-2xl bg-slate-500/10 text-slate-600">
@@ -1353,7 +1384,8 @@ const AdminConfig = () => {
                     <li>Dados financeiros (contas a pagar/receber)</li>
                     <li>Marketing (campanhas, leads, remarketing)</li>
                     <li>SGS (riscos, incidentes, auditorias, equipe, termos)</li>
-                    <li>Documentação da empresa</li>
+                    <li>Documentação da empresa e clientes</li>
+                    <li className="font-bold text-indigo-600 italic">Arquivos, fotos e mídias (Módulo Galeria e anexos)</li>
                   </ul>
                 </div>
 
@@ -1424,7 +1456,7 @@ const AdminConfig = () => {
                 <CardContent className="p-6 space-y-4">
                   <div className="flex items-center gap-3">
                     <Clock size={20} className="text-muted-foreground" />
-                    <h3 className="font-display font-bold text-foreground text-lg">Histórico de Backups (sessão atual)</h3>
+                    <h3 className="font-display font-bold text-foreground text-lg">Histórico de Backups (persistência local)</h3>
                   </div>
                   <div className="space-y-2">
                     {backupHistory.map((b, i) => (
@@ -1450,7 +1482,7 @@ const AdminConfig = () => {
         {/* USUÁRIOS */}
         <TabsContent value="usuarios">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-8 space-y-8">
+            <CardContent className="p-4 md:p-8 space-y-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-2xl bg-teal-500/10 text-teal-600">
@@ -1591,8 +1623,8 @@ const AdminConfig = () => {
               )}
 
 
-              <div className="border border-border rounded-2xl overflow-hidden bg-card">
-                <table className="w-full text-left border-collapse">
+              <div className="border border-border rounded-2xl overflow-x-auto bg-card no-scrollbar">
+                <table className="w-full text-left border-collapse min-w-[600px]">
                   <thead>
                     <tr className="bg-muted/50 border-b border-border">
                       <th className="p-4 text-xs font-black uppercase tracking-widest text-muted-foreground">Usuário</th>
@@ -1711,7 +1743,7 @@ const AdminConfig = () => {
         {/* GALERIA */}
         <TabsContent value="galeria">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-            <CardContent className="p-8 space-y-8">
+            <CardContent className="p-4 md:p-8 space-y-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-600">
