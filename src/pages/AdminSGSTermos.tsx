@@ -399,17 +399,15 @@ const AdminSGSTermos = () => {
           <div class="section-title">Riscos e Cuidados com a Segurança</div>
           <div style="font-size: 10px; color: #444; white-space: pre-wrap;">
             ${term.sgs_empresa?.term_safety_risks || `
-            <p>Os riscos inerentes ao passeio off-road na Rota das Emoções incluem: insolação, variações térmicas (hipotermia), picadas de insetos, mudanças climáticas bruscas, perda de objetos, incidentes veiculares (capotamento/colisão) e riscos aquáticos.</p>
+            <p>Os riscos inerentes ao passeio off-road na Rota das Emoções incluem: insolação, variações térmicas (hipotermia), picadas de insetos, mudanças climáticas bruscas, perda de objetos, incidentes veiculares (capotamento/colisão) e riscos aquáticos aos quais é necessário o uso obrigatório do colete salva-vidas quando solicitado ou em situações de risco, permanecer em locais seguros da embarcação durante a navegação, não consumir bebidas alcoólicas em excesso que possam comprometer a minha segurança.</p>
             <p style="margin-top: 5px;"><strong>Nossas Medidas de Segurança:</strong></p>
             <ul style="padding-left: 15px;">
               <li>Condutores com certificação e treinamento contínuo;</li>
               <li>Equipamentos de resgate e comunicação em todas as viaturas;</li>
               <li>Equipe preparada para Primeiros Socorros e Resgate;</li>
-              <li>Plano de Resposta a Emergências (PRE) rigorosamente seguido;</li>
-              <li>Uso obrigatório do colete salva-vidas quando solicitado ou em situações de risco;</li>
-              <li>Permanecer em locais seguros da embarcação durante a navegação;</li>
-              <li>Não consumir bebidas alcoólicas em excesso que possam comprometer a minha segurança.</li>
+              <li>Plano de Resposta a Emergências (PRE) rigorosamente seguido.</li>
             </ul>
+            <p style="margin-top: 5px;">A atividade poderá ser interrompida a qualquer momento por decisão técnica em caso de condições climáticas adversas ou riscos à integridade do grupo.</p>
             `}
           </div>
         </div>
