@@ -12,11 +12,11 @@ const TestimonialsSection = () => {
   const { t } = useTranslation();
 
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-24 md:py-32 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-14">
-          <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-3">{t("testimonials.label")}</p>
-          <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground">
+        <div className="text-center mb-16">
+          <p className="text-primary font-bold tracking-[0.2em] uppercase text-xs mb-4 opacity-80">{t("testimonials.label")}</p>
+          <h2 className="font-display text-4xl md:text-6xl font-bold text-foreground">
             {t("testimonials.title")}
           </h2>
         </div>

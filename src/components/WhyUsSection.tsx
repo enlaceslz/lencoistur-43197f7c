@@ -12,12 +12,13 @@ const WhyUsSection = () => {
   const { t } = useTranslation();
 
   return (
-    <section className="py-20 md:py-28 bg-foreground text-primary-foreground">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-14">
-          <p className="text-secondary font-semibold tracking-widest uppercase text-sm mb-3">{t("whyUs.label")}</p>
-          <h2 className="font-display text-3xl md:text-5xl font-bold">
-            {t("whyUs.title1")}<br />{t("whyUs.title2")}
+    <section className="py-24 md:py-32 bg-foreground text-primary-foreground relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-secondary to-transparent opacity-30" />
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <p className="text-secondary font-bold tracking-[0.2em] uppercase text-xs mb-4">{t("whyUs.label")}</p>
+          <h2 className="font-display text-4xl md:text-6xl font-bold leading-tight">
+            {t("whyUs.title1")} <span className="text-secondary">{t("whyUs.title2")}</span>
           </h2>
         </div>
 
