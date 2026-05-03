@@ -536,7 +536,6 @@ const AdminParceiros = () => {
               </TableBody>
             </Table>
           </div>
-          </div>
         )}
       </Card>
 
