@@ -764,7 +764,8 @@ const AdminPasseios = () => {
               })
             )}
           </TableBody>
-        </Table>
+          </Table>
+        </div>
       </Card>
 
       {/* Tour Detail Dialog */}
