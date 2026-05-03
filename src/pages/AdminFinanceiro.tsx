@@ -140,7 +140,7 @@ const AdminFinanceiro = () => {
 
   const stats = [
     { label: "Receita Paga", value: fmt(receitaPaga), change: `${pagos.length} reservas`, up: true, icon: DollarSign, color: "text-emerald-600" },
-    { label: "Despesas Pagas", value: fmt(despesasMes), change: `${monthContasPagar.filter(c => c.status === "pago").length} pagamentos`, up: false, icon: TrendingDown, color: "text-rose-600" },
+    { label: "Despesas Pagas", value: fmt(despesasMes), change: `${monthContasPagar.filter(c => c.status === "pago").length} pagamentos`, up: true, icon: TrendingDown, color: "text-rose-600" },
     { label: "Lucro Estimado", value: fmt(lucroMes), change: receitaPaga > 0 ? `${Math.round((lucroMes / receitaPaga) * 100)}% margem` : "0% margem", up: lucroMes > 0, icon: TrendingUp, color: "text-blue-600" },
     { label: "Ticket Médio", value: fmt(ticketMedio), change: "por venda paga", up: true, icon: LayoutDashboard, color: "text-amber-600" },
   ];
