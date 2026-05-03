@@ -233,8 +233,27 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   const activeNotifs = notifications.filter(n => !dismissed.has(n.id));
   const errorCount = activeNotifs.filter(n => n.type === "error").length;
 
-  const dismissNotif = (id: string) => setDismissed(prev => new Set(prev).add(id));
-  const dismissAll = () => { setDismissed(new Set(notifications.map(n => n.id))); setNotifOpen(false); };
+  const markAsRead = async (id: string) => {
+    if (id.length > 20) {
+      await supabase.from("notifications").update({ read: true }).eq("id", id);
+    }
+  };
+
+  const dismissNotif = (id: string) => {
+    setDismissed(prev => new Set(prev).add(id));
+    markAsRead(id);
+  };
+
+  const dismissAll = async () => {
+    const ids = activeNotifs.map(n => n.id);
+    setDismissed(new Set([...Array.from(dismissed), ...ids]));
+    setNotifOpen(false);
+    
+    const uuidIds = ids.filter(id => id.length > 20);
+    if (uuidIds.length > 0) {
+      await supabase.from("notifications").update({ read: true }).in("id", uuidIds);
+    }
+  };
 
   const typeStyles: Record<string, { bg: string; border: string; icon: typeof AlertTriangle; dot: string }> = {
     error: { bg: "bg-red-50", border: "border-l-red-500", icon: AlertTriangle, dot: "bg-red-500" },
