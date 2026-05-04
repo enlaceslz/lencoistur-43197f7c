@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+// Final update of configuration module layouts
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
