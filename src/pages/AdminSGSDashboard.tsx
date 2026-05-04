@@ -112,7 +112,7 @@ const AdminSGSDashboard = () => {
       ) : (
         <div className="space-y-6">
           <div className="grid lg:grid-cols-3 gap-6 animate-in-fade" style={{ animationDelay: '0.1s' }}>
-            <div className="lg:col-span-2 glass-card rounded-[2.5rem] p-6 relative overflow-hidden group">
+            <div className="lg:col-span-2 glass-card rounded-[2.5rem] p-6 relative overflow-hidden group border-primary/10">
               <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity"><Waves size={120} className="text-primary" /></div>
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center"><Activity size={16} className="text-primary" /></div>
@@ -122,39 +122,54 @@ const AdminSGSDashboard = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div className="space-y-1">
                   <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Nível Lagoas</p>
-                  <span className="text-2xl font-black text-foreground tracking-tighter">85%</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-2xl font-black text-foreground tracking-tighter">85%</span>
+                    <Badge className="bg-emerald-500/10 text-emerald-600 border-none text-[8px] h-4">IDEAL</Badge>
+                  </div>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Clima</p>
-                  <div className="flex items-center gap-2"><Sun className="text-amber-500" size={20} /><span className="text-sm font-black text-foreground">Ensolarado</span></div>
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Clima (INMET)</p>
+                  <div className="flex items-center gap-2">
+                    <Sun className="text-amber-500" size={20} />
+                    <span className="text-sm font-black text-foreground">32°C Ensolarado</span>
+                  </div>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Maré (Atins)</p>
-                  <div className="flex items-center gap-2"><Waves className="text-primary" size={20} /><span className="text-sm font-black text-foreground">14:30</span></div>
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Vento (km/h)</p>
+                  <div className="flex items-center gap-2">
+                    <Activity className="text-sky-500" size={20} />
+                    <span className="text-sm font-black text-foreground">12 NE</span>
+                  </div>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Risco</p>
-                  <div className="flex items-center gap-2"><Shield className="text-emerald-500" size={20} /><span className="text-sm font-black text-emerald-600">BAIXO</span></div>
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Risco Operacional</p>
+                  <div className="flex items-center gap-2">
+                    <Shield className="text-emerald-500" size={20} />
+                    <span className="text-sm font-black text-emerald-600">BAIXO (ISO 21101)</span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="glass-card rounded-[2.5rem] p-6 border-primary/10 bg-gradient-to-br from-primary/[0.02] to-transparent">
+            <div className="glass-card rounded-[2.5rem] p-6 border-primary/20 bg-gradient-to-br from-primary/[0.05] to-transparent relative overflow-hidden shadow-lg shadow-primary/5">
+              <div className="absolute -right-4 -top-4 opacity-10 rotate-12"><Shield size={100} className="text-primary" /></div>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Compliance & Normas</h2>
-                <Award size={20} className="text-primary/40" />
+                <h2 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Status de Compliance</h2>
+                <Award size={20} className="text-primary" />
               </div>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 rounded-2xl bg-white/50 border border-border">
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-white/80 border border-emerald-500/20 shadow-sm">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center"><CheckCircle2 size={16} className="text-emerald-600" /></div>
-                    <div><p className="text-[11px] font-black text-foreground uppercase">CADASTUR</p></div>
+                    <div><p className="text-[11px] font-black text-foreground uppercase">CADASTUR ATIVO</p></div>
                   </div>
+                  <Badge variant="outline" className="border-emerald-200 text-emerald-600 text-[8px]">VALIDADO</Badge>
                 </div>
-                <div className="flex items-center justify-between p-3 rounded-2xl bg-white/50 border border-border">
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-white/80 border border-emerald-500/20 shadow-sm">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center"><CheckCircle2 size={16} className="text-emerald-600" /></div>
-                    <div><p className="text-[11px] font-black text-foreground uppercase">ICMBio</p></div>
+                    <div><p className="text-[11px] font-black text-foreground uppercase">ICMBio AUTORIZADO</p></div>
                   </div>
+                  <Badge variant="outline" className="border-emerald-200 text-emerald-600 text-[8px]">2026</Badge>
                 </div>
               </div>
             </div>
