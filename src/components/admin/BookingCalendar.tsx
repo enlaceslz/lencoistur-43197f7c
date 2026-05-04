@@ -166,9 +166,10 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.005 }}
                 className={cn(
-                  "min-h-[180px] border-r border-b border-border/20 p-4 transition-all relative group/cell flex flex-col",
-                  !isCurrentMonth && "bg-muted/5 opacity-40",
-                  isTodayDay && "bg-primary/[0.03] ring-2 ring-inset ring-primary/20 shadow-[inset_0_0_20px_rgba(var(--primary),0.02)]"
+                  "min-h-[200px] border-r border-b border-border/20 p-4 transition-all relative group/cell flex flex-col",
+                  !isCurrentMonth && "bg-muted/10 opacity-60",
+                  isTodayDay && "bg-primary/[0.05] ring-2 ring-inset ring-primary/30 shadow-[inset_0_0_30px_rgba(var(--primary),0.04)]",
+                  dayBookings.length > 0 && "bg-gradient-to-br from-transparent to-primary/[0.02]"
                 )}
               >
                 <div className="flex items-start justify-between mb-4">
@@ -205,7 +206,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
 
                 <div className="space-y-2.5 flex-1 overflow-y-auto no-scrollbar pb-2">
                   <AnimatePresence mode="popLayout">
-                    {dayBookings.slice(0, 5).map((booking) => (
+                    {dayBookings.slice(0, 6).map((booking) => (
                       <TooltipProvider key={booking.id}>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -216,23 +217,23 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                               exit={{ opacity: 0, scale: 0.95 }}
                               onClick={() => onSelectBooking(booking)}
                               className={cn(
-                                "group/item cursor-pointer p-3 rounded-2xl border border-white/30 dark:border-white/5 hover:border-primary/40 hover:bg-white dark:hover:bg-white/10 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 transition-all relative overflow-hidden bg-white/60 dark:bg-black/30 backdrop-blur-md shadow-sm",
+                                "group/item cursor-pointer p-3.5 rounded-[1.25rem] border border-white/40 dark:border-white/10 hover:border-primary/50 hover:bg-white dark:hover:bg-white/20 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1.5 transition-all relative overflow-hidden bg-white/80 dark:bg-black/40 backdrop-blur-md shadow-md",
                               )}
                             >
                               <div className={cn(
                                 "absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b transition-all group-hover/item:w-2",
                                 statusConfig[booking.status]?.gradient
                               )} />
-                              <div className="pl-3">
-                                <div className="flex items-center justify-between mb-1">
-                                  <p className="text-[11px] font-black text-foreground truncate leading-none tracking-tight">
+                              <div className="pl-4">
+                                <div className="flex items-center justify-between mb-1.5">
+                                  <p className="text-[12px] font-black text-foreground truncate leading-none tracking-tight group-hover/item:text-primary transition-colors">
                                     {booking.customerName}
                                   </p>
-                                  <span className="text-[8px] font-black opacity-30 bg-black/5 dark:bg-white/5 px-1.5 py-0.5 rounded uppercase">#{booking.bookingCode.slice(-4)}</span>
+                                  <span className="text-[9px] font-black opacity-40 bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded-full uppercase">#{booking.bookingCode.slice(-4)}</span>
                                 </div>
-                                <div className="flex items-center gap-1.5">
-                                  <div className={cn("w-1.5 h-1.5 rounded-full", statusConfig[booking.status]?.color)} />
-                                  <p className="text-[9px] font-black text-muted-foreground truncate opacity-80 uppercase tracking-widest leading-none">
+                                <div className="flex items-center gap-2">
+                                  <div className={cn("w-2 h-2 rounded-full ring-4 ring-white/10", statusConfig[booking.status]?.color)} />
+                                  <p className="text-[10px] font-black text-muted-foreground truncate opacity-90 uppercase tracking-[0.15em] leading-none">
                                     {booking.itemName.split('(')[0].trim()}
                                   </p>
                                 </div>
@@ -278,12 +279,13 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                     ))}
                   </AnimatePresence>
                   
-                  {dayBookings.length > 5 && (
+                  {dayBookings.length > 6 && (
                     <button 
-                      className="w-full py-2 rounded-xl border-2 border-dashed border-primary/20 hover:border-primary/50 hover:bg-primary/5 transition-all group/more active:scale-95"
+                      className="w-full py-2.5 mt-1 rounded-[1.25rem] border-2 border-dashed border-primary/30 hover:border-primary/60 hover:bg-primary/10 transition-all group/more active:scale-95 bg-white/40 dark:bg-black/20"
                     >
-                      <span className="text-[9px] font-black text-primary/60 group-hover/more:text-primary uppercase tracking-[0.2em]">
-                        + {dayBookings.length - 5} reservas
+                      <span className="text-[10px] font-black text-primary group-hover/more:text-primary-foreground uppercase tracking-[0.25em] flex items-center justify-center gap-2">
+                        + {dayBookings.length - 6} RESERVAS
+                        <ChevronDown size={12} className="group-hover/more:translate-y-0.5 transition-transform" />
                       </span>
                     </button>
                   )}
