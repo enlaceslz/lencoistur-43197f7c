@@ -185,8 +185,8 @@ const AdminSGSRiscos = () => {
         {/* Header */}
         <div className="flex flex-col xl:flex-row gap-6">
           {/* Heatmap Matrix */}
-          <div className="bg-card border border-border rounded-2xl p-5 flex-shrink-0">
-            <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+          <div className="glass-card rounded-[2.5rem] p-8 shadow-sm flex-shrink-0 animate-in-fade" style={{ animationDelay: '0.2s' }}>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-6 flex items-center gap-3">
               <AlertTriangle size={16} className="text-secondary" />
               Matriz de Riscos (PxC)
             </h3>
