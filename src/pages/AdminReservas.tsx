@@ -18,7 +18,7 @@ import {
   Plus, Copy, Pencil, Car, Compass, LayoutGrid, List
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { PrintReceiptButton, type ReceiptData } from "@/components/BookingReceipt";
 import { supabase } from "@/integrations/supabase/client";
@@ -345,86 +345,90 @@ const AdminReservas = () => {
       </div>
 
       {/* View Switcher & Filters */}
-      <Card className="mb-8 border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.2s' }}>
-        <CardContent className="p-8 space-y-6">
-          <div className="flex flex-col xl:flex-row gap-6 items-center">
-            <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/40 w-full xl:w-auto">
+      <Card className="mb-8 border-none shadow-2xl shadow-primary/5 overflow-hidden glass-card rounded-[2.5rem] animate-in-fade border border-white/20" style={{ animationDelay: '0.2s' }}>
+        <CardContent className="p-8 space-y-8">
+          <div className="flex flex-col xl:flex-row gap-8 items-center justify-between">
+            <div className="flex bg-white/40 dark:bg-black/20 backdrop-blur-xl p-1.5 rounded-[1.5rem] border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 w-full xl:w-auto">
               <Button 
                 variant={viewMode === "list" ? "default" : "ghost"} 
                 onClick={() => setViewMode("list")}
                 className={cn(
-                  "flex-1 xl:flex-none h-10 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all",
-                  viewMode === "list" ? "shadow-lg shadow-primary/20" : ""
+                  "flex-1 xl:flex-none h-12 px-8 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] transition-all",
+                  viewMode === "list" ? "shadow-lg shadow-primary/25 scale-[1.02]" : "text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5"
                 )}
               >
-                <List size={16} className="mr-2" /> Lista
+                <List size={18} className="mr-2" /> Lista
               </Button>
               <Button 
                 variant={viewMode === "calendar" ? "default" : "ghost"} 
                 onClick={() => setViewMode("calendar")}
                 className={cn(
-                  "flex-1 xl:flex-none h-10 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all",
-                  viewMode === "calendar" ? "shadow-lg shadow-primary/20" : ""
+                  "flex-1 xl:flex-none h-12 px-8 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] transition-all",
+                  viewMode === "calendar" ? "shadow-lg shadow-primary/25 scale-[1.02]" : "text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5"
                 )}
               >
-                <LayoutGrid size={16} className="mr-2" /> Calendário
+                <LayoutGrid size={18} className="mr-2" /> Calendário
               </Button>
             </div>
 
-            <div className="relative flex-1 w-full group">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
-              <input 
-                placeholder="Buscar por cliente, passeio ou código de reserva..." 
-                value={search} 
-                onChange={(e) => setSearch(e.target.value)} 
-                className="w-full pl-14 h-14 rounded-2xl border border-border/40 focus:ring-4 focus:ring-primary/10 bg-muted/20 transition-all font-medium text-sm outline-none placeholder:text-muted-foreground/40" 
-              />
+            <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto">
+              <div className="relative flex-1 xl:w-[400px] group">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
+                <Input
+                  placeholder="Pesquisar por nome, passeio ou código..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-14 h-14 rounded-[1.5rem] border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/20 backdrop-blur-xl focus:bg-white/80 dark:focus:bg-black/40 focus:ring-4 focus:ring-primary/10 transition-all font-semibold"
+                />
+              </div>
+
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Button 
+                  onClick={() => { resetNewForm(); setShowNewForm(true); }} 
+                  className="flex-1 sm:flex-none h-14 px-8 rounded-[1.5rem] bg-gradient-to-r from-primary to-indigo-600 hover:shadow-2xl hover:shadow-primary/30 transition-all font-black text-[11px] uppercase tracking-[0.2em]"
+                >
+                  <Plus size={20} className="mr-2" /> Nova Reserva
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={exportCSV} 
+                  className="flex-1 sm:flex-none h-14 px-8 rounded-[1.5rem] border-white/40 dark:border-white/10 backdrop-blur-xl hover:bg-white/50 transition-all font-black text-[11px] uppercase tracking-[0.2em]"
+                >
+                  <Download size={20} className="mr-2" /> Exportar
+                </Button>
+              </div>
             </div>
-            
-            <div className="flex gap-1.5 w-full xl:w-auto overflow-x-auto no-scrollbar pb-1">
+          </div>
+
+          <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-border/40">
+            <div className="flex flex-wrap gap-2">
               {["todos", "confirmada", "pendente", "cancelada", "concluida"].map((s) => (
                 <button
                   key={s}
                   onClick={() => setStatusFilter(s)}
-                  className={`text-[10px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all whitespace-nowrap ${
+                  className={`text-[10px] font-black uppercase tracking-widest px-5 py-3 rounded-xl transition-all whitespace-nowrap shadow-sm border border-border/20 ${
                     statusFilter === s
                       ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      : "bg-white/40 dark:bg-black/20 backdrop-blur-sm text-muted-foreground hover:bg-primary/5 hover:text-primary hover:border-primary/20"
                   }`}
                 >
-                  {s === "todos" ? `Todos` : statusConfig[s]?.label}
+                  {s === "todos" ? `Todos os Status` : statusConfig[s]?.label}
                 </button>
               ))}
             </div>
 
-            <div className="flex items-center gap-2 w-full xl:w-auto">
-              <Button variant="outline" size="lg" onClick={exportCSV} className="rounded-2xl h-12 px-6 border-border font-black text-xs uppercase tracking-widest flex-1 xl:flex-none">
-                <Download size={16} className="mr-2" /> Exportar
-              </Button>
-              <Button size="lg" onClick={() => { resetNewForm(); setShowNewForm(true); }} className="bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-sm font-black uppercase tracking-widest flex-1 xl:flex-none shadow-lg shadow-primary/20 transition-all active:scale-95">
-                <Plus size={18} strokeWidth={3} className="mr-2" /> Nova Reserva
-              </Button>
-            </div>
-          </div>
-          
-          <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-border/50">
-            <div className="flex items-center gap-3 bg-muted/50 px-4 py-2 rounded-xl border border-border/50">
-              <Calendar size={14} className="text-primary" />
-              <div className="flex items-center gap-2">
-                <input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="bg-transparent text-[10px] font-bold uppercase tracking-widest outline-none w-28" />
-                <span className="text-muted-foreground text-[10px] font-black">ATÉ</span>
-                <input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="bg-transparent text-[10px] font-bold uppercase tracking-widest outline-none w-28" />
+            <div className="flex items-center gap-4 bg-white/40 dark:bg-black/20 backdrop-blur-xl px-5 py-3 rounded-xl border border-white/40 dark:border-white/10 shadow-sm ml-auto">
+              <Calendar size={16} className="text-primary" />
+              <div className="flex items-center gap-3">
+                <input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="bg-transparent text-[11px] font-black uppercase tracking-widest outline-none w-28 text-foreground" />
+                <span className="text-muted-foreground text-[10px] font-black opacity-40">ATÉ</span>
+                <input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="bg-transparent text-[11px] font-black uppercase tracking-widest outline-none w-28 text-foreground" />
               </div>
               {(dateStart || dateEnd) && (
-                <button onClick={() => { setDateStart(""); setDateEnd(""); }} className="ml-2 text-[10px] font-black text-destructive uppercase tracking-widest hover:underline">
+                <button onClick={() => { setDateStart(""); setDateEnd(""); }} className="ml-2 text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline px-2 py-1 rounded-md bg-rose-500/5">
                   Limpar
                 </button>
               )}
-            </div>
-            <div className="ml-auto">
-              <Badge variant="secondary" className="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-muted text-muted-foreground border-none">
-                Mostrando {filtered.length} de {bookings.length} reservas
-              </Badge>
             </div>
           </div>
         </CardContent>
@@ -443,122 +447,117 @@ const AdminReservas = () => {
           />
         </div>
       ) : (
-        <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
-          {filtered.length === 0 ? (
-          <div className="py-20 text-center text-muted-foreground bg-muted/10">
-            <ShoppingCart className="mx-auto mb-4 opacity-20" size={64} />
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Vazio</p>
-            <p className="text-xs font-medium text-muted-foreground/60 mt-2">Nenhuma reserva encontrada com os filtros atuais.</p>
-          </div>
-        ) : (
+        <Card className="border-none shadow-2xl shadow-primary/5 overflow-hidden glass-card rounded-[2.5rem] border border-white/20 animate-in-fade" style={{ animationDelay: '0.3s' }}>
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent border-b border-border/20">
-                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4">Código</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4">Cliente</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4">Serviço</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4 text-center">Data</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4 text-center">Pax</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4 text-right">Valor Total</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4 text-center">Pagamento</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4 text-center">Status</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4">Solicitação</TableHead>
-                  <TableHead className="w-12"></TableHead>
+              <TableHeader className="bg-muted/30 backdrop-blur-sm">
+                <TableRow className="hover:bg-transparent border-border/40">
+                  <TableHead className="px-8 py-5 text-[10px] font-black uppercase tracking-widest">Código</TableHead>
+                  <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest">Cliente</TableHead>
+                  <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest">Passeio / Item</TableHead>
+                  <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest">Data</TableHead>
+                  <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest">Total</TableHead>
+                  <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-center">Status</TableHead>
+                  <TableHead className="px-8 py-5 text-right text-[10px] font-black uppercase tracking-widest">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((b) => {
-                  const sc = statusConfig[b.status] || statusConfig.pendente;
-                  const pc = paymentConfig[b.paymentStatus] || paymentConfig.pendente;
-                  return (
-                    <TableRow 
-                      key={b.id} 
-                      className="cursor-pointer hover:bg-primary/5 transition-colors border-b border-border/50 group" 
-                      onClick={() => { setSelected(b); setEditNotes(b.notes || ""); setShowNotes(false); }}
-                    >
-                      <TableCell className="font-mono text-[11px] text-foreground py-5">
-                        <div className="flex items-center gap-1">
-                          <span className="bg-muted px-2 py-1 rounded-lg font-black text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors border border-border/30">
-                            {b.bookingCode}
-                          </span>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity" 
-                            onClick={(e) => { 
-                              e.stopPropagation();
-                              navigator.clipboard.writeText(b.bookingCode);
-                              toast.success("Código copiado!");
-                            }}
-                          >
-                            <Copy size={12} />
-                          </Button>
+                {filtered.map((booking) => (
+                  <TableRow 
+                    key={booking.id} 
+                    className="group hover:bg-primary/[0.02] border-border/20 transition-all duration-300"
+                  >
+                    <TableCell className="px-8 py-4">
+                      <div className="font-mono text-[11px] font-bold text-primary/60 bg-primary/5 px-2 py-1 rounded-md inline-block">
+                        #{booking.bookingCode}
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4">
+                      <div>
+                        <p className="font-black text-sm text-foreground mb-0.5">{booking.customerName}</p>
+                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter opacity-70 flex items-center gap-1">
+                          <Mail size={10} /> {booking.customerEmail}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                          {booking.type === 'transfer' ? <Car size={14} /> : <Compass size={14} />}
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="font-bold text-foreground group-hover:text-primary transition-colors">{b.customerName}</span>
-                          <span className="text-[10px] text-muted-foreground">{b.customerEmail}</span>
+                        <div>
+                          <p className="font-bold text-xs text-foreground leading-none mb-1">{booking.itemName}</p>
+                          <p className="text-[10px] font-bold text-muted-foreground opacity-60 flex items-center gap-1">
+                            <Users size={10} /> {booking.guests} {booking.guests === 1 ? 'pessoa' : 'pessoas'}
+                          </p>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-semibold text-foreground">{b.itemName}</span>
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-1 uppercase font-bold tracking-wider">
-                            {b.type === 'transfer' ? <Car size={10} className="text-primary" /> : <Compass size={10} className="text-primary" />}
-                            {b.type === 'transfer' ? 'Translado' : b.type === 'package' ? 'Pacote' : 'Passeio'}
-                          </span>
-                          {b.collaboratorName && (
-                            <span className="text-[9px] text-blue-600 font-bold uppercase mt-0.5">
-                              Vendedor: {b.collaboratorName}
-                            </span>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center font-medium">
-                        <div className="flex flex-col items-center">
-                          <span className="text-sm">{fmtDate(b.date)}</span>
-                          {b.date && new Date(b.date) < new Date() && b.status !== 'concluida' && (
-                            <span className="text-[9px] text-amber-600 font-bold uppercase tracking-tighter">Data Passada</span>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge variant="outline" className="font-bold">{b.guests}</Badge>
-                      </TableCell>
-                      <TableCell className="text-right font-black text-foreground">{fmt(b.finalTotal)}</TableCell>
-                      <TableCell className="text-center">
-                        <Badge variant="outline" className={`${pc.className} border rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase`}>
-                          {pc.label}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge variant="outline" className={`${sc.className} border rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase`}>
-                          {sc.label}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-xs text-muted-foreground whitespace-nowrap">{fmtDateTime(b.createdAt)}</TableCell>
-                      <TableCell className="text-right">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full group-hover:bg-primary group-hover:text-white transition-all">
-                              <Eye size={14} />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Ver Detalhes</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4 font-black text-xs text-muted-foreground uppercase tracking-widest">
+                      {fmtDate(booking.date)}
+                    </TableCell>
+                    <TableCell className="py-4">
+                      <p className="font-black text-sm text-foreground">{fmt(booking.finalTotal)}</p>
+                    </TableCell>
+                    <TableCell className="py-4 text-center">
+                      <Badge className={cn(
+                        "rounded-xl px-3 py-1 font-black text-[9px] uppercase tracking-widest border-none shadow-sm",
+                        statusConfig[booking.status]?.className
+                      )}>
+                        {statusConfig[booking.status]?.label}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="px-8 py-4 text-right">
+                      <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => setSelected(booking)}
+                                className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary"
+                              >
+                                <Eye size={18} />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Ver Detalhes</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                onClick={() => openEdit(booking)}
+                                className="h-9 w-9 rounded-xl hover:bg-amber-500/10 hover:text-amber-500"
+                              >
+                                <Pencil size={18} />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Editar</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {filtered.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7} className="h-48 text-center">
+                      <div className="flex flex-col items-center justify-center space-y-3 grayscale opacity-40">
+                        <Calendar size={48} className="text-muted-foreground" />
+                        <p className="text-sm font-black uppercase tracking-widest">Nenhuma reserva encontrada</p>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </div>
-        )}
-      </Card>
+        </Card>
       )}
 
       {/* Detail Modal */}
