@@ -583,5 +583,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
     </TooltipProvider>
   );
 };
+  );
+};
 
 export default AdminLayout;
