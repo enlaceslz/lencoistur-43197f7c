@@ -1182,32 +1182,42 @@ const AdminConfig = () => {
                   );
                 })()}
 
-                {/* Cartão */}
-                <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center"><CreditCard size={20} className="text-blue-600" /></div>
+                <div className="flex items-center justify-between p-5 bg-card border border-border/50 rounded-3xl hover:border-primary/30 transition-all group shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600 shadow-inner group-hover:scale-110 transition-transform">
+                      <CreditCard size={24} strokeWidth={2.5} />
+                    </div>
                     <div>
-                      <p className="font-medium text-foreground">Cartão de Crédito/Débito</p>
-                      <p className="text-sm text-muted-foreground">Visa, Mastercard, Elo</p>
+                      <p className="font-bold text-foreground leading-none mb-1">Cartão de Crédito</p>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">Parcelamento via gateway de pagamentos</p>
                     </div>
                   </div>
-                  <Switch checked={pagamentos.cartao} onCheckedChange={(v) => setPagamentos({ ...pagamentos, cartao: v })} />
+                  <Switch 
+                    checked={pagamentos.cartao} 
+                    onCheckedChange={(v) => setPagamentos({ ...pagamentos, cartao: v })} 
+                    className="data-[state=checked]:bg-blue-500"
+                  />
                 </div>
 
                 {/* Boleto */}
-                <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center"><Landmark size={20} className="text-orange-600" /></div>
+                <div className="flex items-center justify-between p-5 bg-card border border-border/50 rounded-3xl hover:border-primary/30 transition-all group shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-orange-500/10 text-orange-600 shadow-inner group-hover:scale-110 transition-transform">
+                      <FileText size={24} strokeWidth={2.5} />
+                    </div>
                     <div>
-                      <p className="font-medium text-foreground">Boleto Bancário</p>
-                      <p className="text-sm text-muted-foreground">Compensação em até 3 dias úteis</p>
+                      <p className="font-bold text-foreground leading-none mb-1">Boleto Bancário</p>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">Compensação manual em até 3 dias</p>
                     </div>
                   </div>
-                  <Switch checked={pagamentos.boleto} onCheckedChange={(v) => setPagamentos({ ...pagamentos, boleto: v })} />
+                  <Switch 
+                    checked={pagamentos.boleto} 
+                    onCheckedChange={(v) => setPagamentos({ ...pagamentos, boleto: v })} 
+                    className="data-[state=checked]:bg-orange-500"
+                  />
                 </div>
 
-                {/* Dinheiro */}
-                <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
+                <div className="flex items-center justify-between p-5 bg-card border border-border/50 rounded-3xl hover:border-primary/30 transition-all group shadow-sm">
                   <div className="flex items-center gap-4">
                     <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 shadow-inner group-hover:scale-110 transition-transform">
                       <Banknote size={24} strokeWidth={2.5} />
