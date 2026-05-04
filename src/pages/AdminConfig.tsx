@@ -1831,7 +1831,7 @@ const AdminConfig = () => {
                     <p className="text-sm text-muted-foreground">Galeria "Momentos Inesquecíveis" do website.</p>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-3">
                   <input
                     ref={galleryInputRef}
                     type="file"
@@ -1840,38 +1840,42 @@ const AdminConfig = () => {
                     className="hidden"
                     onChange={handleGalleryUpload}
                   />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={() => galleryInputRef.current?.click()}
-                        disabled={uploadingGallery}
-                        variant="outline"
-                        className="rounded-xl font-bold"
-                      >
-                        {uploadingGallery ? <Loader2 size={16} className="animate-spin mr-2" /> : <UploadCloud size={16} className="mr-2" />}
-                        {uploadingGallery ? "Enviando..." : "Fazer Upload"}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Adicionar novas fotos à galeria do site</p>
-                    </TooltipContent>
-                  </Tooltip>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          onClick={() => galleryInputRef.current?.click()}
+                          disabled={uploadingGallery}
+                          variant="outline"
+                          className="rounded-2xl h-12 px-6 font-bold border-indigo-200 bg-white hover:bg-indigo-50 hover:text-indigo-600 transition-all shadow-sm"
+                        >
+                          {uploadingGallery ? <Loader2 size={18} className="animate-spin mr-2" /> : <UploadCloud size={18} className="mr-2" />}
+                          {uploadingGallery ? "Processando..." : "Subir Fotos"}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Fazer upload de múltiplas imagens</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
 
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={() => saveSetting("gallery", gallery as unknown as Record<string, unknown>, "Galeria")}
-                        disabled={saving}
-                        className="rounded-xl font-black uppercase tracking-widest bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 h-10 px-8"
-                      >
-                        {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
-                        Publicar Galeria
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Salvar e atualizar a galeria no site público</p>
-                    </TooltipContent>
-                  </Tooltip>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          onClick={() => saveSetting("gallery", gallery as unknown as Record<string, unknown>, "Galeria")}
+                          disabled={saving}
+                          className="rounded-2xl h-12 px-8 font-black uppercase tracking-widest bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
+                        >
+                          {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
+                          Publicar Site
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Publicar alterações na galeria</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
 
@@ -1886,19 +1890,21 @@ const AdminConfig = () => {
                     <div key={index} className="relative group aspect-square rounded-xl overflow-hidden border border-border shadow-sm">
                       <img src={img.src} alt={img.alt} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button
-                              onClick={() => removeGalleryImage(index)}
-                              className="p-2 bg-destructive text-destructive-foreground rounded-full hover:scale-110 transition-transform"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Remover imagem</p>
-                          </TooltipContent>
-                        </Tooltip>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={() => setIsDeletingGalleryImage(index)}
+                                className="p-3 bg-rose-500 text-white rounded-2xl hover:scale-110 transition-transform shadow-xl active:scale-95"
+                              >
+                                <Trash2 size={20} />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Remover imagem permanentemente</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
                       <div className="absolute bottom-0 left-0 right-0 p-1 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity">
                         <input
@@ -1921,6 +1927,34 @@ const AdminConfig = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Galeria Delete Confirmation */}
+      <Dialog open={isDeletingGalleryImage !== null} onOpenChange={() => setIsDeletingGalleryImage(null)}>
+        <DialogContent className="max-w-sm rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black">Remover Foto?</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-muted-foreground font-medium">Tem certeza que deseja excluir esta foto da galeria? Esta ação não poderá ser desfeita após salvar.</p>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setIsDeletingGalleryImage(null)} className="rounded-xl font-bold">Cancelar</Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => {
+                if (isDeletingGalleryImage !== null) {
+                  removeGalleryImage(isDeletingGalleryImage);
+                  setIsDeletingGalleryImage(null);
+                  toast.success("Foto marcada para remoção. Clique em 'Publicar' para salvar.");
+                }
+              }} 
+              className="rounded-xl font-black uppercase tracking-widest bg-rose-600 hover:bg-rose-700"
+            >
+              Excluir Foto
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Floating Save Button for Mobile */}
       <div className="fixed bottom-6 right-6 lg:hidden z-[60]">
