@@ -1145,7 +1145,7 @@ const AdminCRMContent = () => {
                         {selectedCustomer.phone && (
                           <div className="flex items-center gap-4 text-sm font-semibold">
                             <div className="p-2 rounded-lg bg-background border border-border cursor-pointer hover:bg-muted" onClick={() => { navigator.clipboard.writeText(selectedCustomer.phone || ""); toast.success("Telefone copiado!"); }}><Smartphone size={16} className="text-primary" /></div>
-                            <span className="text-foreground">{maskPhone(selectedCustomer.phone)}</span>
+                            <span className="text-foreground">{maskPhone(selectedCustomer.phone, selectedCustomer.country || "Brasil")}</span>
                           </div>
                         )}
                         {selectedCustomer.address && (
