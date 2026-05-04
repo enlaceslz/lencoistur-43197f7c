@@ -478,18 +478,19 @@ const AdminRelatorios = () => {
 };
 
 const KPICard = ({ label, value, icon: Icon, color }: any) => (
-  <Card className="border-none shadow-sm bg-card hover:shadow-md transition-shadow duration-300">
-    <CardContent className="p-6">
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
-        <div className={`p-2 rounded-lg bg-opacity-10 ${color.replace('text', 'bg')}`}>
-          <Icon className={color} size={16} />
-        </div>
+  <div className="glass-card rounded-[2.5rem] p-6 border-none shadow-sm group hover:scale-[1.02] transition-all relative overflow-hidden">
+    <div className={`absolute -right-2 -top-2 w-16 h-16 ${color.replace('text', 'bg')} opacity-5 rounded-full blur-xl group-hover:opacity-10 transition-opacity`} />
+    <div className="flex items-center justify-between mb-4">
+      <div className={`w-10 h-10 rounded-xl ${color.replace('text', 'bg')} bg-opacity-10 flex items-center justify-center ${color}`}>
+        <Icon size={20} strokeWidth={2.5} />
       </div>
-      <p className="text-2xl font-bold font-display tracking-tight text-foreground">{value}</p>
-    </CardContent>
-  </Card>
+      <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">KPI</div>
+    </div>
+    <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{value}</p>
+    <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{label}</p>
+  </div>
 );
+
 
 const ChartCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <Card className="border-none shadow-sm overflow-hidden">
