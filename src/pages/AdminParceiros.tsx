@@ -506,18 +506,18 @@ const AdminParceiros = () => {
         ))}
       </div>
 
-      <Card className="border-none shadow-sm overflow-hidden">
+      <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
         {filtered.length === 0 ? (
-          <div className="p-12 text-center text-muted-foreground">
-            <Users className="mx-auto mb-3 opacity-40" size={40} />
-            <p className="font-medium">Nenhum parceiro encontrado</p>
-            <p className="text-sm mt-1">Cadastre um novo parceiro ou mude o filtro.</p>
+          <div className="py-20 text-center text-muted-foreground bg-muted/10">
+            <Users className="mx-auto mb-4 opacity-20" size={64} />
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Vazio</p>
+            <p className="text-xs font-medium text-muted-foreground/60 mt-2">Nenhum parceiro encontrado com os filtros atuais.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
+                <TableRow className="hover:bg-transparent border-b border-border/20">
                   <TableHead>Parceiro</TableHead>
                   <TableHead>Tipo</TableHead>
                   <TableHead>CPF/CNPJ</TableHead>
