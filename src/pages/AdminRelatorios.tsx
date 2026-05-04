@@ -4,14 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import {
   BarChart3, Download, TrendingUp, Users, ShoppingCart, Shield,
-  CreditCard, Calendar, Filter, Printer, PieChart, Activity, MapPin, Mail, Phone, UserPlus
+  CreditCard, Calendar, Filter, Printer, PieChart, Activity, MapPin, Mail, Phone, UserPlus, Save
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer,
   PieChart as RePieChart, Pie, Cell, LineChart, Line, Legend, AreaChart, Area
 } from "recharts";
-import { Tooltip as UITooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
