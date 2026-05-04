@@ -292,28 +292,33 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-[hsl(220,20%,96%)] flex">
+    <TooltipProvider>
+      <div className="min-h-screen bg-[hsl(220,30%,98%)] flex font-body">
       {/* === SIDEBAR === */}
-      <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[80px]" : "w-[260px]"} admin-sidebar transform transition-all duration-200 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[80px]" : "w-[280px]"} admin-sidebar transform transition-all duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
         {/* Brand */}
-        <div className={`px-5 py-5 border-b border-white/[0.08] ${sidebarCollapsed ? "flex justify-center" : ""}`}>
-          <Link to="/" className="flex items-center gap-2">
+        <div className={`px-6 py-8 border-b border-white/[0.05] ${sidebarCollapsed ? "flex justify-center" : ""}`}>
+          <Link to="/" className="flex items-center gap-3 group">
             {settings?.logoUrl ? (
-              <img 
-                src={settings.logoUrl} 
-                alt={settings.titulo || "LençóisTour"} 
-                className={`${sidebarCollapsed ? "h-6" : "h-10"} w-auto object-contain brightness-0 invert`} 
-              />
+              <div className="relative">
+                <img 
+                  src={settings.logoUrl} 
+                  alt={settings.titulo || "LençóisTour"} 
+                  className={`${sidebarCollapsed ? "h-8" : "h-12"} w-auto object-contain brightness-0 invert transition-all duration-300 group-hover:scale-105`} 
+                />
+              </div>
             ) : (
               <>
-                <div className="w-8 h-8 rounded-lg bg-[hsl(217,91%,60%)] flex items-center justify-center shrink-0">
-                  <span className="text-white font-bold text-sm">LT</span>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[hsl(217,91%,60%)] to-[hsl(195,80%,45%)] flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 transition-transform duration-300 group-hover:rotate-12">
+                  <span className="text-white font-black text-lg">LT</span>
                 </div>
                 {!sidebarCollapsed && (
-                  <div>
-                    <span className="font-display text-base font-bold text-white tracking-tight">Lençóis</span>
-                    <span className="font-display text-base font-bold text-[hsl(217,91%,60%)]">Tour</span>
-                    <p className="text-[10px] text-[hsl(220,15%,50%)] -mt-0.5 font-medium">Painel Administrativo</p>
+                  <div className="flex flex-col">
+                    <div className="flex items-baseline gap-0.5">
+                      <span className="font-display text-xl font-black text-white tracking-tight">Lençóis</span>
+                      <span className="font-display text-xl font-black text-[hsl(217,91%,60%)]">Tour</span>
+                    </div>
+                    <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.2em] -mt-0.5">Premium CRM</p>
                   </div>
                 )}
               </>
