@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Star, ThumbsUp, MessageSquare, TrendingUp, Loader2, Trash2, Plus, Search, Filter } from "lucide-react";
+import { Star, ThumbsUp, MessageSquare, TrendingUp, Loader2, Trash2, Plus, Search, Filter, Save } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -211,51 +211,55 @@ const AdminAvaliacoes = () => {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            
+            <DialogContent className="rounded-3xl">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-black">Nova Avaliação</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 pt-4">
+                <div>
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Autor do Comentário *</Label>
+                  <Input value={formAuthor} onChange={(e) => setFormAuthor(e.target.value)} maxLength={100} placeholder="Nome do cliente" className="rounded-xl h-11 border-border/50" />
+                </div>
+                <div>
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Passeio Relacionado</Label>
+                  <Select value={formTourId} onValueChange={setFormTourId}>
+                    <SelectTrigger className="rounded-xl h-11 border-border/50"><SelectValue placeholder="Selecione o passeio" /></SelectTrigger>
+                    <SelectContent>
+                      {tours.map((t) => (
+                        <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Pontuação (Estrelas)</Label>
+                  <div className="flex gap-2 mt-2 bg-muted/30 w-fit p-2 rounded-2xl border border-border/40">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <button key={n} type="button" onClick={() => setFormRating(n)} className="focus:outline-none transition-transform active:scale-90">
+                        <Star size={28} className={n <= formRating ? "text-amber-500 fill-amber-500" : "text-muted-foreground/30"} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Depoimento do Cliente</Label>
+                  <Textarea value={formComment} onChange={(e) => setFormComment(e.target.value)} maxLength={1000} rows={4} placeholder="O que o cliente disse sobre a experiência..." className="rounded-2xl border-border/50 bg-muted/10" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Origem (País/Cidade)</Label>
+                    <Input value={formCountry} onChange={(e) => setFormCountry(e.target.value)} maxLength={50} placeholder="Ex: Brasil" className="rounded-xl h-11 border-border/50" />
+                  </div>
+                </div>
+                <Button onClick={handleCreate} disabled={saving} className="w-full h-12 rounded-2xl font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition-all mt-4">
+                  {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save size={18} className="mr-2" />}
+                  Publicar Avaliação
+                </Button>
+              </div>
+            </DialogContent>
           </Dialog>
         </div>
-      </div>
-            <DialogHeader><DialogTitle>Nova Avaliação</DialogTitle></DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label>Autor *</Label>
-                <Input value={formAuthor} onChange={(e) => setFormAuthor(e.target.value)} maxLength={100} placeholder="Nome do cliente" />
-              </div>
-              <div>
-                <Label>Passeio</Label>
-                <Select value={formTourId} onValueChange={setFormTourId}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                  <SelectContent>
-                    {tours.map((t) => (
-                      <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Nota</Label>
-                <div className="flex gap-1 mt-1">
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <button key={n} type="button" onClick={() => setFormRating(n)} className="focus:outline-none">
-                      <Star size={24} className={n <= formRating ? "text-amber-500 fill-amber-500" : "text-muted-foreground"} />
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <Label>Comentário</Label>
-                <Textarea value={formComment} onChange={(e) => setFormComment(e.target.value)} maxLength={1000} rows={3} placeholder="Comentário do cliente" />
-              </div>
-              <div>
-                <Label>País</Label>
-                <Input value={formCountry} onChange={(e) => setFormCountry(e.target.value)} maxLength={50} placeholder="Ex: Brasil" />
-              </div>
-              <Button onClick={handleCreate} disabled={saving} className="w-full">
-                {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
-                Salvar Avaliação
-              </Button>
-            </div>
-            </DialogContent>
-        </Dialog>
       </div>
 
       {/* List */}
