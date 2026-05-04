@@ -1,13 +1,14 @@
 import AdminLayout from "@/components/AdminLayout";
-import { Users, Megaphone, TrendingUp, RefreshCw, MessageSquare, Mail, Target } from "lucide-react";
+import { Users, Megaphone, TrendingUp, RefreshCw, MessageSquare, Mail, Target, Loader2, Save } from "lucide-react";
 import { useState, useEffect } from "react";
-import MarketingStats from "@/components/marketing/MarketingStats";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import WhatsAppTab from "@/components/marketing/WhatsAppTab";
 import EmailTab from "@/components/marketing/EmailTab";
 import LeadsTab from "@/components/marketing/LeadsTab";
 import RemarketingTab from "@/components/marketing/RemarketingTab";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
 
 type Tab = "whatsapp" | "email" | "leads" | "remarketing";
 
