@@ -72,16 +72,38 @@ const Footer = () => {
               <li className="flex items-center gap-2"><MapPin size={16} className="text-secondary" />{empresa?.endereco || "Santo Amaro do Maranhão, MA"}</li>
               <li className="flex items-center gap-2"><Phone size={16} className="text-secondary" />{empresa?.telefone || "(98) 98588-0954"}</li>
               <li className="flex items-center gap-2"><Mail size={16} className="text-secondary" />{empresa?.email || "contato@lencoisexperience.com"}</li>
-              <li className="flex items-center gap-2">
-                <Instagram size={16} className="text-secondary" />
+              <li className="flex items-center gap-3 pt-2">
                 <a 
                   href={settings?.instagram || "https://instagram.com/lencoisexperience"} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="hover:text-secondary transition-colors"
+                  className="w-8 h-8 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-secondary-foreground transition-all shadow-sm"
+                  title="Instagram"
                 >
-                  {settings?.instagram ? (settings.instagram.split('/').filter(Boolean).pop()?.startsWith('@') ? settings.instagram.split('/').filter(Boolean).pop() : `@${settings.instagram.split('/').filter(Boolean).pop()}`) : "@lencoisexperience"}
+                  <Instagram size={14} />
                 </a>
+                {settings?.facebook && (
+                  <a 
+                    href={settings.facebook} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-8 h-8 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-secondary-foreground transition-all shadow-sm text-[10px] font-black"
+                    title="Facebook"
+                  >
+                    f
+                  </a>
+                )}
+                {settings?.tiktok && (
+                  <a 
+                    href={settings.tiktok} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-8 h-8 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-secondary-foreground transition-all shadow-sm text-[10px] font-black"
+                    title="TikTok"
+                  >
+                    d
+                  </a>
+                )}
               </li>
             </ul>
 
