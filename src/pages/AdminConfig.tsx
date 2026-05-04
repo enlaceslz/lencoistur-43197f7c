@@ -1250,63 +1250,90 @@ const AdminConfig = () => {
         <TabsContent value="notificacoes">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
             <CardContent className="p-4 md:p-8 space-y-8">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-600">
-                    <Bell size={32} />
+              <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 bg-card p-6 rounded-3xl border border-border/50 shadow-sm mb-6">
+                <div className="flex items-center gap-5">
+                  <div className="p-4 rounded-2xl bg-amber-500/10 text-amber-600 shadow-inner">
+                    <Bell size={32} strokeWidth={2.5} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-foreground">Alertas e Notificações</h3>
-                    <p className="text-sm text-muted-foreground">Configure como e quando a agência será avisada.</p>
+                    <h3 className="text-2xl font-black text-foreground tracking-tight">Alertas e Notificações</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                      <p className="text-sm font-medium text-muted-foreground">Configure como a agência será avisada sobre novos eventos.</p>
+                    </div>
                   </div>
                 </div>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      onClick={() => saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações")} 
-                      disabled={saving} 
-                      className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 bg-amber-600 hover:bg-amber-700 text-white transition-all active:scale-95"
-                    >
-                      {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
-                      Salvar Alertas
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Salvar configurações de notificações</p>
-                  </TooltipContent>
-                </Tooltip>
+                <div className="flex items-center gap-3">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          onClick={() => saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações")} 
+                          disabled={saving} 
+                          className="rounded-2xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 bg-amber-600 hover:bg-amber-700 text-white transition-all active:scale-95 flex items-center gap-2"
+                        >
+                          {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                          Salvar Notificações
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Confirmar alterações de alertas</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </div>
 
-              <div className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-4">
                 {([
-                  { key: "email" as const, label: "E-mail", desc: "Receber notificações por e-mail" },
-                  { key: "whatsapp" as const, label: "WhatsApp", desc: "Alertas de reservas via WhatsApp" },
-                  { key: "push" as const, label: "Push Notifications", desc: "Notificações no navegador" },
+                  { key: "email" as const, label: "E-mail", desc: "Receber notificações detalhadas por e-mail", icon: Mail, color: "text-blue-500" },
+                  { key: "whatsapp" as const, label: "WhatsApp", desc: "Alertas rápidos de vendas via API WhatsApp", icon: Megaphone, color: "text-green-500" },
+                  { key: "push" as const, label: "Navegador", desc: "Avisos em tempo real na tela do computador", icon: Bell, color: "text-amber-500" },
                 ] as const).map((item) => (
-                  <div key={item.key} className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
-                    <div>
-                      <p className="font-medium text-foreground">{item.label}</p>
-                      <p className="text-sm text-muted-foreground">{item.desc}</p>
+                  <div key={item.key} className="flex items-center justify-between p-5 bg-card border border-border/50 rounded-3xl hover:border-primary/30 transition-all group shadow-sm">
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-2xl bg-muted/50 ${item.color} group-hover:scale-110 transition-transform`}>
+                        <item.icon size={20} />
+                      </div>
+                      <div>
+                        <p className="font-bold text-foreground leading-none mb-1">{item.label}</p>
+                        <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">{item.desc}</p>
+                      </div>
                     </div>
-                    <Switch checked={notifications[item.key]} onCheckedChange={(v) => setNotifications({ ...notifications, [item.key]: v })} />
+                    <Switch 
+                      checked={notifications[item.key]} 
+                      onCheckedChange={(v) => setNotifications({ ...notifications, [item.key]: v })} 
+                      className="data-[state=checked]:bg-emerald-500"
+                    />
                   </div>
                 ))}
               </div>
-              <h3 className="font-display font-bold text-foreground text-lg pt-4">Eventos Críticos</h3>
-              <div className="space-y-3">
-                {([
-                  { key: "novaReserva" as const, label: "Nova Reserva", desc: "Avisar imediatamente sobre novas vendas" },
-                  { key: "cancelamento" as const, label: "Cancelamento", desc: "Alerta de desistência ou cancelamento" },
-                  { key: "pagamento" as const, label: "Pagamento Confirmado", desc: "Confirmação de recebimento via PIX/Cartão" },
-                ] as const).map((item) => (
-                  <div key={item.key} className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
-                    <div>
-                      <p className="font-medium text-foreground">{item.label}</p>
-                      <p className="text-sm text-muted-foreground">{item.desc}</p>
+              <div className="space-y-4 pt-4">
+                <h3 className="text-sm font-black text-muted-foreground uppercase tracking-[0.2em] ml-2">Gatilhos de Notificação</h3>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {([
+                    { key: "novaReserva" as const, label: "Nova Reserva", desc: "Vendas realizadas no site", icon: ShoppingCart, color: "text-emerald-500" },
+                    { key: "cancelamento" as const, label: "Cancelamento", desc: "Reserva cancelada pelo cliente", icon: X, color: "text-rose-500" },
+                    { key: "pagamento" as const, label: "Pagamento", desc: "Confirmação de recebimento PIX", icon: Banknote, color: "text-blue-500" },
+                  ] as const).map((item) => (
+                    <div key={item.key} className="flex flex-col gap-4 p-6 bg-muted/20 border border-border/40 rounded-3xl hover:bg-muted/30 transition-all">
+                      <div className="flex items-start justify-between">
+                        <div className={`p-3 rounded-2xl bg-background border border-border/50 ${item.color}`}>
+                          <item.icon size={20} />
+                        </div>
+                        <Switch 
+                          checked={notifications[item.key]} 
+                          onCheckedChange={(v) => setNotifications({ ...notifications, [item.key]: v })} 
+                          className="data-[state=checked]:bg-primary"
+                        />
+                      </div>
+                      <div>
+                        <p className="font-black text-foreground text-sm uppercase tracking-wider">{item.label}</p>
+                        <p className="text-[11px] text-muted-foreground font-medium mt-1">{item.desc}</p>
+                      </div>
                     </div>
-                    <Switch checked={notifications[item.key]} onCheckedChange={(v) => setNotifications({ ...notifications, [item.key]: v })} />
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
 
               <div className="flex justify-end pt-8 border-t border-border mt-8">
