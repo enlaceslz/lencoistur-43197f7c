@@ -1430,7 +1430,17 @@ const AdminCRMContent = () => {
                 className="w-full flex h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="Brasil">Brasil</option>
-                <option value="Estrangeiro">Estrangeiro</option>
+                <option value="Argentina">Argentina</option>
+                <option value="Chile">Chile</option>
+                <option value="Uruguai">Uruguai</option>
+                <option value="Paraguai">Paraguai</option>
+                <option value="Estados Unidos">Estados Unidos</option>
+                <option value="Portugal">Portugal</option>
+                <option value="Espanha">Espanha</option>
+                <option value="França">França</option>
+                <option value="Alemanha">Alemanha</option>
+                <option value="Reino Unido">Reino Unido</option>
+                <option value="Outro">Outro (Estrangeiro)</option>
               </select>
             </div>
             <div>
