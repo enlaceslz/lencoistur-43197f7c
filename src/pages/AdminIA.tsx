@@ -180,43 +180,25 @@ const AdminIA = () => {
   return (
     <AdminLayout title="Inteligência Artificial">
       {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <Card>
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-muted text-primary"><MessageSquare size={22} /></div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{totalBookings}</p>
-              <p className="text-xs text-muted-foreground">Reservas (Mês)</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+        {[
+          { label: "Reservas (Mês)", value: totalBookings, icon: MessageSquare, color: "from-blue-500 to-indigo-600", desc: "Volume mensal" },
+          { label: "Receita (Mês)", value: `R$ ${(monthRevenue / 100).toLocaleString("pt-BR", { minimumFractionDigits: 0 })}`, icon: Bot, color: "from-emerald-500 to-teal-600", desc: "Faturamento" },
+          { label: "Conversão", value: `${conversionRate}%`, icon: TrendingUp, color: "from-purple-500 to-pink-600", desc: "Taxa de vendas" },
+          { label: "Passeios Ativos", value: tourDemand.length, icon: ThumbsUp, color: "from-amber-500 to-orange-600", desc: "Portfólio" },
+        ].map((stat, i) => (
+          <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group">
+            <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
+            <div className="flex items-center justify-between mb-4">
+              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-primary/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+                <stat.icon size={22} strokeWidth={2.5} />
+              </div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{stat.desc}</div>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-muted text-green-600"><Bot size={22} /></div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">R$ {(monthRevenue / 100).toLocaleString("pt-BR", { minimumFractionDigits: 0 })}</p>
-              <p className="text-xs text-muted-foreground">Receita (Mês)</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-muted text-blue-600"><TrendingUp size={22} /></div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{conversionRate}%</p>
-              <p className="text-xs text-muted-foreground">Conversão</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-muted text-amber-600"><ThumbsUp size={22} /></div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{tourDemand.length}</p>
-              <p className="text-xs text-muted-foreground">Passeios Ativos</p>
-            </div>
-          </CardContent>
-        </Card>
+            <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
+            <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
+          </div>
+        ))}
       </div>
 
       <Tabs defaultValue="insights">
