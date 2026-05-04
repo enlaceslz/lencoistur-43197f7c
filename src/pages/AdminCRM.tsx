@@ -221,7 +221,7 @@ const validateForm = (form: CustomerForm): string | null => {
     if (!form.cpf) return "CPF é obrigatório para brasileiros.";
     if (!isValidCPF(form.cpf)) return "CPF inválido.";
   } else if (!form.passport) {
-    return "Passaporte é obrigatório para estrangeiros.";
+    return "Passaporte ou Documento é obrigatório para estrangeiros.";
   }
 
   return null;
