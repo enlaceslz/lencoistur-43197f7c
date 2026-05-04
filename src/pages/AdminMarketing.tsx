@@ -78,7 +78,7 @@ const AdminMarketing = () => {
         ))}
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-3 bg-card border border-border rounded-3xl shadow-sm">
+      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-3 glass-card border border-border/40 rounded-[2rem] shadow-sm animate-in-fade" style={{ animationDelay: '0.2s' }}>
         <div className="flex gap-1.5 overflow-x-auto no-scrollbar scroll-smooth w-full">
           {tabs.map((t) => (
             <button
