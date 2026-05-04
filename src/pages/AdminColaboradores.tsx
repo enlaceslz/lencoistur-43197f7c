@@ -617,7 +617,7 @@ const AdminColaboradores = () => {
                   </Button>
                 </div>
               </div>
-            </Card>
+            </div>
           ))}
           {filtered.length === 0 && (
             <div className="col-span-full py-32 text-center bg-white rounded-3xl border-2 border-dashed border-slate-200 shadow-sm">
