@@ -454,44 +454,66 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
       )}
 
       {/* === MAIN === */}
-      <main className={`flex-1 ${sidebarCollapsed ? "lg:ml-[80px]" : "lg:ml-[260px]"} min-h-screen flex flex-col transition-all duration-200 w-full overflow-x-hidden`}>
+      <main className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${sidebarCollapsed ? "lg:ml-[80px]" : "lg:ml-[280px]"}`}>
         {/* Header */}
-        <header className="bg-white border-b border-[hsl(220,20%,92%)] px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_3px_hsl(220,20%,90%)] w-full">
-          <div className="flex items-center gap-3">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button 
-                  onClick={() => {
-                    if (window.innerWidth >= 1024) {
-                      setSidebarCollapsed(!sidebarCollapsed);
-                    } else {
-                      setSidebarOpen(true);
-                    }
-                  }} 
-                  className="p-1.5 rounded-lg text-[hsl(220,15%,40%)] hover:bg-[hsl(220,20%,96%)]"
-                >
-                  <Menu size={22} />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>{sidebarCollapsed ? "Expandir Menu" : "Recolher Menu"}</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-[hsl(220,15%,55%)]">
-              {breadcrumbs.map((crumb, i) => (
-                <span key={crumb.path} className="flex items-center gap-1.5">
-                  {i > 0 && <ChevronRight size={12} className="text-[hsl(220,15%,75%)]" />}
-                  {i === breadcrumbs.length - 1 ? (
-                    <span className="font-medium text-[hsl(220,25%,20%)]">{crumb.label}</span>
-                  ) : (
-                    <Link to={crumb.path} className="hover:text-[hsl(217,91%,60%)] transition-colors">{crumb.label}</Link>
-                  )}
-                </span>
-              ))}
+        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-border/40 px-6 flex items-center justify-between sticky top-0 z-40">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2.5 rounded-xl hover:bg-muted text-muted-foreground transition-all active:scale-95"
+            >
+              <Menu size={22} />
+            </button>
+            <div className="hidden lg:flex items-center gap-3">
+              <button
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="p-2.5 rounded-xl hover:bg-muted text-muted-foreground transition-all active:scale-95"
+              >
+                {sidebarCollapsed ? <ChevronRight size={20} /> : <Menu size={20} />}
+              </button>
+              {/* Breadcrumbs */}
+              <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-muted-foreground/60">
+                {breadcrumbs.map((crumb, i) => (
+                  <React.Fragment key={crumb.path}>
+                    {i > 0 && <span className="text-[10px] opacity-30">/</span>}
+                    <Link
+                      to={crumb.path}
+                      className={`hover:text-primary transition-colors ${i === breadcrumbs.length - 1 ? "text-primary/80 font-black" : ""}`}
+                    >
+                      {crumb.label}
+                    </Link>
+                  </React.Fragment>
+                ))}
+              </div>
             </div>
-            <h1 className="sm:hidden font-display text-lg font-bold text-[hsl(220,25%,18%)]">{title}</h1>
           </div>
+
+          <div className="flex items-center gap-4">
+            {/* Search Bar - Aesthetic only for now */}
+            <div className="hidden md:flex items-center gap-2 bg-muted/50 border border-border/40 rounded-xl px-4 py-2 w-64 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+              <Compass size={16} className="text-muted-foreground" />
+              <input type="text" placeholder="Pesquisar..." className="bg-transparent border-none text-xs focus:ring-0 w-full placeholder:text-muted-foreground/50" />
+            </div>
+
+            <div className="relative" ref={notifRef}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setNotifOpen(!notifOpen)}
+                    className={`relative p-2.5 rounded-xl transition-all active:scale-95 ${notifOpen ? "bg-primary/10 text-primary shadow-inner" : "text-muted-foreground hover:bg-muted"}`}
+                  >
+                    <Bell size={20} />
+                    {activeNotifs.length > 0 && (
+                      <span className={`absolute top-1.5 right-1.5 w-4 h-4 rounded-full text-[9px] text-white flex items-center justify-center font-black animate-in zoom-in ${errorCount > 0 ? "bg-red-500 shadow-lg shadow-red-500/30" : "bg-primary shadow-lg shadow-primary/30"}`}>
+                        {activeNotifs.length}
+                      </span>
+                    )}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border-none shadow-xl">
+                  Notificações
+                </TooltipContent>
+              </Tooltip>
 
           <div className="flex items-center gap-2">
             {/* Notifications */}
