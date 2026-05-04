@@ -1481,12 +1481,12 @@ const AdminCRMContent = () => {
                 </>
               ) : (
                 <>
-                  <Label htmlFor="customer-passport">Passaporte *</Label>
+                  <Label htmlFor="customer-passport">Passaporte / Documento *</Label>
                   <Input
                     id="customer-passport"
                     value={form.passport}
                     onChange={(e) => setForm({ ...form, passport: e.target.value })}
-                    placeholder="Número do Passaporte"
+                    placeholder="Nº Passaporte ou ID"
                     className="rounded-xl"
                   />
                 </>
