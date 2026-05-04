@@ -496,13 +496,14 @@ const AdminFinanceiro = () => {
 
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-border bg-muted/30">
-                            <th className="text-left px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Data</th>
-                            <th className="text-left px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Descrição / Origem</th>
-                            <th className="text-left px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Meio</th>
-                            <th className="text-right px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Valor</th>
-                            <th className="text-center px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Status</th>
+                          <tr className="border-b border-border/20 bg-muted/10">
+                            <th className="text-left px-8 py-5 font-black text-muted-foreground uppercase tracking-widest text-[10px]">Data</th>
+                            <th className="text-left px-8 py-5 font-black text-muted-foreground uppercase tracking-widest text-[10px]">Descrição / Origem</th>
+                            <th className="text-left px-8 py-5 font-black text-muted-foreground uppercase tracking-widest text-[10px]">Meio</th>
+                            <th className="text-right px-8 py-5 font-black text-muted-foreground uppercase tracking-widest text-[10px]">Valor</th>
+                            <th className="text-center px-8 py-5 font-black text-muted-foreground uppercase tracking-widest text-[10px]">Status</th>
                           </tr>
+
                         </thead>
                         <tbody className="divide-y divide-border/50">
                           {filteredTransactions.map((t, i) => (
