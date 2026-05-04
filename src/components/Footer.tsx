@@ -10,7 +10,7 @@ const Footer = () => {
   const tourLinks = settings?.footerTours && settings.footerTours.length > 0 
     ? settings.footerTours 
     : defaultTourLinks;
-
+  // Footer rendered
 
   return (
     <footer id="contato" className="bg-foreground text-primary-foreground border-t border-primary-foreground/10 pt-16 pb-8">
