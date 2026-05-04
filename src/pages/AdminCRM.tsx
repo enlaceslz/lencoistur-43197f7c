@@ -87,10 +87,16 @@ const maskCEP = (v: string) => {
   return n;
 };
 
-const maskPhone = (v: string) => {
+const maskPhone = (v: string, country: string = "Brasil") => {
   const n = v.replace(/\D/g, "");
-  if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
-  if (n.length === 11) return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  if (country === "Brasil") {
+    if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+    if (n.length === 11) return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  }
+  // For international numbers, allow a more flexible format or just return as is with a +
+  if (v.startsWith("+")) {
+    return "+" + v.replace(/\D/g, "");
+  }
   return v;
 };
 
