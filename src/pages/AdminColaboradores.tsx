@@ -719,7 +719,7 @@ const AdminColaboradores = () => {
               </TableBody>
             </Table>
           </div>
-        </Card>
+        </div>
       )}
 
       {/* Collaborator Form Dialog */}
