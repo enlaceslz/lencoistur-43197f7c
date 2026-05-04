@@ -460,7 +460,7 @@ const AdminCRMContent = () => {
     const payload = {
       name: form.name.trim(),
       email: form.email.trim() ? form.email.trim().toLowerCase() : null,
-      phone: form.phone.replace(/\D/g, "") || null,
+      phone: form.country === "Brasil" ? (form.phone.replace(/\D/g, "") || null) : (form.phone || null),
       cpf: form.country === "Brasil" ? (form.cpf.replace(/\D/g, "") || null) : null,
       passport: form.country !== "Brasil" ? (form.passport || null) : null,
       birth_date: form.birth_date || null,
