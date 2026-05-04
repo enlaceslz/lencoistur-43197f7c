@@ -736,7 +736,7 @@ const AdminCRMContent = () => {
     doc.setFontSize(10);
     doc.text(`Nome: ${c.name}`, 14, 65);
     doc.text(`E-mail: ${c.email}`, 14, 72);
-    doc.text(`Telefone: ${c.phone ? maskPhone(c.phone) : "—"}`, 14, 79);
+    doc.text(`Telefone: ${c.phone ? maskPhone(c.phone, c.country || "Brasil") : "—"}`, 14, 79);
     doc.text(`Documento: ${c.country === "Brasil" ? (c.cpf ? maskCPF(c.cpf) : "—") : (c.passport || "—")}`, 14, 86);
     doc.text(`Data de Nascimento: ${c.birth_date ? new Date(c.birth_date + "T00:00:00").toLocaleDateString("pt-BR") : "—"}`, 14, 93);
     doc.text(`Nacionalidade: ${c.country}`, 14, 100);
