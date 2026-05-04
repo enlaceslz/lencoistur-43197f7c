@@ -353,9 +353,9 @@ const AdminRelatorios = () => {
                       <AreaChart data={data.byDay}>
                         <defs><linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/></linearGradient></defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                        <XAxis dataKey="date" fontSize={10} tick={{fill: '#9ca3af'}} axisLine={false} tickLine={false} />
-                        <YAxis fontSize={10} tick={{fill: '#9ca3af'}} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v/100}`} />
-                        <ChartTooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}} formatter={(v: number) => fmt(v)} />
+                        <XAxis dataKey="date" fontSize={10} tick={{fill: '#9ca3af', fontWeight: '900'}} axisLine={false} tickLine={false} tickFormatter={(v) => format(parseISO(v), 'dd MMM', { locale: ptBR })} />
+                        <YAxis fontSize={10} tick={{fill: '#9ca3af', fontWeight: '900'}} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v/100}`} />
+                        <ChartTooltip content={<CustomTooltip />} />
                         <Area type="monotone" dataKey="total" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
                       </AreaChart>
                     </ResponsiveContainer>
