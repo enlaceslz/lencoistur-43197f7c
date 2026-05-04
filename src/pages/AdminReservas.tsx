@@ -432,14 +432,16 @@ const AdminReservas = () => {
 
       {/* Main Content */}
       {viewMode === "calendar" ? (
-        <BookingCalendar 
-          bookings={bookings} 
-          onSelectBooking={(b) => {
-            setSelected(b);
-            setEditNotes(b.notes || "");
-            setShowNotes(false);
-          }}
-        />
+        <div className="animate-in-fade" style={{ animationDelay: '0.3s' }}>
+          <BookingCalendar 
+            bookings={bookings} 
+            onSelectBooking={(b) => {
+              setSelected(b);
+              setEditNotes(b.notes || "");
+              setShowNotes(false);
+            }}
+          />
+        </div>
       ) : (
         <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
           {filtered.length === 0 ? (
