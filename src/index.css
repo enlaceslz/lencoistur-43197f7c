@@ -101,11 +101,26 @@
   }
   /* Admin-specific utilities */
   .admin-sidebar {
-    background: linear-gradient(180deg, hsl(220 25% 14%), hsl(220 30% 10%));
+    background: linear-gradient(180deg, hsl(220 35% 10%), hsl(220 40% 5%));
+    box-shadow: 4px 0 24px rgba(0,0,0,0.2);
   }
   .admin-sidebar-item-active {
-    background: linear-gradient(90deg, hsl(217 91% 60% / 0.15), transparent);
-    border-left: 3px solid hsl(217 91% 60%);
+    background: linear-gradient(90deg, hsla(var(--admin-accent), 0.1), transparent);
+    border-left: 3px solid hsl(var(--admin-accent));
+    box-shadow: inset 4px 0 12px -4px hsla(var(--admin-accent), 0.3);
+  }
+  .admin-card-hover {
+    @apply transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 border-primary/5 hover:border-primary/20;
+  }
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-md border border-white/40 shadow-sm;
+  }
+  .animate-in-fade {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
 
