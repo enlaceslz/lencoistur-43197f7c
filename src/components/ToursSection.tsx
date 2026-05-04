@@ -5,19 +5,19 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/utils";
 
-const tourLagoasAzuis = "/src/assets/tour-lagoas-azuis-hero.jpg";
-const tourRioPreguicas = "/src/assets/tour-rio-preguicas.jpg";
-const tourEcologico = "/src/assets/tour-roteiro-ecologico.jpg";
-const tourGastronomico = "/src/assets/tour-gastronomico.jpg";
-const tourCultural = "/src/assets/tour-cultural.jpg";
-const tourCaiaque = "/src/assets/tour-caiaque.jpg";
-const tourTrekking = "/src/assets/tour-trekking.jpg";
-const tourQuadriciclo = "/src/assets/tour-quadriciclo.jpg";
-const tourLagoaAzul2 = "/src/assets/tour-lagoa-azul-2.jpg";
-const tourLagoaAzul3 = "/src/assets/tour-lagoa-azul-3.jpg";
-const tourPanorama = "/src/assets/gallery-panorama-dunas.jpg";
-const tourBanho = "/src/assets/gallery-banho-lagoa.jpg";
-const tour4x4 = "/src/assets/gallery-4x4-dunas.jpg";
+const tourLagoasAzuis = "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957";
+const tourRioPreguicas = "https://images.unsplash.com/photo-1506744038136-46273834b3fb";
+const tourEcologico = "https://images.unsplash.com/photo-1469474968028-56623f02e42e";
+const tourGastronomico = "https://images.unsplash.com/photo-1472396961693-142e6e269027";
+const tourCultural = "https://images.unsplash.com/photo-1441974231531-c6227db76b6e";
+const tourCaiaque = "https://images.unsplash.com/photo-1501785888041-af3ef285b470";
+const tourTrekking = "https://images.unsplash.com/photo-1470770841072-f978cf4d019e";
+const tourQuadriciclo = "https://images.unsplash.com/photo-1433086966358-54859d0ed716";
+const tourLagoaAzul2 = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee";
+const tourLagoaAzul3 = "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d";
+const tourPanorama = "https://images.unsplash.com/photo-1475924156735-51235946114e";
+const tourBanho = "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b";
+const tour4x4 = "https://images.unsplash.com/photo-1501854140801-50d01698950b";
 
 const localImageMap: Record<string, string> = {
   "lagoas-azuis": tourLagoasAzuis,
