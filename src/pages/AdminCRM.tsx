@@ -1116,6 +1116,17 @@ const AdminCRMContent = () => {
                         </div>
                       </div>
 
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-muted/30 border border-border/50 rounded-2xl p-4 text-center">
+                          <p className="text-xl font-black text-foreground leading-none">{selectedCustomer.cpf ? maskCPF(selectedCustomer.cpf) : (selectedCustomer.passport || "—")}</p>
+                          <p className="text-[10px] uppercase font-bold text-muted-foreground mt-2 tracking-widest">Documento</p>
+                        </div>
+                        <div className="bg-muted/30 border border-border/50 rounded-2xl p-4 text-center">
+                          <p className="text-xl font-black text-foreground leading-none">{selectedCustomer.birth_date ? new Date(selectedCustomer.birth_date + "T00:00:00").toLocaleDateString("pt-BR") : "—"}</p>
+                          <p className="text-[10px] uppercase font-bold text-muted-foreground mt-2 tracking-widest">Nascimento</p>
+                        </div>
+                      </div>
+
                       <div className="space-y-4 bg-muted/10 p-5 rounded-2xl border border-border/50 shadow-inner">
                         <div className="flex items-center gap-4 text-sm font-semibold">
                           <div className="p-2 rounded-lg bg-background border border-border cursor-pointer hover:bg-muted" onClick={() => { navigator.clipboard.writeText(selectedCustomer.email || ""); toast.success("E-mail copiado!"); }}><Mail size={16} className="text-primary" /></div>
@@ -1149,6 +1160,10 @@ const AdminCRMContent = () => {
                             </div>
                           </div>
                         )}
+                        <div className="flex items-center gap-4 text-sm font-semibold">
+                          <div className="p-2 rounded-lg bg-background border border-border"><Globe size={16} className="text-primary" /></div>
+                          <span className="text-foreground">{selectedCustomer.country || "Brasil"}</span>
+                        </div>
                       </div>
 
                       {selectedCustomer.notes && (
