@@ -1107,11 +1107,11 @@ const AdminCRMContent = () => {
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-6">
+          <div className="lg:col-span-1 space-y-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
             {selectedCustomer ? (
-                <div className="space-y-6">
-                  <div className="text-center bg-muted/20 p-6 rounded-3xl border border-border/50">
-                    <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground text-2xl font-black mx-auto mb-4 shadow-xl">
+                <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover sticky top-24">
+                  <div className="text-center bg-primary/[0.02] p-8 rounded-[2rem] border border-primary/5 mb-8">
+                    <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-primary to-ocean flex items-center justify-center text-white text-3xl font-black mx-auto mb-6 shadow-2xl shadow-primary/20 transition-transform duration-500 hover:rotate-6">
                       {selectedCustomer.name.trim() ? selectedCustomer.name.trim().split(" ").filter(Boolean).map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
                     </div>
                     <h3 className="font-display text-xl font-black text-foreground">{selectedCustomer.name}</h3>
