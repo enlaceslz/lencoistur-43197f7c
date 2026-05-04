@@ -1472,6 +1472,44 @@ const AdminCRMContent = () => {
                 <option value="bloqueado">Bloqueado</option>
               </select>
             </div>
+            <div className="md:col-span-2">
+              <Label className="flex items-center gap-2">
+                <TagIcon size={14} /> Tags / Marcadores
+              </Label>
+              <div className="flex flex-wrap gap-2 mb-2 min-h-[32px] p-2 border border-dashed rounded-xl bg-muted/20">
+                {form.tags.length === 0 ? (
+                  <span className="text-[10px] text-muted-foreground italic">Nenhuma tag adicionada. Digite uma tag e pressione vírgula ou Enter.</span>
+                ) : (
+                  form.tags.map((tag, idx) => (
+                    <Badge key={idx} variant="secondary" className="gap-1 px-2 py-0.5 rounded-lg bg-primary/10 text-primary border-primary/20">
+                      {tag}
+                      <button 
+                        type="button"
+                        onClick={() => setForm({ ...form, tags: form.tags.filter((_, i) => i !== idx) })}
+                        className="hover:text-red-500 transition-colors"
+                      >
+                        <X size={10} />
+                      </button>
+                    </Badge>
+                  ))
+                )}
+              </div>
+              <Input
+                placeholder="Adicionar tag (ex: VIP, Frequent Traveler, Problema...)"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    const val = e.currentTarget.value.trim();
+                    if (val && !form.tags.includes(val)) {
+                      setForm({ ...form, tags: [...form.tags, val] });
+                      e.currentTarget.value = '';
+                    }
+                  }
+                }}
+                className="rounded-xl"
+              />
+              <p className="text-[9px] text-muted-foreground mt-1">Pressione Enter ou vírgula para adicionar.</p>
+            </div>
 
             <div className="md:col-span-2 border-t border-border pt-4 mt-2">
               <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
