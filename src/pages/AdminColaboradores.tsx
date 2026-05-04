@@ -470,33 +470,38 @@ const AdminColaboradores = () => {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-8 overflow-x-auto pb-2 no-scrollbar scroll-smooth">
+      <div className="flex flex-wrap gap-3 mb-10 overflow-x-auto pb-4 no-scrollbar scroll-smooth animate-in-fade" style={{ animationDelay: '0.15s' }}>
         <button
           onClick={() => setSearch("")} 
-          className={`text-[10px] font-black uppercase tracking-widest px-6 h-10 rounded-xl transition-all whitespace-nowrap ${
+          className={`text-[10px] font-black uppercase tracking-widest px-8 h-12 rounded-2xl transition-all whitespace-nowrap shadow-lg shadow-primary/5 ${
             !search
-              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
-              : "bg-muted text-muted-foreground hover:bg-muted/80"
+              ? "bg-primary text-primary-foreground shadow-primary/20 scale-105"
+              : "glass-card text-muted-foreground hover:bg-muted/80"
           }`}
         >
-          Todos
+          Todos Especialistas
         </button>
-        {collabTypes.map((t) => (
-          <Button 
-            key={t.id} 
-            variant={search === t.name ? "default" : "outline"} 
-            size="sm" 
-            onClick={() => setSearch(t.name)}
-            className={`rounded-full px-6 h-10 shadow-sm transition-all duration-300 ${search === t.name ? "scale-105" : "hover:bg-primary/5 hover:border-primary/30"}`}
-            style={search === t.name ? { backgroundColor: t.color, borderColor: t.color } : {}}
-          >
-            <Users size={14} className="mr-2 opacity-70" />
-            {t.name}
-            <span className="ml-2 bg-black/10 px-2 py-0.5 rounded-full text-[10px]">
-              {collaborators.filter(c => c.type === t.name).length}
-            </span>
-          </Button>
-        ))}
+        {collabTypes.map((t) => {
+          const isActive = search === t.name;
+          const count = collaborators.filter(c => c.type === t.name).length;
+          return (
+            <button 
+              key={t.id} 
+              onClick={() => setSearch(t.name)}
+              className={`flex items-center gap-3 px-8 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap shadow-lg shadow-primary/5 ${
+                isActive 
+                  ? "bg-primary text-primary-foreground shadow-primary/20 scale-105" 
+                  : "glass-card text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
+              <Users size={16} strokeWidth={2.5} className={isActive ? "text-white" : "text-primary/40"} />
+              {t.name}
+              <span className={`ml-2 px-2.5 py-0.5 rounded-lg text-[9px] ${isActive ? "bg-white/20 text-white" : "bg-primary/10 text-primary"}`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       <div className="mb-10 glass-card rounded-[2.5rem] p-8 shadow-sm animate-in-fade" style={{ animationDelay: '0.2s' }}>
