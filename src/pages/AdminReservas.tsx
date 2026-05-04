@@ -18,7 +18,7 @@ import {
   Plus, Copy, Pencil, Car, Compass, LayoutGrid, List
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { PrintReceiptButton, type ReceiptData } from "@/components/BookingReceipt";
 import { supabase } from "@/integrations/supabase/client";
