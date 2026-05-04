@@ -891,6 +891,7 @@ export type Database = {
           highlights: string[] | null
           id: string
           name: string
+          nights: number | null
           original_price: number | null
           slug: string
           tag: string | null
@@ -905,6 +906,7 @@ export type Database = {
           highlights?: string[] | null
           id?: string
           name: string
+          nights?: number | null
           original_price?: number | null
           slug: string
           tag?: string | null
@@ -919,6 +921,7 @@ export type Database = {
           highlights?: string[] | null
           id?: string
           name?: string
+          nights?: number | null
           original_price?: number | null
           slug?: string
           tag?: string | null
