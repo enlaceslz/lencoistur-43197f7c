@@ -321,31 +321,38 @@ const AdminReservas = () => {
   return (
     <AdminLayout title="Reservas">
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        {stats.map((s) => (
-          <Card key={s.label} className="border-none shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-5 flex items-center gap-4">
-              <div className={`p-3 rounded-2xl bg-muted/50 ${s.color} ring-1 ring-border/50`}><s.icon size={22} /></div>
-              <div>
-                <p className="text-2xl font-black text-foreground tracking-tight">{s.value}</p>
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{s.label}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+        {[
+          { label: "Total Reservas", value: bookings.length, icon: ShoppingCart, color: "from-blue-500 to-indigo-600", desc: "Histórico geral" },
+          { label: "Confirmadas", value: bookings.filter((b) => b.status === "confirmada").length, icon: CheckCircle, color: "from-emerald-500 to-teal-600", desc: "Vendas firmes" },
+          { label: "Pendentes", value: bookings.filter((b) => b.status === "pendente").length, icon: Clock, color: "from-amber-500 to-orange-600", desc: "Aguardando" },
+          { label: "Receita Paga", value: fmt(totalPago), icon: DollarSign, color: "from-purple-500 to-pink-600", desc: "LTV Financeiro" },
+        ].map((stat, i) => (
+          <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group">
+            <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
+            <div className="flex items-center justify-between mb-4">
+              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-primary/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+                <stat.icon size={22} strokeWidth={2.5} />
               </div>
-            </CardContent>
-          </Card>
+              <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{stat.desc}</div>
+            </div>
+            <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
+            <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
+          </div>
         ))}
       </div>
 
       {/* Filters */}
-      <Card className="mb-8 border border-border/50 shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
-        <CardContent className="p-6 space-y-4">
-          <div className="flex flex-col xl:flex-row gap-4 items-center">
+      <Card className="mb-8 border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.2s' }}>
+        <CardContent className="p-8 space-y-6">
+          <div className="flex flex-col xl:flex-row gap-6 items-center">
             <div className="relative flex-1 w-full group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
-              <Input 
-                placeholder="Buscar cliente, passeio, email ou código..." 
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
+              <input 
+                placeholder="Buscar por cliente, passeio ou código de reserva..." 
                 value={search} 
                 onChange={(e) => setSearch(e.target.value)} 
-                className="pl-12 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30 transition-all font-medium text-sm" 
+                className="w-full pl-14 h-14 rounded-2xl border border-border/40 focus:ring-4 focus:ring-primary/10 bg-muted/20 transition-all font-medium text-sm outline-none placeholder:text-muted-foreground/40" 
               />
             </div>
             
@@ -399,18 +406,18 @@ const AdminReservas = () => {
       </Card>
 
       {/* Table */}
-      <Card className="border-none shadow-sm overflow-hidden">
+      <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
         {filtered.length === 0 ? (
-          <div className="p-12 text-center text-muted-foreground">
-            <ShoppingCart className="mx-auto mb-3 opacity-40" size={40} />
-            <p className="font-medium">Nenhuma reserva encontrada</p>
-            <p className="text-sm mt-1">As reservas feitas pelo site aparecerão aqui automaticamente.</p>
+          <div className="py-20 text-center text-muted-foreground bg-muted/10">
+            <ShoppingCart className="mx-auto mb-4 opacity-20" size={64} />
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Vazio</p>
+            <p className="text-xs font-medium text-muted-foreground/60 mt-2">Nenhuma reserva encontrada com os filtros atuais.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/50 border-b border-border/50">
+                <TableRow className="hover:bg-transparent border-b border-border/20">
                   <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4">Código</TableHead>
                   <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4">Cliente</TableHead>
                   <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground py-4">Serviço</TableHead>

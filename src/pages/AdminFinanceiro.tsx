@@ -329,15 +329,15 @@ const AdminFinanceiro = () => {
       <TooltipProvider>
         <div className="space-y-8 pb-10">
         {/* Header Section */}
-        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-4 bg-card p-6 rounded-2xl border border-border/50 shadow-sm">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="space-y-1.5">
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Período</p>
-              <div className="flex items-center gap-2">
+        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 glass-card rounded-[2.5rem] p-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+          <div className="flex flex-col sm:flex-row gap-6">
+            <div className="space-y-2">
+              <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] ml-1">Período de Análise</p>
+              <div className="flex items-center gap-3">
                 <select 
                   value={selectedMonth} 
                   onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                  className="bg-muted/50 border border-border/50 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-tight focus:ring-2 focus:ring-primary transition-all cursor-pointer h-10"
+                  className="bg-muted/40 border border-border/40 rounded-2xl px-5 h-12 text-xs font-black uppercase tracking-tight focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer outline-none"
                 >
                   {["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"].map((m, i) => (
                     <option key={i} value={i}>{m}</option>

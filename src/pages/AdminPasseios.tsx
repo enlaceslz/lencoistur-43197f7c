@@ -282,33 +282,35 @@ const AdminPasseios = () => {
 
   return (
     <AdminLayout title="Passeios">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
         {[
-          { label: "Catálogo", value: tours.length, icon: Compass, color: "text-primary", bg: "bg-primary/10" },
-          { label: "Visíveis", value: activeCount, icon: Eye, color: "text-emerald-600", bg: "bg-emerald-100" },
-          { label: "Rating Médio", value: avgRating, icon: Star, color: "text-amber-600", bg: "bg-amber-100" },
-          { label: "Feedback", value: tours.reduce((a, t) => a + (t.reviews_count || 0), 0), icon: Users, color: "text-blue-600", bg: "bg-blue-100" },
+          { label: "Catálogo", value: tours.length, icon: Compass, color: "from-blue-500 to-indigo-600", desc: "Total cadastrado" },
+          { label: "Visíveis", value: activeCount, icon: Eye, color: "from-emerald-500 to-teal-600", desc: "No site" },
+          { label: "Rating Médio", value: avgRating, icon: Star, color: "from-amber-500 to-orange-600", desc: "Avaliação clientes" },
+          { label: "Feedback", value: tours.reduce((a, t) => a + (t.reviews_count || 0), 0), icon: Users, color: "from-purple-500 to-pink-600", desc: "Reviews totais" },
         ].map((stat, i) => (
-          <Card key={i} className="border-none shadow-sm bg-card hover:shadow-md transition-all">
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} shadow-inner`}><stat.icon size={24} strokeWidth={2.5} /></div>
-              <div>
-                <p className="text-2xl font-black text-foreground leading-none">{stat.value}</p>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-2">{stat.label}</p>
+          <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group">
+            <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
+            <div className="flex items-center justify-between mb-4">
+              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-primary/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+                <stat.icon size={22} strokeWidth={2.5} />
               </div>
-            </CardContent>
-          </Card>
+              <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{stat.desc}</div>
+            </div>
+            <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
+            <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
+          </div>
         ))}
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-4 sm:p-6 bg-card border border-border rounded-3xl shadow-sm">
+      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-4 sm:p-6 glass-card rounded-[2.5rem] shadow-sm animate-in-fade" style={{ animationDelay: '0.2s' }}>
         <div className="relative flex-1 w-full group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
           <Input 
-            placeholder="Buscar passeio..." 
+            placeholder="Buscar passeio pelo nome ou categoria..." 
             value={search} 
             onChange={(e) => setSearch(e.target.value)} 
-            className="pl-12 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30 transition-all text-sm font-medium" 
+            className="pl-12 h-12 rounded-2xl border-border/40 focus:ring-primary/20 bg-muted/20 transition-all text-sm font-medium" 
           />
         </div>
         
@@ -606,11 +608,11 @@ const AdminPasseios = () => {
       </Dialog>
 
 
-      <Card className="border-none shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
+      <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
         <div className="overflow-x-auto">
           <Table>
           <TableHeader>
-            <TableRow className="bg-muted/30">
+            <TableRow className="hover:bg-transparent">
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest pl-6">Passeio / Localização</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Categoria</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Preços & Modalidades</TableHead>
