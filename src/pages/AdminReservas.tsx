@@ -430,9 +430,19 @@ const AdminReservas = () => {
         </CardContent>
       </Card>
 
-      {/* Table */}
-      <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
-        {filtered.length === 0 ? (
+      {/* Main Content */}
+      {viewMode === "calendar" ? (
+        <BookingCalendar 
+          bookings={bookings} 
+          onSelectBooking={(b) => {
+            setSelected(b);
+            setEditNotes(b.notes || "");
+            setShowNotes(false);
+          }}
+        />
+      ) : (
+        <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
+          {filtered.length === 0 ? (
           <div className="py-20 text-center text-muted-foreground bg-muted/10">
             <ShoppingCart className="mx-auto mb-4 opacity-20" size={64} />
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Vazio</p>
