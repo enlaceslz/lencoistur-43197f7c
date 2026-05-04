@@ -982,7 +982,6 @@ const AdminConfig = () => {
                         placeholder="#000000"
                       />
                     </div>
-                    </div>
                   </div>
 
                   <div className="space-y-3">
@@ -1004,6 +1003,7 @@ const AdminConfig = () => {
                           className="rounded-xl border-muted-foreground/20 resize-none h-24 p-4 text-sm"
                         />
                       </div>
+                    </div>
                     </div>
                   <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 border-t border-border pt-6">
                     <div className="space-y-2">
