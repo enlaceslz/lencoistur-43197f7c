@@ -4,13 +4,14 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 
 const DEFAULT_GALLERY = [
-  { src: "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=95&w=2560", alt: "Dunas brancas e lagoas azuis dos Lençóis Maranhenses - Santo Amaro" },
-  { src: "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=95&w=2560", alt: "Turistas nadando nas lagoas cristalinas dos Lençóis Maranhenses" },
-  { src: "https://images.unsplash.com/photo-1616421004128-40656a877073?auto=format&fit=crop&q=95&w=2560", alt: "Panorama das dunas e lagoas ao pôr do sol" },
-  { src: "https://images.unsplash.com/photo-1636113945956-6f81e59273f3?auto=format&fit=crop&q=95&w=2560", alt: "Farol de Mandacaru - Lençóis Maranhenses" },
-  { src: "https://images.unsplash.com/photo-1589112735741-26c6d04325a8?auto=format&fit=crop&q=95&w=2560", alt: "Passeio de 4x4 nas dunas dos Lençóis Maranhenses" },
-  { src: "https://images.unsplash.com/photo-1511216335778-7cb8f49fa7a3?auto=format&fit=crop&q=95&w=2560", alt: "Pôr do sol deslumbrante nos Lençóis Maranhenses" },
-  { src: "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&q=95&w=2560", alt: "Vista aérea das lagoas cristalinas dos Lençóis" },
+  { src: "/src/assets/gallery-panorama-dunas.jpg", alt: "Panorama das dunas e lagoas ao pôr do sol" },
+  { src: "/src/assets/gallery-banho-lagoa.jpg", alt: "Turistas nadando nas lagoas cristalinas dos Lençóis Maranhenses" },
+  { src: "/src/assets/gallery-4x4-dunas.jpg", alt: "Passeio de 4x4 nas dunas dos Lençóis Maranhenses" },
+  { src: "/src/assets/gallery-farol-mandacaru.jpg", alt: "Farol de Mandacaru - Lençóis Maranhenses" },
+  { src: "/src/assets/gallery-por-do-sol.jpg", alt: "Pôr do sol deslumbrante nos Lençóis Maranhenses" },
+  { src: "/src/assets/tour-lagoa-azul-2.jpg", alt: "Dunas brancas e lagoas azuis dos Lençóis Maranhenses - Santo Amaro" },
+  { src: "/src/assets/tour-lagoa-azul-3.jpg", alt: "Vista aérea das lagoas cristalinas dos Lençóis" },
+  { src: "/src/assets/tour-lagoas-azuis-hero.jpg", alt: "Experiência única nos Lençóis" },
 ];
 
 const GallerySection = () => {
