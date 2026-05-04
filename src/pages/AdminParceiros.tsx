@@ -399,22 +399,51 @@ const AdminParceiros = () => {
 
   return (
     <AdminLayout title="Parceiros">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-          <p className="text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">{partners.length}</span> parceiros cadastrados · <span className="font-semibold text-green-600">{activeCount}</span> ativos
-          </p>
+      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-10 bg-card p-6 rounded-3xl border border-border/50 shadow-sm">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Parceiros</h1>
+          <div className="flex items-center gap-3">
+            <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20 transition-colors border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">
+              {partners.length} Cadastrados
+            </Badge>
+            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">
+              {activeCount} Ativos
+            </Badge>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={exportPDF}>
-            <Settings2 size={16} className="mr-1.5" /> Exportar PDF
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setTypesDialogOpen(true)}>
-            <Settings2 size={16} className="mr-1.5" /> Gerenciar Tipos
-          </Button>
-          <Button onClick={openNew} size="sm">
-            <Plus size={16} className="mr-1.5" /> Novo Parceiro
-          </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative flex-1 min-w-[280px] group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
+            <Input 
+              placeholder="Buscar por nome, contato ou CPF/CNPJ..." 
+              value={search} 
+              onChange={(e) => setSearch(e.target.value)} 
+              className="pl-11 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30 transition-all font-medium text-sm" 
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="rounded-xl h-12 w-12 border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-sm" 
+                  onClick={exportPDF}
+                >
+                  <FileDown size={20} className="text-rose-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Relatório PDF</TooltipContent>
+            </Tooltip>
+            
+            <Button variant="outline" size="sm" className="rounded-2xl h-12 px-5 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm hidden sm:flex" onClick={() => setTypesDialogOpen(true)}>
+              <Settings2 size={18} className="mr-2" /> Tipos
+            </Button>
+            
+            <Button onClick={openNew} size="lg" className="rounded-2xl h-12 px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white active:scale-95">
+              <Plus size={20} className="mr-2" strokeWidth={3} /> Novo
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -435,24 +464,31 @@ const AdminParceiros = () => {
         })}
       </div>
 
-      <Card className="mb-6">
-        <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <Input placeholder="Buscar por nome, contato, email ou CPF/CNPJ..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
-          </div>
-          <div className="flex gap-2 flex-wrap overflow-x-auto no-scrollbar pb-1">
-            <Button variant={typeFilter === "todos" ? "default" : "outline"} size="sm" onClick={() => setTypeFilter("todos")}>
-              Todos
-            </Button>
-            {partnerTypes.map((t) => (
-              <Button key={t.id} variant={typeFilter === t.name ? "default" : "outline"} size="sm" onClick={() => setTypeFilter(t.name)}>
-                {t.label}
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex flex-wrap gap-2 mb-8 overflow-x-auto pb-2 no-scrollbar scroll-smooth">
+        <button
+          onClick={() => setTypeFilter("todos")} 
+          className={`text-[10px] font-black uppercase tracking-widest px-6 h-10 rounded-xl transition-all whitespace-nowrap ${
+            typeFilter === "todos"
+              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
+              : "bg-muted text-muted-foreground hover:bg-muted/80"
+          }`}
+        >
+          Todos
+        </button>
+        {partnerTypes.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setTypeFilter(t.name)}
+            className={`text-[10px] font-black uppercase tracking-widest px-6 h-10 rounded-xl transition-all whitespace-nowrap ${
+              typeFilter === t.name
+                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
 
       <Card className="border-none shadow-sm overflow-hidden">
         {filtered.length === 0 ? (

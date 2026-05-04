@@ -418,55 +418,65 @@ const AdminColaboradores = () => {
 
   return (
     <AdminLayout title="Colaboradores">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Colaboradores</h1>
-          <p className="text-slate-500 font-medium flex items-center gap-2">
-            <Users size={18} className="text-primary" />
-            <span className="font-bold text-slate-900">{collaborators.length}</span> especialistas cadastrados 
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-300 mx-1" />
-            <span className="font-bold text-green-600">{collaborators.filter(c => c.status === 'active').length}</span> prontos para o serviço
-          </p>
+      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-10 bg-card p-6 rounded-3xl border border-border/50 shadow-sm">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Colaboradores</h1>
+          <div className="flex items-center gap-3">
+            <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20 transition-colors border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">
+              {collaborators.length} Especialistas
+            </Badge>
+            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">
+              {collaborators.filter(c => c.status === 'active').length} Ativos
+            </Badge>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="rounded-2xl h-12 px-6 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm" 
-            onClick={generatePDF}
-          >
-            <FileDown size={18} className="mr-2 text-red-500" /> PDF
-          </Button>
-          <Button variant="outline" size="sm" className="rounded-2xl h-12 px-6 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm" onClick={() => {
-            const header = "Nome,Email,Telefone,Documento,Tipo,Status,Remuneração\n";
-            const rows = filtered.map(c => `"${c.name}","${c.email || ''}","${c.phone || ''}","${c.document}","${c.type}","${c.status}","${getPaymentTypeLabel(c.payment_type)}: ${formatCurrency(c.payment_value)}"`).join("\n");
-            const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `colaboradores_${new Date().toISOString().slice(0, 10)}.csv`;
-            a.click();
-          }}>
-            <Download size={18} className="mr-2" /> CSV
-          </Button>
-          <Button variant="outline" size="sm" className="rounded-2xl h-12 px-6 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm" onClick={() => setTypesDialogOpen(true)}>
-            <Settings2 size={18} className="mr-2" /> Categorias
-          </Button>
-          <Button onClick={openNew} size="sm" className="rounded-2xl h-12 px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white hover:scale-105 active:scale-95">
-            <Plus size={20} className="mr-2" /> Novo Especialista
-          </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative flex-1 min-w-[280px] group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
+            <Input 
+              placeholder="Buscar por nome, documento ou categoria..." 
+              value={search} 
+              onChange={(e) => setSearch(e.target.value)} 
+              className="pl-11 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30 transition-all font-medium text-sm" 
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="rounded-xl h-12 w-12 border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-sm" 
+                  onClick={generatePDF}
+                >
+                  <FileDown size={20} className="text-rose-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Relatório PDF</TooltipContent>
+            </Tooltip>
+            
+            <Button variant="outline" size="sm" className="rounded-2xl h-12 px-5 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm hidden sm:flex" onClick={() => setTypesDialogOpen(true)}>
+              <Settings2 size={18} className="mr-2" /> Categorias
+            </Button>
+            
+            <Button onClick={openNew} size="lg" className="rounded-2xl h-12 px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white active:scale-95">
+              <Plus size={20} className="mr-2" strokeWidth={3} /> Novo
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-8 overflow-x-auto pb-2 no-scrollbar">
-        <Button 
-          variant={!search ? "default" : "outline"} 
-          size="sm" 
+      <div className="flex flex-wrap gap-2 mb-8 overflow-x-auto pb-2 no-scrollbar scroll-smooth">
+        <button
           onClick={() => setSearch("")} 
-          className={`rounded-full px-6 h-10 shadow-sm transition-all duration-300 ${!search ? "bg-primary text-primary-foreground scale-105" : "hover:bg-primary/5 hover:border-primary/30"}`}
+          className={`text-[10px] font-black uppercase tracking-widest px-6 h-10 rounded-xl transition-all whitespace-nowrap ${
+            !search
+              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
+              : "bg-muted text-muted-foreground hover:bg-muted/80"
+          }`}
         >
           Todos
-        </Button>
+        </button>
         {collabTypes.map((t) => (
           <Button 
             key={t.id} 
