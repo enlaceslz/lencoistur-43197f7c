@@ -6,6 +6,8 @@ export interface SiteSettings {
   metaDescricao: string;
   whatsappUrl: string;
   instagram: string;
+  facebook?: string;
+  tiktok?: string;
   corPrimaria: string;
   logoUrl: string | null;
   footerDesc?: string;
