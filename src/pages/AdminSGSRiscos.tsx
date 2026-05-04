@@ -231,16 +231,23 @@ const AdminSGSRiscos = () => {
             </div>
           </div>
 
-          <div className="flex-1 space-y-4">
+          <div className="flex-1 space-y-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
             <div className="flex flex-col sm:flex-row justify-between gap-4">
-              <div className="flex gap-2 flex-1">
-                <div className="relative flex-1 max-w-md">
-                  <Search size={16} className="absolute left-3 top-3 text-muted-foreground" />
-                  <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar riscos..."
-                    className="w-full pl-9 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30" />
+              <div className="flex gap-3 flex-1">
+                <div className="relative flex-1 max-w-md group">
+                  <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" />
+                  <input 
+                    value={search} 
+                    onChange={(e) => setSearch(e.target.value)} 
+                    placeholder="Buscar por atividade ou perigo..."
+                    className="w-full pl-12 pr-4 h-12 glass-card border-border/40 rounded-2xl text-sm text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all font-medium placeholder:text-muted-foreground/40" 
+                  />
                 </div>
-                <select value={filterStage} onChange={(e) => setFilterStage(e.target.value)}
-                  className="bg-card border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                <select 
+                  value={filterStage} 
+                  onChange={(e) => setFilterStage(e.target.value)}
+                  className="glass-card border-border/40 rounded-2xl px-5 h-12 text-xs font-black uppercase tracking-tight outline-none focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer"
+                >
                   <option value="todas">Todas etapas</option>
                   {Object.entries(STAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
