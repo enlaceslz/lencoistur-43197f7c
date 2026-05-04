@@ -104,16 +104,16 @@ export default function FluxoCaixaTab({
           animate={{ opacity: 1, scale: 1 }}
           className="lg:col-span-2"
         >
-          <Card className="border-none shadow-sm bg-card overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <div className="lg:col-span-2 glass-card rounded-[2.5rem] p-8 admin-card-hover overflow-hidden">
+            <div className="flex flex-row items-center justify-between mb-8">
               <div className="space-y-1">
-                <CardTitle className="text-lg font-bold flex items-center gap-2">
-                  <TrendingUp className="text-primary" size={20} />
+                <h3 className="text-2xl font-black text-foreground tracking-tight flex items-center gap-3">
+                  <TrendingUp className="text-primary" size={24} strokeWidth={2.5} />
                   Desempenho Mensal
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">Comparativo de receitas e despesas em {currentYear}</p>
+                </h3>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest ml-1">Receitas vs Despesas em {currentYear}</p>
               </div>
-            </CardHeader>
+            </div>
             <CardContent className="p-6">
               <ResponsiveContainer width="100%" height={350}>
                 <BarChart data={monthlyFiltered} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
