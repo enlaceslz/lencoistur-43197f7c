@@ -13,14 +13,19 @@ const tourCultural = "/src/assets/tour-cultural.jpg";
 const tourCaiaque = "/src/assets/tour-caiaque.jpg";
 const tourTrekking = "/src/assets/tour-trekking.jpg";
 const tourQuadriciclo = "/src/assets/tour-quadriciclo.jpg";
+const tourLagoaAzul2 = "/src/assets/tour-lagoa-azul-2.jpg";
+const tourLagoaAzul3 = "/src/assets/tour-lagoa-azul-3.jpg";
+const tourPanorama = "/src/assets/gallery-panorama-dunas.jpg";
+const tourBanho = "/src/assets/gallery-banho-lagoa.jpg";
+const tour4x4 = "/src/assets/gallery-4x4-dunas.jpg";
 
 const localImageMap: Record<string, string> = {
   "lagoas-azuis": tourLagoasAzuis,
-  "betania": tourLagoasAzuis,
-  "america": tourLagoasAzuis,
-  "ponta-verde": tourLagoasAzuis,
-  "emendadas": tourLagoasAzuis,
-  "circuito-municipal-gaivota": tourLagoasAzuis,
+  "betania": tourLagoaAzul2,
+  "america": tourLagoaAzul3,
+  "ponta-verde": tourPanorama,
+  "emendadas": tourBanho,
+  "circuito-municipal-gaivota": tour4x4,
   "travosa": tourLagoasAzuis,
   "passeio-de-barco": tourRioPreguicas,
   "roteiro-ecologico": tourEcologico,

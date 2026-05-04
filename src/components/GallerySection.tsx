@@ -12,6 +12,13 @@ const DEFAULT_GALLERY = [
   { src: "/src/assets/tour-lagoa-azul-2.jpg", alt: "Dunas brancas e lagoas azuis dos Lençóis Maranhenses - Santo Amaro" },
   { src: "/src/assets/tour-lagoa-azul-3.jpg", alt: "Vista aérea das lagoas cristalinas dos Lençóis" },
   { src: "/src/assets/tour-lagoas-azuis-hero.jpg", alt: "Experiência única nos Lençóis" },
+  { src: "/src/assets/tour-rio-preguicas.jpg", alt: "Passeio de barco pelo Rio Preguiças" },
+  { src: "/src/assets/tour-roteiro-ecologico.jpg", alt: "Belezas naturais preservadas" },
+  { src: "/src/assets/tour-gastronomico.jpg", alt: "Sabores típicos da região" },
+  { src: "/src/assets/tour-cultural.jpg", alt: "Cultura e tradições locais" },
+  { src: "/src/assets/tour-caiaque.jpg", alt: "Aventura de caiaque" },
+  { src: "/src/assets/tour-trekking.jpg", alt: "Trekking pelas dunas" },
+  { src: "/src/assets/tour-quadriciclo.jpg", alt: "Adrenalina no quadriciclo" },
 ];
 
 const GallerySection = () => {
