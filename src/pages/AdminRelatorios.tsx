@@ -198,7 +198,6 @@ const AdminRelatorios = () => {
 
   useEffect(() => { loadReport(); }, [loadReport]);
 
-  const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const printReport = () => window.print();
 
   const CustomTooltip = ({ active, payload, label }: any) => {
