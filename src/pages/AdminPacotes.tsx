@@ -336,9 +336,16 @@ const AdminPacotes = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1.5 text-sm">
-                      <Clock size={14} className="text-muted-foreground" />
-                      {pkg.days} {pkg.days === 1 ? 'dia' : 'dias'}
+                    <div className="flex flex-col gap-1 text-sm">
+                      <div className="flex items-center gap-1.5">
+                        <Clock size={14} className="text-muted-foreground" />
+                        {pkg.days} {pkg.days === 1 ? 'dia' : 'dias'}
+                      </div>
+                      {pkg.nights > 0 && (
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground ml-5">
+                          {pkg.nights} {pkg.nights === 1 ? 'noite' : 'noites'}
+                        </div>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
