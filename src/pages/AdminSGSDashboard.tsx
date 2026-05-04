@@ -286,16 +286,16 @@ const AdminSGSDashboard = () => {
       ) : (
         <div className="space-y-6">
         {/* Quick Actions Bar */}
-        <div className="bg-card border border-border rounded-2xl p-4">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Ações Rápidas</p>
+        <div className="bg-card border border-border rounded-3xl p-6 shadow-sm">
+          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-4 ml-1">Central de Ações Rápidas (SGS)</p>
           <div className="flex flex-wrap gap-2">
             {quickActions.map(a => (
               <button
                 key={a.label}
-                onClick={() => navigate(a.path)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${a.color}`}
+                onClick={a.onClick ? a.onClick : () => navigate(a.path!)}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-tight transition-all active:scale-95 shadow-sm ${a.color}`}
               >
-                <a.icon size={14} />
+                <a.icon size={16} strokeWidth={2.5} />
                 {a.label}
               </button>
             ))}
@@ -303,21 +303,25 @@ const AdminSGSDashboard = () => {
         </div>
 
         {/* Stats - Clickable */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {statCards.map((s) => (
             <button
               key={s.label}
               onClick={() => navigate(s.path)}
-              className={`bg-card border rounded-2xl p-4 text-left transition-all hover:shadow-md hover:border-primary/30 group ${s.urgent ? "border-destructive/30 shadow-[0_0_15px_-5px_rgba(239,68,68,0.1)]" : "border-border"}`}
+              className={`bg-card border rounded-3xl p-5 text-left transition-all hover:shadow-lg hover:border-primary/40 group relative overflow-hidden ${s.urgent ? "border-destructive/30 shadow-[0_0_15px_-5px_rgba(239,68,68,0.1)]" : "border-border"}`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <s.icon size={16} className={s.color} />
-                  <span className="text-[10px] sm:text-[11px] text-muted-foreground uppercase font-black tracking-tighter truncate">{s.label}</span>
+              <div className="flex items-center justify-between mb-3">
+                <div className={`p-2 rounded-xl bg-muted/50 ${s.color} group-hover:scale-110 transition-transform`}>
+                  <s.icon size={18} strokeWidth={2.5} />
                 </div>
-                <ArrowRight size={12} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
+                <ArrowRight size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all hidden sm:block" />
               </div>
-              <p className="text-xl sm:text-2xl font-black text-foreground font-display tracking-tight">{s.value}</p>
+              <p className="text-2xl font-black text-foreground font-display tracking-tight leading-none mb-1">{s.value}</p>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-tight opacity-70">{s.label}</p>
+              
+              {s.urgent && (
+                <div className="absolute top-0 right-0 w-1 h-full bg-destructive/40" />
+              )}
             </button>
           ))}
         </div>
