@@ -511,11 +511,13 @@ const AdminSGSDashboard = () => {
           </div>
         </details>
 
-        <details className="bg-card border border-border rounded-2xl overflow-hidden group">
-          <summary className="px-5 py-4 cursor-pointer flex items-center gap-3 hover:bg-muted/30 transition-colors">
-            <Shield size={18} className="text-primary" />
-            <span className="font-display font-bold text-foreground text-sm flex-1">Conformidade — ISO 21101 / 21102 / 21103 + VATTI</span>
-            <ArrowRight size={14} className="text-muted-foreground transition-transform group-open:rotate-90" />
+        <details className="glass-card border-none rounded-[2rem] overflow-hidden group animate-in-fade shadow-sm" style={{ animationDelay: '0.5s' }}>
+          <summary className="px-8 py-6 cursor-pointer flex items-center gap-4 hover:bg-muted/30 transition-colors">
+            <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
+              <Shield size={20} strokeWidth={2.5} />
+            </div>
+            <span className="font-display font-black text-foreground text-lg flex-1">Conformidade — ISO + VATTI</span>
+            <ArrowRight size={18} className="text-muted-foreground transition-transform group-open:rotate-90" />
           </summary>
           <div className="px-5 pb-5 pt-2">
             <div className="grid md:grid-cols-3 gap-3">
