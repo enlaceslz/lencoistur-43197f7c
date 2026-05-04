@@ -404,9 +404,15 @@ const AdminPacotes = () => {
               <label className="text-sm font-bold">Descrição</label>
               <Textarea disabled={isViewMode} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-bold">Duração (dias)</label>
-              <Input disabled={isViewMode} type="number" min={1} value={form.days} onChange={e => setForm({ ...form, days: parseInt(e.target.value) })} />
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-bold">Duração (dias)</label>
+                <Input disabled={isViewMode} type="number" min={1} value={form.days} onChange={e => setForm({ ...form, days: parseInt(e.target.value) || 0 })} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold">Duração (noites)</label>
+                <Input disabled={isViewMode} type="number" min={0} value={form.nights} onChange={e => setForm({ ...form, nights: parseInt(e.target.value) || 0 })} />
+              </div>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
