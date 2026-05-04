@@ -630,11 +630,11 @@ const AdminColaboradores = () => {
           )}
         </div>
       ) : (
-        <Card className="border-none shadow-xl bg-white/80 backdrop-blur-md rounded-3xl overflow-hidden">
+        <div className="glass-card rounded-[2.5rem] overflow-hidden border-none shadow-sm animate-in-fade" style={{ animationDelay: '0.3s' }}>
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader className="bg-slate-50/50">
-                <TableRow className="hover:bg-transparent border-slate-100">
+              <TableHeader>
+                <TableRow className="hover:bg-transparent border-border/20">
                   <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6 pl-8">Especialista</TableHead>
                   <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6">Contato</TableHead>
                   <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6">Remuneração</TableHead>
