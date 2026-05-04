@@ -166,19 +166,19 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.005 }}
                 className={cn(
-                  "min-h-[200px] border-r border-b border-border/20 p-4 transition-all relative group/cell flex flex-col",
-                  !isCurrentMonth && "bg-muted/10 opacity-60",
-                  isTodayDay && "bg-primary/[0.05] ring-2 ring-inset ring-primary/30 shadow-[inset_0_0_30px_rgba(var(--primary),0.04)]",
-                  dayBookings.length > 0 && "bg-gradient-to-br from-transparent to-primary/[0.02]"
+                  "min-h-[220px] border-r border-b border-border/20 p-4 transition-all relative group/cell flex flex-col",
+                  !isCurrentMonth && "bg-muted/5 opacity-40 grayscale-[0.5]",
+                  isTodayDay && "bg-primary/[0.08] ring-2 ring-inset ring-primary/40 shadow-[inset_0_0_40px_rgba(var(--primary),0.06)]",
+                  dayBookings.length > 0 && isCurrentMonth && "bg-gradient-to-br from-transparent to-primary/[0.04]"
                 )}
               >
                 <div className="flex items-start justify-between mb-4">
                   <span className={cn(
-                    "text-sm font-black w-10 h-10 flex items-center justify-center rounded-2xl transition-all duration-500",
+                    "text-base font-black w-11 h-11 flex items-center justify-center rounded-2xl transition-all duration-500",
                     isTodayDay 
-                      ? "bg-primary text-primary-foreground shadow-xl shadow-primary/30 scale-110 rotate-3 z-10" 
-                      : "text-muted-foreground group-hover/cell:text-primary group-hover/cell:bg-primary/10 group-hover/cell:rotate-6",
-                    !isCurrentMonth && "font-medium"
+                      ? "bg-primary text-primary-foreground shadow-2xl shadow-primary/40 scale-110 rotate-3 z-10" 
+                      : "text-foreground/80 group-hover/cell:text-primary group-hover/cell:bg-primary/10 group-hover/cell:rotate-6",
+                    !isCurrentMonth && "font-medium opacity-50"
                   )}>
                     {format(day, 'd')}
                   </span>
@@ -221,15 +221,15 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                               )}
                             >
                               <div className={cn(
-                                "absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b transition-all group-hover/item:w-2",
+                                "absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b transition-all group-hover/item:w-3",
                                 statusConfig[booking.status]?.gradient
                               )} />
-                              <div className="pl-4">
+                              <div className="pl-5">
                                 <div className="flex items-center justify-between mb-1.5">
-                                  <p className="text-[12px] font-black text-foreground truncate leading-none tracking-tight group-hover/item:text-primary transition-colors">
+                                  <p className="text-[13px] font-black text-foreground truncate leading-none tracking-tight group-hover/item:text-primary transition-colors">
                                     {booking.customerName}
                                   </p>
-                                  <span className="text-[9px] font-black opacity-40 bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded-full uppercase">#{booking.bookingCode.slice(-4)}</span>
+                                  <span className="text-[10px] font-black opacity-60 bg-black/5 dark:bg-white/20 px-2 py-0.5 rounded-full uppercase">#{booking.bookingCode.slice(-4)}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <div className={cn("w-2 h-2 rounded-full ring-4 ring-white/10", statusConfig[booking.status]?.color)} />
