@@ -344,10 +344,33 @@ const AdminReservas = () => {
         ))}
       </div>
 
-      {/* Filters */}
+      {/* View Switcher & Filters */}
       <Card className="mb-8 border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.2s' }}>
         <CardContent className="p-8 space-y-6">
           <div className="flex flex-col xl:flex-row gap-6 items-center">
+            <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/40 w-full xl:w-auto">
+              <Button 
+                variant={viewMode === "list" ? "default" : "ghost"} 
+                onClick={() => setViewMode("list")}
+                className={cn(
+                  "flex-1 xl:flex-none h-10 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all",
+                  viewMode === "list" ? "shadow-lg shadow-primary/20" : ""
+                )}
+              >
+                <List size={16} className="mr-2" /> Lista
+              </Button>
+              <Button 
+                variant={viewMode === "calendar" ? "default" : "ghost"} 
+                onClick={() => setViewMode("calendar")}
+                className={cn(
+                  "flex-1 xl:flex-none h-10 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all",
+                  viewMode === "calendar" ? "shadow-lg shadow-primary/20" : ""
+                )}
+              >
+                <LayoutGrid size={16} className="mr-2" /> Calendário
+              </Button>
+            </div>
+
             <div className="relative flex-1 w-full group">
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
               <input 
