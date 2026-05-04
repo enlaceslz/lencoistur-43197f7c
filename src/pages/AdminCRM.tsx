@@ -87,10 +87,16 @@ const maskCEP = (v: string) => {
   return n;
 };
 
-const maskPhone = (v: string) => {
+const maskPhone = (v: string, country: string = "Brasil") => {
   const n = v.replace(/\D/g, "");
-  if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
-  if (n.length === 11) return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  if (country === "Brasil") {
+    if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+    if (n.length === 11) return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  }
+  // For international numbers, allow a more flexible format or just return as is with a +
+  if (v.startsWith("+")) {
+    return "+" + v.replace(/\D/g, "");
+  }
   return v;
 };
 
@@ -204,14 +210,18 @@ const validateForm = (form: CustomerForm): string | null => {
 
   if (form.phone) {
     const digits = form.phone.replace(/\D/g, "");
-    if (digits.length < 10 && form.country === "Brasil") return "Telefone deve ter 10 ou 11 dígitos.";
+    if (form.country === "Brasil") {
+      if (digits.length < 10) return "Telefone brasileiro deve ter 10 ou 11 dígitos.";
+    } else {
+      if (digits.length < 7) return "Telefone estrangeiro deve ter pelo menos 7 dígitos.";
+    }
   }
 
   if (form.country === "Brasil") {
     if (!form.cpf) return "CPF é obrigatório para brasileiros.";
     if (!isValidCPF(form.cpf)) return "CPF inválido.";
   } else if (!form.passport) {
-    return "Passaporte é obrigatório para estrangeiros.";
+    return "Passaporte ou Documento é obrigatório para estrangeiros.";
   }
 
   return null;
@@ -450,7 +460,7 @@ const AdminCRMContent = () => {
     const payload = {
       name: form.name.trim(),
       email: form.email.trim() ? form.email.trim().toLowerCase() : null,
-      phone: form.phone.replace(/\D/g, "") || null,
+      phone: form.country === "Brasil" ? (form.phone.replace(/\D/g, "") || null) : (form.phone || null),
       cpf: form.country === "Brasil" ? (form.cpf.replace(/\D/g, "") || null) : null,
       passport: form.country !== "Brasil" ? (form.passport || null) : null,
       birth_date: form.birth_date || null,
@@ -726,7 +736,7 @@ const AdminCRMContent = () => {
     doc.setFontSize(10);
     doc.text(`Nome: ${c.name}`, 14, 65);
     doc.text(`E-mail: ${c.email}`, 14, 72);
-    doc.text(`Telefone: ${c.phone ? maskPhone(c.phone) : "—"}`, 14, 79);
+    doc.text(`Telefone: ${c.phone ? maskPhone(c.phone, c.country || "Brasil") : "—"}`, 14, 79);
     doc.text(`Documento: ${c.country === "Brasil" ? (c.cpf ? maskCPF(c.cpf) : "—") : (c.passport || "—")}`, 14, 86);
     doc.text(`Data de Nascimento: ${c.birth_date ? new Date(c.birth_date + "T00:00:00").toLocaleDateString("pt-BR") : "—"}`, 14, 93);
     doc.text(`Nacionalidade: ${c.country}`, 14, 100);
@@ -987,7 +997,7 @@ const AdminCRMContent = () => {
                               <div className="flex flex-col">
                                 <span className="text-xs font-semibold text-foreground flex items-center gap-1">
                                   <Smartphone size={10} className="text-primary" />
-                                  {c.phone ? maskPhone(c.phone) : "—"}
+                                  {c.phone ? maskPhone(c.phone, c.country || "Brasil") : "—"}
                                 </span>
                                 <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                                   <MapPin size={10} />
@@ -1135,7 +1145,7 @@ const AdminCRMContent = () => {
                         {selectedCustomer.phone && (
                           <div className="flex items-center gap-4 text-sm font-semibold">
                             <div className="p-2 rounded-lg bg-background border border-border cursor-pointer hover:bg-muted" onClick={() => { navigator.clipboard.writeText(selectedCustomer.phone || ""); toast.success("Telefone copiado!"); }}><Smartphone size={16} className="text-primary" /></div>
-                            <span className="text-foreground">{maskPhone(selectedCustomer.phone)}</span>
+                            <span className="text-foreground">{maskPhone(selectedCustomer.phone, selectedCustomer.country || "Brasil")}</span>
                           </div>
                         )}
                         {selectedCustomer.address && (
@@ -1420,7 +1430,17 @@ const AdminCRMContent = () => {
                 className="w-full flex h-10 rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="Brasil">Brasil</option>
-                <option value="Estrangeiro">Estrangeiro</option>
+                <option value="Argentina">Argentina</option>
+                <option value="Chile">Chile</option>
+                <option value="Uruguai">Uruguai</option>
+                <option value="Paraguai">Paraguai</option>
+                <option value="Estados Unidos">Estados Unidos</option>
+                <option value="Portugal">Portugal</option>
+                <option value="Espanha">Espanha</option>
+                <option value="França">França</option>
+                <option value="Alemanha">Alemanha</option>
+                <option value="Reino Unido">Reino Unido</option>
+                <option value="Outro">Outro (Estrangeiro)</option>
               </select>
             </div>
             <div>
@@ -1440,9 +1460,9 @@ const AdminCRMContent = () => {
               <Input
                 id="customer-phone"
                 value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: maskPhone(e.target.value) })}
-                placeholder={form.country === "Brasil" ? "(99) 99999-9999" : "Telefone com DDI"}
-                maxLength={20}
+                onChange={(e) => setForm({ ...form, phone: maskPhone(e.target.value, form.country) })}
+                placeholder={form.country === "Brasil" ? "(99) 99999-9999" : "+DDI Telefone"}
+                maxLength={25}
                 className="rounded-xl"
               />
             </div>
@@ -1461,12 +1481,12 @@ const AdminCRMContent = () => {
                 </>
               ) : (
                 <>
-                  <Label htmlFor="customer-passport">Passaporte *</Label>
+                  <Label htmlFor="customer-passport">Passaporte / Documento *</Label>
                   <Input
                     id="customer-passport"
                     value={form.passport}
                     onChange={(e) => setForm({ ...form, passport: e.target.value })}
-                    placeholder="Número do Passaporte"
+                    placeholder="Nº Passaporte ou ID"
                     className="rounded-xl"
                   />
                 </>
