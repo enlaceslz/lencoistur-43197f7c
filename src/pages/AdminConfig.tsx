@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, RefreshCw, Trash2, Plus, Users, UserPlus, ShieldCheck, Mail, Lock, Key, LayoutDashboard, Compass, ShoppingCart, Car, UserCheck, UserCheck2, Megaphone, FileText, BarChart3, Settings, Edit, Fingerprint } from "lucide-react";
+import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, RefreshCw, Trash2, Plus, Users, UserPlus, ShieldCheck, Mail, Lock, Key, LayoutDashboard, Compass, ShoppingCart, Car, UserCheck, UserCheck2, Megaphone, FileText, BarChart3, Settings, Edit, Fingerprint, QrCode } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -1208,26 +1208,38 @@ const AdminConfig = () => {
 
                 {/* Dinheiro */}
                 <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center"><Banknote size={20} className="text-green-600" /></div>
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 shadow-inner group-hover:scale-110 transition-transform">
+                      <Banknote size={24} strokeWidth={2.5} />
+                    </div>
                     <div>
-                      <p className="font-medium text-foreground">Dinheiro</p>
-                      <p className="text-sm text-muted-foreground">Pagamento em espécie no local</p>
+                      <p className="font-bold text-foreground leading-none mb-1">Dinheiro (Espécie)</p>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">Recebimento direto no balcão ou guia</p>
                     </div>
                   </div>
-                  <Switch checked={pagamentos.dinheiro} onCheckedChange={(v) => setPagamentos({ ...pagamentos, dinheiro: v })} />
+                  <Switch 
+                    checked={pagamentos.dinheiro} 
+                    onCheckedChange={(v) => setPagamentos({ ...pagamentos, dinheiro: v })} 
+                    className="data-[state=checked]:bg-emerald-500"
+                  />
                 </div>
 
                 {/* Transferência */}
-                <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center"><Landmark size={20} className="text-purple-600" /></div>
+                <div className="flex items-center justify-between p-5 bg-card border border-border/50 rounded-3xl hover:border-primary/30 transition-all group shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-600 shadow-inner group-hover:scale-110 transition-transform">
+                      <Landmark size={24} strokeWidth={2.5} />
+                    </div>
                     <div>
-                      <p className="font-medium text-foreground">Transferência Bancária</p>
-                      <p className="text-sm text-muted-foreground">TED/DOC entre contas</p>
+                      <p className="font-bold text-foreground leading-none mb-1">Transferência Bancária</p>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">TED / DOC ou Depósito identificado</p>
                     </div>
                   </div>
-                  <Switch checked={pagamentos.transferencia} onCheckedChange={(v) => setPagamentos({ ...pagamentos, transferencia: v })} />
+                  <Switch 
+                    checked={pagamentos.transferencia} 
+                    onCheckedChange={(v) => setPagamentos({ ...pagamentos, transferencia: v })} 
+                    className="data-[state=checked]:bg-indigo-500"
+                  />
                 </div>
               </div>
               
