@@ -158,7 +158,7 @@ const AdminPacotes = () => {
     setEditingId(null);
     setIsViewMode(false);
     setForm({
-      name: "", slug: "", description: "", days: 1,
+      name: "", slug: "", description: "", days: 1, nights: 0,
       original_price: 0, discount_price: 0, tag: "", highlights: [], active: true
     });
     setSelectedTours([]);
@@ -173,6 +173,7 @@ const AdminPacotes = () => {
       slug: pkg.slug,
       description: pkg.description || "",
       days: pkg.days,
+      nights: pkg.nights || 0,
       original_price: pkg.original_price,
       discount_price: pkg.discount_price,
       tag: pkg.tag || "",
@@ -197,6 +198,7 @@ const AdminPacotes = () => {
       slug: pkg.slug,
       description: pkg.description || "",
       days: pkg.days,
+      nights: pkg.nights || 0,
       original_price: pkg.original_price,
       discount_price: pkg.discount_price,
       tag: pkg.tag || "",
