@@ -229,35 +229,34 @@ const AdminIA = () => {
             </div>
 
             {aiLoading && !aiAnalysis && (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <Loader2 className="animate-spin mx-auto text-primary mb-3" size={32} />
-                  <p className="text-muted-foreground">Analisando dados com IA...</p>
-                  <p className="text-xs text-muted-foreground mt-1">Isso pode levar alguns segundos.</p>
-                </CardContent>
-              </Card>
+              <div className="glass-card rounded-[2.5rem] p-12 text-center animate-in-fade">
+                <Loader2 className="animate-spin mx-auto text-primary mb-6" size={48} />
+                <p className="text-lg font-black text-foreground uppercase tracking-widest">Analisando Dados com IA</p>
+                <p className="text-sm text-muted-foreground mt-2 font-medium">Isso pode levar alguns segundos, aguarde...</p>
+              </div>
             )}
 
             {aiAnalysis && (
-              <Card>
-                <CardContent className="p-6">
-                  <div className="prose prose-sm max-w-none dark:prose-invert [&_h2]:text-foreground [&_h2]:text-base [&_h2]:font-bold [&_h2]:mt-4 [&_h2]:mb-2 [&_p]:text-muted-foreground [&_li]:text-muted-foreground [&_strong]:text-foreground">
-                    <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="glass-card rounded-[2.5rem] p-10 admin-card-hover animate-in-fade">
+                <div className="prose prose-sm max-w-none dark:prose-invert [&_h2]:text-foreground [&_h2]:text-xl [&_h2]:font-black [&_h2]:mt-8 [&_h2]:mb-4 [&_p]:text-muted-foreground [&_p]:text-sm [&_p]:leading-relaxed [&_li]:text-muted-foreground [&_strong]:text-foreground [&_strong]:font-black">
+                  <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
+                </div>
+              </div>
             )}
 
             {!aiAnalysis && !aiLoading && (
-              <Card>
-                <CardContent className="p-12 text-center">
-                  <Brain className="mx-auto mb-3 opacity-40 text-muted-foreground" size={48} />
-                  <p className="font-medium text-foreground">Análise IA disponível</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Clique em "Gerar Análise" para receber insights inteligentes baseados nos seus dados reais de reservas, receita, avaliações e leads.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="glass-card rounded-[2.5rem] p-20 text-center animate-in-fade">
+                <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mx-auto mb-6 text-primary shadow-lg shadow-primary/10">
+                  <Brain size={40} strokeWidth={2.5} />
+                </div>
+                <p className="text-xl font-black text-foreground uppercase tracking-widest">Análise IA Pronta</p>
+                <p className="text-sm text-muted-foreground mt-3 max-w-md mx-auto font-medium leading-relaxed">
+                  Combine o poder da IA generativa com seus dados reais para descobrir oportunidades de crescimento e otimização.
+                </p>
+                <Button onClick={generateAIAnalysis} size="lg" className="mt-8 rounded-2xl h-12 px-10 font-black uppercase tracking-widest shadow-xl shadow-primary/20 animate-bounce">
+                  <Sparkles size={18} className="mr-2" /> Começar Análise
+                </Button>
+              </div>
             )}
           </div>
         </TabsContent>
