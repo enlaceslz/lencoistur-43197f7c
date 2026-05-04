@@ -1160,6 +1160,10 @@ const AdminCRMContent = () => {
                             </div>
                           </div>
                         )}
+                        <div className="flex items-center gap-4 text-sm font-semibold">
+                          <div className="p-2 rounded-lg bg-background border border-border"><Globe size={16} className="text-primary" /></div>
+                          <span className="text-foreground">{selectedCustomer.country || "Brasil"}</span>
+                        </div>
                       </div>
 
                       {selectedCustomer.notes && (
