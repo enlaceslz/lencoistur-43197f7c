@@ -409,7 +409,7 @@ const AdminSGSDashboard = () => {
           </div>
 
         {/* Stats - Clickable */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 animate-in-fade" style={{ animationDelay: '0.2s' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
           {statCards.map((s, idx) => (
             <button
               key={s.label}
