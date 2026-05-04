@@ -384,12 +384,13 @@ const AdminSGSRiscos = () => {
         )}
 
         {/* Table */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in-fade" style={{ animationDelay: '0.4s' }}>
         {filtered.map((r) => {
           const rc = riskClass(r.risk_level);
+          const colorClass = rc.label === 'Inaceitável' ? 'from-rose-500 to-pink-600' : rc.label === 'Aceitável' ? 'from-emerald-500 to-teal-600' : 'from-amber-500 to-orange-600';
           return (
-            <div key={r.id} className="bg-card border border-border rounded-3xl p-6 hover:shadow-xl hover:border-primary/30 transition-all group relative overflow-hidden flex flex-col">
-              <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${rc.label === 'Inaceitável' ? 'bg-destructive' : rc.label === 'Aceitável' ? 'bg-primary' : 'bg-secondary'}`} />
+            <div key={r.id} className="glass-card admin-card-hover rounded-[2.5rem] p-8 group relative overflow-hidden flex flex-col">
+              <div className={`absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r ${colorClass} opacity-20 group-hover:opacity-100 transition-opacity`} />
               
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-4">
