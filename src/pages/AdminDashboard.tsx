@@ -201,28 +201,33 @@ const AdminDashboard = () => {
 
   return (
     <AdminLayout title="Dashboard">
-      <div className="space-y-6">
+      <div className="space-y-8 pb-8">
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat: any) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((stat: any, idx: number) => (
             <div 
               key={stat.label} 
               onClick={() => stat.path && navigate(stat.path)}
-              className={`bg-card border border-border rounded-2xl p-5 cursor-pointer hover:shadow-md hover:border-primary/50 transition-all ${stat.isSgs && stat.value !== "0" ? "ring-2 ring-destructive/50" : ""}`}
+              className={`glass-card admin-card-hover rounded-[2rem] p-6 cursor-pointer relative overflow-hidden group animate-in-fade`}
+              style={{ animationDelay: `${idx * 0.1}s` }}
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.isSgs && stat.value !== "0" ? "bg-destructive/10" : "bg-primary/10"}`}>
-                  <stat.icon size={20} className={stat.isSgs && stat.value !== "0" ? "text-destructive" : "text-primary"} />
+              <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
+              
+              <div className="flex items-center justify-between mb-6">
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg ${stat.isSgs && stat.value !== "0" ? "bg-destructive/10 text-destructive shadow-destructive/10" : "bg-primary/10 text-primary shadow-primary/10"}`}>
+                  <stat.icon size={26} strokeWidth={2.5} />
                 </div>
                 {stat.change && (
-                  <span className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-tight ${stat.up ? "text-primary" : "text-destructive"}`}>
-                    {!stat.isSgs && stat.change.includes('%') && (stat.up ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />)}
+                  <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${stat.up ? "bg-admin-success-soft text-admin-success" : "bg-red-50 text-red-500"}`}>
                     {stat.change}
-                  </span>
+                  </div>
                 )}
               </div>
-              <p className="text-2xl font-black text-foreground">{stat.value}</p>
-              <p className="text-xs font-medium text-muted-foreground mt-1 uppercase tracking-wider">{stat.label}</p>
+              
+              <div className="relative">
+                <p className="text-3xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
+                <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
+              </div>
             </div>
           ))}
         </div>
