@@ -210,7 +210,11 @@ const validateForm = (form: CustomerForm): string | null => {
 
   if (form.phone) {
     const digits = form.phone.replace(/\D/g, "");
-    if (digits.length < 10 && form.country === "Brasil") return "Telefone deve ter 10 ou 11 dígitos.";
+    if (form.country === "Brasil") {
+      if (digits.length < 10) return "Telefone brasileiro deve ter 10 ou 11 dígitos.";
+    } else {
+      if (digits.length < 7) return "Telefone estrangeiro deve ter pelo menos 7 dígitos.";
+    }
   }
 
   if (form.country === "Brasil") {
