@@ -1471,33 +1471,59 @@ const AdminConfig = () => {
         {/* BACKUP & RESTAURAÇÃO */}
         <TabsContent value="backup">
           <div className="space-y-6">
-            <Card className="border-border">
-              <CardContent className="p-6 space-y-5">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
-                    <HardDrive size={20} className="text-indigo-600" />
+            <Card className="border-none shadow-sm glass-card rounded-[2.5rem] overflow-hidden">
+              <CardContent className="p-8 space-y-8">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-indigo-500/5 p-8 rounded-[2rem] border border-indigo-500/10">
+                  <div className="flex items-center gap-5">
+                    <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center shadow-inner">
+                      <HardDrive size={32} strokeWidth={2.5} />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-black text-foreground tracking-tight leading-none">Cópia de Segurança</h3>
+                      <p className="text-sm font-medium text-muted-foreground mt-2">Segurança máxima para seus dados e mídias.</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-display font-bold text-foreground text-lg">Backup do Sistema</h3>
-                    <p className="text-sm text-muted-foreground">Exporte todos os dados do sistema em formato JSON</p>
+                  <div className="flex flex-wrap gap-3">
+                    <Button 
+                      onClick={handleBackup} 
+                      disabled={backupLoading}
+                      className="rounded-2xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20 bg-indigo-600 hover:bg-indigo-700 text-white transition-all active:scale-95 flex items-center gap-2"
+                    >
+                      {backupLoading ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                      Gerar Backup Completo
+                    </Button>
+                    <div className="relative">
+                      <input type="file" ref={restoreInputRef} onChange={handleRestore} className="hidden" accept=".json" />
+                      <Button 
+                        variant="outline"
+                        onClick={() => restoreInputRef.current?.click()} 
+                        disabled={restoreLoading}
+                        className="rounded-2xl px-8 h-12 font-black uppercase tracking-widest border-2 hover:bg-muted transition-all active:scale-95 flex items-center gap-2"
+                      >
+                        {restoreLoading ? <Loader2 size={18} className="animate-spin" /> : <UploadCloud size={18} />}
+                        Restaurar Sistema
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
-                <div className="p-4 bg-muted rounded-xl space-y-2">
-                  <p className="text-sm text-foreground font-medium">O backup inclui:</p>
-                  <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-                    <li>Configurações do sistema e site</li>
-                    <li>Passeios, translados e reservas</li>
-                    <li>Clientes, parceiros e avaliações</li>
-                    <li>Dados financeiros (contas a pagar/receber)</li>
-                    <li>Marketing (campanhas, leads, remarketing)</li>
-                    <li>SGS (riscos, incidentes, auditorias, equipe, termos)</li>
-                    <li>Documentação da empresa e clientes</li>
-                    <li className="font-bold text-indigo-600 italic">Arquivos, fotos e mídias (Módulo Galeria e anexos)</li>
-                  </ul>
-                </div>
-
-                <div className="flex flex-wrap gap-3">
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 ml-2">Integridade dos Dados</p>
+                    <div className="p-6 bg-muted/20 border border-border/40 rounded-[2rem] space-y-4">
+                      <p className="text-xs font-bold text-foreground">O pacote de backup contém:</p>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          "Configurações", "Reservas", "Clientes", "Financeiro", "Marketing", "SGS Segurança", "Documentação", "Mídias/Fotos"
+                        ].map((item, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                            <span className="text-[11px] font-medium text-muted-foreground">{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button 
