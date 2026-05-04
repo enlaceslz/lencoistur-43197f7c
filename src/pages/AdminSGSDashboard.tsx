@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import {
   Shield, AlertTriangle, CheckCircle, Users, TrendingUp, Activity, Phone, Building2,
   Plus, ArrowRight, Clock, FileText, ClipboardCheck, Car, UserCheck2, Map, Truck, Star,
-  Wrench, ClipboardList, AlertCircle, Loader2
+  Wrench, ClipboardList, AlertCircle, Loader2, CloudRain, Waves, Sun, Wind, Award,
+  CheckCircle2, Info
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import { jsPDF } from "jspdf";
@@ -21,6 +22,7 @@ const AdminSGSDashboard = () => {
   const [risksByStage, setRisksByStage] = useState<any[]>([]);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [fleetAlerts, setFleetAlerts] = useState<any[]>([]);
+  const [compliance, setCompliance] = useState({ cadastur: true, icmbio: true, sgs: 85 });
 
   useEffect(() => { loadData(); }, []);
 
