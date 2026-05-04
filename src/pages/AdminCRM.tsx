@@ -856,16 +856,16 @@ const AdminCRMContent = () => {
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Client List */}
-          <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-6">
-            <div className="flex flex-col sm:flex-row gap-3 mb-4">
-              <div className="flex items-center gap-2 flex-1 bg-muted rounded-xl px-4 py-2.5">
-                <Search size={16} className="text-muted-foreground" />
+          <div className="lg:col-span-2 glass-card rounded-[2.5rem] p-8 animate-in-fade" style={{ animationDelay: '0.2s' }}>
+            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+              <div className="flex items-center gap-3 flex-1 bg-muted/40 border border-border/20 rounded-2xl px-5 py-3 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                <Search size={18} className="text-primary/50" />
                 <input
                   type="text"
-                  placeholder="Buscar por nome, e-mail, telefone, documento ou cidade..."
+                  placeholder="Pesquisar clientes..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="bg-transparent w-full outline-none text-foreground text-sm placeholder:text-muted-foreground"
+                  className="bg-transparent w-full outline-none text-foreground text-sm font-medium placeholder:text-muted-foreground/40"
                 />
               </div>
                 <div className="flex flex-wrap gap-2">
