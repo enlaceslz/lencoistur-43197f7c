@@ -352,12 +352,12 @@ const AdminPasseios = () => {
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Nome *</label>
                 <input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: generateSlug(e.target.value) })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={200} />
+                  className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" maxLength={200} />
               </div>
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Slug</label>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Slug (URL amigável)</label>
                 <input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={200} />
+                  className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" maxLength={200} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Preço Coletivo (R$/pessoa)</label>
@@ -365,7 +365,7 @@ const AdminPasseios = () => {
                   value={maskCurrency(String(form.price))} 
                   onChange={e => setForm({ ...form, price: parseCurrency(e.target.value) })}
                   disabled={!form.mode_collective_enabled}
-                  className={`w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 ${!form.mode_collective_enabled ? "opacity-50 grayscale" : ""}`} />
+                  className={`w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold ${!form.mode_collective_enabled ? "opacity-40 grayscale" : ""}`} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Preço Privativo (R$/veículo)</label>
@@ -373,12 +373,12 @@ const AdminPasseios = () => {
                   value={maskCurrency(String(form.private_price))} 
                   onChange={e => setForm({ ...form, private_price: parseCurrency(e.target.value) })}
                   disabled={!form.mode_private_enabled}
-                  className={`w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 ${!form.mode_private_enabled ? "opacity-50 grayscale" : ""}`} />
+                  className={`w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold ${!form.mode_private_enabled ? "opacity-40 grayscale" : ""}`} />
               </div>
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Lotação do Veículo</label>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Lotação Máxima</label>
                 <input type="number" min={1} max={50} value={form.vehicle_capacity} onChange={e => setForm({ ...form, vehicle_capacity: Number(e.target.value) })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" />
+                  className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold" />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block flex items-center gap-1.5">
@@ -451,14 +451,14 @@ const AdminPasseios = () => {
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Inclui (separados por vírgula)</label>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Itens Inclusos (separados por vírgula)</label>
                 <input value={form.includes} onChange={e => setForm({ ...form, includes: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={500} />
+                  className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" maxLength={500} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Destaques (separados por vírgula)</label>
                 <input value={form.highlights} onChange={e => setForm({ ...form, highlights: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={500} />
+                  className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" maxLength={500} />
               </div>
             </div>
 
@@ -562,12 +562,12 @@ const AdminPasseios = () => {
                 </label>
               </div>
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Modalidade Padrão</label>
+                <label className="text-sm font-black uppercase tracking-widest text-muted-foreground mb-2 block ml-1 opacity-80">Modalidade Padrão no Site</label>
                 <select value={form.default_mode}
                   onChange={e => setForm({ ...form, default_mode: e.target.value as "privativo" | "coletivo" })}
-                  className="w-full bg-card border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20">
-                  <option value="privativo" disabled={!form.mode_private_enabled}>Privativo (recomendado)</option>
-                  <option value="coletivo" disabled={!form.mode_collective_enabled}>Coletivo</option>
+                  className="w-full bg-card border border-border/50 rounded-2xl px-4 py-3 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm">
+                  <option value="privativo" disabled={!form.mode_private_enabled}>Privativo (Venda por Veículo)</option>
+                  <option value="coletivo" disabled={!form.mode_collective_enabled}>Coletivo (Venda por Pessoa)</option>
                 </select>
               </div>
               <div className="pt-2">
