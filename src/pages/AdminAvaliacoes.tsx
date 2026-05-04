@@ -134,86 +134,83 @@ const AdminAvaliacoes = () => {
 
   return (
     <AdminLayout title="Avaliações">
-      {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <Card>
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-muted text-amber-600"><Star size={22} /></div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{avgRating}</p>
-              <p className="text-xs text-muted-foreground">Nota Média</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-muted text-primary"><MessageSquare size={22} /></div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{reviews.length}</p>
-              <p className="text-xs text-muted-foreground">Total</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-muted text-green-600"><ThumbsUp size={22} /></div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{positiveCount}</p>
-              <p className="text-xs text-muted-foreground">Positivas (4-5★)</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-muted text-blue-600"><TrendingUp size={22} /></div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{satisfactionPct}%</p>
-              <p className="text-xs text-muted-foreground">Satisfação</p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {[
+          { label: "Nota Média", value: avgRating, icon: Star, color: "text-amber-600", bg: "bg-amber-100" },
+          { label: "Total Reviews", value: reviews.length, icon: MessageSquare, color: "text-primary", bg: "bg-primary/10" },
+          { label: "Positivas (4-5★)", value: positiveCount, icon: ThumbsUp, color: "text-emerald-600", bg: "bg-emerald-100" },
+          { label: "Nível Satisfação", value: `${satisfactionPct}%`, icon: TrendingUp, color: "text-blue-600", bg: "bg-blue-100" },
+        ].map((stat, i) => (
+          <Card key={i} className="border-none shadow-sm bg-card hover:shadow-md transition-all">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} shadow-inner`}><stat.icon size={24} strokeWidth={2.5} /></div>
+              <div>
+                <p className="text-2xl font-black text-foreground leading-none">{stat.value}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-2">{stat.label}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-col md:flex-row gap-3 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-          <Input placeholder="Buscar autor, comentário, país..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-4 sm:p-6 bg-card border border-border rounded-3xl shadow-sm">
+        <div className="relative flex-1 w-full group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
+          <Input 
+            placeholder="Buscar autor, comentário, país..." 
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)} 
+            className="pl-12 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30 transition-all text-sm font-medium" 
+          />
         </div>
-        <Select value={filterRating} onValueChange={setFilterRating}>
-          <SelectTrigger className="w-full md:w-40">
-            <Filter size={14} className="mr-1" />
-            <SelectValue placeholder="Nota" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas notas</SelectItem>
-            {[5, 4, 3, 2, 1].map((n) => (
-              <SelectItem key={n} value={String(n)}>{n} estrela{n > 1 ? "s" : ""}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={filterTour} onValueChange={setFilterTour}>
-          <SelectTrigger className="w-full md:w-48">
-            <SelectValue placeholder="Passeio" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos passeios</SelectItem>
-            {tours.map((t) => (
-              <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DialogTrigger asChild>
-                <Button onClick={resetForm}><Plus size={16} className="mr-1" /> Nova Avaliação</Button>
-              </DialogTrigger>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Cadastrar avaliação manual de cliente</p>
-            </TooltipContent>
-          </Tooltip>
+        
+        <div className="flex gap-2 flex-wrap justify-center">
+          <Select value={filterRating} onValueChange={setFilterRating}>
+            <SelectTrigger className="h-10 w-40 rounded-xl font-bold">
+              <Filter size={14} className="mr-2" />
+              <SelectValue placeholder="Filtrar Nota" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas notas</SelectItem>
+              {[5, 4, 3, 2, 1].map((n) => (
+                <SelectItem key={n} value={String(n)}>{n} estrela{n > 1 ? "s" : ""}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={filterTour} onValueChange={setFilterTour}>
+            <SelectTrigger className="h-10 w-48 rounded-xl font-bold">
+              <SelectValue placeholder="Passeio Específico" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos passeios</SelectItem>
+              {tours.map((t) => (
+                <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DialogTrigger asChild>
+                    <button 
+                      onClick={resetForm}
+                      className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+                    >
+                      <Plus size={20} strokeWidth={3} /> Nova Avaliação
+                    </button>
+                  </DialogTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Cadastrar avaliação manual</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           <DialogContent>
             <DialogHeader><DialogTitle>Nova Avaliação</DialogTitle></DialogHeader>
             <div className="space-y-4">

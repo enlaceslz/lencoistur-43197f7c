@@ -138,42 +138,54 @@ const AdminTranslados = () => {
 
   return (
     <AdminLayout title="Translados">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <Card><CardContent className="p-5 flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-muted text-primary"><Car size={22} /></div>
-          <div><p className="text-2xl font-bold text-foreground">{routes.length}</p><p className="text-xs text-muted-foreground">Total de Rotas</p></div>
-        </CardContent></Card>
-        <Card><CardContent className="p-5 flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-muted text-green-600"><Check size={22} /></div>
-          <div><p className="text-2xl font-bold text-foreground">{activeRoutes.length}</p><p className="text-xs text-muted-foreground">Rotas Ativas</p></div>
-        </CardContent></Card>
-        <Card><CardContent className="p-5 flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-muted text-amber-600"><MapPin size={22} /></div>
-          <div><p className="text-2xl font-bold text-foreground">{new Set(routes.flatMap(t => [t.origin, t.destination])).size}</p><p className="text-xs text-muted-foreground">Destinos</p></div>
-        </CardContent></Card>
-        <Card><CardContent className="p-5 flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-muted text-blue-600"><Users size={22} /></div>
-          <div><p className="text-2xl font-bold text-foreground">{new Set(routes.map(t => t.vehicle_type)).size}</p><p className="text-xs text-muted-foreground">Tipos de Veículo</p></div>
-        </CardContent></Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {[
+          { label: "Total de Rotas", value: routes.length, icon: Car, color: "text-primary", bg: "bg-primary/10" },
+          { label: "Rotas Ativas", value: activeRoutes.length, icon: Check, color: "text-emerald-600", bg: "bg-emerald-100" },
+          { label: "Destinos Atendidos", value: new Set(routes.flatMap(t => [t.origin, t.destination])).size, icon: MapPin, color: "text-amber-600", bg: "bg-amber-100" },
+          { label: "Tipos de Veículo", value: new Set(routes.map(t => t.vehicle_type)).size, icon: Users, color: "text-blue-600", bg: "bg-blue-100" },
+        ].map((stat, i) => (
+          <Card key={i} className="border-none shadow-sm bg-card hover:shadow-md transition-all">
+            <CardContent className="p-6 flex items-center gap-4">
+              <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} shadow-inner`}><stat.icon size={24} strokeWidth={2.5} /></div>
+              <div>
+                <p className="text-2xl font-black text-foreground leading-none">{stat.value}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-2">{stat.label}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Search + New */}
-      <Card className="mb-6">
-        <CardContent className="p-4 flex flex-col md:flex-row gap-4 items-center">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <Input placeholder="Buscar por origem, destino ou veículo..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
-          </div>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button onClick={openNew} className="shrink-0"><Plus size={16} className="mr-1" /> Nova Rota</Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Cadastrar novo trecho de translado</p>
-            </TooltipContent>
-          </Tooltip>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-4 sm:p-6 bg-card border border-border rounded-3xl shadow-sm">
+        <div className="relative flex-1 w-full group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
+          <Input 
+            placeholder="Buscar por origem, destino ou veículo..." 
+            value={search} 
+            onChange={e => setSearch(e.target.value)} 
+            className="pl-12 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30 transition-all text-sm font-medium" 
+          />
+        </div>
+        
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button 
+                  onClick={openNew}
+                  className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+                >
+                  <Plus size={20} strokeWidth={3} /> Nova Rota
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Cadastrar novo trecho de translado</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      </div>
 
       {/* Form Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
