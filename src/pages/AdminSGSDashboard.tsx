@@ -303,25 +303,26 @@ const AdminSGSDashboard = () => {
         </div>
 
         {/* Stats - Clickable */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {statCards.map((s) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 animate-in-fade" style={{ animationDelay: '0.2s' }}>
+          {statCards.map((s, idx) => (
             <button
               key={s.label}
               onClick={() => navigate(s.path)}
-              className={`bg-card border rounded-3xl p-5 text-left transition-all hover:shadow-lg hover:border-primary/40 group relative overflow-hidden ${s.urgent ? "border-destructive/30 shadow-[0_0_15px_-5px_rgba(239,68,68,0.1)]" : "border-border"}`}
+              className={`glass-card admin-card-hover rounded-[2rem] p-6 text-left relative overflow-hidden group ${s.urgent ? "ring-2 ring-destructive/20 border-destructive/20" : ""}`}
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className={`p-2 rounded-xl bg-muted/50 ${s.color} group-hover:scale-110 transition-transform`}>
-                  <s.icon size={18} strokeWidth={2.5} />
-                </div>
-                <ArrowRight size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all hidden sm:block" />
-              </div>
-              <p className="text-2xl font-black text-foreground font-display tracking-tight leading-none mb-1">{s.value}</p>
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-tight opacity-70">{s.label}</p>
+              <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
               
-              {s.urgent && (
-                <div className="absolute top-0 right-0 w-1 h-full bg-destructive/40" />
-              )}
+              <div className="flex items-center justify-between mb-6">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg bg-primary/10 ${s.color} shadow-primary/10`}>
+                  <s.icon size={22} strokeWidth={2.5} />
+                </div>
+                {s.urgent && <div className="w-2 h-2 rounded-full bg-destructive animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.5)]" />}
+              </div>
+              
+              <div className="relative">
+                <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{s.value}</p>
+                <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{s.label}</p>
+              </div>
             </button>
           ))}
         </div>
