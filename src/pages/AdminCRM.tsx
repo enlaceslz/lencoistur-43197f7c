@@ -824,7 +824,7 @@ const AdminCRMContent = () => {
                 <Search size={16} className="text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder="Buscar por nome, email, telefone ou CPF..."
+                  placeholder="Buscar por nome, e-mail, telefone, documento ou cidade..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="bg-transparent w-full outline-none text-foreground text-sm placeholder:text-muted-foreground"
@@ -1095,12 +1095,12 @@ const AdminCRMContent = () => {
 
                 <div className="space-y-4 bg-muted/10 p-5 rounded-2xl border border-border/50 shadow-inner">
                   <div className="flex items-center gap-4 text-sm font-semibold">
-                    <div className="p-2 rounded-lg bg-background border border-border"><Mail size={16} className="text-primary" /></div>
+                    <div className="p-2 rounded-lg bg-background border border-border cursor-pointer hover:bg-muted" onClick={() => { navigator.clipboard.writeText(selectedCustomer.email || ""); toast.success("E-mail copiado!"); }}><Mail size={16} className="text-primary" /></div>
                     <span className="text-foreground truncate">{selectedCustomer.email || "Sem e-mail cadastrado"}</span>
                   </div>
                   {selectedCustomer.phone && (
                     <div className="flex items-center gap-4 text-sm font-semibold">
-                      <div className="p-2 rounded-lg bg-background border border-border"><Smartphone size={16} className="text-primary" /></div>
+                      <div className="p-2 rounded-lg bg-background border border-border cursor-pointer hover:bg-muted" onClick={() => { navigator.clipboard.writeText(selectedCustomer.phone || ""); toast.success("Telefone copiado!"); }}><Smartphone size={16} className="text-primary" /></div>
                       <span className="text-foreground">{maskPhone(selectedCustomer.phone)}</span>
                     </div>
                   )}
@@ -1134,17 +1134,6 @@ const AdminCRMContent = () => {
                     <p className="text-xs text-amber-900 dark:text-amber-200 leading-relaxed font-medium">{selectedCustomer.notes}</p>
                   </div>
                 )}
-
-                <div className="grid grid-cols-2 gap-3 mb-2">
-                  <div className="bg-primary/5 border border-primary/10 rounded-xl p-3 text-center transition-all hover:bg-primary/10">
-                    <p className="text-xl font-bold text-foreground">{selectedCustomer.totalBookings}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Reservas</p>
-                  </div>
-                  <div className="bg-primary/5 border border-primary/10 rounded-xl p-3 text-center transition-all hover:bg-primary/10">
-                    <p className="text-xl font-bold text-primary">{fmt(selectedCustomer.totalSpent)}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">LTV Total</p>
-                  </div>
-                </div>
 
                 <div className="flex flex-col gap-2">
                   {selectedCustomer.phone && (
