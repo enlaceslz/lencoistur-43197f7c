@@ -262,7 +262,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {Object.entries(statusConfig).map(([key, config]) => (
           <div key={key} className="glass-card p-4 rounded-2xl border border-white/20 flex items-center gap-4 group hover:scale-[1.02] transition-transform cursor-default">
-            <div className={cn("w-10 h-10 rounded-xl shadow-lg flex items-center justify-center text-white", config.color)}>
+            <div className={cn("w-10 h-10 rounded-xl shadow-lg flex items-center justify-center text-white bg-gradient-to-br", config.gradient)}>
               <config.icon size={20} />
             </div>
             <div>
