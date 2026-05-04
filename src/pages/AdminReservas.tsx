@@ -15,15 +15,16 @@ import {
   Search, ShoppingCart, CheckCircle, Clock, XCircle, Eye,
   DollarSign, Ban, Loader2, Users, Calendar, CreditCard, FileText,
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
-  Plus, Copy, Pencil, Car, Compass,
+  Plus, Copy, Pencil, Car, Compass, LayoutGrid, List
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { PrintReceiptButton, type ReceiptData } from "@/components/BookingReceipt";
 import { supabase } from "@/integrations/supabase/client";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 import { maskCPF } from "@/lib/masks";
+import { BookingCalendar } from "@/components/admin/BookingCalendar";
 
 const statusConfig: Record<string, { label: string; className: string; icon: typeof CheckCircle }> = {
   confirmada: { label: "Confirmada", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border-emerald-200", icon: CheckCircle },
@@ -83,6 +84,7 @@ const AdminReservas = () => {
   const [editNotes, setEditNotes] = useState("");
   const [showNotes, setShowNotes] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
 
   // New booking form state
   const [showNewForm, setShowNewForm] = useState(false);
@@ -342,10 +344,33 @@ const AdminReservas = () => {
         ))}
       </div>
 
-      {/* Filters */}
+      {/* View Switcher & Filters */}
       <Card className="mb-8 border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.2s' }}>
         <CardContent className="p-8 space-y-6">
           <div className="flex flex-col xl:flex-row gap-6 items-center">
+            <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/40 w-full xl:w-auto">
+              <Button 
+                variant={viewMode === "list" ? "default" : "ghost"} 
+                onClick={() => setViewMode("list")}
+                className={cn(
+                  "flex-1 xl:flex-none h-10 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all",
+                  viewMode === "list" ? "shadow-lg shadow-primary/20" : ""
+                )}
+              >
+                <List size={16} className="mr-2" /> Lista
+              </Button>
+              <Button 
+                variant={viewMode === "calendar" ? "default" : "ghost"} 
+                onClick={() => setViewMode("calendar")}
+                className={cn(
+                  "flex-1 xl:flex-none h-10 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all",
+                  viewMode === "calendar" ? "shadow-lg shadow-primary/20" : ""
+                )}
+              >
+                <LayoutGrid size={16} className="mr-2" /> Calendário
+              </Button>
+            </div>
+
             <div className="relative flex-1 w-full group">
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
               <input 
@@ -405,9 +430,21 @@ const AdminReservas = () => {
         </CardContent>
       </Card>
 
-      {/* Table */}
-      <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
-        {filtered.length === 0 ? (
+      {/* Main Content */}
+      {viewMode === "calendar" ? (
+        <div className="animate-in-fade" style={{ animationDelay: '0.3s' }}>
+          <BookingCalendar 
+            bookings={bookings} 
+            onSelectBooking={(b) => {
+              setSelected(b);
+              setEditNotes(b.notes || "");
+              setShowNotes(false);
+            }}
+          />
+        </div>
+      ) : (
+        <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
+          {filtered.length === 0 ? (
           <div className="py-20 text-center text-muted-foreground bg-muted/10">
             <ShoppingCart className="mx-auto mb-4 opacity-20" size={64} />
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Vazio</p>
@@ -522,6 +559,7 @@ const AdminReservas = () => {
           </div>
         )}
       </Card>
+      )}
 
       {/* Detail Modal */}
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
