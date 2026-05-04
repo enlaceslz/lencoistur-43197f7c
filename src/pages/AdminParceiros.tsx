@@ -424,6 +424,7 @@ const AdminParceiros = () => {
           </div>
           <div className="flex items-center gap-2">
             <TooltipProvider>
+            <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button 
@@ -437,6 +438,7 @@ const AdminParceiros = () => {
                 </TooltipTrigger>
                 <TooltipContent>Relatório PDF</TooltipContent>
               </Tooltip>
+            </TooltipProvider>
             </TooltipProvider>
             
             <Button variant="outline" size="sm" className="rounded-2xl h-12 px-5 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm hidden sm:flex" onClick={() => setTypesDialogOpen(true)}>
