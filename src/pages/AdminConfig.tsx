@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, RefreshCw, Trash2, Plus, Users, UserPlus, ShieldCheck, Mail, Lock, Key, LayoutDashboard, Compass, ShoppingCart, Car, UserCheck, UserCheck2, Megaphone, FileText, BarChart3, Settings, Edit, Fingerprint } from "lucide-react";
+import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, RefreshCw, Trash2, Plus, Users, UserPlus, ShieldCheck, Mail, Lock, Key, LayoutDashboard, Compass, ShoppingCart, Car, UserCheck, UserCheck2, Megaphone, FileText, BarChart3, Settings, Edit, Fingerprint, QrCode } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { maskCPF, maskCNPJ, maskPhone } from "@/lib/masks";
 
@@ -100,6 +101,7 @@ const AdminConfig = () => {
   const [pagamentos, setPagamentos] = useState(DEFAULTS.pagamentos);
   const [notifications, setNotifications] = useState(DEFAULTS.notificacoes);
   const [gallery, setGallery] = useState(DEFAULTS.gallery);
+  const [isDeletingGalleryImage, setIsDeletingGalleryImage] = useState<number | null>(null);
 
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
@@ -1181,52 +1183,74 @@ const AdminConfig = () => {
                   );
                 })()}
 
-                {/* Cartão */}
-                <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center"><CreditCard size={20} className="text-blue-600" /></div>
+                <div className="flex items-center justify-between p-5 bg-card border border-border/50 rounded-3xl hover:border-primary/30 transition-all group shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600 shadow-inner group-hover:scale-110 transition-transform">
+                      <CreditCard size={24} strokeWidth={2.5} />
+                    </div>
                     <div>
-                      <p className="font-medium text-foreground">Cartão de Crédito/Débito</p>
-                      <p className="text-sm text-muted-foreground">Visa, Mastercard, Elo</p>
+                      <p className="font-bold text-foreground leading-none mb-1">Cartão de Crédito</p>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">Parcelamento via gateway de pagamentos</p>
                     </div>
                   </div>
-                  <Switch checked={pagamentos.cartao} onCheckedChange={(v) => setPagamentos({ ...pagamentos, cartao: v })} />
+                  <Switch 
+                    checked={pagamentos.cartao} 
+                    onCheckedChange={(v) => setPagamentos({ ...pagamentos, cartao: v })} 
+                    className="data-[state=checked]:bg-blue-500"
+                  />
                 </div>
 
                 {/* Boleto */}
-                <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center"><Landmark size={20} className="text-orange-600" /></div>
+                <div className="flex items-center justify-between p-5 bg-card border border-border/50 rounded-3xl hover:border-primary/30 transition-all group shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-orange-500/10 text-orange-600 shadow-inner group-hover:scale-110 transition-transform">
+                      <FileText size={24} strokeWidth={2.5} />
+                    </div>
                     <div>
-                      <p className="font-medium text-foreground">Boleto Bancário</p>
-                      <p className="text-sm text-muted-foreground">Compensação em até 3 dias úteis</p>
+                      <p className="font-bold text-foreground leading-none mb-1">Boleto Bancário</p>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">Compensação manual em até 3 dias</p>
                     </div>
                   </div>
-                  <Switch checked={pagamentos.boleto} onCheckedChange={(v) => setPagamentos({ ...pagamentos, boleto: v })} />
+                  <Switch 
+                    checked={pagamentos.boleto} 
+                    onCheckedChange={(v) => setPagamentos({ ...pagamentos, boleto: v })} 
+                    className="data-[state=checked]:bg-orange-500"
+                  />
                 </div>
 
-                {/* Dinheiro */}
-                <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center"><Banknote size={20} className="text-green-600" /></div>
+                <div className="flex items-center justify-between p-5 bg-card border border-border/50 rounded-3xl hover:border-primary/30 transition-all group shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 shadow-inner group-hover:scale-110 transition-transform">
+                      <Banknote size={24} strokeWidth={2.5} />
+                    </div>
                     <div>
-                      <p className="font-medium text-foreground">Dinheiro</p>
-                      <p className="text-sm text-muted-foreground">Pagamento em espécie no local</p>
+                      <p className="font-bold text-foreground leading-none mb-1">Dinheiro (Espécie)</p>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">Recebimento direto no balcão ou guia</p>
                     </div>
                   </div>
-                  <Switch checked={pagamentos.dinheiro} onCheckedChange={(v) => setPagamentos({ ...pagamentos, dinheiro: v })} />
+                  <Switch 
+                    checked={pagamentos.dinheiro} 
+                    onCheckedChange={(v) => setPagamentos({ ...pagamentos, dinheiro: v })} 
+                    className="data-[state=checked]:bg-emerald-500"
+                  />
                 </div>
 
                 {/* Transferência */}
-                <div className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center"><Landmark size={20} className="text-purple-600" /></div>
+                <div className="flex items-center justify-between p-5 bg-card border border-border/50 rounded-3xl hover:border-primary/30 transition-all group shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-600 shadow-inner group-hover:scale-110 transition-transform">
+                      <Landmark size={24} strokeWidth={2.5} />
+                    </div>
                     <div>
-                      <p className="font-medium text-foreground">Transferência Bancária</p>
-                      <p className="text-sm text-muted-foreground">TED/DOC entre contas</p>
+                      <p className="font-bold text-foreground leading-none mb-1">Transferência Bancária</p>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">TED / DOC ou Depósito identificado</p>
                     </div>
                   </div>
-                  <Switch checked={pagamentos.transferencia} onCheckedChange={(v) => setPagamentos({ ...pagamentos, transferencia: v })} />
+                  <Switch 
+                    checked={pagamentos.transferencia} 
+                    onCheckedChange={(v) => setPagamentos({ ...pagamentos, transferencia: v })} 
+                    className="data-[state=checked]:bg-indigo-500"
+                  />
                 </div>
               </div>
               
@@ -1249,63 +1273,90 @@ const AdminConfig = () => {
         <TabsContent value="notificacoes">
           <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
             <CardContent className="p-4 md:p-8 space-y-8">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-600">
-                    <Bell size={32} />
+              <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 bg-card p-6 rounded-3xl border border-border/50 shadow-sm mb-6">
+                <div className="flex items-center gap-5">
+                  <div className="p-4 rounded-2xl bg-amber-500/10 text-amber-600 shadow-inner">
+                    <Bell size={32} strokeWidth={2.5} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-black text-foreground">Alertas e Notificações</h3>
-                    <p className="text-sm text-muted-foreground">Configure como e quando a agência será avisada.</p>
+                    <h3 className="text-2xl font-black text-foreground tracking-tight">Alertas e Notificações</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                      <p className="text-sm font-medium text-muted-foreground">Configure como a agência será avisada sobre novos eventos.</p>
+                    </div>
                   </div>
                 </div>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      onClick={() => saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações")} 
-                      disabled={saving} 
-                      className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 bg-amber-600 hover:bg-amber-700 text-white transition-all active:scale-95"
-                    >
-                      {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
-                      Salvar Alertas
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Salvar configurações de notificações</p>
-                  </TooltipContent>
-                </Tooltip>
+                <div className="flex items-center gap-3">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          onClick={() => saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações")} 
+                          disabled={saving} 
+                          className="rounded-2xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 bg-amber-600 hover:bg-amber-700 text-white transition-all active:scale-95 flex items-center gap-2"
+                        >
+                          {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                          Salvar Notificações
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Confirmar alterações de alertas</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </div>
 
-              <div className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-4">
                 {([
-                  { key: "email" as const, label: "E-mail", desc: "Receber notificações por e-mail" },
-                  { key: "whatsapp" as const, label: "WhatsApp", desc: "Alertas de reservas via WhatsApp" },
-                  { key: "push" as const, label: "Push Notifications", desc: "Notificações no navegador" },
+                  { key: "email" as const, label: "E-mail", desc: "Receber notificações detalhadas por e-mail", icon: Mail, color: "text-blue-500" },
+                  { key: "whatsapp" as const, label: "WhatsApp", desc: "Alertas rápidos de vendas via API WhatsApp", icon: Megaphone, color: "text-green-500" },
+                  { key: "push" as const, label: "Navegador", desc: "Avisos em tempo real na tela do computador", icon: Bell, color: "text-amber-500" },
                 ] as const).map((item) => (
-                  <div key={item.key} className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
-                    <div>
-                      <p className="font-medium text-foreground">{item.label}</p>
-                      <p className="text-sm text-muted-foreground">{item.desc}</p>
+                  <div key={item.key} className="flex items-center justify-between p-5 bg-card border border-border/50 rounded-3xl hover:border-primary/30 transition-all group shadow-sm">
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-2xl bg-muted/50 ${item.color} group-hover:scale-110 transition-transform`}>
+                        <item.icon size={20} />
+                      </div>
+                      <div>
+                        <p className="font-bold text-foreground leading-none mb-1">{item.label}</p>
+                        <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">{item.desc}</p>
+                      </div>
                     </div>
-                    <Switch checked={notifications[item.key]} onCheckedChange={(v) => setNotifications({ ...notifications, [item.key]: v })} />
+                    <Switch 
+                      checked={notifications[item.key]} 
+                      onCheckedChange={(v) => setNotifications({ ...notifications, [item.key]: v })} 
+                      className="data-[state=checked]:bg-emerald-500"
+                    />
                   </div>
                 ))}
               </div>
-              <h3 className="font-display font-bold text-foreground text-lg pt-4">Eventos Críticos</h3>
-              <div className="space-y-3">
-                {([
-                  { key: "novaReserva" as const, label: "Nova Reserva", desc: "Avisar imediatamente sobre novas vendas" },
-                  { key: "cancelamento" as const, label: "Cancelamento", desc: "Alerta de desistência ou cancelamento" },
-                  { key: "pagamento" as const, label: "Pagamento Confirmado", desc: "Confirmação de recebimento via PIX/Cartão" },
-                ] as const).map((item) => (
-                  <div key={item.key} className="flex items-center justify-between p-4 border border-border rounded-xl hover:bg-muted/10 transition-colors">
-                    <div>
-                      <p className="font-medium text-foreground">{item.label}</p>
-                      <p className="text-sm text-muted-foreground">{item.desc}</p>
+              <div className="space-y-4 pt-4">
+                <h3 className="text-sm font-black text-muted-foreground uppercase tracking-[0.2em] ml-2">Gatilhos de Notificação</h3>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {([
+                    { key: "novaReserva" as const, label: "Nova Reserva", desc: "Vendas realizadas no site", icon: ShoppingCart, color: "text-emerald-500" },
+                    { key: "cancelamento" as const, label: "Cancelamento", desc: "Reserva cancelada pelo cliente", icon: X, color: "text-rose-500" },
+                    { key: "pagamento" as const, label: "Pagamento", desc: "Confirmação de recebimento PIX", icon: Banknote, color: "text-blue-500" },
+                  ] as const).map((item) => (
+                    <div key={item.key} className="flex flex-col gap-4 p-6 bg-muted/20 border border-border/40 rounded-3xl hover:bg-muted/30 transition-all">
+                      <div className="flex items-start justify-between">
+                        <div className={`p-3 rounded-2xl bg-background border border-border/50 ${item.color}`}>
+                          <item.icon size={20} />
+                        </div>
+                        <Switch 
+                          checked={notifications[item.key]} 
+                          onCheckedChange={(v) => setNotifications({ ...notifications, [item.key]: v })} 
+                          className="data-[state=checked]:bg-primary"
+                        />
+                      </div>
+                      <div>
+                        <p className="font-black text-foreground text-sm uppercase tracking-wider">{item.label}</p>
+                        <p className="text-[11px] text-muted-foreground font-medium mt-1">{item.desc}</p>
+                      </div>
                     </div>
-                    <Switch checked={notifications[item.key]} onCheckedChange={(v) => setNotifications({ ...notifications, [item.key]: v })} />
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
 
               <div className="flex justify-end pt-8 border-t border-border mt-8">
@@ -1781,7 +1832,7 @@ const AdminConfig = () => {
                     <p className="text-sm text-muted-foreground">Galeria "Momentos Inesquecíveis" do website.</p>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-3">
                   <input
                     ref={galleryInputRef}
                     type="file"
@@ -1790,38 +1841,42 @@ const AdminConfig = () => {
                     className="hidden"
                     onChange={handleGalleryUpload}
                   />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={() => galleryInputRef.current?.click()}
-                        disabled={uploadingGallery}
-                        variant="outline"
-                        className="rounded-xl font-bold"
-                      >
-                        {uploadingGallery ? <Loader2 size={16} className="animate-spin mr-2" /> : <UploadCloud size={16} className="mr-2" />}
-                        {uploadingGallery ? "Enviando..." : "Fazer Upload"}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Adicionar novas fotos à galeria do site</p>
-                    </TooltipContent>
-                  </Tooltip>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          onClick={() => galleryInputRef.current?.click()}
+                          disabled={uploadingGallery}
+                          variant="outline"
+                          className="rounded-2xl h-12 px-6 font-bold border-indigo-200 bg-white hover:bg-indigo-50 hover:text-indigo-600 transition-all shadow-sm"
+                        >
+                          {uploadingGallery ? <Loader2 size={18} className="animate-spin mr-2" /> : <UploadCloud size={18} className="mr-2" />}
+                          {uploadingGallery ? "Processando..." : "Subir Fotos"}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Fazer upload de múltiplas imagens</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
 
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={() => saveSetting("gallery", gallery as unknown as Record<string, unknown>, "Galeria")}
-                        disabled={saving}
-                        className="rounded-xl font-black uppercase tracking-widest bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 h-10 px-8"
-                      >
-                        {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
-                        Publicar Galeria
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Salvar e atualizar a galeria no site público</p>
-                    </TooltipContent>
-                  </Tooltip>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          onClick={() => saveSetting("gallery", gallery as unknown as Record<string, unknown>, "Galeria")}
+                          disabled={saving}
+                          className="rounded-2xl h-12 px-8 font-black uppercase tracking-widest bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
+                        >
+                          {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <Save size={18} className="mr-2" />}
+                          Publicar Site
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Publicar alterações na galeria</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
 
@@ -1836,19 +1891,21 @@ const AdminConfig = () => {
                     <div key={index} className="relative group aspect-square rounded-xl overflow-hidden border border-border shadow-sm">
                       <img src={img.src} alt={img.alt} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button
-                              onClick={() => removeGalleryImage(index)}
-                              className="p-2 bg-destructive text-destructive-foreground rounded-full hover:scale-110 transition-transform"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Remover imagem</p>
-                          </TooltipContent>
-                        </Tooltip>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={() => setIsDeletingGalleryImage(index)}
+                                className="p-3 bg-rose-500 text-white rounded-2xl hover:scale-110 transition-transform shadow-xl active:scale-95"
+                              >
+                                <Trash2 size={20} />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Remover imagem permanentemente</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
                       <div className="absolute bottom-0 left-0 right-0 p-1 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity">
                         <input
@@ -1871,6 +1928,34 @@ const AdminConfig = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Galeria Delete Confirmation */}
+      <Dialog open={isDeletingGalleryImage !== null} onOpenChange={() => setIsDeletingGalleryImage(null)}>
+        <DialogContent className="max-w-sm rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black">Remover Foto?</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-muted-foreground font-medium">Tem certeza que deseja excluir esta foto da galeria? Esta ação não poderá ser desfeita após salvar.</p>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setIsDeletingGalleryImage(null)} className="rounded-xl font-bold">Cancelar</Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => {
+                if (isDeletingGalleryImage !== null) {
+                  removeGalleryImage(isDeletingGalleryImage);
+                  setIsDeletingGalleryImage(null);
+                  toast.success("Foto marcada para remoção. Clique em 'Publicar' para salvar.");
+                }
+              }} 
+              className="rounded-xl font-black uppercase tracking-widest bg-rose-600 hover:bg-rose-700"
+            >
+              Excluir Foto
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Floating Save Button for Mobile */}
       <div className="fixed bottom-6 right-6 lg:hidden z-[60]">
