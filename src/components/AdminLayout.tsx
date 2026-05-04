@@ -560,22 +560,35 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
               )}
             </div>
 
-            <div className="hidden sm:block h-6 w-px bg-[hsl(220,20%,90%)]" />
-            <div className="hidden sm:flex items-center gap-2 pl-1">
-              <div className="w-8 h-8 rounded-full bg-[hsl(217,91%,60%)] flex items-center justify-center text-white font-bold text-xs">
+            <div className="hidden sm:block h-6 w-px bg-border/40 mx-2" />
+            <div className="hidden sm:flex items-center gap-3 pl-1">
+              <div className="flex flex-col items-end hidden xl:flex">
+                <span className="text-xs font-black text-foreground leading-none">{user?.email?.split('@')[0] || "Admin"}</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-primary mt-1">{userRole}</span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-ocean flex items-center justify-center text-white font-black text-xs shadow-lg shadow-primary/20">
                 {userInitials}
               </div>
             </div>
           </div>
         </header>
 
-        {/* Title bar */}
-        <div className="hidden sm:block px-6 pt-5 pb-1">
-          <h1 className="font-display text-xl font-bold text-[hsl(220,25%,18%)] tracking-tight">{title}</h1>
+        {/* Dynamic Page Header */}
+        <div className="px-6 py-8 animate-in-fade">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Painel de Controle</p>
+              <h1 className="font-display text-4xl font-black text-foreground tracking-tight leading-none">{title}</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Sistema Online</span>
+            </div>
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 p-4 sm:p-6">
+        {/* Content Area */}
+        <div className="flex-1 px-6 pb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
           {children}
         </div>
       </main>
