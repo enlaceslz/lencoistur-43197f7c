@@ -175,22 +175,27 @@ const AdminSGSDashboard = () => {
             </div>
           </div>
           {/* Quick Actions Bar */}
-          <div className="glass-card rounded-[2.5rem] p-8 shadow-sm animate-in-fade" style={{ animationDelay: '0.2s' }}>
-            <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-6 ml-1">Central de Ações Rápidas (SGS)</p>
-            <div className="flex flex-wrap gap-3">
+          <div className="glass-card rounded-[2.5rem] p-8 shadow-sm animate-in-fade border-primary/5 bg-gradient-to-r from-primary/[0.03] to-transparent" style={{ animationDelay: '0.2s' }}>
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] ml-1">Central de Gestão e Resposta SGS (ABNT ISO 21101)</p>
+              <div className="flex gap-2">
+                <Badge variant="outline" className="text-[8px] font-black uppercase tracking-tighter">PRE — Plano de Resposta a Emergências</Badge>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-4">
               {[
-                { label: "Registrar Incidente", icon: Activity, path: "/admin/sgs/incidentes", color: "bg-destructive/10 text-destructive" },
-                { label: "Novo Briefing", icon: Shield, path: "/admin/sgs/briefings", color: "bg-primary/10 text-primary" },
-                { label: "Novo Checklist", icon: ClipboardList, path: "/admin/sgs/checklists", color: "bg-primary/10 text-primary" },
-                { label: "Termo de Risco", icon: FileText, path: "/admin/sgs/termos", color: "bg-secondary/10 text-secondary" },
-                { label: "Gerar PGSAT", icon: Award, path: "/admin/sgs/pgsat", color: "bg-primary/10 text-primary" },
+                { label: "Registrar Incidente", icon: Activity, path: "/admin/sgs/incidentes", color: "bg-destructive text-white shadow-destructive/20 hover:bg-destructive/90" },
+                { label: "Briefing Operacional", icon: Shield, path: "/admin/sgs/briefings", color: "bg-primary text-white shadow-primary/20 hover:bg-primary/90" },
+                { label: "Checklist 4x4", icon: ClipboardList, path: "/admin/sgs/checklists", color: "bg-white text-primary border border-primary/20 hover:bg-primary/5" },
+                { label: "Termo de Risco", icon: FileText, path: "/admin/sgs/termos", color: "bg-white text-secondary border border-secondary/20 hover:bg-secondary/5" },
+                { label: "Gerar PGSAT", icon: Award, path: "/admin/sgs/pgsat", color: "bg-ocean-dark text-white shadow-ocean/20 hover:opacity-90" },
               ].map(a => (
                 <button
                   key={a.label}
                   onClick={() => navigate(a.path)}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-tight transition-all active:scale-95 shadow-sm ${a.color}`}
+                  className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-[11px] font-black uppercase tracking-tight transition-all active:scale-95 shadow-md ${a.color}`}
                 >
-                  <a.icon size={16} strokeWidth={2.5} />
+                  <a.icon size={18} strokeWidth={2.5} />
                   {a.label}
                 </button>
               ))}
