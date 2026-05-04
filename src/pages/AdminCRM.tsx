@@ -968,7 +968,15 @@ const AdminCRMContent = () => {
                                       </Badge>
                                     )}
                                   </p>
-                                  <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-medium">
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {c.tags?.slice(0, 2).map(tag => (
+                                      <span key={tag} className="text-[8px] px-1 bg-muted text-muted-foreground rounded uppercase font-bold tracking-tighter">
+                                        {tag}
+                                      </span>
+                                    ))}
+                                    {c.tags?.length > 2 && <span className="text-[8px] text-muted-foreground">+{c.tags.length - 2}</span>}
+                                  </div>
+                                  <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-medium mt-1">
                                     <Mail size={10} />
                                     {c.email}
                                   </div>
