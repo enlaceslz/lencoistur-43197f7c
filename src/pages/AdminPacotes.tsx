@@ -404,41 +404,45 @@ const AdminPacotes = () => {
               <label className="text-sm font-bold">Descrição</label>
               <Textarea disabled={isViewMode} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
             </div>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-bold flex items-center gap-2">
-                  <Clock size={16} className="text-primary" />
-                  Duração (Quantos dias?)
-                </label>
-                <div className="relative">
-                  <Input 
-                    disabled={isViewMode} 
-                    type="number" 
-                    min={1} 
-                    value={form.days} 
-                    onChange={e => setForm({ ...form, days: parseInt(e.target.value) || 0 })}
-                    className="pr-12"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">dias</span>
+            <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50 space-y-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-2">
+                <Clock size={14} /> Duração do Roteiro
+              </h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-700">Quantidade de Dias</label>
+                  <div className="relative group">
+                    <Input 
+                      disabled={isViewMode} 
+                      type="number" 
+                      min={1} 
+                      value={form.days} 
+                      onChange={e => setForm({ ...form, days: parseInt(e.target.value) || 0 })}
+                      className="h-11 rounded-xl border-blue-200/60 focus:ring-blue-500/20 pr-14 transition-all"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase text-blue-400">Dias</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-700">Quantidade de Noites</label>
+                  <div className="relative group">
+                    <Input 
+                      disabled={isViewMode} 
+                      type="number" 
+                      min={0} 
+                      value={form.nights} 
+                      onChange={e => setForm({ ...form, nights: parseInt(e.target.value) || 0 })}
+                      className="h-11 rounded-xl border-blue-200/60 focus:ring-blue-500/20 pr-14 transition-all"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase text-blue-400">Noites</span>
+                  </div>
                 </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-bold flex items-center gap-2">
-                  <Clock size={16} className="text-primary" />
-                  Duração (Quantas noites?)
-                </label>
-                <div className="relative">
-                  <Input 
-                    disabled={isViewMode} 
-                    type="number" 
-                    min={0} 
-                    value={form.nights} 
-                    onChange={e => setForm({ ...form, nights: parseInt(e.target.value) || 0 })}
-                    className="pr-12"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">noites</span>
-                </div>
-              </div>
+              {!isViewMode && (
+                <p className="text-[10px] text-blue-400 italic">
+                  * Informe a duração exata para conformidade com normas de turismo e CADASTUR.
+                </p>
+              )}
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
