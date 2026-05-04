@@ -152,7 +152,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
           ))}
         </div>
 
-        <div className="grid grid-cols-7 bg-background/50">
+        <div className="grid grid-cols-7 bg-background/50 divide-x divide-y divide-border/20">
           {calendarDays.map((day, idx) => {
             const dateKey = format(day, 'yyyy-MM-dd');
             const dayBookings = filteredBookingsByDay[dateKey] || [];
@@ -166,10 +166,10 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.005 }}
                 className={cn(
-                  "min-h-[220px] border-r border-b border-border/20 p-4 transition-all relative group/cell flex flex-col",
-                  !isCurrentMonth && "bg-muted/5 opacity-40 grayscale-[0.5]",
-                  isTodayDay && "bg-primary/[0.08] ring-2 ring-inset ring-primary/40 shadow-[inset_0_0_40px_rgba(var(--primary),0.06)]",
-                  dayBookings.length > 0 && isCurrentMonth && "bg-gradient-to-br from-transparent to-primary/[0.04]"
+                  "min-h-[220px] p-4 transition-all relative group/cell flex flex-col",
+                  !isCurrentMonth && "bg-muted/10 opacity-60 grayscale-[0.2]",
+                  isTodayDay && "bg-primary/[0.12] ring-4 ring-inset ring-primary/60 shadow-[inset_0_0_60px_rgba(var(--primary),0.1)] z-10",
+                  dayBookings.length > 0 && isCurrentMonth && "bg-gradient-to-br from-white/10 to-primary/[0.08]"
                 )}
               >
                 <div className="flex items-start justify-between mb-4">
@@ -221,19 +221,19 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                               )}
                             >
                               <div className={cn(
-                                "absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b transition-all group-hover/item:w-3",
+                                "absolute left-0 top-0 bottom-0 w-2.5 bg-gradient-to-b transition-all group-hover/item:w-4",
                                 statusConfig[booking.status]?.gradient
                               )} />
-                              <div className="pl-5">
-                                <div className="flex items-center justify-between mb-1.5">
-                                  <p className="text-[13px] font-black text-foreground truncate leading-none tracking-tight group-hover/item:text-primary transition-colors">
+                              <div className="pl-6">
+                                <div className="flex items-center justify-between mb-2">
+                                  <p className="text-[14px] font-black text-foreground truncate leading-none tracking-tight group-hover/item:text-primary transition-colors">
                                     {booking.customerName}
                                   </p>
-                                  <span className="text-[10px] font-black opacity-60 bg-black/5 dark:bg-white/20 px-2 py-0.5 rounded-full uppercase">#{booking.bookingCode.slice(-4)}</span>
+                                  <span className="text-[10px] font-black opacity-90 bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full uppercase">#{booking.bookingCode.slice(-4)}</span>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                  <div className={cn("w-2 h-2 rounded-full ring-4 ring-white/10", statusConfig[booking.status]?.color)} />
-                                  <p className="text-[10px] font-black text-muted-foreground truncate opacity-90 uppercase tracking-[0.15em] leading-none">
+                                <div className="flex items-center gap-2.5">
+                                  <div className={cn("w-2.5 h-2.5 rounded-full ring-4 ring-white/20 shadow-sm", statusConfig[booking.status]?.color)} />
+                                  <p className="text-[11px] font-black text-muted-foreground truncate opacity-100 uppercase tracking-[0.15em] leading-none">
                                     {booking.itemName.split('(')[0].trim()}
                                   </p>
                                 </div>
