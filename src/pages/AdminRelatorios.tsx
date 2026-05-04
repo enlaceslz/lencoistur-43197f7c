@@ -241,45 +241,50 @@ const AdminRelatorios = () => {
           </div>
         </div>
 
-        {/* Real-time Dashboard Header (no-print) */}
-        <div className="no-print flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="no-print flex flex-col xl:flex-row xl:items-center justify-between gap-6 bg-card p-6 rounded-3xl border border-border/50 shadow-sm">
           <div>
-            <h2 className="text-2xl font-bold font-display">Módulo de Relatórios</h2>
-            <p className="text-muted-foreground text-sm">Acompanhe a performance do seu negócio em tempo real.</p>
+            <h2 className="text-3xl font-black text-slate-900 tracking-tight">Relatórios Gerenciais</h2>
+            <div className="flex items-center gap-2 mt-1">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <p className="text-sm font-medium text-muted-foreground">Analise métricas de performance e crescimento em tempo real.</p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-card border rounded-xl px-3 py-2 shadow-sm">
-              <Calendar size={16} className="text-primary" />
-              <select value={period} onChange={e => setPeriod(e.target.value)} className="bg-transparent text-sm font-medium outline-none">
+            <div className="flex items-center gap-2 bg-muted/50 border border-border/50 rounded-2xl px-4 h-12 shadow-inner group">
+              <Calendar size={18} className="text-primary group-hover:scale-110 transition-transform" />
+              <select value={period} onChange={e => setPeriod(e.target.value)} className="bg-transparent text-[11px] font-black uppercase tracking-widest outline-none cursor-pointer">
                 <option value="7">Últimos 7 dias</option>
                 <option value="30">Últimos 30 dias</option>
-                <option value="90">Últimos 90 dias</option>
-                <option value="365">Último ano</option>
+                <option value="90">90 dias</option>
+                <option value="365">Anual</option>
               </select>
             </div>
-            <UITooltip>
-              <TooltipTrigger asChild>
-                <button onClick={printReport} className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all active:scale-95">
-                  <Printer size={16} /> Imprimir
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Gerar versão para impressão ou PDF deste relatório</p>
-              </TooltipContent>
-            </UITooltip>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button onClick={printReport} className="flex items-center gap-3 bg-primary hover:bg-primary/90 text-primary-foreground px-8 h-12 rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95">
+                    <Printer size={18} strokeWidth={3} /> Imprimir
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Gerar PDF para impressão</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
 
-        {/* Navigation Tabs (no-print) */}
-        <div className="no-print flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+        <div className="no-print flex gap-2 overflow-x-auto pb-4 no-scrollbar scroll-smooth mb-4">
           {REPORT_TABS.map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold whitespace-nowrap transition-all border shadow-sm ${
+            <button 
+              key={tab.id} 
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-6 h-11 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border ${
                 activeTab === tab.id 
-                ? "bg-primary text-primary-foreground border-primary" 
-                : "bg-card text-muted-foreground border-border hover:bg-muted"
+                ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 scale-105" 
+                : "bg-muted/50 text-muted-foreground border-border/50 hover:bg-muted"
               }`}>
-              <tab.icon size={16} /> {tab.label}
+              <tab.icon size={16} strokeWidth={2.5} /> {tab.label}
             </button>
           ))}
         </div>
