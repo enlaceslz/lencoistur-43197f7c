@@ -1004,13 +1004,31 @@ const AdminConfig = () => {
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-4 border-t border-border pt-6">
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 border-t border-border pt-6">
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Instagram (URL)</Label>
                       <Input 
                         value={site.instagram} 
                         placeholder="https://instagram.com/sua-agencia"
                         onChange={(e) => setSite({ ...site, instagram: e.target.value })} 
+                        className="h-11 rounded-xl border-muted-foreground/20" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Facebook (URL)</Label>
+                      <Input 
+                        value={site.facebook || ""} 
+                        placeholder="https://facebook.com/sua-agencia"
+                        onChange={(e) => setSite({ ...site, facebook: e.target.value })} 
+                        className="h-11 rounded-xl border-muted-foreground/20" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">TikTok (URL)</Label>
+                      <Input 
+                        value={site.tiktok || ""} 
+                        placeholder="https://tiktok.com/@sua-agencia"
+                        onChange={(e) => setSite({ ...site, tiktok: e.target.value })} 
                         className="h-11 rounded-xl border-muted-foreground/20" 
                       />
                     </div>
