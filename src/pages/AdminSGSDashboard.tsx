@@ -287,22 +287,126 @@ const AdminSGSDashboard = () => {
         </div>
       ) : (
         <div className="space-y-6">
-        {/* Quick Actions Bar */}
-        <div className="glass-card rounded-[2.5rem] p-8 shadow-sm animate-in-fade" style={{ animationDelay: '0.1s' }}>
-          <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-6 ml-1">Central de Ações Rápidas (SGS)</p>
-          <div className="flex flex-wrap gap-3">
-            {quickActions.map(a => (
-              <button
-                key={a.label}
-                onClick={a.onClick ? a.onClick : () => navigate(a.path!)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-tight transition-all active:scale-95 shadow-sm ${a.color}`}
-              >
-                <a.icon size={16} strokeWidth={2.5} />
-                {a.label}
-              </button>
-            ))}
+          {/* Santo Amaro Safety Pulse & Compliance */}
+          <div className="grid lg:grid-cols-3 gap-6 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+            {/* Safety Pulse */}
+            <div className="lg:col-span-2 glass-card rounded-[2.5rem] p-6 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                <Waves size={120} className="text-primary" />
+              </div>
+              
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Activity size={16} className="text-primary" />
+                </div>
+                <h2 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Santo Amaro Safety Pulse</h2>
+                <Badge variant="outline" className="ml-auto border-emerald-500/30 text-emerald-600 bg-emerald-50 text-[9px] font-black uppercase tracking-widest">Operação Normal</Badge>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="space-y-1">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Nível das Lagoas</p>
+                  <div className="flex items-end gap-1.5">
+                    <span className="text-2xl font-black text-foreground tracking-tighter">85%</span>
+                    <span className="text-[10px] font-bold text-emerald-500 mb-1">IDEAL</span>
+                  </div>
+                  <div className="w-full h-1 bg-muted rounded-full overflow-hidden mt-2">
+                    <div className="h-full bg-primary w-[85%]" />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Condição Climática</p>
+                  <div className="flex items-center gap-2">
+                    <Sun className="text-amber-500" size={20} />
+                    <span className="text-sm font-black text-foreground uppercase tracking-tight">Ensolarado</span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground font-bold">29°C · Ventos 12km/h</p>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Próxima Maré (Atins)</p>
+                  <div className="flex items-center gap-2">
+                    <Waves className="text-primary" size={20} />
+                    <span className="text-sm font-black text-foreground uppercase tracking-tight">14:30</span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground font-bold">Alta · 2.1m</p>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Risco Operacional</p>
+                  <div className="flex items-center gap-2">
+                    <Shield className="text-emerald-500" size={20} />
+                    <span className="text-sm font-black text-foreground uppercase tracking-tight text-emerald-600">BAIXO</span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground font-bold">Sem alertas vigentes</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Compliance Card */}
+            <div className="glass-card rounded-[2.5rem] p-6 border-primary/10 relative overflow-hidden bg-gradient-to-br from-primary/[0.02] to-transparent">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Compliance & Normas</h2>
+                <Award size={20} className="text-primary/40" />
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-white/50 border border-border">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center">
+                      <CheckCircle2 size={16} className="text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-black text-foreground uppercase">CADASTUR</p>
+                      <p className="text-[9px] text-muted-foreground font-bold italic">Regularizado até 2027</p>
+                    </div>
+                  </div>
+                  <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-100 text-[9px] font-black">ATIVO</Badge>
+                </div>
+
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-white/50 border border-border">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center">
+                      <CheckCircle2 size={16} className="text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-black text-foreground uppercase tracking-tight">Autorização ICMBio</p>
+                      <p className="text-[9px] text-muted-foreground font-bold italic">Vigente · Parque Nacional</p>
+                    </div>
+                  </div>
+                  <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-100 text-[9px] font-black">OK</Badge>
+                </div>
+
+                <div className="pt-2">
+                  <div className="flex justify-between items-end mb-1.5 px-1">
+                    <p className="text-[10px] font-black text-primary uppercase tracking-widest">Saúde do SGS (ISO 21101)</p>
+                    <span className="text-xs font-black text-primary">85%</span>
+                  </div>
+                  <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="h-full bg-primary w-[85%]" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+
+          {/* Quick Actions Bar */}
+          <div className="glass-card rounded-[2.5rem] p-8 shadow-sm animate-in-fade" style={{ animationDelay: '0.2s' }}>
+            <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-6 ml-1">Central de Ações Rápidas (SGS)</p>
+            <div className="flex flex-wrap gap-3">
+              {quickActions.map(a => (
+                <button
+                  key={a.label}
+                  onClick={a.onClick ? a.onClick : () => navigate(a.path!)}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-tight transition-all active:scale-95 shadow-sm ${a.color}`}
+                >
+                  <a.icon size={16} strokeWidth={2.5} />
+                  {a.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
         {/* Stats - Clickable */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 animate-in-fade" style={{ animationDelay: '0.2s' }}>
