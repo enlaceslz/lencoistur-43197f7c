@@ -5,14 +5,14 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/utils";
 
-const tourLagoasAzuis = "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=95&w=2560";
-const tourRioPreguicas = "https://images.unsplash.com/photo-1516750084509-ca4891ded48d?auto=format&fit=crop&q=95&w=2560";
-const tourEcologico = "https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?auto=format&fit=crop&q=95&w=2560";
-const tourGastronomico = "https://images.unsplash.com/photo-1569336415962-a4bd9f67c07a?auto=format&fit=crop&q=95&w=2560";
-const tourCultural = "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=95&w=2560";
-const tourCaiaque = "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=95&w=2560";
-const tourTrekking = "https://images.unsplash.com/photo-1625026214227-2c9cc0883658?auto=format&fit=crop&q=95&w=2560";
-const tourQuadriciclo = "https://images.unsplash.com/photo-1589112735741-26c6d04325a8?auto=format&fit=crop&q=95&w=2560";
+const tourLagoasAzuis = "/src/assets/tour-lagoas-azuis-hero.jpg";
+const tourRioPreguicas = "/src/assets/tour-rio-preguicas.jpg";
+const tourEcologico = "/src/assets/tour-roteiro-ecologico.jpg";
+const tourGastronomico = "/src/assets/tour-gastronomico.jpg";
+const tourCultural = "/src/assets/tour-cultural.jpg";
+const tourCaiaque = "/src/assets/tour-caiaque.jpg";
+const tourTrekking = "/src/assets/tour-trekking.jpg";
+const tourQuadriciclo = "/src/assets/tour-quadriciclo.jpg";
 
 const localImageMap: Record<string, string> = {
   "lagoas-azuis": tourLagoasAzuis,
