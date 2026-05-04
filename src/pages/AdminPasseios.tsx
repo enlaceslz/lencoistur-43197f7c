@@ -303,14 +303,14 @@ const AdminPasseios = () => {
         ))}
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-4 sm:p-6 bg-card border border-border rounded-3xl shadow-sm">
+      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-4 sm:p-6 glass-card rounded-[2.5rem] shadow-sm animate-in-fade" style={{ animationDelay: '0.2s' }}>
         <div className="relative flex-1 w-full group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
           <Input 
-            placeholder="Buscar passeio..." 
+            placeholder="Buscar passeio pelo nome ou categoria..." 
             value={search} 
             onChange={(e) => setSearch(e.target.value)} 
-            className="pl-12 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30 transition-all text-sm font-medium" 
+            className="pl-12 h-12 rounded-2xl border-border/40 focus:ring-primary/20 bg-muted/20 transition-all text-sm font-medium" 
           />
         </div>
         
