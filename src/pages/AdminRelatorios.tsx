@@ -242,13 +242,10 @@ const AdminRelatorios = () => {
           </div>
         </div>
 
-        <div className="no-print flex flex-col xl:flex-row xl:items-center justify-between gap-6 bg-card p-6 rounded-3xl border border-border/50 shadow-sm">
+        <div className="no-print flex flex-col xl:flex-row xl:items-center justify-between gap-6 glass-card p-8 rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.1s' }}>
           <div>
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight">Relatórios Gerenciais</h2>
-            <div className="flex items-center gap-2 mt-1">
-              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <p className="text-sm font-medium text-muted-foreground">Analise métricas de performance e crescimento em tempo real.</p>
-            </div>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Análise de Performance</p>
+            <h2 className="text-4xl font-black text-foreground tracking-tight leading-none">Relatórios Gerenciais</h2>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 bg-muted/50 border border-border/50 rounded-2xl px-4 h-12 shadow-inner group">

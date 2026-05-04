@@ -161,30 +161,32 @@ const AdminSGSRiscos = () => {
     <AdminLayout title="SGS - Matriz de Riscos (P2)">
       <div className="space-y-6">
         {/* Summary cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 animate-in-fade" style={{ animationDelay: '0.1s' }}>
           {[
-            { label: "Total de Riscos", value: summary.total, icon: AlertTriangle, color: "text-slate-600", bg: "bg-slate-100" },
-            { label: "Aceitável (NR < 6)", value: summary.acceptable, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-100" },
-            { label: "Temporário (6-11)", value: summary.temporary, icon: Clock, color: "text-amber-600", bg: "bg-amber-100" },
-            { label: "Inaceitável (NR ≥ 12)", value: summary.unacceptable, icon: AlertTriangle, color: "text-rose-600", bg: "bg-rose-100" },
+            { label: "Total de Riscos", value: summary.total, icon: AlertTriangle, color: "from-slate-500 to-slate-700", desc: "Mapeamento P2" },
+            { label: "Aceitável (NR < 6)", value: summary.acceptable, icon: CheckCircle, color: "from-emerald-500 to-teal-600", desc: "Monitoramento" },
+            { label: "Temporário (6-11)", value: summary.temporary, icon: Clock, color: "from-amber-500 to-orange-600", desc: "Tratamento breve" },
+            { label: "Inaceitável (NR ≥ 12)", value: summary.unacceptable, icon: AlertTriangle, color: "from-rose-500 to-pink-600", desc: "Ação imediata" },
           ].map((stat, i) => (
-            <Card key={i} className="border-none shadow-sm bg-card hover:shadow-md transition-all">
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} shadow-inner`}><stat.icon size={24} strokeWidth={2.5} /></div>
-                <div>
-                  <p className="text-2xl font-black text-foreground leading-none">{stat.value}</p>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-2">{stat.label}</p>
+            <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group">
+              <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
+              <div className="flex items-center justify-between mb-4">
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-primary/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+                  <stat.icon size={22} strokeWidth={2.5} />
                 </div>
-              </CardContent>
-            </Card>
+                <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{stat.desc}</div>
+              </div>
+              <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
+              <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
+            </div>
           ))}
         </div>
 
         {/* Header */}
         <div className="flex flex-col xl:flex-row gap-6">
           {/* Heatmap Matrix */}
-          <div className="bg-card border border-border rounded-2xl p-5 flex-shrink-0">
-            <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+          <div className="glass-card rounded-[2.5rem] p-8 shadow-sm flex-shrink-0 animate-in-fade" style={{ animationDelay: '0.2s' }}>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-6 flex items-center gap-3">
               <AlertTriangle size={16} className="text-secondary" />
               Matriz de Riscos (PxC)
             </h3>
@@ -229,16 +231,23 @@ const AdminSGSRiscos = () => {
             </div>
           </div>
 
-          <div className="flex-1 space-y-4">
+          <div className="flex-1 space-y-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
             <div className="flex flex-col sm:flex-row justify-between gap-4">
-              <div className="flex gap-2 flex-1">
-                <div className="relative flex-1 max-w-md">
-                  <Search size={16} className="absolute left-3 top-3 text-muted-foreground" />
-                  <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar riscos..."
-                    className="w-full pl-9 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30" />
+              <div className="flex gap-3 flex-1">
+                <div className="relative flex-1 max-w-md group">
+                  <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" />
+                  <input 
+                    value={search} 
+                    onChange={(e) => setSearch(e.target.value)} 
+                    placeholder="Buscar por atividade ou perigo..."
+                    className="w-full pl-12 pr-4 h-12 glass-card border-border/40 rounded-2xl text-sm text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all font-medium placeholder:text-muted-foreground/40" 
+                  />
                 </div>
-                <select value={filterStage} onChange={(e) => setFilterStage(e.target.value)}
-                  className="bg-card border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                <select 
+                  value={filterStage} 
+                  onChange={(e) => setFilterStage(e.target.value)}
+                  className="glass-card border-border/40 rounded-2xl px-5 h-12 text-xs font-black uppercase tracking-tight outline-none focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer"
+                >
                   <option value="todas">Todas etapas</option>
                   {Object.entries(STAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
@@ -375,12 +384,13 @@ const AdminSGSRiscos = () => {
         )}
 
         {/* Table */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in-fade" style={{ animationDelay: '0.4s' }}>
         {filtered.map((r) => {
           const rc = riskClass(r.risk_level);
+          const colorClass = rc.label === 'Inaceitável' ? 'from-rose-500 to-pink-600' : rc.label === 'Aceitável' ? 'from-emerald-500 to-teal-600' : 'from-amber-500 to-orange-600';
           return (
-            <div key={r.id} className="bg-card border border-border rounded-3xl p-6 hover:shadow-xl hover:border-primary/30 transition-all group relative overflow-hidden flex flex-col">
-              <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${rc.label === 'Inaceitável' ? 'bg-destructive' : rc.label === 'Aceitável' ? 'bg-primary' : 'bg-secondary'}`} />
+            <div key={r.id} className="glass-card admin-card-hover rounded-[2.5rem] p-8 group relative overflow-hidden flex flex-col">
+              <div className={`absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r ${colorClass} opacity-20 group-hover:opacity-100 transition-opacity`} />
               
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-4">

@@ -400,26 +400,27 @@ const AdminParceiros = () => {
 
   return (
     <AdminLayout title="Parceiros">
-      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-10 bg-card p-6 rounded-3xl border border-border/50 shadow-sm">
+      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-10 glass-card p-8 rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.1s' }}>
         <div className="space-y-1">
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Parceiros</h1>
-          <div className="flex items-center gap-3">
-            <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20 transition-colors border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">
-              {partners.length} Cadastrados
-            </Badge>
-            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">
-              {activeCount} Ativos
-            </Badge>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Relacionamento Externo</p>
+          <h1 className="text-4xl font-black text-foreground tracking-tight leading-none">Parceiros</h1>
+          <div className="flex items-center gap-3 mt-4">
+            <div className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+              <Building2 size={12} /> {partners.length} Cadastrados
+            </div>
+            <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+              <CheckCircle2 size={12} /> {activeCount} Ativos
+            </div>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative flex-1 min-w-[280px] group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
-            <Input 
-              placeholder="Buscar por nome, contato ou CPF/CNPJ..." 
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative flex-1 min-w-[320px] group">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
+            <input 
+              placeholder="Pesquisar por nome, contato ou documento..." 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
-              className="pl-11 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30 transition-all font-medium text-sm" 
+              className="w-full pl-14 h-14 rounded-2xl border border-border/40 focus:ring-4 focus:ring-primary/10 bg-muted/20 transition-all font-medium text-sm outline-none placeholder:text-muted-foreground/40" 
             />
           </div>
           <div className="flex items-center gap-2">
@@ -452,61 +453,79 @@ const AdminParceiros = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {partnerTypes.map((t) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+        {partnerTypes.map((t, idx) => {
           const Icon = getIcon(t.icon);
+          const count = partners.filter((p) => p.type === t.name).length;
           return (
-            <Card key={t.id} className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setTypeFilter(t.name)}>
-              <CardContent className="p-5 flex items-center gap-4">
-                <div className={`p-3 rounded-xl ${t.color}`}><Icon size={22} /></div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{partners.filter((p) => p.type === t.name).length}</p>
-                  <p className="text-xs text-muted-foreground">{t.label}</p>
+            <div 
+              key={t.id} 
+              className="glass-card admin-card-hover rounded-[2rem] p-6 cursor-pointer relative overflow-hidden group"
+              onClick={() => setTypeFilter(t.name)}
+            >
+              <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
+              
+              <div className="flex items-center justify-between mb-6">
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg bg-primary/10 text-primary shadow-primary/10`}>
+                  <Icon size={26} strokeWidth={2.5} />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+              
+              <div className="relative">
+                <p className="text-3xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{count}</p>
+                <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{t.label}</p>
+              </div>
+            </div>
           );
         })}
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-8 overflow-x-auto pb-2 no-scrollbar scroll-smooth">
+      <div className="flex flex-wrap gap-3 mb-10 overflow-x-auto pb-4 no-scrollbar scroll-smooth animate-in-fade" style={{ animationDelay: '0.15s' }}>
         <button
           onClick={() => setTypeFilter("todos")} 
-          className={`text-[10px] font-black uppercase tracking-widest px-6 h-10 rounded-xl transition-all whitespace-nowrap ${
+          className={`text-[10px] font-black uppercase tracking-widest px-8 h-12 rounded-2xl transition-all whitespace-nowrap shadow-lg shadow-primary/5 ${
             typeFilter === "todos"
-              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
-              : "bg-muted text-muted-foreground hover:bg-muted/80"
+              ? "bg-primary text-primary-foreground shadow-primary/20 scale-105"
+              : "glass-card text-muted-foreground hover:bg-muted/80"
           }`}
         >
-          Todos
+          Todos Parceiros
         </button>
-        {partnerTypes.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setTypeFilter(t.name)}
-            className={`text-[10px] font-black uppercase tracking-widest px-6 h-10 rounded-xl transition-all whitespace-nowrap ${
-              typeFilter === t.name
-                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+        {partnerTypes.map((t) => {
+          const isActive = typeFilter === t.name;
+          const count = partners.filter((p) => p.type === t.name).length;
+          const Icon = getIcon(t.icon);
+          return (
+            <button 
+              key={t.id} 
+              onClick={() => setTypeFilter(t.name)}
+              className={`flex items-center gap-3 px-8 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap shadow-lg shadow-primary/5 ${
+                isActive 
+                  ? "bg-primary text-primary-foreground shadow-primary/20 scale-105" 
+                  : "glass-card text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
+              <Icon size={16} strokeWidth={2.5} className={isActive ? "text-white" : "text-primary/40"} />
+              {t.label}
+              <span className={`ml-2 px-2.5 py-0.5 rounded-lg text-[9px] ${isActive ? "bg-white/20 text-white" : "bg-primary/10 text-primary"}`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
-
-      <Card className="border-none shadow-sm overflow-hidden">
+      <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
         {filtered.length === 0 ? (
-          <div className="p-12 text-center text-muted-foreground">
-            <Users className="mx-auto mb-3 opacity-40" size={40} />
-            <p className="font-medium">Nenhum parceiro encontrado</p>
-            <p className="text-sm mt-1">Cadastre um novo parceiro ou mude o filtro.</p>
+          <div className="py-20 text-center text-muted-foreground bg-muted/10">
+            <Users className="mx-auto mb-4 opacity-20" size={64} />
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Vazio</p>
+            <p className="text-xs font-medium text-muted-foreground/60 mt-2">Nenhum parceiro encontrado com os filtros atuais.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
+                <TableRow className="hover:bg-transparent border-b border-border/20">
                   <TableHead>Parceiro</TableHead>
                   <TableHead>Tipo</TableHead>
                   <TableHead>CPF/CNPJ</TableHead>

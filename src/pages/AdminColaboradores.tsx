@@ -419,26 +419,27 @@ const AdminColaboradores = () => {
 
   return (
     <AdminLayout title="Colaboradores">
-      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-10 bg-card p-6 rounded-3xl border border-border/50 shadow-sm">
+      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-10 glass-card p-8 rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.1s' }}>
         <div className="space-y-1">
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Colaboradores</h1>
-          <div className="flex items-center gap-3">
-            <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20 transition-colors border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">
-              {collaborators.length} Especialistas
-            </Badge>
-            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">
-              {collaborators.filter(c => c.status === 'active').length} Ativos
-            </Badge>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Equipe Interna e Operacional</p>
+          <h1 className="text-4xl font-black text-foreground tracking-tight leading-none">Colaboradores</h1>
+          <div className="flex items-center gap-3 mt-4">
+            <div className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+              <Users size={12} /> {collaborators.length} Especialistas
+            </div>
+            <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+              <CheckCircle2 size={12} /> {collaborators.filter(c => c.status === 'active').length} Ativos
+            </div>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative flex-1 min-w-[280px] group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
-            <Input 
-              placeholder="Buscar por nome, documento ou categoria..." 
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative flex-1 min-w-[320px] group">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
+            <input 
+              placeholder="Pesquisar colaborador por nome ou cargo..." 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
-              className="pl-11 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30 transition-all font-medium text-sm" 
+              className="w-full pl-14 h-14 rounded-2xl border border-border/40 focus:ring-4 focus:ring-primary/10 bg-muted/20 transition-all font-medium text-sm outline-none placeholder:text-muted-foreground/40" 
             />
           </div>
           <div className="flex items-center gap-2">
@@ -469,45 +470,49 @@ const AdminColaboradores = () => {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-8 overflow-x-auto pb-2 no-scrollbar scroll-smooth">
+      <div className="flex flex-wrap gap-3 mb-10 overflow-x-auto pb-4 no-scrollbar scroll-smooth animate-in-fade" style={{ animationDelay: '0.15s' }}>
         <button
           onClick={() => setSearch("")} 
-          className={`text-[10px] font-black uppercase tracking-widest px-6 h-10 rounded-xl transition-all whitespace-nowrap ${
+          className={`text-[10px] font-black uppercase tracking-widest px-8 h-12 rounded-2xl transition-all whitespace-nowrap shadow-lg shadow-primary/5 ${
             !search
-              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
-              : "bg-muted text-muted-foreground hover:bg-muted/80"
+              ? "bg-primary text-primary-foreground shadow-primary/20 scale-105"
+              : "glass-card text-muted-foreground hover:bg-muted/80"
           }`}
         >
-          Todos
+          Todos Especialistas
         </button>
-        {collabTypes.map((t) => (
-          <Button 
-            key={t.id} 
-            variant={search === t.name ? "default" : "outline"} 
-            size="sm" 
-            onClick={() => setSearch(t.name)}
-            className={`rounded-full px-6 h-10 shadow-sm transition-all duration-300 ${search === t.name ? "scale-105" : "hover:bg-primary/5 hover:border-primary/30"}`}
-            style={search === t.name ? { backgroundColor: t.color, borderColor: t.color } : {}}
-          >
-            <Users size={14} className="mr-2 opacity-70" />
-            {t.name}
-            <span className="ml-2 bg-black/10 px-2 py-0.5 rounded-full text-[10px]">
-              {collaborators.filter(c => c.type === t.name).length}
-            </span>
-          </Button>
-        ))}
+        {collabTypes.map((t) => {
+          const isActive = search === t.name;
+          const count = collaborators.filter(c => c.type === t.name).length;
+          return (
+            <button 
+              key={t.id} 
+              onClick={() => setSearch(t.name)}
+              className={`flex items-center gap-3 px-8 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap shadow-lg shadow-primary/5 ${
+                isActive 
+                  ? "bg-primary text-primary-foreground shadow-primary/20 scale-105" 
+                  : "glass-card text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
+              <Users size={16} strokeWidth={2.5} className={isActive ? "text-white" : "text-primary/40"} />
+              {t.name}
+              <span className={`ml-2 px-2.5 py-0.5 rounded-lg text-[9px] ${isActive ? "bg-white/20 text-white" : "bg-primary/10 text-primary"}`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      <Card className="mb-8 border-none shadow-lg bg-white/80 backdrop-blur-md overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
-        <CardContent className="p-6 flex flex-col md:flex-row gap-6 items-center justify-between">
+      <div className="mb-10 glass-card rounded-[2.5rem] p-8 shadow-sm animate-in-fade" style={{ animationDelay: '0.2s' }}>
+        <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
           <div className="relative flex-1 w-full group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
-            <Input 
-              placeholder="Buscar por nome, e-mail ou documento..." 
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
+            <input 
+              placeholder="Pesquisar por nome, e-mail ou documento..." 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
-              className="pl-12 h-12 bg-white border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all rounded-2xl shadow-sm" 
+              className="w-full pl-14 h-14 rounded-2xl border border-border/40 focus:ring-4 focus:ring-primary/10 bg-muted/20 transition-all font-medium text-sm outline-none placeholder:text-muted-foreground/40" 
             />
           </div>
           
@@ -535,14 +540,14 @@ const AdminColaboradores = () => {
               </Button>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {viewMode === 'cards' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filtered.map(c => (
-            <Card key={c.id} className="overflow-hidden border-none shadow-md hover:shadow-2xl transition-all duration-500 group relative bg-white flex flex-col h-full rounded-3xl">
-              <div className="absolute top-0 left-0 w-full h-2 bg-slate-100 group-hover:bg-primary/20 transition-colors" />
+            <div key={c.id} className="overflow-hidden border-none glass-card admin-card-hover group relative flex flex-col h-full rounded-[2.5rem] animate-in-fade">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-primary/5 group-hover:bg-primary/20 transition-colors" />
               
               <div className="p-6 flex-1">
                 <div className="flex justify-between items-start mb-6">
@@ -617,7 +622,7 @@ const AdminColaboradores = () => {
                   </Button>
                 </div>
               </div>
-            </Card>
+            </div>
           ))}
           {filtered.length === 0 && (
             <div className="col-span-full py-32 text-center bg-white rounded-3xl border-2 border-dashed border-slate-200 shadow-sm">
@@ -630,11 +635,11 @@ const AdminColaboradores = () => {
           )}
         </div>
       ) : (
-        <Card className="border-none shadow-xl bg-white/80 backdrop-blur-md rounded-3xl overflow-hidden">
+        <div className="glass-card rounded-[2.5rem] overflow-hidden border-none shadow-sm animate-in-fade" style={{ animationDelay: '0.3s' }}>
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader className="bg-slate-50/50">
-                <TableRow className="hover:bg-transparent border-slate-100">
+              <TableHeader>
+                <TableRow className="hover:bg-transparent border-border/20">
                   <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6 pl-8">Especialista</TableHead>
                   <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6">Contato</TableHead>
                   <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6">Remuneração</TableHead>
@@ -719,7 +724,7 @@ const AdminColaboradores = () => {
               </TableBody>
             </Table>
           </div>
-        </Card>
+        </div>
       )}
 
       {/* Collaborator Form Dialog */}
