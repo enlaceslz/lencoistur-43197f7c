@@ -468,11 +468,13 @@ const AdminSGSDashboard = () => {
         </div>
 
         {/* P4 - Emergency + ISO - Collapsible sections */}
-        <details className="bg-card border border-border rounded-2xl overflow-hidden group">
-          <summary className="px-5 py-4 cursor-pointer flex items-center gap-3 hover:bg-muted/30 transition-colors">
-            <Phone size={18} className="text-destructive" />
-            <span className="font-display font-bold text-foreground text-sm flex-1">P4 — Plano de Resposta à Emergência</span>
-            <ArrowRight size={14} className="text-muted-foreground transition-transform group-open:rotate-90" />
+        <details className="glass-card border-none rounded-[2rem] overflow-hidden group animate-in-fade shadow-sm" style={{ animationDelay: '0.4s' }}>
+          <summary className="px-8 py-6 cursor-pointer flex items-center gap-4 hover:bg-muted/30 transition-colors">
+            <div className="p-2.5 rounded-xl bg-destructive/10 text-destructive">
+              <Phone size={20} strokeWidth={2.5} />
+            </div>
+            <span className="font-display font-black text-foreground text-lg flex-1">P4 — Plano de Resposta à Emergência</span>
+            <ArrowRight size={18} className="text-muted-foreground transition-transform group-open:rotate-90" />
           </summary>
           <div className="px-5 pb-5 pt-2">
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
