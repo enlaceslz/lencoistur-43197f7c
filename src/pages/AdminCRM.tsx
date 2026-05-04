@@ -1064,112 +1064,130 @@ const AdminCRMContent = () => {
 
         <div className="bg-card border border-border rounded-2xl p-6">
             {selectedCustomer ? (
-              <div className="space-y-6">
-                <div className="text-center bg-muted/20 p-6 rounded-3xl border border-border/50">
-                  <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground text-2xl font-black mx-auto mb-4 shadow-xl">
-                    {selectedCustomer.name.trim() ? selectedCustomer.name.trim().split(" ").filter(Boolean).map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
-                  </div>
-                  <h3 className="font-display text-xl font-black text-foreground">{selectedCustomer.name}</h3>
-                  <div className="flex items-center justify-center gap-2 mt-3">
-                    <Badge variant="outline" className={`uppercase text-[10px] font-black tracking-widest px-3 py-1 ${customerStatusConfig[selectedCustomer.status]?.className || ""}`}>
-                      {customerStatusConfig[selectedCustomer.status]?.label || selectedCustomer.status}
-                    </Badge>
-                    {selectedCustomer.ltvCategory && (
-                      <Badge variant="secondary" className="uppercase text-[10px] font-black tracking-widest px-3 py-1 bg-primary text-white">
-                        {selectedCustomer.ltvCategory}
+                <div className="space-y-6">
+                  <div className="text-center bg-muted/20 p-6 rounded-3xl border border-border/50">
+                    <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground text-2xl font-black mx-auto mb-4 shadow-xl">
+                      {selectedCustomer.name.trim() ? selectedCustomer.name.trim().split(" ").filter(Boolean).map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
+                    </div>
+                    <h3 className="font-display text-xl font-black text-foreground">{selectedCustomer.name}</h3>
+                    <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
+                      <Badge variant="outline" className={`uppercase text-[10px] font-black tracking-widest px-3 py-1 ${customerStatusConfig[selectedCustomer.status]?.className || ""}`}>
+                        {customerStatusConfig[selectedCustomer.status]?.label || selectedCustomer.status}
                       </Badge>
-                    )}
-                  </div>
-                  <p className="text-[10px] font-bold text-muted-foreground mt-4 uppercase tracking-widest">
-                    Parceiro Lençóis Tour desde {new Date(selectedCustomer.created_at).toLocaleDateString("pt-BR")}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 text-center">
-                    <p className="text-2xl font-black text-primary leading-none">{selectedCustomer.totalBookings}</p>
-                    <p className="text-[10px] uppercase font-bold text-muted-foreground mt-2 tracking-widest">Viagens</p>
-                  </div>
-                  <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 text-center">
-                    <p className="text-2xl font-black text-foreground leading-none">{fmt(selectedCustomer.totalSpent)}</p>
-                    <p className="text-[10px] uppercase font-bold text-muted-foreground mt-2 tracking-widest">LTV Acumulado</p>
-                  </div>
-                </div>
-
-                <div className="space-y-4 bg-muted/10 p-5 rounded-2xl border border-border/50 shadow-inner">
-                  <div className="flex items-center gap-4 text-sm font-semibold">
-                    <div className="p-2 rounded-lg bg-background border border-border cursor-pointer hover:bg-muted" onClick={() => { navigator.clipboard.writeText(selectedCustomer.email || ""); toast.success("E-mail copiado!"); }}><Mail size={16} className="text-primary" /></div>
-                    <span className="text-foreground truncate">{selectedCustomer.email || "Sem e-mail cadastrado"}</span>
-                  </div>
-                  {selectedCustomer.phone && (
-                    <div className="flex items-center gap-4 text-sm font-semibold">
-                      <div className="p-2 rounded-lg bg-background border border-border cursor-pointer hover:bg-muted" onClick={() => { navigator.clipboard.writeText(selectedCustomer.phone || ""); toast.success("Telefone copiado!"); }}><Smartphone size={16} className="text-primary" /></div>
-                      <span className="text-foreground">{maskPhone(selectedCustomer.phone)}</span>
+                      {selectedCustomer.ltvCategory && (
+                        <Badge variant="secondary" className="uppercase text-[10px] font-black tracking-widest px-3 py-1 bg-primary text-white">
+                          {selectedCustomer.ltvCategory}
+                        </Badge>
+                      )}
+                      {selectedCustomer.tags?.map(tag => (
+                        <Badge key={tag} variant="secondary" className="text-[8px] uppercase tracking-tighter px-1.5 py-0 bg-muted text-muted-foreground border-border">
+                          {tag}
+                        </Badge>
+                      ))}
                     </div>
-                  )}
-                  {selectedCustomer.address && (
-                    <div className="flex items-start gap-4 text-sm font-semibold">
-                      <div className="p-2 rounded-lg bg-background border border-border shrink-0"><MapPin size={16} className="text-primary" /></div>
-                      <div className="flex flex-col">
-                        <span className="text-foreground text-xs leading-tight">
-                          {selectedCustomer.address}{selectedCustomer.number ? `, ${selectedCustomer.number}` : ""}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter mt-1">
-                          {selectedCustomer.neighborhood ? `${selectedCustomer.neighborhood}, ` : ""}{selectedCustomer.city} - {selectedCustomer.state}
-                        </span>
+                    <p className="text-[10px] font-bold text-muted-foreground mt-4 uppercase tracking-widest">
+                      Parceiro Lençóis Tour desde {new Date(selectedCustomer.created_at).toLocaleDateString("pt-BR")}
+                    </p>
+                  </div>
+
+                  <Tabs defaultValue="info" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2 mb-4">
+                      <TabsTrigger value="info" className="text-[10px] font-black uppercase tracking-widest">Informações</TabsTrigger>
+                      <TabsTrigger value="timeline" className="text-[10px] font-black uppercase tracking-widest">Histórico</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="info" className="space-y-6">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 text-center">
+                          <p className="text-2xl font-black text-primary leading-none">{selectedCustomer.totalBookings}</p>
+                          <p className="text-[10px] uppercase font-bold text-muted-foreground mt-2 tracking-widest">Viagens</p>
+                        </div>
+                        <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 text-center">
+                          <p className="text-2xl font-black text-foreground leading-none">{fmt(selectedCustomer.totalSpent)}</p>
+                          <p className="text-[10px] uppercase font-bold text-muted-foreground mt-2 tracking-widest">LTV Acumulado</p>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  {selectedCustomer.lastBooking && (
-                    <div className="flex items-center gap-4 text-sm border-t border-border pt-4 mt-2">
-                      <div className="p-2 rounded-lg bg-primary/10"><Calendar size={16} className="text-primary" /></div>
-                      <div className="flex flex-col">
-                        <span className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Última Viagem</span>
-                        <span className="text-xs font-bold">{new Date(selectedCustomer.lastBooking).toLocaleDateString("pt-BR", { dateStyle: 'long' })}</span>
+
+                      <div className="space-y-4 bg-muted/10 p-5 rounded-2xl border border-border/50 shadow-inner">
+                        <div className="flex items-center gap-4 text-sm font-semibold">
+                          <div className="p-2 rounded-lg bg-background border border-border cursor-pointer hover:bg-muted" onClick={() => { navigator.clipboard.writeText(selectedCustomer.email || ""); toast.success("E-mail copiado!"); }}><Mail size={16} className="text-primary" /></div>
+                          <span className="text-foreground truncate">{selectedCustomer.email || "Sem e-mail cadastrado"}</span>
+                        </div>
+                        {selectedCustomer.phone && (
+                          <div className="flex items-center gap-4 text-sm font-semibold">
+                            <div className="p-2 rounded-lg bg-background border border-border cursor-pointer hover:bg-muted" onClick={() => { navigator.clipboard.writeText(selectedCustomer.phone || ""); toast.success("Telefone copiado!"); }}><Smartphone size={16} className="text-primary" /></div>
+                            <span className="text-foreground">{maskPhone(selectedCustomer.phone)}</span>
+                          </div>
+                        )}
+                        {selectedCustomer.address && (
+                          <div className="flex items-start gap-4 text-sm font-semibold">
+                            <div className="p-2 rounded-lg bg-background border border-border shrink-0"><MapPin size={16} className="text-primary" /></div>
+                            <div className="flex flex-col">
+                              <span className="text-foreground text-xs leading-tight">
+                                {selectedCustomer.address}{selectedCustomer.number ? `, ${selectedCustomer.number}` : ""}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter mt-1">
+                                {selectedCustomer.neighborhood ? `${selectedCustomer.neighborhood}, ` : ""}{selectedCustomer.city} - {selectedCustomer.state}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                        {selectedCustomer.lastBooking && (
+                          <div className="flex items-center gap-4 text-sm border-t border-border pt-4 mt-2">
+                            <div className="p-2 rounded-lg bg-primary/10"><Calendar size={16} className="text-primary" /></div>
+                            <div className="flex flex-col">
+                              <span className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Última Viagem</span>
+                              <span className="text-xs font-bold">{new Date(selectedCustomer.lastBooking).toLocaleDateString("pt-BR", { dateStyle: 'long' })}</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  )}
-                </div>
 
-                {selectedCustomer.notes && (
-                  <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-2xl border border-amber-100 dark:border-amber-900/20 shadow-sm">
-                    <p className="text-[10px] font-black text-amber-800 dark:text-amber-400 uppercase tracking-widest mb-1">Observações Internas</p>
-                    <p className="text-xs text-amber-900 dark:text-amber-200 leading-relaxed font-medium">{selectedCustomer.notes}</p>
-                  </div>
-                )}
+                      {selectedCustomer.notes && (
+                        <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-2xl border border-amber-100 dark:border-amber-900/20 shadow-sm">
+                          <p className="text-[10px] font-black text-amber-800 dark:text-amber-400 uppercase tracking-widest mb-1">Observações Internas</p>
+                          <p className="text-xs text-amber-900 dark:text-amber-200 leading-relaxed font-medium">{selectedCustomer.notes}</p>
+                        </div>
+                      )}
 
-                <div className="flex flex-col gap-2">
-                  {selectedCustomer.phone && (
-                    <div className="flex gap-2">
-                      <a
-                        href={`https://wa.me/${selectedCustomer.country === "Brasil" ? "55" : ""}${selectedCustomer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selectedCustomer.name.split(" ")[0]}! Tudo bem?`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1"
-                      >
-                        <Button className="w-full rounded-xl bg-green-600 hover:bg-green-700 text-white shadow-sm h-11">
-                          <Smartphone size={16} /> WhatsApp
-                        </Button>
-                      </a>
-                      <a
-                        href={`tel:${selectedCustomer.phone.replace(/\D/g, "")}`}
-                        className="shrink-0"
-                      >
-                        <Button variant="outline" className="rounded-xl h-11 w-11 p-0">
-                          <Phone size={16} />
-                        </Button>
-                      </a>
-                    </div>
-                  )}
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline" className="w-full rounded-xl h-11" onClick={() => openEditModal(selectedCustomer)}>
-                      <Pencil size={14} /> Editar
-                    </Button>
-                    <Button variant="outline" className="w-full rounded-xl border-primary/20 text-primary hover:bg-primary/5 h-11" onClick={() => exportClientPDF(selectedCustomer)}>
-                      <Printer size={14} /> Ficha PDF
-                    </Button>
-                  </div>
-                </div>
+                      <div className="flex flex-col gap-2">
+                        {selectedCustomer.phone && (
+                          <div className="flex gap-2">
+                            <a
+                              href={`https://wa.me/${selectedCustomer.country === "Brasil" ? "55" : ""}${selectedCustomer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selectedCustomer.name.split(" ")[0]}! Tudo bem?`)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1"
+                            >
+                              <Button className="w-full rounded-xl bg-green-600 hover:bg-green-700 text-white shadow-sm h-11">
+                                <Smartphone size={16} /> WhatsApp
+                              </Button>
+                            </a>
+                            <a
+                              href={`tel:${selectedCustomer.phone.replace(/\D/g, "")}`}
+                              className="shrink-0"
+                            >
+                              <Button variant="outline" className="rounded-xl h-11 w-11 p-0">
+                                <Phone size={16} />
+                              </Button>
+                            </a>
+                          </div>
+                        )}
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button variant="outline" className="w-full rounded-xl h-11" onClick={() => openEditModal(selectedCustomer)}>
+                            <Pencil size={14} /> Editar
+                          </Button>
+                          <Button variant="outline" className="w-full rounded-xl border-primary/20 text-primary hover:bg-primary/5 h-11" onClick={() => exportClientPDF(selectedCustomer)}>
+                            <Printer size={14} /> Ficha PDF
+                          </Button>
+                        </div>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="timeline">
+                      <CustomerInteractionHistory customerId={selectedCustomer.id} />
+                    </TabsContent>
+                  </Tabs>
                 <div className="border-t border-border pt-6">
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="font-display font-bold text-foreground">Dependentes / Acompanhantes</h4>
