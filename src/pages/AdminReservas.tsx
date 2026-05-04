@@ -557,6 +557,7 @@ const AdminReservas = () => {
           </div>
         )}
       </Card>
+      )}
 
       {/* Detail Modal */}
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
