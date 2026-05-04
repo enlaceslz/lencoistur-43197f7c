@@ -494,6 +494,41 @@ export type Database = {
           },
         ]
       }
+      customer_interactions: {
+        Row: {
+          content: string
+          created_at: string | null
+          created_by: string | null
+          customer_id: string
+          id: string
+          type: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          created_by?: string | null
+          customer_id: string
+          id?: string
+          type: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          created_by?: string | null
+          customer_id?: string
+          id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_interactions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           address: string | null
@@ -513,6 +548,7 @@ export type Database = {
           phone: string | null
           state: string | null
           status: string | null
+          tags: string[] | null
           updated_at: string
           user_id: string | null
         }
@@ -534,6 +570,7 @@ export type Database = {
           phone?: string | null
           state?: string | null
           status?: string | null
+          tags?: string[] | null
           updated_at?: string
           user_id?: string | null
         }
@@ -555,6 +592,7 @@ export type Database = {
           phone?: string | null
           state?: string | null
           status?: string | null
+          tags?: string[] | null
           updated_at?: string
           user_id?: string | null
         }
