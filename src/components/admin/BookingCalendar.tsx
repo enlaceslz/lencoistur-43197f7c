@@ -166,9 +166,9 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.005 }}
                 className={cn(
-                  "min-h-[220px] p-4 transition-all relative group/cell flex flex-col",
+                  "min-h-[220px] p-5 transition-all relative group/cell flex flex-col border-r border-b border-border/10",
                   !isCurrentMonth && "bg-muted/10 opacity-60 grayscale-[0.2]",
-                  isTodayDay && "bg-primary/[0.12] ring-4 ring-inset ring-primary/60 shadow-[inset_0_0_60px_rgba(var(--primary),0.1)] z-10",
+                  isTodayDay && "bg-primary/[0.12] ring-4 ring-inset ring-primary/60 shadow-[inset_0_0_80px_rgba(var(--primary),0.1)] z-10",
                   dayBookings.length > 0 && isCurrentMonth && "bg-gradient-to-br from-white/10 to-primary/[0.08]"
                 )}
               >
@@ -226,14 +226,14 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                               )} />
                               <div className="pl-6">
                                 <div className="flex items-center justify-between mb-2">
-                                  <p className="text-[14px] font-black text-foreground truncate leading-none tracking-tight group-hover/item:text-primary transition-colors">
+                                  <p className="text-[14px] font-black text-foreground truncate leading-none tracking-tight group-hover/item:text-primary transition-colors drop-shadow-sm">
                                     {booking.customerName}
                                   </p>
-                                  <span className="text-[10px] font-black opacity-90 bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full uppercase">#{booking.bookingCode.slice(-4)}</span>
+                                  <span className="text-[10px] font-black opacity-100 bg-primary/10 text-primary border border-primary/30 px-2 py-0.5 rounded-full uppercase shadow-sm">#{booking.bookingCode.slice(-4)}</span>
                                 </div>
                                 <div className="flex items-center gap-2.5">
-                                  <div className={cn("w-2.5 h-2.5 rounded-full ring-4 ring-white/20 shadow-sm", statusConfig[booking.status]?.color)} />
-                                  <p className="text-[11px] font-black text-muted-foreground truncate opacity-100 uppercase tracking-[0.15em] leading-none">
+                                  <div className={cn("w-2.5 h-2.5 rounded-full ring-4 ring-white/30 shadow-md", statusConfig[booking.status]?.color)} />
+                                  <p className="text-[11px] font-black text-muted-foreground truncate opacity-100 uppercase tracking-[0.15em] leading-none drop-shadow-sm">
                                     {booking.itemName.split('(')[0].trim()}
                                   </p>
                                 </div>
