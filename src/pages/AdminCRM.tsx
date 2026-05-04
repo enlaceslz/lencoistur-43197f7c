@@ -135,7 +135,8 @@ const emptyForm: CustomerForm = {
   number: "",
   neighborhood: "",
   city: "",
-  state: ""
+  state: "",
+  tags: []
 };
 
 const emptyDependentForm: DependentForm = {
