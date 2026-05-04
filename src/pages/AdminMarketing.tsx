@@ -37,10 +37,10 @@ const AdminMarketing = () => {
   const emailCampaigns = campaigns.filter((c) => c.type === "email");
 
   const stats = [
-    { label: "Leads Ativos", value: leads.filter((l) => l.status !== "frio").length, icon: Users, color: "text-primary" },
-    { label: "Campanhas Ativas", value: campaigns.filter((c) => c.status === "ativa" || c.status === "automática").length, icon: Megaphone, color: "text-secondary" },
-    { label: "Taxa de Conversão", value: leads.length > 0 ? `${((leads.filter(l => l.status === "convertido").length / leads.length) * 100).toFixed(1)}%` : "0%", icon: TrendingUp, color: "text-green-600" },
-    { label: "Recuperações (mês)", value: rules.reduce((a, r) => a + (r.conversions || 0), 0), icon: RefreshCw, color: "text-blue-600" },
+    { label: "Leads Ativos", value: leads.filter((l) => l.status !== "frio").length, icon: Users, color: "text-primary", bg: "bg-primary/10" },
+    { label: "Campanhas Ativas", value: campaigns.filter((c) => c.status === "ativa" || c.status === "automática").length, icon: Megaphone, color: "text-secondary", bg: "bg-secondary/10" },
+    { label: "Taxa de Conversão", value: leads.length > 0 ? `${((leads.filter(l => l.status === "convertido").length / leads.length) * 100).toFixed(1)}%` : "0%", icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-100" },
+    { label: "Recuperações (Mês)", value: rules.reduce((a, r) => a + (r.conversions || 0), 0), icon: RefreshCw, color: "text-blue-600", bg: "bg-blue-100" },
   ];
 
   const tabs: { key: Tab; label: string; icon: React.ElementType }[] = [
