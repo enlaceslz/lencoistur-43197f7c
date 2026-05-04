@@ -116,9 +116,11 @@ const AdminSGSEquipe = () => {
       <div className="space-y-6">
         <div className="flex justify-between gap-4">
           <p className="text-sm text-muted-foreground">Gestão de competências conforme ABNT NBR ISO 21102</p>
-          <button onClick={() => { setEditId(null); setForm({ name: "", role: "guia", phone: "", email: "", document: "", blocked: false }); setShowForm(!showForm); }}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-            <Plus size={16} /> Novo Membro
+          <button 
+            onClick={() => { setEditId(null); setForm({ name: "", role: "guia", phone: "", email: "", document: "", blocked: false }); setShowForm(!showForm); }}
+            className="flex items-center gap-3 px-8 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95"
+          >
+            <Plus size={20} strokeWidth={3} /> Novo Membro
           </button>
         </div>
 

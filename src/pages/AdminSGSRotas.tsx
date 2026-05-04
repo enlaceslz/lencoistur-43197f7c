@@ -70,8 +70,11 @@ const AdminSGSRotas = () => {
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar rota..." className="w-full pl-9 pr-4 py-2 rounded-xl border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" />
           </div>
-          <button onClick={() => { setForm(emptyForm); setEditId(null); setShowForm(!showForm); }} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:opacity-90">
-            <Plus size={16} /> Nova Rota
+          <button 
+            onClick={() => { setForm(emptyForm); setEditId(null); setShowForm(!showForm); }} 
+            className="flex items-center gap-3 px-8 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95"
+          >
+            <Plus size={20} strokeWidth={3} /> Nova Rota
           </button>
         </div>
 

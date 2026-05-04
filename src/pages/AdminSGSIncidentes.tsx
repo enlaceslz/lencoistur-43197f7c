@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, AlertCircle, Pencil, Trash2, MapPin } from "lucide-react";
+import { Plus, Search, AlertCircle, Pencil, Trash2, MapPin, Clock } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 
 const SEVERITY: Record<string, { label: string; color: string }> = {
@@ -141,19 +142,22 @@ const AdminSGSIncidentes = () => {
     <AdminLayout title="SGS - Registro de Incidentes (P5)">
       <div className="space-y-6">
         {/* Summary */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="bg-card border border-border rounded-2xl p-4">
-            <p className="text-xs text-muted-foreground">Total Registrados</p>
-            <p className="text-2xl font-bold text-foreground">{summary.total}</p>
-          </div>
-          <div className="bg-card border border-border rounded-2xl p-4">
-            <p className="text-xs text-secondary">Abertos</p>
-            <p className="text-2xl font-bold text-secondary">{summary.abertos}</p>
-          </div>
-          <div className="bg-card border border-border rounded-2xl p-4">
-            <p className="text-xs text-destructive">Alta/Crítica</p>
-            <p className="text-2xl font-bold text-destructive">{summary.graves}</p>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+          {[
+            { label: "Total Registrados", value: summary.total, icon: AlertCircle, color: "text-slate-600", bg: "bg-slate-100" },
+            { label: "Ocorrências Abertas", value: summary.abertos, icon: Clock, color: "text-amber-600", bg: "bg-amber-100" },
+            { label: "Alta / Crítica", value: summary.graves, icon: AlertCircle, color: "text-rose-600", bg: "bg-rose-100" },
+          ].map((stat, i) => (
+            <Card key={i} className="border-none shadow-sm bg-card hover:shadow-md transition-all">
+              <CardContent className="p-6 flex items-center gap-4">
+                <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} shadow-inner`}><stat.icon size={24} strokeWidth={2.5} /></div>
+                <div>
+                  <p className="text-2xl font-black text-foreground leading-none">{stat.value}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-2">{stat.label}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between gap-4">

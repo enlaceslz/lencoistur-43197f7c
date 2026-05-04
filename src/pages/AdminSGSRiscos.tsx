@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, AlertTriangle, Search, Info, Pencil, Trash2, Printer, CheckCircle } from "lucide-react";
+import { Plus, AlertTriangle, Search, Info, Pencil, Trash2, Printer, CheckCircle, Clock } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 
@@ -160,23 +161,23 @@ const AdminSGSRiscos = () => {
     <AdminLayout title="SGS - Matriz de Riscos (P2)">
       <div className="space-y-6">
         {/* Summary cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-card border border-border rounded-2xl p-4">
-            <p className="text-xs text-muted-foreground">Total de Riscos</p>
-            <p className="text-2xl font-bold text-foreground">{summary.total}</p>
-          </div>
-          <div className="bg-card border border-border rounded-2xl p-4">
-            <p className="text-xs text-primary">Aceitável (NR &lt; 6)</p>
-            <p className="text-2xl font-bold text-primary">{summary.acceptable}</p>
-          </div>
-          <div className="bg-card border border-border rounded-2xl p-4">
-            <p className="text-xs text-secondary">Temporário (6-11)</p>
-            <p className="text-2xl font-bold text-secondary">{summary.temporary}</p>
-          </div>
-          <div className="bg-card border border-border rounded-2xl p-4">
-            <p className="text-xs text-destructive">Inaceitável (NR ≥ 12)</p>
-            <p className="text-2xl font-bold text-destructive">{summary.unacceptable}</p>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {[
+            { label: "Total de Riscos", value: summary.total, icon: AlertTriangle, color: "text-slate-600", bg: "bg-slate-100" },
+            { label: "Aceitável (NR < 6)", value: summary.acceptable, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-100" },
+            { label: "Temporário (6-11)", value: summary.temporary, icon: Clock, color: "text-amber-600", bg: "bg-amber-100" },
+            { label: "Inaceitável (NR ≥ 12)", value: summary.unacceptable, icon: AlertTriangle, color: "text-rose-600", bg: "bg-rose-100" },
+          ].map((stat, i) => (
+            <Card key={i} className="border-none shadow-sm bg-card hover:shadow-md transition-all">
+              <CardContent className="p-6 flex items-center gap-4">
+                <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} shadow-inner`}><stat.icon size={24} strokeWidth={2.5} /></div>
+                <div>
+                  <p className="text-2xl font-black text-foreground leading-none">{stat.value}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-2">{stat.label}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* Header */}

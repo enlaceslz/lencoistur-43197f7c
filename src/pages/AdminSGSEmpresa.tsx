@@ -166,13 +166,18 @@ const AdminSGSEmpresa = () => {
   if (loading) return <AdminLayout title="SGS — Empresa"><div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" /></div></AdminLayout>;
 
   return (
-    <AdminLayout title="SGS — Dados da Empresa">
-      <form onSubmit={handleSave} className="space-y-6 max-w-4xl">
+    <AdminLayout title="SGS — Perfil Organizacional">
+      <form onSubmit={handleSave} className="space-y-6 max-w-5xl">
         {/* Logo */}
-        <div className="bg-card border border-border rounded-2xl p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Image size={20} className="text-primary" />
-            <h3 className="font-display font-bold text-foreground">Logo da Empresa</h3>
+        <div className="bg-card border border-border rounded-3xl p-8 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2.5 rounded-xl bg-primary/10 text-primary shadow-inner">
+              <Image size={24} strokeWidth={2.5} />
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-foreground tracking-tight">Identidade Visual</h3>
+              <p className="text-xs font-medium text-muted-foreground">Logo oficial da agência para documentos e relatórios SGS.</p>
+            </div>
           </div>
           <div className="flex items-center gap-6">
             {logoPreview ? (
@@ -223,10 +228,15 @@ const AdminSGSEmpresa = () => {
         </div>
 
         {/* Dados Gerais */}
-        <div className="bg-card border border-border rounded-2xl p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Building2 size={20} className="text-primary" />
-            <h3 className="font-display font-bold text-foreground">Dados Gerais</h3>
+        <div className="bg-card border border-border rounded-3xl p-8 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2.5 rounded-xl bg-primary/10 text-primary shadow-inner">
+              <Building2 size={24} strokeWidth={2.5} />
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-foreground tracking-tight">Dados Jurídicos e Localização</h3>
+              <p className="text-xs font-medium text-muted-foreground">Informações cadastrais oficiais da Lençóis Tour.</p>
+            </div>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             <Field label="Razão Social *" field="razao_social" span={2} />
@@ -259,11 +269,16 @@ const AdminSGSEmpresa = () => {
             className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" />
         </div>
 
-        <button type="submit" disabled={saving}
-          className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
-          <Save size={18} />
-          {saving ? "Salvando..." : "Salvar Dados"}
-        </button>
+        <div className="flex justify-end pt-4">
+          <Button 
+            type="submit" 
+            disabled={saving}
+            className="h-14 px-12 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95 flex items-center gap-3"
+          >
+            {saving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} strokeWidth={3} />}
+            Finalizar e Salvar Perfil
+          </Button>
+        </div>
       </form>
     </AdminLayout>
   );
