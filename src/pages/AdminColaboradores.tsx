@@ -419,26 +419,27 @@ const AdminColaboradores = () => {
 
   return (
     <AdminLayout title="Colaboradores">
-      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-10 bg-card p-6 rounded-3xl border border-border/50 shadow-sm">
+      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-10 glass-card p-8 rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.1s' }}>
         <div className="space-y-1">
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Colaboradores</h1>
-          <div className="flex items-center gap-3">
-            <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20 transition-colors border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">
-              {collaborators.length} Especialistas
-            </Badge>
-            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">
-              {collaborators.filter(c => c.status === 'active').length} Ativos
-            </Badge>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Equipe Interna e Operacional</p>
+          <h1 className="text-4xl font-black text-foreground tracking-tight leading-none">Colaboradores</h1>
+          <div className="flex items-center gap-3 mt-4">
+            <div className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+              <Users size={12} /> {collaborators.length} Especialistas
+            </div>
+            <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+              <CheckCircle2 size={12} /> {collaborators.filter(c => c.status === 'active').length} Ativos
+            </div>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative flex-1 min-w-[280px] group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
-            <Input 
-              placeholder="Buscar por nome, documento ou categoria..." 
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative flex-1 min-w-[320px] group">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
+            <input 
+              placeholder="Pesquisar colaborador por nome ou cargo..." 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
-              className="pl-11 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30 transition-all font-medium text-sm" 
+              className="w-full pl-14 h-14 rounded-2xl border border-border/40 focus:ring-4 focus:ring-primary/10 bg-muted/20 transition-all font-medium text-sm outline-none placeholder:text-muted-foreground/40" 
             />
           </div>
           <div className="flex items-center gap-2">
