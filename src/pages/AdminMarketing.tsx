@@ -63,17 +63,18 @@ const AdminMarketing = () => {
 
   return (
     <AdminLayout title="Marketing & Automação">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 animate-in-fade" style={{ animationDelay: '0.1s' }}>
         {stats.map((s, i) => (
-          <Card key={i} className="border-none shadow-sm bg-card hover:shadow-md transition-all group">
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className={`p-3 rounded-2xl ${s.bg} ${s.color} shadow-inner group-hover:scale-110 transition-transform`}><s.icon size={24} strokeWidth={2.5} /></div>
-              <div>
-                <p className="text-2xl font-black text-foreground leading-none">{s.value}</p>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-2">{s.label}</p>
+          <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group">
+            <div className={`absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-opacity`} />
+            <div className="flex items-center justify-between mb-4">
+              <div className={`w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-lg shadow-primary/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+                <s.icon size={22} strokeWidth={2.5} />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{s.value}</p>
+            <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{s.label}</p>
+          </div>
         ))}
       </div>
 
