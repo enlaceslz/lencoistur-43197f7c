@@ -35,7 +35,7 @@ const COLORS = [
   "hsl(217,91%,60%)", "hsl(152,60%,42%)", "hsl(38,92%,50%)", "hsl(280,60%,50%)",
 ];
 
-  // Local fmt removed
+const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const AdminRelatorios = () => {
   const [activeTab, setActiveTab] = useState<ReportType>("reservas");
