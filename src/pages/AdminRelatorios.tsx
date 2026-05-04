@@ -493,14 +493,15 @@ const KPICard = ({ label, value, icon: Icon, color }: any) => (
 
 
 const ChartCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <Card className="border-none shadow-sm overflow-hidden">
-    <CardHeader className="bg-muted/30 border-b border-border/50 py-4">
-      <CardTitle className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-        <Activity size={14} className="text-primary" /> {title}
+  <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] group hover:shadow-xl hover:shadow-primary/5 transition-all duration-500">
+    <CardHeader className="bg-muted/10 border-b border-border/20 py-6 px-8">
+      <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-3 text-muted-foreground group-hover:text-primary transition-colors">
+        <Activity size={16} className="text-primary group-hover:scale-110 transition-transform" strokeWidth={3} /> {title}
       </CardTitle>
     </CardHeader>
-    <CardContent className="p-6 bg-card">{children}</CardContent>
+    <CardContent className="p-8 bg-transparent">{children}</CardContent>
   </Card>
 );
+
 
 export default AdminRelatorios;
