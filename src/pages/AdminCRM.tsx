@@ -833,13 +833,26 @@ const AdminCRMContent = () => {
     <AdminLayout title="CRM - Clientes">
       <div className="space-y-6">
         {/* Stats */}
-        <CustomerStats 
-          totalCustomers={customers.length}
-          newThisMonth={newThisMonth}
-          totalRevenue={totalRevenue}
-          averageTicket={withBookings > 0 ? Math.round(totalRevenue / withBookings) : 0}
-          fmt={fmt}
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+          {[
+            { label: "Total de Clientes", value: customers.length, icon: Users, color: "from-blue-500 to-indigo-600", desc: "Base ativa" },
+            { label: "Novos no Mês", value: newThisMonth, icon: UserPlus, color: "from-purple-500 to-pink-600", desc: "Crescimento" },
+            { label: "Receita Total", value: fmt(totalRevenue), icon: DollarSign, color: "from-emerald-500 to-teal-600", desc: "LTV Acumulado" },
+            { label: "Ticket Médio", value: withBookings > 0 ? fmt(Math.round(totalRevenue / withBookings)) : "R$ 0", icon: Smartphone, color: "from-amber-500 to-orange-600", desc: "Por cliente" },
+          ].map((stat, i) => (
+            <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group">
+              <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
+              <div className="flex items-center justify-between mb-4">
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-primary/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+                  <stat.icon size={22} strokeWidth={2.5} />
+                </div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{stat.desc}</div>
+              </div>
+              <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
+              <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
+            </div>
+          ))}
+        </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Client List */}
