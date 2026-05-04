@@ -13,39 +13,34 @@ interface StatItem {
 
 export default function FinanceiroStats({ stats }: { stats: StatItem[] }) {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {stats.map((s, idx) => (
         <motion.div
           key={s.label}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: idx * 0.1 }}
+          className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group"
         >
-          <Card className="hover:shadow-md transition-shadow border-none bg-gradient-to-br from-card to-muted/50 overflow-hidden group">
-            <CardContent className="p-5 relative">
-              <div className="flex items-center justify-between mb-3">
-                <div className={`p-3 rounded-xl bg-muted/50 ${s.color || "text-primary"} group-hover:bg-primary group-hover:text-white transition-all duration-300`}>
-                  <s.icon size={20} />
-                </div>
-                {s.change && (
-                  <span className={`flex items-center gap-1 text-[10px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-lg border ${
-                    s.up 
-                      ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/30" 
-                      : "bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-900/30"
-                  }`}>
-                    {s.change}
-                  </span>
-                )}
+          <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
+          
+          <div className="flex items-center justify-between mb-6">
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg bg-primary/10 ${s.color || "text-primary"} shadow-primary/10`}>
+              <s.icon size={26} strokeWidth={2.5} />
+            </div>
+            {s.change && (
+              <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                s.up ? "bg-admin-success-soft text-admin-success" : "bg-red-50 text-red-500"
+              }`}>
+                {s.change}
               </div>
-              <p className="text-2xl font-black text-foreground tracking-tight">{s.value}</p>
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1 opacity-80">{s.label}</p>
-              
-              {/* Decorative background shape */}
-              <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                <s.icon size={80} />
-              </div>
-            </CardContent>
-          </Card>
+            )}
+          </div>
+          
+          <div className="relative">
+            <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{s.value}</p>
+            <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{s.label}</p>
+          </div>
         </motion.div>
       ))}
     </div>
