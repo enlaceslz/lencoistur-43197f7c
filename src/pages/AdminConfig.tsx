@@ -100,6 +100,7 @@ const AdminConfig = () => {
   const [pagamentos, setPagamentos] = useState(DEFAULTS.pagamentos);
   const [notifications, setNotifications] = useState(DEFAULTS.notificacoes);
   const [gallery, setGallery] = useState(DEFAULTS.gallery);
+  const [isDeletingGalleryImage, setIsDeletingGalleryImage] = useState<number | null>(null);
 
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
