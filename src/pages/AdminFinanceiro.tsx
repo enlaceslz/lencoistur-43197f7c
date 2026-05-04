@@ -473,25 +473,27 @@ const AdminFinanceiro = () => {
                 <div className="space-y-8">
                   <FluxoCaixaTab bookings={bookings} contasPagar={contasPagar} selectedMonth={selectedMonth} selectedYear={selectedYear} />
                   
-                  <Card className="border-none shadow-sm bg-card overflow-hidden">
-                    <CardHeader className="p-6 border-b border-border/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem]">
+                    <CardHeader className="p-8 border-b border-border/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div>
-                        <CardTitle className="text-lg font-bold">Detalhamento das Transações</CardTitle>
-                        <p className="text-sm text-muted-foreground">Listagem consolidada do período selecionado</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1">Livro Caixa</p>
+                        <CardTitle className="text-2xl font-black tracking-tight text-foreground">Detalhamento das Transações</CardTitle>
+                        <p className="text-xs text-muted-foreground mt-1">Listagem consolidada do período selecionado</p>
                       </div>
                       <div className="md:hidden">
-                        <div className="relative">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                        <div className="relative group">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
                           <Input 
                             placeholder="Pesquisar..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10 h-10 bg-muted/30 border-none rounded-xl"
+                            className="pl-10 h-10 bg-muted/20 border-none rounded-xl text-xs"
                           />
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="p-0 overflow-x-auto">
+
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-border bg-muted/30">
