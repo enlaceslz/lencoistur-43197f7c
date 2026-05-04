@@ -507,23 +507,28 @@ const AdminFinanceiro = () => {
                         </thead>
                         <tbody className="divide-y divide-border/50">
                           {filteredTransactions.map((t, i) => (
-                            <tr key={i} className="hover:bg-muted/30 transition-colors">
-                              <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">{fmtDate(t.date)}</td>
-                              <td className="px-6 py-4 font-medium">{t.desc}</td>
-                              <td className="px-6 py-4 text-xs font-mono text-muted-foreground">{t.method}</td>
-                              <td className={cn("px-6 py-4 text-right font-bold", t.type === 'entrada' ? "text-emerald-600" : "text-rose-600")}>
+                            <tr key={i} className="hover:bg-primary/5 transition-colors group">
+                              <td className="px-8 py-5 whitespace-nowrap text-[11px] font-bold text-muted-foreground">{fmtDate(t.date)}</td>
+                              <td className="px-8 py-5">
+                                <span className="font-bold text-foreground group-hover:text-primary transition-colors">{t.desc}</span>
+                              </td>
+                              <td className="px-8 py-5">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2 py-1 bg-muted/50 rounded-lg">{t.method}</span>
+                              </td>
+                              <td className={cn("px-8 py-5 text-right font-black", t.type === 'entrada' ? "text-emerald-600" : "text-rose-600")}>
                                 {t.type === 'entrada' ? "" : "-"} {fmt(Math.abs(t.value))}
                               </td>
-                              <td className="px-6 py-4 text-center">
+                              <td className="px-8 py-5 text-center">
                                 <span className={cn(
-                                  "px-2 py-1 rounded-full text-[10px] font-bold uppercase",
-                                  t.status === "PAGO" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40" : "bg-amber-100 text-amber-700 dark:bg-amber-900/40"
+                                  "px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest border",
+                                  t.status === "PAGO" ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" : "bg-amber-500/10 text-amber-700 border-amber-500/20"
                                 )}>
                                   {t.status}
                                 </span>
                               </td>
                             </tr>
                           ))}
+
                         </tbody>
                       </table>
                     </CardContent>
