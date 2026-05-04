@@ -199,6 +199,22 @@ const AdminRelatorios = () => {
   const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const printReport = () => window.print();
 
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="glass-card p-4 rounded-2xl border-none shadow-xl">
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+            {label ? format(parseISO(label), "dd 'de' MMMM", { locale: ptBR }) : ''}
+          </p>
+          <p className="text-sm font-black text-primary">
+            {fmt(payload[0].value)}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <AdminLayout title="Relatórios">
       <style>{`
