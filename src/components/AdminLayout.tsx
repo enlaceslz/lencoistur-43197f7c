@@ -514,51 +514,49 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
                   Notificações
                 </TooltipContent>
               </Tooltip>
-            </div>
-
             {notifOpen && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-border/40 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-border/40 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in-fade">
                 <div className="px-5 py-4 border-b border-border/40 flex items-center justify-between bg-muted/30">
                   <h3 className="font-black text-foreground text-xs uppercase tracking-widest">Notificações</h3>
                   {activeNotifs.length > 0 && (
                     <button onClick={dismissAll} className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary/80 transition-colors">Limpar tudo</button>
                   )}
                 </div>
-                  <div className="max-h-80 overflow-y-auto">
-                    {activeNotifs.length === 0 ? (
-                      <div className="px-4 py-8 text-center">
-                        <Check size={32} className="mx-auto text-[hsl(152,60%,42%)] mb-2" />
-                        <p className="text-sm text-[hsl(220,15%,55%)]">Tudo em ordem!</p>
-                      </div>
-                    ) : (
-                      activeNotifs.map((n) => {
-                        const style = typeStyles[n.type];
-                        const Icon = style.icon;
-                        return (
-                          <div
-                            key={n.id}
-                            className={`px-4 py-3 border-l-[3px] ${style.border} ${style.bg} hover:brightness-[0.97] transition-all cursor-pointer flex gap-3 items-start`}
-                            onClick={() => { if (n.link) navigate(n.link); setNotifOpen(false); }}
-                          >
-                            <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${style.dot}`} />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-[hsl(220,25%,18%)]">{n.title}</p>
-                              <p className="text-xs text-[hsl(220,15%,50%)] mt-0.5">{n.message}</p>
-                            </div>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); dismissNotif(n.id); }}
-                              className="p-1 rounded hover:bg-black/5 transition-colors shrink-0"
-                            >
-                              <X size={12} className="text-[hsl(220,15%,60%)]" />
-                            </button>
+                <div className="max-h-80 overflow-y-auto">
+                  {activeNotifs.length === 0 ? (
+                    <div className="px-4 py-8 text-center">
+                      <Check size={32} className="mx-auto text-admin-success mb-2 opacity-50" />
+                      <p className="text-xs font-black uppercase tracking-widest text-muted-foreground/50">Tudo em ordem!</p>
+                    </div>
+                  ) : (
+                    activeNotifs.map((n) => {
+                      const style = typeStyles[n.type];
+                      return (
+                        <div
+                          key={n.id}
+                          className={`px-5 py-4 border-l-[4px] ${style.border} ${style.bg} hover:brightness-[0.98] transition-all cursor-pointer flex gap-4 items-start border-b border-border/20 last:border-0`}
+                          onClick={() => { if (n.link) navigate(n.link); setNotifOpen(false); }}
+                        >
+                          <div className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 shadow-sm ${style.dot}`} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-black text-foreground leading-tight">{n.title}</p>
+                            <p className="text-[11px] font-medium text-muted-foreground mt-1 line-clamp-2">{n.message}</p>
+                            <p className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground/40 mt-2">{n.time}</p>
                           </div>
-                        );
-                      })
-                    )}
-                  </div>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); dismissNotif(n.id); }}
+                            className="p-1.5 rounded-lg hover:bg-black/5 transition-colors shrink-0 text-muted-foreground/50"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+          </div>
 
             <div className="hidden sm:block h-6 w-px bg-border/40 mx-2" />
             <div className="hidden sm:flex items-center gap-3 pl-1">
