@@ -166,33 +166,34 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.005 }}
                 className={cn(
-                  "min-h-[160px] border-r border-b border-border/20 p-3 transition-all relative group/cell flex flex-col",
-                  !isCurrentMonth && "bg-muted/10 opacity-40",
-                  isTodayDay && "bg-primary/5 ring-1 ring-inset ring-primary/20"
+                  "min-h-[180px] border-r border-b border-border/20 p-4 transition-all relative group/cell flex flex-col",
+                  !isCurrentMonth && "bg-muted/5 opacity-40",
+                  isTodayDay && "bg-primary/[0.03] ring-2 ring-inset ring-primary/20 shadow-[inset_0_0_20px_rgba(var(--primary),0.02)]"
                 )}
               >
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex items-start justify-between mb-4">
                   <span className={cn(
-                    "text-sm font-black w-9 h-9 flex items-center justify-center rounded-xl transition-all duration-500",
+                    "text-sm font-black w-10 h-10 flex items-center justify-center rounded-2xl transition-all duration-500",
                     isTodayDay 
-                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-110 rotate-3" 
-                      : "text-muted-foreground group-hover/cell:text-primary group-hover/cell:bg-primary/5",
+                      ? "bg-primary text-primary-foreground shadow-xl shadow-primary/30 scale-110 rotate-3 z-10" 
+                      : "text-muted-foreground group-hover/cell:text-primary group-hover/cell:bg-primary/10 group-hover/cell:rotate-6",
                     !isCurrentMonth && "font-medium"
                   )}>
                     {format(day, 'd')}
                   </span>
                   
                   {dayBookings.length > 0 && (
-                    <div className="flex flex-col items-end gap-1">
-                      <Badge variant="secondary" className="bg-primary/10 text-primary border-none text-[9px] font-black h-5 px-2 rounded-lg animate-pulse">
+                    <div className="flex flex-col items-end gap-1.5">
+                      <Badge variant="secondary" className="bg-primary/10 text-primary border border-primary/20 text-[9px] font-black h-5 px-2.5 rounded-full animate-pulse shadow-sm">
                         {dayBookings.length} {dayBookings.length === 1 ? 'RESERVA' : 'RESERVAS'}
                       </Badge>
-                      <div className="flex -space-x-1.5 overflow-hidden p-0.5">
-                        {dayBookings.slice(0, 3).map((b, i) => (
+                      <div className="flex -space-x-2 overflow-hidden p-0.5">
+                        {dayBookings.slice(0, 4).map((b, i) => (
                           <div 
                             key={b.id} 
+                            style={{ zIndex: 10 - i }}
                             className={cn(
-                              "w-2 h-2 rounded-full border border-background shadow-sm",
+                              "w-2.5 h-2.5 rounded-full border-2 border-background shadow-sm",
                               statusConfig[b.status]?.color || 'bg-gray-400'
                             )} 
                           />
@@ -202,49 +203,74 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                   )}
                 </div>
 
-                <div className="space-y-2 flex-1 overflow-y-auto no-scrollbar pb-2">
+                <div className="space-y-2.5 flex-1 overflow-y-auto no-scrollbar pb-2">
                   <AnimatePresence mode="popLayout">
-                    {dayBookings.slice(0, 4).map((booking) => (
+                    {dayBookings.slice(0, 5).map((booking) => (
                       <TooltipProvider key={booking.id}>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <motion.div
                               layout
-                              initial={{ opacity: 0, x: -5 }}
-                              animate={{ opacity: 1, x: 0 }}
+                              initial={{ opacity: 0, y: 5 }}
+                              animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, scale: 0.95 }}
                               onClick={() => onSelectBooking(booking)}
                               className={cn(
-                                "group/item cursor-pointer p-2.5 rounded-xl border border-white/20 dark:border-white/5 hover:border-primary/30 hover:bg-white dark:hover:bg-white/5 hover:shadow-xl hover:shadow-black/5 hover:-translate-y-0.5 transition-all relative overflow-hidden bg-white/50 dark:bg-black/20 backdrop-blur-sm",
+                                "group/item cursor-pointer p-3 rounded-2xl border border-white/30 dark:border-white/5 hover:border-primary/40 hover:bg-white dark:hover:bg-white/10 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 transition-all relative overflow-hidden bg-white/60 dark:bg-black/30 backdrop-blur-md shadow-sm",
                               )}
                             >
                               <div className={cn(
-                                "absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b",
+                                "absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b transition-all group-hover/item:w-2",
                                 statusConfig[booking.status]?.gradient
                               )} />
-                              <div className="pl-2">
-                                <div className="flex items-center justify-between mb-0.5">
-                                  <p className="text-[11px] font-black text-foreground truncate leading-none">
+                              <div className="pl-3">
+                                <div className="flex items-center justify-between mb-1">
+                                  <p className="text-[11px] font-black text-foreground truncate leading-none tracking-tight">
                                     {booking.customerName}
                                   </p>
-                                  <span className="text-[8px] font-bold opacity-40">#{booking.bookingCode.slice(-4)}</span>
+                                  <span className="text-[8px] font-black opacity-30 bg-black/5 dark:bg-white/5 px-1.5 py-0.5 rounded uppercase">#{booking.bookingCode.slice(-4)}</span>
                                 </div>
-                                <div className="flex items-center gap-1">
-                                  <p className="text-[9px] font-bold text-muted-foreground truncate opacity-80 uppercase tracking-tighter">
+                                <div className="flex items-center gap-1.5">
+                                  <div className={cn("w-1.5 h-1.5 rounded-full", statusConfig[booking.status]?.color)} />
+                                  <p className="text-[9px] font-black text-muted-foreground truncate opacity-80 uppercase tracking-widest leading-none">
                                     {booking.itemName.split('(')[0].trim()}
                                   </p>
                                 </div>
                               </div>
                             </motion.div>
                           </TooltipTrigger>
-                          <TooltipContent side="right" className="p-4 rounded-2xl glass-card border-white/20 shadow-2xl backdrop-blur-xl">
-                            <div className="space-y-2">
-                              <p className="text-xs font-black text-primary uppercase tracking-widest">{booking.itemName}</p>
-                              <div className="space-y-1">
-                                <p className="text-[11px] font-bold flex items-center gap-2"><Users size={12} /> {booking.guests} {booking.guests === 1 ? 'pessoa' : 'pessoas'}</p>
-                                <p className="text-[11px] font-bold flex items-center gap-2"><Clock size={12} /> Status: {statusConfig[booking.status]?.label}</p>
-                                <p className="text-[11px] font-black text-foreground mt-2 bg-primary/5 px-2 py-1 rounded-md inline-block">Total: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(booking.finalTotal)}</p>
+                          <TooltipContent side="right" className="p-0 overflow-hidden rounded-[2rem] border-none shadow-2xl backdrop-blur-2xl w-72">
+                            <div className={cn("h-2 w-full bg-gradient-to-r", statusConfig[booking.status]?.gradient)} />
+                            <div className="p-6 bg-white/90 dark:bg-black/90 space-y-4">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1">Detalhes da Reserva</p>
+                                  <h4 className="text-sm font-black text-foreground leading-tight">{booking.itemName}</h4>
+                                </div>
+                                <Badge className={cn("border-none text-[9px] font-black px-3 py-1 rounded-full text-white shadow-lg", statusConfig[booking.status]?.color)}>
+                                  {statusConfig[booking.status]?.label.toUpperCase()}
+                                </Badge>
                               </div>
+                              
+                              <div className="grid grid-cols-2 gap-4 pt-2 border-t border-border/40">
+                                <div className="space-y-1">
+                                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Passageiros</p>
+                                  <p className="text-xs font-black flex items-center gap-2"><Users size={12} className="text-primary" /> {booking.guests} pax</p>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Total Bruto</p>
+                                  <p className="text-xs font-black text-foreground">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(booking.finalTotal)}</p>
+                                </div>
+                              </div>
+
+                              <div className="bg-primary/5 p-3 rounded-2xl border border-primary/10 flex items-center justify-between group-hover:bg-primary/10 transition-colors">
+                                <span className="text-[10px] font-black text-primary uppercase tracking-widest">Código</span>
+                                <span className="text-xs font-mono font-black text-primary">{booking.bookingCode}</span>
+                              </div>
+                              
+                              <Button className="w-full rounded-xl font-black text-[10px] uppercase tracking-widest h-10 shadow-lg shadow-primary/20">
+                                <Eye size={14} className="mr-2" /> Ver Reserva Completa
+                              </Button>
                             </div>
                           </TooltipContent>
                         </Tooltip>
@@ -252,20 +278,20 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                     ))}
                   </AnimatePresence>
                   
-                  {dayBookings.length > 4 && (
+                  {dayBookings.length > 5 && (
                     <button 
-                      className="w-full py-1.5 rounded-lg border border-dashed border-primary/20 hover:border-primary/50 hover:bg-primary/5 transition-all group/more"
+                      className="w-full py-2 rounded-xl border-2 border-dashed border-primary/20 hover:border-primary/50 hover:bg-primary/5 transition-all group/more active:scale-95"
                     >
-                      <span className="text-[9px] font-black text-primary/60 group-hover/more:text-primary uppercase tracking-[0.1em]">
-                        + {dayBookings.length - 4} reservas
+                      <span className="text-[9px] font-black text-primary/60 group-hover/more:text-primary uppercase tracking-[0.2em]">
+                        + {dayBookings.length - 5} reservas
                       </span>
                     </button>
                   )}
                 </div>
                 
-                <div className="absolute bottom-1 right-1 opacity-0 group-hover/cell:opacity-100 transition-opacity">
-                  <div className="bg-primary/10 p-1 rounded-md">
-                    <Eye size={12} className="text-primary" />
+                <div className="absolute bottom-2 right-2 opacity-0 group-hover/cell:opacity-100 transition-all duration-300 translate-y-2 group-hover/cell:translate-y-0">
+                  <div className="bg-primary/10 backdrop-blur-md p-2 rounded-xl border border-primary/20 shadow-lg">
+                    <Eye size={14} className="text-primary" />
                   </div>
                 </div>
               </motion.div>
