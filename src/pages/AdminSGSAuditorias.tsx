@@ -70,9 +70,11 @@ const AdminSGSAuditorias = () => {
       <div className="space-y-6">
         <div className="flex justify-between gap-4">
           <p className="text-sm text-muted-foreground">Auditorias periódicas de segurança conforme ISO 21101</p>
-          <button onClick={() => setShowForm(!showForm)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-            <Plus size={16} /> Nova Auditoria
+          <button 
+            onClick={() => setShowForm(!showForm)}
+            className="flex items-center gap-3 px-8 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95"
+          >
+            <Plus size={20} strokeWidth={3} /> Nova Auditoria
           </button>
         </div>
 
