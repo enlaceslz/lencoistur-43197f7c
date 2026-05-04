@@ -404,44 +404,67 @@ const AdminPacotes = () => {
               <label className="text-sm font-bold">Descrição</label>
               <Textarea disabled={isViewMode} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
             </div>
-            <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100/50 space-y-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-2">
-                <Clock size={14} /> Duração do Roteiro
-              </h3>
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50/30 p-5 rounded-3xl border border-blue-100/50 space-y-5 shadow-sm">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-blue-600 flex items-center gap-2">
+                  <Clock size={14} className="animate-pulse" /> Duração do Roteiro
+                </h3>
+                <Badge variant="outline" className="bg-white/50 text-[10px] border-blue-200 text-blue-600 font-bold">
+                  PADRÃO CADASTUR
+                </Badge>
+              </div>
+              
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700">Quantidade de Dias</label>
-                  <div className="relative group">
+                <div className="space-y-2.5">
+                  <div className="flex justify-between items-center">
+                    <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Quantidade de Dias</label>
+                  </div>
+                  <div className="relative group transition-all duration-300">
                     <Input 
                       disabled={isViewMode} 
                       type="number" 
                       min={1} 
                       value={form.days} 
                       onChange={e => setForm({ ...form, days: parseInt(e.target.value) || 0 })}
-                      className="h-11 rounded-xl border-blue-200/60 focus:ring-blue-500/20 pr-14 transition-all"
+                      className="h-12 rounded-2xl border-blue-200/60 bg-white/80 focus:bg-white focus:ring-blue-500/20 pr-14 transition-all text-slate-800 font-bold"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase text-blue-400">Dias</span>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                      <span className="text-[10px] font-black uppercase text-blue-500/70">Dias</span>
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700">Quantidade de Noites</label>
-                  <div className="relative group">
+
+                <div className="space-y-2.5">
+                  <div className="flex justify-between items-center">
+                    <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Quantidade de Noites</label>
+                  </div>
+                  <div className="relative group transition-all duration-300">
                     <Input 
                       disabled={isViewMode} 
                       type="number" 
                       min={0} 
                       value={form.nights} 
                       onChange={e => setForm({ ...form, nights: parseInt(e.target.value) || 0 })}
-                      className="h-11 rounded-xl border-blue-200/60 focus:ring-blue-500/20 pr-14 transition-all"
+                      className="h-12 rounded-2xl border-blue-200/60 bg-white/80 focus:bg-white focus:ring-blue-500/20 pr-14 transition-all text-slate-800 font-bold"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase text-blue-400">Noites</span>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
+                      <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                      <span className="text-[10px] font-black uppercase text-indigo-500/70">Noites</span>
+                    </div>
                   </div>
                 </div>
               </div>
+
               {!isViewMode && (
-                <p className="text-[10px] text-blue-400 italic">
-                  * Informe a duração exata para conformidade com normas de turismo e CADASTUR.
-                </p>
+                <div className="flex items-start gap-2 bg-blue-100/30 p-3 rounded-xl border border-blue-100/50">
+                  <div className="mt-0.5 p-1 bg-blue-500 rounded-full">
+                    <CheckCircle size={8} className="text-white" />
+                  </div>
+                  <p className="text-[10px] text-blue-700/80 leading-relaxed font-medium">
+                    As informações de <strong>pernoite</strong> e <strong>período</strong> são requisitos fundamentais para o credenciamento de pacotes junto ao <strong>ICMBio</strong> e fiscalizações do <strong>CADASTUR</strong> em Santo Amaro - MA.
+                  </p>
+                </div>
               )}
             </div>
             <div className="grid md:grid-cols-2 gap-4">
