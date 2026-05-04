@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -292,28 +292,32 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-[hsl(220,20%,96%)] flex">
+      <div className="min-h-screen bg-[hsl(220,30%,98%)] flex font-body">
       {/* === SIDEBAR === */}
-      <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[80px]" : "w-[260px]"} admin-sidebar transform transition-all duration-200 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[80px]" : "w-[280px]"} admin-sidebar transform transition-all duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
         {/* Brand */}
-        <div className={`px-5 py-5 border-b border-white/[0.08] ${sidebarCollapsed ? "flex justify-center" : ""}`}>
-          <Link to="/" className="flex items-center gap-2">
+        <div className={`px-6 py-8 border-b border-white/[0.05] ${sidebarCollapsed ? "flex justify-center" : ""}`}>
+          <Link to="/" className="flex items-center gap-3 group">
             {settings?.logoUrl ? (
-              <img 
-                src={settings.logoUrl} 
-                alt={settings.titulo || "LençóisTour"} 
-                className={`${sidebarCollapsed ? "h-6" : "h-10"} w-auto object-contain brightness-0 invert`} 
-              />
+              <div className="relative">
+                <img 
+                  src={settings.logoUrl} 
+                  alt={settings.titulo || "LençóisTour"} 
+                  className={`${sidebarCollapsed ? "h-8" : "h-12"} w-auto object-contain brightness-0 invert transition-all duration-300 group-hover:scale-105`} 
+                />
+              </div>
             ) : (
               <>
-                <div className="w-8 h-8 rounded-lg bg-[hsl(217,91%,60%)] flex items-center justify-center shrink-0">
-                  <span className="text-white font-bold text-sm">LT</span>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[hsl(217,91%,60%)] to-[hsl(195,80%,45%)] flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 transition-transform duration-300 group-hover:rotate-12">
+                  <span className="text-white font-black text-lg">LT</span>
                 </div>
                 {!sidebarCollapsed && (
-                  <div>
-                    <span className="font-display text-base font-bold text-white tracking-tight">Lençóis</span>
-                    <span className="font-display text-base font-bold text-[hsl(217,91%,60%)]">Tour</span>
-                    <p className="text-[10px] text-[hsl(220,15%,50%)] -mt-0.5 font-medium">Painel Administrativo</p>
+                  <div className="flex flex-col">
+                    <div className="flex items-baseline gap-0.5">
+                      <span className="font-display text-xl font-black text-white tracking-tight">Lençóis</span>
+                      <span className="font-display text-xl font-black text-[hsl(217,91%,60%)]">Tour</span>
+                    </div>
+                    <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.2em] -mt-0.5">Premium CRM</p>
                   </div>
                 )}
               </>
@@ -450,132 +454,144 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
       )}
 
       {/* === MAIN === */}
-      <main className={`flex-1 ${sidebarCollapsed ? "lg:ml-[80px]" : "lg:ml-[260px]"} min-h-screen flex flex-col transition-all duration-200 w-full overflow-x-hidden`}>
+      <main className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${sidebarCollapsed ? "lg:ml-[80px]" : "lg:ml-[280px]"}`}>
         {/* Header */}
-        <header className="bg-white border-b border-[hsl(220,20%,92%)] px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-[0_1px_3px_hsl(220,20%,90%)] w-full">
-          <div className="flex items-center gap-3">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button 
-                  onClick={() => {
-                    if (window.innerWidth >= 1024) {
-                      setSidebarCollapsed(!sidebarCollapsed);
-                    } else {
-                      setSidebarOpen(true);
-                    }
-                  }} 
-                  className="p-1.5 rounded-lg text-[hsl(220,15%,40%)] hover:bg-[hsl(220,20%,96%)]"
-                >
-                  <Menu size={22} />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>{sidebarCollapsed ? "Expandir Menu" : "Recolher Menu"}</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-[hsl(220,15%,55%)]">
-              {breadcrumbs.map((crumb, i) => (
-                <span key={crumb.path} className="flex items-center gap-1.5">
-                  {i > 0 && <ChevronRight size={12} className="text-[hsl(220,15%,75%)]" />}
-                  {i === breadcrumbs.length - 1 ? (
-                    <span className="font-medium text-[hsl(220,25%,20%)]">{crumb.label}</span>
-                  ) : (
-                    <Link to={crumb.path} className="hover:text-[hsl(217,91%,60%)] transition-colors">{crumb.label}</Link>
-                  )}
-                </span>
-              ))}
+        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-border/40 px-6 flex items-center justify-between sticky top-0 z-40">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2.5 rounded-xl hover:bg-muted text-muted-foreground transition-all active:scale-95"
+            >
+              <Menu size={22} />
+            </button>
+            <div className="hidden lg:flex items-center gap-3">
+              <button
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="p-2.5 rounded-xl hover:bg-muted text-muted-foreground transition-all active:scale-95"
+              >
+                {sidebarCollapsed ? <ChevronRight size={20} /> : <Menu size={20} />}
+              </button>
+              {/* Breadcrumbs */}
+              <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-muted-foreground/60">
+                {breadcrumbs.map((crumb, i) => (
+                  <React.Fragment key={crumb.path}>
+                    {i > 0 && <span className="text-[10px] opacity-30">/</span>}
+                    <Link
+                      to={crumb.path}
+                      className={`hover:text-primary transition-colors ${i === breadcrumbs.length - 1 ? "text-primary/80 font-black" : ""}`}
+                    >
+                      {crumb.label}
+                    </Link>
+                  </React.Fragment>
+                ))}
+              </div>
             </div>
-            <h1 className="sm:hidden font-display text-lg font-bold text-[hsl(220,25%,18%)]">{title}</h1>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Notifications */}
+          <div className="flex items-center gap-4">
+            {/* Search Bar - Aesthetic only for now */}
+            <div className="hidden md:flex items-center gap-2 bg-muted/50 border border-border/40 rounded-xl px-4 py-2 w-64 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+              <Compass size={16} className="text-muted-foreground" />
+              <input type="text" placeholder="Pesquisar..." className="bg-transparent border-none text-xs focus:ring-0 w-full placeholder:text-muted-foreground/50" />
+            </div>
+
             <div className="relative" ref={notifRef}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => setNotifOpen(!notifOpen)}
-                    className={`relative p-2 rounded-lg transition-colors ${notifOpen ? "bg-[hsl(220,20%,94%)] text-[hsl(220,25%,20%)]" : "text-[hsl(220,15%,50%)] hover:text-[hsl(220,25%,20%)] hover:bg-[hsl(220,20%,96%)]"}`}
+                    className={`relative p-2.5 rounded-xl transition-all active:scale-95 ${notifOpen ? "bg-primary/10 text-primary shadow-inner" : "text-muted-foreground hover:bg-muted"}`}
                   >
-                    <Bell size={19} />
+                    <Bell size={20} />
                     {activeNotifs.length > 0 && (
-                  <span className={`absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 rounded-full text-[9px] text-white flex items-center justify-center font-bold ${errorCount > 0 ? "bg-red-500" : "bg-amber-500"}`}>
-                    {activeNotifs.length}
-                  </span>
+                      <span className={`absolute top-1.5 right-1.5 w-4 h-4 rounded-full text-[9px] text-white flex items-center justify-center font-black animate-in zoom-in ${errorCount > 0 ? "bg-red-500 shadow-lg shadow-red-500/30" : "bg-primary shadow-lg shadow-primary/30"}`}>
+                        {activeNotifs.length}
+                      </span>
+                    )}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border-none shadow-xl">
+                  Notificações
+                </TooltipContent>
+              </Tooltip>
+            {notifOpen && (
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-border/40 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in-fade">
+                <div className="px-5 py-4 border-b border-border/40 flex items-center justify-between bg-muted/30">
+                  <h3 className="font-black text-foreground text-xs uppercase tracking-widest">Notificações</h3>
+                  {activeNotifs.length > 0 && (
+                    <button onClick={dismissAll} className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary/80 transition-colors">Limpar tudo</button>
                   )}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>Notificações</p>
-              </TooltipContent>
-            </Tooltip>
-
-              {notifOpen && (
-                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-[hsl(220,20%,92%)] rounded-xl shadow-xl overflow-hidden z-50">
-                  <div className="px-4 py-3 border-b border-[hsl(220,20%,94%)] flex items-center justify-between bg-[hsl(220,20%,98%)]">
-                    <h3 className="font-semibold text-[hsl(220,25%,18%)] text-sm">Notificações</h3>
-                    {activeNotifs.length > 0 && (
-                      <button onClick={dismissAll} className="text-xs text-[hsl(217,91%,60%)] hover:underline font-medium">Limpar tudo</button>
-                    )}
-                  </div>
-                  <div className="max-h-80 overflow-y-auto">
-                    {activeNotifs.length === 0 ? (
-                      <div className="px-4 py-8 text-center">
-                        <Check size={32} className="mx-auto text-[hsl(152,60%,42%)] mb-2" />
-                        <p className="text-sm text-[hsl(220,15%,55%)]">Tudo em ordem!</p>
-                      </div>
-                    ) : (
-                      activeNotifs.map((n) => {
-                        const style = typeStyles[n.type];
-                        const Icon = style.icon;
-                        return (
-                          <div
-                            key={n.id}
-                            className={`px-4 py-3 border-l-[3px] ${style.border} ${style.bg} hover:brightness-[0.97] transition-all cursor-pointer flex gap-3 items-start`}
-                            onClick={() => { if (n.link) navigate(n.link); setNotifOpen(false); }}
-                          >
-                            <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${style.dot}`} />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold text-[hsl(220,25%,18%)]">{n.title}</p>
-                              <p className="text-xs text-[hsl(220,15%,50%)] mt-0.5">{n.message}</p>
-                            </div>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); dismissNotif(n.id); }}
-                              className="p-1 rounded hover:bg-black/5 transition-colors shrink-0"
-                            >
-                              <X size={12} className="text-[hsl(220,15%,60%)]" />
-                            </button>
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
                 </div>
-              )}
-            </div>
+                <div className="max-h-80 overflow-y-auto">
+                  {activeNotifs.length === 0 ? (
+                    <div className="px-4 py-8 text-center">
+                      <Check size={32} className="mx-auto text-admin-success mb-2 opacity-50" />
+                      <p className="text-xs font-black uppercase tracking-widest text-muted-foreground/50">Tudo em ordem!</p>
+                    </div>
+                  ) : (
+                    activeNotifs.map((n) => {
+                      const style = typeStyles[n.type];
+                      return (
+                        <div
+                          key={n.id}
+                          className={`px-5 py-4 border-l-[4px] ${style.border} ${style.bg} hover:brightness-[0.98] transition-all cursor-pointer flex gap-4 items-start border-b border-border/20 last:border-0`}
+                          onClick={() => { if (n.link) navigate(n.link); setNotifOpen(false); }}
+                        >
+                          <div className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 shadow-sm ${style.dot}`} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-black text-foreground leading-tight">{n.title}</p>
+                            <p className="text-[11px] font-medium text-muted-foreground mt-1 line-clamp-2">{n.message}</p>
+                            <p className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground/40 mt-2">{n.time}</p>
+                          </div>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); dismissNotif(n.id); }}
+                            className="p-1.5 rounded-lg hover:bg-black/5 transition-colors shrink-0 text-muted-foreground/50"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
-            <div className="hidden sm:block h-6 w-px bg-[hsl(220,20%,90%)]" />
-            <div className="hidden sm:flex items-center gap-2 pl-1">
-              <div className="w-8 h-8 rounded-full bg-[hsl(217,91%,60%)] flex items-center justify-center text-white font-bold text-xs">
+            <div className="hidden sm:block h-6 w-px bg-border/40 mx-2" />
+            <div className="hidden sm:flex items-center gap-3 pl-1">
+              <div className="flex flex-col items-end hidden xl:flex">
+                <span className="text-xs font-black text-foreground leading-none">{user?.email?.split('@')[0] || "Admin"}</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-primary mt-1">{userRole}</span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-ocean flex items-center justify-center text-white font-black text-xs shadow-lg shadow-primary/20">
                 {userInitials}
               </div>
             </div>
           </div>
         </header>
 
-        {/* Title bar */}
-        <div className="hidden sm:block px-6 pt-5 pb-1">
-          <h1 className="font-display text-xl font-bold text-[hsl(220,25%,18%)] tracking-tight">{title}</h1>
+        {/* Dynamic Page Header */}
+        <div className="px-6 py-8 animate-in-fade">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Painel de Controle</p>
+              <h1 className="font-display text-4xl font-black text-foreground tracking-tight leading-none">{title}</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Sistema Online</span>
+            </div>
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 p-4 sm:p-6">
+        {/* Content Area */}
+        <div className="flex-1 px-6 pb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
           {children}
         </div>
       </main>
-      </div>
-    </TooltipProvider>
+    </div>
+  </TooltipProvider>
   );
 };
 
