@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import {
   Shield, AlertTriangle, CheckCircle, Activity, Phone, Car, UserCheck2, Map, Truck, Star,
-  Wrench, ClipboardList, Loader2, Waves, Sun, Award, CheckCircle2, Clock
+  Wrench, ClipboardList, Loader2, Waves, Sun, Award, CheckCircle2, Clock, FileText, Info
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import { jsPDF } from "jspdf";
