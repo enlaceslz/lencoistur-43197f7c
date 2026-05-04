@@ -152,8 +152,8 @@ export default function FluxoCaixaTab({
                   <Bar dataKey="despesas" name="Despesas" fill="url(#colorDespesas)" radius={[6, 6, 0, 0]} barSize={32} />
                 </BarChart>
               </ResponsiveContainer>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
 
         <motion.div
