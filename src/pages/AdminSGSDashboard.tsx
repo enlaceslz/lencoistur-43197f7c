@@ -286,9 +286,9 @@ const AdminSGSDashboard = () => {
       ) : (
         <div className="space-y-6">
         {/* Quick Actions Bar */}
-        <div className="bg-card border border-border rounded-3xl p-6 shadow-sm">
-          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-4 ml-1">Central de Ações Rápidas (SGS)</p>
-          <div className="flex flex-wrap gap-2">
+        <div className="glass-card rounded-[2.5rem] p-8 shadow-sm animate-in-fade" style={{ animationDelay: '0.1s' }}>
+          <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-6 ml-1">Central de Ações Rápidas (SGS)</p>
+          <div className="flex flex-wrap gap-3">
             {quickActions.map(a => (
               <button
                 key={a.label}
