@@ -982,6 +982,7 @@ const AdminConfig = () => {
                         placeholder="#000000"
                       />
                     </div>
+                    </div>
                   </div>
 
                   <div className="space-y-3">
