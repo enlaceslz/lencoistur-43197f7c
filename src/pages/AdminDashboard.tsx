@@ -234,63 +234,96 @@ const AdminDashboard = () => {
 
         {/* Charts */}
         <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-6">
-            <h3 className="font-display text-lg font-bold text-foreground mb-4">Faturamento Mensal</h3>
-            <ResponsiveContainer width="100%" height={280}>
+          <div className="lg:col-span-2 glass-card rounded-[2.5rem] p-8 admin-card-hover animate-in-fade" style={{ animationDelay: '0.4s' }}>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="font-display text-2xl font-black text-foreground tracking-tight">Faturamento e Lucro</h3>
+                <p className="text-xs font-medium text-muted-foreground mt-1 uppercase tracking-widest">Performance financeira dos últimos 7 meses</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-primary" />
+                  <span className="text-[10px] font-black uppercase tracking-tighter">Faturamento</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-secondary" />
+                  <span className="text-[10px] font-black uppercase tracking-tighter">Lucro</span>
+                </div>
+              </div>
+            </div>
+            <ResponsiveContainer width="100%" height={320}>
               <AreaChart data={revenueData}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(174, 62%, 38%)" stopOpacity={0.3} />
+                    <stop offset="5%" stopColor="hsl(174, 62%, 38%)" stopOpacity={0.2} />
                     <stop offset="95%" stopColor="hsl(174, 62%, 38%)" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(35, 80%, 55%)" stopOpacity={0.3} />
+                    <stop offset="5%" stopColor="hsl(35, 80%, 55%)" stopOpacity={0.2} />
                     <stop offset="95%" stopColor="hsl(35, 80%, 55%)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="month" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => `R$${(v / 100).toFixed(0)}`} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.4} />
+                <XAxis 
+                  dataKey="month" 
+                  tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))", fontWeight: 'bold' }} 
+                  axisLine={false}
+                  tickLine={false}
+                  dy={10}
+                />
+                <YAxis 
+                  tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))", fontWeight: 'bold' }} 
+                  tickFormatter={(v) => `R$${(v / 100).toFixed(0)}`}
+                  axisLine={false}
+                  tickLine={false}
+                />
                 <Tooltip 
+                  contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', fontSize: '12px' }}
                   formatter={(value: number, name: string) => [
                     fmt(value), 
-                    name === "revenue" ? "Faturamento" : name === "profit" ? "Lucro" : "Despesas"
+                    name === "revenue" ? "Faturamento" : "Lucro"
                   ]} 
                 />
-                <Area type="monotone" dataKey="revenue" stroke="hsl(174, 62%, 38%)" fill="url(#colorRevenue)" strokeWidth={2} />
-                <Area type="monotone" dataKey="profit" stroke="hsl(35, 80%, 55%)" fill="url(#colorProfit)" strokeWidth={2} />
+                <Area type="monotone" dataKey="revenue" stroke="hsl(174, 62%, 38%)" fill="url(#colorRevenue)" strokeWidth={4} />
+                <Area type="monotone" dataKey="profit" stroke="hsl(35, 80%, 55%)" fill="url(#colorProfit)" strokeWidth={4} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-6">
-            <h3 className="font-display text-lg font-bold text-foreground mb-4">Passeios Mais Vendidos</h3>
+          <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover animate-in-fade" style={{ animationDelay: '0.5s' }}>
+            <h3 className="font-display text-2xl font-black text-foreground tracking-tight mb-8">Tour Popularity</h3>
             {tourPopularity.length > 0 ? (
-              <>
-                <ResponsiveContainer width="100%" height={200}>
+              <div className="flex flex-col h-full">
+                <ResponsiveContainer width="100%" height={220}>
                   <PieChart>
-                    <Pie data={tourPopularity} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" paddingAngle={4}>
+                    <Pie data={tourPopularity} cx="50%" cy="50%" innerRadius={60} outerRadius={90} dataKey="value" paddingAngle={8} cornerRadius={4}>
                       {tourPopularity.map((entry) => (
-                        <Cell key={entry.name} fill={entry.color} />
+                        <Cell key={entry.name} fill={entry.color} stroke="none" />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: number) => [`${value}%`, ""]} />
+                    <Tooltip 
+                      contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', fontSize: '12px' }}
+                      formatter={(value: number) => [`${value}%`, "Demanda"]} 
+                    />
                   </PieChart>
                 </ResponsiveContainer>
-                <div className="space-y-2 mt-2">
+                <div className="grid grid-cols-1 gap-3 mt-6">
                   {tourPopularity.map((t) => (
-                    <div key={t.name} className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: t.color }} />
-                        <span className="text-muted-foreground">{t.name}</span>
+                    <div key={t.name} className="flex items-center justify-between p-2 rounded-xl hover:bg-muted/30 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: t.color }} />
+                        <span className="text-[11px] font-bold text-muted-foreground truncate max-w-[120px]">{t.name}</span>
                       </div>
-                      <span className="font-semibold text-foreground">{t.value}%</span>
+                      <span className="text-xs font-black text-foreground">{t.value}%</span>
                     </div>
                   ))}
                 </div>
-              </>
+              </div>
             ) : (
-              <p className="text-muted-foreground text-sm text-center py-16">Nenhuma reserva registrada</p>
+              <div className="flex flex-col items-center justify-center py-20 opacity-30">
+                <PieChartIcon size={48} />
+                <p className="text-[10px] font-black uppercase tracking-widest mt-4">Sem dados</p>
+              </div>
             )}
           </div>
         </div>
