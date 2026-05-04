@@ -47,11 +47,11 @@ interface BookingCalendarProps {
   onSelectBooking: (booking: BookingItem) => void;
 }
 
-const statusConfig: Record<string, { color: string; icon: any; label: string; lightColor: string }> = {
-  confirmada: { color: 'bg-emerald-500', lightColor: 'bg-emerald-50', icon: CheckCircle2, label: 'Confirmada' },
-  pendente: { color: 'bg-amber-500', lightColor: 'bg-amber-50', icon: Clock, label: 'Pendente' },
-  cancelada: { color: 'bg-rose-500', lightColor: 'bg-rose-50', icon: XCircle, label: 'Cancelada' },
-  concluida: { color: 'bg-blue-500', lightColor: 'bg-blue-50', icon: CheckCircle2, label: 'Concluída' },
+const statusConfig: Record<string, { color: string; icon: any; label: string; gradient: string }> = {
+  confirmada: { color: 'bg-emerald-500', gradient: 'from-emerald-400 to-emerald-600', icon: CheckCircle2, label: 'Confirmada' },
+  pendente: { color: 'bg-amber-500', gradient: 'from-amber-400 to-amber-600', icon: Clock, label: 'Pendente' },
+  cancelada: { color: 'bg-rose-500', gradient: 'from-rose-400 to-rose-600', icon: XCircle, label: 'Cancelada' },
+  concluida: { color: 'bg-blue-500', gradient: 'from-blue-400 to-blue-600', icon: CheckCircle2, label: 'Concluída' },
 };
 
 export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSelectBooking }) => {
