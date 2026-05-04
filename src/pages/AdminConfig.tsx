@@ -87,7 +87,8 @@ const DEFAULTS = {
     bannerTransition: "fade" as "fade" | "slide",
     exibirParceiros: true,
     footerDesc: "A Lençóis Tour Experience é a sua porta de entrada para os Lençóis Maranhenses. Localizada estrategicamente em Santo Amaro, oferecemos a experiência mais autêntica e segura da região.",
-    footerTours: ["Lagoa da Gaivota", "Circuito Betânia", "Circuito Emendadas", "Canto do Atins", "Circuito Ponta Verde", "Trekking nas Dunas", "Passeio de Quadriciclo", "Descida de Caiaque"]
+    footerTours: ["Lagoa da Gaivota", "Circuito Betânia", "Circuito Emendadas", "Canto do Atins", "Circuito Ponta Verde", "Trekking nas Dunas", "Passeio de Quadriciclo", "Descida de Caiaque"],
+    footerCopyright: "© 2026 LençóisTour. Todos os direitos reservados."
   },
   pagamentos: { pix: true, cartao: true, boleto: false, dinheiro: true, transferencia: false, pixChave: "12.345.678/0001-90", pixTipo: "cnpj" as PixKeyType },
   notificacoes: { email: true, whatsapp: true, push: false, novaReserva: true, cancelamento: true, pagamento: true },
