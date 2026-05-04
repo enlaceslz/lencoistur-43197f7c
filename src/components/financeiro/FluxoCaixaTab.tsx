@@ -104,7 +104,7 @@ export default function FluxoCaixaTab({
           animate={{ opacity: 1, scale: 1 }}
           className="lg:col-span-2"
         >
-          <div className="lg:col-span-2 glass-card rounded-[2.5rem] p-8 admin-card-hover overflow-hidden">
+          <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover overflow-hidden h-full">
             <div className="flex flex-row items-center justify-between mb-8">
               <div className="space-y-1">
                 <h3 className="text-2xl font-black text-foreground tracking-tight flex items-center gap-3">
@@ -114,7 +114,7 @@ export default function FluxoCaixaTab({
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest ml-1">Receitas vs Despesas em {currentYear}</p>
               </div>
             </div>
-            <CardContent className="p-6">
+            <div>
               <ResponsiveContainer width="100%" height={350}>
                 <BarChart data={monthlyFiltered} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
@@ -144,7 +144,7 @@ export default function FluxoCaixaTab({
                   />
                   <Tooltip 
                     cursor={{ fill: 'hsl(var(--muted)/0.3)' }}
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}
                     formatter={(value: number) => [fmt(value), ""]} 
                   />
                   <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ paddingBottom: '20px' }} />
@@ -161,64 +161,64 @@ export default function FluxoCaixaTab({
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="border-none shadow-sm bg-card h-full">
-            <CardHeader>
-              <CardTitle className="text-lg font-bold flex items-center gap-2">
-                <PieChartIcon className="text-primary" size={20} />
-                Métodos de Pagamento
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              {revenueByMethod.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center space-y-2">
-                  <Wallet className="text-muted-foreground/30" size={48} />
-                  <p className="text-muted-foreground text-sm">Sem movimentações este mês</p>
-                </div>
-              ) : (
-                <div className="space-y-8">
-                  <div className="h-[220px] relative">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie 
-                          data={revenueByMethod} 
-                          cx="50%" 
-                          cy="50%" 
-                          innerRadius={65} 
-                          outerRadius={90} 
-                          paddingAngle={5}
-                          dataKey="value"
-                        >
-                          {revenueByMethod.map((_, i) => (
-                            <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} stroke="none" />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(value: number) => [fmt(value), ""]} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                      <span className="text-xs text-muted-foreground uppercase font-bold tracking-widest">Total</span>
-                      <span className="text-xl font-bold">{fmt(revenueByMethod.reduce((acc, curr) => acc + curr.value, 0))}</span>
-                    </div>
+          <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover h-full">
+            <h3 className="text-2xl font-black text-foreground tracking-tight flex items-center gap-3 mb-8">
+              <PieChartIcon className="text-primary" size={24} strokeWidth={2.5} />
+              Pagamentos
+            </h3>
+            
+            {revenueByMethod.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 opacity-30">
+                <Wallet size={48} />
+                <p className="text-[10px] font-black uppercase tracking-widest">Sem dados</p>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                <div className="h-[220px] relative">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie 
+                        data={revenueByMethod} 
+                        cx="50%" 
+                        cy="50%" 
+                        innerRadius={65} 
+                        outerRadius={90} 
+                        paddingAngle={5}
+                        dataKey="value"
+                        cornerRadius={4}
+                      >
+                        {revenueByMethod.map((_, i) => (
+                          <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} stroke="none" />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', fontSize: '12px' }}
+                        formatter={(value: number) => [fmt(value), "Total"]} 
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Total</span>
+                    <span className="text-lg font-black text-foreground">{fmt(revenueByMethod.reduce((acc, curr) => acc + curr.value, 0))}</span>
                   </div>
-                  
-                  <div className="grid gap-3">
-                    {revenueByMethod.map((m, i) => (
-                      <div key={m.name} className="group flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 transition-colors border border-transparent hover:border-border/50">
-                        <div className="flex items-center gap-3">
-                          <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }} />
-                          <span className="text-sm font-medium">{m.name}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold">{fmt(m.value)}</span>
-                          <ArrowRight size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-                        </div>
+                </div>
+                
+                <div className="grid gap-3">
+                  {revenueByMethod.map((m, i) => (
+                    <div key={m.name} className="group flex items-center justify-between p-3 rounded-2xl hover:bg-muted/30 transition-all border border-transparent hover:border-border/30">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }} />
+                        <span className="text-xs font-bold text-muted-foreground">{m.name}</span>
                       </div>
-                    ))}
-                  </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black text-foreground">{fmt(m.value)}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </div>
+            )}
+          </div>
         </motion.div>
       </div>
 
@@ -227,52 +227,51 @@ export default function FluxoCaixaTab({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <Card className="border-none shadow-sm bg-card overflow-hidden">
-          <CardHeader>
-            <CardTitle className="text-lg font-bold">Projeção de Fluxo de Caixa</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <ResponsiveContainer width="100%" height={250}>
-              <AreaChart data={monthlyFiltered} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorLiquida" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border)/0.5)" />
-                <XAxis 
-                  dataKey="month" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 12 }}
-                  dy={10}
-                />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 12 }} 
-                  tickFormatter={(v) => `R$${(v / 100).toFixed(0)}`}
-                />
-                <Tooltip 
-                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                   formatter={(value: number) => [fmt(value), ""]} 
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="receitaLiquida" 
-                  name="Receita Líquida" 
-                  stroke="hsl(var(--primary))" 
-                  strokeWidth={3} 
-                  fillOpacity={1} 
-                  fill="url(#colorLiquida)" 
-                  dot={{ r: 4, fill: "hsl(var(--primary))", strokeWidth: 2, stroke: "white" }}
-                  activeDot={{ r: 6, strokeWidth: 0 }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover overflow-hidden">
+          <h3 className="text-2xl font-black text-foreground tracking-tight flex items-center gap-3 mb-8">
+            <TrendingUp className="text-primary" size={24} strokeWidth={2.5} />
+            Projeção de Caixa
+          </h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <AreaChart data={monthlyFiltered} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorLiquida" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border)/0.5)" />
+              <XAxis 
+                dataKey="month" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fontSize: 10, fontWeight: 'bold' }}
+                dy={10}
+              />
+              <YAxis 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fontSize: 10, fontWeight: 'bold' }} 
+                tickFormatter={(v) => `R$${(v / 100).toFixed(0)}`}
+              />
+              <Tooltip 
+                 contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', fontSize: '12px' }}
+                 formatter={(value: number) => [fmt(value), "Líquido"]} 
+              />
+              <Area 
+                type="monotone" 
+                dataKey="receitaLiquida" 
+                name="Receita Líquida" 
+                stroke="hsl(var(--primary))" 
+                strokeWidth={4} 
+                fillOpacity={1} 
+                fill="url(#colorLiquida)" 
+                dot={{ r: 5, fill: "hsl(var(--primary))", strokeWidth: 3, stroke: "white" }}
+                activeDot={{ r: 8, strokeWidth: 0 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
       </motion.div>
     </div>
   );
