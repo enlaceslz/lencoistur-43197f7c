@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-const HERO_IMG_DEFAULT = "https://images.unsplash.com/photo-1616421004128-40656a877073?auto=format&fit=crop&q=100&w=3840";
+const HERO_IMG_DEFAULT = "/src/assets/tour-lagoas-azuis-hero.jpg";
 
 const categoryKeys = ["boat", "eco", "gastro", "cultural", "kayak", "trekking"] as const;
 
