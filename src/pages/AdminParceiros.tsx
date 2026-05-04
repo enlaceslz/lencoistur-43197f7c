@@ -423,19 +423,21 @@ const AdminParceiros = () => {
             />
           </div>
           <div className="flex items-center gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  className="rounded-xl h-12 w-12 border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-sm" 
-                  onClick={exportPDF}
-                >
-                  <FileDown size={20} className="text-rose-500" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Relatório PDF</TooltipContent>
-            </Tooltip>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className="rounded-xl h-12 w-12 border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-sm" 
+                    onClick={exportPDF}
+                  >
+                    <FileDown size={20} className="text-rose-500" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Relatório PDF</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             
             <Button variant="outline" size="sm" className="rounded-2xl h-12 px-5 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm hidden sm:flex" onClick={() => setTypesDialogOpen(true)}>
               <Settings2 size={18} className="mr-2" /> Tipos
