@@ -77,27 +77,39 @@ interface BookingRow {
 
 const maskCPF = (v: string) => {
   const n = v.replace(/\D/g, "");
-  if (n.length <= 11) return n.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-  return n;
+  if (n.length <= 11) {
+    return n
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+  }
+  return n.slice(0, 11);
 };
 
 const maskCEP = (v: string) => {
   const n = v.replace(/\D/g, "");
-  if (n.length <= 8) return n.replace(/(\d{5})(\d{3})/, "$1-$2");
-  return n;
+  if (n.length <= 8) {
+    return n.replace(/(\d{5})(\d)/, "$1-$2");
+  }
+  return n.slice(0, 8);
 };
 
 const maskPhone = (v: string, country: string = "Brasil") => {
   const n = v.replace(/\D/g, "");
   if (country === "Brasil") {
-    if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
-    if (n.length === 11) return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    if (n.length <= 10) {
+      return n.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{4})(\d)/, "$1-$2");
+    }
+    return n
+      .slice(0, 11)
+      .replace(/(\d{2})(\d)/, "($1) $2")
+      .replace(/(\d{5})(\d)/, "$1-$2");
   }
-  // For international numbers, allow a more flexible format or just return as is with a +
+  // For international numbers, keep it simple but allow the +
   if (v.startsWith("+")) {
-    return "+" + v.replace(/\D/g, "");
+    return "+" + n;
   }
-  return v;
+  return n;
 };
 
 interface CustomerForm {
@@ -1023,7 +1035,7 @@ const AdminCRMContent = () => {
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <a
-                                      href={`https://wa.me/55${c.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${c.name.split(" ")[0]}! Tudo bem?`)}`}
+                                      href={`https://wa.me/${c.phone.startsWith("+") ? c.phone.replace(/\D/g, "") : `55${c.phone.replace(/\D/g, "")}`}?text=${encodeURIComponent(`Olá ${c.name.split(" ")[0]}! Tudo bem?`)}`}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       onClick={(e) => e.stopPropagation()}
