@@ -473,54 +473,62 @@ const AdminFinanceiro = () => {
                 <div className="space-y-8">
                   <FluxoCaixaTab bookings={bookings} contasPagar={contasPagar} selectedMonth={selectedMonth} selectedYear={selectedYear} />
                   
-                  <Card className="border-none shadow-sm bg-card overflow-hidden">
-                    <CardHeader className="p-6 border-b border-border/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem]">
+                    <CardHeader className="p-8 border-b border-border/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div>
-                        <CardTitle className="text-lg font-bold">Detalhamento das Transações</CardTitle>
-                        <p className="text-sm text-muted-foreground">Listagem consolidada do período selecionado</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1">Livro Caixa</p>
+                        <CardTitle className="text-2xl font-black tracking-tight text-foreground">Detalhamento das Transações</CardTitle>
+                        <p className="text-xs text-muted-foreground mt-1">Listagem consolidada do período selecionado</p>
                       </div>
                       <div className="md:hidden">
-                        <div className="relative">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                        <div className="relative group">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
                           <Input 
                             placeholder="Pesquisar..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10 h-10 bg-muted/30 border-none rounded-xl"
+                            className="pl-10 h-10 bg-muted/20 border-none rounded-xl text-xs"
                           />
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="p-0 overflow-x-auto">
+
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-border bg-muted/30">
-                            <th className="text-left px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Data</th>
-                            <th className="text-left px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Descrição / Origem</th>
-                            <th className="text-left px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Meio</th>
-                            <th className="text-right px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Valor</th>
-                            <th className="text-center px-6 py-4 font-bold text-muted-foreground uppercase tracking-wider text-[11px]">Status</th>
+                          <tr className="border-b border-border/20 bg-muted/10">
+                            <th className="text-left px-8 py-5 font-black text-muted-foreground uppercase tracking-widest text-[10px]">Data</th>
+                            <th className="text-left px-8 py-5 font-black text-muted-foreground uppercase tracking-widest text-[10px]">Descrição / Origem</th>
+                            <th className="text-left px-8 py-5 font-black text-muted-foreground uppercase tracking-widest text-[10px]">Meio</th>
+                            <th className="text-right px-8 py-5 font-black text-muted-foreground uppercase tracking-widest text-[10px]">Valor</th>
+                            <th className="text-center px-8 py-5 font-black text-muted-foreground uppercase tracking-widest text-[10px]">Status</th>
                           </tr>
+
                         </thead>
                         <tbody className="divide-y divide-border/50">
                           {filteredTransactions.map((t, i) => (
-                            <tr key={i} className="hover:bg-muted/30 transition-colors">
-                              <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">{fmtDate(t.date)}</td>
-                              <td className="px-6 py-4 font-medium">{t.desc}</td>
-                              <td className="px-6 py-4 text-xs font-mono text-muted-foreground">{t.method}</td>
-                              <td className={cn("px-6 py-4 text-right font-bold", t.type === 'entrada' ? "text-emerald-600" : "text-rose-600")}>
+                            <tr key={i} className="hover:bg-primary/5 transition-colors group">
+                              <td className="px-8 py-5 whitespace-nowrap text-[11px] font-bold text-muted-foreground">{fmtDate(t.date)}</td>
+                              <td className="px-8 py-5">
+                                <span className="font-bold text-foreground group-hover:text-primary transition-colors">{t.desc}</span>
+                              </td>
+                              <td className="px-8 py-5">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2 py-1 bg-muted/50 rounded-lg">{t.method}</span>
+                              </td>
+                              <td className={cn("px-8 py-5 text-right font-black", t.type === 'entrada' ? "text-emerald-600" : "text-rose-600")}>
                                 {t.type === 'entrada' ? "" : "-"} {fmt(Math.abs(t.value))}
                               </td>
-                              <td className="px-6 py-4 text-center">
+                              <td className="px-8 py-5 text-center">
                                 <span className={cn(
-                                  "px-2 py-1 rounded-full text-[10px] font-bold uppercase",
-                                  t.status === "PAGO" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40" : "bg-amber-100 text-amber-700 dark:bg-amber-900/40"
+                                  "px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest border",
+                                  t.status === "PAGO" ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" : "bg-amber-500/10 text-amber-700 border-amber-500/20"
                                 )}>
                                   {t.status}
                                 </span>
                               </td>
                             </tr>
                           ))}
+
                         </tbody>
                       </table>
                     </CardContent>

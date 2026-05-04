@@ -13,8 +13,9 @@ import {
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 type ReportType = "reservas" | "financeiro" | "clientes" | "passeios" | "sgs" | "marketing" | "parceiros" | "usuarios";
 
@@ -33,6 +34,8 @@ const COLORS = [
   "hsl(var(--primary))", "hsl(var(--secondary))", "hsl(var(--destructive))",
   "hsl(217,91%,60%)", "hsl(152,60%,42%)", "hsl(38,92%,50%)", "hsl(280,60%,50%)",
 ];
+
+const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const AdminRelatorios = () => {
   const [activeTab, setActiveTab] = useState<ReportType>("reservas");
@@ -195,8 +198,23 @@ const AdminRelatorios = () => {
 
   useEffect(() => { loadReport(); }, [loadReport]);
 
-  const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const printReport = () => window.print();
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="glass-card p-4 rounded-2xl border-none shadow-xl">
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+            {label ? format(parseISO(label), "dd 'de' MMMM", { locale: ptBR }) : ''}
+          </p>
+          <p className="text-sm font-black text-primary">
+            {fmt(payload[0].value)}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <AdminLayout title="Relatórios">
@@ -353,9 +371,9 @@ const AdminRelatorios = () => {
                       <AreaChart data={data.byDay}>
                         <defs><linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/></linearGradient></defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                        <XAxis dataKey="date" fontSize={10} tick={{fill: '#9ca3af'}} axisLine={false} tickLine={false} />
-                        <YAxis fontSize={10} tick={{fill: '#9ca3af'}} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v/100}`} />
-                        <ChartTooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}} formatter={(v: number) => fmt(v)} />
+                        <XAxis dataKey="date" fontSize={10} tick={{fill: '#9ca3af', fontWeight: '900'}} axisLine={false} tickLine={false} tickFormatter={(v) => format(parseISO(v), 'dd MMM', { locale: ptBR })} />
+                        <YAxis fontSize={10} tick={{fill: '#9ca3af', fontWeight: '900'}} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v/100}`} />
+                        <ChartTooltip content={<CustomTooltip />} />
                         <Area type="monotone" dataKey="total" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
                       </AreaChart>
                     </ResponsiveContainer>
@@ -363,7 +381,7 @@ const AdminRelatorios = () => {
                   <ChartCard title="Status das Reservas">
                     <ResponsiveContainer width="100%" height={280}>
                       <RePieChart>
-                        <Pie data={data.byStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={8}>
+                        <Pie data={data.byStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={8} stroke="none">
                           {data.byStatus?.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                         </Pie>
                         <ChartTooltip />
@@ -478,28 +496,30 @@ const AdminRelatorios = () => {
 };
 
 const KPICard = ({ label, value, icon: Icon, color }: any) => (
-  <Card className="border-none shadow-sm bg-card hover:shadow-md transition-shadow duration-300">
-    <CardContent className="p-6">
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
-        <div className={`p-2 rounded-lg bg-opacity-10 ${color.replace('text', 'bg')}`}>
-          <Icon className={color} size={16} />
-        </div>
+  <div className="glass-card rounded-[2.5rem] p-6 border-none shadow-sm group hover:scale-[1.02] transition-all relative overflow-hidden">
+    <div className={`absolute -right-2 -top-2 w-16 h-16 ${color.replace('text', 'bg')} opacity-5 rounded-full blur-xl group-hover:opacity-10 transition-opacity`} />
+    <div className="flex items-center justify-between mb-4">
+      <div className={`w-10 h-10 rounded-xl ${color.replace('text', 'bg')} bg-opacity-10 flex items-center justify-center ${color}`}>
+        <Icon size={20} strokeWidth={2.5} />
       </div>
-      <p className="text-2xl font-bold font-display tracking-tight text-foreground">{value}</p>
-    </CardContent>
+      <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">KPI</div>
+    </div>
+    <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{value}</p>
+    <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{label}</p>
+  </div>
+);
+
+
+const ChartCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] group hover:shadow-xl hover:shadow-primary/5 transition-all duration-500">
+    <CardHeader className="bg-muted/10 border-b border-border/20 py-6 px-8">
+      <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-3 text-muted-foreground group-hover:text-primary transition-colors">
+        <Activity size={16} className="text-primary group-hover:scale-110 transition-transform" strokeWidth={3} /> {title}
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="p-8 bg-transparent">{children}</CardContent>
   </Card>
 );
 
-const ChartCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <Card className="border-none shadow-sm overflow-hidden">
-    <CardHeader className="bg-muted/30 border-b border-border/50 py-4">
-      <CardTitle className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
-        <Activity size={14} className="text-primary" /> {title}
-      </CardTitle>
-    </CardHeader>
-    <CardContent className="p-6 bg-card">{children}</CardContent>
-  </Card>
-);
 
 export default AdminRelatorios;
