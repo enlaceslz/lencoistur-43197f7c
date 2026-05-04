@@ -292,7 +292,6 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
 
   return (
     <TooltipProvider>
-    <TooltipProvider>
       <div className="min-h-screen bg-[hsl(220,30%,98%)] flex font-body">
       {/* === SIDEBAR === */}
       <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[80px]" : "w-[280px]"} admin-sidebar transform transition-all duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
