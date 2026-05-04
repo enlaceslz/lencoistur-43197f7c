@@ -159,6 +159,29 @@ const AdminSGSDashboard = () => {
               </div>
             </div>
           </div>
+          {/* Quick Actions Bar */}
+          <div className="glass-card rounded-[2.5rem] p-8 shadow-sm animate-in-fade" style={{ animationDelay: '0.2s' }}>
+            <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-6 ml-1">Central de Ações Rápidas (SGS)</p>
+            <div className="flex flex-wrap gap-3">
+              {[
+                { label: "Registrar Incidente", icon: Activity, path: "/admin/sgs/incidentes", color: "bg-destructive/10 text-destructive" },
+                { label: "Novo Briefing", icon: Shield, path: "/admin/sgs/briefings", color: "bg-primary/10 text-primary" },
+                { label: "Novo Checklist", icon: ClipboardList, path: "/admin/sgs/checklists", color: "bg-primary/10 text-primary" },
+                { label: "Termo de Risco", icon: FileText, path: "/admin/sgs/termos", color: "bg-secondary/10 text-secondary" },
+                { label: "Gerar PGSAT", icon: Award, path: "/admin/sgs/pgsat", color: "bg-primary/10 text-primary" },
+              ].map(a => (
+                <button
+                  key={a.label}
+                  onClick={() => navigate(a.path)}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-tight transition-all active:scale-95 shadow-sm ${a.color}`}
+                >
+                  <a.icon size={16} strokeWidth={2.5} />
+                  {a.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
             {statCards.map((s, idx) => (
               <button key={s.label} onClick={() => navigate(s.path)} className="glass-card rounded-[2rem] p-6 text-left relative overflow-hidden group">
@@ -170,6 +193,42 @@ const AdminSGSDashboard = () => {
                 <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{s.label}</p>
               </button>
             ))}
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-6 animate-in-fade" style={{ animationDelay: '0.4s' }}>
+            {/* Risk Distribution Chart */}
+            <div className="glass-card rounded-[2.5rem] p-6">
+              <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-6">Distribuição de Riscos</h3>
+              <div className="h-[200px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={risksByLevel} cx="50%" cy="50%" outerRadius={80} innerRadius={40} dataKey="value">
+                      {risksByLevel.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="glass-card rounded-[2.5rem] p-6">
+              <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-6">Atividade Recente</h3>
+              <div className="space-y-4">
+                {recentActivity.map((a, i) => (
+                  <div key={i} className="flex items-start gap-4 p-3 rounded-2xl hover:bg-primary/5 transition-colors border border-transparent hover:border-primary/10">
+                    <div className={`w-2 h-2 rounded-full mt-2 ${a.severity === 'alta' ? 'bg-destructive' : 'bg-primary'}`} />
+                    <div className="flex-1">
+                      <p className="text-xs font-black text-foreground uppercase tracking-tight">{a.title}</p>
+                      <p className="text-[10px] text-muted-foreground line-clamp-1">{a.desc}</p>
+                    </div>
+                    <p className="text-[9px] font-bold text-muted-foreground/60 uppercase">
+                      {new Date(a.date).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
