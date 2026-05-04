@@ -345,86 +345,90 @@ const AdminReservas = () => {
       </div>
 
       {/* View Switcher & Filters */}
-      <Card className="mb-8 border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.2s' }}>
-        <CardContent className="p-8 space-y-6">
-          <div className="flex flex-col xl:flex-row gap-6 items-center">
-            <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/40 w-full xl:w-auto">
+      <Card className="mb-8 border-none shadow-2xl shadow-primary/5 overflow-hidden glass-card rounded-[2.5rem] animate-in-fade border border-white/20" style={{ animationDelay: '0.2s' }}>
+        <CardContent className="p-8 space-y-8">
+          <div className="flex flex-col xl:flex-row gap-8 items-center justify-between">
+            <div className="flex bg-white/40 dark:bg-black/20 backdrop-blur-xl p-1.5 rounded-[1.5rem] border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 w-full xl:w-auto">
               <Button 
                 variant={viewMode === "list" ? "default" : "ghost"} 
                 onClick={() => setViewMode("list")}
                 className={cn(
-                  "flex-1 xl:flex-none h-10 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all",
-                  viewMode === "list" ? "shadow-lg shadow-primary/20" : ""
+                  "flex-1 xl:flex-none h-12 px-8 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] transition-all",
+                  viewMode === "list" ? "shadow-lg shadow-primary/25 scale-[1.02]" : "text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5"
                 )}
               >
-                <List size={16} className="mr-2" /> Lista
+                <List size={18} className="mr-2" /> Lista
               </Button>
               <Button 
                 variant={viewMode === "calendar" ? "default" : "ghost"} 
                 onClick={() => setViewMode("calendar")}
                 className={cn(
-                  "flex-1 xl:flex-none h-10 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all",
-                  viewMode === "calendar" ? "shadow-lg shadow-primary/20" : ""
+                  "flex-1 xl:flex-none h-12 px-8 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] transition-all",
+                  viewMode === "calendar" ? "shadow-lg shadow-primary/25 scale-[1.02]" : "text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5"
                 )}
               >
-                <LayoutGrid size={16} className="mr-2" /> Calendário
+                <LayoutGrid size={18} className="mr-2" /> Calendário
               </Button>
             </div>
 
-            <div className="relative flex-1 w-full group">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
-              <input 
-                placeholder="Buscar por cliente, passeio ou código de reserva..." 
-                value={search} 
-                onChange={(e) => setSearch(e.target.value)} 
-                className="w-full pl-14 h-14 rounded-2xl border border-border/40 focus:ring-4 focus:ring-primary/10 bg-muted/20 transition-all font-medium text-sm outline-none placeholder:text-muted-foreground/40" 
-              />
+            <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto">
+              <div className="relative flex-1 xl:w-[400px] group">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
+                <Input
+                  placeholder="Pesquisar por nome, passeio ou código..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-14 h-14 rounded-[1.5rem] border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/20 backdrop-blur-xl focus:bg-white/80 dark:focus:bg-black/40 focus:ring-4 focus:ring-primary/10 transition-all font-semibold"
+                />
+              </div>
+
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Button 
+                  onClick={() => { resetNewForm(); setShowNewForm(true); }} 
+                  className="flex-1 sm:flex-none h-14 px-8 rounded-[1.5rem] bg-gradient-to-r from-primary to-indigo-600 hover:shadow-2xl hover:shadow-primary/30 transition-all font-black text-[11px] uppercase tracking-[0.2em]"
+                >
+                  <Plus size={20} className="mr-2" /> Nova Reserva
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={exportCSV} 
+                  className="flex-1 sm:flex-none h-14 px-8 rounded-[1.5rem] border-white/40 dark:border-white/10 backdrop-blur-xl hover:bg-white/50 transition-all font-black text-[11px] uppercase tracking-[0.2em]"
+                >
+                  <Download size={20} className="mr-2" /> Exportar
+                </Button>
+              </div>
             </div>
-            
-            <div className="flex gap-1.5 w-full xl:w-auto overflow-x-auto no-scrollbar pb-1">
+          </div>
+
+          <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-border/40">
+            <div className="flex flex-wrap gap-2">
               {["todos", "confirmada", "pendente", "cancelada", "concluida"].map((s) => (
                 <button
                   key={s}
                   onClick={() => setStatusFilter(s)}
-                  className={`text-[10px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all whitespace-nowrap ${
+                  className={`text-[10px] font-black uppercase tracking-widest px-5 py-3 rounded-xl transition-all whitespace-nowrap shadow-sm border border-border/20 ${
                     statusFilter === s
                       ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      : "bg-white/40 dark:bg-black/20 backdrop-blur-sm text-muted-foreground hover:bg-primary/5 hover:text-primary hover:border-primary/20"
                   }`}
                 >
-                  {s === "todos" ? `Todos` : statusConfig[s]?.label}
+                  {s === "todos" ? `Todos os Status` : statusConfig[s]?.label}
                 </button>
               ))}
             </div>
 
-            <div className="flex items-center gap-2 w-full xl:w-auto">
-              <Button variant="outline" size="lg" onClick={exportCSV} className="rounded-2xl h-12 px-6 border-border font-black text-xs uppercase tracking-widest flex-1 xl:flex-none">
-                <Download size={16} className="mr-2" /> Exportar
-              </Button>
-              <Button size="lg" onClick={() => { resetNewForm(); setShowNewForm(true); }} className="bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-sm font-black uppercase tracking-widest flex-1 xl:flex-none shadow-lg shadow-primary/20 transition-all active:scale-95">
-                <Plus size={18} strokeWidth={3} className="mr-2" /> Nova Reserva
-              </Button>
-            </div>
-          </div>
-          
-          <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-border/50">
-            <div className="flex items-center gap-3 bg-muted/50 px-4 py-2 rounded-xl border border-border/50">
-              <Calendar size={14} className="text-primary" />
-              <div className="flex items-center gap-2">
-                <input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="bg-transparent text-[10px] font-bold uppercase tracking-widest outline-none w-28" />
-                <span className="text-muted-foreground text-[10px] font-black">ATÉ</span>
-                <input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="bg-transparent text-[10px] font-bold uppercase tracking-widest outline-none w-28" />
+            <div className="flex items-center gap-4 bg-white/40 dark:bg-black/20 backdrop-blur-xl px-5 py-3 rounded-xl border border-white/40 dark:border-white/10 shadow-sm ml-auto">
+              <Calendar size={16} className="text-primary" />
+              <div className="flex items-center gap-3">
+                <input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="bg-transparent text-[11px] font-black uppercase tracking-widest outline-none w-28 text-foreground" />
+                <span className="text-muted-foreground text-[10px] font-black opacity-40">ATÉ</span>
+                <input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="bg-transparent text-[11px] font-black uppercase tracking-widest outline-none w-28 text-foreground" />
               </div>
               {(dateStart || dateEnd) && (
-                <button onClick={() => { setDateStart(""); setDateEnd(""); }} className="ml-2 text-[10px] font-black text-destructive uppercase tracking-widest hover:underline">
+                <button onClick={() => { setDateStart(""); setDateEnd(""); }} className="ml-2 text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline px-2 py-1 rounded-md bg-rose-500/5">
                   Limpar
                 </button>
               )}
-            </div>
-            <div className="ml-auto">
-              <Badge variant="secondary" className="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-muted text-muted-foreground border-none">
-                Mostrando {filtered.length} de {bookings.length} reservas
-              </Badge>
             </div>
           </div>
         </CardContent>
