@@ -404,66 +404,80 @@ const AdminPacotes = () => {
               <label className="text-sm font-bold">Descrição</label>
               <Textarea disabled={isViewMode} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
             </div>
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50/30 p-5 rounded-3xl border border-blue-100/50 space-y-5 shadow-sm">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-blue-600 flex items-center gap-2">
-                  <Clock size={14} className="animate-pulse" /> Duração do Roteiro
-                </h3>
-                <Badge variant="outline" className="bg-white/50 text-[10px] border-blue-200 text-blue-600 font-bold">
-                  PADRÃO CADASTUR
+            <div className="bg-gradient-to-br from-slate-50 to-blue-50/30 p-6 rounded-[2rem] border border-blue-100/50 space-y-6 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[80px] rounded-full -mr-16 -mt-16" />
+              
+              <div className="flex items-center justify-between relative z-10">
+                <div className="space-y-1">
+                  <h3 className="text-xs font-black uppercase tracking-[0.2em] text-blue-600 flex items-center gap-2">
+                    <Clock size={14} className="animate-pulse" /> Duração Logística
+                  </h3>
+                  <p className="text-[10px] text-slate-400 font-medium">Especificações técnicas para vouchers e seguros</p>
+                </div>
+                <Badge variant="outline" className="bg-white/80 backdrop-blur-sm text-[10px] border-blue-200 text-blue-600 font-bold px-3 py-1 rounded-full shadow-sm">
+                  PADRÃO CADASTUR & ICMBIO
                 </Badge>
               </div>
               
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-2.5">
-                  <div className="flex justify-between items-center">
-                    <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Quantidade de Dias</label>
+              <div className="grid md:grid-cols-2 gap-8 relative z-10">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center px-1">
+                    <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Dias de Atividade</label>
                   </div>
                   <div className="relative group transition-all duration-300">
+                    <div className="absolute inset-0 bg-blue-500/5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
                     <Input 
                       disabled={isViewMode} 
                       type="number" 
                       min={1} 
                       value={form.days} 
                       onChange={e => setForm({ ...form, days: parseInt(e.target.value) || 0 })}
-                      className="h-12 rounded-2xl border-blue-200/60 bg-white/80 focus:bg-white focus:ring-blue-500/20 pr-14 transition-all text-slate-800 font-bold"
+                      className="h-14 rounded-2xl border-blue-100 bg-white/90 backdrop-blur-md focus:bg-white focus:ring-4 focus:ring-blue-500/10 pr-20 transition-all text-slate-800 font-black text-lg shadow-inner"
                     />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
-                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                      <span className="text-[10px] font-black uppercase text-blue-500/70">Dias</span>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                      <span className="text-[10px] font-black uppercase text-blue-600">DIAS</span>
                     </div>
                   </div>
+                  <p className="text-[9px] text-slate-400 font-bold px-1 uppercase tracking-tighter">Período total de operação em campo</p>
                 </div>
 
-                <div className="space-y-2.5">
-                  <div className="flex justify-between items-center">
-                    <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Quantidade de Noites</label>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center px-1">
+                    <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Pernoites (Noites)</label>
                   </div>
                   <div className="relative group transition-all duration-300">
+                    <div className="absolute inset-0 bg-indigo-500/5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
                     <Input 
                       disabled={isViewMode} 
                       type="number" 
                       min={0} 
                       value={form.nights} 
                       onChange={e => setForm({ ...form, nights: parseInt(e.target.value) || 0 })}
-                      className="h-12 rounded-2xl border-blue-200/60 bg-white/80 focus:bg-white focus:ring-blue-500/20 pr-14 transition-all text-slate-800 font-bold"
+                      className="h-14 rounded-2xl border-indigo-100 bg-white/90 backdrop-blur-md focus:bg-white focus:ring-4 focus:ring-indigo-500/10 pr-20 transition-all text-slate-800 font-black text-lg shadow-inner"
                     />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 pointer-events-none">
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-100">
                       <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                      <span className="text-[10px] font-black uppercase text-indigo-500/70">Noites</span>
+                      <span className="text-[10px] font-black uppercase text-indigo-600">NOITES</span>
                     </div>
                   </div>
+                  <p className="text-[9px] text-slate-400 font-bold px-1 uppercase tracking-tighter">Quantidade de estadias para logística hoteleira</p>
                 </div>
               </div>
 
               {!isViewMode && (
-                <div className="flex items-start gap-2 bg-blue-100/30 p-3 rounded-xl border border-blue-100/50">
-                  <div className="mt-0.5 p-1 bg-blue-500 rounded-full">
-                    <CheckCircle size={8} className="text-white" />
+                <div className="flex items-start gap-4 bg-white/60 backdrop-blur-sm p-4 rounded-[1.5rem] border border-blue-100/50 shadow-sm relative z-10">
+                  <div className="shrink-0 p-2 bg-blue-600 rounded-2xl shadow-lg shadow-blue-200">
+                    <CheckCircle size={14} className="text-white" strokeWidth={3} />
                   </div>
-                  <p className="text-[10px] text-blue-700/80 leading-relaxed font-medium">
-                    As informações de <strong>pernoite</strong> e <strong>período</strong> são requisitos fundamentais para o credenciamento de pacotes junto ao <strong>ICMBio</strong> e fiscalizações do <strong>CADASTUR</strong> em Santo Amaro - MA.
-                  </p>
+                  <div className="space-y-1">
+                    <p className="text-[11px] text-slate-700 leading-relaxed font-bold">
+                      Conformidade Normativa em Santo Amaro - MA
+                    </p>
+                    <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+                      O registro preciso da <strong>duração logística</strong> (Dias x Noites) é obrigatório para a emissão de <strong>Vouchers Digitais</strong>, seguros de acidentes pessoais e relatórios estatísticos do <strong>Observatório de Turismo</strong> dos Lençóis Maranhenses.
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
