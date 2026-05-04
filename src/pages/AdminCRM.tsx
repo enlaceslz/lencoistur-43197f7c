@@ -462,7 +462,8 @@ const AdminCRMContent = () => {
       number: form.number,
       neighborhood: form.neighborhood,
       city: form.city,
-      state: form.state
+      state: form.state,
+      tags: form.tags
     };
 
     if (editingCustomer) {
