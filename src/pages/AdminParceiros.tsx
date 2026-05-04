@@ -513,18 +513,6 @@ const AdminParceiros = () => {
             </button>
           );
         })}
-      </div>
-            className={`text-[10px] font-black uppercase tracking-widest px-6 h-10 rounded-xl transition-all whitespace-nowrap ${
-              typeFilter === t.name
-                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
       <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
         {filtered.length === 0 ? (
           <div className="py-20 text-center text-muted-foreground bg-muted/10">
