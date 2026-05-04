@@ -324,7 +324,7 @@ const AdminPacotes = () => {
               <TableRow><TableCell colSpan={5} className="text-center py-10 text-muted-foreground">Nenhum pacote encontrado.</TableCell></TableRow>
             ) : (
               filtered.map((pkg) => (
-                <TableRow key={pkg.id}>
+                <TableRow key={pkg.id} className="cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => openView(pkg)}>
                   <TableCell className="font-medium">
                     <div>
                       <p className="font-bold text-foreground">{pkg.name}</p>
@@ -349,7 +349,7 @@ const AdminPacotes = () => {
                       {pkg.active ? "Ativo" : "Inativo"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                     <div className="flex justify-end gap-2">
                       <Button variant="ghost" size="icon" onClick={() => openView(pkg)} title="Visualizar" className="h-8 w-8 rounded-lg text-slate-600 hover:text-slate-700 hover:bg-slate-50">
                         <Eye size={16} />
