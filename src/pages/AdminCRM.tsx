@@ -363,6 +363,7 @@ const AdminCRMContent = () => {
         neighborhood: c.neighborhood,
         city: c.city,
         state: c.state,
+        tags: c.tags || [],
         totalBookings: bookingsByCustomer[c.id]?.count || 0,
         totalSpent: bookingsByCustomer[c.id]?.total || 0,
         lastBooking: bookingsByCustomer[c.id]?.lastDate || null,
