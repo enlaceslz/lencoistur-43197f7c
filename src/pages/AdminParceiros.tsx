@@ -513,6 +513,7 @@ const AdminParceiros = () => {
             </button>
           );
         })}
+      </div>
       <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
         {filtered.length === 0 ? (
           <div className="py-20 text-center text-muted-foreground bg-muted/10">
