@@ -330,60 +330,79 @@ const AdminDashboard = () => {
 
         {/* Bookings */}
         <div className="grid lg:grid-cols-3 gap-6">
-          <div className="bg-card border border-border rounded-2xl p-6">
-            <h3 className="font-display text-lg font-bold text-foreground mb-4">Reservas por Mês</h3>
+          <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover animate-in-fade" style={{ animationDelay: '0.6s' }}>
+            <h3 className="font-display text-2xl font-black text-foreground tracking-tight mb-8">Volumetria</h3>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={revenueData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="month" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                <Tooltip />
-                <Bar dataKey="bookings" fill="hsl(35, 80%, 55%)" radius={[6, 6, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.4} />
+                <XAxis 
+                  dataKey="month" 
+                  tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))", fontWeight: 'bold' }} 
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis 
+                  tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))", fontWeight: 'bold' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', fontSize: '12px' }}
+                />
+                <Bar dataKey="bookings" fill="hsl(35, 80%, 55%)" radius={[8, 8, 0, 0]} barSize={20} />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display text-lg font-bold text-foreground">Reservas Recentes</h3>
-              <button onClick={() => navigate("/admin/reservas")} className="text-primary text-sm font-semibold hover:underline">Ver todas</button>
+          <div className="lg:col-span-2 glass-card rounded-[2.5rem] p-8 admin-card-hover animate-in-fade" style={{ animationDelay: '0.7s' }}>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="font-display text-2xl font-black text-foreground tracking-tight">Reservas Recentes</h3>
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary mt-1">Últimas movimentações</p>
+              </div>
+              <button 
+                onClick={() => navigate("/admin/reservas")} 
+                className="px-6 py-2 rounded-xl bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/5"
+              >
+                Ver todas
+              </button>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full">
                 <thead>
-                  <tr className="border-b border-border text-muted-foreground bg-muted/30">
-                    <th className="text-left py-3 px-4 font-bold uppercase text-[10px] tracking-widest">Código</th>
-                    <th className="text-left py-3 px-2 font-bold uppercase text-[10px] tracking-widest">Cliente</th>
-                    <th className="text-left py-3 px-2 font-bold uppercase text-[10px] tracking-widest">Passeio</th>
-                    <th className="text-left py-3 px-2 font-bold uppercase text-[10px] tracking-widest text-center">Data</th>
-                    <th className="text-right py-3 px-2 font-bold uppercase text-[10px] tracking-widest">Valor</th>
-                    <th className="text-right py-3 px-4 font-bold uppercase text-[10px] tracking-widest">Status</th>
+                  <tr className="text-muted-foreground">
+                    <th className="text-left pb-4 font-black uppercase text-[10px] tracking-widest opacity-40">Código</th>
+                    <th className="text-left pb-4 font-black uppercase text-[10px] tracking-widest opacity-40">Cliente</th>
+                    <th className="text-left pb-4 font-black uppercase text-[10px] tracking-widest opacity-40">Passeio</th>
+                    <th className="text-left pb-4 font-black uppercase text-[10px] tracking-widest opacity-40 text-center">Data</th>
+                    <th className="text-right pb-4 font-black uppercase text-[10px] tracking-widest opacity-40">Total</th>
+                    <th className="text-right pb-4 font-black uppercase text-[10px] tracking-widest opacity-40">Status</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-border/20">
                   {recentBookings.length === 0 ? (
-                    <tr><td colSpan={6} className="py-12 text-center text-muted-foreground font-medium italic">Nenhuma reserva recente encontrada</td></tr>
-                  ) : recentBookings.map((b) => {
+                    <tr><td colSpan={6} className="py-20 text-center text-[10px] font-black uppercase tracking-widest text-muted-foreground/30">Vazio</td></tr>
+                  ) : recentBookings.map((b, bIdx) => {
                     const s = statusMap[b.status] || { label: b.status, className: "bg-muted text-muted-foreground" };
                     return (
                       <tr 
                         key={b.id} 
                         onClick={() => navigate("/admin/reservas")}
-                        className="border-b border-border/50 last:border-0 hover:bg-primary/5 transition-colors cursor-pointer group"
+                        className="group hover:bg-primary/[0.02] transition-colors cursor-pointer"
                       >
-                        <td className="py-4 px-4 font-mono text-[10px] text-primary font-bold">
-                          <span className="bg-primary/5 px-2 py-1 rounded">{b.id}</span>
+                        <td className="py-5">
+                          <span className="bg-primary/5 text-primary text-[9px] font-black px-2 py-1 rounded-lg border border-primary/10">{b.id}</span>
                         </td>
-                        <td className="py-4 px-2">
-                          <p className="font-bold text-foreground group-hover:text-primary transition-colors">{b.client}</p>
+                        <td className="py-5">
+                          <p className="font-black text-sm text-foreground group-hover:text-primary transition-colors">{b.client}</p>
                         </td>
-                        <td className="py-4 px-2 text-muted-foreground text-xs font-medium">{b.tour}</td>
-                        <td className="py-4 px-2 text-muted-foreground text-xs text-center font-semibold">
+                        <td className="py-5 text-xs font-medium text-muted-foreground">{b.tour}</td>
+                        <td className="py-5 text-[11px] text-center font-black text-muted-foreground/60">
                           {b.date ? new Date(b.date + "T12:00:00").toLocaleDateString("pt-BR") : "—"}
                         </td>
-                        <td className="py-4 px-2 text-right font-black text-foreground">{fmt(b.total)}</td>
-                        <td className="py-4 px-4 text-right">
-                          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter border ${s.className}`}>
+                        <td className="py-5 text-right font-black text-foreground">{fmt(b.total)}</td>
+                        <td className="py-5 text-right">
+                          <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-current shadow-sm ${s.className}`}>
                             {s.label}
                           </span>
                         </td>
