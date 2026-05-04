@@ -103,6 +103,7 @@ const AdminPacotes = () => {
     slug: "",
     description: "",
     days: 1,
+    nights: 0,
     original_price: 0,
     discount_price: 0,
     tag: "",
@@ -157,7 +158,7 @@ const AdminPacotes = () => {
     setEditingId(null);
     setIsViewMode(false);
     setForm({
-      name: "", slug: "", description: "", days: 1,
+      name: "", slug: "", description: "", days: 1, nights: 0,
       original_price: 0, discount_price: 0, tag: "", highlights: [], active: true
     });
     setSelectedTours([]);
@@ -172,6 +173,7 @@ const AdminPacotes = () => {
       slug: pkg.slug,
       description: pkg.description || "",
       days: pkg.days,
+      nights: pkg.nights || 0,
       original_price: pkg.original_price,
       discount_price: pkg.discount_price,
       tag: pkg.tag || "",
@@ -196,6 +198,7 @@ const AdminPacotes = () => {
       slug: pkg.slug,
       description: pkg.description || "",
       days: pkg.days,
+      nights: pkg.nights || 0,
       original_price: pkg.original_price,
       discount_price: pkg.discount_price,
       tag: pkg.tag || "",
@@ -333,9 +336,16 @@ const AdminPacotes = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1.5 text-sm">
-                      <Clock size={14} className="text-muted-foreground" />
-                      {pkg.days} {pkg.days === 1 ? 'dia' : 'dias'}
+                    <div className="flex flex-col gap-1 text-sm">
+                      <div className="flex items-center gap-1.5">
+                        <Clock size={14} className="text-muted-foreground" />
+                        {pkg.days} {pkg.days === 1 ? 'dia' : 'dias'}
+                      </div>
+                      {pkg.nights > 0 && (
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground ml-5">
+                          {pkg.nights} {pkg.nights === 1 ? 'noite' : 'noites'}
+                        </div>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -394,9 +404,15 @@ const AdminPacotes = () => {
               <label className="text-sm font-bold">Descrição</label>
               <Textarea disabled={isViewMode} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-bold">Duração (dias)</label>
-              <Input disabled={isViewMode} type="number" min={1} value={form.days} onChange={e => setForm({ ...form, days: parseInt(e.target.value) })} />
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-bold">Duração (dias)</label>
+                <Input disabled={isViewMode} type="number" min={1} value={form.days} onChange={e => setForm({ ...form, days: parseInt(e.target.value) || 0 })} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold">Duração (noites)</label>
+                <Input disabled={isViewMode} type="number" min={0} value={form.nights} onChange={e => setForm({ ...form, nights: parseInt(e.target.value) || 0 })} />
+              </div>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">

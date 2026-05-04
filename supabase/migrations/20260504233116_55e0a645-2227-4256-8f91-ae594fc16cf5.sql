@@ -1,0 +1,1 @@
+ALTER TABLE public.packages ADD COLUMN nights INTEGER DEFAULT 0;
