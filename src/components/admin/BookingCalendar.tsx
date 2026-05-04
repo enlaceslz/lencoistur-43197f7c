@@ -217,8 +217,8 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                         )}
                       >
                         <div className={cn(
-                          "absolute left-0 top-0 bottom-0 w-1.5",
-                          statusConfig[booking.status]?.color
+                          "absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b",
+                          statusConfig[booking.status]?.gradient
                         )} />
                         <div className="pl-2">
                           <div className="flex items-center justify-between mb-0.5">
