@@ -1035,7 +1035,7 @@ const AdminCRMContent = () => {
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <a
-                                      href={`https://wa.me/55${c.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${c.name.split(" ")[0]}! Tudo bem?`)}`}
+                                      href={`https://wa.me/${c.phone.startsWith("+") ? c.phone.replace(/\D/g, "") : `55${c.phone.replace(/\D/g, "")}`}?text=${encodeURIComponent(`Olá ${c.name.split(" ")[0]}! Tudo bem?`)}`}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       onClick={(e) => e.stopPropagation()}
