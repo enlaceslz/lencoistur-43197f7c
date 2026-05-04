@@ -110,6 +110,7 @@ interface CustomerForm {
   neighborhood: string;
   city: string;
   state: string;
+  tags: string[];
 }
 
 interface DependentForm {
