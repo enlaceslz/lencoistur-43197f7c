@@ -908,12 +908,14 @@ const AdminCRMContent = () => {
               ))}
             </div>
 
-            <div className="bg-card border border-border rounded-2xl p-6 overflow-hidden">
+            <div className="overflow-hidden">
               {(filter === "dependents" ? filteredDependents : filtered).length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Users className="mx-auto mb-3 opacity-40" size={40} />
-                  <p className="font-medium">Nenhum {filter === "dependents" ? "dependente" : "cliente"} encontrado</p>
-                  <p className="text-sm mt-1">Clique em "Novo Cliente" para cadastrar.</p>
+                <div className="text-center py-20 bg-muted/20 rounded-[2rem] border border-dashed border-border/50">
+                  <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4 opacity-50">
+                    <Users size={32} />
+                  </div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Vazio</p>
+                  <p className="text-xs font-medium text-muted-foreground/60 mt-2">Nenhum {filter === "dependents" ? "dependente" : "cliente"} encontrado.</p>
                 </div>
               ) : (
               <div className="overflow-x-auto">
