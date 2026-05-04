@@ -541,8 +541,8 @@ const AdminColaboradores = () => {
       {viewMode === 'cards' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filtered.map(c => (
-            <Card key={c.id} className="overflow-hidden border-none shadow-md hover:shadow-2xl transition-all duration-500 group relative bg-white flex flex-col h-full rounded-3xl">
-              <div className="absolute top-0 left-0 w-full h-2 bg-slate-100 group-hover:bg-primary/20 transition-colors" />
+            <div key={c.id} className="overflow-hidden border-none glass-card admin-card-hover group relative flex flex-col h-full rounded-[2.5rem] animate-in-fade">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-primary/5 group-hover:bg-primary/20 transition-colors" />
               
               <div className="p-6 flex-1">
                 <div className="flex justify-between items-start mb-6">
