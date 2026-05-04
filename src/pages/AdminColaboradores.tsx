@@ -499,16 +499,15 @@ const AdminColaboradores = () => {
         ))}
       </div>
 
-      <Card className="mb-8 border-none shadow-lg bg-white/80 backdrop-blur-md overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
-        <CardContent className="p-6 flex flex-col md:flex-row gap-6 items-center justify-between">
+      <div className="mb-10 glass-card rounded-[2.5rem] p-8 shadow-sm animate-in-fade" style={{ animationDelay: '0.2s' }}>
+        <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
           <div className="relative flex-1 w-full group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
-            <Input 
-              placeholder="Buscar por nome, e-mail ou documento..." 
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
+            <input 
+              placeholder="Pesquisar por nome, e-mail ou documento..." 
               value={search} 
               onChange={(e) => setSearch(e.target.value)} 
-              className="pl-12 h-12 bg-white border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all rounded-2xl shadow-sm" 
+              className="w-full pl-14 h-14 rounded-2xl border border-border/40 focus:ring-4 focus:ring-primary/10 bg-muted/20 transition-all font-medium text-sm outline-none placeholder:text-muted-foreground/40" 
             />
           </div>
           
