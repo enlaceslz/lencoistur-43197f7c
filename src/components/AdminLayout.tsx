@@ -514,28 +514,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
                   Notificações
                 </TooltipContent>
               </Tooltip>
-
-          <div className="flex items-center gap-2">
-            {/* Notifications */}
-            <div className="relative" ref={notifRef}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setNotifOpen(!notifOpen)}
-                    className={`relative p-2 rounded-lg transition-colors ${notifOpen ? "bg-[hsl(220,20%,94%)] text-[hsl(220,25%,20%)]" : "text-[hsl(220,15%,50%)] hover:text-[hsl(220,25%,20%)] hover:bg-[hsl(220,20%,96%)]"}`}
-                  >
-                    <Bell size={19} />
-                    {activeNotifs.length > 0 && (
-                  <span className={`absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 rounded-full text-[9px] text-white flex items-center justify-center font-bold ${errorCount > 0 ? "bg-red-500" : "bg-amber-500"}`}>
-                    {activeNotifs.length}
-                  </span>
-                  )}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>Notificações</p>
-              </TooltipContent>
-            </Tooltip>
+            </div>
 
               {notifOpen && (
                 <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-[hsl(220,20%,92%)] rounded-xl shadow-xl overflow-hidden z-50">
