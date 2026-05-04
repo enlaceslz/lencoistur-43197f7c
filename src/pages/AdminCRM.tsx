@@ -433,7 +433,8 @@ const AdminCRMContent = () => {
       number: c.number || "",
       neighborhood: c.neighborhood || "",
       city: c.city || "",
-      state: c.state || ""
+      state: c.state || "",
+      tags: c.tags || []
     });
     setModalOpen(true);
   };
