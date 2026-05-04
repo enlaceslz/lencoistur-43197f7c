@@ -1083,6 +1083,16 @@ const AdminConfig = () => {
                       />
                       <p className="text-[10px] text-muted-foreground italic">Estes nomes aparecerão na coluna "Experiências" do rodapé.</p>
                     </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-xs">Copyright / Créditos</Label>
+                      <Input 
+                        value={site.footerCopyright || ""} 
+                        onChange={(e) => setSite({ ...site, footerCopyright: e.target.value })} 
+                        placeholder="Ex: © 2026 LençóisTour. Todos os direitos reservados."
+                        className="h-10 rounded-xl border-muted-foreground/20 text-sm"
+                      />
+                    </div>
                   </div>
 
                   <div className="flex justify-end pt-6 border-t border-border">
