@@ -205,35 +205,50 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                 <div className="space-y-2 flex-1 overflow-y-auto no-scrollbar pb-2">
                   <AnimatePresence mode="popLayout">
                     {dayBookings.slice(0, 4).map((booking) => (
-                      <motion.div
-                        layout
-                        initial={{ opacity: 0, x: -5 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        key={booking.id}
-                        onClick={() => onSelectBooking(booking)}
-                        className={cn(
-                          "group/item cursor-pointer p-2.5 rounded-xl border border-white/20 dark:border-white/5 hover:border-primary/30 hover:bg-white dark:hover:bg-white/5 hover:shadow-xl hover:shadow-black/5 hover:-translate-y-0.5 transition-all relative overflow-hidden bg-white/50 dark:bg-black/20 backdrop-blur-sm",
-                        )}
-                      >
-                        <div className={cn(
-                          "absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b",
-                          statusConfig[booking.status]?.gradient
-                        )} />
-                        <div className="pl-2">
-                          <div className="flex items-center justify-between mb-0.5">
-                            <p className="text-[11px] font-black text-foreground truncate leading-none">
-                              {booking.customerName}
-                            </p>
-                            <span className="text-[8px] font-bold opacity-40">#{booking.bookingCode.slice(-4)}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <p className="text-[9px] font-bold text-muted-foreground truncate opacity-80 uppercase tracking-tighter">
-                              {booking.itemName.split('(')[0].trim()}
-                            </p>
-                          </div>
-                        </div>
-                      </motion.div>
+                      <TooltipProvider key={booking.id}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <motion.div
+                              layout
+                              initial={{ opacity: 0, x: -5 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, scale: 0.95 }}
+                              onClick={() => onSelectBooking(booking)}
+                              className={cn(
+                                "group/item cursor-pointer p-2.5 rounded-xl border border-white/20 dark:border-white/5 hover:border-primary/30 hover:bg-white dark:hover:bg-white/5 hover:shadow-xl hover:shadow-black/5 hover:-translate-y-0.5 transition-all relative overflow-hidden bg-white/50 dark:bg-black/20 backdrop-blur-sm",
+                              )}
+                            >
+                              <div className={cn(
+                                "absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b",
+                                statusConfig[booking.status]?.gradient
+                              )} />
+                              <div className="pl-2">
+                                <div className="flex items-center justify-between mb-0.5">
+                                  <p className="text-[11px] font-black text-foreground truncate leading-none">
+                                    {booking.customerName}
+                                  </p>
+                                  <span className="text-[8px] font-bold opacity-40">#{booking.bookingCode.slice(-4)}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <p className="text-[9px] font-bold text-muted-foreground truncate opacity-80 uppercase tracking-tighter">
+                                    {booking.itemName.split('(')[0].trim()}
+                                  </p>
+                                </div>
+                              </div>
+                            </motion.div>
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="p-4 rounded-2xl glass-card border-white/20 shadow-2xl backdrop-blur-xl">
+                            <div className="space-y-2">
+                              <p className="text-xs font-black text-primary uppercase tracking-widest">{booking.itemName}</p>
+                              <div className="space-y-1">
+                                <p className="text-[11px] font-bold flex items-center gap-2"><Users size={12} /> {booking.guests} {booking.guests === 1 ? 'pessoa' : 'pessoas'}</p>
+                                <p className="text-[11px] font-bold flex items-center gap-2"><Clock size={12} /> Status: {statusConfig[booking.status]?.label}</p>
+                                <p className="text-[11px] font-black text-foreground mt-2 bg-primary/5 px-2 py-1 rounded-md inline-block">Total: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(booking.finalTotal)}</p>
+                              </div>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     ))}
                   </AnimatePresence>
                   
