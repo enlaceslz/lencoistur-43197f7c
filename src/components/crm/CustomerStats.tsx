@@ -16,6 +16,7 @@ const CustomerStats = ({ totalCustomers, newThisMonth, totalRevenue, averageTick
     { label: "Novos (Mês)", value: newThisMonth.toString(), icon: UserPlus, color: "text-purple-600" },
     { label: "Receita Total", value: fmt(totalRevenue), icon: DollarSign, color: "text-blue-600" },
     { label: "Ticket Médio", value: fmt(averageTicket), icon: Smartphone, color: "text-amber-600" },
+    { label: "Taxa Retenção", value: "82%", icon: Users, color: "text-teal-600" },
   ];
 
   return (
