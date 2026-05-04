@@ -211,7 +211,9 @@ const AdminAvaliacoes = () => {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          <DialogContent>
+          </Dialog>
+        </div>
+      </div>
             <DialogHeader><DialogTitle>Nova Avaliação</DialogTitle></DialogHeader>
             <div className="space-y-4">
               <div>
