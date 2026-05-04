@@ -343,16 +343,16 @@ const AdminReservas = () => {
       </div>
 
       {/* Filters */}
-      <Card className="mb-8 border border-border/50 shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
-        <CardContent className="p-6 space-y-4">
-          <div className="flex flex-col xl:flex-row gap-4 items-center">
+      <Card className="mb-8 border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.2s' }}>
+        <CardContent className="p-8 space-y-6">
+          <div className="flex flex-col xl:flex-row gap-6 items-center">
             <div className="relative flex-1 w-full group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
-              <Input 
-                placeholder="Buscar cliente, passeio, email ou código..." 
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
+              <input 
+                placeholder="Buscar por cliente, passeio ou código de reserva..." 
                 value={search} 
                 onChange={(e) => setSearch(e.target.value)} 
-                className="pl-12 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30 transition-all font-medium text-sm" 
+                className="w-full pl-14 h-14 rounded-2xl border border-border/40 focus:ring-4 focus:ring-primary/10 bg-muted/20 transition-all font-medium text-sm outline-none placeholder:text-muted-foreground/40" 
               />
             </div>
             
