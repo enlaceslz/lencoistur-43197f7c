@@ -75,8 +75,11 @@ const AdminSGSPGSAT = () => {
         </div>
 
         <div className="flex justify-end">
-          <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:opacity-90">
-            <Plus size={16} /> Gerar Novo PGSAT
+          <button 
+            onClick={() => setShowForm(!showForm)} 
+            className="flex items-center gap-3 px-8 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95"
+          >
+            <Plus size={20} strokeWidth={3} /> Gerar Novo PGSAT
           </button>
         </div>
 
