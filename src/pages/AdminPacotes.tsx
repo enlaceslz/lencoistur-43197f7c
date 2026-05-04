@@ -12,7 +12,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Search, Plus, Pencil, Trash2, Package as PackageIcon, Clock, Tag, PlusCircle, X, CheckCircle, GripVertical
+  Search, Plus, Pencil, Trash2, Package as PackageIcon, Clock, Tag, PlusCircle, X, CheckCircle, GripVertical, Eye
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -95,6 +95,7 @@ const AdminPacotes = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [isViewMode, setIsViewMode] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const [form, setForm] = useState({
@@ -154,6 +155,7 @@ const AdminPacotes = () => {
 
   const openNew = () => {
     setEditingId(null);
+    setIsViewMode(false);
     setForm({
       name: "", slug: "", description: "", days: 1,
       original_price: 0, discount_price: 0, tag: "", highlights: [], active: true
@@ -162,8 +164,33 @@ const AdminPacotes = () => {
     setShowForm(true);
   };
 
+  const openView = (pkg: any) => {
+    setEditingId(pkg.id);
+    setIsViewMode(true);
+    setForm({
+      name: pkg.name,
+      slug: pkg.slug,
+      description: pkg.description || "",
+      days: pkg.days,
+      original_price: pkg.original_price,
+      discount_price: pkg.discount_price,
+      tag: pkg.tag || "",
+      highlights: pkg.highlights || [],
+      active: pkg.active,
+    });
+    
+    const pkgTours = (pkg.package_tours || [])
+      .sort((a: any, b: any) => a.sort_order - b.sort_order)
+      .map((pt: any) => tours.find(t => t.id === pt.tour_id))
+      .filter(Boolean);
+      
+    setSelectedTours(pkgTours);
+    setShowForm(true);
+  };
+
   const openEdit = (pkg: any) => {
     setEditingId(pkg.id);
+    setIsViewMode(false);
     setForm({
       name: pkg.name,
       slug: pkg.slug,
@@ -324,10 +351,13 @@ const AdminPacotes = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(pkg)} className="h-8 w-8 rounded-lg text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+                      <Button variant="ghost" size="icon" onClick={() => openView(pkg)} title="Visualizar" className="h-8 w-8 rounded-lg text-slate-600 hover:text-slate-700 hover:bg-slate-50">
+                        <Eye size={16} />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(pkg)} title="Editar" className="h-8 w-8 rounded-lg text-blue-600 hover:text-blue-700 hover:bg-blue-50">
                         <Pencil size={16} />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(pkg.id)} className="h-8 w-8 rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50">
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(pkg.id)} title="Excluir" className="h-8 w-8 rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50">
                         <Trash2 size={16} />
                       </Button>
                     </div>
@@ -344,7 +374,7 @@ const AdminPacotes = () => {
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               <PackageIcon className="text-primary" />
-              {editingId ? "Editar Pacote" : "Novo Pacote"}
+              {isViewMode ? "Visualizar Pacote" : editingId ? "Editar Pacote" : "Novo Pacote"}
             </DialogTitle>
           </DialogHeader>
 
@@ -352,26 +382,27 @@ const AdminPacotes = () => {
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-bold">Nome do Pacote</label>
-                <Input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: generateSlug(e.target.value) })} />
+                <Input required disabled={isViewMode} value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: generateSlug(e.target.value) })} />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold">Slug (URL)</label>
-                <Input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} />
+                <Input disabled={isViewMode} value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} />
               </div>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-bold">Descrição</label>
-              <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
+              <Textarea disabled={isViewMode} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-bold">Duração (dias)</label>
-              <Input type="number" min={1} value={form.days} onChange={e => setForm({ ...form, days: parseInt(e.target.value) })} />
+              <Input disabled={isViewMode} type="number" min={1} value={form.days} onChange={e => setForm({ ...form, days: parseInt(e.target.value) })} />
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-bold">Preço Original</label>
                 <Input 
+                  disabled={isViewMode}
                   value={maskCurrency(String(form.original_price))} 
                   onChange={e => setForm({ ...form, original_price: parseCurrency(e.target.value) })} 
                 />
@@ -380,6 +411,7 @@ const AdminPacotes = () => {
               <div className="space-y-2">
                 <label className="text-sm font-bold">Preço Promocional</label>
                 <Input 
+                  disabled={isViewMode}
                   value={maskCurrency(String(form.discount_price))} 
                   onChange={e => setForm({ ...form, discount_price: parseCurrency(e.target.value) })} 
                 />
@@ -390,6 +422,7 @@ const AdminPacotes = () => {
             <div className="flex items-center space-x-2 bg-muted/50 p-4 rounded-xl">
               <Switch 
                 id="active" 
+                disabled={isViewMode}
                 checked={form.active} 
                 onCheckedChange={(checked) => setForm({ ...form, active: checked })} 
               />
@@ -411,12 +444,12 @@ const AdminPacotes = () => {
                       <button
                         key={tour.id}
                         type="button"
-                        onClick={() => toggleTour(tour)}
+                        onClick={() => !isViewMode && toggleTour(tour)}
                         className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border-2 ${
                           isSelected 
                           ? "bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105" 
                           : "bg-background border-transparent text-muted-foreground hover:border-primary/30"
-                        }`}
+                        } ${isViewMode ? 'cursor-default' : 'cursor-pointer'}`}
                       >
                         {isSelected ? <CheckCircle size={14} strokeWidth={3} /> : <PlusCircle size={14} />}
                         {tour.name}
@@ -444,7 +477,7 @@ const AdminPacotes = () => {
                               key={t.id} 
                               tour={t} 
                               index={i} 
-                              onRemove={() => toggleTour(t)}
+                               onRemove={() => !isViewMode && toggleTour(t)}
                             />
                           ))}
                         </div>
@@ -458,26 +491,34 @@ const AdminPacotes = () => {
             <div className="space-y-4">
               <label className="text-sm font-bold block">Destaques (Highlights)</label>
               <div className="flex gap-2">
-                <Input value={highlightInput} onChange={e => setHighlightInput(e.target.value)} placeholder="Ex: Guia bilíngue incluso" onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addHighlight())} />
-                <Button type="button" onClick={addHighlight} variant="secondary">Adicionar</Button>
+                <Input disabled={isViewMode} value={highlightInput} onChange={e => setHighlightInput(e.target.value)} placeholder="Ex: Guia bilíngue incluso" onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addHighlight())} />
+                <Button disabled={isViewMode} type="button" onClick={addHighlight} variant="secondary">Adicionar</Button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {form.highlights.map((h, i) => (
                   <Badge key={i} className="pl-3 pr-1 py-1 gap-1 flex items-center bg-blue-50 text-blue-700 border-blue-200">
                     {h}
-                    <button type="button" onClick={() => removeHighlight(i)} className="hover:bg-blue-200 rounded-full p-0.5"><X size={12} /></button>
+                    {!isViewMode && <button type="button" onClick={() => removeHighlight(i)} className="hover:bg-blue-200 rounded-full p-0.5"><X size={12} /></button>}
                   </Badge>
                 ))}
               </div>
             </div>
 
             <div className="flex gap-4 pt-4 border-t">
-              <Button type="submit" className="flex-1 h-12 rounded-xl font-bold">
-                {editingId ? "Salvar Alterações" : "Criar Pacote"}
-              </Button>
-              <Button type="button" variant="ghost" onClick={() => setShowForm(false)} className="h-12 rounded-xl font-bold">
-                Cancelar
-              </Button>
+              {!isViewMode ? (
+                <>
+                  <Button type="submit" className="flex-1 h-12 rounded-xl font-bold">
+                    {editingId ? "Salvar Alterações" : "Criar Pacote"}
+                  </Button>
+                  <Button type="button" variant="ghost" onClick={() => setShowForm(false)} className="h-12 rounded-xl font-bold">
+                    Cancelar
+                  </Button>
+                </>
+              ) : (
+                <Button type="button" onClick={() => setShowForm(false)} className="flex-1 h-12 rounded-xl font-bold">
+                  Fechar
+                </Button>
+              )}
             </div>
           </form>
         </DialogContent>
