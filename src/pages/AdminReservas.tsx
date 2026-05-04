@@ -559,7 +559,6 @@ const AdminReservas = () => {
           </div>
         )}
       </Card>
-      {/* End of view toggle */}
       )}
 
       {/* Detail Modal */}
