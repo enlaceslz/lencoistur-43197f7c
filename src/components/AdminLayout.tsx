@@ -516,14 +516,14 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
               </Tooltip>
             </div>
 
-              {notifOpen && (
-                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-[hsl(220,20%,92%)] rounded-xl shadow-xl overflow-hidden z-50">
-                  <div className="px-4 py-3 border-b border-[hsl(220,20%,94%)] flex items-center justify-between bg-[hsl(220,20%,98%)]">
-                    <h3 className="font-semibold text-[hsl(220,25%,18%)] text-sm">Notificações</h3>
-                    {activeNotifs.length > 0 && (
-                      <button onClick={dismissAll} className="text-xs text-[hsl(217,91%,60%)] hover:underline font-medium">Limpar tudo</button>
-                    )}
-                  </div>
+            {notifOpen && (
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-border/40 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
+                <div className="px-5 py-4 border-b border-border/40 flex items-center justify-between bg-muted/30">
+                  <h3 className="font-black text-foreground text-xs uppercase tracking-widest">Notificações</h3>
+                  {activeNotifs.length > 0 && (
+                    <button onClick={dismissAll} className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary/80 transition-colors">Limpar tudo</button>
+                  )}
+                </div>
                   <div className="max-h-80 overflow-y-auto">
                     {activeNotifs.length === 0 ? (
                       <div className="px-4 py-8 text-center">
