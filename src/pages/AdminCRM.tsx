@@ -997,7 +997,7 @@ const AdminCRMContent = () => {
                               <div className="flex flex-col">
                                 <span className="text-xs font-semibold text-foreground flex items-center gap-1">
                                   <Smartphone size={10} className="text-primary" />
-                                  {c.phone ? maskPhone(c.phone) : "—"}
+                                  {c.phone ? maskPhone(c.phone, c.country || "Brasil") : "—"}
                                 </span>
                                 <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                                   <MapPin size={10} />
