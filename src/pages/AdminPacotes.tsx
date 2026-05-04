@@ -103,6 +103,7 @@ const AdminPacotes = () => {
     slug: "",
     description: "",
     days: 1,
+    nights: 0,
     original_price: 0,
     discount_price: 0,
     tag: "",
