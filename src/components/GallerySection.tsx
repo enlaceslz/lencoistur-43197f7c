@@ -4,21 +4,21 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 
 const DEFAULT_GALLERY = [
-  { src: "/src/assets/gallery-panorama-dunas.jpg", alt: "Panorama das dunas e lagoas ao pôr do sol" },
-  { src: "/src/assets/gallery-banho-lagoa.jpg", alt: "Turistas nadando nas lagoas cristalinas dos Lençóis Maranhenses" },
-  { src: "/src/assets/gallery-4x4-dunas.jpg", alt: "Passeio de 4x4 nas dunas dos Lençóis Maranhenses" },
-  { src: "/src/assets/gallery-farol-mandacaru.jpg", alt: "Farol de Mandacaru - Lençóis Maranhenses" },
-  { src: "/src/assets/gallery-por-do-sol.jpg", alt: "Pôr do sol deslumbrante nos Lençóis Maranhenses" },
-  { src: "/src/assets/tour-lagoa-azul-2.jpg", alt: "Dunas brancas e lagoas azuis dos Lençóis Maranhenses - Santo Amaro" },
-  { src: "/src/assets/tour-lagoa-azul-3.jpg", alt: "Vista aérea das lagoas cristalinas dos Lençóis" },
-  { src: "/src/assets/tour-lagoas-azuis-hero.jpg", alt: "Experiência única nos Lençóis" },
-  { src: "/src/assets/tour-rio-preguicas.jpg", alt: "Passeio de barco pelo Rio Preguiças" },
-  { src: "/src/assets/tour-roteiro-ecologico.jpg", alt: "Belezas naturais preservadas" },
-  { src: "/src/assets/tour-gastronomico.jpg", alt: "Sabores típicos da região" },
-  { src: "/src/assets/tour-cultural.jpg", alt: "Cultura e tradições locais" },
-  { src: "/src/assets/tour-caiaque.jpg", alt: "Aventura de caiaque" },
-  { src: "/src/assets/tour-trekking.jpg", alt: "Trekking pelas dunas" },
-  { src: "/src/assets/tour-quadriciclo.jpg", alt: "Adrenalina no quadriciclo" },
+  { src: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957", alt: "Panorama das dunas e lagoas ao pôr do sol" },
+  { src: "https://images.unsplash.com/photo-1506744038136-46273834b3fb", alt: "Turistas nadando nas lagoas cristalinas dos Lençóis Maranhenses" },
+  { src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e", alt: "Passeio de 4x4 nas dunas dos Lençóis Maranhenses" },
+  { src: "https://images.unsplash.com/photo-1472396961693-142e6e269027", alt: "Farol de Mandacaru - Lençóis Maranhenses" },
+  { src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e", alt: "Pôr do sol deslumbrante nos Lençóis Maranhenses" },
+  { src: "https://images.unsplash.com/photo-1501785888041-af3ef285b470", alt: "Dunas brancas e lagoas azuis dos Lençóis Maranhenses - Santo Amaro" },
+  { src: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e", alt: "Vista aérea das lagoas cristalinas dos Lençóis" },
+  { src: "https://images.unsplash.com/photo-1433086966358-54859d0ed716", alt: "Experiência única nos Lençóis" },
+  { src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee", alt: "Passeio de barco pelo Rio Preguiças" },
+  { src: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d", alt: "Belezas naturais preservadas" },
+  { src: "https://images.unsplash.com/photo-1475924156735-51235946114e", alt: "Sabores típicos da região" },
+  { src: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b", alt: "Cultura e tradições locais" },
+  { src: "https://images.unsplash.com/photo-1501854140801-50d01698950b", alt: "Aventura de caiaque" },
+  { src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e", alt: "Trekking pelas dunas" },
+  { src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee", alt: "Adrenalina no quadriciclo" },
 ];
 
 const GallerySection = () => {
