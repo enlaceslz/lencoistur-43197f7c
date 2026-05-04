@@ -579,10 +579,8 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           {children}
         </div>
       </main>
-      </div>
-    </TooltipProvider>
-  );
-};
+    </div>
+  </TooltipProvider>
   );
 };
 
