@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-// Marketing and reports review update
+import AdminLayout from "@/components/AdminLayout";
 import { Users, Megaphone, TrendingUp, RefreshCw, MessageSquare, Mail, Target, Loader2, Save } from "lucide-react";
-import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
