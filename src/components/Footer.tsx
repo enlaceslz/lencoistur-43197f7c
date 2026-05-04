@@ -80,7 +80,7 @@ const Footer = () => {
                   className="w-8 h-8 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-secondary-foreground transition-all shadow-sm"
                   title="Instagram"
                 >
-                  <Instagram size={14} />
+                  <div className="text-[10px] font-black">IG</div>
                 </a>
                 {settings?.facebook && (
                   <a 
