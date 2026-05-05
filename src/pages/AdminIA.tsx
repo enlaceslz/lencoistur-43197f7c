@@ -16,6 +16,8 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 interface TourDemand {
   name: string;
