@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Loader2, Pencil, Trash2, Calendar, Tag, User, AlertCircle, CheckCircle2, Printer, Search } from "lucide-react";
+import { Plus, Loader2, Pencil, Trash2, Calendar, Tag, User, AlertCircle, CheckCircle2, Printer, Search, FileText, Upload, X, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -49,12 +49,22 @@ interface Conta {
   observacoes: string | null;
   pago_em: string | null;
   booking_id: string | null;
+  anexo_url: string | null;
   bookings?: {
     booking_code: string;
   } | null;
 }
 
-const emptyForm = { descricao: "", valor: 0, vencimento: "", categoria: "operacional", fornecedor: "", observacoes: "", status: "pendente" };
+const emptyForm = { 
+  descricao: "", 
+  valor: 0, 
+  vencimento: "", 
+  categoria: "operacional", 
+  fornecedor: "", 
+  observacoes: "", 
+  status: "pendente",
+  anexo_url: "" 
+};
 
 export default function ContasPagarTab({ company }: { company?: any }) {
   const [contas, setContas] = useState<Conta[]>([]);
@@ -63,6 +73,7 @@ export default function ContasPagarTab({ company }: { company?: any }) {
   const [editing, setEditing] = useState<Conta | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("todos");
   const [categoryFilter, setCategoryFilter] = useState<string>("todos");
@@ -81,8 +92,46 @@ export default function ContasPagarTab({ company }: { company?: any }) {
   const openNew = () => { setEditing(null); setForm(emptyForm); setOpen(true); };
   const openEdit = (c: Conta) => {
     setEditing(c);
-    setForm({ descricao: c.descricao, valor: c.valor, vencimento: c.vencimento, categoria: c.categoria, fornecedor: c.fornecedor || "", observacoes: c.observacoes || "", status: c.status });
+    setForm({ 
+      descricao: c.descricao, 
+      valor: c.valor, 
+      vencimento: c.vencimento, 
+      categoria: c.categoria, 
+      fornecedor: c.fornecedor || "", 
+      observacoes: c.observacoes || "", 
+      status: c.status,
+      anexo_url: c.anexo_url || "" 
+    });
     setOpen(true);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `pagar/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('financeiro')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('financeiro')
+        .getPublicUrl(filePath);
+
+      setForm({ ...form, anexo_url: publicUrl });
+      toast.success("Comprovante enviado!");
+    } catch (error: any) {
+      toast.error("Erro no upload: " + error.message);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSave = async () => {
@@ -97,6 +146,7 @@ export default function ContasPagarTab({ company }: { company?: any }) {
       observacoes: form.observacoes || null,
       status: form.status,
       pago_em: form.status === "pago" ? new Date().toISOString().slice(0, 10) : null,
+      anexo_url: form.anexo_url || null,
     };
     if (editing) {
       const { error } = await supabase.from("contas_pagar").update(payload).eq("id", editing.id);
@@ -320,7 +370,18 @@ export default function ContasPagarTab({ company }: { company?: any }) {
                             <span className="text-base font-black text-foreground">{fmt(c.valor)}</span>
                           </td>
                           <td className="px-6 py-4 text-right">
-                            <div className="flex justify-end gap-1.5">
+                            <div className="flex justify-end items-center gap-1.5">
+                              {c.anexo_url && (
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-8 w-8 rounded-lg text-primary hover:bg-primary/10"
+                                  onClick={() => window.open(c.anexo_url!, '_blank')}
+                                  title="Ver Comprovante"
+                                >
+                                  <FileText size={14} />
+                                </Button>
+                              )}
                               <Button 
                                 size="icon" 
                                 variant="ghost" 
