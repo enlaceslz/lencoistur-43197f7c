@@ -101,7 +101,7 @@ const AdminSGSCondutores = () => {
     }
   };
 
-  const cnhExpired = (d: string | null) => d && new Date(d) < new Date();
+  const isDateExpired = (d: string | null) => d && new Date(d) < new Date();
   const filtered = condutores.filter(c => c.nome.toLowerCase().includes(search.toLowerCase()) || (c.cpf && c.cpf.includes(search)));
   const set = (k: string, v: any) => {
     let value = v;
@@ -198,7 +198,7 @@ const AdminSGSCondutores = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map(c => {
-              const isCnhExpired = cnhExpired(c.cnh_validade);
+              const isCnhExpired = isDateExpired(c.cnh_validade);
               return (
                 <div key={c.id} className="bg-card border border-border rounded-3xl p-6 hover:shadow-xl hover:border-primary/30 transition-all group relative overflow-hidden">
                   <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${c.status === "ativo" ? "bg-emerald-500" : c.status === "bloqueado" ? "bg-destructive" : "bg-muted"}`} />
@@ -257,7 +257,7 @@ const AdminSGSCondutores = () => {
 
                   <div className="flex flex-wrap gap-2 pt-4 border-t border-border/50">
                     {c.primeiros_socorros && (
-                      <Badge variant="secondary" className={`border text-[8px] font-black uppercase py-0 px-1.5 ${isExpired(c.first_aid_expiry) ? "bg-destructive/10 text-destructive border-destructive/20" : "bg-primary/5 text-primary border-primary/10"}`}>
+                      <Badge variant="secondary" className={`border text-[8px] font-black uppercase py-0 px-1.5 ${isDateExpired(c.first_aid_expiry) ? "bg-destructive/10 text-destructive border-destructive/20" : "bg-primary/5 text-primary border-primary/10"}`}>
                         🚑 1º Socorros {c.first_aid_expiry && `(v. ${new Date(c.first_aid_expiry + "T12:00").toLocaleDateString("pt-BR")})`}
                       </Badge>
                     )}
