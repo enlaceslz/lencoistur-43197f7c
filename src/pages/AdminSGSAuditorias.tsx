@@ -63,6 +63,18 @@ const AdminSGSAuditorias = () => {
     load();
   };
 
+  const createAction = async (item: any, auditCode: string) => {
+    const code = `AC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`;
+    const { error } = await supabase.from("sgs_corrective_actions").insert({
+      action_code: code,
+      description: `Ação corretiva para não conformidade na auditoria ${auditCode}: ${item.item_name}. Obs: ${item.observation || "Nenhuma"}`,
+      status: "pendente",
+      responsible: "Gestor de Segurança",
+    });
+    if (error) toast({ title: "Erro ao criar ação", variant: "destructive" });
+    else toast({ title: "Ação corretiva criada!", description: `Código: ${code}` });
+  };
+
   const getAuditItems = (auditId: string) => auditItems.filter((i) => i.audit_id === auditId);
 
   return (
@@ -179,13 +191,23 @@ const AdminSGSAuditorias = () => {
                 <div className="flex-1 space-y-3 mb-6">
                   <div className="grid grid-cols-2 gap-2">
                     {items.map((item) => (
-                      <div key={item.id} className="flex items-center gap-2 p-2 rounded-xl bg-muted/30 border border-border/50">
-                        {item.compliant ? (
-                          <CheckCircle size={14} className="text-emerald-500 shrink-0" />
-                        ) : (
-                          <XCircle size={14} className="text-destructive shrink-0" />
+                      <div key={item.id} className="flex flex-col gap-1 p-2 rounded-xl bg-muted/30 border border-border/50">
+                        <div className="flex items-center gap-2">
+                          {item.compliant ? (
+                            <CheckCircle size={14} className="text-emerald-500 shrink-0" />
+                          ) : (
+                            <XCircle size={14} className="text-destructive shrink-0" />
+                          )}
+                          <span className="text-[10px] font-bold text-foreground truncate">{CATEGORIES[item.category] || item.item_name}</span>
+                        </div>
+                        {!item.compliant && (
+                          <button 
+                            onClick={() => createAction(item, audit.audit_code)}
+                            className="text-[8px] font-black text-destructive uppercase tracking-widest hover:underline mt-1 self-start"
+                          >
+                            + Criar Ação Corretiva
+                          </button>
                         )}
-                        <span className="text-[10px] font-bold text-foreground truncate">{CATEGORIES[item.category] || item.item_name}</span>
                       </div>
                     ))}
                   </div>

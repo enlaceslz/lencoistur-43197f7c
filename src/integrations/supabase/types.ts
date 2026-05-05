@@ -1401,6 +1401,7 @@ export type Database = {
           cpf: string | null
           created_at: string
           email: string | null
+          first_aid_expiry: string | null
           foto_url: string | null
           id: string
           nome: string
@@ -1409,6 +1410,7 @@ export type Database = {
           primeiros_socorros: boolean | null
           status: string
           telefone: string | null
+          training_history: Json | null
           treinamentos: string[] | null
           updated_at: string
         }
@@ -1420,6 +1422,7 @@ export type Database = {
           cpf?: string | null
           created_at?: string
           email?: string | null
+          first_aid_expiry?: string | null
           foto_url?: string | null
           id?: string
           nome: string
@@ -1428,6 +1431,7 @@ export type Database = {
           primeiros_socorros?: boolean | null
           status?: string
           telefone?: string | null
+          training_history?: Json | null
           treinamentos?: string[] | null
           updated_at?: string
         }
@@ -1439,6 +1443,7 @@ export type Database = {
           cpf?: string | null
           created_at?: string
           email?: string | null
+          first_aid_expiry?: string | null
           foto_url?: string | null
           id?: string
           nome?: string
@@ -1447,6 +1452,7 @@ export type Database = {
           primeiros_socorros?: boolean | null
           status?: string
           telefone?: string | null
+          training_history?: Json | null
           treinamentos?: string[] | null
           updated_at?: string
         }
@@ -1706,9 +1712,11 @@ export type Database = {
           guide_name: string | null
           id: string
           incident_code: string
+          lessons_learned: string | null
           location: string
           people_involved: string | null
           photos: string[] | null
+          pre_activated: boolean | null
           severity: string
           status: string
           tour_id: string | null
@@ -1725,9 +1733,11 @@ export type Database = {
           guide_name?: string | null
           id?: string
           incident_code: string
+          lessons_learned?: string | null
           location: string
           people_involved?: string | null
           photos?: string[] | null
+          pre_activated?: boolean | null
           severity: string
           status?: string
           tour_id?: string | null
@@ -1744,9 +1754,11 @@ export type Database = {
           guide_name?: string | null
           id?: string
           incident_code?: string
+          lessons_learned?: string | null
           location?: string
           people_involved?: string | null
           photos?: string[] | null
+          pre_activated?: boolean | null
           severity?: string
           status?: string
           tour_id?: string | null
@@ -2079,6 +2091,9 @@ export type Database = {
           id: string
           impact: number
           probability: number
+          residual_impact: number | null
+          residual_probability: number | null
+          residual_risk_level: number | null
           responsible: string
           risk_code: string
           risk_level: number | null
@@ -2097,6 +2112,9 @@ export type Database = {
           id?: string
           impact: number
           probability: number
+          residual_impact?: number | null
+          residual_probability?: number | null
+          residual_risk_level?: number | null
           responsible: string
           risk_code: string
           risk_level?: number | null
@@ -2115,6 +2133,9 @@ export type Database = {
           id?: string
           impact?: number
           probability?: number
+          residual_impact?: number | null
+          residual_probability?: number | null
+          residual_risk_level?: number | null
           responsible?: string
           risk_code?: string
           risk_level?: number | null

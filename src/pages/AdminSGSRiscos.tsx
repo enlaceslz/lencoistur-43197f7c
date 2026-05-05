@@ -52,11 +52,13 @@ const CONS_LABELS: Record<number, string> = {
 interface Risk {
   id: string; risk_code: string; stage: string; activity: string; hazard: string;
   probability: number; impact: number; risk_level: number;
+  residual_probability?: number; residual_impact?: number; residual_risk_level?: number;
   control_measures: string; treatment_measures: string; responsible: string; status: string;
 }
 
 const emptyForm = {
   stage: "venda_recepcao", activity: "", hazard: "", probability: 1, impact: 1,
+  residual_probability: 1, residual_impact: 1,
   control_measures: "", treatment_measures: "", responsible: "",
 };
 
@@ -86,6 +88,8 @@ const AdminSGSRiscos = () => {
     setForm({
       stage: r.stage, activity: r.activity, hazard: r.hazard,
       probability: r.probability, impact: r.impact,
+      residual_probability: r.residual_probability || 1,
+      residual_impact: r.residual_impact || 1,
       control_measures: r.control_measures || "", treatment_measures: r.treatment_measures || "",
       responsible: r.responsible,
     });
@@ -102,13 +106,20 @@ const AdminSGSRiscos = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const level = form.probability * form.impact;
+    const residualLevel = form.residual_probability * form.residual_impact;
+
+    const dataToSubmit = {
+      ...form,
+      risk_level: level,
+      residual_risk_level: residualLevel
+    };
 
     if (editing) {
-      const { error } = await supabase.from("sgs_risks").update({ ...form, risk_level: level }).eq("id", editing.id);
+      const { error } = await supabase.from("sgs_risks").update(dataToSubmit).eq("id", editing.id);
       if (error) { toast({ title: "Erro ao atualizar", variant: "destructive" }); return; }
       toast({ title: "Risco atualizado!" });
     } else {
-      const { error } = await supabase.from("sgs_risks").insert({ risk_code: generateCode(), ...form, risk_level: level });
+      const { error } = await supabase.from("sgs_risks").insert({ risk_code: generateCode(), ...dataToSubmit });
       if (error) { toast({ title: "Erro ao cadastrar risco", variant: "destructive" }); return; }
       toast({ title: "Risco cadastrado com sucesso!" });
 
@@ -320,9 +331,15 @@ const AdminSGSRiscos = () => {
 
         {/* Form */}
         {showForm && (
-          <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
-            <h3 className="font-display font-bold text-foreground">{editing ? "Editar Risco" : "Registrar Novo Risco"}</h3>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-6 animate-in-slide-down">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display font-black text-lg text-foreground uppercase tracking-tight">
+                {editing ? "Editar Risco" : "Registrar Novo Risco"}
+              </h3>
+              <Badge variant="outline" className="font-mono text-[10px] uppercase opacity-50">VATTI Criteria (P2)</Badge>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Etapa do Passeio *</label>
                 <select value={form.stage} onChange={(e) => setForm({ ...form, stage: e.target.value })}
@@ -330,55 +347,98 @@ const AdminSGSRiscos = () => {
                   {Object.entries(STAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </div>
-              <div>
+              <div className="lg:col-span-2">
                 <label className="text-sm font-semibold text-foreground mb-1 block">Atividade / Perigo *</label>
                 <input required value={form.activity} onChange={(e) => setForm({ ...form, activity: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Ex: Travessia de lagoa" />
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Ex: Banho em lagoa profunda" />
               </div>
               <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Danos Potenciais *</label>
-                <input required value={form.hazard} onChange={(e) => setForm({ ...form, hazard: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Ex: Afogamento, traumatismo" />
-              </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Probabilidade (P) 1-5 *</label>
-                <select value={form.probability} onChange={(e) => setForm({ ...form, probability: Number(e.target.value) })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
-                  {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n} — {PROB_LABELS[n]}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Consequência (C) 1-5 *</label>
-                <select value={form.impact} onChange={(e) => setForm({ ...form, impact: Number(e.target.value) })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
-                  {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n} — {CONS_LABELS[n].split("—")[0]}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">NR (auto)</label>
-                <div className={`px-3 py-2.5 rounded-xl text-sm font-bold text-center ${riskClass(form.probability * form.impact).color}`}>
-                  {form.probability * form.impact} — {riskClass(form.probability * form.impact).label}
-                </div>
-              </div>
-              <div className="sm:col-span-2 lg:col-span-3">
-                <label className="text-sm font-semibold text-foreground mb-1 block">Medidas de Controle Implementadas</label>
-                <textarea value={form.control_measures} onChange={(e) => setForm({ ...form, control_measures: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-16 resize-none" placeholder="Medidas já em execução..." />
-              </div>
-              <div className="sm:col-span-2 lg:col-span-3">
-                <label className="text-sm font-semibold text-foreground mb-1 block">Tratamento (Medidas a Implementar)</label>
-                <textarea value={form.treatment_measures} onChange={(e) => setForm({ ...form, treatment_measures: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-16 resize-none" placeholder="Ações planejadas para reduzir ou eliminar o risco..." />
-              </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Responsável *</label>
-                <input required value={form.responsible} onChange={(e) => setForm({ ...form, responsible: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+                <label className="text-sm font-semibold text-foreground mb-1 block">Responsável</label>
+                <input value={form.responsible} onChange={(e) => setForm({ ...form, responsible: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Nome ou cargo" />
               </div>
             </div>
-            <div className="flex gap-3">
-              <button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">{editing ? "Atualizar" : "Salvar"} Risco</button>
-              <button type="button" onClick={() => { setShowForm(false); setEditing(null); }} className="bg-muted text-muted-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">Cancelar</button>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 bg-muted/30 rounded-[2rem] border border-border/50">
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  Risco Bruto (Inicial)
+                </h4>
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">Probabilidade</label>
+                    <select value={form.probability} onChange={(e) => setForm({ ...form, probability: Number(e.target.value) })}
+                      className="w-full bg-card border border-border rounded-lg px-2 py-1.5 text-xs">
+                      {[1,2,3,4,5].map(v => <option key={v} value={v}>{v} - {PROB_LABELS[v]}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">Impacto (Consequência)</label>
+                    <select value={form.impact} onChange={(e) => setForm({ ...form, impact: Number(e.target.value) })}
+                      className="w-full bg-card border border-border rounded-lg px-2 py-1.5 text-xs">
+                      {[1,2,3,4,5].map(v => <option key={v} value={v}>{v} - {CONS_LABELS[v].split("—")[0]}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className={`p-3 rounded-xl text-center shadow-sm ${riskClass(form.probability * form.impact).color}`}>
+                  <span className="text-xs font-black uppercase">NR: {form.probability * form.impact}</span>
+                </div>
+              </div>
+
+              <div className="lg:col-span-2 space-y-4">
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-secondary flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-secondary" />
+                  Medidas e Risco Residual
+                </h4>
+                <div className="space-y-3">
+                  <textarea value={form.control_measures} onChange={(e) => setForm({ ...form, control_measures: e.target.value })}
+                    placeholder="Medidas de Controle (EPIs, Treinamento, etc)"
+                    className="w-full bg-card border border-border rounded-xl px-3 py-2.5 text-xs outline-none resize-none h-24" />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-500 flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  Risco Residual (Pós-Controle)
+                </h4>
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">Prob. Residual</label>
+                    <select value={form.residual_probability} onChange={(e) => setForm({ ...form, residual_probability: Number(e.target.value) })}
+                      className="w-full bg-card border border-border rounded-lg px-2 py-1.5 text-xs">
+                      {[1,2,3,4,5].map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">Impacto Resid.</label>
+                    <select value={form.residual_impact} onChange={(e) => setForm({ ...form, residual_impact: Number(e.target.value) })}
+                      className="w-full bg-card border border-border rounded-lg px-2 py-1.5 text-xs">
+                      {[1,2,3,4,5].map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className={`p-3 rounded-xl text-center shadow-sm ${riskClass(form.residual_probability * form.residual_impact).color}`}>
+                  <span className="text-xs font-black uppercase">NR Final: {form.residual_probability * form.residual_impact}</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1 block">Plano de Tratamento / Emergência</label>
+              <textarea value={form.treatment_measures} onChange={(e) => setForm({ ...form, treatment_measures: e.target.value })}
+                placeholder="O que fazer se o risco ocorrer? Procedimentos do PRE..."
+                className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-sm text-foreground outline-none resize-none h-24" />
+            </div>
+
+            <div className="flex gap-4 pt-4 border-t border-border/50">
+              <button type="submit" className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground h-12 rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95">
+                {editing ? "Atualizar Registro" : "Cadastrar Risco"}
+              </button>
+              <button type="button" onClick={() => { setShowForm(false); setEditing(null); }} className="px-8 h-12 bg-muted text-muted-foreground rounded-2xl text-sm font-black uppercase tracking-widest transition-all">
+                Cancelar
+              </button>
             </div>
           </form>
         )}
