@@ -69,7 +69,7 @@ const AdminSGSAuditorias = () => {
       action_code: code,
       description: `Ação corretiva para não conformidade na auditoria ${auditCode}: ${item.item_name}. Obs: ${item.observation || "Nenhuma"}`,
       status: "pendente",
-      priority: "alta",
+      responsible: "Gestor de Segurança",
     });
     if (error) toast({ title: "Erro ao criar ação", variant: "destructive" });
     else toast({ title: "Ação corretiva criada!", description: `Código: ${code}` });
