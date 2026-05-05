@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { UserCheck, Plus, Search, AlertTriangle, Pencil, Trash2, Loader2, CheckCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-const emptyForm = { nome: "", cpf: "", cnh_numero: "", cnh_categoria: "B", cnh_validade: "", telefone: "", email: "", primeiros_socorros: false, off_road: false, status: "ativo" as const, observacoes: "" };
+const emptyForm = { nome: "", cpf: "", cnh_numero: "", cnh_categoria: "B", cnh_validade: "", telefone: "", email: "", primeiros_socorros: false, first_aid_expiry: "", off_road: false, status: "ativo" as const, observacoes: "", training_history: [] as any[] };
 
 const AdminSGSCondutores = () => {
   const [condutores, setCondutores] = useState<any[]>([]);
@@ -79,9 +79,11 @@ const AdminSGSCondutores = () => {
       telefone: c.telefone || "",
       email: c.email || "",
       primeiros_socorros: !!c.primeiros_socorros,
+      first_aid_expiry: c.first_aid_expiry || "",
       off_road: !!c.off_road,
       status: c.status || "ativo",
-      observacoes: c.observacoes || ""
+      observacoes: c.observacoes || "",
+      training_history: Array.isArray(c.training_history) ? c.training_history : []
     });
     setEditId(c.id);
     setShowForm(true);
@@ -159,9 +161,26 @@ const AdminSGSCondutores = () => {
                 </select>
               </div>
             </div>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.primeiros_socorros} onChange={e => set("primeiros_socorros", e.target.checked)} className="rounded" /> Primeiros Socorros</label>
-              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.off_road} onChange={e => set("off_road", e.target.checked)} className="rounded" /> Off-Road</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <label className="flex items-center gap-2 text-sm font-bold uppercase tracking-tight">
+                  <input type="checkbox" checked={form.primeiros_socorros} onChange={e => set("primeiros_socorros", e.target.checked)} className="rounded" /> 
+                  🚒 Primeiros Socorros / WFR
+                </label>
+                {form.primeiros_socorros && (
+                  <div>
+                    <label className="block text-[10px] font-black text-muted-foreground uppercase mb-1">Validade da Certificação *</label>
+                    <input type="date" value={form.first_aid_expiry} onChange={e => set("first_aid_expiry", e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" />
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="flex items-center gap-2 text-sm font-bold uppercase tracking-tight pt-1">
+                  <input type="checkbox" checked={form.off_road} onChange={e => set("off_road", e.target.checked)} className="rounded" /> 
+                  🚜 Direção Defensiva / Off-Road
+                </label>
+              </div>
             </div>
             <div className="flex gap-2">
               <button type="submit" className="px-5 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:opacity-90">Salvar</button>
@@ -238,8 +257,8 @@ const AdminSGSCondutores = () => {
 
                   <div className="flex flex-wrap gap-2 pt-4 border-t border-border/50">
                     {c.primeiros_socorros && (
-                      <Badge variant="secondary" className="bg-primary/5 text-primary border-primary/10 text-[8px] font-black uppercase py-0 px-1.5">
-                        🚑 1º Socorros
+                      <Badge variant="secondary" className={`border text-[8px] font-black uppercase py-0 px-1.5 ${isExpired(c.first_aid_expiry) ? "bg-destructive/10 text-destructive border-destructive/20" : "bg-primary/5 text-primary border-primary/10"}`}>
+                        🚑 1º Socorros {c.first_aid_expiry && `(v. ${new Date(c.first_aid_expiry + "T12:00").toLocaleDateString("pt-BR")})`}
                       </Badge>
                     )}
                     {c.off_road && (
