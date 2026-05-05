@@ -159,17 +159,14 @@ const AdminFinanceiro = () => {
     const dateStr = now.toLocaleDateString("pt-BR");
     const monthName = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"][selectedMonth];
     
-    // Header styling
     const brandName = company?.nome_fantasia || "LENÇÓIS TOUR";
     const cnpj = company?.cnpj || "";
     const address = company?.endereco || "";
     const phone = company?.telefone || "";
 
-    // Header Background
     doc.setFillColor(33, 150, 243);
     doc.rect(0, 0, 210, 40, "F");
 
-    // Logo (if exists)
     if (company?.logo_url) {
       try {
         const img = new Image();
@@ -184,7 +181,6 @@ const AdminFinanceiro = () => {
       }
     }
 
-    // Company Info in Header
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(22);
@@ -195,7 +191,6 @@ const AdminFinanceiro = () => {
     doc.text(`CNPJ: ${cnpj} | Contato: ${phone}`, 45, 25);
     doc.text(`${address}`, 45, 30);
 
-    // Title & Period
     doc.setFontSize(16);
     doc.setTextColor(33, 150, 243);
     doc.setFont("helvetica", "bold");
@@ -207,7 +202,6 @@ const AdminFinanceiro = () => {
     doc.text(`Competência: ${monthName} de ${selectedYear}`, 14, 62);
     doc.text(`Data de Emissão: ${dateStr}`, 150, 62);
 
-    // Summary Box
     doc.setFillColor(245, 247, 250);
     doc.roundedRect(14, 70, 182, 35, 3, 3, "F");
 
@@ -218,12 +212,12 @@ const AdminFinanceiro = () => {
 
     doc.setFont("helvetica", "normal");
     doc.text("Total de Receitas Pagas:", 20, 85);
-    doc.setTextColor(22, 163, 74); // Emerald
+    doc.setTextColor(22, 163, 74); 
     doc.text(fmt(receitaPaga), 75, 85);
 
     doc.setTextColor(71, 85, 105);
     doc.text("Total de Despesas Pagas:", 20, 92);
-    doc.setTextColor(220, 38, 38); // Rose
+    doc.setTextColor(220, 38, 38); 
     doc.text(fmt(despesasMes), 75, 92);
 
     doc.setTextColor(71, 85, 105);
@@ -233,7 +227,6 @@ const AdminFinanceiro = () => {
     doc.setTextColor(lucroMes >= 0 ? 33 : 220, lucroMes >= 0 ? 150 : 38, lucroMes >= 0 ? 243 : 38);
     doc.text(fmt(lucroMes), 155, 88);
 
-    // Main Table - Unified view of transactions
     const tableData = filteredTransactions.map(t => [
       fmtDate(t.date),
       t.desc,
@@ -274,7 +267,6 @@ const AdminFinanceiro = () => {
       }
     });
 
-    // Footer
     const pageCount = (doc as any).internal.getNumberOfPages();
     for(let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
@@ -325,28 +317,87 @@ const AdminFinanceiro = () => {
   }
 
   return (
-    <AdminLayout title="Painel Financeiro">
+    <AdminLayout title="Gestão Financeira Estratégica">
       <TooltipProvider>
         <div className="space-y-8 pb-10">
-        {/* Header Section */}
+        
+        {/* Superior "Health Pulse" Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in-fade" style={{ animationDelay: '0.05s' }}>
+          <div className="md:col-span-2 glass-card rounded-[2.5rem] p-8 relative overflow-hidden group">
+            <div className="absolute right-0 top-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-primary/10 transition-colors" />
+            <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Status do Sistema</p>
+                </div>
+                <h2 className="text-3xl font-black text-foreground tracking-tight">Saúde Financeira: {lucroMes >= 0 ? 'Excelente' : 'Atenção'}</h2>
+                <p className="text-sm text-muted-foreground max-w-md">
+                  {lucroMes >= 0 
+                    ? `Sua agência está operando com lucro líquido de ${fmt(lucroMes)} este mês. A margem de contribuição está dentro dos parâmetros ideais.`
+                    : `Detectamos um saldo negativo de ${fmt(Math.abs(lucroMes))} no período selecionado. Recomendamos revisar as despesas administrativas.`}
+                </p>
+              </div>
+              <div className="flex gap-4">
+                <div className="bg-white/50 dark:bg-black/20 backdrop-blur rounded-2xl p-4 border border-white/50 shadow-sm">
+                  <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest mb-1">Ponto de Equilíbrio</p>
+                  <p className="text-lg font-black text-foreground">{fmt(despesasMes)}</p>
+                </div>
+                <div className="bg-white/50 dark:bg-black/20 backdrop-blur rounded-2xl p-4 border border-white/50 shadow-sm">
+                  <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest mb-1">Eficiência de Caixa</p>
+                  <p className="text-lg font-black text-primary">{receitaPaga > 0 ? ((lucroMes / receitaPaga) * 100).toFixed(1) : '0'}%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="glass-card rounded-[2.5rem] p-8 flex flex-col justify-between group">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:rotate-6 transition-transform">
+                  <LayoutDashboard size={20} strokeWidth={2.5} />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Visão Consolidada</span>
+              </div>
+              <div className="space-y-1">
+                <p className="text-2xl font-black text-foreground">{bookings.length}</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Movimentações Registradas</p>
+              </div>
+            </div>
+            <Button 
+              variant="outline" 
+              className="mt-6 rounded-2xl border-primary/20 text-primary font-black uppercase text-[10px] tracking-widest hover:bg-primary hover:text-white transition-all w-full h-11"
+              onClick={() => setTab("dre")}
+            >
+              Análise DRE Completa
+            </Button>
+          </div>
+        </div>
+
+        {/* Header Section with Filters */}
         <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 glass-card rounded-[2.5rem] p-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
           <div className="flex flex-col sm:flex-row gap-6">
             <div className="space-y-2">
-              <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] ml-1">Período de Análise</p>
+              <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] ml-1">Período de Competência</p>
               <div className="flex items-center gap-3">
-                <select 
-                  value={selectedMonth} 
-                  onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                  className="bg-muted/40 border border-border/40 rounded-2xl px-5 h-12 text-xs font-black uppercase tracking-tight focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer outline-none"
-                >
-                  {["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"].map((m, i) => (
-                    <option key={i} value={i}>{m}</option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select 
+                    value={selectedMonth} 
+                    onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                    className="appearance-none bg-muted/40 border border-border/40 rounded-2xl px-6 pr-10 h-12 text-xs font-black uppercase tracking-tight focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer outline-none w-40"
+                  >
+                    {["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"].map((m, i) => (
+                      <option key={i} value={i}>{m}</option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+                    <TrendingUp size={14} />
+                  </div>
+                </div>
                 <select 
                   value={selectedYear} 
                   onChange={(e) => setSelectedYear(Number(e.target.value))}
-                  className="bg-muted/50 border border-border/50 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-tight focus:ring-2 focus:ring-primary transition-all cursor-pointer h-10"
+                  className="bg-muted/40 border border-border/40 rounded-2xl px-5 h-12 text-xs font-black uppercase tracking-tight focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer outline-none"
                 >
                   {[2024, 2025, 2026].map(y => (
                     <option key={y} value={y}>{y}</option>
@@ -355,15 +406,15 @@ const AdminFinanceiro = () => {
               </div>
             </div>
 
-            <div className="space-y-1.5 flex-1 min-w-[200px]">
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Pesquisa Rápida</p>
+            <div className="space-y-1.5 flex-1 min-w-[250px]">
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Pesquisa Inteligente</p>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                 <Input 
-                  placeholder="Descrição, meio, status..." 
+                  placeholder="Descrição, meio de pagamento, status..." 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 h-10 bg-muted/30 border-border/50 rounded-xl text-xs font-medium"
+                  className="pl-11 h-12 bg-muted/30 border-border/50 rounded-2xl text-xs font-medium focus:ring-4 focus:ring-primary/10"
                 />
               </div>
             </div>
@@ -371,12 +422,12 @@ const AdminFinanceiro = () => {
           
           <div className="flex flex-wrap items-end gap-3">
             <div className="space-y-1.5">
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Filtros</p>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Refinar por</p>
               <div className="flex gap-2">
                 <select 
                   value={statusFilter} 
                   onChange={(e) => setStatusFilter(e.target.value as any)}
-                  className="bg-muted/50 border border-border/50 rounded-xl px-3 h-10 text-xs font-bold focus:ring-2 focus:ring-primary transition-all cursor-pointer"
+                  className="bg-muted/40 border border-border/40 rounded-2xl px-4 h-12 text-xs font-bold focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer outline-none min-w-[140px]"
                 >
                   <option value="todos">Status: Todos</option>
                   <option value="pago">Apenas Pagos</option>
@@ -385,30 +436,30 @@ const AdminFinanceiro = () => {
                 <select 
                   value={typeFilter} 
                   onChange={(e) => setTypeFilter(e.target.value as any)}
-                  className="bg-muted/50 border border-border/50 rounded-xl px-3 h-10 text-xs font-bold focus:ring-2 focus:ring-primary transition-all cursor-pointer"
+                  className="bg-muted/40 border border-border/40 rounded-2xl px-4 h-12 text-xs font-bold focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer outline-none min-w-[140px]"
                 >
                   <option value="todos">Tipo: Todos</option>
-                  <option value="entrada">Entradas</option>
-                  <option value="saida">Saídas</option>
+                  <option value="entrada">Entradas (+)</option>
+                  <option value="saida">Saídas (-)</option>
                 </select>
               </div>
             </div>
           </div>
           
-          <div className="flex items-center gap-2 self-end">
+          <div className="flex items-center gap-3 self-end">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={exportCSV}
-                  className="rounded-xl border-border h-10 px-4 text-xs font-black uppercase tracking-widest hover:bg-primary/5 hover:text-primary transition-all"
+                  className="rounded-2xl border-border/60 h-12 px-5 text-xs font-black uppercase tracking-widest hover:bg-primary/5 hover:text-primary transition-all group"
                 >
-                  <Download size={14} className="mr-2" /> 
-                  Excel
+                  <Download size={16} className="mr-2 group-hover:-translate-y-1 transition-transform" /> 
+                  CSV
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Exportar CSV</TooltipContent>
+              <TooltipContent>Exportar para Excel/Planilha</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -417,13 +468,13 @@ const AdminFinanceiro = () => {
                   variant="default" 
                   size="sm" 
                   onClick={exportPDF}
-                  className="rounded-xl shadow-lg shadow-primary/20 h-10 px-4 text-xs font-black uppercase tracking-widest transition-all"
+                  className="rounded-2xl shadow-xl shadow-primary/20 h-12 px-6 text-xs font-black uppercase tracking-widest transition-all group"
                 >
-                  <Printer size={14} className="mr-2" /> 
+                  <Printer size={16} className="mr-2 group-hover:scale-110 transition-transform" /> 
                   Relatório PDF
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Gerar Relatório</TooltipContent>
+              <TooltipContent>Gerar Relatório Profissional</TooltipContent>
             </Tooltip>
           </div>
         </div>
@@ -433,7 +484,7 @@ const AdminFinanceiro = () => {
 
         {/* Navigation Tabs */}
         <div className="relative">
-          <div className="flex items-center gap-1 bg-muted/30 p-1.5 rounded-2xl w-fit border border-border/40 backdrop-blur-sm overflow-x-auto max-w-full no-scrollbar">
+          <div className="flex items-center gap-2 bg-muted/20 p-2 rounded-[1.5rem] w-fit border border-border/30 backdrop-blur-md overflow-x-auto max-w-full no-scrollbar">
             {tabs.map((t) => (
               <button
                 key={t.key}
