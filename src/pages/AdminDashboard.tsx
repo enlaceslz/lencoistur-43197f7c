@@ -200,25 +200,67 @@ const AdminDashboard = () => {
   }
 
   return (
-    <AdminLayout title="Dashboard">
-      <div className="space-y-8 pb-8">
+    <AdminLayout title="Centro de Operações">
+      <div className="space-y-8 pb-10">
+        
+        {/* Quick Actions & High-Level Pulse */}
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 animate-in-fade" style={{ animationDelay: '0.05s' }}>
+          <div className="xl:col-span-3 glass-card rounded-[2.5rem] p-8 relative overflow-hidden group border border-white/20">
+            <div className="absolute right-0 top-0 w-80 h-80 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-primary/10 transition-colors" />
+            <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Painel Executivo</p>
+                </div>
+                <h2 className="text-4xl font-black text-foreground tracking-tighter">Bom dia, Gestor</h2>
+                <p className="text-sm text-muted-foreground max-w-lg leading-relaxed">
+                  Sua agência está operando com <span className="text-primary font-bold">{sgsStats.criticalRisks === 0 ? '100% de conformidade' : 'alertas ativos'}</span> no SGS. 
+                  Temos {bookings.filter(b => b.status === 'pendente').length} reservas aguardando confirmação.
+                </p>
+              </div>
+              <div className="flex gap-4">
+                <button onClick={() => navigate("/admin/reservas")} className="bg-primary hover:bg-primary/90 text-white px-8 h-14 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95 flex items-center gap-3">
+                  <Calendar size={18} strokeWidth={2.5} /> Nova Reserva
+                </button>
+                <button onClick={() => navigate("/admin/sgs")} className="bg-white/50 dark:bg-black/20 hover:bg-white/80 dark:hover:bg-black/40 text-foreground border border-white/50 px-6 h-14 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 flex items-center gap-3">
+                  <ShieldAlert size={18} /> SGS
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="glass-card rounded-[2.5rem] p-8 flex flex-col justify-center items-center text-center group border border-white/20">
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-4">Meta de Vendas</p>
+            <div className="relative w-24 h-24 mb-4">
+               <svg className="w-full h-full" viewBox="0 0 100 100">
+                  <circle className="text-muted/20 stroke-current" strokeWidth="10" cx="50" cy="50" r="40" fill="transparent"></circle>
+                  <circle className="text-primary stroke-current" strokeWidth="10" strokeLinecap="round" cx="50" cy="50" r="40" fill="transparent" strokeDasharray="251.2" strokeDashoffset={251.2 * (1 - 0.75)}></circle>
+               </svg>
+               <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xl font-black">75%</span>
+               </div>
+            </div>
+            <p className="text-xs font-bold text-foreground">R$ 45.2k / R$ 60k</p>
+          </div>
+        </div>
+
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat: any, idx: number) => (
             <div 
               key={stat.label} 
               onClick={() => stat.path && navigate(stat.path)}
-              className={`glass-card admin-card-hover rounded-[2rem] p-6 cursor-pointer relative overflow-hidden group animate-in-fade`}
+              className={`glass-card admin-card-hover rounded-[2rem] p-6 cursor-pointer relative overflow-hidden group animate-in-fade border border-white/20`}
               style={{ animationDelay: `${idx * 0.1}s` }}
             >
               <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
               
               <div className="flex items-center justify-between mb-6">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg ${stat.isSgs && stat.value !== "0" ? "bg-destructive/10 text-destructive shadow-destructive/10" : "bg-primary/10 text-primary shadow-primary/10"}`}>
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg ${stat.isSgs && stat.value !== "0" ? "bg-destructive/10 text-destructive shadow-destructive/10" : "bg-primary/5 text-primary shadow-primary/5 border border-primary/10"}`}>
                   <stat.icon size={26} strokeWidth={2.5} />
                 </div>
                 {stat.change && (
-                  <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${stat.up ? "bg-admin-success-soft text-admin-success" : "bg-red-50 text-red-500"}`}>
+                  <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${stat.up ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/10" : "bg-rose-500/10 text-rose-600 border border-rose-500/10"}`}>
                     {stat.change}
                   </div>
                 )}
