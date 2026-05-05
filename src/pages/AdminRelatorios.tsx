@@ -496,16 +496,18 @@ const AdminRelatorios = () => {
 };
 
 const KPICard = ({ label, value, icon: Icon, color }: any) => (
-  <div className="glass-card rounded-[2.5rem] p-6 border-none shadow-sm group hover:scale-[1.02] transition-all relative overflow-hidden">
-    <div className={`absolute -right-2 -top-2 w-16 h-16 ${color.replace('text', 'bg')} opacity-5 rounded-full blur-xl group-hover:opacity-10 transition-opacity`} />
-    <div className="flex items-center justify-between mb-4">
-      <div className={`w-10 h-10 rounded-xl ${color.replace('text', 'bg')} bg-opacity-10 flex items-center justify-center ${color}`}>
-        <Icon size={20} strokeWidth={2.5} />
+  <div className="glass-card rounded-[2rem] p-7 border border-white/20 shadow-xl shadow-black/5 group hover:shadow-primary/5 transition-all relative overflow-hidden bg-white/40 backdrop-blur-xl">
+    <div className={`absolute -right-4 -top-4 w-24 h-24 ${color.replace('text', 'bg')} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
+    <div className="flex items-center justify-between mb-5">
+      <div className={`w-12 h-12 rounded-2xl ${color.replace('text', 'bg')} bg-opacity-10 flex items-center justify-center ${color} shadow-lg shadow-black/5 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
+        <Icon size={22} strokeWidth={2.5} />
       </div>
-      <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">KPI</div>
+      <div className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">Executivo</div>
     </div>
-    <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{value}</p>
-    <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{label}</p>
+    <div className="space-y-1">
+      <p className="text-3xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{value}</p>
+      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{label}</p>
+    </div>
   </div>
 );
 
