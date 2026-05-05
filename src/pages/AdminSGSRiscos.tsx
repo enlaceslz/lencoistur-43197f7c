@@ -52,11 +52,13 @@ const CONS_LABELS: Record<number, string> = {
 interface Risk {
   id: string; risk_code: string; stage: string; activity: string; hazard: string;
   probability: number; impact: number; risk_level: number;
+  residual_probability?: number; residual_impact?: number; residual_risk_level?: number;
   control_measures: string; treatment_measures: string; responsible: string; status: string;
 }
 
 const emptyForm = {
   stage: "venda_recepcao", activity: "", hazard: "", probability: 1, impact: 1,
+  residual_probability: 1, residual_impact: 1,
   control_measures: "", treatment_measures: "", responsible: "",
 };
 
@@ -86,6 +88,8 @@ const AdminSGSRiscos = () => {
     setForm({
       stage: r.stage, activity: r.activity, hazard: r.hazard,
       probability: r.probability, impact: r.impact,
+      residual_probability: r.residual_probability || 1,
+      residual_impact: r.residual_impact || 1,
       control_measures: r.control_measures || "", treatment_measures: r.treatment_measures || "",
       responsible: r.responsible,
     });
@@ -102,13 +106,20 @@ const AdminSGSRiscos = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const level = form.probability * form.impact;
+    const residualLevel = form.residual_probability * form.residual_impact;
+
+    const dataToSubmit = {
+      ...form,
+      risk_level: level,
+      residual_risk_level: residualLevel
+    };
 
     if (editing) {
-      const { error } = await supabase.from("sgs_risks").update({ ...form, risk_level: level }).eq("id", editing.id);
+      const { error } = await supabase.from("sgs_risks").update(dataToSubmit).eq("id", editing.id);
       if (error) { toast({ title: "Erro ao atualizar", variant: "destructive" }); return; }
       toast({ title: "Risco atualizado!" });
     } else {
-      const { error } = await supabase.from("sgs_risks").insert({ risk_code: generateCode(), ...form, risk_level: level });
+      const { error } = await supabase.from("sgs_risks").insert({ risk_code: generateCode(), ...dataToSubmit });
       if (error) { toast({ title: "Erro ao cadastrar risco", variant: "destructive" }); return; }
       toast({ title: "Risco cadastrado com sucesso!" });
 
@@ -322,7 +333,7 @@ const AdminSGSRiscos = () => {
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
             <h3 className="font-display font-bold text-foreground">{editing ? "Editar Risco" : "Registrar Novo Risco"}</h3>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Etapa do Passeio *</label>
                 <select value={form.stage} onChange={(e) => setForm({ ...form, stage: e.target.value })}
@@ -330,9 +341,81 @@ const AdminSGSRiscos = () => {
                   {Object.entries(STAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </div>
-              <div>
+              <div className="lg:col-span-2">
                 <label className="text-sm font-semibold text-foreground mb-1 block">Atividade / Perigo *</label>
                 <input required value={form.activity} onChange={(e) => setForm({ ...form, activity: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Ex: Banho em lagoa profunda" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Responsável</label>
+                <input value={form.responsible} onChange={(e) => setForm({ ...form, responsible: e.target.value })}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Nome ou cargo" />
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 p-4 bg-muted/30 rounded-2xl border border-border/50">
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-primary">Risco Bruto (Inicial)</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">Probabilidade</label>
+                    <select value={form.probability} onChange={(e) => setForm({ ...form, probability: Number(e.target.value) })}
+                      className="w-full bg-card border border-border rounded-lg px-2 py-1.5 text-xs">
+                      {[1,2,3,4,5].map(v => <option key={v} value={v}>{v} - {PROB_LABELS[v]}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">Impacto</label>
+                    <select value={form.impact} onChange={(e) => setForm({ ...form, impact: Number(e.target.value) })}
+                      className="w-full bg-card border border-border rounded-lg px-2 py-1.5 text-xs">
+                      {[1,2,3,4,5].map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className="p-2 bg-primary/10 rounded-lg text-center">
+                  <span className="text-xs font-black text-primary">NR Bruto: {form.probability * form.impact}</span>
+                </div>
+              </div>
+
+              <div className="lg:col-span-2 space-y-4">
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-secondary">Medidas e Risco Residual</h4>
+                <div className="grid grid-cols-1 gap-3">
+                  <textarea value={form.control_measures} onChange={(e) => setForm({ ...form, control_measures: e.target.value })}
+                    placeholder="Medidas de Controle (EPIs, Treinamento, etc)"
+                    className="w-full bg-card border border-border rounded-xl px-3 py-2 text-xs outline-none resize-none h-16" />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Risco Residual (Pós-Controle)</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">Prob. Residual</label>
+                    <select value={form.residual_probability} onChange={(e) => setForm({ ...form, residual_probability: Number(e.target.value) })}
+                      className="w-full bg-card border border-border rounded-lg px-2 py-1.5 text-xs">
+                      {[1,2,3,4,5].map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase mb-1 block">Impacto Resid.</label>
+                    <select value={form.residual_impact} onChange={(e) => setForm({ ...form, residual_impact: Number(e.target.value) })}
+                      className="w-full bg-card border border-border rounded-lg px-2 py-1.5 text-xs">
+                      {[1,2,3,4,5].map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className="p-2 bg-emerald-500/10 rounded-lg text-center">
+                  <span className="text-xs font-black text-emerald-500">NR Residual: {form.residual_probability * form.residual_impact}</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-semibold text-foreground mb-1 block">Plano de Tratamento (Ação Reativa)</label>
+              <textarea value={form.treatment_measures} onChange={(e) => setForm({ ...form, treatment_measures: e.target.value })}
+                placeholder="O que fazer se o risco ocorrer? (Link com o PRE)"
+                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none resize-none h-20" />
+            </div>
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Ex: Travessia de lagoa" />
               </div>
               <div>
