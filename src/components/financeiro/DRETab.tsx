@@ -4,7 +4,7 @@ import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { 
   TrendingUp, TrendingDown, DollarSign, PieChart, 
-  ArrowUpRight, ArrowDownRight, Info, Target, LayoutDashboard, Printer
+  ArrowUpRight, ArrowDownRight, Info, Target, LayoutDashboard, Printer, ShieldCheck, Zap
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -65,14 +65,11 @@ export default function DRETab({
 
   const receitaBruta = monthBookings.reduce((s, b) => s + b.total, 0);
   const descontosMes = monthBookings.reduce((s, b) => s + b.discount, 0);
-  
-  // Somar outras receitas que não vêm de bookings (para evitar duplicidade)
   const outrasReceitas = monthContasReceber.filter(c => !c.booking_id && c.status === "recebido").reduce((s, c) => s + c.valor, 0);
-  
   const receitaLiquida = (receitaBruta - descontosMes) + outrasReceitas;
   
-  const custosOp = monthContasPagar.filter(c => c.categoria === "operacional" || c.categoria === "combustivel" || c.categoria === "manutencao").reduce((s, c) => s + c.valor, 0);
-  const despesasAdmin = monthContasPagar.filter(c => c.categoria === "administrativo" || c.categoria === "pessoal").reduce((s, c) => s + c.valor, 0);
+  const custosOp = monthContasPagar.filter(c => ["operacional", "combustivel", "manutencao"].includes(c.categoria)).reduce((s, c) => s + c.valor, 0);
+  const despesasAdmin = monthContasPagar.filter(c => ["administrativo", "pessoal"].includes(c.categoria)).reduce((s, c) => s + c.valor, 0);
   const despesasMkt = monthContasPagar.filter(c => c.categoria === "marketing").reduce((s, c) => s + c.valor, 0);
   const despesasTech = monthContasPagar.filter(c => c.categoria === "tecnologia").reduce((s, c) => s + c.valor, 0);
   const outrasDespesas = monthContasPagar.filter(c => c.categoria === "outros").reduce((s, c) => s + c.valor, 0);
@@ -84,13 +81,10 @@ export default function DRETab({
 
   const exportDRE = async () => {
     const doc = new jsPDF();
-    const now = new Date();
-    const dateStr = now.toLocaleDateString("pt-BR");
     const monthName = MONTH_LABELS[currentMonth];
     
-    // Header
-    doc.setFillColor(15, 23, 42); // slate-900
-    doc.rect(0, 0, 210, 40, "F");
+    doc.setFillColor(15, 23, 42); 
+    doc.rect(0, 0, 210, 45, "F");
 
     if (company?.logo_url) {
       try {
@@ -100,178 +94,190 @@ export default function DRETab({
           img.onload = resolve;
           img.onerror = resolve;
         });
-        doc.addImage(img, 'PNG', 14, 8, 24, 24);
+        doc.addImage(img, 'PNG', 15, 10, 25, 25);
       } catch (e) {}
     }
 
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
-    doc.text(company?.nome_fantasia?.toUpperCase() || "DEMONSTRATIVO DE RESULTADO", 45, 18);
+    doc.setFontSize(22);
+    doc.text(company?.nome_fantasia?.toUpperCase() || "DEMONSTRATIVO FINANCEIRO", 45, 22);
     
-    doc.setFontSize(9);
+    doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    doc.text(`Relatório de Lucratividade Consolidado`, 45, 25);
-    doc.text(`${monthName} / ${currentYear}`, 45, 30);
+    doc.text(`Análise de Performance Operacional | ${monthName} de ${currentYear}`, 45, 30);
 
-    // DRE Content
     doc.setTextColor(15, 23, 42);
-    doc.setFontSize(16);
+    doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
-    doc.text("DEMONSTRATIVO DE RESULTADO (DRE)", 14, 55);
+    doc.text("DEMONSTRATIVO DE RESULTADO DO EXERCÍCIO (DRE)", 14, 60);
 
     autoTable(doc, {
-      startY: 65,
-      head: [["Item do Demonstrativo", "Valor (R$)", "% sobre Receita"]],
+      startY: 70,
+      head: [["Descrição", "Valor Atual (R$)", "% S/ Receita"]],
       body: [
-        ["(+) RECEITA BRUTA", fmt(receitaBruta), "100%"],
+        ["(+) RECEITA BRUTA OPERACIONAL", fmt(receitaBruta), "100.0%"],
         ["(-) Descontos e Abatimentos", `(${fmt(descontosMes)})`, `${receitaBruta > 0 ? ((descontosMes/receitaBruta)*100).toFixed(1) : 0}%`],
         ["(=) RECEITA LÍQUIDA", fmt(receitaLiquida), `${receitaBruta > 0 ? ((receitaLiquida/receitaBruta)*100).toFixed(1) : 0}%`],
-        ["(-) Custos Operacionais", `(${fmt(custosOp)})`, `${receitaBruta > 0 ? ((custosOp/receitaBruta)*100).toFixed(1) : 0}%`],
-        ["(=) LUCRO BRUTO", fmt(lucroBruto), `${receitaBruta > 0 ? ((lucroBruto/receitaBruta)*100).toFixed(1) : 0}%`],
+        ["(-) Custos Operacionais (Diretos)", `(${fmt(custosOp)})`, `${receitaBruta > 0 ? ((custosOp/receitaBruta)*100).toFixed(1) : 0}%`],
+        ["(=) LUCRO BRUTO (Margem de Contribuição)", fmt(lucroBruto), `${receitaBruta > 0 ? ((lucroBruto/receitaBruta)*100).toFixed(1) : 0}%`],
         ["(-) Despesas Administrativas", `(${fmt(despesasAdmin)})`, `${receitaBruta > 0 ? ((despesasAdmin/receitaBruta)*100).toFixed(1) : 0}%`],
-        ["(-) Despesas Marketing", `(${fmt(despesasMkt)})`, `${receitaBruta > 0 ? ((despesasMkt/receitaBruta)*100).toFixed(1) : 0}%`],
-        ["(-) Despesas Tecnologia", `(${fmt(despesasTech)})`, `${receitaBruta > 0 ? ((despesasTech/receitaBruta)*100).toFixed(1) : 0}%`],
+        ["(-) Despesas de Marketing", `(${fmt(despesasMkt)})`, `${receitaBruta > 0 ? ((despesasMkt/receitaBruta)*100).toFixed(1) : 0}%`],
+        ["(-) Tecnologia e Inovação", `(${fmt(despesasTech)})`, `${receitaBruta > 0 ? ((despesasTech/receitaBruta)*100).toFixed(1) : 0}%`],
         ["(-) Outras Despesas", `(${fmt(outrasDespesas)})`, `${receitaBruta > 0 ? ((outrasDespesas/receitaBruta)*100).toFixed(1) : 0}%`],
         ["(=) RESULTADO OPERACIONAL LÍQUIDO", fmt(lucroOp), `${margemOp.toFixed(1)}%`],
       ],
       theme: "grid",
-      headStyles: { fillColor: [15, 23, 42] },
+      headStyles: { fillColor: [15, 23, 42], fontSize: 11, cellPadding: 6 },
       styles: { fontSize: 10, cellPadding: 5 },
+      columnStyles: { 1: { halign: 'right' }, 2: { halign: 'center' } },
       didParseCell: (data) => {
-        if (data.row.index === 2 || data.row.index === 4 || data.row.index === 9) {
+        if ([2, 4, 9].includes(data.row.index)) {
           data.cell.styles.fontStyle = 'bold';
-          if (data.row.index === 9) data.cell.styles.fillColor = [241, 245, 249];
+          data.cell.styles.fillColor = [241, 245, 249];
         }
       }
     });
 
-    doc.save(`DRE_${monthName}_${currentYear}.pdf`);
+    doc.save(`DRE_Estrategico_${monthName}_${currentYear}.pdf`);
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-end">
-        <Button onClick={exportDRE} variant="outline" className="rounded-xl gap-2">
-          <Printer size={16} /> Exportar DRE (PDF)
+    <div className="space-y-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 glass-card p-8 rounded-[2.5rem] border border-white/20">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Visão Estratégica</p>
+          </div>
+          <h2 className="text-3xl font-black text-foreground tracking-tight">Análise de Lucratividade</h2>
+          <p className="text-sm text-muted-foreground">Comparativo detalhado entre receitas e custos operacionais.</p>
+        </div>
+        <Button onClick={exportDRE} variant="default" className="rounded-2xl gap-3 h-14 px-8 shadow-xl shadow-primary/20 font-black uppercase text-xs tracking-widest transition-all hover:scale-105 active:scale-95">
+          <Printer size={18} /> Exportar DRE Premium
         </Button>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="lg:col-span-2"
         >
-          <Card className="border-none shadow-sm bg-card overflow-hidden">
-            <CardHeader className="bg-muted/30 pb-6">
+          <Card className="border-none shadow-2xl bg-card overflow-hidden rounded-[2.5rem]">
+            <CardHeader className="bg-muted/30 p-8 border-b border-border/20">
               <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-xl font-bold flex items-center gap-2">
-                    <LayoutDashboard className="text-primary" size={20} />
-                    Demonstrativo de Resultado (DRE)
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">Análise detalhada de lucratividade — {MONTH_LABELS[currentMonth]} {currentYear}</p>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                    <LayoutDashboard size={24} strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl font-black tracking-tight">Demonstrativo Detalhado</CardTitle>
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Competência: {MONTH_LABELS[currentMonth]} {currentYear}</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Margem Operacional</p>
-                  <p className={`text-2xl font-black ${margemOp >= 20 ? "text-emerald-500" : margemOp > 0 ? "text-amber-500" : "text-rose-500"}`}>
+                <div className="text-right p-4 rounded-2xl bg-white/40 dark:bg-black/20 border border-white/50 backdrop-blur-sm">
+                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">Margem Líquida</p>
+                  <p className={`text-3xl font-black tracking-tighter ${margemOp >= 20 ? "text-emerald-500" : margemOp > 0 ? "text-amber-500" : "text-rose-500"}`}>
                     {margemOp.toFixed(1)}%
                   </p>
                 </div>
               </div>
             </CardHeader>
           <CardContent className="p-0">
-            <div className="divide-y divide-border/50">
-              {/* Receitas */}
-              <div className="p-6 space-y-4">
+            <div className="divide-y divide-border/30">
+              {/* Receitas Section */}
+              <div className="p-8 space-y-6">
                 <div className="flex justify-between items-center group">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/20">
-                      <TrendingUp size={18} />
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center group-hover:rotate-12 transition-transform">
+                      <TrendingUp size={20} />
                     </div>
-                    <span className="font-bold text-foreground">Receita Bruta ({monthBookings.length} reservas)</span>
+                    <div>
+                      <span className="font-black text-foreground text-sm uppercase tracking-tight">Receita Bruta Operacional</span>
+                      <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-0.5">{monthBookings.length} Vendas Registradas</p>
+                    </div>
                   </div>
-                  <span className="text-lg font-black text-foreground">{fmt(receitaBruta)}</span>
+                  <span className="text-2xl font-black text-foreground tracking-tighter">{fmt(receitaBruta)}</span>
                 </div>
-                <div className="flex justify-between items-center pl-11 text-sm text-muted-foreground italic">
-                  <span>(-) Descontos e Abatimentos</span>
-                  <span className="text-rose-500 font-semibold">- {fmt(descontosMes)}</span>
+                <div className="flex justify-between items-center pl-14 text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                  <span>(-) Abatimentos e Cancelamentos</span>
+                  <span className="text-rose-500">-{fmt(descontosMes)}</span>
                 </div>
-                <div className="flex justify-between items-center p-3 rounded-xl bg-primary/5 border border-primary/10">
-                  <span className="font-bold text-primary flex items-center gap-2">
-                    <DollarSign size={16} />
-                    RECEITA LÍQUIDA
+                <div className="flex justify-between items-center p-5 rounded-2xl bg-primary/5 border border-primary/20 shadow-inner">
+                  <span className="font-black text-primary flex items-center gap-3 text-xs uppercase tracking-[0.15em]">
+                    <ShieldCheck size={18} />
+                    Receita Operacional Líquida
                   </span>
-                  <span className="text-xl font-black text-primary">{fmt(receitaLiquida)}</span>
+                  <span className="text-2xl font-black text-primary tracking-tighter">{fmt(receitaLiquida)}</span>
                 </div>
               </div>
 
-              {/* Custos Operacionais */}
-              <div className="p-6 space-y-4 bg-muted/10">
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                  <Target size={14} /> Custos das Atividades
+              {/* Custos Operacionais Section */}
+              <div className="p-8 space-y-5 bg-muted/10">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground flex items-center gap-3 mb-2">
+                  <Target size={14} className="text-rose-500" /> Custos de Venda (CPV)
                 </h4>
-                <div className="flex justify-between items-center pl-1 text-sm">
-                  <span className="text-muted-foreground">(-) Custos Operacionais (Combustível, Manutenção, Guias)</span>
-                  <span className="text-rose-500 font-bold">- {fmt(custosOp)}</span>
+                <div className="flex justify-between items-center pl-2 text-xs font-bold">
+                  <span className="text-muted-foreground uppercase tracking-tight">(-) Custos Operacionais Diretos</span>
+                  <span className="text-rose-500">-{fmt(custosOp)}</span>
                 </div>
-                <div className="flex justify-between items-center p-3 rounded-xl bg-muted border border-border">
-                  <span className="font-bold text-foreground uppercase tracking-tight text-xs">LUCRO BRUTO</span>
-                  <span className="text-lg font-black text-foreground">{fmt(lucroBruto)}</span>
+                <div className="flex justify-between items-center p-4 rounded-2xl bg-muted/50 border border-border/40">
+                  <span className="font-black text-foreground uppercase tracking-widest text-[10px]">Resultado Bruto</span>
+                  <span className="text-xl font-black text-foreground tracking-tight">{fmt(lucroBruto)}</span>
                 </div>
               </div>
 
-              {/* Despesas Administrativas */}
-              <div className="p-6 space-y-4">
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                  <PieChart size={14} /> Despesas Fixas e Variáveis
+              {/* Despesas Administrativas Section */}
+              <div className="p-8 space-y-6">
+                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground flex items-center gap-3 mb-2">
+                  <PieChart size={14} className="text-amber-500" /> Despesas de Suporte
                 </h4>
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm items-center">
-                    <span className="text-muted-foreground flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                      Administrativo e Pessoal
-                    </span>
-                    <span className="font-semibold text-rose-500">- {fmt(despesasAdmin)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm items-center">
-                    <span className="text-muted-foreground flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                      Marketing e Vendas
-                    </span>
-                    <span className="font-semibold text-rose-500">- {fmt(despesasMkt)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm items-center">
-                    <span className="text-muted-foreground flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-                      Tecnologia e Software
-                    </span>
-                    <span className="font-semibold text-rose-500">- {fmt(despesasTech)}</span>
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { label: "Admin & Pessoal", val: despesasAdmin, color: "bg-amber-500" },
+                    { label: "Marketing", val: despesasMkt, color: "bg-blue-500" },
+                    { label: "Tecnologia", val: despesasTech, color: "bg-purple-500" },
+                    { label: "Outros", val: outrasDespesas, color: "bg-slate-400" }
+                  ].map((item) => (
+                    <div key={item.label} className="flex justify-between items-center p-3 rounded-xl hover:bg-muted/40 transition-colors border border-transparent hover:border-border/30">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${item.color} shadow-sm`} />
+                        <span className="text-[11px] font-black text-muted-foreground uppercase tracking-tight">{item.label}</span>
+                      </div>
+                      <span className="text-xs font-black text-rose-500">-{fmt(item.val)}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Resultado Final */}
-              <div className={`p-6 bg-gradient-to-r ${lucroOp >= 0 ? "from-emerald-500/10 to-primary/10" : "from-rose-500/10 to-amber-500/10"}`}>
-                <div className="flex justify-between items-center">
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Resultado Líquido</span>
-                    <h3 className={`text-3xl font-black ${lucroOp >= 0 ? "text-primary" : "text-rose-600"}`}>
+              {/* Resultado Final Section */}
+              <div className={`p-10 bg-gradient-to-br ${lucroOp >= 0 ? "from-emerald-500/10 to-primary/10" : "from-rose-500/10 to-amber-500/10"} relative overflow-hidden`}>
+                <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none -mb-10 -mr-10">
+                  <Zap size={200} />
+                </div>
+                <div className="flex justify-between items-end relative z-10">
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">Resultado Líquido Final</span>
+                    <h3 className={`text-4xl font-black tracking-tighter ${lucroOp >= 0 ? "text-primary" : "text-rose-600"}`}>
                       {fmt(lucroOp)}
                     </h3>
                   </div>
-                  <div className="p-4 rounded-2xl bg-white/50 dark:bg-black/20 backdrop-blur shadow-sm border border-white/50">
+                  <div className="p-6 rounded-[2rem] bg-white/60 dark:bg-black/30 backdrop-blur-md shadow-xl border border-white/50 flex flex-col items-center gap-2">
                     {lucroOp >= 0 ? (
-                      <div className="flex flex-col items-center gap-1">
-                        <ArrowUpRight className="text-emerald-500" size={24} />
-                        <span className="text-[10px] font-bold text-emerald-600 uppercase">Superavit</span>
-                      </div>
+                      <>
+                        <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-600 flex items-center justify-center">
+                          <ArrowUpRight size={28} strokeWidth={2.5} />
+                        </div>
+                        <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Superavit</span>
+                      </>
                     ) : (
-                      <div className="flex flex-col items-center gap-1">
-                        <ArrowDownRight className="text-rose-500" size={24} />
-                        <span className="text-[10px] font-bold text-rose-600 uppercase">Deficit</span>
-                      </div>
+                      <>
+                        <div className="w-12 h-12 rounded-full bg-rose-500/20 text-rose-600 flex items-center justify-center">
+                          <ArrowDownRight size={28} strokeWidth={2.5} />
+                        </div>
+                        <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest">Deficit</span>
+                      </>
                     )}
                   </div>
                 </div>
@@ -279,48 +285,54 @@ export default function DRETab({
             </div>
           </CardContent>
         </Card>
-        <p className="mt-4 text-[11px] text-muted-foreground flex items-center gap-2 italic">
-          <Info size={14} className="text-primary" />
-          Os valores de custos e despesas são baseados nos registros reais da aba "Contas a Pagar".
-        </p>
       </motion.div>
 
-      <div className="space-y-6">
+      <div className="space-y-8">
         <motion.div
            initial={{ opacity: 0, scale: 0.95 }}
            animate={{ opacity: 1, scale: 1 }}
            transition={{ delay: 0.1 }}
         >
-          <Card className="border-none shadow-sm bg-card h-full">
-            <CardHeader>
-              <CardTitle className="text-lg font-bold">Saúde Financeira</CardTitle>
+          <Card className="border-none shadow-2xl bg-card h-full rounded-[2.5rem] overflow-hidden">
+            <CardHeader className="p-8 bg-muted/20">
+              <CardTitle className="text-xl font-black tracking-tight">Saúde e KPIs</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs font-bold uppercase">
-                  <span>Margem Operacional</span>
-                  <span className="text-primary">{margemOp.toFixed(0)}%</span>
+            <CardContent className="p-8 space-y-8">
+              <div className="space-y-3">
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                  <span className="text-muted-foreground">Margem Operacional</span>
+                  <span className="text-primary">{margemOp.toFixed(1)}%</span>
                 </div>
-                <Progress value={Math.max(0, margemOp)} className="h-2 rounded-full" />
-                <p className="text-[10px] text-muted-foreground">O ideal para o setor de turismo é manter acima de 15%.</p>
+                <Progress value={Math.max(0, margemOp)} className="h-2.5 rounded-full bg-muted shadow-inner" />
+                <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-bold italic">
+                  <Info size={12} className="text-primary" />
+                  <span>Meta do setor: &gt; 18%</span>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs font-bold uppercase">
-                  <span>Peso das Despesas Fixas</span>
-                  <span className="text-rose-500">{receitaBruta > 0 ? ((totalDespesasOp / receitaBruta) * 100).toFixed(0) : 0}%</span>
+              <div className="space-y-3">
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                  <span className="text-muted-foreground">Peso das Despesas Fixas</span>
+                  <span className="text-rose-500">{receitaBruta > 0 ? ((totalDespesasOp / receitaBruta) * 100).toFixed(1) : 0}%</span>
                 </div>
-                <Progress value={receitaBruta > 0 ? (totalDespesasOp / receitaBruta) * 100 : 0} className="h-2 rounded-full bg-muted shadow-inner" />
+                <Progress value={receitaBruta > 0 ? (totalDespesasOp / receitaBruta) * 100 : 0} className="h-2.5 rounded-full bg-muted shadow-inner" />
               </div>
 
-              <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 space-y-3">
-                <h5 className="text-xs font-black uppercase text-primary">Insight do Mês</h5>
-                <p className="text-xs text-muted-foreground leading-relaxed">
+              <div className="p-6 rounded-[2rem] bg-primary/5 border border-primary/10 space-y-4 relative group overflow-hidden">
+                <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:scale-125 transition-transform">
+                  <Zap size={40} className="text-primary" />
+                </div>
+                <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Insight Estratégico</h5>
+                <p className="text-xs text-muted-foreground leading-relaxed font-medium">
                   {lucroOp > 0 
-                    ? `Parabéns! Sua operação está saudável com um lucro de ${fmt(lucroOp)}. Continue otimizando os custos operacionais para aumentar sua margem.`
-                    : "Atenção! As despesas superaram as receitas este mês. Revise seus custos fixos e tente aumentar o ticket médio das reservas."}
+                    ? `Operação altamente rentável! Com um lucro de ${fmt(lucroOp)}, sugerimos reinvestir 10% em marketing para escalar o volume de vendas.`
+                    : "Ponto de atenção crítico! As despesas superaram a receita líquida. Recomendamos reduzir custos fixos administrativos imediatamente."}
                 </p>
               </div>
+
+              <Button variant="outline" className="w-full rounded-2xl h-12 border-primary/20 text-primary font-black uppercase text-[10px] tracking-widest hover:bg-primary hover:text-white transition-all">
+                Simular Próximo Mês
+              </Button>
             </CardContent>
           </Card>
         </motion.div>
