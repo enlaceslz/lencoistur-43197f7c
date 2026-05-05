@@ -111,66 +111,44 @@ const AdminSGSDashboard = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="grid lg:grid-cols-3 gap-6 animate-in-fade" style={{ animationDelay: '0.1s' }}>
-            <div className="lg:col-span-2 glass-card rounded-[2.5rem] p-6 relative overflow-hidden group border-primary/10">
+          <div className="grid lg:grid-cols-4 gap-6 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+            <div className="lg:col-span-3 glass-card rounded-[2.5rem] p-6 relative overflow-hidden group border-primary/10">
               <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity"><Waves size={120} className="text-primary" /></div>
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center"><Activity size={16} className="text-primary" /></div>
-                <h2 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Santo Amaro Safety Pulse</h2>
-                <Badge variant="outline" className="ml-auto border-emerald-500/30 text-emerald-600 bg-emerald-50 text-[9px] font-black uppercase tracking-widest">Operação Normal</Badge>
+                <h2 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Santo Amaro Safety Pulse (Real-Time)</h2>
+                <Badge variant="outline" className="ml-auto border-emerald-500/30 text-emerald-600 bg-emerald-50 text-[9px] font-black uppercase tracking-widest">Operação Segura</Badge>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div className="space-y-1">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Nível Lagoas</p>
-                  <div className="flex items-center gap-1">
-                    <span className="text-2xl font-black text-foreground tracking-tighter">85%</span>
-                    <Badge className="bg-emerald-500/10 text-emerald-600 border-none text-[8px] h-4">IDEAL</Badge>
+                {[
+                  { label: "Nível Lagoas", val: "85%", badge: "IDEAL", icon: Waves, iconCol: "text-blue-500" },
+                  { label: "Clima (INMET)", val: "32°C", desc: "Ensolarado", icon: Sun, iconCol: "text-amber-500" },
+                  { label: "Vento (km/h)", val: "12 NE", desc: "Brisa Leve", icon: Activity, iconCol: "text-sky-500" },
+                  { label: "Ocupação", val: "64%", desc: "Capacidade", icon: UserCheck2, iconCol: "text-purple-500" },
+                ].map((stat, i) => (
+                  <div key={i} className="space-y-1">
+                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">{stat.label}</p>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-2xl font-black text-foreground tracking-tighter">{stat.val}</span>
+                        {stat.badge && <Badge className="bg-emerald-500/10 text-emerald-600 border-none text-[8px] h-4">{stat.badge}</Badge>}
+                      </div>
+                      <stat.icon size={16} className={stat.iconCol} />
+                    </div>
+                    {stat.desc && <p className="text-[10px] font-bold text-muted-foreground/60">{stat.desc}</p>}
                   </div>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Clima (INMET)</p>
-                  <div className="flex items-center gap-2">
-                    <Sun className="text-amber-500" size={20} />
-                    <span className="text-sm font-black text-foreground">32°C Ensolarado</span>
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Vento (km/h)</p>
-                  <div className="flex items-center gap-2">
-                    <Activity className="text-sky-500" size={20} />
-                    <span className="text-sm font-black text-foreground">12 NE</span>
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Risco Operacional</p>
-                  <div className="flex items-center gap-2">
-                    <Shield className="text-emerald-500" size={20} />
-                    <span className="text-sm font-black text-emerald-600">BAIXO (ISO 21101)</span>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
-            <div className="glass-card rounded-[2.5rem] p-6 border-primary/20 bg-gradient-to-br from-primary/[0.05] to-transparent relative overflow-hidden shadow-lg shadow-primary/5">
+            <div className="glass-card rounded-[2.5rem] p-6 border-primary/20 bg-gradient-to-br from-primary/[0.05] to-transparent relative overflow-hidden shadow-lg shadow-primary/5 flex flex-col justify-center">
               <div className="absolute -right-4 -top-4 opacity-10 rotate-12"><Shield size={100} className="text-primary" /></div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Status de Compliance</h2>
-                <Award size={20} className="text-primary" />
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 rounded-2xl bg-white/80 border border-emerald-500/20 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center"><CheckCircle2 size={16} className="text-emerald-600" /></div>
-                    <div><p className="text-[11px] font-black text-foreground uppercase">CADASTUR ATIVO</p></div>
-                  </div>
-                  <Badge variant="outline" className="border-emerald-200 text-emerald-600 text-[8px]">VALIDADO</Badge>
+              <div className="text-center space-y-2">
+                <p className="text-[9px] font-black text-primary uppercase tracking-[0.3em]">SGS Health Score</p>
+                <p className="text-5xl font-black text-foreground tracking-tighter">98<span className="text-lg text-primary/40">/100</span></p>
+                <div className="flex justify-center gap-1">
+                  {[1,2,3,4,5].map(i => <Star key={i} size={10} className="fill-primary text-primary" />)}
                 </div>
-                <div className="flex items-center justify-between p-3 rounded-2xl bg-white/80 border border-emerald-500/20 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center"><CheckCircle2 size={16} className="text-emerald-600" /></div>
-                    <div><p className="text-[11px] font-black text-foreground uppercase">ICMBio AUTORIZADO</p></div>
-                  </div>
-                  <Badge variant="outline" className="border-emerald-200 text-emerald-600 text-[8px]">2026</Badge>
-                </div>
+                <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">ISO 21101 Compliant</p>
               </div>
             </div>
           </div>
