@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Loader2, Pencil, Trash2, Link2, Calendar, User, Tag, CheckCircle2, AlertCircle, Printer, Search } from "lucide-react";
+import { Plus, Loader2, Pencil, Trash2, Link2, Calendar, User, Tag, CheckCircle2, AlertCircle, Printer, Search, FileText, Upload, X, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -49,12 +49,24 @@ interface Conta {
   observacoes: string | null;
   recebido_em: string | null;
   booking_id: string | null;
+  anexo_url: string | null;
 }
 
 interface CustomerOption { id: string; name: string; email: string; }
 interface BookingOption { id: string; booking_code: string; item_name: string; final_total: number; customer_name: string; }
 
-const emptyForm = { descricao: "", valor: 0, vencimento: "", categoria: "reserva", cliente: "", observacoes: "", status: "pendente", booking_id: "", customer_id: "" };
+const emptyForm = { 
+  descricao: "", 
+  valor: 0, 
+  vencimento: "", 
+  categoria: "reserva", 
+  cliente: "", 
+  observacoes: "", 
+  status: "pendente", 
+  booking_id: "", 
+  customer_id: "",
+  anexo_url: ""
+};
 
 export default function ContasReceberTab({ company }: { company?: any }) {
   const [contas, setContas] = useState<Conta[]>([]);
@@ -63,6 +75,7 @@ export default function ContasReceberTab({ company }: { company?: any }) {
   const [editing, setEditing] = useState<Conta | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [bookings, setBookings] = useState<BookingOption[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -108,8 +121,38 @@ export default function ContasReceberTab({ company }: { company?: any }) {
       status: c.status,
       booking_id: c.booking_id || "",
       customer_id: "",
+      anexo_url: c.anexo_url || "",
     });
     setOpen(true);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `receber/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('financeiro')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('financeiro')
+        .getPublicUrl(filePath);
+
+      setForm({ ...form, anexo_url: publicUrl });
+      toast.success("Comprovante enviado!");
+    } catch (error: any) {
+      toast.error("Erro no upload: " + error.message);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleBookingSelect = (bookingId: string) => {
@@ -152,6 +195,7 @@ export default function ContasReceberTab({ company }: { company?: any }) {
       status: form.status,
       recebido_em: form.status === "recebido" ? new Date().toISOString().slice(0, 10) : null,
       booking_id: form.booking_id || null,
+      anexo_url: form.anexo_url || null,
     };
     if (editing) {
       const { error } = await supabase.from("contas_receber").update(payload).eq("id", editing.id);
@@ -374,7 +418,18 @@ export default function ContasReceberTab({ company }: { company?: any }) {
                             <span className="text-base font-black text-foreground">{fmt(c.valor)}</span>
                           </td>
                           <td className="px-6 py-4 text-right">
-                            <div className="flex justify-end gap-1.5">
+                            <div className="flex justify-end items-center gap-1.5">
+                              {c.anexo_url && (
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-8 w-8 rounded-lg text-primary hover:bg-primary/10"
+                                  onClick={() => window.open(c.anexo_url!, '_blank')}
+                                  title="Ver Comprovante"
+                                >
+                                  <FileText size={14} />
+                                </Button>
+                              )}
                               <Button 
                                 size="icon" 
                                 variant="ghost" 
@@ -532,10 +587,54 @@ export default function ContasReceberTab({ company }: { company?: any }) {
               />
             </div>
 
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Comprovante / Anexo</Label>
+              <div className="flex items-center gap-2">
+                {form.anexo_url ? (
+                  <div className="flex-1 flex items-center justify-between p-2 bg-muted rounded-xl border border-dashed border-primary/30">
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <FileText size={16} className="text-primary shrink-0" />
+                      <span className="text-xs truncate max-w-[200px]">Comprovante Anexado</span>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        className="h-8 w-8 text-primary" 
+                        onClick={() => window.open(form.anexo_url, '_blank')}
+                      >
+                        <ExternalLink size={14} />
+                      </Button>
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        className="h-8 w-8 text-destructive" 
+                        onClick={() => setForm({ ...form, anexo_url: "" })}
+                      >
+                        <X size={14} />
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <label className="flex-1 flex flex-col items-center justify-center py-4 bg-muted/50 rounded-xl border-2 border-dashed border-muted-foreground/20 cursor-pointer hover:bg-muted transition-colors">
+                    {uploading ? (
+                      <Loader2 className="animate-spin text-primary" size={20} />
+                    ) : (
+                      <>
+                        <Upload size={20} className="text-muted-foreground mb-1" />
+                        <span className="text-xs text-muted-foreground font-medium">Anexar Comprovante</span>
+                      </>
+                    )}
+                    <input type="file" className="hidden" onChange={handleFileUpload} disabled={uploading} accept="image/*,application/pdf" />
+                  </label>
+                )}
+              </div>
+            </div>
+
             <Button 
               className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/20 bg-emerald-600 hover:bg-emerald-700" 
               onClick={handleSave} 
-              disabled={saving}
+              disabled={saving || uploading}
             >
               {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : null}
               {editing ? "Salvar Alterações" : "Cadastrar Recebimento"}

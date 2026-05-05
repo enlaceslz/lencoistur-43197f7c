@@ -319,6 +319,7 @@ export type Database = {
       }
       contas_pagar: {
         Row: {
+          anexo_url: string | null
           booking_id: string | null
           categoria: string
           collaborator_id: string | null
@@ -335,6 +336,7 @@ export type Database = {
           vencimento: string
         }
         Insert: {
+          anexo_url?: string | null
           booking_id?: string | null
           categoria?: string
           collaborator_id?: string | null
@@ -351,6 +353,7 @@ export type Database = {
           vencimento: string
         }
         Update: {
+          anexo_url?: string | null
           booking_id?: string | null
           categoria?: string
           collaborator_id?: string | null
@@ -392,6 +395,7 @@ export type Database = {
       }
       contas_receber: {
         Row: {
+          anexo_url: string | null
           booking_id: string | null
           categoria: string
           cliente: string | null
@@ -406,6 +410,7 @@ export type Database = {
           vencimento: string
         }
         Insert: {
+          anexo_url?: string | null
           booking_id?: string | null
           categoria?: string
           cliente?: string | null
@@ -420,6 +425,7 @@ export type Database = {
           vencimento: string
         }
         Update: {
+          anexo_url?: string | null
           booking_id?: string | null
           categoria?: string
           cliente?: string | null
