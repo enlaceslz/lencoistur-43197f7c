@@ -31,6 +31,7 @@ const emptyForm = {
   type: "incidente", location: "", guide_name: "", description: "", severity: "media",
   people_involved: "", action_taken: "", tour_id: "" as string, booking_id: "" as string,
   date: new Date().toISOString().slice(0, 16),
+  lessons_learned: "", pre_activated: false,
 };
 
 interface TourOpt { id: string; name: string; }
@@ -75,6 +76,8 @@ const AdminSGSIncidentes = () => {
       tour_id: inc.tour_id || "",
       booking_id: inc.booking_id || "",
       date: new Date(inc.date).toISOString().slice(0, 16),
+      lessons_learned: inc.lessons_learned || "",
+      pre_activated: !!inc.pre_activated,
     });
     setShowForm(true);
   };
@@ -241,11 +244,23 @@ const AdminSGSIncidentes = () => {
                 <input value={form.action_taken} onChange={(e) => setForm({ ...form, action_taken: e.target.value })}
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Primeiros socorros, resgate..." />
               </div>
+              <div className="flex items-center gap-2 pt-6">
+                <input type="checkbox" id="pre_activated" checked={form.pre_activated} onChange={(e) => setForm({ ...form, pre_activated: e.target.checked })}
+                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary/30" />
+                <label htmlFor="pre_activated" className="text-sm font-bold text-destructive uppercase tracking-tighter">🚨 PRE Ativado</label>
+              </div>
             </div>
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1 block">Descrição (fatos, circunstâncias e consequências) *</label>
-              <textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none resize-none" />
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Descrição (Fatos e Circunstâncias) *</label>
+                <textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none resize-none" placeholder="Relato detalhado..." />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-foreground mb-1 block">Lições Aprendidas (Prevenção)</label>
+                <textarea value={form.lessons_learned} onChange={(e) => setForm({ ...form, lessons_learned: e.target.value })} rows={3}
+                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none resize-none" placeholder="O que aprendemos para evitar reincidência?" />
+              </div>
             </div>
             <div className="flex gap-3">
               <button type="submit" className="bg-destructive hover:bg-destructive/90 text-destructive-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">{editing ? "Atualizar" : "Registrar"}</button>
@@ -272,6 +287,7 @@ const AdminSGSIncidentes = () => {
                     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${SEVERITY[inc.severity]?.color}`}>{SEVERITY[inc.severity]?.label}</span>
                     <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground">{TYPE_LABELS[inc.type] || inc.type}</span>
                     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[inc.status] || ""}`}>{inc.status}</span>
+                    {inc.pre_activated && <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-destructive text-white animate-pulse">🚨 PRE ATIVADO</span>}
                   </div>
                   <p className="text-foreground font-medium">{inc.description}</p>
                   <p className="text-xs text-muted-foreground mt-1">
@@ -280,7 +296,13 @@ const AdminSGSIncidentes = () => {
                     📍 {inc.location} {inc.guide_name && `• Condutor: ${inc.guide_name}`}
                   </p>
                   {inc.people_involved && <p className="text-xs text-muted-foreground">👥 Envolvidos: {inc.people_involved}</p>}
-                  {inc.action_taken && <p className="text-xs text-primary mt-1">✅ Ação: {inc.action_taken}</p>}
+                  {inc.action_taken && <p className="text-xs text-primary mt-1 font-bold">✅ Ação: {inc.action_taken}</p>}
+                  {inc.lessons_learned && (
+                    <div className="mt-2 p-2 bg-emerald-50 rounded-lg border border-emerald-100">
+                      <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-1">💡 Lições Aprendidas</p>
+                      <p className="text-[11px] text-emerald-800 italic">{inc.lessons_learned}</p>
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <p className="text-xs text-muted-foreground">{new Date(inc.date).toLocaleDateString("pt-BR")}</p>
