@@ -283,32 +283,39 @@ const AdminIA = () => {
             <Card><CardContent className="p-8 text-center text-muted-foreground">Nenhuma reserva de passeio encontrada este mês.</CardContent></Card>
           ) : (
             <div className="grid gap-4">
-              {tourDemand.map((t) => (
-                <Card key={t.name}>
-                  <CardContent className="p-5">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-display font-bold text-foreground">{t.name}</h4>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {t.bookings} reserva{t.bookings !== 1 ? "s" : ""} · R$ {(t.revenue / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                        </p>
-                      </div>
-                      <Badge variant="outline" className={
-                        t.trend === "up" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" :
-                        t.trend === "down" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" :
-                        "bg-muted text-muted-foreground"
-                      }>
-                        {t.trend === "up" ? "📈 Alta" : t.trend === "down" ? "📉 Baixa" : "➡️ Estável"}
+              {tourDemand.map((t, idx) => (
+                <div key={t.name} className="glass-card rounded-3xl p-6 admin-card-hover group border border-white/20 shadow-lg shadow-black/5 bg-white overflow-hidden relative" style={{ animationDelay: `${idx * 0.05}s` }}>
+                  <div className="absolute right-0 top-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
+                  <div className="flex items-center justify-between relative z-10">
+                    <div className="space-y-1">
+                      <h4 className="font-black text-foreground text-lg tracking-tight">{t.name}</h4>
+                      <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
+                        {t.bookings} reserva{t.bookings !== 1 ? "s" : ""} processada{t.bookings !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xl font-black text-primary tracking-tighter">R$ {(t.revenue / 100).toLocaleString("pt-BR", { minimumFractionDigits: 0 })}</p>
+                      <Badge variant="outline" className={cn(
+                        "mt-1 text-[9px] font-black uppercase tracking-widest border-none px-2",
+                        t.trend === "up" ? "bg-emerald-50 text-emerald-600" :
+                        t.trend === "down" ? "bg-rose-50 text-rose-600" :
+                        "bg-slate-50 text-slate-600"
+                      )}>
+                        {t.trend === "up" ? "📈 Performance Alta" : t.trend === "down" ? "📉 Performance Baixa" : "➡️ Performance Estável"}
                       </Badge>
                     </div>
-                    <div className="mt-3 bg-muted rounded-full h-2 overflow-hidden">
-                      <div
-                        className="bg-primary h-full rounded-full transition-all"
-                        style={{ width: `${Math.min((t.bookings / (tourDemand[0]?.bookings || 1)) * 100, 100)}%` }}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                  <div className="mt-6 bg-muted/30 rounded-full h-3 overflow-hidden relative">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.min((t.bookings / (tourDemand[0]?.bookings || 1)) * 100, 100)}%` }}
+                      transition={{ duration: 1, delay: 0.2 }}
+                      className="bg-gradient-to-r from-primary to-blue-400 h-full rounded-full relative"
+                    >
+                      <div className="absolute top-0 right-0 h-full w-4 bg-white/30 blur-sm skew-x-12" />
+                    </motion.div>
+                  </div>
+                </div>
               ))}
             </div>
           )}
