@@ -323,53 +323,56 @@ const AdminFinanceiro = () => {
         
         {/* Superior "Health Pulse" Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in-fade" style={{ animationDelay: '0.05s' }}>
-          <div className="md:col-span-2 glass-card rounded-[2.5rem] p-8 relative overflow-hidden group">
-            <div className="absolute right-0 top-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-primary/10 transition-colors" />
+          <div className="md:col-span-2 relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-indigo-600 via-blue-600 to-blue-700 p-8 text-white shadow-2xl shadow-blue-500/20 group">
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+            <div className="absolute right-0 top-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
+            
             <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Status do Sistema</p>
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ring-4 ring-emerald-400/20" />
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70">Health Pulse Activo</p>
                 </div>
-                <h2 className="text-3xl font-black text-foreground tracking-tight">Saúde Financeira: {lucroMes >= 0 ? 'Excelente' : 'Atenção'}</h2>
-                <p className="text-sm text-muted-foreground max-w-md">
+                <h2 className="text-4xl font-black tracking-tight text-white drop-shadow-sm">Saúde: {lucroMes >= 0 ? 'Excelente' : 'Atenção'}</h2>
+                <p className="text-sm text-white/80 max-w-md font-medium leading-relaxed">
                   {lucroMes >= 0 
-                    ? `Sua agência está operando com lucro líquido de ${fmt(lucroMes)} este mês. A margem de contribuição está dentro dos parâmetros ideais.`
-                    : `Detectamos um saldo negativo de ${fmt(Math.abs(lucroMes))} no período selecionado. Recomendamos revisar as despesas administrativas.`}
+                    ? `Fluxo de caixa positivo em ${fmt(lucroMes)}. Performance financeira acima da meta mensal projetada.`
+                    : `Saldo operacional em ${fmt(Math.abs(lucroMes))}. Recomendamos otimização de custos fixos.`}
                 </p>
               </div>
+              
               <div className="flex gap-4">
-                <div className="bg-white/50 dark:bg-black/20 backdrop-blur rounded-2xl p-4 border border-white/50 shadow-sm">
-                  <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest mb-1">Ponto de Equilíbrio</p>
-                  <p className="text-lg font-black text-foreground">{fmt(despesasMes)}</p>
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-lg">
+                  <p className="text-[9px] font-black uppercase text-white/60 tracking-widest mb-1">Margem Líquida</p>
+                  <p className="text-2xl font-black text-white">{receitaPaga > 0 ? ((lucroMes / receitaPaga) * 100).toFixed(1) : '0'}%</p>
                 </div>
-                <div className="bg-white/50 dark:bg-black/20 backdrop-blur rounded-2xl p-4 border border-white/50 shadow-sm">
-                  <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest mb-1">Eficiência de Caixa</p>
-                  <p className="text-lg font-black text-primary">{receitaPaga > 0 ? ((lucroMes / receitaPaga) * 100).toFixed(1) : '0'}%</p>
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 shadow-lg">
+                  <p className="text-[9px] font-black uppercase text-white/60 tracking-widest mb-1">Liquidez Mês</p>
+                  <p className="text-2xl font-black text-white">{(receitaPaga / (despesasMes || 1)).toFixed(2)}x</p>
                 </div>
               </div>
             </div>
           </div>
           
-          <div className="glass-card rounded-[2.5rem] p-8 flex flex-col justify-between group">
+          <div className="glass-card rounded-[2.5rem] p-8 flex flex-col justify-between group border border-white/20 shadow-xl shadow-black/5 bg-white">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:rotate-6 transition-transform">
-                  <LayoutDashboard size={20} strokeWidth={2.5} />
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:rotate-6 transition-transform">
+                  <LayoutDashboard size={22} strokeWidth={2.5} />
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Visão Consolidada</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Análise Executiva</span>
               </div>
               <div className="space-y-1">
-                <p className="text-2xl font-black text-foreground">{bookings.length}</p>
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Movimentações Registradas</p>
+                <p className="text-3xl font-black text-foreground">{bookings.length}</p>
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Movimentações processadas</p>
               </div>
             </div>
             <Button 
               variant="outline" 
-              className="mt-6 rounded-2xl border-primary/20 text-primary font-black uppercase text-[10px] tracking-widest hover:bg-primary hover:text-white transition-all w-full h-11"
+              className="mt-6 rounded-2xl border-primary/20 text-primary font-black uppercase text-[10px] tracking-widest hover:bg-primary hover:text-white transition-all w-full h-12 shadow-sm"
               onClick={() => setTab("dre")}
             >
-              Análise DRE Completa
+              Consultar DRE Estratégico
             </Button>
           </div>
         </div>

@@ -840,7 +840,7 @@ const AdminCRMContent = () => {
             { label: "LTV Consolidado", value: fmt(totalRevenue), icon: DollarSign, color: "text-emerald-500", bg: "bg-emerald-500/10", desc: "Receita histórica" },
             { label: "Ticket Médio", value: withBookings > 0 ? fmt(Math.round(totalRevenue / withBookings)) : "R$ 0", icon: Target, color: "text-amber-500", bg: "bg-amber-500/10", desc: "Valor por cliente" },
           ].map((stat, i) => (
-            <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group">
+            <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group border border-white/20 shadow-xl shadow-black/5 bg-white">
               <div className="absolute right-0 top-0 w-24 h-24 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-primary/10 transition-colors" />
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-12 h-12 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center shadow-sm transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
@@ -849,7 +849,7 @@ const AdminCRMContent = () => {
                 <div className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">{stat.desc}</div>
               </div>
               <div className="space-y-1">
-                <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
+                <p className="text-3xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
                 <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{stat.label}</p>
               </div>
             </div>

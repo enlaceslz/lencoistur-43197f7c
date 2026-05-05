@@ -213,10 +213,10 @@ const AdminDashboard = () => {
                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Painel Executivo</p>
                 </div>
-                <h2 className="text-4xl font-black text-foreground tracking-tighter">Bom dia, Gestor</h2>
-                <p className="text-sm text-muted-foreground max-w-lg leading-relaxed">
-                  Sua agência está operando com <span className="text-primary font-bold">{sgsStats.criticalRisks === 0 ? '100% de conformidade' : 'alertas ativos'}</span> no SGS. 
-                  Temos {bookings.filter(b => b.status === 'pendente').length} reservas aguardando confirmação.
+                <h2 className="text-4xl font-black text-foreground tracking-tighter leading-tight">Bom dia, Gestor</h2>
+                <p className="text-sm text-muted-foreground max-w-lg leading-relaxed font-medium">
+                  Sua agência opera hoje com <span className="text-primary font-black uppercase tracking-widest text-[10px] bg-primary/10 px-2 py-0.5 rounded-md">{sgsStats.criticalRisks === 0 ? 'Conformidade Total' : 'Alertas SGS'}</span>. 
+                  Monitoramos {bookings.filter(b => b.status === 'pendente').length} solicitações aguardando sua validação executiva.
                 </p>
               </div>
               <div className="flex gap-4">
