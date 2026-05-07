@@ -861,7 +861,7 @@ const AdminSGSTermos = () => {
                         <div className="flex flex-col">
                           <span className="font-bold">{m.full_name} {m.is_adult ? "(Adulto)" : "(Menor)"}</span>
                           <span className="text-[10px] text-muted-foreground">
-                            {m.birth_date ? `Nascimento: ${format(new Date(m.birth_date), "dd/MM/yyyy")}` : ""} 
+                            {m.birth_date ? `Nascimento: ${formatDate(new Date(m.birth_date), "dd/MM/yyyy")}` : ""} 
                             {!m.is_adult && m.responsible_name ? ` • Responsável: ${m.responsible_name}` : ""}
                           </span>
                         </div>
