@@ -1207,8 +1207,6 @@ const AdminColaboradores = () => {
           )}
         </DialogContent>
       </Dialog>
-        </DialogContent>
-      </Dialog>
 
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
