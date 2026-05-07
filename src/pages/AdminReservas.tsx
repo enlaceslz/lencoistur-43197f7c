@@ -15,7 +15,7 @@ import {
   Search, ShoppingCart, CheckCircle, Clock, XCircle, Eye,
   DollarSign, Ban, Loader2, Users, Calendar, CreditCard, FileText,
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
-  Plus, Copy, Pencil, Car, Compass, LayoutGrid, List
+  Plus, Copy, Pencil, Car, Compass, LayoutGrid, List, X
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
