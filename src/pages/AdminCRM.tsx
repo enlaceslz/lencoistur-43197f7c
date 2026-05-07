@@ -1000,7 +1000,7 @@ const AdminCRMContent = () => {
                               <div className="flex flex-col">
                                 <span className="text-xs font-semibold text-foreground flex items-center gap-1">
                                   <Smartphone size={10} className="text-primary" />
-                                  {c.phone ? maskPhone(c.phone, c.country || "Brasil") : "—"}
+                                  {c.phone ? maskPhone(c.phone) : "—"}
                                 </span>
                                 <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                                   <MapPin size={10} />
@@ -1148,7 +1148,7 @@ const AdminCRMContent = () => {
                         {selectedCustomer.phone && (
                           <div className="flex items-center gap-4 text-sm font-semibold">
                             <div className="p-2 rounded-lg bg-background border border-border cursor-pointer hover:bg-muted" onClick={() => { navigator.clipboard.writeText(selectedCustomer.phone || ""); toast.success("Telefone copiado!"); }}><Smartphone size={16} className="text-primary" /></div>
-                            <span className="text-foreground">{maskPhone(selectedCustomer.phone, selectedCustomer.country || "Brasil")}</span>
+                            <span className="text-foreground">{maskPhone(selectedCustomer.phone)}</span>
                           </div>
                         )}
                         {selectedCustomer.address && (
