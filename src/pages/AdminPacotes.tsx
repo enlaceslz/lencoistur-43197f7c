@@ -56,6 +56,8 @@ const AdminPacotes = () => {
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [showView, setShowView] = useState(false);
+  const [viewingPackage, setViewingPackage] = useState<any>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
