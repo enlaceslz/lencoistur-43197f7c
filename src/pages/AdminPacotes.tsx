@@ -190,7 +190,7 @@ const AdminPacotes = () => {
   };
 
   const sharePackage = (pkg: any) => {
-    const shareText = `💎 *CAMPANHA: ${pkg.name.toUpperCase()}*\n\n📍 ${pkg.description || 'Roteiro completo'}\n\n💰 De: ${fmt(pkg.original_price)} por *${fmt(pkg.discount_price)}*\n\n🔗 ${window.location.origin}/pacote/${pkg.slug}`;
+    const shareText = `💎 *CAMPANHA: ${pkg.name.toUpperCase()}*\n\n📍 ${pkg.description || 'Roteiro completo'}\n\n💰 Por apenas: *${fmt(pkg.discount_price)}*\n\n🔗 Confira os detalhes: ${window.location.origin}/pacote/${pkg.slug}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
   };
 
