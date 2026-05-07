@@ -963,13 +963,26 @@ const AdminColaboradores = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Launch Payment Dialog */}
+      {/* Payment Dialog */}
       <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Lançar Pagamento para {selectedCollab?.name}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
+        <DialogContent className="sm:max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                <Banknote size={20} className="md:w-6 md:h-6" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                  Lançar Pagamento
+                </DialogTitle>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Lançamento direto para o contas a pagar</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setPaymentDialogOpen(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <XCircle size={20} className="text-slate-400" />
+            </Button>
+          </div>
+          <div className="p-4 md:p-8 space-y-6">
             <div className="space-y-2">
               <Label>Valor do Pagamento</Label>
               <Input 
@@ -1001,6 +1014,8 @@ const AdminColaboradores = () => {
           </div>
         </DialogContent>
       </Dialog>
+        </DialogContent>
+      </Dialog>
 
       {/* Manage Types Dialog */}
       <Dialog open={typesDialogOpen} onOpenChange={setTypesDialogOpen}>
@@ -1023,7 +1038,7 @@ const AdminColaboradores = () => {
           </div>
 
           <div className="p-4 md:p-8 space-y-6">
-          <div className="space-y-4 py-4">
+          
             <div className="flex gap-2">
               <div className="flex-1 space-y-2">
                 <Label>Novo Tipo</Label>
