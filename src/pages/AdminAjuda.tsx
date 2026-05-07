@@ -304,18 +304,40 @@ const modules: ModuleGuide[] = [
     title: "Termos de Risco",
     subtitle: "Conformidade ISO 21103",
     color: "bg-red-600",
-    overview: "Módulo para gestão dos Termos de Ciência de Risco. Gerencie assinaturas digitais, valide documentação e assegure a conformidade legal em todas as atividades.",
+    overview: "Módulo para gestão dos Termos de Ciência de Risco conforme a norma ABNT NBR ISO 21103. Permite a coleta de assinaturas digitais, gerenciamento de dependentes e armazenamento seguro de documentos para fins de compliance e segurança turística.",
     steps: [
-      { title: "Gerar Termo", desc: "Vincule o termo a uma reserva existente ou crie um registro avulso." },
-      { title: "Coleta de Assinatura", desc: "Envie o link por WhatsApp ou assine no próprio painel durante o briefing." },
-      { title: "Monitoramento", desc: "Acompanhe termos pendentes e gerencie assinaturas de menores de idade." }
+      { title: "Geração do Termo", desc: "Vincule o termo a uma reserva existente para preenchimento automático dos dados do passeio e do cliente." },
+      { title: "Coleta de Assinatura", desc: "Utilize a assinatura digital na tela ou envie o link via WhatsApp/E-mail para que o cliente assine em seu próprio dispositivo." },
+      { title: "Gestão de Menores", desc: "Registre responsáveis legais e colete assinaturas vinculadas para participantes menores de idade." },
+      { title: "Arquivo Digital", desc: "O sistema gera um PDF técnico assinado que é armazenado automaticamente na ficha 360º do cliente." }
     ],
     tips: [
-      "Sempre colete a assinatura antes do início do passeio",
-      "O termo assinado gera automaticamente um PDF armazenado no histórico do cliente"
+      "A assinatura do termo é obrigatória antes do embarque em atividades de aventura",
+      "O documento serve como prova jurídica de que o cliente foi orientado sobre os riscos inerentes à atividade"
     ],
     faq: [
-      { q: "O termo tem validade legal?", a: "Sim, atende aos requisitos da ABNT NBR ISO 21103 para turismo de aventura." }
+      { q: "O sistema aceita assinatura por terceiros?", a: "Não. Cada participante maior de idade deve assinar individualmente. Menores são assinados por seus responsáveis cadastrados." }
+    ]
+  },
+  {
+    id: "ia_gateway",
+    icon: Bot,
+    title: "IA Gateway",
+    subtitle: "Inteligência de Operação",
+    color: "bg-indigo-600",
+    badge: "v2.0",
+    overview: "Portal de comando da Inteligência Artificial do LençóisTour. Integra modelos de linguagem avançados para suporte ao cliente, análise de dados operacionais e automação de processos repetitivos.",
+    steps: [
+      { title: "Monitoramento", desc: "Acompanhe as interações da IA com leads e clientes em tempo real." },
+      { title: "Insights de Negócio", desc: "Acesse sugestões de precificação dinâmica e predição de demanda baseada em dados históricos." },
+      { title: "Configuração", desc: "Ajuste o tom de voz e as regras de negócio que orientam as respostas da IA." }
+    ],
+    tips: [
+      "A IA analisa o histórico de SGS para sugerir melhorias preventivas na matriz de riscos",
+      "Leads quentes identificados pela IA são destacados automaticamente no CRM"
+    ],
+    faq: [
+      { q: "A IA pode realizar reservas sozinha?", a: "Ela pode orientar e pré-cadastrar os dados, mas a confirmação final de pagamento sempre passa pelo motor de reservas do sistema." }
     ]
   },
   {
