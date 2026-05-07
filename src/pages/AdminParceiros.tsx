@@ -92,7 +92,9 @@ const AdminParceiros = () => {
   const [form, setForm] = useState({
     name: "", type: "hotel", contact_name: "", phone: "", email: "",
     commission_rate: "10", cpf_cnpj: "", address: "", cnh: "", cnh_validade: "", cadastur: "",
-    remuneration_type: "comissao_percent", remuneration_value: "0"
+    remuneration_type: "comissao_percent", remuneration_value: "0",
+    bank_name: "", bank_agency: "", bank_account: "", bank_pix_key: "",
+    credit_limit: "0", tags: ""
   });
 
   const [typeForm, setTypeForm] = useState({
