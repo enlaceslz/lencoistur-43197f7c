@@ -447,118 +447,124 @@ const AdminReservas = () => {
           />
         </div>
       ) : (
-        <Card className="border-none shadow-2xl shadow-primary/5 overflow-hidden glass-card rounded-[2.5rem] border border-white/20 animate-in-fade" style={{ animationDelay: '0.3s' }}>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader className="bg-muted/30 backdrop-blur-sm">
-                <TableRow className="hover:bg-transparent border-border/40">
-                  <TableHead className="px-8 py-5 text-[10px] font-black uppercase tracking-widest">Código</TableHead>
-                  <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest">Cliente</TableHead>
-                  <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest">Passeio / Item</TableHead>
-                  <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest">Data</TableHead>
-                  <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest">Total</TableHead>
-                  <TableHead className="py-5 text-[10px] font-black uppercase tracking-widest text-center">Status</TableHead>
-                  <TableHead className="px-8 py-5 text-right text-[10px] font-black uppercase tracking-widest">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((booking) => (
-                  <TableRow 
-                    key={booking.id} 
-                    className="group hover:bg-primary/[0.02] border-border/20 transition-all duration-300"
-                  >
-                    <TableCell className="px-8 py-4">
-                      <div className="font-mono text-[11px] font-bold text-primary/60 bg-primary/5 px-2 py-1 rounded-md inline-block">
-                        #{booking.bookingCode}
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <div>
-                        <p className="font-black text-sm text-foreground mb-0.5">{booking.customerName}</p>
-                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter opacity-70 flex items-center gap-1">
-                          <Mail size={10} /> {booking.customerEmail}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                          {booking.type === 'transfer' ? <Car size={14} /> : <Compass size={14} />}
-                        </div>
-                        <div>
-                          <p className="font-bold text-xs text-foreground leading-none mb-1">{booking.itemName}</p>
-                          <p className="text-[10px] font-bold text-muted-foreground opacity-60 flex items-center gap-1">
-                            <Users size={10} /> {booking.guests} {booking.guests === 1 ? 'pessoa' : 'pessoas'}
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4 font-black text-xs text-muted-foreground uppercase tracking-widest">
-                      {fmtDate(booking.date)}
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <p className="font-black text-sm text-foreground">{fmt(booking.finalTotal)}</p>
-                    </TableCell>
-                    <TableCell className="py-4 text-center">
-                      <Badge className={cn(
-                        "rounded-xl px-3 py-1 font-black text-[9px] uppercase tracking-widest border-none shadow-sm",
-                        statusConfig[booking.status]?.className
-                      )}>
-                        {statusConfig[booking.status]?.label}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="px-8 py-4 text-right">
-                      <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                onClick={() => setSelected(booking)}
-                                className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary"
-                              >
-                                <Eye size={18} />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Ver Detalhes</TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                onClick={() => openEdit(booking)}
-                                className="h-9 w-9 rounded-xl hover:bg-amber-500/10 hover:text-amber-500"
-                              >
-                                <Pencil size={18} />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Editar</TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {filtered.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={7} className="h-48 text-center">
-                      <div className="flex flex-col items-center justify-center space-y-3 grayscale opacity-40">
-                        <Calendar size={48} className="text-muted-foreground" />
-                        <p className="text-sm font-black uppercase tracking-widest">Nenhuma reserva encontrada</p>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
+          {filtered.map((booking, index) => (
+            <div 
+              key={booking.id}
+              className="glass-card admin-card-hover rounded-[2.5rem] overflow-hidden border border-white/20 group animate-in-slide-up bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-2xl shadow-black/5"
+              style={{ animationDelay: `${0.05 * (index % 10)}s` }}
+            >
+              <div className="p-8">
+                {/* Card Header */}
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 mb-2 bg-primary/5 px-2 py-1 rounded-lg self-start">
+                      #{booking.bookingCode}
+                    </span>
+                    <h3 className="text-xl font-black text-foreground tracking-tight line-clamp-1 group-hover:text-primary transition-colors duration-300">
+                      {booking.customerName}
+                    </h3>
+                  </div>
+                  <Badge className={cn(
+                    "rounded-2xl px-4 py-1.5 font-black text-[10px] uppercase tracking-widest border-none shadow-xl",
+                    statusConfig[booking.status]?.className
+                  )}>
+                    {statusConfig[booking.status]?.label}
+                  </Badge>
+                </div>
+
+                {/* Tour Info */}
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-center gap-4 group/item">
+                    <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
+                      {booking.type === 'tour' ? <Compass size={18} /> : <Car size={18} />}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Serviço</span>
+                      <span className="text-sm font-bold text-foreground/80 line-clamp-1">{booking.itemName}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4 group/item">
+                    <div className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
+                      <Calendar size={18} />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Data Agendada</span>
+                      <span className="text-sm font-bold text-foreground/80">{fmtDate(booking.date)}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 group/item">
+                    <div className="w-10 h-10 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
+                      <Users size={18} />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Capacidade</span>
+                      <span className="text-sm font-bold text-foreground/80">{booking.guests} {booking.guests === 1 ? 'passageiro' : 'passageiros'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer with Price and Actions */}
+                <div className="flex items-center justify-between pt-6 border-t border-border/40">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-1">Valor Total</span>
+                    <p className="text-2xl font-black text-foreground tracking-tighter">{fmt(booking.finalTotal)}</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => setSelected(booking)}
+                            className="h-12 w-12 rounded-[1.25rem] bg-white/50 dark:bg-white/5 hover:bg-primary hover:text-white transition-all duration-500 shadow-lg hover:shadow-primary/40 active:scale-95 border border-white/40 dark:border-white/10"
+                          >
+                            <Eye size={20} />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-primary text-white font-black text-[10px] uppercase tracking-widest border-none px-4 py-2 rounded-xl shadow-2xl">Ver Detalhes</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => openEdit(booking)}
+                            className="h-12 w-12 rounded-[1.25rem] bg-white/50 dark:bg-white/5 hover:bg-amber-500 hover:text-white transition-all duration-500 shadow-lg hover:shadow-amber-500/40 active:scale-95 border border-white/40 dark:border-white/10"
+                          >
+                            <Pencil size={20} />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-amber-500 text-white font-black text-[10px] uppercase tracking-widest border-none px-4 py-2 rounded-xl shadow-2xl">Editar Reserva</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {filtered.length === 0 && (
+            <div className="col-span-full h-80 flex flex-col items-center justify-center space-y-6 bg-white/40 dark:bg-black/20 backdrop-blur-xl rounded-[3rem] border-2 border-dashed border-white/40 dark:border-white/10 animate-pulse">
+              <div className="w-20 h-20 rounded-[2rem] bg-muted/20 flex items-center justify-center text-muted-foreground/40 shadow-inner">
+                <Calendar size={40} />
+              </div>
+              <div className="text-center">
+                <p className="text-xl font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-2">Nenhuma reserva encontrada</p>
+                <p className="text-sm font-bold text-muted-foreground/40">Tente ajustar seus filtros ou termos de busca</p>
+              </div>
+            </div>
+          )}
+        </div>
       )}
+
+
 
       {/* Detail Modal */}
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
