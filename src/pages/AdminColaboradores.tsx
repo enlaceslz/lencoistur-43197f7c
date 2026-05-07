@@ -747,8 +747,9 @@ const AdminColaboradores = () => {
             </Button>
           </div>
 
-          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
-          <div className="grid md:grid-cols-2 gap-4 py-4">
+          <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col h-[calc(90vh-80px)]">
+            <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
+              <div className="grid md:grid-cols-2 gap-4 py-4">
             <div className="md:col-span-2 flex flex-col items-center justify-center space-y-4 mb-4 pb-4 border-b">
               <div className="relative group">
                 <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-100 border-2 border-slate-200 flex items-center justify-center">
