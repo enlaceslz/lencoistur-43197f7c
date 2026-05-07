@@ -219,45 +219,60 @@ const AdminPacotes = () => {
       </div>
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto rounded-[2.5rem] glass-card">
-          <DialogHeader className="border-b pb-6 mb-6">
-            <DialogTitle className="text-2xl font-black tracking-tight">{editingId ? "Editar Pacote" : "Novo Pacote"}</DialogTitle>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingId ? "Editar Pacote" : "Novo Pacote"}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="grid md:grid-cols-5 gap-8">
-              <div className="md:col-span-2 space-y-6">
-                <div className="space-y-2"><Label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Nome</Label><Input value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="h-12 rounded-xl bg-muted/30 font-bold" required /></div>
-                <div className="space-y-2"><Label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Descrição</Label><Textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="min-h-[120px] rounded-2xl bg-muted/30" /></div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Preço Promo</Label><Input type="number" value={form.discount_price} onChange={e => setForm({...form, discount_price: Number(e.target.value)})} className="h-12 rounded-xl bg-muted/30 font-black text-primary" required /></div>
-                  <div className="space-y-2"><Label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Dias</Label><Input type="number" value={form.days} onChange={e => setForm({...form, days: Number(e.target.value)})} className="h-12 rounded-xl bg-muted/30 font-bold" required /></div>
+          <form onSubmit={handleSubmit} className="space-y-6 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <Label htmlFor="pkg-name">Nome do Pacote *</Label>
+                  <Input id="pkg-name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Ex: Fim de semana em Bonito" className="rounded-xl" required />
                 </div>
-                <div className="space-y-2"><Label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Banner URL</Label><Input value={form.banner_url} onChange={e => setForm({...form, banner_url: e.target.value})} className="h-12 rounded-xl bg-muted/30" /></div>
+                <div className="space-y-1">
+                  <Label htmlFor="pkg-desc">Descrição</Label>
+                  <Textarea id="pkg-desc" value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="rounded-xl min-h-[100px]" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <Label htmlFor="pkg-price">Preço Promocional (R$)</Label>
+                    <Input id="pkg-price" type="number" value={form.discount_price} onChange={e => setForm({...form, discount_price: Number(e.target.value)})} className="rounded-xl" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="pkg-days">Dias</Label>
+                    <Input id="pkg-days" type="number" value={form.days} onChange={e => setForm({...form, days: Number(e.target.value)})} className="rounded-xl" />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="pkg-banner">Banner URL</Label>
+                  <Input id="pkg-banner" value={form.banner_url} onChange={e => setForm({...form, banner_url: e.target.value})} className="rounded-xl" placeholder="https://..." />
+                </div>
               </div>
-              <div className="md:col-span-3 space-y-6">
-                <div className="bg-primary/5 rounded-[2rem] p-8 border border-primary/10 space-y-6">
-                  <div className="flex items-center justify-between"><Label className="text-[11px] font-black uppercase tracking-widest text-primary flex items-center gap-2"><Calendar size={14} /> Timeline do Roteiro</Label></div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <select className="h-10 rounded-xl bg-white border border-amber-200 text-xs font-bold px-3 outline-none" onChange={e => { const t = tours.find(x => x.id === e.target.value); if(t) setSelectedItems([...selectedItems, {id:t.id, type:'tour', data:t}]); e.target.value=""; }}>
-                      <option value="">+ Passeio</option>{tours.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                    </select>
-                    <select className="h-10 rounded-xl bg-white border border-blue-200 text-xs font-bold px-3 outline-none" onChange={e => { const t = transfers.find(x => x.id === e.target.value); if(t) setSelectedItems([...selectedItems, {id:t.id, type:'transfer', data:t}]); e.target.value=""; }}>
-                      <option value="">+ Translado</option>{transfers.map(t => <option key={t.id} value={t.id}>{t.origin} → {t.destination}</option>)}
-                    </select>
-                  </div>
-                  <div className="min-h-[200px] space-y-3">
-                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
-                      <SortableContext items={selectedItems.map((i,idx) => `${i.type}-${i.id}-${idx}`)} strategy={verticalListSortingStrategy}>
-                        {selectedItems.map((item, idx) => <SortableItem key={`${item.type}-${item.id}-${idx}`} item={item.data} type={item.type} index={idx} onRemove={() => setSelectedItems(selectedItems.filter((_, i) => i !== idx))} />)}
-                      </SortableContext>
-                    </DndContext>
-                  </div>
+              
+              <div className="bg-muted/30 rounded-2xl p-4 border border-border">
+                <h4 className="font-bold text-sm mb-4">Itinerário</h4>
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  <select className="h-10 rounded-xl bg-background border px-3 text-xs" onChange={e => { const t = tours.find(x => x.id === e.target.value); if(t) setSelectedItems([...selectedItems, {id:t.id, type:'tour', data:t}]); e.target.value=""; }}>
+                    <option value="">+ Passeio</option>{tours.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                  </select>
+                  <select className="h-10 rounded-xl bg-background border px-3 text-xs" onChange={e => { const t = transfers.find(x => x.id === e.target.value); if(t) setSelectedItems([...selectedItems, {id:t.id, type:'transfer', data:t}]); e.target.value=""; }}>
+                    <option value="">+ Translado</option>{transfers.map(t => <option key={t.id} value={t.id}>{t.origin} → {t.destination}</option>)}
+                  </select>
+                </div>
+                <div className="min-h-[200px] space-y-2">
+                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
+                    <SortableContext items={selectedItems.map((i,idx) => `${i.type}-${i.id}-${idx}`)} strategy={verticalListSortingStrategy}>
+                      {selectedItems.map((item, idx) => <SortableItem key={`${item.type}-${item.id}-${idx}`} item={item.data} type={item.type} index={idx} onRemove={() => setSelectedItems(selectedItems.filter((_, i) => i !== idx))} />)}
+                    </SortableContext>
+                  </DndContext>
                 </div>
               </div>
             </div>
-            <DialogFooter className="pt-6 border-t border-border/40 gap-4">
-              <Button type="button" variant="ghost" onClick={() => setShowForm(false)} className="h-14 px-8 rounded-2xl font-black text-[11px] uppercase tracking-widest text-muted-foreground">Cancelar</Button>
-              <Button type="submit" disabled={saving} className="flex-1 h-14 rounded-2xl bg-gradient-to-r from-primary to-indigo-600 font-black text-[11px] uppercase tracking-widest shadow-xl">{saving ? <Loader2 className="animate-spin mr-2" /> : <CheckCircle size={18} className="mr-2" />}{editingId ? "Salvar" : "Criar"}</Button>
+            
+            <DialogFooter className="pt-4 border-t">
+              <Button type="button" variant="ghost" onClick={() => setShowForm(false)} className="rounded-xl">Cancelar</Button>
+              <Button type="submit" disabled={saving} className="rounded-xl">{saving ? <Loader2 className="animate-spin mr-2" /> : <CheckCircle size={16} className="mr-2" />}{editingId ? "Salvar" : "Criar"}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
