@@ -396,18 +396,39 @@ const AdminPacotes = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="pkg-banner" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Banner do Pacote (URL da Imagem)</Label>
-                    <div className="relative group">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
-                        <Eye size={16} />
+                    <Label htmlFor="pkg-banner" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Banner do Pacote (Upload ou URL)</Label>
+                    <div className="flex gap-2">
+                      <div className="relative group flex-1">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
+                          <Eye size={16} />
+                        </div>
+                        <Input 
+                          id="pkg-banner" 
+                          value={form.banner_url} 
+                          onChange={e => setForm({...form, banner_url: e.target.value})} 
+                          placeholder="Cole o link ou use o botão de upload"
+                          className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all" 
+                        />
                       </div>
-                      <Input 
-                        id="pkg-banner" 
-                        value={form.banner_url} 
-                        onChange={e => setForm({...form, banner_url: e.target.value})} 
-                        placeholder="Cole o link da imagem (Unsplash, Firebase, etc)"
-                        className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all" 
-                      />
+                      <div className="relative">
+                        <input
+                          type="file"
+                          id="banner-upload"
+                          className="hidden"
+                          accept="image/*"
+                          onChange={handleBannerUpload}
+                          disabled={uploading}
+                        />
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          className="h-12 w-12 rounded-xl p-0 border-slate-200"
+                          onClick={() => document.getElementById('banner-upload')?.click()}
+                          disabled={uploading}
+                        >
+                          {uploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
+                        </Button>
+                      </div>
                     </div>
                     {form.banner_url && (
                       <div className="mt-3 rounded-2xl overflow-hidden border border-slate-100 shadow-sm aspect-[21/9]">
