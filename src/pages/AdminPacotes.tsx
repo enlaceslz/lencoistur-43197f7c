@@ -18,6 +18,7 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, Keyboa
 import { arrayMove, SortableContext, verticalListSortingStrategy, useSortable, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { NumericFormat } from "react-number-format";
 
 const SortableItem = ({ item, type, index, onRemove }: { item: any, type: 'tour' | 'transfer', index: number, onRemove: () => void }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: `${type}-${item.id}-${index}` });
@@ -189,7 +190,7 @@ const AdminPacotes = () => {
   };
 
   const sharePackage = (pkg: any) => {
-    const shareText = `💎 *CAMPANHA: ${pkg.name.toUpperCase()}*\n\n📍 ${pkg.description || 'Roteiro completo'}\n\n💰 De: ${fmt(pkg.original_price)} por *${fmt(pkg.discount_price)}*\n\n🔗 ${window.location.origin}/pacote/${pkg.slug}`;
+    const shareText = `💎 *CAMPANHA: ${pkg.name.toUpperCase()}*\n\n📍 ${pkg.description || 'Roteiro completo'}\n\n💰 Por apenas: *${fmt(pkg.discount_price)}*\n\n🔗 Confira os detalhes: ${window.location.origin}/pacote/${pkg.slug}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
   };
 
@@ -365,13 +366,19 @@ const AdminPacotes = () => {
                     <div className="space-y-2">
                       <Label htmlFor="pkg-price" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Final (R$)</Label>
                       <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">R$</span>
-                        <Input 
-                          id="pkg-price" 
-                          type="number" 
-                          value={form.discount_price} 
-                          onChange={e => setForm({...form, discount_price: Number(e.target.value)})} 
-                          className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-black text-primary" 
+                        <NumericFormat
+                          id="pkg-price"
+                          value={form.discount_price / 100}
+                          onValueChange={(values) => {
+                            const { floatValue } = values;
+                            setForm({ ...form, discount_price: Math.round((floatValue || 0) * 100) });
+                          }}
+                          thousandSeparator="."
+                          decimalSeparator=","
+                          prefix="R$ "
+                          decimalScale={2}
+                          fixedDecimalScale
+                          className="flex h-12 w-full px-4 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-black text-primary outline-none focus:ring-2 focus:ring-primary/20"
                         />
                       </div>
                     </div>
