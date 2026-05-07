@@ -360,7 +360,7 @@ const AdminPasseios = () => {
             </Button>
           </div>
 
-          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
+          <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-6 md:space-y-8">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Nome *</label>
@@ -594,7 +594,7 @@ const AdminPasseios = () => {
             <div className="flex gap-3 pt-4 border-t border-border">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button type="button" onClick={handleSubmit} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all">
+                  <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all">
                     {editingId ? "Salvar Alterações" : "Criar Passeio"}
                   </button>
                 </TooltipTrigger>
@@ -614,8 +614,7 @@ const AdminPasseios = () => {
                 </TooltipContent>
               </Tooltip>
             </div>
-            </div>
-          </div>
+          </form>
         </DialogContent>
       </Dialog>
 
