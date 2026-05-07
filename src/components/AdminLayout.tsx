@@ -224,7 +224,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
               </button>
               {sgsOpen && !sidebarCollapsed && (
                 <div className="mt-2 space-y-1">
-                  {sgsItems.slice(0, 5).map(item => <SidebarLink key={item.path} {...item} indent />)}
+                  {sgsItems.map(item => <SidebarLink key={item.path} {...item} indent />)}
                 </div>
               )}
             </div>

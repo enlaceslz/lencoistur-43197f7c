@@ -166,6 +166,7 @@ const AdminSGSDashboard = () => {
                 { label: "Briefing Operacional", icon: Shield, path: "/admin/sgs/briefings", color: "bg-primary text-white shadow-primary/20 hover:bg-primary/90" },
                 { label: "Checklist 4x4", icon: ClipboardList, path: "/admin/sgs/checklists", color: "bg-white text-primary border border-primary/20 hover:bg-primary/5" },
                 { label: "Termo de Risco", icon: FileText, path: "/admin/sgs/termos", color: "bg-white text-secondary border border-secondary/20 hover:bg-secondary/5" },
+                { label: "IA Segurança", icon: Activity, path: "/admin/ia", color: "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-indigo-500/20 hover:opacity-90" },
                 { label: "Gerar PGSAT", icon: Award, path: "/admin/sgs/pgsat", color: "bg-ocean-dark text-white shadow-ocean/20 hover:opacity-90" },
               ].map(a => (
                 <button
