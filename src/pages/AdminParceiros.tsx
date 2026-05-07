@@ -1105,11 +1105,10 @@ const AdminParceiros = () => {
           </div>
         </DialogContent>
       </Dialog>
-          </div>
-        </DialogContent>
-      </Dialog>
     </AdminLayout>
   );
 };
+
+export default AdminParceiros;
 
 export default AdminParceiros;
