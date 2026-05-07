@@ -1194,7 +1194,7 @@ const AdminColaboradores = () => {
                 </div>
               </div>
               
-              <div className="flex gap-3 pt-6 border-t border-slate-100">
+              <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0">
                 <Button variant="outline" onClick={() => setDetailsDialogOpen(false)} className="flex-1 h-12 rounded-xl font-bold">Fechar</Button>
                 <Button onClick={() => { setDetailsDialogOpen(false); openEdit(selectedCollab!); }} className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white">Editar Perfil</Button>
               </div>
