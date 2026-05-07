@@ -542,7 +542,7 @@ const AdminParceiros = () => {
             {filtered.map((p) => {
               const type = partnerTypes.find(t => t.name === p.type) || partnerTypes[0];
               const Icon = getIcon(type?.icon || "Building2");
-              const colorClass = type?.color?.split(' ')[0] || "from-blue-500 to-indigo-600";
+              const colorClass = getGradient(type?.color || "");
               
               return (
                 <div 
