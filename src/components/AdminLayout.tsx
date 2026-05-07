@@ -187,6 +187,8 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
     );
   };
 
+  const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : "AD";
+
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-[hsl(220,30%,98%)] flex font-body">
