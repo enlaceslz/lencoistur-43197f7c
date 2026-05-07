@@ -97,16 +97,26 @@ const AdminSGSBriefings = () => {
   return (
     <AdminLayout title={form.language === "en" ? "SGS - Safety Briefings" : "SGS - Resumos de Segurança"}>
       <div className="space-y-6">
-        <div className="flex justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            {form.language === "en" 
-              ? "Mandatory guide checklist before each tour (ISO 21103)" 
-              : "Checklist obrigatório do guia antes de cada passeio (ISO 21103)"}
-          </p>
-          <button onClick={() => setShowForm(!showForm)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-            <Plus size={16} /> {form.language === "en" ? "New Briefing" : "Novo Resumo"}
-          </button>
+        <div className="flex flex-col xl:flex-row gap-6 items-center justify-between glass-card p-8 rounded-[2.5rem] mb-10 animate-in-fade border border-white/20 shadow-xl shadow-black/5" style={{ animationDelay: '0.1s' }}>
+          <div className="flex-1 w-full">
+            <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-1 ml-1">ISO 21103 Protocol</p>
+            <h2 className="text-2xl font-black text-foreground tracking-tight leading-none uppercase">
+              {form.language === "en" ? "Operational Briefings" : "Briefings Operacionais"}
+            </h2>
+            <p className="text-xs font-bold text-muted-foreground mt-2 ml-1">
+              {form.language === "en" 
+                ? "Mandatory guide checklist before each tour." 
+                : "Checklist obrigatório do guia antes de cada passeio."}
+            </p>
+          </div>
+          
+          <div className="flex gap-3 w-full xl:w-auto justify-center">
+            <button onClick={() => setShowForm(!showForm)}
+              className="h-14 px-8 rounded-[1.5rem] bg-gradient-to-r from-primary to-indigo-600 font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all text-white flex items-center gap-2 whitespace-nowrap"
+            >
+              <Plus size={20} strokeWidth={3} /> {form.language === "en" ? "NEW BRIEFING" : "NOVO BRIEFING"}
+            </button>
+          </div>
         </div>
 
         {showForm && (

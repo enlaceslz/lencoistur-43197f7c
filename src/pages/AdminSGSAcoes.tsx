@@ -70,105 +70,181 @@ const AdminSGSAcoes = () => {
   return (
     <AdminLayout title="SGS - Ações Corretivas">
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search size={16} className="absolute left-3 top-3 text-muted-foreground" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar ações..."
-              className="w-full pl-9 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30" />
+        <div className="flex flex-col xl:flex-row gap-6 items-center justify-between glass-card p-8 rounded-[2.5rem] mb-10 animate-in-fade border border-white/20 shadow-xl shadow-black/5" style={{ animationDelay: '0.1s' }}>
+          <div className="relative flex-1 w-full group">
+            <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" />
+            <input 
+              value={search} 
+              onChange={(e) => setSearch(e.target.value)} 
+              placeholder="Buscar ações corretivas ou preventivas..."
+              className="w-full pl-14 pr-4 h-14 bg-white/40 dark:bg-black/20 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-2xl text-sm font-semibold outline-none focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-muted-foreground/40" 
+            />
           </div>
-          <button 
-            onClick={() => setShowForm(!showForm)} 
-            className="flex items-center gap-3 px-8 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95"
-          >
-            <Plus size={20} strokeWidth={3} /> Nova Ação
-          </button>
+          
+          <div className="flex gap-3 w-full xl:w-auto justify-center">
+            <button 
+              onClick={() => setShowForm(!showForm)} 
+              className="h-14 px-8 rounded-[1.5rem] bg-gradient-to-r from-primary to-indigo-600 font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all text-white flex items-center gap-2 whitespace-nowrap"
+            >
+              <Plus size={20} strokeWidth={3} /> NOVA AÇÃO
+            </button>
+          </div>
         </div>
 
         {showForm && (
-          <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
-            <h3 className="font-display font-bold text-foreground">Nova Ação Corretiva</h3>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Incidente Relacionado</label>
+          <form onSubmit={handleSubmit} className="glass-card border-none rounded-[2.5rem] p-8 space-y-8 animate-in-slide-down mb-10 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-8 opacity-5"><CheckCircle size={120} className="text-primary" /></div>
+            
+            <div>
+              <h3 className="text-xl font-black text-foreground uppercase tracking-tight flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                  <Plus size={20} strokeWidth={3} />
+                </div>
+                Registrar Ação Corretiva
+              </h3>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-2 ml-13">Planejamento e execução de melhorias SGS</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Incidente Relacionado</label>
                 <select value={form.incident_id} onChange={(e) => setForm({ ...form, incident_id: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
-                  <option value="">Nenhum</option>
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all">
+                  <option value="">Nenhum incidente</option>
                   {incidents.map(i => <option key={i.id} value={i.id}>{i.code} — {i.desc}</option>)}
                 </select>
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Risco Relacionado</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Risco Relacionado</label>
                 <select value={form.risk_id} onChange={(e) => setForm({ ...form, risk_id: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
-                  <option value="">Nenhum</option>
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all">
+                  <option value="">Nenhum risco</option>
                   {risks.map(r => <option key={r.id} value={r.id}>{r.code} — {r.hazard}</option>)}
                 </select>
               </div>
-              <div className="sm:col-span-2">
-                <label className="text-sm font-semibold text-foreground mb-1 block">Descrição *</label>
-                <textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none resize-none" />
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Descrição Detalhada *</label>
+                <textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3}
+                  className="w-full bg-muted/30 border border-border/40 rounded-xl px-4 py-3 text-sm font-bold text-foreground outline-none resize-none focus:ring-4 focus:ring-primary/10 transition-all" 
+                  placeholder="Descreva a ação a ser tomada..." />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Responsável *</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Responsável pela Execução *</label>
                 <input required value={form.responsible} onChange={(e) => setForm({ ...form, responsible: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all" 
+                  placeholder="Nome do colaborador" />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Prazo</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Prazo Final</label>
                 <input type="date" value={form.due_date} onChange={(e) => setForm({ ...form, due_date: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all" />
               </div>
             </div>
-            <div className="flex gap-3">
-              <button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">Salvar</button>
-              <button type="button" onClick={() => setShowForm(false)} className="bg-muted text-muted-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">Cancelar</button>
+
+            <div className="flex gap-4 pt-4 border-t border-border/50">
+              <button type="submit" className="flex-1 h-14 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95">
+                Salvar Ação Corretiva
+              </button>
+              <button type="button" onClick={() => setShowForm(false)} className="px-10 h-14 bg-muted text-muted-foreground rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all">
+                Cancelar
+              </button>
             </div>
           </form>
         )}
 
-        {/* Cards */}
-        <div className="space-y-3">
-          {loading ? (
-            <p className="text-center text-muted-foreground py-8">Carregando...</p>
-          ) : filtered.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">Nenhuma ação corretiva</p>
-          ) : filtered.map((a) => {
-            const st = STATUS_CONFIG[a.status] || STATUS_CONFIG.pendente;
-            const isOverdue = a.due_date && new Date(a.due_date) < new Date() && a.status !== "concluida" && a.status !== "cancelada";
-            return (
-              <div key={a.id} className={`bg-card border rounded-2xl p-5 ${isOverdue ? "border-destructive" : "border-border"}`}>
-                <div className="flex flex-col sm:flex-row justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-mono text-xs text-muted-foreground">{a.action_code}</span>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${st.color}`}>{st.label}</span>
-                      {isOverdue && <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-destructive text-destructive-foreground">ATRASADA</span>}
+        {/* List Section */}
+        <div className="space-y-6">
+          <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.2em] ml-2">Cronograma de Ações e Melhorias</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in-fade" style={{ animationDelay: '0.2s' }}>
+            {loading ? (
+              <div className="md:col-span-2 flex flex-col items-center justify-center py-20">
+                <Loader2 className="animate-spin text-primary mb-4" size={32} />
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground animate-pulse">Sincronizando Ações...</p>
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="md:col-span-2 glass-card rounded-[2.5rem] p-20 text-center border-2 border-dashed border-border/40">
+                <CheckCircle size={48} className="mx-auto text-muted-foreground/20 mb-4" />
+                <p className="text-xl font-black text-muted-foreground/40 uppercase tracking-widest">Nenhuma ação registrada</p>
+              </div>
+            ) : filtered.map((a, idx) => {
+              const st = STATUS_CONFIG[a.status] || STATUS_CONFIG.pendente;
+              const isOverdue = a.due_date && new Date(a.due_date) < new Date() && a.status !== "concluida" && a.status !== "cancelada";
+              return (
+                <div key={a.id} className={`glass-card admin-card-hover rounded-[2.5rem] p-8 group relative overflow-hidden flex flex-col border-2 transition-all ${isOverdue ? "border-rose-500/20 hover:border-rose-500/40" : "border-transparent hover:border-primary/20"}`} style={{ animationDelay: `${idx * 0.05}s` }}>
+                  <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${isOverdue ? "bg-rose-500" : st.color.includes('primary') ? "bg-primary" : st.color.includes('secondary') ? "bg-secondary" : "bg-muted"}`} />
+                  
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-inner ${isOverdue ? 'bg-rose-500/10 text-rose-500' : 'bg-primary/10 text-primary'}`}>
+                        <st.icon size={24} strokeWidth={2.5} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-mono text-[10px] font-black text-muted-foreground tracking-tighter uppercase px-2 py-0.5 bg-muted/50 rounded-lg border border-border/40">{a.action_code}</span>
+                          <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${st.color}`}>{st.label}</span>
+                          {isOverdue && <span className="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-rose-500 text-white animate-pulse">ATRASADA</span>}
+                        </div>
+                        <h4 className="font-black text-foreground group-hover:text-primary transition-colors leading-tight line-clamp-1">{a.description}</h4>
+                      </div>
                     </div>
-                    <p className="text-foreground font-medium">{a.description}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      👤 {a.responsible} {a.due_date && `• Prazo: ${new Date(a.due_date + "T12:00").toLocaleDateString("pt-BR")}`}
-                    </p>
+                  </div>
+
+                  <div className="bg-muted/30 p-5 rounded-2xl border border-border/50 mb-6 flex-1">
+                    <div className="flex items-center gap-6">
+                      <div className="space-y-1">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Responsável</p>
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-black shadow-sm">
+                            {a.responsible?.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="text-xs font-black text-foreground">{a.responsible}</span>
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Prazo Final</p>
+                        <div className="flex items-center gap-2">
+                          <Clock size={12} className={isOverdue ? "text-rose-500" : "text-muted-foreground"} />
+                          <span className={`text-xs font-black ${isOverdue ? "text-rose-500" : "text-foreground"}`}>
+                            {a.due_date ? new Date(a.due_date + "T12:00").toLocaleDateString("pt-BR") : "S/ PRAZO"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
                     {(a.sgs_incidents?.incident_code || a.sgs_risks?.risk_code) && (
-                      <p className="text-xs text-primary mt-0.5">
-                        {a.sgs_incidents?.incident_code && `🔗 ${a.sgs_incidents.incident_code}`}
-                        {a.sgs_incidents?.incident_code && a.sgs_risks?.risk_code && " • "}
-                        {a.sgs_risks?.risk_code && `⚠️ ${a.sgs_risks.risk_code}: ${a.sgs_risks.hazard?.slice(0, 40)}`}
-                      </p>
+                      <div className="mt-4 pt-4 border-t border-border/40 flex flex-wrap gap-3">
+                        {a.sgs_incidents?.incident_code && (
+                          <div className="flex items-center gap-1.5 bg-rose-500/5 px-2.5 py-1 rounded-lg border border-rose-500/10">
+                            <AlertTriangle size={10} className="text-rose-500" />
+                            <span className="text-[9px] font-black text-rose-600 uppercase tracking-tighter">INC: {a.sgs_incidents.incident_code}</span>
+                          </div>
+                        )}
+                        {a.sgs_risks?.risk_code && (
+                          <div className="flex items-center gap-1.5 bg-amber-500/5 px-2.5 py-1 rounded-lg border border-amber-500/10">
+                            <Shield size={10} className="text-amber-600" />
+                            <span className="text-[9px] font-black text-amber-700 uppercase tracking-tighter" title={a.sgs_risks.hazard}>RIS: {a.sgs_risks.risk_code}</span>
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
-                  <div className="flex gap-2">
-                    {a.status === "pendente" && (
-                      <button onClick={() => updateStatus(a.id, "em_andamento")} className="text-primary text-xs font-semibold hover:underline">Iniciar</button>
-                    )}
-                    {(a.status === "pendente" || a.status === "em_andamento") && (
-                      <button onClick={() => updateStatus(a.id, "concluida")} className="text-primary text-xs font-semibold hover:underline">Concluir</button>
-                    )}
+
+                  <div className="flex items-center justify-between gap-3 pt-4 border-t border-border/40">
+                    <div className="flex gap-2">
+                      {a.status === "pendente" && (
+                        <button onClick={() => updateStatus(a.id, "em_andamento")} className="h-9 px-4 rounded-xl bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all">Iniciar</button>
+                      )}
+                      {(a.status === "pendente" || a.status === "em_andamento") && (
+                        <button onClick={() => updateStatus(a.id, "concluida")} className="h-9 px-4 rounded-xl bg-emerald-500/10 text-emerald-600 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Concluir</button>
+                      )}
+                    </div>
+                    <button className="text-[9px] font-black text-muted-foreground uppercase tracking-widest hover:text-primary transition-colors">Visualizar Detalhes</button>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
     </AdminLayout>
