@@ -405,7 +405,7 @@ const AdminAjuda = () => {
 
         {/* Module Grid or Detail */}
         {!active ? (
-          <>
+          <div className="space-y-12">
             {/* Modules Grid */}
             <div>
               <div className="flex items-center gap-3 mb-6">
