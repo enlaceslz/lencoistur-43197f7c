@@ -114,85 +114,84 @@ const AdminSGSCondutores = () => {
   return (
     <AdminLayout title="SGS — Condutores">
       <TooltipProvider>
-        <div className="space-y-6">
-          <div className="flex flex-wrap gap-3 items-center justify-between">
-            <div className="relative flex-1 min-w-[200px] max-w-sm">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar condutor..." className="w-full pl-9 pr-4 py-2 rounded-xl border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" />
-            </div>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button 
-                  onClick={() => { setForm(emptyForm); setEditId(null); setShowForm(!showForm); }} 
-                  className="flex items-center gap-3 px-8 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95"
-                >
-                  <Plus size={20} strokeWidth={3} /> Novo Condutor
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>Cadastrar novo motorista ou guia</TooltipContent>
-            </Tooltip>
+      <div className="space-y-6">
+        <div className="flex flex-wrap gap-3 items-center justify-between glass-card p-4 rounded-3xl border border-border/50">
+          <div className="relative flex-1 min-w-[200px] max-w-sm">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar condutor..." className="w-full pl-9 pr-4 py-2.5 rounded-2xl border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" />
           </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button 
+                onClick={() => { setForm(emptyForm); setEditId(null); setShowForm(!showForm); }} 
+                className="flex items-center gap-3 px-6 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95"
+              >
+                <Plus size={20} strokeWidth={3} /> Novo Condutor
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>Cadastrar novo motorista ou guia</TooltipContent>
+          </Tooltip>
+        </div>
 
         {showForm && (
-          <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
-            <h3 className="font-display font-bold text-foreground">{editId ? "Editar Condutor" : "Novo Condutor"}</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <form onSubmit={handleSubmit} className="bg-card/50 backdrop-blur-xl border border-border rounded-3xl p-8 space-y-6 animate-in fade-in slide-in-from-top-4">
+            <h3 className="font-display font-black text-xl text-foreground">{editId ? "Editar Condutor" : "Novo Condutor"}</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 { l: "Nome *", k: "nome" }, { l: "CPF", k: "cpf" }, { l: "CNH Número", k: "cnh_numero" },
                 { l: "CNH Categoria", k: "cnh_categoria" }, { l: "CNH Validade", k: "cnh_validade", t: "date" },
                 { l: "Telefone", k: "telefone" }, { l: "E-mail", k: "email", t: "email" },
               ].map(f => (
                 <div key={f.k}>
-                  <label className="block text-xs font-medium text-muted-foreground mb-1">{f.l}</label>
+                  <label className="block text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1.5">{f.l}</label>
                   <input 
                     type={f.t || "text"} 
                     value={(form as any)[f.k]} 
                     onChange={e => set(f.k, e.target.value)} 
-                    className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" 
+                    className="w-full px-4 py-3 rounded-2xl border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30 transition-all" 
                     maxLength={f.k === "cpf" ? 14 : f.k === "telefone" ? 15 : undefined}
                   />
-
                 </div>
               ))}
               <div>
-                <label className="block text-xs font-medium text-muted-foreground mb-1">Status</label>
-                <select value={form.status} onChange={e => set("status", e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm">
+                <label className="block text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1.5">Status</label>
+                <select value={form.status} onChange={e => set("status", e.target.value)} className="w-full px-4 py-3 rounded-2xl border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30 transition-all">
                   <option value="ativo">Ativo</option><option value="inativo">Inativo</option><option value="bloqueado">Bloqueado</option>
                 </select>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-muted/30 p-6 rounded-2xl border border-border">
               <div className="space-y-4">
-                <label className="flex items-center gap-2 text-sm font-bold uppercase tracking-tight">
-                  <input type="checkbox" checked={form.primeiros_socorros} onChange={e => set("primeiros_socorros", e.target.checked)} className="rounded" /> 
+                <label className="flex items-center gap-3 text-sm font-bold uppercase tracking-tight text-foreground cursor-pointer">
+                  <input type="checkbox" checked={form.primeiros_socorros} onChange={e => set("primeiros_socorros", e.target.checked)} className="rounded size-5" /> 
                   🚒 Primeiros Socorros / WFR
                 </label>
                 {form.primeiros_socorros && (
                   <div>
                     <label className="block text-[10px] font-black text-muted-foreground uppercase mb-1">Validade da Certificação *</label>
                     <input type="date" value={form.first_aid_expiry} onChange={e => set("first_aid_expiry", e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" />
+                      className="w-full px-4 py-3 rounded-2xl border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" />
                   </div>
                 )}
               </div>
               <div>
-                <label className="flex items-center gap-2 text-sm font-bold uppercase tracking-tight pt-1">
-                  <input type="checkbox" checked={form.off_road} onChange={e => set("off_road", e.target.checked)} className="rounded" /> 
+                <label className="flex items-center gap-3 text-sm font-bold uppercase tracking-tight text-foreground cursor-pointer pt-1">
+                  <input type="checkbox" checked={form.off_road} onChange={e => set("off_road", e.target.checked)} className="rounded size-5" /> 
                   🚜 Direção Defensiva / Off-Road
                 </label>
               </div>
             </div>
-            <div className="flex gap-2">
-              <button type="submit" className="px-5 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:opacity-90">Salvar</button>
-              <button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="px-5 py-2 border border-border rounded-xl text-sm">Cancelar</button>
+            <div className="flex gap-3">
+              <button type="submit" className="px-8 py-3 bg-primary text-primary-foreground rounded-2xl text-sm font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-lg shadow-primary/20">Salvar</button>
+              <button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="px-8 py-3 border border-border rounded-2xl text-sm font-black uppercase tracking-widest text-muted-foreground hover:bg-muted transition-all">Cancelar</button>
             </div>
           </form>
         )}
 
         {loading ? <div className="flex justify-center py-16"><Loader2 className="animate-spin text-primary" size={32} /></div> : filtered.length === 0 ? (
-          <div className="text-center py-20 bg-card border border-dashed rounded-3xl">
-            <UserCheck size={48} className="mx-auto mb-4 opacity-20" />
-            <p className="font-bold text-lg">Nenhum condutor encontrado</p>
+          <div className="text-center py-20 bg-card border border-dashed border-border rounded-3xl">
+            <UserCheck size={48} className="mx-auto mb-4 opacity-20 text-foreground" />
+            <p className="font-display font-black text-xl text-foreground">Nenhum condutor encontrado</p>
             <p className="text-sm text-muted-foreground">Cadastre motoristas e guias para gerenciar escalas e treinamentos.</p>
           </div>
         ) : (
@@ -200,28 +199,28 @@ const AdminSGSCondutores = () => {
             {filtered.map(c => {
               const isCnhExpired = isDateExpired(c.cnh_validade);
               return (
-                <div key={c.id} className="bg-card border border-border rounded-3xl p-6 hover:shadow-xl hover:border-primary/30 transition-all group relative overflow-hidden">
-                  <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${c.status === "ativo" ? "bg-emerald-500" : c.status === "bloqueado" ? "bg-destructive" : "bg-muted"}`} />
+                <div key={c.id} className="bg-card border border-border rounded-[2rem] p-6 hover:shadow-2xl hover:border-primary/30 transition-all group relative overflow-hidden admin-card-hover">
+                  <div className={`absolute top-0 left-0 w-2 h-full transition-colors ${c.status === "ativo" ? "bg-emerald-500" : c.status === "bloqueado" ? "bg-destructive" : "bg-muted"}`} />
                   
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                        <UserCheck size={24} />
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                        <UserCheck size={28} />
                       </div>
                       <div className="min-w-0">
-                        <h4 className="font-black text-foreground group-hover:text-primary transition-colors leading-tight truncate">{c.nome}</h4>
-                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-0.5">{c.email || 'Sem e-mail'}</p>
+                        <h4 className="font-display font-black text-foreground group-hover:text-primary transition-colors leading-tight truncate">{c.nome}</h4>
+                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">{c.email || 'Sem e-mail'}</p>
                       </div>
                     </div>
                     <div className="flex flex-col gap-2 items-end">
-                      <Badge variant="outline" className={`font-black text-[9px] uppercase px-2.5 py-0.5 rounded-lg border ${c.status === "ativo" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground"}`}>
+                      <Badge variant="outline" className={`font-black text-[9px] uppercase px-3 py-1 rounded-full border ${c.status === "ativo" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground"}`}>
                         {c.status}
                       </Badge>
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <button onClick={() => openEdit(c)} className="p-1.5 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors">
-                              <Pencil size={14} />
+                            <button onClick={() => openEdit(c)} className="p-2 rounded-lg hover:bg-primary/10 hover:text-primary transition-colors">
+                              <Pencil size={16} />
                             </button>
                           </TooltipTrigger>
                           <TooltipContent>Editar dados do condutor</TooltipContent>
@@ -229,8 +228,8 @@ const AdminSGSCondutores = () => {
                         
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <button onClick={() => handleDelete(c.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
-                              <Trash2 size={14} />
+                            <button onClick={() => handleDelete(c.id)} className="p-2 rounded-lg hover:bg-destructive/10 text-destructive transition-colors">
+                              <Trash2 size={16} />
                             </button>
                           </TooltipTrigger>
                           <TooltipContent>Remover condutor do sistema</TooltipContent>
@@ -239,14 +238,14 @@ const AdminSGSCondutores = () => {
                     </div>
                   </div>
 
-                  <div className="space-y-3 mb-5">
+                  <div className="space-y-4 mb-6">
                     <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-muted-foreground font-bold uppercase tracking-tighter">CNH ({c.cnh_categoria})</span>
+                      <span className="text-muted-foreground font-black uppercase tracking-widest">CNH ({c.cnh_categoria})</span>
                       <span className="text-foreground font-mono font-bold">{c.cnh_numero || '—'}</span>
                     </div>
-                    <div className={`flex items-center justify-between p-2 rounded-lg transition-colors ${isCnhExpired ? "bg-destructive/5 text-destructive" : "bg-muted/30 text-muted-foreground"}`}>
-                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase">
-                        {isCnhExpired ? <AlertTriangle size={12} /> : <CheckCircle size={12} className="text-emerald-500" />}
+                    <div className={`flex items-center justify-between p-3 rounded-2xl transition-colors ${isCnhExpired ? "bg-destructive/10 text-destructive" : "bg-muted/50 text-muted-foreground"}`}>
+                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+                        {isCnhExpired ? <AlertTriangle size={14} /> : <CheckCircle size={14} className="text-emerald-500" />}
                         Validade CNH
                       </div>
                       <span className={`text-[10px] font-black ${isCnhExpired ? 'animate-pulse' : ''}`}>
@@ -255,14 +254,14 @@ const AdminSGSCondutores = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 pt-4 border-t border-border/50">
+                  <div className="flex flex-wrap gap-2 pt-6 border-t border-border/50">
                     {c.primeiros_socorros && (
-                      <Badge variant="secondary" className={`border text-[8px] font-black uppercase py-0 px-1.5 ${isDateExpired(c.first_aid_expiry) ? "bg-destructive/10 text-destructive border-destructive/20" : "bg-primary/5 text-primary border-primary/10"}`}>
+                      <Badge variant="secondary" className={`border text-[9px] font-black uppercase py-1 px-3 rounded-full ${isDateExpired(c.first_aid_expiry) ? "bg-destructive/10 text-destructive border-destructive/20" : "bg-primary/10 text-primary border-primary/20"}`}>
                         🚑 1º Socorros {c.first_aid_expiry && `(v. ${new Date(c.first_aid_expiry + "T12:00").toLocaleDateString("pt-BR")})`}
                       </Badge>
                     )}
                     {c.off_road && (
-                      <Badge variant="secondary" className="bg-secondary/5 text-secondary border-secondary/10 text-[8px] font-black uppercase py-0 px-1.5">
+                      <Badge variant="secondary" className="bg-secondary/10 text-secondary border-secondary/20 text-[9px] font-black uppercase py-1 px-3 rounded-full">
                         🚜 Off-Road
                       </Badge>
                     )}
