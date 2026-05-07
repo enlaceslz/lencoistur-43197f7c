@@ -444,96 +444,84 @@ const AdminAjuda = () => {
                   );
                 })}
               </div>
-            </div>
               {filtered.length === 0 && (
-                <div className="text-center py-12 text-[hsl(220,15%,55%)]">
-                  <Search size={40} className="mx-auto mb-3 opacity-30" />
-                  <p>Nenhum módulo encontrado para "{search}"</p>
+                <div className="text-center py-20 glass-card rounded-[2.5rem] border-2 border-dashed border-border/40">
+                  <Search size={48} className="mx-auto mb-4 text-muted-foreground/20" />
+                  <p className="text-lg font-black text-muted-foreground uppercase tracking-widest">Nenhum guia encontrado</p>
                 </div>
               )}
             </div>
 
             {/* Flow Diagrams */}
-            <div>
-              <h3 className="text-lg font-bold text-[hsl(220,25%,18%)] mb-4 flex items-center gap-2">
-                <Workflow size={20} className="text-[hsl(217,91%,60%)]" />
-                Fluxos Principais
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Info size={14} className="text-[hsl(220,15%,60%)]" />
-                  </TooltipTrigger>
-                  <TooltipContent>Diagramas visuais dos processos mais importantes</TooltipContent>
-                </Tooltip>
-              </h3>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <Workflow size={22} className="text-primary" strokeWidth={3} />
+                <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Fluxos Operacionais Integrados</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {flowDiagrams.map((flow) => {
                   const Icon = flow.icon;
                   return (
-                    <Card key={flow.title} className="border-[hsl(220,20%,92%)]">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm flex items-center gap-2">
-                          <Icon size={16} className="text-[hsl(217,91%,60%)]" />
-                          {flow.title}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <div className="space-y-0">
-                          {flow.steps.map((step, i) => (
-                            <div key={i} className="flex items-start gap-2.5 py-1.5">
-                              <div className="flex flex-col items-center">
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${i === flow.steps.length - 1 ? "bg-emerald-100 text-emerald-700" : "bg-[hsl(217,91%,95%)] text-[hsl(217,91%,50%)]"}`}>
-                                  {i === flow.steps.length - 1 ? <CheckCircle2 size={14} /> : i + 1}
-                                </div>
-                                {i < flow.steps.length - 1 && <div className="w-px h-3 bg-[hsl(220,20%,88%)]" />}
-                              </div>
-                              <span className="text-xs text-[hsl(220,15%,40%)] pt-1">{step}</span>
-                            </div>
-                          ))}
+                    <div key={flow.title} className="glass-card rounded-[2rem] p-8 border border-border/50 shadow-sm relative overflow-hidden flex flex-col">
+                       <div className="flex items-center gap-3 mb-8">
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                          <Icon size={20} strokeWidth={2.5} />
                         </div>
-                      </CardContent>
-                    </Card>
+                        <h4 className="font-black text-foreground text-xs uppercase tracking-wider">{flow.title}</h4>
+                      </div>
+                      
+                      <div className="space-y-4 flex-1">
+                        {flow.steps.map((step, i) => (
+                          <div key={i} className="flex items-start gap-4">
+                            <div className="flex flex-col items-center">
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${i === flow.steps.length - 1 ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "bg-primary/10 text-primary"}`}>
+                                {i === flow.steps.length - 1 ? <CheckCircle2 size={12} strokeWidth={3} /> : i + 1}
+                              </div>
+                              {i < flow.steps.length - 1 && <div className="w-0.5 h-6 bg-border/40 my-1" />}
+                            </div>
+                            <span className="text-[11px] font-bold text-muted-foreground leading-relaxed pt-1 uppercase tracking-tight">{step}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   );
                 })}
               </div>
             </div>
 
             {/* Legends */}
-            <Card className="border-[hsl(220,20%,92%)]">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Info size={16} className="text-[hsl(217,91%,60%)]" />
-                  Legendas e Ícones do Sistema
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-[hsl(220,20%,97%)]">
-                    <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                    <span className="text-[hsl(220,15%,40%)]"><strong>Verde</strong> — Ativo, confirmado, conforme, pago</span>
+            <div className="glass-card rounded-[2.5rem] p-8 border border-border/50 shadow-sm overflow-hidden relative group">
+              <div className="flex items-center gap-3 mb-8">
+                <Info size={22} className="text-primary" strokeWidth={3} />
+                <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Sistema Visual de Feedback</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { color: "bg-emerald-500", label: "Sucesso / Ativo", desc: "Confirmado, conforme ou pago" },
+                  { color: "bg-amber-500", label: "Pendente / Atenção", desc: "Requer verificação manual" },
+                  { color: "bg-rose-500", label: "Urgente / Bloqueado", desc: "Vencido, erro ou impedimento" },
+                  { color: "bg-blue-500", label: "Informativo", desc: "Dados extras ou andamento" },
+                  { badge: true, label: "Categorização", desc: "Filtros, tags e tipos de dados" },
+                  { icon: AlertTriangle, label: "Alertas SGS", desc: "Avisos críticos de segurança" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-muted/20 border border-border/40 hover:bg-white hover:shadow-lg transition-all">
+                    {item.color ? (
+                      <div className={`w-4 h-4 rounded-full ${item.color} shadow-sm shrink-0`} />
+                    ) : item.badge ? (
+                      <Badge variant="secondary" className="bg-primary/10 text-primary border-none text-[8px] font-black uppercase px-2 shrink-0">TAG</Badge>
+                    ) : (
+                      <AlertTriangle size={18} className="text-amber-500 shrink-0" strokeWidth={3} />
+                    )}
+                    <div>
+                      <p className="text-[10px] font-black text-foreground uppercase tracking-widest">{item.label}</p>
+                      <p className="text-[10px] font-medium text-muted-foreground">{item.desc}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-[hsl(220,20%,97%)]">
-                    <div className="w-3 h-3 rounded-full bg-amber-500" />
-                    <span className="text-[hsl(220,15%,40%)]"><strong>Amarelo</strong> — Pendente, atenção necessária</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-[hsl(220,20%,97%)]">
-                    <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <span className="text-[hsl(220,15%,40%)]"><strong>Vermelho</strong> — Urgente, vencido, bloqueado, erro</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-[hsl(220,20%,97%)]">
-                    <div className="w-3 h-3 rounded-full bg-blue-500" />
-                    <span className="text-[hsl(220,15%,40%)]"><strong>Azul</strong> — Informativo, em andamento</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-[hsl(220,20%,97%)]">
-                    <Badge variant="secondary" className="text-[9px]">Badge</Badge>
-                    <span className="text-[hsl(220,15%,40%)]"><strong>Badge</strong> — Categorias, status e tags</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-[hsl(220,20%,97%)]">
-                    <AlertTriangle size={14} className="text-amber-500" />
-                    <span className="text-[hsl(220,15%,40%)]"><strong>Triângulo</strong> — Alerta ou aviso de segurança</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                ))}
+              </div>
+            </div>
           </>
         ) : (
           /* Module Detail View */
