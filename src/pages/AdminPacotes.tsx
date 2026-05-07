@@ -278,6 +278,14 @@ const AdminPacotes = () => {
                   <Share2 size={14} className="mr-2 text-primary" /> Campanha
                 </Button>
                 <Button 
+                  variant="outline"
+                  size="icon"
+                  onClick={() => openForm(pkg)} 
+                  className="h-10 w-10 rounded-xl"
+                >
+                  <Eye size={16} />
+                </Button>
+                <Button 
                   variant="secondary"
                   size="icon"
                   onClick={() => openForm(pkg)} 
