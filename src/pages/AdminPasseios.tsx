@@ -110,11 +110,11 @@ const AdminPasseios = () => {
     try {
       new URL(url);
     } catch {
-      toast({ title: "URL inválida", variant: "destructive" });
+      toast.error("URL inválida");
       return;
     }
     if (imageUrls.includes(url)) {
-      toast({ title: "Imagem já adicionada", variant: "destructive" });
+      toast.error("Imagem já adicionada");
       return;
     }
     setImageUrls(prev => [...prev, url]);
@@ -130,11 +130,11 @@ const AdminPasseios = () => {
 
     for (const file of Array.from(files)) {
       if (!file.type.startsWith("image/")) {
-        toast({ title: `${file.name} não é uma imagem`, variant: "destructive" });
+        toast.error(`${file.name} não é uma imagem`);
         continue;
       }
       if (file.size > 5 * 1024 * 1024) {
-        toast({ title: `${file.name} excede 5MB`, variant: "destructive" });
+        toast.error(`${file.name} excede 5MB`);
         continue;
       }
 
@@ -147,7 +147,7 @@ const AdminPasseios = () => {
       });
 
       if (error) {
-        toast({ title: `Erro no upload de ${file.name}`, description: error.message, variant: "destructive" });
+        toast.error(`Erro no upload de ${file.name}: ${error.message}`);
         continue;
       }
 
@@ -157,7 +157,7 @@ const AdminPasseios = () => {
 
     if (newUrls.length > 0) {
       setImageUrls(prev => [...prev, ...newUrls]);
-      toast({ title: `${newUrls.length} imagem(ns) enviada(s)!` });
+      toast.success(`${newUrls.length} imagem(ns) enviada(s)!`);
     }
 
     setUploading(false);
@@ -207,22 +207,22 @@ const AdminPasseios = () => {
     }
 
     if (!payload.name) {
-      toast({ title: "Preencha o nome do passeio", variant: "destructive" });
+      toast.error("Preencha o nome do passeio");
       return;
     }
 
     if (payload.mode_collective_enabled && !payload.price) {
-      toast({ title: "Preencha o preço coletivo", variant: "destructive" });
+      toast.error("Preencha o preço coletivo");
       return;
     }
 
     if (payload.mode_private_enabled && !payload.private_price) {
-      toast({ title: "Preencha o preço privativo", variant: "destructive" });
+      toast.error("Preencha o preço privativo");
       return;
     }
 
     if (!payload.mode_collective_enabled && !payload.mode_private_enabled) {
-      toast({ title: "Habilite ao menos uma modalidade (Coletivo ou Privativo)", variant: "destructive" });
+      toast.error("Habilite ao menos uma modalidade (Coletivo ou Privativo)");
       return;
     }
 
@@ -241,9 +241,9 @@ const AdminPasseios = () => {
     }
 
     if (error) {
-      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+      toast.error(`Erro ao salvar: ${error.message}`);
     } else {
-      toast({ title: editingId ? "Passeio atualizado!" : "Passeio criado!" });
+      toast.success(editingId ? "Passeio atualizado!" : "Passeio criado!");
       setShowForm(false);
       setEditingId(null);
       load();
@@ -254,15 +254,15 @@ const AdminPasseios = () => {
     const { id, created_at, updated_at, ...rest } = t;
     const payload = { ...rest, name: `${t.name} (Cópia)`, slug: `${t.slug}-copia-${Date.now().toString().slice(-4)}`, active: false };
     const { error } = await supabase.from("tours").insert(payload);
-    if (error) toast({ title: "Erro ao duplicar", variant: "destructive" });
-    else { toast({ title: "Passeio duplicado!" }); load(); }
+    if (error) toast.error("Erro ao duplicar");
+    else { toast.success("Passeio duplicado!"); load(); }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Excluir este passeio?")) return;
     const { error } = await supabase.from("tours").delete().eq("id", id);
-    if (error) toast({ title: "Erro ao excluir", variant: "destructive" });
-    else { toast({ title: "Passeio excluído" }); load(); }
+    if (error) toast.error("Erro ao excluir");
+    else { toast.success("Passeio excluído"); load(); }
   };
 
   const toggleActive = async (id: string, current: boolean) => {
