@@ -1231,3 +1231,4 @@ const AdminColaboradores = () => {
 };
 
 export default AdminColaboradores;
+
