@@ -1691,15 +1691,15 @@ const AdminCRMContent = () => {
               />
             </div>
           </div>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => setModalOpen(false)} disabled={saving} className="rounded-xl">
+          <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0">
+            <Button variant="outline" onClick={() => setModalOpen(false)} disabled={saving} className="flex-1 h-12 rounded-xl font-bold">
               Cancelar
             </Button>
-            <Button onClick={handleSave} disabled={saving} className="rounded-xl">
-              {saving ? <Loader2 size={14} className="animate-spin mr-1" /> : <Save size={14} className="mr-1" />}
-              {editingCustomer ? "Salvar" : "Cadastrar"}
+            <Button onClick={handleSave} disabled={saving} className="flex-[2] h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-black shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
+              {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <CheckCircle2 size={18} className="mr-2" />}
+              {editingCustomer ? "Salvar Alterações" : "Cadastrar Cliente"}
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 
