@@ -22,10 +22,10 @@ import {
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { maskCPF, maskPhone, maskDate, maskCEP } from "@/lib/masks";
 import { PrintReceiptButton, type ReceiptData } from "@/components/BookingReceipt";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency, cn } from "@/lib/utils";
-import { maskCPF } from "@/lib/masks";
 import { BookingCalendar } from "@/components/admin/BookingCalendar";
 import { NumericFormat } from "react-number-format";
 
@@ -57,24 +57,7 @@ const fmtDateTime = (d: string) => {
 interface TourOption { id: string; name: string; price: number; private_price?: number; pix_discount?: number; }
 interface TransferOption { id: string; label: string; price: number; pix_discount?: number; }
 
-const formatPhone = (v: string) => {
-  const n = v.replace(/\D/g, "");
-  if (n.startsWith("55") && n.length >= 12) {
-    const ddd = n.substring(2, 4);
-    const rest = n.substring(4);
-    if (rest.length === 9) return `+55 (${ddd}) ${rest.substring(0, 5)}-${rest.substring(5)}`;
-    if (rest.length === 8) return `+55 (${ddd}) ${rest.substring(0, 4)}-${rest.substring(4)}`;
-  }
-  if (n.length <= 10) return n.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
-  if (n.length === 11) return n.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-  return v.startsWith("+") ? v : `+${v}`;
-};
-
-const formatCPF = (v: string) => {
-  const n = v.replace(/\D/g, "");
-  if (n.length <= 11) return n.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-  return n;
-};
+// Utilizando máscaras de @/lib/masks.ts
 
 const AdminReservas = () => {
   const { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
@@ -214,8 +197,8 @@ const AdminReservas = () => {
         payMethod: newForm.payMethod,
         customerName: newForm.customerName.trim(),
         customerEmail: newForm.customerEmail.trim().toLowerCase(),
-        customerPhone: newForm.customerPhone.trim(),
-        cpf: newForm.cpf.trim() || undefined,
+        customerPhone: maskPhone(newForm.customerPhone),
+        cpf: newForm.cpf.replace(/\D/g, "") || undefined,
         passport: newForm.passport.trim() || undefined,
         country: newForm.country.trim(),
         birthDate: newForm.birthDate || undefined,
@@ -632,7 +615,7 @@ const AdminReservas = () => {
                   )}
                   {selected.cpf && (
                     <span className="flex items-center gap-2 text-muted-foreground text-xs">
-                      <FileText size={12} /> CPF: {formatCPF(selected.cpf)}
+                      <FileText size={12} /> CPF: {maskCPF(selected.cpf)}
                     </span>
                   )}
                   {selected.passport && (
@@ -1052,7 +1035,7 @@ const AdminReservas = () => {
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Telefone</Label>
-                        <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" className="h-12 rounded-xl border-slate-200 font-bold" disabled={!!selectedCustomerId && !editingId} />
+                        <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: maskPhone(e.target.value) }))} placeholder="(99) 99999-9999" className="h-12 rounded-xl border-slate-200 font-bold" disabled={!!selectedCustomerId && !editingId} />
                       </div>
                     </div>
 

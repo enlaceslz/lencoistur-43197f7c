@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import CustomerStats from "@/components/crm/CustomerStats";
 import CustomerInteractionHistory from "@/components/crm/CustomerInteractionHistory";
 import { NumericFormat } from "react-number-format";
+import { maskCPF, maskPhone, maskCEP, maskDate } from "@/lib/masks";
 
 interface Customer {
   id: string;
@@ -83,42 +84,7 @@ interface BookingRow {
   type: string;
 }
 
-const maskCPF = (v: string) => {
-  const n = v.replace(/\D/g, "");
-  if (n.length <= 11) {
-    return n
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-  }
-  return n.slice(0, 11);
-};
-
-const maskCEP = (v: string) => {
-  const n = v.replace(/\D/g, "");
-  if (n.length <= 8) {
-    return n.replace(/(\d{5})(\d)/, "$1-$2");
-  }
-  return n.slice(0, 8);
-};
-
-const maskPhone = (v: string, country: string = "Brasil") => {
-  const n = v.replace(/\D/g, "");
-  if (country === "Brasil") {
-    if (n.length <= 10) {
-      return n.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{4})(\d)/, "$1-$2");
-    }
-    return n
-      .slice(0, 11)
-      .replace(/(\d{2})(\d)/, "($1) $2")
-      .replace(/(\d{5})(\d)/, "$1-$2");
-  }
-  // For international numbers, keep it simple but allow the +
-  if (v.startsWith("+")) {
-    return "+" + n;
-  }
-  return n;
-};
+// Utilizando máscaras centralizadas de @/lib/masks.ts
 
 interface CustomerForm {
   name: string;
@@ -756,7 +722,7 @@ const AdminCRMContent = () => {
     doc.setFontSize(10);
     doc.text(`Nome: ${c.name}`, 14, 65);
     doc.text(`E-mail: ${c.email}`, 14, 72);
-    doc.text(`Telefone: ${c.phone ? maskPhone(c.phone, c.country || "Brasil") : "—"}`, 14, 79);
+    doc.text(`Telefone: ${c.phone ? maskPhone(c.phone) : "—"}`, 14, 79);
     doc.text(`Documento: ${c.country === "Brasil" ? (c.cpf ? maskCPF(c.cpf) : "—") : (c.passport || "—")}`, 14, 86);
     doc.text(`Data de Nascimento: ${c.birth_date ? new Date(c.birth_date + "T00:00:00").toLocaleDateString("pt-BR") : "—"}`, 14, 93);
     doc.text(`Nacionalidade: ${c.country}`, 14, 100);
@@ -1034,7 +1000,7 @@ const AdminCRMContent = () => {
                               <div className="flex flex-col">
                                 <span className="text-xs font-semibold text-foreground flex items-center gap-1">
                                   <Smartphone size={10} className="text-primary" />
-                                  {c.phone ? maskPhone(c.phone, c.country || "Brasil") : "—"}
+                                  {c.phone ? maskPhone(c.phone) : "—"}
                                 </span>
                                 <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                                   <MapPin size={10} />
@@ -1182,7 +1148,7 @@ const AdminCRMContent = () => {
                         {selectedCustomer.phone && (
                           <div className="flex items-center gap-4 text-sm font-semibold">
                             <div className="p-2 rounded-lg bg-background border border-border cursor-pointer hover:bg-muted" onClick={() => { navigator.clipboard.writeText(selectedCustomer.phone || ""); toast.success("Telefone copiado!"); }}><Smartphone size={16} className="text-primary" /></div>
-                            <span className="text-foreground">{maskPhone(selectedCustomer.phone, selectedCustomer.country || "Brasil")}</span>
+                            <span className="text-foreground">{maskPhone(selectedCustomer.phone)}</span>
                           </div>
                         )}
                         {selectedCustomer.address && (
@@ -1513,7 +1479,7 @@ const AdminCRMContent = () => {
               <Input
                 id="customer-phone"
                 value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: maskPhone(e.target.value, form.country) })}
+                onChange={(e) => setForm({ ...form, phone: maskPhone(e.target.value) })}
                 placeholder={form.country === "Brasil" ? "(99) 99999-9999" : "+DDI Telefone"}
                 maxLength={25}
                 className="rounded-xl"
