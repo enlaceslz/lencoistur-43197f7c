@@ -250,9 +250,17 @@ const AdminPacotes = () => {
             </div>
             <CardContent className="p-5">
               <div className="flex justify-between items-center mb-5">
-                <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <Clock size={14} className="text-primary" />
-                  <span className="text-xs font-bold">{pkg.days} Dias</span>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <Clock size={14} className="text-primary" />
+                    <span className="text-xs font-bold">{pkg.days} {pkg.days === 1 ? 'Dia' : 'Dias'}</span>
+                  </div>
+                  {pkg.nights > 0 && (
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <Moon size={14} className="text-blue-500" />
+                      <span className="text-xs font-bold">{pkg.nights} {pkg.nights === 1 ? 'Noite' : 'Noites'}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="text-right">
                   <p className="text-[10px] text-muted-foreground uppercase font-black leading-none mb-1">Preço Especial</p>
