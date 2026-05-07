@@ -297,15 +297,6 @@ const modules: ModuleGuide[] = [
       { q: "O PGSAT é gerado na hora?", a: "Sim, o sistema compila todos os dados ativos (rotas, frota, riscos e equipe) em um documento técnico estruturado." }
     ]
   },
-    tips: [
-      "O preenchimento do checklist é requisito legal para operação em trilhas",
-      "Briefings bem feitos reduzem o risco de incidentes em até 70%",
-      "Mantenha o cadastro de condutores e seus treinamentos sempre em dia",
-    ],
-    faq: [
-      { q: "O que é o PGSAT?", a: "É o Plano de Gestão de Segurança para Atividades Turísticas exigido para operar em Unidades de Conservação Federais." },
-    ],
-  },
   {
     id: "termos",
     icon: FileText,
