@@ -917,6 +917,19 @@ const AdminParceiros = () => {
                       )}
                     </div>
                   </div>
+                  {viewPartner?.credit_limit !== null && (
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Limite de Crédito</Label>
+                      <p className="font-bold text-emerald-600">R$ {viewPartner?.credit_limit || 0}</p>
+                    </div>
+                  )}
+                  {viewPartner?.tags && viewPartner.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {viewPartner.tags.map((tag, i) => (
+                        <Badge key={i} variant="secondary" className="text-[9px] h-5 bg-primary/5 text-primary border-primary/20">{tag}</Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </section>
 
