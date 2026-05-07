@@ -169,43 +169,59 @@ const AdminSGSAuditorias = () => {
             const items = getAuditItems(audit.id);
             const scoreColor = audit.score >= 80 ? "text-primary border-primary/20 bg-primary/5" : audit.score >= 50 ? "text-secondary border-secondary/20 bg-secondary/5" : "text-destructive border-destructive/20 bg-destructive/5";
             return (
-              <div key={audit.id} className="bg-card border border-border rounded-3xl p-6 hover:shadow-xl hover:border-primary/30 transition-all group relative overflow-hidden flex flex-col">
-                <div className="flex justify-between items-start mb-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                      <ClipboardCheck size={24} />
+              <div key={audit.id} className="glass-card admin-card-hover rounded-[2.5rem] p-8 group relative overflow-hidden flex flex-col border-2 border-transparent transition-all hover:border-primary/20">
+                <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${audit.score >= 80 ? 'bg-primary' : audit.score >= 50 ? 'bg-secondary' : 'bg-destructive'}`} />
+                
+                <div className="flex justify-between items-start mb-8">
+                  <div className="flex items-center gap-5">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all shadow-inner ${
+                      audit.score >= 80 ? 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white' : 
+                      audit.score >= 50 ? 'bg-secondary/10 text-secondary group-hover:bg-secondary group-hover:text-white' : 
+                      'bg-destructive/10 text-destructive group-hover:bg-destructive group-hover:text-white'
+                    }`}>
+                      <ClipboardCheck size={28} />
                     </div>
                     <div>
-                      <h4 className="font-black text-foreground group-hover:text-primary transition-colors leading-tight">{audit.audit_code}</h4>
-                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-0.5">Auditor: {audit.auditor}</p>
+                      <h4 className="font-display font-black text-xl text-foreground group-hover:text-primary transition-colors leading-tight uppercase tracking-tighter">{audit.audit_code}</h4>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[8px] font-black">
+                          {audit.auditor?.charAt(0).toUpperCase()}
+                        </div>
+                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Auditor: {audit.auditor}</p>
+                      </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className={`px-4 py-2 rounded-2xl border ${scoreColor} transition-all`}>
-                      <p className="text-2xl font-black font-display leading-none">{audit.score}%</p>
-                      <p className="text-[8px] font-black uppercase tracking-widest mt-1">Conformidade</p>
+                    <div className={`px-5 py-3 rounded-2xl border ${scoreColor} transition-all shadow-sm`}>
+                      <p className="text-3xl font-black font-display leading-none tracking-tighter">{audit.score}%</p>
+                      <p className="text-[8px] font-black uppercase tracking-widest mt-1.5 opacity-60">Compliance</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex-1 space-y-3 mb-6">
-                  <div className="grid grid-cols-2 gap-2">
+                <div className="flex-1 space-y-4 mb-8">
+                   <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Checklist de Verificação</p>
+                   <div className="grid grid-cols-2 gap-3">
                     {items.map((item) => (
-                      <div key={item.id} className="flex flex-col gap-1 p-2 rounded-xl bg-muted/30 border border-border/50">
+                      <div key={item.id} className="flex flex-col gap-2 p-3 rounded-2xl bg-muted/30 border border-border/50 hover:bg-white hover:shadow-lg transition-all">
                         <div className="flex items-center gap-2">
                           {item.compliant ? (
-                            <CheckCircle size={14} className="text-emerald-500 shrink-0" />
+                            <div className="w-5 h-5 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                              <CheckCircle size={14} strokeWidth={3} />
+                            </div>
                           ) : (
-                            <XCircle size={14} className="text-destructive shrink-0" />
+                            <div className="w-5 h-5 rounded-lg bg-destructive/10 flex items-center justify-center text-destructive">
+                              <XCircle size={14} strokeWidth={3} />
+                            </div>
                           )}
-                          <span className="text-[10px] font-bold text-foreground truncate">{CATEGORIES[item.category] || item.item_name}</span>
+                          <span className="text-[10px] font-black text-foreground truncate uppercase tracking-tighter">{CATEGORIES[item.category] || item.item_name}</span>
                         </div>
                         {!item.compliant && (
                           <button 
                             onClick={() => createAction(item, audit.audit_code)}
-                            className="text-[8px] font-black text-destructive uppercase tracking-widest hover:underline mt-1 self-start"
+                            className="w-full h-7 rounded-lg bg-destructive/10 text-destructive text-[8px] font-black uppercase tracking-widest hover:bg-destructive hover:text-white transition-all mt-1"
                           >
-                            + Criar Ação Corretiva
+                            + Gerar Ação Corretiva
                           </button>
                         )}
                       </div>
@@ -213,12 +229,13 @@ const AdminSGSAuditorias = () => {
                   </div>
                 </div>
 
-                <div className="mt-auto pt-4 border-t border-border/50 flex justify-between items-center">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">
-                    Realizada em {new Date(audit.date).toLocaleDateString("pt-BR")}
-                  </span>
-                  <button className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline">
-                    Ver Laudo Técnico
+                <div className="mt-auto pt-6 border-t border-border/50 flex justify-between items-center">
+                  <div className="flex items-center gap-2 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                    <Calendar size={12} className="text-primary" />
+                    <span>{new Date(audit.date).toLocaleDateString("pt-BR")}</span>
+                  </div>
+                  <button className="h-9 px-4 rounded-xl bg-muted text-muted-foreground text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all flex items-center gap-2">
+                    <FileText size={14} /> Laudo Completo
                   </button>
                 </div>
               </div>
