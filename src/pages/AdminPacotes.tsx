@@ -160,6 +160,13 @@ const AdminPacotes = () => {
     window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm("Excluir este pacote permanentemente?")) return;
+    const { error } = await supabase.from("packages").delete().eq("id", id);
+    if (error) toast.error("Erro ao excluir: " + error.message);
+    else { toast.success("Pacote excluído"); loadData(); }
+  };
+
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
 
   return (
