@@ -138,6 +138,11 @@ const AdminPacotes = () => {
     setShowForm(true);
   };
 
+  const openView = (pkg: any) => {
+    setViewingPackage(pkg);
+    setShowView(true);
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("Excluir este pacote permanentemente?")) return;
     const { error } = await supabase.from("packages").delete().eq("id", id);
