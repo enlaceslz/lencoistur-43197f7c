@@ -810,8 +810,8 @@ const AdminReservas = () => {
             </Button>
           </div>
 
-          <form onSubmit={handleNewBooking} className="p-4 md:p-8 space-y-6 md:space-y-8">
-          <form onSubmit={handleNewBooking} className="space-y-4">
+          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
+            <div className="space-y-4">
             {/* Type */}
             <div>
               <label className="text-sm font-semibold text-foreground mb-1.5 block">Tipo</label>
@@ -1028,10 +1028,12 @@ const AdminReservas = () => {
               </div>
             )}
 
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white" disabled={newLoading || !newForm.itemName}>
-              {newLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : (editingId ? <Pencil size={16} className="mr-2" /> : <Plus size={16} className="mr-2" />)}
-              {editingId ? "Salvar Alterações" : "Criar Reserva"}
-            </Button>
+                <Button type="button" onClick={handleNewBooking} className="w-full bg-blue-600 hover:bg-blue-700 text-white" disabled={newLoading || !newForm.itemName}>
+                  {newLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : (editingId ? <Pencil size={16} className="mr-2" /> : <Plus size={16} className="mr-2" />)}
+                  {editingId ? "Salvar Alterações" : "Criar Reserva"}
+                </Button>
+              </div>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
