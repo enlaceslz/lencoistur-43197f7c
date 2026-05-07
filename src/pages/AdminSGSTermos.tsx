@@ -913,7 +913,7 @@ const AdminSGSTermos = () => {
                       {t.sgs_veiculos?.modelo && <span>• {t.sgs_veiculos.modelo}</span>}
                     </p>
                     <div className="flex gap-4 mt-1">
-                      <p className="text-xs text-muted-foreground">Gerado em: {format(new Date(t.created_at), "dd/MM/yyyy")}</p>
+                      <p className="text-xs text-muted-foreground">Gerado em: {formatDate(new Date(t.created_at), "dd/MM/yyyy")}</p>
                       <p className="text-xs text-muted-foreground">Status: <span className={t.signature_data ? "text-green-600 font-semibold" : "text-amber-600 font-semibold"}>{t.signature_data ? "Assinado" : "Pendente de Assinatura"}</span></p>
                     </div>
                   </div>
