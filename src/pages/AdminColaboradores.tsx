@@ -1123,7 +1123,7 @@ const AdminColaboradores = () => {
                 <div className="flex-1 text-center md:text-left">
                   <h2 className="text-3xl font-black text-slate-900 tracking-tight">{selectedCollab.name}</h2>
                   <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
-                    <Badge className={cn("rounded-full px-4 py-1 font-black text-[10px] uppercase tracking-widest border-none shadow-sm", selectedCollab.status === 'active' ? 'bg-green-500 text-white' : 'bg-slate-200 text-slate-500')}>
+                    <Badge className={selectedCollab.status === 'active' ? 'rounded-full px-4 py-1 font-black text-[10px] uppercase tracking-widest border-none shadow-sm bg-green-500 text-white' : 'rounded-full px-4 py-1 font-black text-[10px] uppercase tracking-widest border-none shadow-sm bg-slate-200 text-slate-500'}>
                       {selectedCollab.status === 'active' ? 'Ativo' : 'Inativo'}
                     </Badge>
                     <Badge variant="secondary" className="rounded-full px-4 py-1 font-black text-[10px] uppercase tracking-widest bg-blue-50 text-blue-600 border-none shadow-sm">{selectedCollab.type || "Outro"}</Badge>
@@ -1182,7 +1182,7 @@ const AdminColaboradores = () => {
                             <TableCell className="py-3 text-[11px] font-bold text-slate-700 truncate max-w-[150px]">{p.description}</TableCell>
                             <TableCell className="py-3 text-[11px] font-black text-slate-900 text-right">{formatCurrency(p.amount)}</TableCell>
                             <TableCell className="py-3 text-right pr-4">
-                              <Badge variant="outline" className={cn("text-[9px] font-black uppercase tracking-tighter border-none h-5", p.status === 'paid' ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600')}>
+                              <Badge variant="outline" className={p.status === 'paid' ? 'text-[9px] font-black uppercase tracking-tighter border-none h-5 bg-green-50 text-green-600' : 'text-[9px] font-black uppercase tracking-tighter border-none h-5 bg-amber-50 text-amber-600'}>
                                 {p.status === 'paid' ? 'Pago' : 'Pend'}
                               </Badge>
                             </TableCell>

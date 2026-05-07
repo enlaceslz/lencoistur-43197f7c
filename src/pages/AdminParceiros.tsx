@@ -913,7 +913,7 @@ const AdminParceiros = () => {
         <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
           <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-3 md:gap-4">
-              <div className={cn("w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center", partnerTypes.find(t => t.name === viewPartner?.type)?.color || "bg-primary/10 text-primary")}>
+              <div className={viewPartner?.type && partnerTypes.find(t => t.name === viewPartner?.type)?.color ? `w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center ${partnerTypes.find(t => t.name === viewPartner?.type)?.color}` : "w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center bg-primary/10 text-primary"}>
                 {(() => {
                   const Icon = getIcon(partnerTypes.find(t => t.name === viewPartner?.type)?.icon || "Building2");
                   return <Icon size={20} className="md:w-6 md:h-6" />;
