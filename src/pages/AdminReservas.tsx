@@ -22,6 +22,7 @@ import {
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { maskCPF, maskPhone, maskDate } from "@/lib/masks";
 import { PrintReceiptButton, type ReceiptData } from "@/components/BookingReceipt";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency, cn } from "@/lib/utils";
@@ -1052,7 +1053,7 @@ const AdminReservas = () => {
                       </div>
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Telefone</Label>
-                        <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" className="h-12 rounded-xl border-slate-200 font-bold" disabled={!!selectedCustomerId && !editingId} />
+                        <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: maskPhone(e.target.value) }))} placeholder="(99) 99999-9999" className="h-12 rounded-xl border-slate-200 font-bold" disabled={!!selectedCustomerId && !editingId} />
                       </div>
                     </div>
 

@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import CustomerStats from "@/components/crm/CustomerStats";
 import CustomerInteractionHistory from "@/components/crm/CustomerInteractionHistory";
 import { NumericFormat } from "react-number-format";
+import { maskCPF, maskPhone, maskCEP, maskDate } from "@/lib/masks";
 
 interface Customer {
   id: string;
@@ -83,42 +84,7 @@ interface BookingRow {
   type: string;
 }
 
-const maskCPF = (v: string) => {
-  const n = v.replace(/\D/g, "");
-  if (n.length <= 11) {
-    return n
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-  }
-  return n.slice(0, 11);
-};
-
-const maskCEP = (v: string) => {
-  const n = v.replace(/\D/g, "");
-  if (n.length <= 8) {
-    return n.replace(/(\d{5})(\d)/, "$1-$2");
-  }
-  return n.slice(0, 8);
-};
-
-const maskPhone = (v: string, country: string = "Brasil") => {
-  const n = v.replace(/\D/g, "");
-  if (country === "Brasil") {
-    if (n.length <= 10) {
-      return n.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{4})(\d)/, "$1-$2");
-    }
-    return n
-      .slice(0, 11)
-      .replace(/(\d{2})(\d)/, "($1) $2")
-      .replace(/(\d{5})(\d)/, "$1-$2");
-  }
-  // For international numbers, keep it simple but allow the +
-  if (v.startsWith("+")) {
-    return "+" + n;
-  }
-  return n;
-};
+// Utilizando máscaras centralizadas de @/lib/masks.ts
 
 interface CustomerForm {
   name: string;
