@@ -202,6 +202,12 @@ export function useBookings() {
       .update({ status: "cancelada", payment_status: "pendente" })
       .eq("id", id);
     if (error) throw error;
+
+    // Também atualizar o status no financeiro (Contas a Receber)
+    await supabase
+      .from("contas_receber")
+      .update({ status: "cancelado", observacoes: "Reserva cancelada via CRM" })
+      .eq("booking_id", id);
   }, []);
 
   const completeBooking = useCallback(async (id: string) => {
