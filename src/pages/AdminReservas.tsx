@@ -276,7 +276,7 @@ const AdminReservas = () => {
 
   const handleAction = async (action: () => Promise<void>, successMsg: string, isCancellation = false) => {
     if (isCancellation) {
-      const confirm = window.confirm("⚠️ Tem certeza que deseja cancelar esta reserva?\n\nEsta ação excluirá permanentemente a reserva do histórico.");
+      const confirm = window.confirm("⚠️ Tem certeza que deseja cancelar esta reserva?\n\nO status será alterado para 'Cancelada'.");
       if (!confirm) return;
     }
     setActionLoading(true);
