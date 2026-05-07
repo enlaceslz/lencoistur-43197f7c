@@ -509,7 +509,7 @@ const AdminParceiros = () => {
           const isActive = typeFilter === t.name;
           const count = partners.filter((p) => p.type === t.name).length;
           const Icon = getIcon(t.icon);
-          const colorClass = t.color?.split(' ')[0] || "from-blue-500 to-indigo-600";
+          const colorClass = getGradient(t.color || "");
           
           return (
             <button 
