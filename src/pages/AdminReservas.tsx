@@ -805,7 +805,7 @@ const AdminReservas = () => {
                 <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
                   {editingId ? "Editar Reserva" : "Nova Reserva"}
                 </DialogTitle>
-                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Preencha os dados do cliente e do serviço</p>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Configure os detalhes do cliente e do serviço</p>
               </div>
             </div>
             <Button variant="ghost" size="icon" onClick={() => setShowNewForm(false)} className="rounded-full hover:bg-slate-100 transition-colors">
@@ -813,231 +813,275 @@ const AdminReservas = () => {
             </Button>
           </div>
 
-          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
-            <div className="space-y-4">
-            {/* Type */}
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1.5 block">Tipo</label>
-              <div className="flex gap-2">
-                <Button type="button" variant={newForm.type === "tour" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, type: "tour", itemName: "" }))}>
-                  Passeio
-                </Button>
-                <Button type="button" variant={newForm.type === "transfer" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, type: "transfer", itemName: "" }))}>
-                  Translado
-                </Button>
-              </div>
-            </div>
-
-            {/* Item selection */}
-            <div className="space-y-4">
-              {newForm.type === "tour" && (
-                <div>
-                  <label className="text-sm font-semibold text-foreground mb-1.5 block">Modalidade</label>
-                  <div className="flex gap-2">
-                    <Button type="button" variant={newForm.tourMode === "coletivo" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, tourMode: "coletivo" }))} className="flex-1">
-                      Coletivo (por pessoa)
-                    </Button>
-                    <Button type="button" variant={newForm.tourMode === "privativo" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, tourMode: "privativo" }))} className="flex-1">
-                      Privativo (veículo)
-                    </Button>
+          <form onSubmit={handleNewBooking} className="p-4 md:p-8 space-y-6 md:space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+              {/* Coluna 1: Dados do Serviço */}
+              <div className="lg:col-span-6 space-y-6">
+                <div className="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-1.5 h-6 bg-primary rounded-full" />
+                    <h3 className="font-black text-slate-800 uppercase tracking-wider text-xs">Informações do Serviço</h3>
                   </div>
-                </div>
-              )}
 
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1.5 block">
-                  {newForm.type === "tour" ? "Passeio" : "Rota"} *
-                </label>
-                <select
-                  value={newForm.itemName}
-                  onChange={(e) => setNewForm(f => ({ ...f, itemName: e.target.value }))}
-                  className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
-                  required
-                >
-                  <option value="">Selecione...</option>
-                  {newForm.type === "tour"
-                    ? tours.map(t => <option key={t.id} value={t.name}>{t.name} — {fmt(newForm.tourMode === "privativo" ? t.private_price : t.price)}</option>)
-                    : transfers.map(t => <option key={t.id} value={t.label}>{t.label} — {fmt(t.price)}</option>)
-                  }
-                </select>
-              </div>
-            </div>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Tipo de Serviço</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button 
+                          type="button" 
+                          variant={newForm.type === "tour" ? "default" : "outline"} 
+                          onClick={() => setNewForm(f => ({ ...f, type: "tour", itemName: "" }))}
+                          className={cn("h-11 rounded-xl font-bold", newForm.type === "tour" && "shadow-lg shadow-primary/20")}
+                        >
+                          <Compass size={16} className="mr-2" /> Passeio
+                        </Button>
+                        <Button 
+                          type="button" 
+                          variant={newForm.type === "transfer" ? "default" : "outline"} 
+                          onClick={() => setNewForm(f => ({ ...f, type: "transfer", itemName: "" }))}
+                          className={cn("h-11 rounded-xl font-bold", newForm.type === "transfer" && "shadow-lg shadow-primary/20")}
+                        >
+                          <Car size={16} className="mr-2" /> Translado
+                        </Button>
+                      </div>
+                    </div>
 
-            {/* Date & Guests */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1.5 block">Data</label>
-                <Input type="date" value={newForm.date} onChange={(e) => setNewForm(f => ({ ...f, date: e.target.value }))} />
-              </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1.5 block">Pessoas *</label>
-                <Input type="number" min={1} max={50} value={newForm.guests} onChange={(e) => setNewForm(f => ({ ...f, guests: parseInt(e.target.value) || 1 }))} required />
-              </div>
-            </div>
+                    {newForm.type === "tour" && (
+                      <div className="space-y-2 animate-in-fade">
+                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Modalidade</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button 
+                            type="button" 
+                            variant={newForm.tourMode === "coletivo" ? "default" : "outline"} 
+                            onClick={() => setNewForm(f => ({ ...f, tourMode: "coletivo" }))}
+                            className={cn("h-11 rounded-xl font-bold", newForm.tourMode === "coletivo" && "shadow-lg shadow-primary/20")}
+                          >
+                            <Users size={16} className="mr-2" /> Coletivo
+                          </Button>
+                          <Button 
+                            type="button" 
+                            variant={newForm.tourMode === "privativo" ? "default" : "outline"} 
+                            onClick={() => setNewForm(f => ({ ...f, tourMode: "privativo" }))}
+                            className={cn("h-11 rounded-xl font-bold", newForm.tourMode === "privativo" && "shadow-lg shadow-primary/20")}
+                          >
+                            <User size={16} className="mr-2" /> Privativo
+                          </Button>
+                        </div>
+                      </div>
+                    )}
 
-            {/* Payment method */}
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1.5 block">Pagamento</label>
-              <div className="flex gap-2">
-                <Button type="button" variant={newForm.payMethod === "pix" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, payMethod: "pix" }))}>
-                  PIX
-                </Button>
-                <Button type="button" variant={newForm.payMethod === "card" ? "default" : "outline"} size="sm" onClick={() => setNewForm(f => ({ ...f, payMethod: "card" }))}>
-                  Cartão
-                </Button>
-              </div>
-            </div>
-            
-            {/* Collaborator */}
-            <div>
-              <label className="text-sm font-semibold text-foreground mb-1.5 block">Vendedor / Colaborador</label>
-              <select
-                value={newForm.collaboratorId}
-                onChange={(e) => setNewForm(f => ({ ...f, collaboratorId: e.target.value }))}
-                className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
-              >
-                <option value="">Nenhum</option>
-                {collaborators.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Customer info */}
-            <div className="border-t border-border pt-4">
-              <h4 className="font-semibold text-sm text-foreground mb-3">Dados do Cliente</h4>
-              
-              {/* Existing customer selector */}
-              <div className="mb-3">
-                <label className="text-sm text-muted-foreground mb-1 block">Pesquisar cliente existente</label>
-                <div className="space-y-2">
-                  <Input 
-                    placeholder="Nome ou e-mail..." 
-                    value={customerSearch} 
-                    onChange={(e) => setCustomerSearch(e.target.value)}
-                    className="h-9"
-                  />
-                  <select
-                    value={selectedCustomerId}
-                    onChange={(e) => {
-                      const custId = e.target.value;
-                      setSelectedCustomerId(custId);
-                      if (custId) {
-                        const cust = existingCustomers.find(c => c.id === custId);
-                        if (cust) {
-                          setNewForm(f => ({
-                            ...f,
-                            customerName: cust.name,
-                            customerEmail: cust.email,
-                            customerPhone: cust.phone || "",
-                            cpf: cust.cpf || "",
-                            passport: cust.passport || "",
-                            country: cust.country || "Brasil",
-                            birthDate: cust.birth_date || "",
-                          }));
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">
+                        {newForm.type === "tour" ? "Selecionar Passeio" : "Selecionar Rota"}
+                      </Label>
+                      <select
+                        value={newForm.itemName}
+                        onChange={(e) => setNewForm(f => ({ ...f, itemName: e.target.value }))}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                        required
+                      >
+                        <option value="">Selecione um item...</option>
+                        {newForm.type === "tour"
+                          ? tours.map(t => <option key={t.id} value={t.name}>{t.name} — {fmt(newForm.tourMode === "privativo" ? t.private_price : t.price)}</option>)
+                          : transfers.map(t => <option key={t.id} value={t.label}>{t.label} — {fmt(t.price)}</option>)
                         }
-                      } else {
-                        setNewForm(f => ({ ...f, customerName: "", customerEmail: "", customerPhone: "", cpf: "", passport: "", country: "Brasil", birthDate: "" }));
-                      }
-                    }}
-                    className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm text-foreground"
-                  >
-                    <option value="">— Novo cliente —</option>
-                    {existingCustomers
-                      .filter(c => !customerSearch || c.name.toLowerCase().includes(customerSearch.toLowerCase()) || c.email.toLowerCase().includes(customerSearch.toLowerCase()))
-                      .slice(0, 100) // Limit to avoid performance issues
-                      .map(c => (
-                        <option key={c.id} value={c.id}>{c.name} ({c.email})</option>
-                      ))
-                    }
-                  </select>
+                      </select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Data</Label>
+                        <div className="relative">
+                          <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                          <Input type="date" value={newForm.date} onChange={(e) => setNewForm(f => ({ ...f, date: e.target.value }))} className="pl-11 h-12 rounded-xl border-slate-200 font-bold" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Passageiros</Label>
+                        <div className="relative">
+                          <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                          <Input type="number" min={1} max={50} value={newForm.guests} onChange={(e) => setNewForm(f => ({ ...f, guests: parseInt(e.target.value) || 1 }))} className="pl-11 h-12 rounded-xl border-slate-200 font-bold" required />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-1.5 h-6 bg-blue-500 rounded-full" />
+                    <h3 className="font-black text-slate-800 uppercase tracking-wider text-xs">Pagamento e Vendas</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Método de Pagamento</Label>
+                      <div className="flex gap-2">
+                        <Button 
+                          type="button" 
+                          variant={newForm.payMethod === "pix" ? "default" : "outline"} 
+                          onClick={() => setNewForm(f => ({ ...f, payMethod: "pix" }))}
+                          className={cn("flex-1 h-11 rounded-xl font-bold", newForm.payMethod === "pix" && "bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20")}
+                        >
+                          PIX
+                        </Button>
+                        <Button 
+                          type="button" 
+                          variant={newForm.payMethod === "card" ? "default" : "outline"} 
+                          onClick={() => setNewForm(f => ({ ...f, payMethod: "card" }))}
+                          className={cn("flex-1 h-11 rounded-xl font-bold")}
+                        >
+                          Cartão
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Vendedor</Label>
+                      <select
+                        value={newForm.collaboratorId}
+                        onChange={(e) => setNewForm(f => ({ ...f, collaboratorId: e.target.value }))}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                      >
+                        <option value="">Nenhum</option>
+                        {collaborators.map(c => (
+                          <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1 block">Nome *</label>
-                  <Input value={newForm.customerName} onChange={(e) => setNewForm(f => ({ ...f, customerName: e.target.value }))} placeholder="Nome completo" required maxLength={255} disabled={!!selectedCustomerId && !editingId} />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-sm text-muted-foreground mb-1 block">E-mail *</label>
-                    <Input type="email" value={newForm.customerEmail} onChange={(e) => setNewForm(f => ({ ...f, customerEmail: e.target.value }))} placeholder="email@exemplo.com" required maxLength={255} disabled={!!selectedCustomerId && !editingId} />
+              {/* Coluna 2: Dados do Cliente */}
+              <div className="lg:col-span-6 space-y-6">
+                <div className="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-1.5 h-6 bg-amber-500 rounded-full" />
+                    <h3 className="font-black text-slate-800 uppercase tracking-wider text-xs">Dados do Cliente</h3>
                   </div>
-                  <div>
-                    <label className="text-sm text-muted-foreground mb-1 block">Telefone</label>
-                    <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" maxLength={15} disabled={!!selectedCustomerId && !editingId} />
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Buscar Cliente Cadastrado</Label>
+                      <div className="flex flex-col gap-2">
+                        <div className="relative">
+                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                          <Input 
+                            placeholder="Nome ou e-mail..." 
+                            value={customerSearch} 
+                            onChange={(e) => setCustomerSearch(e.target.value)}
+                            className="pl-11 h-11 rounded-xl border-slate-100 bg-slate-50 focus:bg-white transition-all"
+                          />
+                        </div>
+                        <select
+                          value={selectedCustomerId}
+                          onChange={(e) => {
+                            const custId = e.target.value;
+                            setSelectedCustomerId(custId);
+                            if (custId) {
+                              const cust = existingCustomers.find(c => c.id === custId);
+                              if (cust) {
+                                setNewForm(f => ({
+                                  ...f,
+                                  customerName: cust.name,
+                                  customerEmail: cust.email,
+                                  customerPhone: cust.phone || "",
+                                  cpf: cust.cpf || "",
+                                  passport: cust.passport || "",
+                                  country: cust.country || "Brasil",
+                                  birthDate: cust.birth_date || "",
+                                }));
+                              }
+                            } else {
+                              setNewForm(f => ({ ...f, customerName: "", customerEmail: "", customerPhone: "", cpf: "", passport: "", country: "Brasil", birthDate: "" }));
+                            }
+                          }}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                        >
+                          <option value="">— Novo cliente / Digitar manual —</option>
+                          {existingCustomers
+                            .filter(c => !customerSearch || c.name.toLowerCase().includes(customerSearch.toLowerCase()) || c.email.toLowerCase().includes(customerSearch.toLowerCase()))
+                            .slice(0, 100)
+                            .map(c => (
+                              <option key={c.id} value={c.id}>{c.name} ({c.email})</option>
+                            ))
+                          }
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Nome Completo *</Label>
+                      <Input value={newForm.customerName} onChange={(e) => setNewForm(f => ({ ...f, customerName: e.target.value }))} placeholder="Ex: João da Silva" className="h-12 rounded-xl border-slate-200 font-bold" required disabled={!!selectedCustomerId && !editingId} />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">E-mail *</Label>
+                        <Input type="email" value={newForm.customerEmail} onChange={(e) => setNewForm(f => ({ ...f, customerEmail: e.target.value }))} placeholder="email@exemplo.com" className="h-12 rounded-xl border-slate-200 font-bold" required disabled={!!selectedCustomerId && !editingId} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Telefone</Label>
+                        <Input value={newForm.customerPhone} onChange={(e) => setNewForm(f => ({ ...f, customerPhone: formatPhone(e.target.value) }))} placeholder="(99) 99999-9999" className="h-12 rounded-xl border-slate-200 font-bold" disabled={!!selectedCustomerId && !editingId} />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">CPF</Label>
+                        <Input value={newForm.cpf} onChange={(e) => setNewForm(f => ({ ...f, cpf: maskCPF(e.target.value) }))} placeholder="000.000.000-00" className="h-12 rounded-xl border-slate-200 font-bold" disabled={!!selectedCustomerId && !editingId} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Nascimento</Label>
+                        <Input type="date" value={newForm.birthDate} onChange={(e) => setNewForm(f => ({ ...f, birthDate: e.target.value }))} className="h-12 rounded-xl border-slate-200 font-bold" disabled={!!selectedCustomerId && !editingId} />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Observações da Reserva</Label>
+                      <Textarea value={newForm.notes} onChange={(e) => setNewForm(f => ({ ...f, notes: e.target.value }))} placeholder="Ex: Alergias, preferências, horários específicos..." rows={3} className="rounded-2xl border-slate-200 font-medium text-sm" />
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-sm text-muted-foreground mb-1 block">CPF</label>
-                    <Input 
-                      value={newForm.cpf} 
-                      onChange={(e) => setNewForm(f => ({ ...f, cpf: maskCPF(e.target.value) }))} 
-                      placeholder="000.000.000-00" 
-                      disabled={!!selectedCustomerId && !editingId} 
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm text-muted-foreground mb-1 block">Passaporte</label>
-                    <Input value={newForm.passport} onChange={(e) => setNewForm(f => ({ ...f, passport: e.target.value }))} placeholder="Para estrangeiros" disabled={!!selectedCustomerId && !editingId} />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-sm text-muted-foreground mb-1 block">Data de Nascimento</label>
-                    <Input type="date" value={newForm.birthDate} onChange={(e) => setNewForm(f => ({ ...f, birthDate: e.target.value }))} disabled={!!selectedCustomerId && !editingId} />
-                  </div>
-                  <div>
-                    <label className="text-sm text-muted-foreground mb-1 block">País</label>
-                    <Input value={newForm.country} onChange={(e) => setNewForm(f => ({ ...f, country: e.target.value }))} placeholder="Ex: Brasil" disabled={!!selectedCustomerId && !editingId} />
-                  </div>
-                </div>
-              </div>
-
-
-              <div className="mt-3">
-                <label className="text-sm font-semibold text-foreground mb-1.5 block">Observações Internas</label>
-                <Textarea 
-                  value={newForm.notes} 
-                  onChange={(e) => setNewForm(f => ({ ...f, notes: e.target.value }))} 
-                  placeholder="Instruções para a equipe, restrições alimentares, etc." 
-                  rows={2}
-                  className="text-sm"
-                />
-              </div>
-            </div>
-
-            {/* Summary */}
-            {unitPrice > 0 && (
-              <div className="bg-muted p-3 rounded-lg space-y-1">
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>Subtotal ({newForm.type === "tour" && newForm.tourMode === "privativo" ? "Veículo Privativo" : `${newForm.guests}x ${fmt(unitPrice)}`})</span>
-                  <span>{fmt(total)}</span>
-                </div>
-                {discount > 0 && (
-                  <div className="flex justify-between text-xs text-green-600 dark:text-green-400">
-                    <span>Desconto PIX ({pixDiscountPercent}%)</span>
-                    <span>-{fmt(discount)}</span>
+                {/* Resumo Financeiro no Form */}
+                {unitPrice > 0 && (
+                  <div className="bg-slate-900 rounded-[2rem] p-6 text-white shadow-2xl shadow-slate-900/20 animate-in-slide-up">
+                    <div className="flex items-center gap-2 mb-4">
+                      <DollarSign className="text-emerald-400" size={18} />
+                      <h3 className="font-black uppercase tracking-widest text-[11px]">Resumo do Checkout</h3>
+                    </div>
+                    <div className="space-y-2 border-b border-white/10 pb-4 mb-4">
+                      <div className="flex justify-between text-[11px] font-bold text-white/60 uppercase tracking-wider">
+                        <span>{newForm.type === "tour" && newForm.tourMode === "privativo" ? "Veículo Privativo" : `${newForm.guests} Passageiro(s)`}</span>
+                        <span>{fmt(total)}</span>
+                      </div>
+                      {discount > 0 && (
+                        <div className="flex justify-between text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
+                          <span>Desconto PIX ({pixDiscountPercent}%)</span>
+                          <span>-{fmt(discount)}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex justify-between items-end">
+                      <span className="text-[10px] font-black uppercase text-white/40 tracking-[0.2em]">Total a Pagar</span>
+                      <span className="text-3xl font-black text-white tracking-tighter">{fmt(finalTotal)}</span>
+                    </div>
                   </div>
                 )}
-                <div className="flex justify-between text-sm font-bold text-foreground border-t border-border mt-1 pt-1">
-                  <span>Total</span>
-                  <span>{fmt(finalTotal)}</span>
-                </div>
-              </div>
-            )}
-
-                <Button type="button" onClick={handleNewBooking} className="w-full bg-blue-600 hover:bg-blue-700 text-white" disabled={newLoading || !newForm.itemName}>
-                  {newLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : (editingId ? <Pencil size={16} className="mr-2" /> : <Plus size={16} className="mr-2" />)}
-                  {editingId ? "Salvar Alterações" : "Criar Reserva"}
-                </Button>
               </div>
             </div>
-          
+
+            <div className="flex gap-4 sticky bottom-0 bg-white/80 backdrop-blur-md p-6 border-t border-slate-100 -mx-8 -mb-8 mt-8">
+              <Button type="button" variant="ghost" onClick={() => setShowNewForm(false)} className="flex-1 h-14 rounded-2xl font-black uppercase text-[11px] tracking-widest">
+                Cancelar
+              </Button>
+              <Button type="submit" className="flex-[2] h-14 rounded-2xl bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20 font-black uppercase text-[11px] tracking-widest" disabled={newLoading || !newForm.itemName}>
+                {newLoading ? <Loader2 className="animate-spin mr-2" size={18} /> : (editingId ? <Save size={18} className="mr-2" /> : <Plus size={18} className="mr-2" />)}
+                {editingId ? "Salvar Alterações" : "Confirmar Reserva"}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
     </AdminLayout>
