@@ -360,7 +360,7 @@ const AdminPasseios = () => {
             </Button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-6 md:space-y-8">
+          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Nome *</label>
@@ -614,7 +614,8 @@ const AdminPasseios = () => {
                 </TooltipContent>
               </Tooltip>
             </div>
-          </form>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
