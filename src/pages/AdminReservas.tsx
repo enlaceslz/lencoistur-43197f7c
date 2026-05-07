@@ -15,7 +15,7 @@ import {
   Search, ShoppingCart, CheckCircle, Clock, XCircle, Eye,
   DollarSign, Ban, Loader2, Users, Calendar, CreditCard, FileText,
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
-  Plus, Copy, Pencil, Car, Compass, LayoutGrid, List
+  Plus, Copy, Pencil, Car, Compass, LayoutGrid, List, X
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -181,8 +181,8 @@ const AdminReservas = () => {
     : 0;
   const finalTotal = total - discount;
 
-  const handleNewBooking = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleNewBooking = async (e: any) => {
+    if (e?.preventDefault) e.preventDefault();
     if (!newForm.itemName || !newForm.customerName || !newForm.customerEmail) {
       toast.error("Preencha todos os campos obrigatórios.");
       return;
@@ -568,15 +568,27 @@ const AdminReservas = () => {
 
       {/* Detail Modal */}
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <FileText size={20} />
-              Reserva {selected?.bookingCode}
-            </DialogTitle>
-          </DialogHeader>
-          {selected && (
-            <div className="space-y-4">
+        <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                <FileText size={20} className="md:w-6 md:h-6" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                  Reserva {selected?.bookingCode}
+                </DialogTitle>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Detalhes completos da reserva</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setSelected(null)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <X size={20} className="text-slate-400" />
+            </Button>
+          </div>
+
+          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
+            {selected && (
+              <div className="space-y-4">
               {/* Customer */}
               <div className="bg-muted rounded-xl p-4 space-y-2">
                 <h4 className="font-semibold text-sm text-foreground">Cliente</h4>
@@ -672,9 +684,14 @@ const AdminReservas = () => {
                         {actionLoading ? <Loader2 className="animate-spin mr-1" size={14} /> : null} Salvar
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => setShowNotes(false)}>Cancelar</Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{selected.notes || "Nenhuma observação."}</p>
+                )}
                 {/* Links */}
                 {(selected.invoiceUrl || selected.voucherUrl) && (
-                  <div className="flex gap-2 w-full">
+                  <div className="flex gap-2 w-full mt-4">
                     {selected.invoiceUrl && (
                       <Button variant="outline" size="sm" className="flex-1" asChild>
                         <a href={selected.invoiceUrl} target="_blank" rel="noopener noreferrer">
@@ -690,11 +707,6 @@ const AdminReservas = () => {
                       </Button>
                     )}
                   </div>
-                )}
-              </div>
-            </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">{selected.notes || "Nenhuma observação."}</p>
                 )}
               </div>
 
@@ -772,21 +784,34 @@ const AdminReservas = () => {
                   </a>
                 )}
               </div>
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 
       {/* New Booking Dialog */}
       <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              {editingId ? <Pencil size={20} /> : <Plus size={20} />} 
-              {editingId ? "Editar Reserva" : "Nova Reserva"}
-            </DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleNewBooking} className="space-y-4">
+        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                {editingId ? <Pencil size={20} className="md:w-6 md:h-6" /> : <Plus size={20} className="md:w-6 md:h-6" />}
+              </div>
+              <div>
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                  {editingId ? "Editar Reserva" : "Nova Reserva"}
+                </DialogTitle>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Preencha os dados do cliente e do serviço</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setShowNewForm(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <X size={20} className="text-slate-400" />
+            </Button>
+          </div>
+
+          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
+            <div className="space-y-4">
             {/* Type */}
             <div>
               <label className="text-sm font-semibold text-foreground mb-1.5 block">Tipo</label>
@@ -1003,11 +1028,13 @@ const AdminReservas = () => {
               </div>
             )}
 
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white" disabled={newLoading || !newForm.itemName}>
-              {newLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : (editingId ? <Pencil size={16} className="mr-2" /> : <Plus size={16} className="mr-2" />)}
-              {editingId ? "Salvar Alterações" : "Criar Reserva"}
-            </Button>
-          </form>
+                <Button type="button" onClick={handleNewBooking} className="w-full bg-blue-600 hover:bg-blue-700 text-white" disabled={newLoading || !newForm.itemName}>
+                  {newLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : (editingId ? <Pencil size={16} className="mr-2" /> : <Plus size={16} className="mr-2" />)}
+                  {editingId ? "Salvar Alterações" : "Criar Reserva"}
+                </Button>
+              </div>
+            </div>
+          
         </DialogContent>
       </Dialog>
     </AdminLayout>
