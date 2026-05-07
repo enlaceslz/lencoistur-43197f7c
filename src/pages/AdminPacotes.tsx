@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
-  Search, Plus, Pencil, Package as PackageIcon, X, CheckCircle, GripVertical, Eye, Share2, Car, Compass, Trash2, Calendar, Target, Loader2, Clock
+  Search, Plus, Pencil, Package as PackageIcon, X, CheckCircle, GripVertical, Eye, Share2, Car, Compass, Trash2, Calendar, Target, Loader2, Clock, Upload, Moon
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -56,6 +56,7 @@ const AdminPacotes = () => {
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const [form, setForm] = useState({
     name: "", slug: "", description: "", days: 1, nights: 0,
@@ -82,6 +83,35 @@ const AdminPacotes = () => {
   };
 
   const generateSlug = (name: string) => name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `package-banners/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      setForm(prev => ({ ...prev, banner_url: publicUrl }));
+      toast.success("Banner enviado com sucesso!");
+    } catch (error: any) {
+      toast.error("Erro ao enviar imagem: " + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const openForm = (pkg?: any) => {
     if (pkg) {
@@ -220,9 +250,17 @@ const AdminPacotes = () => {
             </div>
             <CardContent className="p-5">
               <div className="flex justify-between items-center mb-5">
-                <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <Clock size={14} className="text-primary" />
-                  <span className="text-xs font-bold">{pkg.days} Dias</span>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <Clock size={14} className="text-primary" />
+                    <span className="text-xs font-bold">{pkg.days} {pkg.days === 1 ? 'Dia' : 'Dias'}</span>
+                  </div>
+                  {pkg.nights > 0 && (
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      <Moon size={14} className="text-blue-500" />
+                      <span className="text-xs font-bold">{pkg.nights} {pkg.nights === 1 ? 'Noite' : 'Noites'}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="text-right">
                   <p className="text-[10px] text-muted-foreground uppercase font-black leading-none mb-1">Preço Especial</p>
@@ -238,6 +276,14 @@ const AdminPacotes = () => {
                   className="flex-1 rounded-xl h-10 text-[10px] font-black uppercase tracking-widest"
                 >
                   <Share2 size={14} className="mr-2 text-primary" /> Campanha
+                </Button>
+                <Button 
+                  variant="outline"
+                  size="icon"
+                  onClick={() => openForm(pkg)} 
+                  className="h-10 w-10 rounded-xl"
+                >
+                  <Eye size={16} />
                 </Button>
                 <Button 
                   variant="secondary"
@@ -327,34 +373,70 @@ const AdminPacotes = () => {
                         />
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="pkg-days" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Duração (Dias)</Label>
-                      <div className="relative">
-                        <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                        <Input 
-                          id="pkg-days" 
-                          type="number" 
-                          value={form.days} 
-                          onChange={e => setForm({...form, days: Number(e.target.value)})} 
-                          className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-bold" 
-                        />
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="pkg-days" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Dias</Label>
+                        <div className="relative">
+                          <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                          <Input 
+                            id="pkg-days" 
+                            type="number" 
+                            value={form.days} 
+                            onChange={e => setForm({...form, days: Number(e.target.value)})} 
+                            className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-bold text-xs" 
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="pkg-nights" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Noites</Label>
+                        <div className="relative">
+                          <Moon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                          <Input 
+                            id="pkg-nights" 
+                            type="number" 
+                            value={form.nights} 
+                            onChange={e => setForm({...form, nights: Number(e.target.value)})} 
+                            className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-bold text-xs" 
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="pkg-banner" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Banner do Pacote (URL da Imagem)</Label>
-                    <div className="relative group">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
-                        <Eye size={16} />
+                    <Label htmlFor="pkg-banner" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Banner do Pacote (Upload ou URL)</Label>
+                    <div className="flex gap-2">
+                      <div className="relative group flex-1">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
+                          <Eye size={16} />
+                        </div>
+                        <Input 
+                          id="pkg-banner" 
+                          value={form.banner_url} 
+                          onChange={e => setForm({...form, banner_url: e.target.value})} 
+                          placeholder="Cole o link ou use o botão de upload"
+                          className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all" 
+                        />
                       </div>
-                      <Input 
-                        id="pkg-banner" 
-                        value={form.banner_url} 
-                        onChange={e => setForm({...form, banner_url: e.target.value})} 
-                        placeholder="Cole o link da imagem (Unsplash, Firebase, etc)"
-                        className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all" 
-                      />
+                      <div className="relative">
+                        <input
+                          type="file"
+                          id="banner-upload"
+                          className="hidden"
+                          accept="image/*"
+                          onChange={handleBannerUpload}
+                          disabled={uploading}
+                        />
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          className="h-12 w-12 rounded-xl p-0 border-slate-200"
+                          onClick={() => document.getElementById('banner-upload')?.click()}
+                          disabled={uploading}
+                        >
+                          {uploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
+                        </Button>
+                      </div>
                     </div>
                     {form.banner_url && (
                       <div className="mt-3 rounded-2xl overflow-hidden border border-slate-100 shadow-sm aspect-[21/9]">
