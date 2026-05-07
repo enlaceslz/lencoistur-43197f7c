@@ -568,13 +568,25 @@ const AdminReservas = () => {
 
       {/* Detail Modal */}
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <FileText size={20} />
-              Reserva {selected?.bookingCode}
-            </DialogTitle>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                <FileText size={20} className="md:w-6 md:h-6" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                  Reserva {selected?.bookingCode}
+                </DialogTitle>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Detalhes completos da reserva</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setSelected(null)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <X size={20} className="text-slate-400" />
+            </Button>
+          </div>
+
+          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
           {selected && (
             <div className="space-y-4">
               {/* Customer */}
