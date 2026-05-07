@@ -61,25 +61,26 @@ const AdminSGSPGSAT = () => {
 
   return (
     <AdminLayout title="SGS — PGSAT (ICMBio)">
-      <div className="space-y-6">
-        {/* Info card */}
-        <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <Shield size={20} className="text-primary" />
-            <h3 className="font-display font-bold text-foreground">Plano de Gestão de Segurança para Atividades Turísticas</h3>
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="glass-card p-8 rounded-[2.5rem] border border-border/50 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-primary/10 transition-all duration-700" />
+          
+          <div className="flex items-center gap-6 relative z-10">
+            <div className="p-4 rounded-3xl bg-primary/10 text-primary shadow-inner">
+              <Shield size={32} strokeWidth={2.5} />
+            </div>
+            <div className="max-w-xl">
+              <h2 className="text-xl md:text-2xl font-black text-foreground tracking-tight">Plano de Gestão de Segurança (PGSAT)</h2>
+              <p className="text-xs font-black text-muted-foreground uppercase tracking-widest mt-2 leading-relaxed opacity-70">
+                Compilado oficial para o ICMBio contendo análise de riscos, rotas, frotas e competências.
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Documento obrigatório conforme normativa do ICMBio para empresas que operam em Unidades de Conservação.
-            O PGSAT compila informações da empresa, análise de riscos, rotas, frota e condutores em um documento unificado.
-          </p>
-        </div>
-
-        <div className="flex justify-end">
           <button 
             onClick={() => setShowForm(!showForm)} 
-            className="flex items-center gap-3 px-8 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95"
+            className="relative z-10 w-full md:w-auto flex items-center justify-center gap-3 px-8 h-14 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-2xl shadow-primary/30 transition-all active:scale-95"
           >
-            <Plus size={20} strokeWidth={3} /> Gerar Novo PGSAT
+            <Plus size={24} strokeWidth={3} /> Gerar Novo PGSAT
           </button>
         </div>
 
