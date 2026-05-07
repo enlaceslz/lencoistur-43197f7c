@@ -373,22 +373,33 @@ const AdminAjuda = () => {
     <AdminLayout title="Central de Ajuda">
       <div className="space-y-6">
         {/* Header */}
-        <div className="bg-gradient-to-r from-[hsl(217,91%,60%)] to-[hsl(217,91%,45%)] rounded-2xl p-6 sm:p-8 text-white">
-          <div className="flex items-center gap-3 mb-3">
-            <BookOpen size={28} />
-            <h2 className="text-2xl font-bold font-display">Central de Ajuda</h2>
-          </div>
-          <p className="text-white/80 text-sm max-w-2xl mb-5">
-            Guia completo e ilustrativo de todos os módulos do sistema LençóisTour. Clique em qualquer módulo para ver instruções detalhadas, fluxos e dicas.
-          </p>
-          <div className="relative max-w-md">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50" />
-            <Input
-              placeholder="Buscar módulo ou funcionalidade..."
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setSelectedModule(null); }}
-              className="pl-10 bg-white/15 border-white/20 text-white placeholder:text-white/50 focus:bg-white/20"
-            />
+        <div className="glass-card rounded-[2.5rem] p-8 md:p-12 mb-10 border-none shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-primary/10 transition-all duration-700" />
+          
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                  <BookOpen size={28} strokeWidth={2.5} />
+                </div>
+                <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tighter uppercase">Central de Ajuda</h2>
+              </div>
+              <p className="text-sm md:text-base font-medium text-muted-foreground leading-relaxed">
+                Guia interativo e documentação técnica do ecossistema <span className="text-primary font-bold">LençóisTour</span>. 
+                Explore os módulos abaixo para dominar cada funcionalidade do sistema.
+              </p>
+            </div>
+            
+            <div className="relative w-full md:w-96 group/search">
+              <Search size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within/search:text-primary transition-colors" />
+              <input
+                type="text"
+                placeholder="Pesquisar guia..."
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); setSelectedModule(null); }}
+                className="w-full h-14 pl-14 pr-6 bg-muted/30 border border-border/40 rounded-2xl text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 focus:bg-white transition-all placeholder:text-muted-foreground/30 uppercase tracking-widest shadow-inner"
+              />
+            </div>
           </div>
         </div>
 
