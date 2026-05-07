@@ -327,10 +327,10 @@ const AdminSGSTermos = () => {
       <div style="margin: 8px 0; padding-bottom: 5px; border-bottom: 1px solid #f0f0f0;">
         <p style="margin: 2px 0;"><strong>${i + 1}- ${m.full_name}</strong> ${m.is_adult ? "(Maior de Idade)" : "(Menor de Idade)"}</p>
         <p style="margin: 2px 0; font-size: 10px; color: #666;">
-          ${m.cpf ? `CPF: ${m.cpf}` : ""} ${m.birth_date ? `| Nasc: ${format(new Date(m.birth_date), "dd/MM/yyyy")}` : ""} 
+          ${m.cpf ? `CPF: ${m.cpf}` : ""} ${m.birth_date ? `| Nasc: ${formatDate(new Date(m.birth_date), "dd/MM/yyyy")}` : ""} 
           ${!m.is_adult && m.responsible_name ? `| Responsável: ${m.responsible_name}` : ""}
         </p>
-        ${m.signature_data ? `<div style="margin-top: 5px;"><img src="${m.signature_data}" style="height: 40px;" /><br/><span style="font-size: 8px;">Assinado em ${format(new Date(m.signed_at), "dd/MM/yyyy HH:mm")}</span></div>` : ""}
+        ${m.signature_data ? `<div style="margin-top: 5px;"><img src="${m.signature_data}" style="height: 40px;" /><br/><span style="font-size: 8px;">Assinado em ${formatDate(new Date(m.signed_at), "dd/MM/yyyy HH:mm")}</span></div>` : ""}
       </div>
     `).join("") || "Nenhum dependente declarado.";
 
