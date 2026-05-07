@@ -671,11 +671,25 @@ const AdminParceiros = () => {
 
       {/* Form Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editPartner ? "Editar Parceiro" : "Novo Parceiro"}</DialogTitle>
-            <DialogDescription>Preencha os dados do parceiro. Ao digitar um CNPJ válido, os dados serão preenchidos automaticamente.</DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                {editPartner ? <Edit size={20} className="md:w-6 md:h-6" /> : <Plus size={20} className="md:w-6 md:h-6" />}
+              </div>
+              <div>
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                  {editPartner ? "Editar Parceiro" : "Novo Parceiro"}
+                </DialogTitle>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Gestão de fornecedores e prestadores de serviço</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setDialogOpen(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <XCircle size={20} className="text-slate-400" />
+            </Button>
+          </div>
+
+          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
           <div className="space-y-4">
             <div>
               <Label className="mb-1.5 block">CPF / CNPJ</Label>
