@@ -408,42 +408,43 @@ const AdminAjuda = () => {
           <>
             {/* Modules Grid */}
             <div>
-              <h3 className="text-lg font-bold text-[hsl(220,25%,18%)] mb-4 flex items-center gap-2">
-                <HelpCircle size={20} className="text-[hsl(217,91%,60%)]" />
-                Módulos do Sistema
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Info size={14} className="text-[hsl(220,15%,60%)]" />
-                  </TooltipTrigger>
-                  <TooltipContent>Clique em um módulo para ver o guia completo</TooltipContent>
-                </Tooltip>
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              <div className="flex items-center gap-3 mb-6">
+                <HelpCircle size={22} className="text-primary" strokeWidth={3} />
+                <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Arquitetura de Módulos</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
                 {filtered.map((mod) => {
                   const Icon = mod.icon;
                   return (
-                    <Card
+                    <div
                       key={mod.id}
-                      className="cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 border-[hsl(220,20%,92%)]"
+                      className="glass-card admin-card-hover rounded-[2rem] p-6 cursor-pointer group relative overflow-hidden flex flex-col border border-border/50 transition-all hover:border-primary/30 shadow-sm"
                       onClick={() => setSelectedModule(mod.id)}
                     >
-                      <CardContent className="p-4 flex items-start gap-3">
-                        <div className={`${mod.color} w-10 h-10 rounded-xl flex items-center justify-center shrink-0`}>
-                          <Icon size={20} className="text-white" />
+                      <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${mod.color.replace('bg-', 'bg-')}`} />
+                      
+                      <div className="flex items-start justify-between mb-4">
+                        <div className={`w-12 h-12 rounded-2xl ${mod.color} flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
+                          <Icon size={24} strokeWidth={2.5} />
                         </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-semibold text-sm text-[hsl(220,25%,18%)]">{mod.title}</h4>
-                            {mod.badge && <Badge variant="secondary" className="text-[9px] px-1.5 py-0">{mod.badge}</Badge>}
-                          </div>
-                          <p className="text-xs text-[hsl(220,15%,55%)] mt-0.5">{mod.subtitle}</p>
-                        </div>
-                        <ArrowRight size={14} className="text-[hsl(220,15%,75%)] shrink-0 mt-1 ml-auto" />
-                      </CardContent>
-                    </Card>
+                        {mod.badge && <Badge variant="secondary" className="bg-primary/10 text-primary border-none font-black text-[8px] uppercase px-2 py-0.5 rounded-full">{mod.badge}</Badge>}
+                      </div>
+                      
+                      <div className="flex-1">
+                        <h4 className="font-black text-foreground text-sm uppercase tracking-wider group-hover:text-primary transition-colors">{mod.title}</h4>
+                        <p className="text-[10px] font-bold text-muted-foreground mt-1 leading-relaxed opacity-70">{mod.subtitle}</p>
+                      </div>
+                      
+                      <div className="mt-4 pt-4 border-t border-border/50 flex items-center justify-between">
+                        <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Ver Documentação</span>
+                        <ArrowRight size={14} className="text-primary group-hover:translate-x-1 transition-transform" strokeWidth={3} />
+                      </div>
+                    </div>
                   );
                 })}
               </div>
+            </div>
               {filtered.length === 0 && (
                 <div className="text-center py-12 text-[hsl(220,15%,55%)]">
                   <Search size={40} className="mx-auto mb-3 opacity-30" />
