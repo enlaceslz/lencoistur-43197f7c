@@ -260,43 +260,44 @@ const modules: ModuleGuide[] = [
     id: "relatorios",
     icon: BarChart3,
     title: "Relatórios",
-    subtitle: "Business Intelligence",
+    subtitle: "Business Intelligence (BI)",
     color: "bg-slate-500",
-    badge: "Novo",
-    overview: "Painéis visuais e gráficos dinâmicos para análise profunda de Reservas, Financeiro, CRM e Marketing. Exporte dados em CSV para ferramentas externas.",
+    badge: "Professional",
+    overview: "Painéis analíticos avançados que processam o Big Data da sua operação. Visualize tendências de receita, performance por canal de marketing, produtividade da equipe e conformidade do SGS em tempo real.",
     steps: [
-      { title: "Gráficos de Performance", desc: "Visualize a evolução de vendas e leads através de gráficos de linha e barras." },
-      { title: "Análise de Receita", desc: "Veja a distribuição de faturamento por tipo de passeio e canal de venda." },
-      { title: "Exportação", desc: "Gere planilhas detalhadas para contabilidade ou auditorias externas." },
+      { title: "Dashboard Executivo", desc: "Monitore KPIs críticos como Receita Bruta, Ticket Médio e Taxa de Ocupação." },
+      { title: "BI Financeiro", desc: "Acesse o DRE automático e analise a lucratividade líquida após deduções de impostos e comissões." },
+      { title: "Exportação Técnica", desc: "Gere relatórios PDF assinados para prestação de contas ou auditorias externas ISO." }
     ],
     tips: [
-      "Compare os períodos (ano anterior vs atual) para medir o crescimento real",
-      "O relatório de ocupação ajuda a decidir sobre promoções em datas de baixa demanda",
+      "Utilize o filtro de 'Ano Anterior' para entender a sazonalidade da Rota das Emoções",
+      "A ferramenta de impressão gera documentos profissionais com logomarca e rodapé técnico"
     ],
-    faq: [],
+    faq: [
+      { q: "Os dados podem ser exportados?", a: "Sim, todos os relatórios suportam exportação integral em formato CSV e visual em PDF Professional." }
+    ]
   },
   {
     id: "sgs",
     icon: Shield,
     title: "SGS — Segurança",
-    subtitle: "ISO 21101 / 21102",
+    subtitle: "ISO 21101 / 21102 / 21103",
     color: "bg-red-500",
-    badge: "ISO Compliant",
-    overview: "Módulo robusto para gestão de riscos e segurança. Atende integralmente às normas ISO 21101 e 21102, além das exigências do PGSAT (ICMBio).",
+    badge: "Enterprise",
+    overview: "Módulo central de governança de segurança. Integra a Matriz de Riscos (P2), Registro de Incidentes (P5), Auditorias Internas e o Plano de Gestão de Segurança (PGSAT), garantindo total conformidade com as normas ABNT NBR ISO de Turismo de Aventura.",
     steps: [
-      { title: "Matriz de Riscos", desc: "Identifique perigos, avalie riscos e defina medidas de controle preventivas." },
-      { title: "Checklists & Veículos", desc: "Inspeções diárias de frota e equipamentos antes de cada operação." },
-      { title: "Briefings & Termos", desc: "Gestão de orientações de segurança e coleta de assinaturas digitais de termos de risco." },
-      { title: "Incidentes & Ações", desc: "Registro detalhado de ocorrências e gestão de ações corretivas/preventivas." },
+      { title: "Mapeamento P2", desc: "Identificação dinâmica de perigos e cálculo automático do Nível de Risco (NR) residual." },
+      { title: "Gestão P5", desc: "Fluxo completo de registro de incidentes com análise de causa raiz e geração de lições aprendidas." },
+      { title: "Conformidade ISO", desc: "Monitoramento de competências da equipe (21102) e conformidade de equipamentos/veículos." },
+      { title: "Relatórios Técnicos", desc: "Emissão de laudos de auditoria e do PGSAT oficial para o ICMBio." }
     ],
     tips: [
-      "O preenchimento do checklist é requisito legal para operação em trilhas",
-      "Briefings bem feitos reduzem o risco de incidentes em até 70%",
-      "Mantenha o cadastro de condutores e seus treinamentos sempre em dia",
+      "Riscos inaceitáveis (NR ≥ 12) bloqueiam automaticamente a operação até que medidas de controle sejam aplicadas",
+      "O sistema sincroniza as validades de seguros e CNHs para evitar falhas de conformidade"
     ],
     faq: [
-      { q: "O que é o PGSAT?", a: "É o Plano de Gestão de Segurança para Atividades Turísticas exigido para operar em Unidades de Conservação Federais." },
-    ],
+      { q: "O PGSAT é gerado na hora?", a: "Sim, o sistema compila todos os dados ativos (rotas, frota, riscos e equipe) em um documento técnico estruturado." }
+    ]
   },
   {
     id: "termos",
@@ -304,18 +305,40 @@ const modules: ModuleGuide[] = [
     title: "Termos de Risco",
     subtitle: "Conformidade ISO 21103",
     color: "bg-red-600",
-    overview: "Módulo para gestão dos Termos de Ciência de Risco. Gerencie assinaturas digitais, valide documentação e assegure a conformidade legal em todas as atividades.",
+    overview: "Módulo para gestão dos Termos de Ciência de Risco conforme a norma ABNT NBR ISO 21103. Permite a coleta de assinaturas digitais, gerenciamento de dependentes e armazenamento seguro de documentos para fins de compliance e segurança turística.",
     steps: [
-      { title: "Gerar Termo", desc: "Vincule o termo a uma reserva existente ou crie um registro avulso." },
-      { title: "Coleta de Assinatura", desc: "Envie o link por WhatsApp ou assine no próprio painel durante o briefing." },
-      { title: "Monitoramento", desc: "Acompanhe termos pendentes e gerencie assinaturas de menores de idade." }
+      { title: "Geração do Termo", desc: "Vincule o termo a uma reserva existente para preenchimento automático dos dados do passeio e do cliente." },
+      { title: "Coleta de Assinatura", desc: "Utilize a assinatura digital na tela ou envie o link via WhatsApp/E-mail para que o cliente assine em seu próprio dispositivo." },
+      { title: "Gestão de Menores", desc: "Registre responsáveis legais e colete assinaturas vinculadas para participantes menores de idade." },
+      { title: "Arquivo Digital", desc: "O sistema gera um PDF técnico assinado que é armazenado automaticamente na ficha 360º do cliente." }
     ],
     tips: [
-      "Sempre colete a assinatura antes do início do passeio",
-      "O termo assinado gera automaticamente um PDF armazenado no histórico do cliente"
+      "A assinatura do termo é obrigatória antes do embarque em atividades de aventura",
+      "O documento serve como prova jurídica de que o cliente foi orientado sobre os riscos inerentes à atividade"
     ],
     faq: [
-      { q: "O termo tem validade legal?", a: "Sim, atende aos requisitos da ABNT NBR ISO 21103 para turismo de aventura." }
+      { q: "O sistema aceita assinatura por terceiros?", a: "Não. Cada participante maior de idade deve assinar individualmente. Menores são assinados por seus responsáveis cadastrados." }
+    ]
+  },
+  {
+    id: "ia_gateway",
+    icon: Bot,
+    title: "IA Gateway",
+    subtitle: "Inteligência de Operação",
+    color: "bg-indigo-600",
+    badge: "v2.0",
+    overview: "Portal de comando da Inteligência Artificial do LençóisTour. Integra modelos de linguagem avançados para suporte ao cliente, análise de dados operacionais e automação de processos repetitivos.",
+    steps: [
+      { title: "Monitoramento", desc: "Acompanhe as interações da IA com leads e clientes em tempo real." },
+      { title: "Insights de Negócio", desc: "Acesse sugestões de precificação dinâmica e predição de demanda baseada em dados históricos." },
+      { title: "Configuração", desc: "Ajuste o tom de voz e as regras de negócio que orientam as respostas da IA." }
+    ],
+    tips: [
+      "A IA analisa o histórico de SGS para sugerir melhorias preventivas na matriz de riscos",
+      "Leads quentes identificados pela IA são destacados automaticamente no CRM"
+    ],
+    faq: [
+      { q: "A IA pode realizar reservas sozinha?", a: "Ela pode orientar e pré-cadastrar os dados, mas a confirmação final de pagamento sempre passa pelo motor de reservas do sistema." }
     ]
   },
   {
@@ -338,19 +361,19 @@ const modules: ModuleGuide[] = [
 
 const flowDiagrams = [
   {
-    title: "Ciclo de Vida da Reserva",
+    title: "Motor de Reservas & SGS",
     icon: Workflow,
-    steps: ["Cliente escolhe no site", "Preenchimento de dados e dependentes", "Pagamento (PIX/Cartão)", "Confirmação automática/manual", "Geração de registro no Financeiro", "Check-in e Briefing de Segurança", "Realização do passeio ✅"],
+    steps: ["Reserva gerada no Motor (Site/Painel)", "Identificação do perfil no CRM 360º", "Cálculo de Descontos & Confirmação", "Assinatura do Termo ISO 21103", "Briefing de Segurança (ISO 21103)", "Checklist Operacional de Frota", "Operação Segura ✅"],
   },
   {
-    title: "Gestão Financeira Integrada",
+    title: "Governança de Dados (BI)",
     icon: Zap,
-    steps: ["Venda realizada (Receita)", "Lançamento automático no Contas a Receber", "Registro de custos (Combustível/Guias)", "Cálculo de comissões de parceiros", "Fechamento de Caixa", "Análise de DRE e Lucratividade 📊"],
+    steps: ["Venda consolidada no Financeiro", "Lançamento de Custos Operacionais", "Integração de Comissões em Tempo Real", "Processamento no IA Gateway", "Geração de KPIs de Performance", "Fechamento de DRE Executivo", "Insight Estratégico 📊"],
   },
   {
-    title: "Segurança e Conformidade (SGS)",
+    title: "Conformidade Técnica",
     icon: Shield,
-    steps: ["Matriz de Riscos atualizada", "Verificação de equipamentos e veículos", "Briefing obrigatório com turistas", "Coleta de Termo de Responsabilidade", "Execução segura com condutor habilitado", "Registro de feedback ou incidentes 🔍"],
+    steps: ["Mapeamento de Riscos P2", "Controle de Recursos P5 (POPs)", "Verificação de Competências (ISO 21102)", "Auditoria Interna de Segurança", "Geração de Ações Corretivas", "Emissão de PGSAT (ICMBio)", "Certificação de Segurança 🔍"],
   },
 ];
 
@@ -499,12 +522,12 @@ const AdminAjuda = () => {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
-                  { color: "bg-emerald-500", label: "Sucesso / Ativo", desc: "Confirmado, conforme ou pago" },
-                  { color: "bg-amber-500", label: "Pendente / Atenção", desc: "Requer verificação manual" },
-                  { color: "bg-rose-500", label: "Urgente / Bloqueado", desc: "Vencido, erro ou impedimento" },
-                  { color: "bg-blue-500", label: "Informativo", desc: "Dados extras ou andamento" },
-                  { badge: true, label: "Categorização", desc: "Filtros, tags e tipos de dados" },
-                  { icon: AlertTriangle, label: "Alertas SGS", desc: "Avisos críticos de segurança" },
+                  { color: "bg-emerald-500", label: "Sucesso / Ativo", desc: "Confirmado, conforme, pago ou aprovado" },
+                  { color: "bg-amber-500", label: "Pendente / Atenção", desc: "Aguardando ação manual ou vencimento próximo" },
+                  { color: "bg-rose-500", label: "Urgente / Bloqueado", desc: "Vencido, erro, incidente ou risco inaceitável" },
+                  { color: "bg-blue-500", label: "Informativo", desc: "Documentação, metadados ou andamento" },
+                  { badge: true, label: "Hierarquia / Tag", desc: "Nível de acesso, categorias e classificações" },
+                  { icon: AlertTriangle, label: "Matriz de Risco", desc: "Heatmap de segurança e classificação NR" },
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-muted/20 border border-border/40 hover:bg-white hover:shadow-lg transition-all">
                     {item.color ? (
