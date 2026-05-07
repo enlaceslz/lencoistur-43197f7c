@@ -84,6 +84,35 @@ const AdminPacotes = () => {
 
   const generateSlug = (name: string) => name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `package-banners/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('images')
+        .getPublicUrl(filePath);
+
+      setForm(prev => ({ ...prev, banner_url: publicUrl }));
+      toast.success("Banner enviado com sucesso!");
+    } catch (error: any) {
+      toast.error("Erro ao enviar imagem: " + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const openForm = (pkg?: any) => {
     if (pkg) {
       setEditingId(pkg.id);
