@@ -994,7 +994,6 @@ const AdminSGSTermos = () => {
               </div>
             </div>
           ))}
-          ))}
         </div>
       </div>
     </AdminLayout>
