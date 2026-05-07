@@ -25,22 +25,22 @@ const SortableItem = ({ item, type, index, onRemove }: { item: any, type: 'tour'
   
   return (
     <div ref={setNodeRef} style={style} className={cn(
-      "flex items-center gap-3 bg-white p-4 rounded-2xl border border-blue-100/50 shadow-sm group transition-all",
-      isDragging && "shadow-xl border-primary ring-2 ring-primary/10"
+      "flex items-center gap-3 bg-white p-3 rounded-xl border border-border shadow-sm group transition-all",
+      isDragging && "shadow-lg border-primary ring-2 ring-primary/10"
     )}>
-      <div {...attributes} {...listeners} className="cursor-grab p-1 text-slate-300 hover:text-primary transition-colors"><GripVertical size={18} /></div>
+      <div {...attributes} {...listeners} className="cursor-grab p-1 text-muted-foreground/30 hover:text-primary transition-colors"><GripVertical size={16} /></div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
-          <Badge variant="outline" className={cn("text-[8px] uppercase font-black px-1.5 h-4", type === 'tour' ? "text-amber-600 bg-amber-50" : "text-blue-600 bg-blue-50")}>
+          <Badge variant="secondary" className={cn("text-[8px] uppercase font-black px-1.5 h-4", type === 'tour' ? "text-amber-600 bg-amber-50" : "text-blue-600 bg-blue-50")}>
             {type === 'tour' ? 'Passeio' : 'Translado'}
           </Badge>
-          <span className="text-xs font-black text-slate-400">Item {index + 1}</span>
+          <span className="text-[10px] font-bold text-muted-foreground">Item {index + 1}</span>
         </div>
-        <p className="text-sm font-bold text-slate-700 truncate">
+        <p className="text-sm font-bold text-foreground truncate">
           {type === 'tour' ? item.name : `${item.origin} → ${item.destination}`}
         </p>
       </div>
-      <button type="button" onClick={onRemove} className="p-2 hover:bg-red-50 text-red-300 hover:text-red-500 rounded-xl transition-all"><X size={18} /></button>
+      <Button type="button" variant="ghost" size="icon" onClick={onRemove} className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all"><X size={16} /></Button>
     </div>
   );
 };
