@@ -81,7 +81,7 @@ const AdminSGSTermos = () => {
     medication_details: "",
     emergency_contact_name: "",
     emergency_contact_phone: "",
-    term_date: format(new Date(), "yyyy-MM-dd"),
+    term_date: formatDate(new Date(), "yyyy-MM-dd"),
     minors: [] as any[],
   });
 
