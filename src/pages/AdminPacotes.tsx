@@ -167,31 +167,35 @@ const AdminPacotes = () => {
 
   return (
     <AdminLayout title="Pacotes & Campanhas">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade">
         {[
-          { label: "Ativos", value: packages.filter(p => p.active).length, icon: PackageIcon, color: "from-blue-500 to-indigo-600" },
-          { label: "Passeios", value: tours.length, icon: Compass, color: "from-emerald-500 to-teal-600" },
-          { label: "Rotas", value: transfers.length, icon: Car, color: "from-amber-500 to-orange-600" },
-          { label: "Média", value: fmt(packages.reduce((a, b) => a + (b.discount_price || 0), 0) / (packages.length || 1)), icon: Target, color: "from-purple-500 to-pink-600" }
+          { label: "Pacotes Ativos", value: packages.filter(p => p.active).length, icon: PackageIcon, color: "text-blue-500", bg: "bg-blue-500/10", desc: "Total em catálogo" },
+          { label: "Passeios Cadastrados", value: tours.length, icon: Compass, color: "text-emerald-500", bg: "bg-emerald-500/10", desc: "Opções de roteiro" },
+          { label: "Rotas de Transfer", value: transfers.length, icon: Car, color: "text-amber-500", bg: "bg-amber-500/10", desc: "Logística ativa" },
+          { label: "Preço Médio", value: fmt(packages.reduce((a, b) => a + (b.discount_price || 0), 0) / (packages.length || 1)), icon: Target, color: "text-purple-500", bg: "bg-purple-500/10", desc: "Valor promocional" }
         ].map((stat, i) => (
-          <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden">
-            <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl`} />
-            <div className={cn("w-12 h-12 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white mb-4 shadow-lg", stat.color)}>
-              <stat.icon size={22} />
+          <div key={i} className="bg-white border border-border shadow-sm rounded-2xl p-6 relative overflow-hidden group hover:border-primary/50 transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shadow-sm", stat.bg, stat.color)}>
+                <stat.icon size={22} />
+              </div>
+              <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">{stat.desc}</div>
             </div>
-            <p className="text-2xl font-black text-foreground">{stat.value}</p>
-            <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-widest">{stat.label}</p>
+            <div className="space-y-1">
+              <p className="text-2xl font-black text-foreground">{stat.value}</p>
+              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{stat.label}</p>
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="flex flex-col md:flex-row gap-6 mb-8 items-center">
+      <div className="flex flex-col md:flex-row gap-4 mb-8 items-center">
         <div className="relative flex-1 w-full group">
-          <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
-          <Input placeholder="Buscar pacotes..." value={search} onChange={e => setSearch(e.target.value)} className="pl-14 h-14 rounded-[1.5rem] bg-white/40 backdrop-blur-xl shadow-xl border-white/20" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary transition-colors" size={18} />
+          <Input placeholder="Pesquisar pacotes pelo nome..." value={search} onChange={e => setSearch(e.target.value)} className="pl-11 h-12 rounded-xl bg-white shadow-sm border-border focus:ring-2 focus:ring-primary/20" />
         </div>
-        <Button onClick={() => openForm()} className="h-14 px-8 rounded-[1.5rem] bg-gradient-to-r from-primary to-indigo-600 font-black text-[11px] uppercase tracking-widest shadow-lg">
-          <Plus size={20} className="mr-2" /> Novo Pacote
+        <Button onClick={() => openForm()} className="h-12 px-6 rounded-xl bg-primary hover:bg-primary/90 font-bold text-sm shadow-sm transition-all">
+          <Plus size={18} className="mr-2" /> Novo Pacote
         </Button>
       </div>
 
