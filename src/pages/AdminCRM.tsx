@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import { Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, Pencil, Trash2, X, Save, UserPlus, Baby, FileText, Printer, Paperclip, Upload, History, Tag as TagIcon, Target, CheckCircle2 } from "lucide-react";
+import { 
+  Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, 
+  DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, 
+  Pencil, Trash2, X, Save, UserPlus, Baby, FileText, Printer, 
+  Paperclip, Upload, History, Tag as TagIcon, Target, CheckCircle2,
+  ChevronRight, Star, Heart, Activity, Award, Shield, User, 
+  MoreHorizontal, Map, Filter, ArrowRight, UserCheck, UserPlus2
+} from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import CustomerStats from "@/components/crm/CustomerStats";
 import CustomerInteractionHistory from "@/components/crm/CustomerInteractionHistory";
+import { NumericFormat } from "react-number-format";
 
 interface Customer {
   id: string;

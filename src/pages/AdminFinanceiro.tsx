@@ -3,23 +3,27 @@ import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   DollarSign, TrendingUp, TrendingDown, CreditCard, Wallet, Receipt,
-  Loader2, Download, Printer, LayoutDashboard, FileText, Search
+  Loader2, Download, Printer, LayoutDashboard, FileText, Search,
+  Calendar as CalendarIcon, Filter, ArrowUpRight, ArrowDownRight,
+  TrendingUp as TrendingUpIcon, Plus, MoreHorizontal, CheckCircle2,
+  Clock, XCircle, CreditCard as CreditCardIcon, Banknote
 } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import FinanceiroStats from "@/components/financeiro/FinanceiroStats";
 import FluxoCaixaTab from "@/components/financeiro/FluxoCaixaTab";
 import ContasPagarTab from "@/components/financeiro/ContasPagarTab";
 import ContasReceberTab from "@/components/financeiro/ContasReceberTab";
 import DRETab from "@/components/financeiro/DRETab";
 import NotasFiscaisTab from "@/components/financeiro/NotasFiscaisTab";
-import { formatCurrency } from "@/lib/utils";
-import { cn } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
+import { NumericFormat } from "react-number-format";
 
 type Tab = "fluxo" | "pagar" | "receber" | "dre" | "notas";
 

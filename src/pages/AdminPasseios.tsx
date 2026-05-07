@@ -7,16 +7,20 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter
 } from "@/components/ui/dialog";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import {
   Search, Plus, Pencil, Trash2, Eye, EyeOff, Compass, Users, Clock, Star, X, Upload, Link as LinkIcon, Image as ImageIcon, GripVertical, Percent, MapPin, CheckCircle, Sparkles, Copy, Shield, Loader2,
+  Save, XCircle
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
-import { formatCurrency } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { formatCurrency, cn } from "@/lib/utils";
+import { NumericFormat } from "react-number-format";
 
 const fmt = (v: number) => formatCurrency(v);
 
@@ -106,11 +110,11 @@ const AdminPasseios = () => {
     try {
       new URL(url);
     } catch {
-      toast({ title: "URL inválida", variant: "destructive" });
+      toast.error("URL inválida");
       return;
     }
     if (imageUrls.includes(url)) {
-      toast({ title: "Imagem já adicionada", variant: "destructive" });
+      toast.error("Imagem já adicionada");
       return;
     }
     setImageUrls(prev => [...prev, url]);
@@ -126,11 +130,11 @@ const AdminPasseios = () => {
 
     for (const file of Array.from(files)) {
       if (!file.type.startsWith("image/")) {
-        toast({ title: `${file.name} não é uma imagem`, variant: "destructive" });
+        toast.error(`${file.name} não é uma imagem`);
         continue;
       }
       if (file.size > 5 * 1024 * 1024) {
-        toast({ title: `${file.name} excede 5MB`, variant: "destructive" });
+        toast.error(`${file.name} excede 5MB`);
         continue;
       }
 
@@ -143,7 +147,7 @@ const AdminPasseios = () => {
       });
 
       if (error) {
-        toast({ title: `Erro no upload de ${file.name}`, description: error.message, variant: "destructive" });
+        toast.error(`Erro no upload de ${file.name}: ${error.message}`);
         continue;
       }
 
@@ -153,7 +157,7 @@ const AdminPasseios = () => {
 
     if (newUrls.length > 0) {
       setImageUrls(prev => [...prev, ...newUrls]);
-      toast({ title: `${newUrls.length} imagem(ns) enviada(s)!` });
+      toast.success(`${newUrls.length} imagem(ns) enviada(s)!`);
     }
 
     setUploading(false);
@@ -203,22 +207,22 @@ const AdminPasseios = () => {
     }
 
     if (!payload.name) {
-      toast({ title: "Preencha o nome do passeio", variant: "destructive" });
+      toast.error("Preencha o nome do passeio");
       return;
     }
 
     if (payload.mode_collective_enabled && !payload.price) {
-      toast({ title: "Preencha o preço coletivo", variant: "destructive" });
+      toast.error("Preencha o preço coletivo");
       return;
     }
 
     if (payload.mode_private_enabled && !payload.private_price) {
-      toast({ title: "Preencha o preço privativo", variant: "destructive" });
+      toast.error("Preencha o preço privativo");
       return;
     }
 
     if (!payload.mode_collective_enabled && !payload.mode_private_enabled) {
-      toast({ title: "Habilite ao menos uma modalidade (Coletivo ou Privativo)", variant: "destructive" });
+      toast.error("Habilite ao menos uma modalidade (Coletivo ou Privativo)");
       return;
     }
 
@@ -237,9 +241,9 @@ const AdminPasseios = () => {
     }
 
     if (error) {
-      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+      toast.error(`Erro ao salvar: ${error.message}`);
     } else {
-      toast({ title: editingId ? "Passeio atualizado!" : "Passeio criado!" });
+      toast.success(editingId ? "Passeio atualizado!" : "Passeio criado!");
       setShowForm(false);
       setEditingId(null);
       load();
@@ -250,15 +254,15 @@ const AdminPasseios = () => {
     const { id, created_at, updated_at, ...rest } = t;
     const payload = { ...rest, name: `${t.name} (Cópia)`, slug: `${t.slug}-copia-${Date.now().toString().slice(-4)}`, active: false };
     const { error } = await supabase.from("tours").insert(payload);
-    if (error) toast({ title: "Erro ao duplicar", variant: "destructive" });
-    else { toast({ title: "Passeio duplicado!" }); load(); }
+    if (error) toast.error("Erro ao duplicar");
+    else { toast.success("Passeio duplicado!"); load(); }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Excluir este passeio?")) return;
     const { error } = await supabase.from("tours").delete().eq("id", id);
-    if (error) toast({ title: "Erro ao excluir", variant: "destructive" });
-    else { toast({ title: "Passeio excluído" }); load(); }
+    if (error) toast.error("Erro ao excluir");
+    else { toast.success("Passeio excluído"); load(); }
   };
 
   const toggleActive = async (id: string, current: boolean) => {
@@ -372,21 +376,35 @@ const AdminPasseios = () => {
                 <input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })}
                   className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" maxLength={200} />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Preço Coletivo (R$/pessoa)</label>
-                <input 
-                  value={maskCurrency(String(form.price))} 
-                  onChange={e => setForm({ ...form, price: parseCurrency(e.target.value) })}
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Coletivo (R$/pessoa)</Label>
+                <NumericFormat
+                  value={form.price / 100}
+                  onValueChange={(values) => setForm({ ...form, price: Math.round(Number(values.floatValue) * 100) })}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  prefix="R$ "
                   disabled={!form.mode_collective_enabled}
-                  className={`w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold ${!form.mode_collective_enabled ? "opacity-40 grayscale" : ""}`} />
+                  className={cn(
+                    "w-full bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 transition-all outline-none",
+                    !form.mode_collective_enabled && "opacity-40 grayscale"
+                  )}
+                />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Preço Privativo (R$/veículo)</label>
-                <input 
-                  value={maskCurrency(String(form.private_price))} 
-                  onChange={e => setForm({ ...form, private_price: parseCurrency(e.target.value) })}
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Privativo (R$/veículo)</Label>
+                <NumericFormat
+                  value={form.private_price / 100}
+                  onValueChange={(values) => setForm({ ...form, private_price: Math.round(Number(values.floatValue) * 100) })}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  prefix="R$ "
                   disabled={!form.mode_private_enabled}
-                  className={`w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold ${!form.mode_private_enabled ? "opacity-40 grayscale" : ""}`} />
+                  className={cn(
+                    "w-full bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 transition-all outline-none",
+                    !form.mode_private_enabled && "opacity-40 grayscale"
+                  )}
+                />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Lotação Máxima</label>
