@@ -420,84 +420,66 @@ const AdminParceiros = () => {
 
   return (
     <AdminLayout title="Parceiros">
-      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-10 glass-card p-8 rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.1s' }}>
-        <div className="space-y-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Relacionamento Externo</p>
-          <h1 className="text-4xl font-black text-foreground tracking-tight leading-none">Parceiros</h1>
-          <div className="flex items-center gap-3 mt-4">
-            <div className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-              <Building2 size={12} /> {partners.length} Cadastrados
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+        {[
+          { label: "Parceiros", value: partners.length, icon: Building2, color: "from-blue-500 to-indigo-600", desc: "Total cadastrado" },
+          { label: "Ativos", value: activeCount, icon: CheckCircle2, color: "from-emerald-500 to-teal-600", desc: "Operando" },
+          { label: "Tipos", value: partnerTypes.length, icon: Settings2, color: "from-amber-500 to-orange-600", desc: "Categorias" },
+          { label: "Crédito Total", value: `R$ ${partners.reduce((a, b) => a + (b.credit_limit || 0), 0).toLocaleString("pt-BR")}`, icon: Banknote, color: "from-purple-500 to-pink-600", desc: "Limite global" },
+        ].map((stat, i) => (
+          <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group">
+            <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
+            <div className="flex items-center justify-between mb-4">
+              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-primary/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+                <stat.icon size={22} strokeWidth={2.5} />
+              </div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{stat.desc}</div>
             </div>
-            <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-              <CheckCircle2 size={12} /> {activeCount} Ativos
-            </div>
+            <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
+            <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
           </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 min-w-[320px] group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
-            <input 
-              placeholder="Pesquisar por nome, contato ou documento..." 
-              value={search} 
-              onChange={(e) => setSearch(e.target.value)} 
-              className="w-full pl-14 h-14 rounded-2xl border border-border/40 focus:ring-4 focus:ring-primary/10 bg-muted/20 transition-all font-medium text-sm outline-none placeholder:text-muted-foreground/40" 
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="rounded-xl h-12 w-12 border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-sm" 
-                    onClick={exportPDF}
-                  >
-                    <FileDown size={20} className="text-rose-500" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Relatório PDF</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            </TooltipProvider>
-            
-            <Button variant="outline" size="sm" className="rounded-2xl h-12 px-5 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm hidden sm:flex" onClick={() => setTypesDialogOpen(true)}>
-              <Settings2 size={18} className="mr-2" /> Tipos
-            </Button>
-            
-            <Button onClick={openNew} size="lg" className="rounded-2xl h-12 px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white active:scale-95">
-              <Plus size={20} className="mr-2" strokeWidth={3} /> Novo
-            </Button>
-          </div>
-        </div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
-        {partnerTypes.map((t, idx) => {
-          const Icon = getIcon(t.icon);
-          const count = partners.filter((p) => p.type === t.name).length;
-          return (
-            <div 
-              key={t.id} 
-              className="glass-card admin-card-hover rounded-[2rem] p-6 cursor-pointer relative overflow-hidden group"
-              onClick={() => setTypeFilter(t.name)}
-            >
-              <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
-              
-              <div className="flex items-center justify-between mb-6">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg bg-primary/10 text-primary shadow-primary/10`}>
-                  <Icon size={26} strokeWidth={2.5} />
-                </div>
-              </div>
-              
-              <div className="relative">
-                <p className="text-3xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{count}</p>
-                <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{t.label}</p>
-              </div>
-            </div>
-          );
-        })}
+      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-4 sm:p-6 glass-card rounded-[2.5rem] shadow-sm animate-in-fade" style={{ animationDelay: '0.2s' }}>
+        <div className="relative flex-1 w-full group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
+          <Input 
+            placeholder="Pesquisar parceiro por nome, contato ou documento..." 
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)} 
+            className="pl-12 h-12 rounded-2xl border-border/40 focus:ring-primary/20 bg-muted/20 transition-all text-sm font-medium" 
+          />
+        </div>
+        
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <Button variant="outline" size="sm" className="rounded-xl h-12 px-5 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm" onClick={() => setTypesDialogOpen(true)}>
+            <Settings2 size={18} className="mr-2" /> Gerenciar Tipos
+          </Button>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="rounded-xl h-12 w-12 border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-sm" 
+                  onClick={exportPDF}
+                >
+                  <FileDown size={20} className="text-rose-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Relatório PDF</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <button 
+            onClick={openNew}
+            className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+          >
+            <Plus size={20} strokeWidth={3} /> Novo Parceiro
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3 mb-10 overflow-x-auto pb-4 no-scrollbar scroll-smooth animate-in-fade" style={{ animationDelay: '0.15s' }}>
