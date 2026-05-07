@@ -522,7 +522,7 @@ const AdminAjuda = () => {
                 ))}
               </div>
             </div>
-          </>
+          </div>
         ) : (
           <div className="animate-in-fade">
             <button
