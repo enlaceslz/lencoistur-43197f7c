@@ -282,11 +282,10 @@ const AdminSGSRiscos = () => {
             </div>
           </div>
 
-          {/* List Area */}
-          <div className="xl:col-span-3 space-y-6">
-            <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.2em] ml-2">
-              Resultados do Mapeamento de Perigos e Danos
-            </p>
+          </div>
+        </div>
+
+        {/* NR Legend - VATTI criteria */}
 
         {/* NR Legend - VATTI criteria */}
         {showLegend && (
