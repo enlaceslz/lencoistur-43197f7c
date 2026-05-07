@@ -495,48 +495,46 @@ const AdminSGSTermos = () => {
   });
 
   return (
-    <AdminLayout title="SGS - Termos de Ciência de Risco">
+    <AdminLayout title="SGS — Termos de Ciência de Risco">
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <div className="glass-card p-6 rounded-[2.5rem] border border-border/50 flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="relative flex-1 max-w-md w-full">
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input 
               value={search} 
               onChange={e => setSearch(e.target.value)} 
               placeholder="Buscar por cliente ou passeio..."
-              className="w-full pl-9 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30" 
+              className="w-full pl-11 pr-4 h-12 bg-background border border-border rounded-2xl text-sm text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all font-medium" 
             />
           </div>
-          <div className="flex bg-muted p-1 rounded-xl">
-            <button 
-              onClick={() => setStatusFilter("todos")}
-              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${statusFilter === "todos" ? "bg-white text-primary shadow-sm" : "text-muted-foreground"}`}
-            >
-              Todos
-            </button>
-            <button 
-              onClick={() => setStatusFilter("assinado")}
-              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${statusFilter === "assinado" ? "bg-white text-green-600 shadow-sm" : "text-muted-foreground"}`}
-            >
-              Assinados
-            </button>
-            <button 
-              onClick={() => setStatusFilter("pendente")}
-              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${statusFilter === "pendente" ? "bg-white text-amber-600 shadow-sm" : "text-muted-foreground"}`}
-            >
-              Pendentes
-            </button>
+          
+          <div className="flex bg-muted/50 p-1.5 rounded-2xl border border-border/50">
+            {[
+              { id: "todos", label: "Todos", color: "primary" },
+              { id: "assinado", label: "Assinados", color: "emerald-600" },
+              { id: "pendente", label: "Pendentes", color: "amber-600" }
+            ].map(tab => (
+              <button 
+                key={tab.id}
+                onClick={() => setStatusFilter(tab.id)}
+                className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                  statusFilter === tab.id 
+                  ? "bg-white text-primary shadow-lg shadow-black/5" 
+                  : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
-          <div className="flex gap-2">
+
+          <div className="flex gap-3 w-full lg:w-auto">
             <button 
-              onClick={() => {
-                setShowConfig(!showConfig);
-                setShowForm(false);
-              }}
-              className="bg-muted hover:bg-muted/80 text-muted-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
+              onClick={() => { setShowConfig(!showConfig); setShowForm(false); }}
+              className="flex-1 lg:flex-none h-12 px-6 bg-muted/50 hover:bg-muted text-muted-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 border border-border"
             >
-              <Settings size={16} />
-              Configurar Conteúdo
+              <Settings size={18} />
+              Configurações
             </button>
             <button 
               onClick={() => {
@@ -544,10 +542,10 @@ const AdminSGSTermos = () => {
                 setShowForm(!showForm);
                 setShowConfig(false);
               }}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
+              className="flex-1 lg:flex-none h-12 px-8 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95 flex items-center justify-center gap-3"
             >
-              {showForm ? <XCircle size={16} /> : <Plus size={16} />} 
-              {showForm ? "Fechar Formulário" : "Novo Termo"}
+              {showForm ? <XCircle size={20} /> : <Plus size={20} strokeWidth={3} />} 
+              {showForm ? "Fechar" : "Novo Termo"}
             </button>
           </div>
         </div>
