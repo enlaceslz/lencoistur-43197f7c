@@ -56,6 +56,7 @@ const AdminPacotes = () => {
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const [form, setForm] = useState({
     name: "", slug: "", description: "", days: 1, nights: 0,
