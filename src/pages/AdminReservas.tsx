@@ -763,15 +763,17 @@ const AdminReservas = () => {
                     Marcar Concluída
                   </Button>
                 )}
-                <Button 
-                  variant="destructive" 
-                  onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada com sucesso.", true)} 
-                  disabled={actionLoading} 
-                  className="flex-1 min-w-[140px]"
-                >
-                  {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
-                  Cancelar Reserva
-                </Button>
+                {selected.status !== "cancelada" && (
+                  <Button 
+                    variant="destructive" 
+                    onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada com sucesso.", true)} 
+                    disabled={actionLoading} 
+                    className="flex-1 min-w-[140px]"
+                  >
+                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
+                    Cancelar Reserva
+                  </Button>
+                )}
                 {/* Print Receipt */}
                 {selected.payMethod !== "info" && (
                   <PrintReceiptButton
