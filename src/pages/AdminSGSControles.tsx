@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
 const EQUIPMENT_CATEGORIES: Record<string, string> = {
   resgate: "Resgate",
