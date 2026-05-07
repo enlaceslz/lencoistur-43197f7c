@@ -299,6 +299,26 @@ const modules: ModuleGuide[] = [
     ],
   },
   {
+    id: "termos",
+    icon: FileText,
+    title: "Termos de Risco",
+    subtitle: "Conformidade ISO 21103",
+    color: "bg-red-600",
+    overview: "Módulo para gestão dos Termos de Ciência de Risco. Gerencie assinaturas digitais, valide documentação e assegure a conformidade legal em todas as atividades.",
+    steps: [
+      { title: "Gerar Termo", desc: "Vincule o termo a uma reserva existente ou crie um registro avulso." },
+      { title: "Coleta de Assinatura", desc: "Envie o link por WhatsApp ou assine no próprio painel durante o briefing." },
+      { title: "Monitoramento", desc: "Acompanhe termos pendentes e gerencie assinaturas de menores de idade." }
+    ],
+    tips: [
+      "Sempre colete a assinatura antes do início do passeio",
+      "O termo assinado gera automaticamente um PDF armazenado no histórico do cliente"
+    ],
+    faq: [
+      { q: "O termo tem validade legal?", a: "Sim, atende aos requisitos da ABNT NBR ISO 21103 para turismo de aventura." }
+    ]
+  },
+  {
     id: "config",
     icon: Settings,
     title: "Configurações",
@@ -353,248 +373,265 @@ const AdminAjuda = () => {
     <AdminLayout title="Central de Ajuda">
       <div className="space-y-6">
         {/* Header */}
-        <div className="bg-gradient-to-r from-[hsl(217,91%,60%)] to-[hsl(217,91%,45%)] rounded-2xl p-6 sm:p-8 text-white">
-          <div className="flex items-center gap-3 mb-3">
-            <BookOpen size={28} />
-            <h2 className="text-2xl font-bold font-display">Central de Ajuda</h2>
-          </div>
-          <p className="text-white/80 text-sm max-w-2xl mb-5">
-            Guia completo e ilustrativo de todos os módulos do sistema LençóisTour. Clique em qualquer módulo para ver instruções detalhadas, fluxos e dicas.
-          </p>
-          <div className="relative max-w-md">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/50" />
-            <Input
-              placeholder="Buscar módulo ou funcionalidade..."
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setSelectedModule(null); }}
-              className="pl-10 bg-white/15 border-white/20 text-white placeholder:text-white/50 focus:bg-white/20"
-            />
+        <div className="glass-card rounded-[2.5rem] p-8 md:p-12 mb-10 border-none shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-primary/10 transition-all duration-700" />
+          
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                  <BookOpen size={28} strokeWidth={2.5} />
+                </div>
+                <h2 className="text-3xl md:text-4xl font-black text-foreground tracking-tighter uppercase">Central de Ajuda</h2>
+              </div>
+              <p className="text-sm md:text-base font-medium text-muted-foreground leading-relaxed">
+                Guia interativo e documentação técnica do ecossistema <span className="text-primary font-bold">LençóisTour</span>. 
+                Explore os módulos abaixo para dominar cada funcionalidade do sistema.
+              </p>
+            </div>
+            
+            <div className="relative w-full md:w-96 group/search">
+              <Search size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within/search:text-primary transition-colors" />
+              <input
+                type="text"
+                placeholder="Pesquisar guia..."
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); setSelectedModule(null); }}
+                className="w-full h-14 pl-14 pr-6 bg-muted/30 border border-border/40 rounded-2xl text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 focus:bg-white transition-all placeholder:text-muted-foreground/30 uppercase tracking-widest shadow-inner"
+              />
+            </div>
           </div>
         </div>
 
         {/* Module Grid or Detail */}
         {!active ? (
-          <>
+          <div className="space-y-12">
             {/* Modules Grid */}
             <div>
-              <h3 className="text-lg font-bold text-[hsl(220,25%,18%)] mb-4 flex items-center gap-2">
-                <HelpCircle size={20} className="text-[hsl(217,91%,60%)]" />
-                Módulos do Sistema
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Info size={14} className="text-[hsl(220,15%,60%)]" />
-                  </TooltipTrigger>
-                  <TooltipContent>Clique em um módulo para ver o guia completo</TooltipContent>
-                </Tooltip>
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              <div className="flex items-center gap-3 mb-6">
+                <HelpCircle size={22} className="text-primary" strokeWidth={3} />
+                <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Arquitetura de Módulos</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
                 {filtered.map((mod) => {
                   const Icon = mod.icon;
                   return (
-                    <Card
+                    <div
                       key={mod.id}
-                      className="cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 border-[hsl(220,20%,92%)]"
+                      className="glass-card admin-card-hover rounded-[2rem] p-6 cursor-pointer group relative overflow-hidden flex flex-col border border-border/50 transition-all hover:border-primary/30 shadow-sm"
                       onClick={() => setSelectedModule(mod.id)}
                     >
-                      <CardContent className="p-4 flex items-start gap-3">
-                        <div className={`${mod.color} w-10 h-10 rounded-xl flex items-center justify-center shrink-0`}>
-                          <Icon size={20} className="text-white" />
+                      <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${mod.color.replace('bg-', 'bg-')}`} />
+                      
+                      <div className="flex items-start justify-between mb-4">
+                        <div className={`w-12 h-12 rounded-2xl ${mod.color} flex items-center justify-center text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
+                          <Icon size={24} strokeWidth={2.5} />
                         </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-semibold text-sm text-[hsl(220,25%,18%)]">{mod.title}</h4>
-                            {mod.badge && <Badge variant="secondary" className="text-[9px] px-1.5 py-0">{mod.badge}</Badge>}
-                          </div>
-                          <p className="text-xs text-[hsl(220,15%,55%)] mt-0.5">{mod.subtitle}</p>
-                        </div>
-                        <ArrowRight size={14} className="text-[hsl(220,15%,75%)] shrink-0 mt-1 ml-auto" />
-                      </CardContent>
-                    </Card>
+                        {mod.badge && <Badge variant="secondary" className="bg-primary/10 text-primary border-none font-black text-[8px] uppercase px-2 py-0.5 rounded-full">{mod.badge}</Badge>}
+                      </div>
+                      
+                      <div className="flex-1">
+                        <h4 className="font-black text-foreground text-sm uppercase tracking-wider group-hover:text-primary transition-colors">{mod.title}</h4>
+                        <p className="text-[10px] font-bold text-muted-foreground mt-1 leading-relaxed opacity-70">{mod.subtitle}</p>
+                      </div>
+                      
+                      <div className="mt-4 pt-4 border-t border-border/50 flex items-center justify-between">
+                        <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Ver Documentação</span>
+                        <ArrowRight size={14} className="text-primary group-hover:translate-x-1 transition-transform" strokeWidth={3} />
+                      </div>
+                    </div>
                   );
                 })}
               </div>
               {filtered.length === 0 && (
-                <div className="text-center py-12 text-[hsl(220,15%,55%)]">
-                  <Search size={40} className="mx-auto mb-3 opacity-30" />
-                  <p>Nenhum módulo encontrado para "{search}"</p>
+                <div className="text-center py-20 glass-card rounded-[2.5rem] border-2 border-dashed border-border/40">
+                  <Search size={48} className="mx-auto mb-4 text-muted-foreground/20" />
+                  <p className="text-lg font-black text-muted-foreground uppercase tracking-widest">Nenhum guia encontrado</p>
                 </div>
               )}
             </div>
 
             {/* Flow Diagrams */}
-            <div>
-              <h3 className="text-lg font-bold text-[hsl(220,25%,18%)] mb-4 flex items-center gap-2">
-                <Workflow size={20} className="text-[hsl(217,91%,60%)]" />
-                Fluxos Principais
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Info size={14} className="text-[hsl(220,15%,60%)]" />
-                  </TooltipTrigger>
-                  <TooltipContent>Diagramas visuais dos processos mais importantes</TooltipContent>
-                </Tooltip>
-              </h3>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <Workflow size={22} className="text-primary" strokeWidth={3} />
+                <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Fluxos Operacionais Integrados</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {flowDiagrams.map((flow) => {
                   const Icon = flow.icon;
                   return (
-                    <Card key={flow.title} className="border-[hsl(220,20%,92%)]">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm flex items-center gap-2">
-                          <Icon size={16} className="text-[hsl(217,91%,60%)]" />
-                          {flow.title}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <div className="space-y-0">
-                          {flow.steps.map((step, i) => (
-                            <div key={i} className="flex items-start gap-2.5 py-1.5">
-                              <div className="flex flex-col items-center">
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${i === flow.steps.length - 1 ? "bg-emerald-100 text-emerald-700" : "bg-[hsl(217,91%,95%)] text-[hsl(217,91%,50%)]"}`}>
-                                  {i === flow.steps.length - 1 ? <CheckCircle2 size={14} /> : i + 1}
-                                </div>
-                                {i < flow.steps.length - 1 && <div className="w-px h-3 bg-[hsl(220,20%,88%)]" />}
-                              </div>
-                              <span className="text-xs text-[hsl(220,15%,40%)] pt-1">{step}</span>
-                            </div>
-                          ))}
+                    <div key={flow.title} className="glass-card rounded-[2rem] p-8 border border-border/50 shadow-sm relative overflow-hidden flex flex-col">
+                       <div className="flex items-center gap-3 mb-8">
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                          <Icon size={20} strokeWidth={2.5} />
                         </div>
-                      </CardContent>
-                    </Card>
+                        <h4 className="font-black text-foreground text-xs uppercase tracking-wider">{flow.title}</h4>
+                      </div>
+                      
+                      <div className="space-y-4 flex-1">
+                        {flow.steps.map((step, i) => (
+                          <div key={i} className="flex items-start gap-4">
+                            <div className="flex flex-col items-center">
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${i === flow.steps.length - 1 ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "bg-primary/10 text-primary"}`}>
+                                {i === flow.steps.length - 1 ? <CheckCircle2 size={12} strokeWidth={3} /> : i + 1}
+                              </div>
+                              {i < flow.steps.length - 1 && <div className="w-0.5 h-6 bg-border/40 my-1" />}
+                            </div>
+                            <span className="text-[11px] font-bold text-muted-foreground leading-relaxed pt-1 uppercase tracking-tight">{step}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   );
                 })}
               </div>
             </div>
 
             {/* Legends */}
-            <Card className="border-[hsl(220,20%,92%)]">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Info size={16} className="text-[hsl(217,91%,60%)]" />
-                  Legendas e Ícones do Sistema
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-[hsl(220,20%,97%)]">
-                    <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                    <span className="text-[hsl(220,15%,40%)]"><strong>Verde</strong> — Ativo, confirmado, conforme, pago</span>
+            <div className="glass-card rounded-[2.5rem] p-8 border border-border/50 shadow-sm overflow-hidden relative group">
+              <div className="flex items-center gap-3 mb-8">
+                <Info size={22} className="text-primary" strokeWidth={3} />
+                <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Sistema Visual de Feedback</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { color: "bg-emerald-500", label: "Sucesso / Ativo", desc: "Confirmado, conforme ou pago" },
+                  { color: "bg-amber-500", label: "Pendente / Atenção", desc: "Requer verificação manual" },
+                  { color: "bg-rose-500", label: "Urgente / Bloqueado", desc: "Vencido, erro ou impedimento" },
+                  { color: "bg-blue-500", label: "Informativo", desc: "Dados extras ou andamento" },
+                  { badge: true, label: "Categorização", desc: "Filtros, tags e tipos de dados" },
+                  { icon: AlertTriangle, label: "Alertas SGS", desc: "Avisos críticos de segurança" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-muted/20 border border-border/40 hover:bg-white hover:shadow-lg transition-all">
+                    {item.color ? (
+                      <div className={`w-4 h-4 rounded-full ${item.color} shadow-sm shrink-0`} />
+                    ) : item.badge ? (
+                      <Badge variant="secondary" className="bg-primary/10 text-primary border-none text-[8px] font-black uppercase px-2 shrink-0">TAG</Badge>
+                    ) : (
+                      <AlertTriangle size={18} className="text-amber-500 shrink-0" strokeWidth={3} />
+                    )}
+                    <div>
+                      <p className="text-[10px] font-black text-foreground uppercase tracking-widest">{item.label}</p>
+                      <p className="text-[10px] font-medium text-muted-foreground">{item.desc}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-[hsl(220,20%,97%)]">
-                    <div className="w-3 h-3 rounded-full bg-amber-500" />
-                    <span className="text-[hsl(220,15%,40%)]"><strong>Amarelo</strong> — Pendente, atenção necessária</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-[hsl(220,20%,97%)]">
-                    <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <span className="text-[hsl(220,15%,40%)]"><strong>Vermelho</strong> — Urgente, vencido, bloqueado, erro</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-[hsl(220,20%,97%)]">
-                    <div className="w-3 h-3 rounded-full bg-blue-500" />
-                    <span className="text-[hsl(220,15%,40%)]"><strong>Azul</strong> — Informativo, em andamento</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-[hsl(220,20%,97%)]">
-                    <Badge variant="secondary" className="text-[9px]">Badge</Badge>
-                    <span className="text-[hsl(220,15%,40%)]"><strong>Badge</strong> — Categorias, status e tags</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 rounded-lg bg-[hsl(220,20%,97%)]">
-                    <AlertTriangle size={14} className="text-amber-500" />
-                    <span className="text-[hsl(220,15%,40%)]"><strong>Triângulo</strong> — Alerta ou aviso de segurança</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </>
+                ))}
+              </div>
+            </div>
+          </div>
         ) : (
-          /* Module Detail View */
-          <div>
+          <div className="animate-in-fade">
             <button
               onClick={() => setSelectedModule(null)}
-              className="text-sm text-[hsl(217,91%,60%)] hover:underline mb-4 flex items-center gap-1"
+              className="h-10 px-6 rounded-xl bg-white border border-border/50 text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white transition-all mb-8 shadow-sm flex items-center gap-2 group"
             >
-              ← Voltar para todos os módulos
+              <ArrowRight size={14} className="rotate-180 group-hover:-translate-x-1 transition-transform" strokeWidth={3} />
+              Voltar para a Central
             </button>
 
-            <Card className="border-[hsl(220,20%,92%)]">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className={`${active.color} w-12 h-12 rounded-xl flex items-center justify-center`}>
-                    <active.icon size={24} className="text-white" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <CardTitle className="text-xl">{active.title}</CardTitle>
-                      {active.badge && <Badge>{active.badge}</Badge>}
+            <div className="glass-card rounded-[2.5rem] border-none shadow-2xl overflow-hidden">
+              <div className={`h-3 w-full ${active.color}`} />
+              
+              <div className="p-8 md:p-12">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
+                  <div className="flex items-center gap-6">
+                    <div className={`${active.color} w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl`}>
+                      <active.icon size={32} strokeWidth={2.5} />
                     </div>
-                    <p className="text-sm text-[hsl(220,15%,55%)]">{active.subtitle}</p>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Overview */}
-                <div className="p-4 bg-[hsl(217,91%,97%)] rounded-xl border border-[hsl(217,91%,90%)]">
-                  <div className="flex items-start gap-2">
-                    <BookOpen size={16} className="text-[hsl(217,91%,60%)] mt-0.5 shrink-0" />
-                    <p className="text-sm text-[hsl(220,15%,35%)]">{active.overview}</p>
+                    <div>
+                      <div className="flex items-center gap-3 mb-1">
+                        <h3 className="text-2xl md:text-3xl font-black text-foreground uppercase tracking-tight">{active.title}</h3>
+                        {active.badge && <Badge className="bg-primary/10 text-primary border-none font-black text-[9px] uppercase px-2 py-0.5 rounded-full">{active.badge}</Badge>}
+                      </div>
+                      <p className="text-sm font-bold text-muted-foreground uppercase tracking-[0.2em]">{active.subtitle}</p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Step by step */}
-                <div>
-                  <h4 className="font-semibold text-[hsl(220,25%,18%)] mb-3 flex items-center gap-2">
-                    <CheckCircle2 size={16} className="text-emerald-500" />
-                    Passo a Passo
-                  </h4>
-                  <div className="space-y-3">
-                    {active.steps.map((step, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-[hsl(220,20%,97%)] border border-[hsl(220,20%,93%)]">
-                        <div className="w-7 h-7 rounded-full bg-[hsl(217,91%,60%)] text-white flex items-center justify-center text-xs font-bold shrink-0">
-                          {i + 1}
+                <div className="grid lg:grid-cols-12 gap-12">
+                  <div className="lg:col-span-8 space-y-12">
+                    {/* Overview */}
+                    <div className="bg-primary/5 p-8 rounded-[2rem] border border-primary/10 relative overflow-hidden group">
+                      <BookOpen size={64} className="absolute -right-4 -bottom-4 text-primary/5 group-hover:scale-110 transition-transform duration-700" />
+                      <div className="flex items-start gap-4 relative z-10">
+                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-primary shadow-sm shrink-0">
+                          <Info size={20} strokeWidth={2.5} />
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-[hsl(220,25%,18%)]">{step.title}</p>
-                          <p className="text-xs text-[hsl(220,15%,50%)] mt-0.5">{step.desc}</p>
+                        <p className="text-base font-medium text-foreground/80 leading-relaxed italic">{active.overview}</p>
+                      </div>
+                    </div>
+
+                    {/* Step by step */}
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3 mb-2">
+                        <CheckCircle2 size={22} className="text-emerald-500" strokeWidth={3} />
+                        <h4 className="text-xl font-black text-foreground uppercase tracking-tight">Guia de Implementação</h4>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        {active.steps.map((step, i) => (
+                          <div key={i} className="flex items-start gap-6 p-6 rounded-[2rem] bg-muted/20 border border-border/40 hover:bg-white hover:shadow-xl transition-all group">
+                            <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-sm font-black shrink-0 shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
+                              {i + 1}
+                            </div>
+                            <div>
+                              <p className="text-base font-black text-foreground uppercase tracking-tight mb-1">{step.title}</p>
+                              <p className="text-sm font-medium text-muted-foreground leading-relaxed">{step.desc}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-4 space-y-8">
+                    {/* Tips */}
+                    {active.tips.length > 0 && (
+                      <div className="glass-card rounded-[2rem] p-8 border border-amber-200/50 bg-amber-50/30">
+                        <div className="flex items-center gap-3 mb-6">
+                          <Lightbulb size={20} className="text-amber-500" strokeWidth={3} />
+                          <h4 className="text-base font-black text-foreground uppercase tracking-tight">Dicas Pro</h4>
+                        </div>
+                        <div className="space-y-4">
+                          {active.tips.map((tip, i) => (
+                            <div key={i} className="flex items-start gap-3">
+                              <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
+                              <p className="text-xs font-bold text-amber-900/70 leading-relaxed uppercase tracking-tighter">{tip}</p>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    ))}
+                    )}
+
+                    {/* FAQ */}
+                    {active.faq.length > 0 && (
+                      <div className="space-y-6">
+                         <div className="flex items-center gap-3">
+                          <HelpCircle size={20} className="text-primary" strokeWidth={3} />
+                          <h4 className="text-base font-black text-foreground uppercase tracking-tight">Dúvidas Comuns</h4>
+                        </div>
+                        <Accordion type="single" collapsible className="w-full space-y-3">
+                          {active.faq.map((item, i) => (
+                            <AccordionItem key={i} value={`faq-${i}`} className="border border-border/50 rounded-2xl px-4 bg-white shadow-sm overflow-hidden">
+                              <AccordionTrigger className="text-xs font-black uppercase tracking-widest text-left hover:no-underline py-4">
+                                {item.q}
+                              </AccordionTrigger>
+                              <AccordionContent className="text-xs font-medium text-muted-foreground leading-relaxed pb-4 pt-2 border-t border-border/20">
+                                {item.a}
+                              </AccordionContent>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                {/* Tips */}
-                {active.tips.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-[hsl(220,25%,18%)] mb-3 flex items-center gap-2">
-                      <Lightbulb size={16} className="text-amber-500" />
-                      Dicas Úteis
-                    </h4>
-                    <div className="space-y-2">
-                      {active.tips.map((tip, i) => (
-                        <div key={i} className="flex items-start gap-2 p-2.5 rounded-lg bg-amber-50 border border-amber-100">
-                          <Lightbulb size={14} className="text-amber-500 mt-0.5 shrink-0" />
-                          <p className="text-xs text-amber-800">{tip}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* FAQ */}
-                {active.faq.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-[hsl(220,25%,18%)] mb-3 flex items-center gap-2">
-                      <HelpCircle size={16} className="text-[hsl(217,91%,60%)]" />
-                      Perguntas Frequentes
-                    </h4>
-                    <Accordion type="single" collapsible className="w-full">
-                      {active.faq.map((item, i) => (
-                        <AccordionItem key={i} value={`faq-${i}`}>
-                          <AccordionTrigger className="text-sm text-left">{item.q}</AccordionTrigger>
-                          <AccordionContent className="text-xs text-[hsl(220,15%,45%)]">{item.a}</AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         )}
       </div>
