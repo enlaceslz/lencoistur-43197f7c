@@ -1034,7 +1034,7 @@ const AdminReservas = () => {
                 </Button>
               </div>
             </div>
-          </form>
+          
         </DialogContent>
       </Dialog>
     </AdminLayout>
