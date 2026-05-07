@@ -1698,7 +1698,7 @@ const AdminCRMContent = () => {
                 placeholder="Notas internas importantes sobre as preferências ou restrições do cliente..."
                 className="w-full min-h-[100px] rounded-2xl border border-input bg-amber-50/30 dark:bg-amber-900/10 px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/30 focus-visible:border-amber-500/50 transition-all font-medium"
               />
-              </div>
+            </div>
             </div>
             <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0">
               <Button type="button" variant="outline" onClick={() => setModalOpen(false)} disabled={saving} className="flex-1 h-12 rounded-xl font-bold">
