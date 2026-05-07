@@ -520,7 +520,7 @@ const AdminReservas = () => {
                     <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-1">Valor Total</span>
                     <p className="text-2xl font-black text-foreground tracking-tighter">{fmt(booking.finalTotal)}</p>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -528,12 +528,12 @@ const AdminReservas = () => {
                             variant="ghost" 
                             size="icon" 
                             onClick={() => setSelected(booking)}
-                            className="h-12 w-12 rounded-[1.25rem] bg-white/50 dark:bg-white/5 hover:bg-primary hover:text-white transition-all duration-500 shadow-lg hover:shadow-primary/40 active:scale-95 border border-white/40 dark:border-white/10"
+                            className="h-10 w-10 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-primary hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10"
                           >
-                            <Eye size={20} />
+                            <Eye size={18} />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent className="bg-primary text-white font-black text-[10px] uppercase tracking-widest border-none px-4 py-2 rounded-xl shadow-2xl">Ver Detalhes</TooltipContent>
+                        <TooltipContent>Ver Detalhes</TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                     
@@ -544,14 +544,32 @@ const AdminReservas = () => {
                             variant="ghost" 
                             size="icon" 
                             onClick={() => openEdit(booking)}
-                            className="h-12 w-12 rounded-[1.25rem] bg-white/50 dark:bg-white/5 hover:bg-amber-500 hover:text-white transition-all duration-500 shadow-lg hover:shadow-amber-500/40 active:scale-95 border border-white/40 dark:border-white/10"
+                            className="h-10 w-10 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-amber-500 hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10"
                           >
-                            <Pencil size={20} />
+                            <Pencil size={18} />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent className="bg-amber-500 text-white font-black text-[10px] uppercase tracking-widest border-none px-4 py-2 rounded-xl shadow-2xl">Editar Reserva</TooltipContent>
+                        <TooltipContent>Editar Reserva</TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
+
+                    {booking.status !== "cancelada" && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => handleAction(() => cancelBooking(booking.id), "Reserva cancelada com sucesso.", true)}
+                              className="h-10 w-10 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-rose-500 hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10 text-rose-500"
+                            >
+                              <Ban size={18} />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Cancelar Reserva</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
                   </div>
                 </div>
               </div>
@@ -745,15 +763,17 @@ const AdminReservas = () => {
                     Marcar Concluída
                   </Button>
                 )}
-                <Button 
-                  variant="destructive" 
-                  onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada com sucesso.", true)} 
-                  disabled={actionLoading} 
-                  className="flex-1 min-w-[140px]"
-                >
-                  {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
-                  Cancelar Reserva
-                </Button>
+                {selected.status !== "cancelada" && (
+                  <Button 
+                    variant="destructive" 
+                    onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada com sucesso.", true)} 
+                    disabled={actionLoading} 
+                    className="flex-1 min-w-[140px]"
+                  >
+                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
+                    Cancelar Reserva
+                  </Button>
+                )}
                 {/* Print Receipt */}
                 {selected.payMethod !== "info" && (
                   <PrintReceiptButton
