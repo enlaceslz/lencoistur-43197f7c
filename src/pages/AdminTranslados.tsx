@@ -8,7 +8,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
-import { Car, MapPin, Clock, Users, Plus, Pencil, Trash2, Search, Loader2, Percent, Eye, ArrowRight } from "lucide-react";
+import { Car, MapPin, Clock, Users, Plus, Pencil, Trash2, Search, Loader2, Percent, Eye, ArrowRight, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
