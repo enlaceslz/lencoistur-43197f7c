@@ -814,7 +814,7 @@ const AdminParceiros = () => {
                 {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
                 {editPartner ? "Salvar Alterações" : "Cadastrar Parceiro"}
               </Button>
-            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
