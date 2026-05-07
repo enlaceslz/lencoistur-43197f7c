@@ -541,10 +541,10 @@ const AdminSGSRiscos = () => {
           );
         })}
       </div>
-      </div>
     </AdminLayout>
   );
 };
+
 
 
 export default AdminSGSRiscos;
