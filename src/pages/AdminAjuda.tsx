@@ -299,6 +299,26 @@ const modules: ModuleGuide[] = [
     ],
   },
   {
+    id: "termos",
+    icon: FileText,
+    title: "Termos de Risco",
+    subtitle: "Conformidade ISO 21103",
+    color: "bg-red-600",
+    overview: "Módulo para gestão dos Termos de Ciência de Risco. Gerencie assinaturas digitais, valide documentação e assegure a conformidade legal em todas as atividades.",
+    steps: [
+      { title: "Gerar Termo", desc: "Vincule o termo a uma reserva existente ou crie um registro avulso." },
+      { title: "Coleta de Assinatura", desc: "Envie o link por WhatsApp ou assine no próprio painel durante o briefing." },
+      { title: "Monitoramento", desc: "Acompanhe termos pendentes e gerencie assinaturas de menores de idade." }
+    ],
+    tips: [
+      "Sempre colete a assinatura antes do início do passeio",
+      "O termo assinado gera automaticamente um PDF armazenado no histórico do cliente"
+    ],
+    faq: [
+      { q: "O termo tem validade legal?", a: "Sim, atende aos requisitos da ABNT NBR ISO 21103 para turismo de aventura." }
+    ]
+  },
+  {
     id: "config",
     icon: Settings,
     title: "Configurações",
