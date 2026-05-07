@@ -8,7 +8,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
-import { Car, MapPin, Clock, Users, Plus, Pencil, Trash2, Search, Loader2, Percent, Eye, ArrowRight } from "lucide-react";
+import { Car, MapPin, Clock, Users, Plus, Pencil, Trash2, Search, Loader2, Percent, Eye, ArrowRight, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -321,14 +321,25 @@ const AdminTranslados = () => {
 
       {/* Form Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Car size={20} className="text-primary" />
-              {editingId ? "Editar Rota" : "Nova Rota"}
-            </DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                <Car size={20} className="md:w-6 md:h-6" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                  {editingId ? "Editar Rota" : "Nova Rota de Translado"}
+                </DialogTitle>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium line-clamp-1">Configure os detalhes da logística e valores</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setShowForm(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <X size={20} className="text-slate-400" />
+            </Button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-6 md:space-y-8">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-black uppercase tracking-widest text-muted-foreground/60 mb-2 block ml-1">Origem *</label>
@@ -416,14 +427,25 @@ const AdminTranslados = () => {
 
       {/* Detail Dialog */}
       <Dialog open={!!detailRoute} onOpenChange={() => setDetailRoute(null)}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Car size={20} className="text-primary" /> Detalhes da Rota
-            </DialogTitle>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                <Car size={20} className="md:w-6 md:h-6" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                  Detalhes da Rota
+                </DialogTitle>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium line-clamp-1">Logística, horários e tarifação</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setDetailRoute(null)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <X size={20} className="text-slate-400" />
+            </Button>
+          </div>
           {detailRoute && (
-            <div className="space-y-6 py-4">
+            <div className="p-4 md:p-8 space-y-6 md:space-y-8">
               <div className="flex items-center gap-4 bg-primary/5 rounded-[2rem] p-6 border border-primary/10">
                 <div className="text-center flex-1">
                   <p className="text-[10px] font-black uppercase tracking-widest text-primary/40 mb-1">Origem</p>
