@@ -365,17 +365,32 @@ const AdminPacotes = () => {
                         />
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="pkg-days" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Duração (Dias)</Label>
-                      <div className="relative">
-                        <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                        <Input 
-                          id="pkg-days" 
-                          type="number" 
-                          value={form.days} 
-                          onChange={e => setForm({...form, days: Number(e.target.value)})} 
-                          className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-bold" 
-                        />
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="pkg-days" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Dias</Label>
+                        <div className="relative">
+                          <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                          <Input 
+                            id="pkg-days" 
+                            type="number" 
+                            value={form.days} 
+                            onChange={e => setForm({...form, days: Number(e.target.value)})} 
+                            className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-bold text-xs" 
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="pkg-nights" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Noites</Label>
+                        <div className="relative">
+                          <Moon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                          <Input 
+                            id="pkg-nights" 
+                            type="number" 
+                            value={form.nights} 
+                            onChange={e => setForm({...form, nights: Number(e.target.value)})} 
+                            className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-bold text-xs" 
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
