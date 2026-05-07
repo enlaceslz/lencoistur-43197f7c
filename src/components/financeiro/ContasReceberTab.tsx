@@ -5,14 +5,15 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Loader2, Pencil, Trash2, Link2, Calendar, User, Tag, CheckCircle2, AlertCircle, Printer, Search, FileText, Upload, X, ExternalLink } from "lucide-react";
+import { Plus, Loader2, Pencil, Trash2, Link2, Calendar, User, Tag, CheckCircle2, AlertCircle, Printer, Search, FileText, Upload, X, ExternalLink, DollarSign, Save, XCircle } from "lucide-react";
 import { toast } from "sonner";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { NumericFormat } from "react-number-format";
 
 const fmt = (v: number) => formatCurrency(v);
 
@@ -460,184 +461,166 @@ export default function ContasReceberTab({ company }: { company?: any }) {
       </Card>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-xl rounded-2xl border-none shadow-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold flex items-center gap-2">
-              <div className="p-2 rounded-xl bg-primary/10 text-primary">
-                {editing ? <Pencil size={20} /> : <Plus size={20} />}
+        <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                <CheckCircle2 size={20} className="md:w-6 md:h-6" />
               </div>
-              {editing ? "Editar" : "Nova"} Conta a Receber
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-6 pt-4 pb-2">
-            
-            <div className="bg-muted/30 p-4 rounded-2xl space-y-4 border border-border/50">
-              <h4 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
-                <Link2 size={14} /> Vínculos do CRM
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Vincular Reserva</Label>
-                  <select
-                    value={form.booking_id}
-                    onChange={(e) => handleBookingSelect(e.target.value)}
-                    className="w-full bg-background border border-muted-foreground/20 rounded-xl px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-primary outline-none h-11 transition-all"
-                  >
-                    <option value="">— Sem reserva —</option>
-                    {bookings.map(b => (
-                      <option key={b.id} value={b.id}>
-                        {b.booking_code} - {b.item_name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Selecionar Cliente</Label>
-                  <select
-                    value={form.customer_id}
-                    onChange={(e) => handleCustomerSelect(e.target.value)}
-                    className="w-full bg-background border border-muted-foreground/20 rounded-xl px-3 py-2 text-sm text-foreground focus:ring-2 focus:ring-primary outline-none h-11 transition-all"
-                  >
-                    <option value="">— Sem cliente —</option>
-                    {customers.map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
+              <div>
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                  {editing ? "Editar Entrada" : "Nova Conta a Receber"}
+                </DialogTitle>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Registre seus recebimentos e faturamento</p>
               </div>
             </div>
+            <Button variant="ghost" size="icon" onClick={() => setOpen(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <XCircle size={20} className="text-slate-400" />
+            </Button>
+          </div>
 
-            <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Descrição Principal *</Label>
-              <Input 
-                value={form.descricao} 
-                onChange={e => setForm({ ...form, descricao: e.target.value })}
-                className="rounded-xl border-muted-foreground/20 focus:ring-primary h-11"
-                placeholder="Ex: Pagamento Passeio X, Comissão..."
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
+          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              <div className="md:col-span-2 space-y-2 bg-primary/5 p-4 rounded-2xl border border-primary/10 mb-2">
+                <Label className="text-[10px] font-black uppercase text-primary tracking-widest ml-1">Vincular a uma Reserva (Opcional)</Label>
+                <Select value={form.booking_id} onValueChange={handleBookingSelect}>
+                  <SelectTrigger className="h-11 rounded-xl font-bold bg-white border-primary/20">
+                    <SelectValue placeholder="Selecione uma reserva ativa..." />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    <SelectItem value="none" className="font-bold text-muted-foreground italic">— Nenhuma reserva —</SelectItem>
+                    {bookings.map(b => (
+                      <SelectItem key={b.id} value={b.id}>
+                        {b.booking_code} - {b.item_name} ({b.customer_name})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="md:col-span-2 space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Descrição do Recebimento *</Label>
+                <Input value={form.descricao} onChange={e => setForm({ ...form, descricao: e.target.value })} placeholder="Ex: Pagamento Passeio Atins" className="h-12 rounded-xl font-bold" />
+              </div>
+
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Valor Estimado *</Label>
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Valor Esperado (R$) *</Label>
+                <NumericFormat
+                  value={form.valor / 100}
+                  onValueChange={(values) => setForm({ ...form, valor: Math.round(Number(values.floatValue) * 100) })}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  prefix="R$ "
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 h-12 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Previsão / Vencimento *</Label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-bold text-sm">R$</span>
-                  <Input 
-                    value={maskCurrency(String(form.valor))} 
-                    onChange={e => setForm({ ...form, valor: parseCurrency(e.target.value) })}
-                    className="pl-10 rounded-xl border-muted-foreground/20 h-11 font-bold text-lg"
-                  />
+                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  <Input type="date" value={form.vencimento} onChange={e => setForm({ ...form, vencimento: e.target.value })} className="pl-11 h-12 rounded-xl font-bold" />
                 </div>
               </div>
+
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Vencimento *</Label>
-                <Input 
-                  type="date" 
-                  value={form.vencimento} 
-                  onChange={e => setForm({ ...form, vencimento: e.target.value })}
-                  className="rounded-xl border-muted-foreground/20 h-11"
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Categoria de Receita</Label>
+                <Select value={form.categoria} onValueChange={v => setForm({ ...form, categoria: v })}>
+                  <SelectTrigger className="h-12 rounded-xl font-bold bg-white">
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    {categorias.map(cat => (
+                      <SelectItem key={cat} value={cat} className="capitalize font-medium">{cat}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Cliente / Titular</Label>
+                <div className="flex flex-col gap-2">
+                  <Select value={form.customer_id} onValueChange={handleCustomerSelect}>
+                    <SelectTrigger className="h-12 rounded-xl font-bold bg-white">
+                      <SelectValue placeholder="Vincular cliente..." />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl">
+                      {customers.map(c => (
+                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {!form.customer_id && (
+                    <Input value={form.cliente} onChange={e => setForm({ ...form, cliente: e.target.value })} placeholder="Nome manual..." className="h-10 rounded-xl" />
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Status de Recebimento</Label>
+                <div className="flex gap-2">
+                  <Button 
+                    type="button" 
+                    variant={form.status === "pendente" ? "default" : "outline"} 
+                    onClick={() => setForm({ ...form, status: "pendente" })}
+                    className={cn("flex-1 h-11 rounded-xl font-bold", form.status === "pendente" && "bg-amber-500 hover:bg-amber-600 shadow-lg shadow-amber-500/20")}
+                  >
+                    Pendente
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant={form.status === "recebido" ? "default" : "outline"} 
+                    onClick={() => setForm({ ...form, status: "recebido" })}
+                    className={cn("flex-1 h-11 rounded-xl font-bold", form.status === "recebido" && "bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20")}
+                  >
+                    Já Recebido
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Anexo / Comprovante</Label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Input 
+                      className="h-12 rounded-xl font-medium pr-10" 
+                      placeholder="URL do anexo" 
+                      value={form.anexo_url} 
+                      onChange={e => setForm({...form, anexo_url: e.target.value})} 
+                    />
+                    {form.anexo_url && (
+                      <a href={form.anexo_url} target="_blank" className="absolute right-3 top-1/2 -translate-y-1/2 text-primary hover:scale-110 transition-transform">
+                        <ExternalLink size={16} />
+                      </a>
+                    )}
+                  </div>
+                  <Button type="button" variant="outline" className="h-12 w-12 rounded-xl p-0 relative overflow-hidden shrink-0">
+                    <input type="file" onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+                    {uploading ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="md:col-span-2 space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Observações do Recebimento</Label>
+                <textarea 
+                  value={form.observacoes} 
+                  onChange={e => setForm({ ...form, observacoes: e.target.value })} 
+                  placeholder="Detalhes sobre a negociação ou forma de recebimento..."
+                  className="w-full min-h-[100px] rounded-2xl border border-slate-200 px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition-all outline-none"
                 />
               </div>
             </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Categoria</Label>
-                <Select value={form.categoria} onValueChange={v => setForm({ ...form, categoria: v })}>
-                  <SelectTrigger className="rounded-xl border-muted-foreground/20 h-11 capitalize">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl">
-                    {categorias.map(c => <SelectItem key={c} value={c} className="capitalize">{c}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Status do Recebimento</Label>
-                <Select value={form.status} onValueChange={v => setForm({ ...form, status: v })}>
-                  <SelectTrigger className="rounded-xl border-muted-foreground/20 h-11 font-semibold">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl">
-                    <SelectItem value="pendente">Pendente</SelectItem>
-                    <SelectItem value="recebido">Confirmar Recebimento</SelectItem>
-                    <SelectItem value="vencido">Vencido</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Nome do Cliente (Manual)</Label>
-              <Input 
-                value={form.cliente} 
-                onChange={e => setForm({ ...form, cliente: e.target.value })}
-                className="rounded-xl border-muted-foreground/20 h-11"
-                placeholder="Caso não queira selecionar do CRM..."
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Observações</Label>
-              <Input 
-                value={form.observacoes} 
-                onChange={e => setForm({ ...form, observacoes: e.target.value })}
-                className="rounded-xl border-muted-foreground/20 h-11"
-                placeholder="Informações extras sobre este recebimento"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Comprovante / Anexo</Label>
-              <div className="flex items-center gap-2">
-                {form.anexo_url ? (
-                  <div className="flex-1 flex items-center justify-between p-2 bg-muted rounded-xl border border-dashed border-primary/30">
-                    <div className="flex items-center gap-2 overflow-hidden">
-                      <FileText size={16} className="text-primary shrink-0" />
-                      <span className="text-xs truncate max-w-[200px]">Comprovante Anexado</span>
-                    </div>
-                    <div className="flex gap-1">
-                      <Button 
-                        size="icon" 
-                        variant="ghost" 
-                        className="h-8 w-8 text-primary" 
-                        onClick={() => window.open(form.anexo_url, '_blank')}
-                      >
-                        <ExternalLink size={14} />
-                      </Button>
-                      <Button 
-                        size="icon" 
-                        variant="ghost" 
-                        className="h-8 w-8 text-destructive" 
-                        onClick={() => setForm({ ...form, anexo_url: "" })}
-                      >
-                        <X size={14} />
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <label className="flex-1 flex flex-col items-center justify-center py-4 bg-muted/50 rounded-xl border-2 border-dashed border-muted-foreground/20 cursor-pointer hover:bg-muted transition-colors">
-                    {uploading ? (
-                      <Loader2 className="animate-spin text-primary" size={20} />
-                    ) : (
-                      <>
-                        <Upload size={20} className="text-muted-foreground mb-1" />
-                        <span className="text-xs text-muted-foreground font-medium">Anexar Comprovante</span>
-                      </>
-                    )}
-                    <input type="file" className="hidden" onChange={handleFileUpload} disabled={uploading} accept="image/*,application/pdf" />
-                  </label>
-                )}
-              </div>
-            </div>
-
-            <Button 
-              className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/20 bg-emerald-600 hover:bg-emerald-700" 
-              onClick={handleSave} 
-              disabled={saving || uploading}
-            >
-              {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : null}
-              {editing ? "Salvar Alterações" : "Cadastrar Recebimento"}
+          <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-4 sticky bottom-0">
+            <Button variant="ghost" onClick={() => setOpen(false)} className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest">
+              Cancelar
+            </Button>
+            <Button onClick={handleSave} disabled={saving} className="flex-[2] h-12 rounded-xl bg-emerald-500 hover:bg-emerald-600 shadow-xl shadow-emerald-500/20 font-black uppercase text-[10px] tracking-widest text-white transition-all">
+              {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save size={18} className="mr-2" />}
+              {editing ? "Salvar Alterações" : "Confirmar Lançamento"}
             </Button>
           </div>
         </DialogContent>
