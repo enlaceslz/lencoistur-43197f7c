@@ -262,61 +262,215 @@ const AdminPacotes = () => {
       </div>
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingId ? "Editar Pacote" : "Novo Pacote"}</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-6 pt-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <Label htmlFor="pkg-name">Nome do Pacote *</Label>
-                  <Input id="pkg-name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Ex: Fim de semana em Bonito" className="rounded-xl" required />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="pkg-desc">Descrição</Label>
-                  <Textarea id="pkg-desc" value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="rounded-xl min-h-[100px]" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <Label htmlFor="pkg-price">Preço Promocional (R$)</Label>
-                    <Input id="pkg-price" type="number" value={form.discount_price} onChange={e => setForm({...form, discount_price: Number(e.target.value)})} className="rounded-xl" />
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                <PackageIcon size={24} />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-black text-slate-900 leading-none mb-1">
+                  {editingId ? "Editar Pacote" : "Novo Pacote Turístico"}
+                </DialogTitle>
+                <p className="text-sm text-slate-500 font-medium">Configure os detalhes e o itinerário da campanha</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setShowForm(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <X size={20} className="text-slate-400" />
+            </Button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="p-8 space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Coluna Principal: Informações Básicas */}
+              <div className="lg:col-span-7 space-y-6">
+                <div className="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-1.5 h-6 bg-primary rounded-full" />
+                    <h3 className="font-black text-slate-800 uppercase tracking-wider text-xs">Informações Gerais</h3>
                   </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="pkg-days">Dias</Label>
-                    <Input id="pkg-days" type="number" value={form.days} onChange={e => setForm({...form, days: Number(e.target.value)})} className="rounded-xl" />
+
+                  <div className="space-y-2">
+                    <Label htmlFor="pkg-name" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Nome do Pacote Comercial</Label>
+                    <Input 
+                      id="pkg-name" 
+                      value={form.name} 
+                      onChange={e => setForm({...form, name: e.target.value})} 
+                      placeholder="Ex: Bonito Master Experience" 
+                      className="h-12 px-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-bold" 
+                      required 
+                    />
                   </div>
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="pkg-banner">Banner URL</Label>
-                  <Input id="pkg-banner" value={form.banner_url} onChange={e => setForm({...form, banner_url: e.target.value})} className="rounded-xl" placeholder="https://..." />
+
+                  <div className="space-y-2">
+                    <Label htmlFor="pkg-desc" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Descrição para Marketing (WhatsApp/Site)</Label>
+                    <Textarea 
+                      id="pkg-desc" 
+                      value={form.description} 
+                      onChange={e => setForm({...form, description: e.target.value})} 
+                      placeholder="Descreva o que torna este pacote único..."
+                      className="min-h-[120px] p-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-medium leading-relaxed" 
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="pkg-price" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Final (R$)</Label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">R$</span>
+                        <Input 
+                          id="pkg-price" 
+                          type="number" 
+                          value={form.discount_price} 
+                          onChange={e => setForm({...form, discount_price: Number(e.target.value)})} 
+                          className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-black text-primary" 
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="pkg-days" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Duração (Dias)</Label>
+                      <div className="relative">
+                        <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                        <Input 
+                          id="pkg-days" 
+                          type="number" 
+                          value={form.days} 
+                          onChange={e => setForm({...form, days: Number(e.target.value)})} 
+                          className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-bold" 
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="pkg-banner" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Banner do Pacote (URL da Imagem)</Label>
+                    <div className="relative group">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
+                        <Eye size={16} />
+                      </div>
+                      <Input 
+                        id="pkg-banner" 
+                        value={form.banner_url} 
+                        onChange={e => setForm({...form, banner_url: e.target.value})} 
+                        placeholder="Cole o link da imagem (Unsplash, Firebase, etc)"
+                        className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all" 
+                      />
+                    </div>
+                    {form.banner_url && (
+                      <div className="mt-3 rounded-2xl overflow-hidden border border-slate-100 shadow-sm aspect-[21/9]">
+                        <img src={form.banner_url} alt="Preview" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-              
-              <div className="bg-muted/30 rounded-2xl p-4 border border-border">
-                <h4 className="font-bold text-sm mb-4">Itinerário</h4>
-                <div className="grid grid-cols-2 gap-2 mb-4">
-                  <select className="h-10 rounded-xl bg-background border px-3 text-xs" onChange={e => { const t = tours.find(x => x.id === e.target.value); if(t) setSelectedItems([...selectedItems, {id:t.id, type:'tour', data:t}]); e.target.value=""; }}>
-                    <option value="">+ Passeio</option>{tours.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                  </select>
-                  <select className="h-10 rounded-xl bg-background border px-3 text-xs" onChange={e => { const t = transfers.find(x => x.id === e.target.value); if(t) setSelectedItems([...selectedItems, {id:t.id, type:'transfer', data:t}]); e.target.value=""; }}>
-                    <option value="">+ Translado</option>{transfers.map(t => <option key={t.id} value={t.id}>{t.origin} → {t.destination}</option>)}
-                  </select>
+
+              {/* Coluna Lateral: Itinerário e Configurações */}
+              <div className="lg:col-span-5 space-y-6">
+                <div className="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm space-y-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-6 bg-amber-500 rounded-full" />
+                      <h3 className="font-black text-slate-800 uppercase tracking-wider text-xs">Itinerário do Pacote</h3>
+                    </div>
+                    <Badge variant="secondary" className="bg-slate-100 text-slate-600 font-bold border-none h-6">
+                      {selectedItems.length} Itens
+                    </Badge>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <div className="relative">
+                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1.5 block">Adicionar Itens</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <select 
+                          className="h-11 rounded-xl bg-slate-50 border border-slate-200 px-3 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer" 
+                          onChange={e => { 
+                            const t = tours.find(x => x.id === e.target.value); 
+                            if(t) setSelectedItems([...selectedItems, {id:t.id, type:'tour', data:t}]); 
+                            e.target.value=""; 
+                          }}
+                        >
+                          <option value="" className="font-medium text-slate-400">+ Passeio</option>
+                          {tours.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                        </select>
+                        <select 
+                          className="h-11 rounded-xl bg-slate-50 border border-slate-200 px-3 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer" 
+                          onChange={e => { 
+                            const t = transfers.find(x => x.id === e.target.value); 
+                            if(t) setSelectedItems([...selectedItems, {id:t.id, type:'transfer', data:t}]); 
+                            e.target.value=""; 
+                          }}
+                        >
+                          <option value="" className="font-medium text-slate-400">+ Translado</option>
+                          {transfers.map(t => <option key={t.id} value={t.id}>{t.origin} → {t.destination}</option>)}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="min-h-[250px] max-h-[400px] overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                      {selectedItems.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-48 border-2 border-dashed border-slate-100 rounded-2xl p-6 text-center">
+                          <PackageIcon className="text-slate-200 mb-3" size={32} />
+                          <p className="text-xs font-bold text-slate-400">O itinerário está vazio.<br/>Selecione passeios ou translados acima.</p>
+                        </div>
+                      ) : (
+                        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
+                          <SortableContext items={selectedItems.map((i,idx) => `${i.type}-${i.id}-${idx}`)} strategy={verticalListSortingStrategy}>
+                            {selectedItems.map((item, idx) => (
+                              <SortableItem 
+                                key={`${item.type}-${item.id}-${idx}`} 
+                                item={item.data} 
+                                type={item.type} 
+                                index={idx} 
+                                onRemove={() => setSelectedItems(selectedItems.filter((_, i) => i !== idx))} 
+                              />
+                            ))}
+                          </SortableContext>
+                        </DndContext>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div className="min-h-[200px] space-y-2">
-                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
-                    <SortableContext items={selectedItems.map((i,idx) => `${i.type}-${i.id}-${idx}`)} strategy={verticalListSortingStrategy}>
-                      {selectedItems.map((item, idx) => <SortableItem key={`${item.type}-${item.id}-${idx}`} item={item.data} type={item.type} index={idx} onRemove={() => setSelectedItems(selectedItems.filter((_, i) => i !== idx))} />)}
-                    </SortableContext>
-                  </DndContext>
+
+                <div className="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <p className="font-black text-slate-800 text-sm">Status do Pacote</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Exibir no catálogo público</p>
+                    </div>
+                    <Switch checked={form.active} onCheckedChange={(val) => setForm({...form, active: val})} />
+                  </div>
                 </div>
               </div>
             </div>
-            
-            <DialogFooter className="pt-4 border-t">
-              <Button type="button" variant="ghost" onClick={() => setShowForm(false)} className="rounded-xl">Cancelar</Button>
-              <Button type="submit" disabled={saving} className="rounded-xl">{saving ? <Loader2 className="animate-spin mr-2" /> : <CheckCircle size={16} className="mr-2" />}{editingId ? "Salvar" : "Criar"}</Button>
-            </DialogFooter>
+
+            <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100">
+              <p className="text-[11px] font-bold text-slate-400 max-w-xs text-center sm:text-left">
+                * Campos obrigatórios. O pacote será salvo e poderá ser compartilhado imediatamente como campanha.
+              </p>
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  onClick={() => setShowForm(false)} 
+                  className="flex-1 sm:flex-none h-12 px-6 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-all"
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={saving} 
+                  className="flex-1 sm:flex-none h-12 px-10 rounded-xl bg-primary hover:bg-primary/90 text-white font-black shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
+                >
+                  {saving ? (
+                    <Loader2 className="animate-spin mr-2" size={18} />
+                  ) : (
+                    <CheckCircle size={18} className="mr-2" />
+                  )}
+                  {editingId ? "Salvar Alterações" : "Criar Pacote Completo"}
+                </Button>
+              </div>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
