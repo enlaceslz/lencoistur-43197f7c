@@ -12,11 +12,11 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Search, Plus, Pencil, Trash2, Package as PackageIcon, Clock, Tag, PlusCircle, X, CheckCircle, GripVertical, Eye
+  Search, Plus, Pencil, Trash2, Package as PackageIcon, Clock, PlusCircle, X, CheckCircle, GripVertical, Eye, Share2, Image as ImageIcon
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
@@ -38,571 +38,154 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
-const SortableTourItem = ({ tour, index, onRemove }: { tour: any, index: number, onRemove: () => void }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({ id: tour.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 1 : 0,
-    opacity: isDragging ? 0.5 : 1,
-  };
+const SortableItem = ({ item, type, index, onRemove }: { item: any, type: 'tour' | 'transfer', index: number, onRemove: () => void }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: `${type}-${item.id}` });
+  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 1 : 0, opacity: isDragging ? 0.5 : 1 };
 
   return (
-    <div 
-      ref={setNodeRef} 
-      style={style} 
-      className={`flex items-center gap-3 bg-white p-3 rounded-xl border border-blue-100 shadow-sm transition-shadow ${isDragging ? 'shadow-lg border-primary' : ''}`}
-    >
-      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing p-1 hover:bg-slate-100 rounded shrink-0">
+    <div ref={setNodeRef} style={style} className="flex items-center gap-3 bg-white p-3 rounded-xl border border-blue-100 shadow-sm">
+      <div {...attributes} {...listeners} className="cursor-grab p-1 hover:bg-slate-100 rounded shrink-0">
         <GripVertical size={16} className="text-slate-400" />
       </div>
       <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
         {index + 1}
       </span>
-      <span className="text-sm font-bold text-slate-700 flex-1 truncate">{tour.name}</span>
-      <button 
-        type="button"
-        onClick={onRemove}
-        className="p-1.5 hover:bg-red-50 text-red-400 hover:text-red-600 rounded-lg transition-colors"
-      >
+      <span className="text-sm font-bold text-slate-700 flex-1 truncate">
+        {type === 'tour' ? item.name : `${item.origin} → ${item.destination}`}
+      </span>
+      <button type="button" onClick={onRemove} className="p-1.5 hover:bg-red-50 text-red-400 rounded-lg">
         <X size={16} />
       </button>
     </div>
   );
 };
+
 const fmt = (v: number) => (Number(v) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-
-const maskCurrency = (v: string) => {
-  const n = v.replace(/\D/g, "");
-  return (Number(n) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
-};
-
-const parseCurrency = (v: string) => {
-  return Number(v.replace(/\D/g, ""));
-};
 
 const AdminPacotes = () => {
   const [packages, setPackages] = useState<any[]>([]);
   const [tours, setTours] = useState<any[]>([]);
+  const [transfers, setTransfers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [isViewMode, setIsViewMode] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const [form, setForm] = useState({
-    name: "",
-    slug: "",
-    description: "",
-    days: 1,
-    nights: 0,
-    original_price: 0,
-    discount_price: 0,
-    tag: "",
-    highlights: [] as string[],
-    active: true,
+    name: "", slug: "", description: "", days: 1, nights: 0,
+    original_price: 0, discount_price: 0, banner_url: "", active: true,
   });
 
   const [selectedTours, setSelectedTours] = useState<any[]>([]);
-  const [highlightInput, setHighlightInput] = useState("");
+  const [selectedTransfers, setSelectedTransfers] = useState<any[]>([]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
-  const handleDragEnd = (event: any) => {
-    const { active, over } = event;
-
-    if (active.id !== over.id) {
-      setSelectedTours((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
+  useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
     setLoading(true);
-    const [pkgRes, tourRes] = await Promise.all([
-      supabase.from("packages").select("*, package_tours(tour_id)").order("created_at", { ascending: false }),
-      supabase.from("tours").select("id, name, slug").eq("active", true).order("name"),
+    const [pkgRes, tourRes, transferRes] = await Promise.all([
+      supabase.from("packages").select("*, package_tours(tour_id), package_transfers(transfer_route_id)").order("created_at", { ascending: false }),
+      supabase.from("tours").select("id, name").eq("active", true).order("name"),
+      supabase.from("transfer_routes").select("id, origin, destination").eq("active", true).order("origin"),
     ]);
 
     setPackages(pkgRes.data || []);
     setTours(tourRes.data || []);
+    setTransfers(transferRes.data || []);
     setLoading(false);
   };
 
-  const generateSlug = (name: string) =>
-    name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-
-  const openNew = () => {
-    setEditingId(null);
-    setIsViewMode(false);
-    setForm({
-      name: "", slug: "", description: "", days: 1, nights: 0,
-      original_price: 0, discount_price: 0, tag: "", highlights: [], active: true
-    });
-    setSelectedTours([]);
-    setShowForm(true);
-  };
-
-  const openView = (pkg: any) => {
-    setEditingId(pkg.id);
-    setIsViewMode(true);
-    setForm({
-      name: pkg.name,
-      slug: pkg.slug,
-      description: pkg.description || "",
-      days: pkg.days,
-      nights: pkg.nights || 0,
-      original_price: pkg.original_price,
-      discount_price: pkg.discount_price,
-      tag: pkg.tag || "",
-      highlights: pkg.highlights || [],
-      active: pkg.active,
-    });
+  const sharePackage = (pkg: any) => {
+    const text = `Confira nosso pacote: ${pkg.name}\n${pkg.description || ""}\n\nPreço especial: ${fmt(pkg.discount_price)}`;
+    const url = window.location.origin + "/pacote/" + pkg.slug;
     
-    const pkgTours = (pkg.package_tours || [])
-      .sort((a: any, b: any) => a.sort_order - b.sort_order)
-      .map((pt: any) => tours.find(t => t.id === pt.tour_id))
-      .filter(Boolean);
-      
-    setSelectedTours(pkgTours);
-    setShowForm(true);
-  };
-
-  const openEdit = (pkg: any) => {
-    setEditingId(pkg.id);
-    setIsViewMode(false);
-    setForm({
-      name: pkg.name,
-      slug: pkg.slug,
-      description: pkg.description || "",
-      days: pkg.days,
-      nights: pkg.nights || 0,
-      original_price: pkg.original_price,
-      discount_price: pkg.discount_price,
-      tag: pkg.tag || "",
-      highlights: pkg.highlights || [],
-      active: pkg.active,
-    });
-    
-    // Map existing tours in correct order
-    const pkgTours = (pkg.package_tours || [])
-      .sort((a: any, b: any) => a.sort_order - b.sort_order)
-      .map((pt: any) => tours.find(t => t.id === pt.tour_id))
-      .filter(Boolean);
-      
-    setSelectedTours(pkgTours);
-    setShowForm(true);
+    if (navigator.share) {
+      navigator.share({ title: pkg.name, text, url });
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(text + "\n\n" + url)}`);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const slug = form.slug || generateSlug(form.name);
-    
-    const payload = { ...form, slug };
-
+    const payload = { ...form };
     let res;
     if (editingId) {
-      res = await supabase
-        .from("packages")
-        .update(payload)
-        .eq("id", editingId)
-        .select()
-        .single();
+      res = await supabase.from("packages").update(payload).eq("id", editingId).select().single();
     } else {
-      res = await supabase
-        .from("packages")
-        .insert(payload)
-        .select()
-        .single();
+      res = await supabase.from("packages").insert(payload).select().single();
     }
 
-    if (res.error) {
-      toast.error("Erro ao salvar pacote: " + res.error.message);
-      return;
-    }
+    if (res.error) { toast.error("Erro ao salvar: " + res.error.message); return; }
 
-    const packageId = res.data.id;
+    const pid = res.data.id;
+    await supabase.from("package_tours").delete().eq("package_id", pid);
+    await supabase.from("package_transfers").delete().eq("package_id", pid);
 
-    // Update package_tours
-    await supabase.from("package_tours").delete().eq("package_id", packageId);
-    
     if (selectedTours.length > 0) {
-      const tourInserts = selectedTours.map((t, idx) => ({
-        package_id: packageId,
-        tour_id: t.id,
-        sort_order: idx
-      }));
-      await supabase.from("package_tours").insert(tourInserts);
+      await supabase.from("package_tours").insert(selectedTours.map((t, i) => ({ package_id: pid, tour_id: t.id, sort_order: i })));
+    }
+    if (selectedTransfers.length > 0) {
+      await supabase.from("package_transfers").insert(selectedTransfers.map((t, i) => ({ package_id: pid, transfer_route_id: t.id, sort_order: i })));
     }
 
-    toast.success(editingId ? "Pacote atualizado!" : "Pacote criado!");
+    toast.success("Pacote salvo com sucesso!");
     setShowForm(false);
     loadData();
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Excluir este pacote permanentemente?")) return;
-    const { error } = await supabase.from("packages").delete().eq("id", id);
-    if (error) toast.error("Erro ao excluir: " + error.message);
-    else { toast.success("Pacote excluído"); loadData(); }
-  };
-
-  const addHighlight = () => {
-    if (!highlightInput.trim()) return;
-    setForm({ ...form, highlights: [...form.highlights, highlightInput.trim()] });
-    setHighlightInput("");
-  };
-
-  const removeHighlight = (idx: number) => {
-    setForm({ ...form, highlights: form.highlights.filter((_, i) => i !== idx) });
-  };
-
-  const toggleTour = (tour: any) => {
-    if (selectedTours.some(t => t.id === tour.id)) {
-      setSelectedTours(selectedTours.filter(t => t.id !== tour.id));
-    } else {
-      setSelectedTours([...selectedTours, tour]);
-    }
-  };
-
-  const filtered = packages.filter(p => 
-    p.name.toLowerCase().includes(search.toLowerCase()) || 
-    p.tag?.toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
     <AdminLayout title="Gestão de Pacotes">
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-8 p-6 bg-card border border-border rounded-3xl shadow-sm">
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-          <Input 
-            placeholder="Buscar pacotes..." 
-            value={search} 
-            onChange={(e) => setSearch(e.target.value)} 
-            className="pl-12 h-12 rounded-2xl border-muted-foreground/20 focus:ring-primary/20 bg-muted/30" 
-          />
-        </div>
-        <Button onClick={openNew} className="h-12 px-8 rounded-2xl font-bold flex items-center gap-2">
-          <Plus size={20} strokeWidth={3} /> Novo Pacote
+      <div className="flex flex-col md:flex-row gap-4 justify-between mb-8">
+        <Input placeholder="Buscar pacotes..." value={search} onChange={e => setSearch(e.target.value)} className="max-w-xs" />
+        <Button onClick={() => { setEditingId(null); setShowForm(true); }}>
+          <Plus size={20} className="mr-2" /> Novo Pacote
         </Button>
       </div>
 
-      <Card className="border-none shadow-sm overflow-hidden rounded-3xl">
-        <Table>
-          <TableHeader className="bg-muted/50">
-            <TableRow>
-              <TableHead className="font-bold">Pacote</TableHead>
-              <TableHead className="font-bold">Duração</TableHead>
-              <TableHead className="font-bold">Preço</TableHead>
-              <TableHead className="font-bold">Status</TableHead>
-              <TableHead className="text-right font-bold">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow><TableCell colSpan={5} className="text-center py-10">Carregando...</TableCell></TableRow>
-            ) : filtered.length === 0 ? (
-              <TableRow><TableCell colSpan={5} className="text-center py-10 text-muted-foreground">Nenhum pacote encontrado.</TableCell></TableRow>
-            ) : (
-              filtered.map((pkg) => (
-                <TableRow key={pkg.id} className="cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => openView(pkg)}>
-                  <TableCell className="font-medium">
-                    <div>
-                      <p className="font-bold text-foreground">{pkg.name}</p>
-                      <p className="text-xs text-muted-foreground">{pkg.slug}</p>
-                      {pkg.tag && <Badge variant="secondary" className="mt-1">{pkg.tag}</Badge>}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col gap-1 text-sm">
-                      <div className="flex items-center gap-1.5">
-                        <Clock size={14} className="text-muted-foreground" />
-                        {pkg.days} {pkg.days === 1 ? 'dia' : 'dias'}
-                      </div>
-                      {pkg.nights > 0 && (
-                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground ml-5">
-                          {pkg.nights} {pkg.nights === 1 ? 'noite' : 'noites'}
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-0.5">
-                      <p className="text-sm font-bold text-primary">{fmt(pkg.discount_price)}</p>
-                      <p className="text-xs text-muted-foreground line-through">{fmt(pkg.original_price)}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={pkg.active ? "default" : "outline"} className={pkg.active ? "bg-green-100 text-green-700 hover:bg-green-100" : ""}>
-                      {pkg.active ? "Ativo" : "Inativo"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => openView(pkg)} title="Visualizar" className="h-8 w-8 rounded-lg text-slate-600 hover:text-slate-700 hover:bg-slate-50">
-                        <Eye size={16} />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => openEdit(pkg)} title="Editar" className="h-8 w-8 rounded-lg text-blue-600 hover:text-blue-700 hover:bg-blue-50">
-                        <Pencil size={16} />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(pkg.id)} title="Excluir" className="h-8 w-8 rounded-lg text-red-600 hover:text-red-700 hover:bg-red-50">
-                        <Trash2 size={16} />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </Card>
-
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {packages.filter(p => p.name.toLowerCase().includes(search.toLowerCase())).map(pkg => (
+          <Card key={pkg.id} className="rounded-3xl shadow-sm border overflow-hidden">
+            {pkg.banner_url && <img src={pkg.banner_url} className="w-full h-40 object-cover" alt={pkg.name} />}
+            <CardContent className="p-6 space-y-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-bold text-lg">{pkg.name}</h3>
+                  <Badge variant="outline">{pkg.days} dias</Badge>
+                </div>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="icon" onClick={() => sharePackage(pkg)}><Share2 size={16} /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => { setEditingId(pkg.id); setForm(pkg); setShowForm(true); }}><Pencil size={16} /></Button>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground line-clamp-2">{pkg.description}</p>
+              <div className="flex items-center justify-between pt-4 border-t">
+                <span className="font-bold text-primary">{fmt(pkg.discount_price)}</span>
+                <Badge className={pkg.active ? "bg-green-100 text-green-700" : ""}>{pkg.active ? "Ativo" : "Inativo"}</Badge>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold flex items-center gap-2">
-              <PackageIcon className="text-primary" />
-              {isViewMode ? "Visualizar Pacote" : editingId ? "Editar Pacote" : "Novo Pacote"}
-            </DialogTitle>
+            <DialogTitle>{editingId ? "Editar Pacote" : "Novo Pacote"}</DialogTitle>
           </DialogHeader>
-
-          <form onSubmit={handleSubmit} className="space-y-6 pt-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-bold">Nome do Pacote</label>
-                <Input required disabled={isViewMode} value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: generateSlug(e.target.value) })} />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-bold">Slug (URL)</label>
-                <Input disabled={isViewMode} value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} />
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input placeholder="Nome" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
+            <Textarea placeholder="Descrição" value={form.description} onChange={e => setForm({...form, description: e.target.value})} />
+            <div className="flex gap-4">
+              <Input type="number" placeholder="Dias" value={form.days} onChange={e => setForm({...form, days: Number(e.target.value)})} />
+              <Input type="number" placeholder="Preço" value={form.discount_price} onChange={e => setForm({...form, discount_price: Number(e.target.value)})} />
             </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-bold">Descrição</label>
-              <Textarea disabled={isViewMode} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} />
+            <Input placeholder="URL do Banner" value={form.banner_url} onChange={e => setForm({...form, banner_url: e.target.value})} />
+            <div className="flex items-center gap-2">
+              <Switch checked={form.active} onCheckedChange={v => setForm({...form, active: v})} />
+              <Label>Ativo</Label>
             </div>
-            <div className="bg-gradient-to-br from-slate-50 to-blue-50/30 p-6 rounded-[2rem] border border-blue-100/50 space-y-6 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[80px] rounded-full -mr-16 -mt-16" />
-              
-              <div className="flex items-center justify-between relative z-10">
-                <div className="space-y-1">
-                  <h3 className="text-xs font-black uppercase tracking-[0.2em] text-blue-600 flex items-center gap-2">
-                    <Clock size={14} className="animate-pulse" /> Duração Logística
-                  </h3>
-                  <p className="text-[10px] text-slate-400 font-medium">Especificações técnicas para vouchers e seguros</p>
-                </div>
-                <Badge variant="outline" className="bg-white/80 backdrop-blur-sm text-[10px] border-blue-200 text-blue-600 font-bold px-3 py-1 rounded-full shadow-sm">
-                  PADRÃO CADASTUR & ICMBIO
-                </Badge>
-              </div>
-              
-              <div className="grid md:grid-cols-2 gap-8 relative z-10">
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center px-1">
-                    <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Dias de Atividade</label>
-                  </div>
-                  <div className="relative group transition-all duration-300">
-                    <div className="absolute inset-0 bg-blue-500/5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <Input 
-                      disabled={isViewMode} 
-                      type="number" 
-                      min={1} 
-                      value={form.days} 
-                      onChange={e => setForm({ ...form, days: parseInt(e.target.value) || 0 })}
-                      className="h-14 rounded-2xl border-blue-100 bg-white/90 backdrop-blur-md focus:bg-white focus:ring-4 focus:ring-blue-500/10 pr-20 transition-all text-slate-800 font-black text-lg shadow-inner"
-                    />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
-                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                      <span className="text-[10px] font-black uppercase text-blue-600">DIAS</span>
-                    </div>
-                  </div>
-                  <p className="text-[9px] text-slate-400 font-bold px-1 uppercase tracking-tighter">Período total de operação em campo</p>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center px-1">
-                    <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Pernoites (Noites)</label>
-                  </div>
-                  <div className="relative group transition-all duration-300">
-                    <div className="absolute inset-0 bg-indigo-500/5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <Input 
-                      disabled={isViewMode} 
-                      type="number" 
-                      min={0} 
-                      value={form.nights} 
-                      onChange={e => setForm({ ...form, nights: parseInt(e.target.value) || 0 })}
-                      className="h-14 rounded-2xl border-indigo-100 bg-white/90 backdrop-blur-md focus:bg-white focus:ring-4 focus:ring-indigo-500/10 pr-20 transition-all text-slate-800 font-black text-lg shadow-inner"
-                    />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-100">
-                      <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                      <span className="text-[10px] font-black uppercase text-indigo-600">NOITES</span>
-                    </div>
-                  </div>
-                  <p className="text-[9px] text-slate-400 font-bold px-1 uppercase tracking-tighter">Quantidade de estadias para logística hoteleira</p>
-                </div>
-              </div>
-
-              {!isViewMode && (
-                <div className="flex items-start gap-4 bg-white/60 backdrop-blur-sm p-4 rounded-[1.5rem] border border-blue-100/50 shadow-sm relative z-10">
-                  <div className="shrink-0 p-2 bg-blue-600 rounded-2xl shadow-lg shadow-blue-200">
-                    <CheckCircle size={14} className="text-white" strokeWidth={3} />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[11px] text-slate-700 leading-relaxed font-bold">
-                      Conformidade Normativa em Santo Amaro - MA
-                    </p>
-                    <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
-                      O registro preciso da <strong>duração logística</strong> (Dias x Noites) é obrigatório para a emissão de <strong>Vouchers Digitais</strong>, seguros de acidentes pessoais e relatórios estatísticos do <strong>Observatório de Turismo</strong> dos Lençóis Maranhenses.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-bold">Preço Original</label>
-                <Input 
-                  disabled={isViewMode}
-                  value={maskCurrency(String(form.original_price))} 
-                  onChange={e => setForm({ ...form, original_price: parseCurrency(e.target.value) })} 
-                />
-                <p className="text-[10px] text-muted-foreground">{fmt(form.original_price)}</p>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-bold">Preço Promocional</label>
-                <Input 
-                  disabled={isViewMode}
-                  value={maskCurrency(String(form.discount_price))} 
-                  onChange={e => setForm({ ...form, discount_price: parseCurrency(e.target.value) })} 
-                />
-                <p className="text-[10px] text-muted-foreground">{fmt(form.discount_price)}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2 bg-muted/50 p-4 rounded-xl">
-              <Switch 
-                id="active" 
-                disabled={isViewMode}
-                checked={form.active} 
-                onCheckedChange={(checked) => setForm({ ...form, active: checked })} 
-              />
-              <Label htmlFor="active" className="font-bold cursor-pointer">Pacote Ativo (visível no site)</Label>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-bold block">Passeios Inclusos (Clique para selecionar)</label>
-                  <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
-                    {selectedTours.length} selecionados
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-2 p-4 bg-muted/30 rounded-2xl border border-dashed border-border min-h-[100px]">
-                  {tours.map(tour => {
-                    const isSelected = selectedTours.some(t => t.id === tour.id);
-                    return (
-                      <button
-                        key={tour.id}
-                        type="button"
-                        onClick={() => !isViewMode && toggleTour(tour)}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border-2 ${
-                          isSelected 
-                          ? "bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-105" 
-                          : "bg-background border-transparent text-muted-foreground hover:border-primary/30"
-                        } ${isViewMode ? 'cursor-default' : 'cursor-pointer'}`}
-                      >
-                        {isSelected ? <CheckCircle size={14} strokeWidth={3} /> : <PlusCircle size={14} />}
-                        {tour.name}
-                      </button>
-                    );
-                  })}
-                </div>
-                {selectedTours.length > 0 && (
-                  <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 mt-2">
-                    <p className="text-[10px] font-black uppercase text-blue-600 mb-4 tracking-widest">Ordem no Roteiro (Arraste para reordenar)</p>
-                    
-                    <DndContext 
-                      sensors={sensors}
-                      collisionDetection={closestCenter}
-                      onDragEnd={handleDragEnd}
-                      modifiers={[restrictToVerticalAxis]}
-                    >
-                      <SortableContext 
-                        items={selectedTours.map(t => t.id)}
-                        strategy={verticalListSortingStrategy}
-                      >
-                        <div className="flex flex-col gap-3">
-                          {selectedTours.map((t, i) => (
-                            <SortableTourItem 
-                              key={t.id} 
-                              tour={t} 
-                              index={i} 
-                               onRemove={() => !isViewMode && toggleTour(t)}
-                            />
-                          ))}
-                        </div>
-                      </SortableContext>
-                    </DndContext>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <label className="text-sm font-bold block">Destaques (Highlights)</label>
-              <div className="flex gap-2">
-                <Input disabled={isViewMode} value={highlightInput} onChange={e => setHighlightInput(e.target.value)} placeholder="Ex: Guia bilíngue incluso" onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addHighlight())} />
-                <Button disabled={isViewMode} type="button" onClick={addHighlight} variant="secondary">Adicionar</Button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {form.highlights.map((h, i) => (
-                  <Badge key={i} className="pl-3 pr-1 py-1 gap-1 flex items-center bg-blue-50 text-blue-700 border-blue-200">
-                    {h}
-                    {!isViewMode && <button type="button" onClick={() => removeHighlight(i)} className="hover:bg-blue-200 rounded-full p-0.5"><X size={12} /></button>}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex gap-4 pt-4 border-t">
-              {!isViewMode ? (
-                <>
-                  <Button type="submit" className="flex-1 h-12 rounded-xl font-bold">
-                    {editingId ? "Salvar Alterações" : "Criar Pacote"}
-                  </Button>
-                  <Button type="button" variant="ghost" onClick={() => setShowForm(false)} className="h-12 rounded-xl font-bold">
-                    Cancelar
-                  </Button>
-                </>
-              ) : (
-                <Button type="button" onClick={() => setShowForm(false)} className="flex-1 h-12 rounded-xl font-bold">
-                  Fechar
-                </Button>
-              )}
-            </div>
+            <Button type="submit" className="w-full">Salvar Pacote</Button>
           </form>
         </DialogContent>
       </Dialog>
