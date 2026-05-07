@@ -111,16 +111,23 @@ const AdminSGSEquipe = () => {
   const getStaffTrainings = (staffId: string) => trainings.filter((t) => t.staff_id === staffId);
   const hasExpiredTraining = (staffId: string) => getStaffTrainings(staffId).some((t) => t.status === "vencido");
 
-  return (
-    <AdminLayout title="SGS - Equipe e Competências (ISO 21102)">
-      <div className="space-y-6">
-        <div className="flex justify-between gap-4">
-          <p className="text-sm text-muted-foreground">Gestão de competências conforme ABNT NBR ISO 21102</p>
+    <AdminLayout title="SGS — Equipe e Competências (ISO 21102)">
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="glass-card p-6 rounded-[2.5rem] border border-border/50 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-2xl bg-primary/10 text-primary shadow-inner">
+              <Shield size={24} strokeWidth={2.5} />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-foreground tracking-tight">Gestão de Competências</h2>
+              <p className="text-xs font-black text-muted-foreground uppercase tracking-widest mt-1">Conformidade ABNT NBR ISO 21102</p>
+            </div>
+          </div>
           <button 
             onClick={() => { setEditId(null); setForm({ name: "", role: "guia", phone: "", email: "", document: "", blocked: false }); setShowForm(!showForm); }}
-            className="flex items-center gap-3 px-8 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95"
+            className="w-full md:w-auto flex items-center justify-center gap-3 px-8 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95"
           >
-            <Plus size={20} strokeWidth={3} /> Novo Membro
+            <Plus size={20} strokeWidth={3} /> Novo Membro da Equipe
           </button>
         </div>
 
