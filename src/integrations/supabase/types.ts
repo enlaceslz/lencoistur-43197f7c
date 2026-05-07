@@ -887,9 +887,49 @@ export type Database = {
           },
         ]
       }
+      package_transfers: {
+        Row: {
+          created_at: string | null
+          id: string
+          package_id: string
+          sort_order: number | null
+          transfer_route_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          package_id: string
+          sort_order?: number | null
+          transfer_route_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          package_id?: string
+          sort_order?: number | null
+          transfer_route_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "package_transfers_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_transfers_transfer_route_id_fkey"
+            columns: ["transfer_route_id"]
+            isOneToOne: false
+            referencedRelation: "transfer_routes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       packages: {
         Row: {
           active: boolean | null
+          banner_url: string | null
           created_at: string
           days: number
           description: string | null
@@ -905,6 +945,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean | null
+          banner_url?: string | null
           created_at?: string
           days?: number
           description?: string | null
@@ -920,6 +961,7 @@ export type Database = {
         }
         Update: {
           active?: boolean | null
+          banner_url?: string | null
           created_at?: string
           days?: number
           description?: string | null
