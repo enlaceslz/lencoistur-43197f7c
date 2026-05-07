@@ -1011,6 +1011,9 @@ const AdminColaboradores = () => {
                 Lançar no Financeiro
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Manage Types Dialog */}
       <Dialog open={typesDialogOpen} onOpenChange={setTypesDialogOpen}>
