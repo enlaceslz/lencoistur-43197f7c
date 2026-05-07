@@ -25,8 +25,8 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { maskCPF, maskCNPJ, maskPhone, maskCpfCnpj } from "@/lib/masks";
 import { Separator } from "@/components/ui/separator";
-import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { formatDate } from "@/lib/utils";
 
 
 interface PartnerType {
