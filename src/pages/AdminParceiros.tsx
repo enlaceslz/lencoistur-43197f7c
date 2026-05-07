@@ -1079,30 +1079,32 @@ const AdminParceiros = () => {
             </div>
           </div>
 
-            <div className="flex gap-3 pt-6 border-t border-slate-100">
-              <Button variant="outline" onClick={() => {
+          <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0">
+            <Button variant="outline" onClick={() => {
+              if (viewPartner) {
+                openEdit(viewPartner);
+                setViewPartner(null);
+              }
+            }} className="flex-1 h-12 rounded-xl font-bold">
+              <Edit size={16} className="mr-2" /> Editar
+            </Button>
+            <Button 
+              variant={viewPartner?.active ? "destructive" : "default"} 
+              className="flex-1 h-12 rounded-xl font-bold"
+              onClick={() => {
                 if (viewPartner) {
-                  openEdit(viewPartner);
+                  toggleActive(viewPartner);
                   setViewPartner(null);
                 }
-              }} className="flex-1 h-12 rounded-xl font-bold">
-                <Edit size={16} className="mr-2" /> Editar
-              </Button>
-              <Button 
-                variant={viewPartner?.active ? "destructive" : "default"} 
-                className="flex-1 h-12 rounded-xl font-bold"
-                onClick={() => {
-                  if (viewPartner) {
-                    toggleActive(viewPartner);
-                    setViewPartner(null);
-                  }
-                }}
-              >
-                {viewPartner?.active ? <XCircle size={16} className="mr-2" /> : <CheckCircle2 size={16} className="mr-2" />}
-                {viewPartner?.active ? "Desativar" : "Ativar"}
-              </Button>
-              <Button variant="secondary" onClick={() => setViewPartner(null)} className="h-12 rounded-xl font-bold">Fechar</Button>
-            </div>
+              }}
+            >
+              {viewPartner?.active ? <XCircle size={16} className="mr-2" /> : <CheckCircle2 size={16} className="mr-2" />}
+              {viewPartner?.active ? "Desativar" : "Ativar"}
+            </Button>
+            <Button variant="secondary" onClick={() => setViewPartner(null)} className="h-12 rounded-xl font-bold px-8">Fechar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
           </div>
         </DialogContent>
       </Dialog>
