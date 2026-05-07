@@ -524,97 +524,114 @@ const AdminAjuda = () => {
             </div>
           </>
         ) : (
-          /* Module Detail View */
-          <div>
+          <div className="animate-in-fade">
             <button
               onClick={() => setSelectedModule(null)}
-              className="text-sm text-[hsl(217,91%,60%)] hover:underline mb-4 flex items-center gap-1"
+              className="h-10 px-6 rounded-xl bg-white border border-border/50 text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white transition-all mb-8 shadow-sm flex items-center gap-2 group"
             >
-              ← Voltar para todos os módulos
+              <ArrowRight size={14} className="rotate-180 group-hover:-translate-x-1 transition-transform" strokeWidth={3} />
+              Voltar para a Central
             </button>
 
-            <Card className="border-[hsl(220,20%,92%)]">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className={`${active.color} w-12 h-12 rounded-xl flex items-center justify-center`}>
-                    <active.icon size={24} className="text-white" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <CardTitle className="text-xl">{active.title}</CardTitle>
-                      {active.badge && <Badge>{active.badge}</Badge>}
+            <div className="glass-card rounded-[2.5rem] border-none shadow-2xl overflow-hidden">
+              <div className={`h-3 w-full ${active.color}`} />
+              
+              <div className="p-8 md:p-12">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
+                  <div className="flex items-center gap-6">
+                    <div className={`${active.color} w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl`}>
+                      <active.icon size={32} strokeWidth={2.5} />
                     </div>
-                    <p className="text-sm text-[hsl(220,15%,55%)]">{active.subtitle}</p>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Overview */}
-                <div className="p-4 bg-[hsl(217,91%,97%)] rounded-xl border border-[hsl(217,91%,90%)]">
-                  <div className="flex items-start gap-2">
-                    <BookOpen size={16} className="text-[hsl(217,91%,60%)] mt-0.5 shrink-0" />
-                    <p className="text-sm text-[hsl(220,15%,35%)]">{active.overview}</p>
+                    <div>
+                      <div className="flex items-center gap-3 mb-1">
+                        <h3 className="text-2xl md:text-3xl font-black text-foreground uppercase tracking-tight">{active.title}</h3>
+                        {active.badge && <Badge className="bg-primary/10 text-primary border-none font-black text-[9px] uppercase px-2 py-0.5 rounded-full">{active.badge}</Badge>}
+                      </div>
+                      <p className="text-sm font-bold text-muted-foreground uppercase tracking-[0.2em]">{active.subtitle}</p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Step by step */}
-                <div>
-                  <h4 className="font-semibold text-[hsl(220,25%,18%)] mb-3 flex items-center gap-2">
-                    <CheckCircle2 size={16} className="text-emerald-500" />
-                    Passo a Passo
-                  </h4>
-                  <div className="space-y-3">
-                    {active.steps.map((step, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-[hsl(220,20%,97%)] border border-[hsl(220,20%,93%)]">
-                        <div className="w-7 h-7 rounded-full bg-[hsl(217,91%,60%)] text-white flex items-center justify-center text-xs font-bold shrink-0">
-                          {i + 1}
+                <div className="grid lg:grid-cols-12 gap-12">
+                  <div className="lg:col-span-8 space-y-12">
+                    {/* Overview */}
+                    <div className="bg-primary/5 p-8 rounded-[2rem] border border-primary/10 relative overflow-hidden group">
+                      <BookOpen size={64} className="absolute -right-4 -bottom-4 text-primary/5 group-hover:scale-110 transition-transform duration-700" />
+                      <div className="flex items-start gap-4 relative z-10">
+                        <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-primary shadow-sm shrink-0">
+                          <Info size={20} strokeWidth={2.5} />
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-[hsl(220,25%,18%)]">{step.title}</p>
-                          <p className="text-xs text-[hsl(220,15%,50%)] mt-0.5">{step.desc}</p>
+                        <p className="text-base font-medium text-foreground/80 leading-relaxed italic">{active.overview}</p>
+                      </div>
+                    </div>
+
+                    {/* Step by step */}
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3 mb-2">
+                        <CheckCircle2 size={22} className="text-emerald-500" strokeWidth={3} />
+                        <h4 className="text-xl font-black text-foreground uppercase tracking-tight">Guia de Implementação</h4>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        {active.steps.map((step, i) => (
+                          <div key={i} className="flex items-start gap-6 p-6 rounded-[2rem] bg-muted/20 border border-border/40 hover:bg-white hover:shadow-xl transition-all group">
+                            <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-sm font-black shrink-0 shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
+                              {i + 1}
+                            </div>
+                            <div>
+                              <p className="text-base font-black text-foreground uppercase tracking-tight mb-1">{step.title}</p>
+                              <p className="text-sm font-medium text-muted-foreground leading-relaxed">{step.desc}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-4 space-y-8">
+                    {/* Tips */}
+                    {active.tips.length > 0 && (
+                      <div className="glass-card rounded-[2rem] p-8 border border-amber-200/50 bg-amber-50/30">
+                        <div className="flex items-center gap-3 mb-6">
+                          <Lightbulb size={20} className="text-amber-500" strokeWidth={3} />
+                          <h4 className="text-base font-black text-foreground uppercase tracking-tight">Dicas Pro</h4>
+                        </div>
+                        <div className="space-y-4">
+                          {active.tips.map((tip, i) => (
+                            <div key={i} className="flex items-start gap-3">
+                              <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
+                              <p className="text-xs font-bold text-amber-900/70 leading-relaxed uppercase tracking-tighter">{tip}</p>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    ))}
+                    )}
+
+                    {/* FAQ */}
+                    {active.faq.length > 0 && (
+                      <div className="space-y-6">
+                         <div className="flex items-center gap-3">
+                          <HelpCircle size={20} className="text-primary" strokeWidth={3} />
+                          <h4 className="text-base font-black text-foreground uppercase tracking-tight">Dúvidas Comuns</h4>
+                        </div>
+                        <Accordion type="single" collapsible className="w-full space-y-3">
+                          {active.faq.map((item, i) => (
+                            <AccordionItem key={i} value={`faq-${i}`} className="border border-border/50 rounded-2xl px-4 bg-white shadow-sm overflow-hidden">
+                              <AccordionTrigger className="text-xs font-black uppercase tracking-widest text-left hover:no-underline py-4">
+                                {item.q}
+                              </AccordionTrigger>
+                              <AccordionContent className="text-xs font-medium text-muted-foreground leading-relaxed pb-4 pt-2 border-t border-border/20">
+                                {item.a}
+                              </AccordionContent>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                {/* Tips */}
-                {active.tips.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-[hsl(220,25%,18%)] mb-3 flex items-center gap-2">
-                      <Lightbulb size={16} className="text-amber-500" />
-                      Dicas Úteis
-                    </h4>
-                    <div className="space-y-2">
-                      {active.tips.map((tip, i) => (
-                        <div key={i} className="flex items-start gap-2 p-2.5 rounded-lg bg-amber-50 border border-amber-100">
-                          <Lightbulb size={14} className="text-amber-500 mt-0.5 shrink-0" />
-                          <p className="text-xs text-amber-800">{tip}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* FAQ */}
-                {active.faq.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-[hsl(220,25%,18%)] mb-3 flex items-center gap-2">
-                      <HelpCircle size={16} className="text-[hsl(217,91%,60%)]" />
-                      Perguntas Frequentes
-                    </h4>
-                    <Accordion type="single" collapsible className="w-full">
-                      {active.faq.map((item, i) => (
-                        <AccordionItem key={i} value={`faq-${i}`}>
-                          <AccordionTrigger className="text-sm text-left">{item.q}</AccordionTrigger>
-                          <AccordionContent className="text-xs text-[hsl(220,15%,45%)]">{item.a}</AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         )}
       </div>
