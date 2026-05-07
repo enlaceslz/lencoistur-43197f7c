@@ -279,16 +279,24 @@ const modules: ModuleGuide[] = [
     id: "sgs",
     icon: Shield,
     title: "SGS — Segurança",
-    subtitle: "ISO 21101 / 21102",
+    subtitle: "ISO 21101 / 21102 / 21103",
     color: "bg-red-500",
-    badge: "ISO Compliant",
-    overview: "Módulo robusto para gestão de riscos e segurança. Atende integralmente às normas ISO 21101 e 21102, além das exigências do PGSAT (ICMBio).",
+    badge: "Enterprise",
+    overview: "Módulo central de governança de segurança. Integra a Matriz de Riscos (P2), Registro de Incidentes (P5), Auditorias Internas e o Plano de Gestão de Segurança (PGSAT), garantindo total conformidade com as normas ABNT NBR ISO de Turismo de Aventura.",
     steps: [
-      { title: "Matriz de Riscos", desc: "Identifique perigos, avalie riscos e defina medidas de controle preventivas." },
-      { title: "Checklists & Veículos", desc: "Inspeções diárias de frota e equipamentos antes de cada operação." },
-      { title: "Briefings & Termos", desc: "Gestão de orientações de segurança e coleta de assinaturas digitais de termos de risco." },
-      { title: "Incidentes & Ações", desc: "Registro detalhado de ocorrências e gestão de ações corretivas/preventivas." },
+      { title: "Mapeamento P2", desc: "Identificação dinâmica de perigos e cálculo automático do Nível de Risco (NR) residual." },
+      { title: "Gestão P5", desc: "Fluxo completo de registro de incidentes com análise de causa raiz e geração de lições aprendidas." },
+      { title: "Conformidade ISO", desc: "Monitoramento de competências da equipe (21102) e conformidade de equipamentos/veículos." },
+      { title: "Relatórios Técnicos", desc: "Emissão de laudos de auditoria e do PGSAT oficial para o ICMBio." }
     ],
+    tips: [
+      "Riscos inaceitáveis (NR ≥ 12) bloqueiam automaticamente a operação até que medidas de controle sejam aplicadas",
+      "O sistema sincroniza as validades de seguros e CNHs para evitar falhas de conformidade"
+    ],
+    faq: [
+      { q: "O PGSAT é gerado na hora?", a: "Sim, o sistema compila todos os dados ativos (rotas, frota, riscos e equipe) em um documento técnico estruturado." }
+    ]
+  },
     tips: [
       "O preenchimento do checklist é requisito legal para operação em trilhas",
       "Briefings bem feitos reduzem o risco de incidentes em até 70%",
