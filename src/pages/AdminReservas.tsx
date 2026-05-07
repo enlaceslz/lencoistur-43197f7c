@@ -181,8 +181,8 @@ const AdminReservas = () => {
     : 0;
   const finalTotal = total - discount;
 
-  const handleNewBooking = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleNewBooking = async (e: any) => {
+    if (e?.preventDefault) e.preventDefault();
     if (!newForm.itemName || !newForm.customerName || !newForm.customerEmail) {
       toast.error("Preencha todos os campos obrigatórios.");
       return;
@@ -684,9 +684,14 @@ const AdminReservas = () => {
                         {actionLoading ? <Loader2 className="animate-spin mr-1" size={14} /> : null} Salvar
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => setShowNotes(false)}>Cancelar</Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{selected.notes || "Nenhuma observação."}</p>
+                )}
                 {/* Links */}
                 {(selected.invoiceUrl || selected.voucherUrl) && (
-                  <div className="flex gap-2 w-full">
+                  <div className="flex gap-2 w-full mt-4">
                     {selected.invoiceUrl && (
                       <Button variant="outline" size="sm" className="flex-1" asChild>
                         <a href={selected.invoiceUrl} target="_blank" rel="noopener noreferrer">
@@ -702,11 +707,6 @@ const AdminReservas = () => {
                       </Button>
                     )}
                   </div>
-                )}
-              </div>
-            </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">{selected.notes || "Nenhuma observação."}</p>
                 )}
               </div>
 
@@ -791,13 +791,25 @@ const AdminReservas = () => {
 
       {/* New Booking Dialog */}
       <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              {editingId ? <Pencil size={20} /> : <Plus size={20} />} 
-              {editingId ? "Editar Reserva" : "Nova Reserva"}
-            </DialogTitle>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                {editingId ? <Pencil size={20} className="md:w-6 md:h-6" /> : <Plus size={20} className="md:w-6 md:h-6" />}
+              </div>
+              <div>
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                  {editingId ? "Editar Reserva" : "Nova Reserva"}
+                </DialogTitle>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Preencha os dados do cliente e do serviço</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setShowNewForm(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <X size={20} className="text-slate-400" />
+            </Button>
+          </div>
+
+          <form onSubmit={handleNewBooking} className="p-4 md:p-8 space-y-6 md:space-y-8">
           <form onSubmit={handleNewBooking} className="space-y-4">
             {/* Type */}
             <div>
