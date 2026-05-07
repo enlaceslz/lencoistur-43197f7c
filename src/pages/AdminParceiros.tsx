@@ -815,7 +815,6 @@ const AdminParceiros = () => {
                 {editPartner ? "Salvar Alterações" : "Cadastrar Parceiro"}
               </Button>
             </div>
-          </div>
         </DialogContent>
       </Dialog>
 
