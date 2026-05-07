@@ -960,6 +960,31 @@ const AdminParceiros = () => {
                 </div>
               </section>
 
+              <section>
+                <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Landmark size={14} /> Dados Bancários
+                </h4>
+                <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">Banco</span>
+                    <span className="text-sm font-semibold">{viewPartner?.bank_name || "—"}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">Agência</span>
+                    <span className="text-sm font-semibold">{viewPartner?.bank_agency || "—"}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">Conta</span>
+                    <span className="text-sm font-semibold">{viewPartner?.bank_account || "—"}</span>
+                  </div>
+                  <Separator />
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-muted-foreground">Chave PIX</span>
+                    <span className="text-sm font-mono font-bold text-primary bg-primary/5 p-2 rounded block text-center truncate">{viewPartner?.bank_pix_key || "—"}</span>
+                  </div>
+                </div>
+              </section>
+
               {(viewPartner?.type === "motorista" || viewPartner?.type === "guia") && (
                 <section>
                   <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
