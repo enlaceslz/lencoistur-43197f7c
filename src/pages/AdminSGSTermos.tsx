@@ -225,7 +225,7 @@ const AdminSGSTermos = () => {
       company_id: company.id,
       customer_name: selectedCustomer?.name,
       tour_name: selectedTour?.name,
-      term_date: format(new Date(), "yyyy-MM-dd"), // Sempre usa a data atual ao salvar/enviar
+      term_date: formatDate(new Date(), "yyyy-MM-dd"), // Sempre usa a data atual ao salvar/enviar
       has_allergy: form.has_allergy,
       allergy_details: form.allergy_details,
       has_fainting_convulsions: form.has_fainting_convulsions,
