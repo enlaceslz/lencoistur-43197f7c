@@ -725,6 +725,37 @@ const AdminParceiros = () => {
                 </div>
               </div>
             )}
+
+            <div className="space-y-4 p-4 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/10">
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-400 flex items-center gap-1"><Banknote size={14} /> Dados Bancários e Financeiros</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="mb-1.5 block text-xs">Banco</Label>
+                  <Input value={form.bank_name} onChange={(e) => setForm({ ...form, bank_name: e.target.value })} placeholder="Ex: NuBank, Bradesco" />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs">Chave PIX</Label>
+                  <Input value={form.bank_pix_key} onChange={(e) => setForm({ ...form, bank_pix_key: e.target.value })} placeholder="Email, CPF ou Celular" />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs">Agência</Label>
+                  <Input value={form.bank_agency} onChange={(e) => setForm({ ...form, bank_agency: e.target.value })} placeholder="0001" />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs">Conta</Label>
+                  <Input value={form.bank_account} onChange={(e) => setForm({ ...form, bank_account: e.target.value })} placeholder="12345-6" />
+                </div>
+                <div className="col-span-2">
+                  <Label className="mb-1.5 block text-xs">Limite de Crédito (R$)</Label>
+                  <Input type="number" value={form.credit_limit} onChange={(e) => setForm({ ...form, credit_limit: e.target.value })} />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <Label className="mb-1.5 block flex items-center gap-1"><Percent size={14} /> Tags (Separadas por vírgula)</Label>
+              <Input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="Premium, VIP, Recorrente..." />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
