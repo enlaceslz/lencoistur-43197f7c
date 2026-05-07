@@ -244,6 +244,12 @@ const AdminParceiros = () => {
       cadastur: form.type === "guia" || form.type === "agencia" ? (form.cadastur.trim() || null) : null,
       remuneration_type: form.remuneration_type,
       remuneration_value: Number(form.remuneration_value) || 0,
+      bank_name: form.bank_name.trim() || null,
+      bank_agency: form.bank_agency.trim() || null,
+      bank_account: form.bank_account.trim() || null,
+      bank_pix_key: form.bank_pix_key.trim() || null,
+      credit_limit: Number(form.credit_limit) || 0,
+      tags: form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : null,
     };
 
     try {
