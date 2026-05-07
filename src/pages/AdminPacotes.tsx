@@ -268,39 +268,41 @@ const AdminPacotes = () => {
                 </div>
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={() => sharePackage(pkg)} 
-                  className="flex-1 rounded-xl h-10 text-[10px] font-black uppercase tracking-widest"
+                  className="flex-1 min-w-[120px] rounded-xl h-10 text-[10px] font-black uppercase tracking-widest"
                 >
                   <Share2 size={14} className="mr-2 text-primary" /> Campanha
                 </Button>
-                <Button 
-                  variant="outline"
-                  size="icon"
-                  onClick={() => openForm(pkg)} 
-                  className="h-10 w-10 rounded-xl"
-                >
-                  <Eye size={16} />
-                </Button>
-                <Button 
-                  variant="secondary"
-                  size="icon"
-                  onClick={() => openForm(pkg)} 
-                  className="h-10 w-10 rounded-xl"
-                >
-                  <Pencil size={16} />
-                </Button>
-                <Button 
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDelete(pkg.id)} 
-                  className="h-10 w-10 rounded-xl text-destructive hover:bg-destructive/10"
-                >
-                  <Trash2 size={16} />
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline"
+                    size="icon"
+                    onClick={() => openForm(pkg)} 
+                    className="h-10 w-10 rounded-xl"
+                  >
+                    <Eye size={16} />
+                  </Button>
+                  <Button 
+                    variant="secondary"
+                    size="icon"
+                    onClick={() => openForm(pkg)} 
+                    className="h-10 w-10 rounded-xl"
+                  >
+                    <Pencil size={16} />
+                  </Button>
+                  <Button 
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(pkg.id)} 
+                    className="h-10 w-10 rounded-xl text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 size={16} />
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
