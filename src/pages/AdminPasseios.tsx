@@ -174,8 +174,8 @@ const AdminPasseios = () => {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: any) => {
+    if (e?.preventDefault) e.preventDefault();
     const slug = form.slug || generateSlug(form.name);
     const pixDiscount = Math.max(0, Math.min(50, Number(form.pix_discount) || 0));
     const payload: any = {
@@ -594,7 +594,7 @@ const AdminPasseios = () => {
             <div className="flex gap-3 pt-4 border-t border-border">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all">
+                  <button type="button" onClick={handleSubmit} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all">
                     {editingId ? "Salvar Alterações" : "Criar Passeio"}
                   </button>
                 </TooltipTrigger>
