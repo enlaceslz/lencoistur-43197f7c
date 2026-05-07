@@ -420,84 +420,66 @@ const AdminParceiros = () => {
 
   return (
     <AdminLayout title="Parceiros">
-      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-10 glass-card p-8 rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.1s' }}>
-        <div className="space-y-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Relacionamento Externo</p>
-          <h1 className="text-4xl font-black text-foreground tracking-tight leading-none">Parceiros</h1>
-          <div className="flex items-center gap-3 mt-4">
-            <div className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-              <Building2 size={12} /> {partners.length} Cadastrados
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+        {[
+          { label: "Parceiros", value: partners.length, icon: Building2, color: "from-blue-500 to-indigo-600", desc: "Total cadastrado" },
+          { label: "Ativos", value: activeCount, icon: CheckCircle2, color: "from-emerald-500 to-teal-600", desc: "Operando" },
+          { label: "Tipos", value: partnerTypes.length, icon: Settings2, color: "from-amber-500 to-orange-600", desc: "Categorias" },
+          { label: "Crédito Total", value: `R$ ${partners.reduce((a, b) => a + (b.credit_limit || 0), 0).toLocaleString("pt-BR")}`, icon: Banknote, color: "from-purple-500 to-pink-600", desc: "Limite global" },
+        ].map((stat, i) => (
+          <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group">
+            <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
+            <div className="flex items-center justify-between mb-4">
+              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-primary/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+                <stat.icon size={22} strokeWidth={2.5} />
+              </div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{stat.desc}</div>
             </div>
-            <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-              <CheckCircle2 size={12} /> {activeCount} Ativos
-            </div>
+            <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
+            <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
           </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 min-w-[320px] group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
-            <input 
-              placeholder="Pesquisar por nome, contato ou documento..." 
-              value={search} 
-              onChange={(e) => setSearch(e.target.value)} 
-              className="w-full pl-14 h-14 rounded-2xl border border-border/40 focus:ring-4 focus:ring-primary/10 bg-muted/20 transition-all font-medium text-sm outline-none placeholder:text-muted-foreground/40" 
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="rounded-xl h-12 w-12 border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-sm" 
-                    onClick={exportPDF}
-                  >
-                    <FileDown size={20} className="text-rose-500" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Relatório PDF</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            </TooltipProvider>
-            
-            <Button variant="outline" size="sm" className="rounded-2xl h-12 px-5 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm hidden sm:flex" onClick={() => setTypesDialogOpen(true)}>
-              <Settings2 size={18} className="mr-2" /> Tipos
-            </Button>
-            
-            <Button onClick={openNew} size="lg" className="rounded-2xl h-12 px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white active:scale-95">
-              <Plus size={20} className="mr-2" strokeWidth={3} /> Novo
-            </Button>
-          </div>
-        </div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
-        {partnerTypes.map((t, idx) => {
-          const Icon = getIcon(t.icon);
-          const count = partners.filter((p) => p.type === t.name).length;
-          return (
-            <div 
-              key={t.id} 
-              className="glass-card admin-card-hover rounded-[2rem] p-6 cursor-pointer relative overflow-hidden group"
-              onClick={() => setTypeFilter(t.name)}
-            >
-              <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
-              
-              <div className="flex items-center justify-between mb-6">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg bg-primary/10 text-primary shadow-primary/10`}>
-                  <Icon size={26} strokeWidth={2.5} />
-                </div>
-              </div>
-              
-              <div className="relative">
-                <p className="text-3xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{count}</p>
-                <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{t.label}</p>
-              </div>
-            </div>
-          );
-        })}
+      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-4 sm:p-6 glass-card rounded-[2.5rem] shadow-sm animate-in-fade" style={{ animationDelay: '0.2s' }}>
+        <div className="relative flex-1 w-full group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
+          <Input 
+            placeholder="Pesquisar parceiro por nome, contato ou documento..." 
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)} 
+            className="pl-12 h-12 rounded-2xl border-border/40 focus:ring-primary/20 bg-muted/20 transition-all text-sm font-medium" 
+          />
+        </div>
+        
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <Button variant="outline" size="sm" className="rounded-xl h-12 px-5 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm" onClick={() => setTypesDialogOpen(true)}>
+            <Settings2 size={18} className="mr-2" /> Gerenciar Tipos
+          </Button>
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="rounded-xl h-12 w-12 border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-sm" 
+                  onClick={exportPDF}
+                >
+                  <FileDown size={20} className="text-rose-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Relatório PDF</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <button 
+            onClick={openNew}
+            className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+          >
+            <Plus size={20} strokeWidth={3} /> Novo Parceiro
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3 mb-10 overflow-x-auto pb-4 no-scrollbar scroll-smooth animate-in-fade" style={{ animationDelay: '0.15s' }}>
@@ -534,89 +516,139 @@ const AdminParceiros = () => {
           );
         })}
       </div>
-      <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
+      <div className="animate-in-fade" style={{ animationDelay: '0.3s' }}>
         {filtered.length === 0 ? (
-          <div className="py-20 text-center text-muted-foreground bg-muted/10">
+          <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] py-20 text-center text-muted-foreground bg-muted/10">
             <Users className="mx-auto mb-4 opacity-20" size={64} />
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Vazio</p>
             <p className="text-xs font-medium text-muted-foreground/60 mt-2">Nenhum parceiro encontrado com os filtros atuais.</p>
-          </div>
+          </Card>
         ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent border-b border-border/20">
-                  <TableHead>Parceiro</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>CPF/CNPJ</TableHead>
-                  <TableHead>Contato</TableHead>
-                  <TableHead>Remuneração</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-24 text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((p) => {
-                  const type = partnerTypes.find(t => t.name === p.type) || partnerTypes[0];
-                  const Icon = getIcon(type?.icon || "Building2");
-                  return (
-                    <TableRow key={p.id} className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setViewPartner(p)}>
-                      <TableCell>
-                        <div>
-                          <p className="font-semibold text-foreground">{p.name}</p>
-                          {p.email && <p className="text-xs text-muted-foreground">{p.email}</p>}
-                          {p.address && <p className="text-xs text-muted-foreground flex items-center gap-1"><MapPin size={10} />{p.address.length > 40 ? p.address.slice(0, 40) + "..." : p.address}</p>}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary" className={type?.color}>
-                          <Icon size={12} className="mr-1" />{type?.label}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground text-sm font-mono">{p.cpf_cnpj || "—"}</TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
-                        {p.contact_name && <span className="block">{p.contact_name}</span>}
-                        {p.phone && <span className="block">{p.phone}</span>}
-                        {p.type === "motorista" && p.cnh && (
-                          <span className="block text-xs text-amber-600 dark:text-amber-400">CNH: {p.cnh}{p.cnh_validade ? ` (val. ${new Date(p.cnh_validade + "T12:00:00").toLocaleDateString("pt-BR")})` : ""}</span>
-                        )}
-                        {p.type === "guia" && p.cadastur && (
-                          <span className="block text-xs text-green-600 dark:text-green-400">Cadastur: {p.cadastur}</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="font-medium text-foreground">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+            {filtered.map((p) => {
+              const type = partnerTypes.find(t => t.name === p.type) || partnerTypes[0];
+              const Icon = getIcon(type?.icon || "Building2");
+              
+              return (
+                <div 
+                  key={p.id} 
+                  className={`glass-card admin-card-hover rounded-[2rem] p-6 flex flex-col relative overflow-hidden group transition-all duration-300 ${!p.active ? "opacity-60 grayscale" : ""}`}
+                  onClick={() => setViewPartner(p)}
+                >
+                  <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${type?.color?.split(' ')[0] || "bg-primary/5"} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
+                  
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg ${type?.color?.split(' ')[1] || "bg-primary/10 text-primary"} shadow-primary/5`}>
+                      <Icon size={22} strokeWidth={2.5} />
+                    </div>
+                    <Badge
+                      variant="secondary"
+                      className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg cursor-pointer transition-all active:scale-95 ${p.active
+                        ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/10"
+                        : "bg-rose-500/10 text-rose-600 border border-rose-500/10"
+                      }`}
+                      onClick={(e) => { e.stopPropagation(); toggleActive(p); }}
+                    >
+                      {p.active ? "Ativo" : "Inativo"}
+                    </Badge>
+                  </div>
+
+                  <div className="mb-4">
+                    <h3 className="font-black text-lg text-foreground tracking-tight line-clamp-1 group-hover:text-primary transition-colors">{p.name}</h3>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1 flex items-center gap-1">
+                      {type?.label}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2.5 mb-6 flex-1">
+                    {p.cpf_cnpj && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <FileText size={14} className="text-primary/40" />
+                        <span className="text-xs font-mono tracking-tighter">{p.cpf_cnpj}</span>
+                      </div>
+                    )}
+                    {p.phone && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Phone size={14} className="text-primary/40" />
+                        <span className="text-xs font-bold">{p.phone}</span>
+                      </div>
+                    )}
+                    {p.address && (
+                      <div className="flex items-start gap-2 text-muted-foreground">
+                        <MapPin size={14} className="text-primary/40 mt-0.5 shrink-0" />
+                        <span className="text-[11px] leading-tight line-clamp-2">{p.address}</span>
+                      </div>
+                    )}
+                    
+                    {(p.type === "motorista" || p.type === "fretista") && p.cnh && (
+                      <div className="flex items-center gap-2 bg-amber-500/5 text-amber-700 dark:text-amber-400 px-3 py-1.5 rounded-xl border border-amber-200/20">
+                        <Car size={14} />
+                        <span className="text-[10px] font-black uppercase tracking-tight">CNH: {p.cnh}</span>
+                      </div>
+                    )}
+                    {(p.type === "guia" || p.type === "agencia") && p.cadastur && (
+                      <div className="flex items-center gap-2 bg-emerald-500/5 text-emerald-700 dark:text-emerald-400 px-3 py-1.5 rounded-xl border border-emerald-200/20">
+                        <Compass size={14} />
+                        <span className="text-[10px] font-black uppercase tracking-tight">CADASTUR: {p.cadastur}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-border/10">
+                    <div className="bg-primary/5 px-3 py-2 rounded-xl">
+                      <p className="text-[8px] font-black text-primary/60 uppercase tracking-widest mb-0.5">Remuneração</p>
+                      <p className="text-xs font-black text-primary">
                         {p.remuneration_type === "comissao_percent" && `${p.remuneration_value || 0}%`}
-                        {p.remuneration_type === "valor_por_passeio" && `R$ ${p.remuneration_value || 0} / passeio`}
-                        {p.remuneration_type === "valor_mensal" && `R$ ${p.remuneration_value || 0} / mês`}
+                        {p.remuneration_type === "valor_por_passeio" && `R$ ${p.remuneration_value || 0}`}
+                        {p.remuneration_type === "valor_mensal" && `R$ ${p.remuneration_value || 0}`}
                         {!p.remuneration_type && `${p.commission_rate || 0}%`}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="secondary"
-                          className={p.active
-                            ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 cursor-pointer"
-                            : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 cursor-pointer"
-                          }
-                          onClick={() => toggleActive(p)}
-                        >
-                          {p.active ? "Ativo" : "Inativo"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex gap-1 justify-end" onClick={(e) => e.stopPropagation()}>
-                          <Button variant="ghost" size="icon" onClick={() => setViewPartner(p)} title="Visualizar"><Eye size={14} /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => openEdit(p)} title="Editar"><Edit size={14} /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(p.id)} title="Excluir"><Trash2 size={14} className="text-destructive" /></Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                        <span className="text-[9px] ml-1 opacity-60">
+                          {p.remuneration_type === "valor_por_passeio" ? "/pass" : p.remuneration_type === "valor_mensal" ? "/mês" : ""}
+                        </span>
+                      </p>
+                    </div>
+
+                    <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary transition-all" onClick={() => setViewPartner(p)}>
+                              <Eye size={16} />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Ver detalhes</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-blue-500/10 hover:text-blue-600 transition-all" onClick={() => openEdit(p)}>
+                              <Edit size={16} />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Editar</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-rose-500/10 hover:text-rose-600 transition-all text-rose-500" onClick={() => setDeleteId(p.id)}>
+                              <Trash2 size={16} />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Excluir</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
-      </Card>
+      </div>
 
       {/* Form Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
