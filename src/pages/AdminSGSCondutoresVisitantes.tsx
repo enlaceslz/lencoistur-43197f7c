@@ -215,7 +215,6 @@ const AdminSGSCondutoresVisitantes = () => {
         )}
       </div>
     </AdminLayout>
-    </AdminLayout>
   );
 };
 
