@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 import { formatCurrency } from "@/lib/utils";
+import { ShareWithFriend } from "@/components/ShareWithFriend";
 
 const TourDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -339,18 +340,20 @@ const TourDetail = () => {
                 </div>
               </div>
 
-              <Link to={`/checkout?tour=${tour.slug}&pax=${guests}&date=${selectedDate}&mode=${tourMode}`}
-                className={`w-full py-4 rounded-xl font-semibold text-lg transition-colors block text-center ${
-                  isPrivate
-                    ? "bg-secondary hover:bg-secondary/90 text-secondary-foreground"
-                    : "bg-primary hover:bg-primary/90 text-primary-foreground"
-                }`}>
-                Reservar {isPrivate ? "Privativo" : "Agora"}
-              </Link>
-
-              <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">
-                <Shield size={14} />
-                <span>Cancelamento grátis até 24h antes</span>
+              <div className="space-y-3">
+                <Link to={`/checkout?tour=${tour.slug}&pax=${guests}&date=${selectedDate}&mode=${tourMode}`}
+                  className={`w-full py-4 rounded-xl font-semibold text-lg transition-colors block text-center ${
+                    isPrivate
+                      ? "bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                      : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                  }`}>
+                  Reservar {isPrivate ? "Privativo" : "Agora"}
+                </Link>
+                <ShareWithFriend itemName={tour.name} itemUrl={window.location.href} />
+                <div className="flex items-center justify-center gap-2 text-muted-foreground text-[10px]">
+                  <Shield size={12} />
+                  <span>Cancelamento grátis até 24h antes</span>
+                </div>
               </div>
             </div>
           </div>
