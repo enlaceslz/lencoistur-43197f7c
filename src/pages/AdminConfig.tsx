@@ -470,10 +470,1136 @@ const AdminConfig = () => {
       const a = document.createElement("a");
       a.href = url;
       a.download = `backup-completo-lencoistour-${formatDate(now, "yyyy-MM-dd-HHmmss")}.json`;
-...
+      a.click();
+      URL.revokeObjectURL(url);
+
+      setBackupHistory((prev) => {
+        const newHistory = [
+          { date: now.toISOString(), tables: BACKUP_TABLES.length, records: totalRecords, size: `${sizeMB} MB` },
+          ...prev.slice(0, 9),
+        ];
+        localStorage.setItem("backup_history", JSON.stringify(newHistory));
+        return newHistory;
+      });
+
+      toast.success(`Backup realizado com sucesso! ${totalRecords} registros e ${totalFiles} arquivos salvos.`);
+    } catch (err) {
+      toast.error("Erro ao gerar backup: " + (err instanceof Error ? err.message : "Erro desconhecido"));
+    } finally {
+      setBackupLoading(false);
+    }
+  };
+
+  const handleRestore = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith(".json")) { toast.error("Selecione um arquivo .json de backup válido."); return; }
+
+    const confirmRestore = window.confirm(
+      "⚠️ ATENÇÃO: A restauração irá SUBSTITUIR todos os dados atuais (incluindo imagens) pelos dados do backup.\n\nEssa ação não pode ser desfeita.\n\nDeseja continuar?"
+    );
+    if (!confirmRestore) { e.target.value = ""; return; }
+
+    setRestoreLoading(true);
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+
+      if (!parsed.metadata || !parsed.data) {
+        toast.error("Arquivo de backup inválido. Formato não reconhecido.");
+        return;
+      }
+
+      const backupDate = parsed.metadata.created_at
         ? formatDate(new Date(parsed.metadata.created_at), "dd/MM/yyyy 'às' HH:mm:ss")
-...
+        : "Data desconhecida";
+
+      const confirmFinal = window.confirm(
+        `Backup de: ${backupDate}\n${parsed.metadata.total_records || "?"} registros e ${parsed.metadata.total_files || "0"} arquivos.\n\nConfirmar restauração completa?`
+      );
+      if (!confirmFinal) return;
+
+      let restored = 0;
+      let restoredFiles = 0;
+      let errors = 0;
+
+      // Restore Storage Files
+      if (parsed.storage) {
+        for (const bucket of STORAGE_BUCKETS) {
+          const files = parsed.storage[bucket];
+          if (!files || !Array.isArray(files)) continue;
+
+          for (const fileObj of files) {
+            try {
+              const response = await fetch(fileObj.data);
+              const blob = await response.blob();
+              
+              const { error: uploadError } = await supabase.storage
+                .from(bucket)
+                .upload(fileObj.name, blob, { upsert: true });
+              
+              if (uploadError) throw uploadError;
+              restoredFiles++;
+            } catch (err) {
+              console.error(`Erro ao restaurar arquivo ${fileObj.name} no bucket ${bucket}:`, err);
+              errors++;
+            }
+          }
+        }
+      }
+
+      // Restore Database Tables
+      for (const table of BACKUP_TABLES) {
+        const rows = parsed.data[table];
+        if (!rows || !Array.isArray(rows) || rows.length === 0) continue;
+
+        // Delete existing data
+        const { error: delError } = await supabase.from(table as any).delete().neq("id", "00000000-0000-0000-0000-000000000000" as any);
+        if (delError) {
+          console.error(`Erro ao limpar ${table}:`, delError.message);
+          errors++;
+          continue;
+        }
+
+        // Insert backup data in batches of 100
+        for (let i = 0; i < rows.length; i += 100) {
+          const batch = rows.slice(i, i + 100);
+          const { error: insError } = await supabase.from(table as any).insert(batch);
+          if (insError) {
+            console.error(`Erro ao restaurar ${table}:`, insError.message);
+            errors++;
+          } else {
+            restored += batch.length;
+          }
+        }
+      }
+
+      if (errors > 0) {
+        toast.error(`Restauração concluída com ${errors} erros. ${restored} registros e ${restoredFiles} arquivos restaurados.`);
+      } else {
+        toast.success(`Sistema restaurado com sucesso! ${restored} registros e ${restoredFiles} arquivos importados.`);
+        loadSettings();
+        loadUsers();
+      }
+    } catch (err) {
+      toast.error("Erro ao processar arquivo de backup: " + (err instanceof Error ? err.message : "Erro desconhecido"));
+    } finally {
+      setRestoreLoading(false);
+      if (e.target) e.target.value = "";
+    }
+  };
+
+  const handleAddUser = async () => {
+    if (!newUser.full_name || !newUser.email || !newUser.password) {
+      toast.error("Preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const { data, error } = await supabase
+        .from("user_management")
+        .insert([{
+          full_name: newUser.full_name,
+          email: newUser.email,
+          role: newUser.role,
+          status: 'ativo'
+        }]);
+
+      if (error) throw error;
+
+      toast.success("Usuário registrado com sucesso!");
+      setIsAddingUser(false);
+      setNewUser({ full_name: "", email: "", role: "operador", password: "" });
+      loadUsers();
+    } catch (err: any) {
+      toast.error("Erro ao adicionar usuário: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleUpdateUserStatus = async (userId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'ativo' ? 'inativo' : 'ativo';
+    try {
+      const { error } = await supabase
+        .from("user_management")
+        .update({ status: newStatus })
+        .eq("id", userId);
+      
+      if (error) throw error;
+      toast.success(`Usuário ${newStatus === 'ativo' ? 'ativado' : 'desativado'} com sucesso.`);
+      loadUsers();
+    } catch (err: any) {
+      toast.error("Erro ao atualizar status: " + err.message);
+    }
+  };
+
+  const handleUpdateUserRole = async (userId: string, newRole: string) => {
+    try {
+      const { error } = await supabase
+        .from("user_management")
+        .update({ role: newRole })
+        .eq("id", userId);
+      
+      if (error) throw error;
+      toast.success(`Hierarquia atualizada para ${newRole}.`);
+      loadUsers();
+    } catch (err: any) {
+      toast.error("Erro ao atualizar cargo: " + err.message);
+    }
+  };
+
+  const handleUpdatePermissions = async () => {
+    if (!editingUser) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("user_management")
+        .update({ permissions: editingUser.permissions })
+        .eq("id", editingUser.id);
+      
+      if (error) throw error;
+      toast.success("Permissões de acesso sincronizadas!");
+      setIsEditingPermissions(false);
+      setEditingUser(null);
+      loadUsers();
+    } catch (err: any) {
+      toast.error("Erro ao salvar permissões: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const togglePermission = (moduleId: string) => {
+    if (!editingUser) return;
+    const currentPermissions = { ...(editingUser.permissions || {}) };
+    currentPermissions[moduleId] = !currentPermissions[moduleId];
+    setEditingUser({ ...editingUser, permissions: currentPermissions });
+  };
+  if (loading) {
+    return (
+      <AdminLayout title="Configurações">
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="animate-spin text-primary" size={32} />
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  return (
+    <AdminLayout title="Configurações">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <div className="bg-card border border-border p-2 rounded-2xl shadow-sm overflow-x-auto no-scrollbar scroll-smooth">
+          <TabsList className="bg-transparent flex-nowrap h-auto gap-1">
+            {[
+              { value: "empresa", icon: Building2, label: "Agência" },
+              { value: "site", icon: Globe, label: "Frontend" },
+              { value: "pagamento", icon: CreditCard, label: "Financeiro" },
+              { value: "notificacoes", icon: Bell, label: "Alertas" },
+              { value: "usuarios", icon: Users, label: "Usuários" },
+              { value: "seguranca", icon: Shield, label: "Acesso" },
+              { value: "backup", icon: Database, label: "Backup" },
+              { value: "galeria", icon: Image, label: "Mídia" },
+            ].map((tab) => (
+              <TabsTrigger 
+                key={tab.value}
+                value={tab.value} 
+                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-xl px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 whitespace-nowrap"
+              >
+                <tab.icon size={14} className="shrink-0" /> 
+                <span>{tab.label}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
+
+        {/* EMPRESA */}
+        <TabsContent value="empresa">
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-4 md:p-8">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600">
+                    <Building2 size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-foreground">Identidade e Contato</h3>
+                    <p className="text-sm text-muted-foreground">Dados da agência e informações de contato exibidas no site.</p>
+                  </div>
+                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      onClick={() => saveSetting("empresa", empresa, "Agência")} 
+                      disabled={saving}
+                      className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95"
+                    >
+                      {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <Save size={18} className="mr-2" />}
+                      Salvar Alterações
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Salvar alterações nas informações da agência</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Nome Fantasia</Label>
+                  <Input 
+                    value={empresa.nome} 
+                    onChange={e => setEmpresa({ ...empresa, nome: e.target.value })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary font-bold"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">CNPJ / Identificação</Label>
+                  <Input 
+                    value={empresa.cnpj} 
+                    onChange={e => setEmpresa({ ...empresa, cnpj: maskCNPJ(e.target.value) })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary font-mono"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Telefone Fixo / Comercial</Label>
+                  <Input 
+                    value={empresa.telefone} 
+                    onChange={e => setEmpresa({ ...empresa, telefone: maskPhone(e.target.value) })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary font-bold"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">WhatsApp Operacional</Label>
+                  <Input 
+                    value={empresa.whatsapp} 
+                    onChange={e => setEmpresa({ ...empresa, whatsapp: maskPhone(e.target.value) })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary font-bold text-green-600"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">E-mail de Contato</Label>
+                  <Input 
+                    value={empresa.email} 
+                    onChange={e => setEmpresa({ ...empresa, email: e.target.value })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary"
+                  />
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Endereço Completo (Sede)</Label>
+                  <Input 
+                    value={empresa.endereco} 
+                    onChange={e => setEmpresa({ ...empresa, endereco: e.target.value })}
+                    className="h-12 rounded-xl border-muted-foreground/20 focus:ring-primary"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-8 border-t border-border mt-8">
+                <Button 
+                  onClick={() => saveSetting("empresa", empresa, "Agência")} 
+                  disabled={saving}
+                  className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95 flex items-center gap-2"
+                >
+                  {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                  Salvar Dados da Agência
+                </Button>
+              </div>
+
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* SITE / FRONTEND */}
+        <TabsContent value="site">
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-4 md:p-8 space-y-8">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600">
+                    <Globe size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-foreground">Aparência do Website</h3>
+                    <p className="text-sm text-muted-foreground">Personalize a identidade visual, banners e seções do site público.</p>
+                  </div>
+                </div>
+                <div className="flex gap-2 relative z-10">
+                  <Button 
+                    onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
+                    disabled={saving} 
+                    className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95 flex items-center gap-2"
+                  >
+                    {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                    Salvar Alterações Frontend
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-10">
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Logotipo da Marca</Label>
+                    <div className="flex items-center gap-6 p-4 rounded-2xl bg-muted/30 border border-border/50">
+                      <div className="w-24 h-24 rounded-xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center bg-background overflow-hidden shrink-0">
+                        {site.logoUrl ? (
+                          <img src={site.logoUrl} alt="Logo" className="w-full h-full object-contain p-2" />
+                        ) : (
+                          <Image size={32} className="text-muted-foreground/20" />
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                        <div className="flex gap-2">
+                          <Button type="button" variant="outline" size="sm" onClick={() => logoInputRef.current?.click()} disabled={uploadingLogo} className="rounded-xl font-bold h-9">
+                            {uploadingLogo ? <Loader2 size={14} className="animate-spin mr-2" /> : <Upload size={14} className="mr-2" />}
+                            {site.logoUrl ? "Alterar Logo" : "Fazer Upload"}
+                          </Button>
+                          {site.logoUrl && (
+                            <Button type="button" variant="ghost" size="sm" onClick={() => setSite({ ...site, logoUrl: null })} className="text-destructive rounded-lg h-9">
+                              <X size={14} className="mr-1" /> Remover
+                            </Button>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-muted-foreground font-medium italic">Sugerido: PNG transparente, máx 2MB.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Banner Principal (Carrossel)</Label>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {site.banners?.map((b, i) => (
+                          <div key={b.id || i} className="aspect-video rounded-xl border border-border bg-muted/30 overflow-hidden relative group">
+                            <img src={b.url} alt={`Banner ${i+1}`} className="w-full h-full object-cover" />
+                            <button 
+                              onClick={() => {
+                                const newBanners = site.banners.filter((_, idx) => idx !== i);
+                                setSite({ ...site, banners: newBanners, bannerUrl: newBanners[0]?.url || null });
+                              }}
+                              className="absolute top-2 right-2 p-1.5 bg-destructive text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                            <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-black/50 text-[10px] text-white rounded-md font-bold">
+                              #{i + 1}
+                            </div>
+                          </div>
+                        ))}
+                        
+                        <button 
+                          type="button"
+                          onClick={() => bannerInputRef.current?.click()}
+                          disabled={uploadingBanner}
+                          className="aspect-video rounded-xl border-2 border-dashed border-muted-foreground/20 flex flex-col items-center justify-center bg-muted/10 hover:bg-muted/20 transition-colors"
+                        >
+                          {uploadingBanner ? (
+                            <Loader2 size={24} className="animate-spin text-muted-foreground" />
+                          ) : (
+                            <>
+                              <Plus size={24} className="text-muted-foreground mb-1" />
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Adicionar</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      
+                      {site.banners?.length > 1 && (
+                        <div className="flex flex-col gap-3 p-4 rounded-2xl bg-muted/30 border border-border/50">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Efeito de Transição</Label>
+                          <div className="flex gap-2">
+                            <Button 
+                              type="button" 
+                              variant={site.bannerTransition === "fade" ? "default" : "outline"}
+                              size="sm"
+                              className="rounded-lg font-bold"
+                              onClick={() => setSite({ ...site, bannerTransition: "fade" })}
+                            >
+                              Esmaecer (Fade)
+                            </Button>
+                            <Button 
+                              type="button" 
+                              variant={site.bannerTransition === "slide" ? "default" : "outline"}
+                              size="sm"
+                              className="rounded-lg font-bold"
+                              onClick={() => setSite({ ...site, bannerTransition: "slide" })}
+                            >
+                              Deslizar (Slide)
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        if (!file.type.startsWith("image/")) { toast.error("Selecione um arquivo de imagem válido."); return; }
+                        if (file.size > 5 * 1024 * 1024) { toast.error("A imagem deve ter no máximo 5MB."); return; }
+
+                        setUploadingBanner(true);
+                        const ext = file.name.split(".").pop() || "jpg";
+                        const path = `banners/banner-${Date.now()}.${ext}`;
+
+                        const { error } = await supabase.storage.from("tour-images").upload(path, file, { upsert: true });
+                        if (error) { toast.error("Erro ao enviar banner: " + error.message); setUploadingBanner(false); return; }
+
+                        const { data: urlData } = supabase.storage.from("tour-images").getPublicUrl(path);
+                        const newBanner = { url: urlData.publicUrl, id: crypto.randomUUID() };
+                        const updatedBanners = [...(site.banners || []), newBanner];
+                        
+                        setSite((prev) => ({ 
+                          ...prev, 
+                          banners: updatedBanners,
+                          bannerUrl: updatedBanners[0]?.url || null 
+                        }));
+                        setUploadingBanner(false);
+                        toast.success("Imagem adicionada ao banner!");
+                      }} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Cor Primária da Marca</Label>
+                    <div className="flex items-center gap-4 p-4 rounded-2xl bg-muted/30 border border-border/50">
+                      <div 
+                        className="w-12 h-12 rounded-xl border border-border shadow-inner shrink-0" 
+                        style={{ backgroundColor: site.corPrimaria || "#2563eb" }}
+                      />
+                      <Input 
+                        type="color" 
+                        value={site.corPrimaria || "#2563eb"} 
+                        onChange={(e) => setSite({ ...site, corPrimaria: e.target.value })}
+                        className="w-16 h-10 p-1 rounded-lg border-none bg-transparent cursor-pointer"
+                      />
+                      <Input 
+                        type="text" 
+                        value={site.corPrimaria || "#2563eb"} 
+                        onChange={(e) => setSite({ ...site, corPrimaria: e.target.value })}
+                        className="h-10 rounded-xl border-muted-foreground/20 font-mono text-sm"
+                        placeholder="#000000"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">SEO e Títulos</Label>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label className="text-xs">Título do Site</Label>
+                        <Input 
+                          value={site.titulo} 
+                          onChange={(e) => setSite({ ...site, titulo: e.target.value })} 
+                          className="h-10 rounded-xl border-muted-foreground/20 font-bold"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs">Meta Descrição</Label>
+                        <Textarea 
+                          value={site.metaDescricao} 
+                          onChange={(e) => setSite({ ...site, metaDescricao: e.target.value })} 
+                          className="rounded-xl border-muted-foreground/20 resize-none h-24 p-4 text-sm"
+                        />
+                      </div>
+                    </div>
+                    </div>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 border-t border-border pt-6">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Instagram (URL)</Label>
+                      <Input 
+                        value={site.instagram} 
+                        placeholder="https://instagram.com/sua-agencia"
+                        onChange={(e) => setSite({ ...site, instagram: e.target.value })} 
+                        className="h-11 rounded-xl border-muted-foreground/20" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Facebook (URL)</Label>
+                      <Input 
+                        value={site.facebook || ""} 
+                        placeholder="https://facebook.com/sua-agencia"
+                        onChange={(e) => setSite({ ...site, facebook: e.target.value })} 
+                        className="h-11 rounded-xl border-muted-foreground/20" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">TikTok (URL)</Label>
+                      <Input 
+                        value={site.tiktok || ""} 
+                        placeholder="https://tiktok.com/@sua-agencia"
+                        onChange={(e) => setSite({ ...site, tiktok: e.target.value })} 
+                        className="h-11 rounded-xl border-muted-foreground/20" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">WhatsApp do Site (URL)</Label>
+                      <Input 
+                        value={site.whatsappUrl} 
+                        placeholder="https://wa.me/5598..."
+                        onChange={(e) => setSite({ ...site, whatsappUrl: e.target.value })} 
+                        className="h-11 rounded-xl border-muted-foreground/20" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="border-t border-border pt-6 space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Seções do Website</Label>
+                    <div className="flex items-center justify-between p-4 border border-border rounded-xl bg-muted/20">
+                      <div>
+                        <p className="font-bold text-sm text-foreground">Seção "Seja um Parceiro"</p>
+                        <p className="text-xs text-muted-foreground">Habilitar formulário de captação de novos parceiros no site.</p>
+                        <p className="text-[10px] text-secondary font-black uppercase mt-1">Os cadastros cairão em Marketing {">"} Leads</p>
+                      </div>
+                      <Switch 
+                        checked={site.exibirParceiros} 
+                        onCheckedChange={(v) => setSite({ ...site, exibirParceiros: v })} 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 pt-6 border-t border-border">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Customização do Rodapé</Label>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-xs">Descrição do Rodapé (Sobre a Empresa)</Label>
+                      <Textarea 
+                        value={site.footerDesc || ""} 
+                        onChange={(e) => setSite({ ...site, footerDesc: e.target.value })} 
+                        placeholder="Breve descrição sobre a agência no rodapé..."
+                        className="rounded-xl border-muted-foreground/20 resize-none h-24 p-4 text-sm"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-xs">Experiências / Links (Separados por vírgula)</Label>
+                      <Input 
+                        value={site.footerTours?.join(", ") || ""} 
+                        onChange={(e) => setSite({ ...site, footerTours: e.target.value.split(",").map(s => s.trim()) })} 
+                        placeholder="Ex: Passeio 1, Passeio 2, Passeio 3"
+                        className="h-10 rounded-xl border-muted-foreground/20 text-sm"
+                      />
+                      <p className="text-[10px] text-muted-foreground italic">Estes nomes aparecerão na coluna "Experiências" do rodapé.</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-xs">Copyright / Créditos</Label>
+                      <Input 
+                        value={site.footerCopyright || ""} 
+                        onChange={(e) => setSite({ ...site, footerCopyright: e.target.value })} 
+                        placeholder="Ex: © 2026 LençóisTour. Todos os direitos reservados."
+                        className="h-10 rounded-xl border-muted-foreground/20 text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-6 border-t border-border">
+                    <Button 
+                      onClick={() => saveSetting("site", site as unknown as Record<string, unknown>, "Frontend")} 
+                      disabled={saving} 
+                      className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 bg-blue-600 hover:bg-blue-700 text-white transition-all active:scale-95 flex items-center gap-2"
+                    >
+                      {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                      Salvar Tudo no Frontend
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* FINANCEIRO / PAGAMENTO */}
+        <TabsContent value="pagamento">
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-4 md:p-8 space-y-8">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600">
+                    <CreditCard size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-foreground">Configurações Financeiras</h3>
+                    <p className="text-sm text-muted-foreground">Gerencie métodos de recebimento e chaves PIX.</p>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Financeiro")}
+                  disabled={saving}
+                  className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white"
+                >
+                  {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : <Save size={16} className="mr-2" />}
+                  Salvar Financeiro
+                </Button>
+              </div>
+
+              <div className="grid gap-4">
+                {/* PIX */}
+                <div className="flex items-center justify-between p-4 border border-border rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center"><Banknote size={20} className="text-emerald-600" /></div>
+                    <div>
+                      <p className="font-medium text-foreground">PIX</p>
+                      <p className="text-sm text-muted-foreground">Pagamento instantâneo via PIX</p>
+                    </div>
+                  </div>
+                  <Switch checked={pagamentos.pix} onCheckedChange={(v) => setPagamentos({ ...pagamentos, pix: v })} />
+                </div>
+                {pagamentos.pix && (() => {
+                  const validation = validatePixKey(pagamentos.pixChave, pagamentos.pixTipo);
+                  const selectedType = PIX_KEY_TYPES.find(t => t.value === pagamentos.pixTipo);
+                  return (
+                    <div className="space-y-4 pl-4 border-l-2 border-emerald-500/30 ml-5">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-semibold">Tipo da Chave PIX</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {PIX_KEY_TYPES.map((t) => (
+                            <button
+                              key={t.value}
+                              type="button"
+                              onClick={() => setPagamentos({ ...pagamentos, pixTipo: t.value, pixChave: "" })}
+                              className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
+                                pagamentos.pixTipo === t.value
+                                  ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
+                                  : "bg-muted text-muted-foreground border-border hover:bg-accent"
+                              }`}
+                            >
+                              {t.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Chave PIX ({selectedType?.label})</Label>
+                        <div className="relative">
+                          <Input
+                            value={pagamentos.pixChave}
+                            onChange={(e) => {
+                              let val = e.target.value;
+                              if (pagamentos.pixTipo === "cpf") val = maskCPF(val);
+                              if (pagamentos.pixTipo === "cnpj") val = maskCNPJ(val);
+                              if (pagamentos.pixTipo === "telefone") val = maskPhone(val);
+                              setPagamentos({ ...pagamentos, pixChave: val });
+                            }}
+
+                            maxLength={selectedType?.maxLength || 50}
+                            placeholder={
+                              pagamentos.pixTipo === "cpf" ? "000.000.000-00" :
+                              pagamentos.pixTipo === "cnpj" ? "00.000.000/0000-00" :
+                              pagamentos.pixTipo === "email" ? "email@exemplo.com" :
+                              pagamentos.pixTipo === "telefone" ? "+55 (00) 00000-0000" :
+                              "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                            }
+                            className={pagamentos.pixChave ? (validation.valid ? "border-emerald-500 pr-10" : "border-destructive pr-10") : ""}
+                          />
+                          {pagamentos.pixChave && (
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                              {validation.valid
+                                ? <CheckCircle size={16} className="text-emerald-500" />
+                                : <AlertCircle size={16} className="text-destructive" />}
+                            </span>
+                          )}
+                        </div>
+                        {pagamentos.pixChave && (
+                          <p className={`text-xs mt-1 ${validation.valid ? "text-emerald-600 font-medium" : "text-destructive font-medium"}`}>
+                            {validation.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                <div className="flex items-center justify-between p-5 bg-card border border-border/50 rounded-3xl hover:border-primary/30 transition-all group shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600 shadow-inner group-hover:scale-110 transition-transform">
+                      <CreditCard size={24} strokeWidth={2.5} />
+                    </div>
+                    <div>
+                      <p className="font-bold text-foreground leading-none mb-1">Cartão de Crédito</p>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">Parcelamento via gateway de pagamentos</p>
+                    </div>
+                  </div>
+                  <Switch 
+                    checked={pagamentos.cartao} 
+                    onCheckedChange={(v) => setPagamentos({ ...pagamentos, cartao: v })} 
+                    className="data-[state=checked]:bg-blue-500"
+                  />
+                </div>
+
+                {/* Boleto */}
+                <div className="flex items-center justify-between p-5 bg-card border border-border/50 rounded-3xl hover:border-primary/30 transition-all group shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-orange-500/10 text-orange-600 shadow-inner group-hover:scale-110 transition-transform">
+                      <FileText size={24} strokeWidth={2.5} />
+                    </div>
+                    <div>
+                      <p className="font-bold text-foreground leading-none mb-1">Boleto Bancário</p>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">Compensação manual em até 3 dias</p>
+                    </div>
+                  </div>
+                  <Switch 
+                    checked={pagamentos.boleto} 
+                    onCheckedChange={(v) => setPagamentos({ ...pagamentos, boleto: v })} 
+                    className="data-[state=checked]:bg-orange-500"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-5 bg-card border border-border/50 rounded-3xl hover:border-primary/30 transition-all group shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 shadow-inner group-hover:scale-110 transition-transform">
+                      <Banknote size={24} strokeWidth={2.5} />
+                    </div>
+                    <div>
+                      <p className="font-bold text-foreground leading-none mb-1">Dinheiro (Espécie)</p>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">Recebimento direto no balcão ou guia</p>
+                    </div>
+                  </div>
+                  <Switch 
+                    checked={pagamentos.dinheiro} 
+                    onCheckedChange={(v) => setPagamentos({ ...pagamentos, dinheiro: v })} 
+                    className="data-[state=checked]:bg-emerald-500"
+                  />
+                </div>
+
+                {/* Transferência */}
+                <div className="flex items-center justify-between p-5 bg-card border border-border/50 rounded-3xl hover:border-primary/30 transition-all group shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-600 shadow-inner group-hover:scale-110 transition-transform">
+                      <Landmark size={24} strokeWidth={2.5} />
+                    </div>
+                    <div>
+                      <p className="font-bold text-foreground leading-none mb-1">Transferência Bancária</p>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">TED / DOC ou Depósito identificado</p>
+                    </div>
+                  </div>
+                  <Switch 
+                    checked={pagamentos.transferencia} 
+                    onCheckedChange={(v) => setPagamentos({ ...pagamentos, transferencia: v })} 
+                    className="data-[state=checked]:bg-indigo-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex justify-end pt-8 border-t border-border">
+                <Button
+                  onClick={() => saveSetting("pagamentos", pagamentos as unknown as Record<string, unknown>, "Financeiro")}
+                  disabled={saving}
+                  className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 bg-emerald-600 hover:bg-emerald-700 text-white transition-all active:scale-95 flex items-center gap-2"
+                >
+                  {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                  Salvar Configurações Financeiras
+                </Button>
+              </div>
+
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* NOTIFICAÇÕES */}
+        <TabsContent value="notificacoes">
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-4 md:p-8 space-y-8">
+              <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 bg-card p-6 rounded-3xl border border-border/50 shadow-sm mb-6">
+                <div className="flex items-center gap-5">
+                  <div className="p-4 rounded-2xl bg-amber-500/10 text-amber-600 shadow-inner">
+                    <Bell size={32} strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-foreground tracking-tight">Alertas e Notificações</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                      <p className="text-sm font-medium text-muted-foreground">Configure como a agência será avisada sobre novos eventos.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          onClick={() => saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações")} 
+                          disabled={saving} 
+                          className="rounded-2xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 bg-amber-600 hover:bg-amber-700 text-white transition-all active:scale-95 flex items-center gap-2"
+                        >
+                          {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                          Salvar Notificações
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Confirmar alterações de alertas</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                {([
+                  { key: "email" as const, label: "E-mail", desc: "Receber notificações detalhadas por e-mail", icon: Mail, color: "text-blue-500" },
+                  { key: "whatsapp" as const, label: "WhatsApp", desc: "Alertas rápidos de vendas via API WhatsApp", icon: Megaphone, color: "text-green-500" },
+                  { key: "push" as const, label: "Navegador", desc: "Avisos em tempo real na tela do computador", icon: Bell, color: "text-amber-500" },
+                ] as const).map((item) => (
+                  <div key={item.key} className="flex items-center justify-between p-5 bg-card border border-border/50 rounded-3xl hover:border-primary/30 transition-all group shadow-sm">
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-2xl bg-muted/50 ${item.color} group-hover:scale-110 transition-transform`}>
+                        <item.icon size={20} />
+                      </div>
+                      <div>
+                        <p className="font-bold text-foreground leading-none mb-1">{item.label}</p>
+                        <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-tight">{item.desc}</p>
+                      </div>
+                    </div>
+                    <Switch 
+                      checked={notifications[item.key]} 
+                      onCheckedChange={(v) => setNotifications({ ...notifications, [item.key]: v })} 
+                      className="data-[state=checked]:bg-emerald-500"
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-4 pt-4">
+                <h3 className="text-sm font-black text-muted-foreground uppercase tracking-[0.2em] ml-2">Gatilhos de Notificação</h3>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {([
+                    { key: "novaReserva" as const, label: "Nova Reserva", desc: "Vendas realizadas no site", icon: ShoppingCart, color: "text-emerald-500" },
+                    { key: "cancelamento" as const, label: "Cancelamento", desc: "Reserva cancelada pelo cliente", icon: X, color: "text-rose-500" },
+                    { key: "pagamento" as const, label: "Pagamento", desc: "Confirmação de recebimento PIX", icon: Banknote, color: "text-blue-500" },
+                  ] as const).map((item) => (
+                    <div key={item.key} className="flex flex-col gap-4 p-6 bg-muted/20 border border-border/40 rounded-3xl hover:bg-muted/30 transition-all">
+                      <div className="flex items-start justify-between">
+                        <div className={`p-3 rounded-2xl bg-background border border-border/50 ${item.color}`}>
+                          <item.icon size={20} />
+                        </div>
+                        <Switch 
+                          checked={notifications[item.key]} 
+                          onCheckedChange={(v) => setNotifications({ ...notifications, [item.key]: v })} 
+                          className="data-[state=checked]:bg-primary"
+                        />
+                      </div>
+                      <div>
+                        <p className="font-black text-foreground text-sm uppercase tracking-wider">{item.label}</p>
+                        <p className="text-[11px] text-muted-foreground font-medium mt-1">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-8 border-t border-border mt-8">
+                <Button 
+                  onClick={() => saveSetting("notificacoes", notifications as unknown as Record<string, unknown>, "Notificações")} 
+                  disabled={saving} 
+                  className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 bg-amber-600 hover:bg-amber-700 text-white transition-all active:scale-95 flex items-center gap-2"
+                >
+                  {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                  Salvar Preferências de Alerta
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* SEGURANÇA */}
+        <TabsContent value="seguranca">
+          <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
+            <CardContent className="p-4 md:p-8 space-y-8">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-2xl bg-slate-500/10 text-slate-600">
+                    <Shield size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-foreground">Acesso e Segurança</h3>
+                    <p className="text-sm text-muted-foreground">Gestão de credenciais do painel administrativo.</p>
+                  </div>
+                </div>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button onClick={handleChangePassword} disabled={changingPassword} className="rounded-xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-slate-500/20 bg-slate-700 hover:bg-slate-800 text-white">
+                      {changingPassword ? <Loader2 size={16} className="animate-spin mr-2" /> : <Shield size={16} className="mr-2" />}
+                      Salvar Senha
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Salvar nova senha de acesso</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label>Nova Senha</Label>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      value={novaSenha}
+                      onChange={(e) => setNovaSenha(e.target.value)}
+                      placeholder="Mínimo 8 caracteres"
+                      maxLength={72}
+                    />
+                    <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" onClick={() => setShowPassword(!showPassword)}>
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </Button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Confirmar Nova Senha</Label>
+                  <Input type={showPassword ? "text" : "password"} value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} placeholder="Repita a nova senha" maxLength={72} />
+                </div>
+                {novaSenha && novaSenha.length < 8 && <p className="text-xs text-destructive">A senha deve ter pelo menos 8 caracteres.</p>}
+                {confirmarSenha && novaSenha !== confirmarSenha && <p className="text-xs text-destructive">As senhas não conferem.</p>}
+              </div>
+
+              <div className="flex justify-end pt-8 border-t border-border mt-8">
+                <Button 
+                  onClick={handleChangePassword} 
+                  disabled={changingPassword || !novaSenha} 
+                  className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-slate-500/20 bg-slate-700 hover:bg-slate-800 text-white transition-all active:scale-95 flex items-center gap-2"
+                >
+                  {changingPassword ? <Loader2 size={18} className="animate-spin" /> : <Shield size={18} />}
+                  Atualizar Senha de Acesso
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* BACKUP & RESTAURAÇÃO */}
+        <TabsContent value="backup">
+          <div className="space-y-6">
+            <Card className="border-none shadow-sm glass-card rounded-[2.5rem] overflow-hidden">
+              <CardContent className="p-8 space-y-8">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-indigo-500/5 p-8 rounded-[2rem] border border-indigo-500/10">
+                  <div className="flex items-center gap-5">
+                    <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center shadow-inner">
+                      <HardDrive size={32} strokeWidth={2.5} />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-black text-foreground tracking-tight leading-none">Cópia de Segurança</h3>
+                      <p className="text-sm font-medium text-muted-foreground mt-2">Segurança máxima para seus dados e mídias.</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <Button 
+                      onClick={handleBackup} 
+                      disabled={backupLoading}
+                      className="rounded-2xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20 bg-indigo-600 hover:bg-indigo-700 text-white transition-all active:scale-95 flex items-center gap-2"
+                    >
+                      {backupLoading ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                      Gerar Backup Completo
+                    </Button>
+                    <div className="relative">
+                      <input type="file" ref={restoreInputRef} onChange={handleRestore} className="hidden" accept=".json" />
+                      <Button 
+                        variant="outline"
+                        onClick={() => restoreInputRef.current?.click()} 
+                        disabled={restoreLoading}
+                        className="rounded-2xl px-8 h-12 font-black uppercase tracking-widest border-2 hover:bg-muted transition-all active:scale-95 flex items-center gap-2"
+                      >
+                        {restoreLoading ? <Loader2 size={18} className="animate-spin" /> : <UploadCloud size={18} />}
+                        Restaurar Sistema
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 ml-2">Integridade dos Dados</p>
+                    <div className="p-6 bg-muted/20 border border-border/40 rounded-[2rem] space-y-4">
+                      <p className="text-xs font-bold text-foreground">O pacote de backup contém:</p>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          "Configurações", "Reservas", "Clientes", "Financeiro", "Marketing", "SGS Segurança", "Documentação", "Mídias/Fotos"
+                        ].map((item, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                            <span className="text-[11px] font-medium text-muted-foreground">{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        onClick={handleBackup} 
+                        disabled={backupLoading} 
+                        className="rounded-xl px-6 h-11 font-bold shadow-sm bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        {backupLoading ? <Loader2 size={18} className="animate-spin mr-2" /> : <Download size={18} className="mr-2" />}
+                        {backupLoading ? "Gerando backup..." : "Gerar Backup Completo"}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Exportar todos os dados do banco para um arquivo JSON</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border">
+              <CardContent className="p-6 space-y-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                    <RefreshCw size={20} className="text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-bold text-foreground text-lg">Restaurar Backup</h3>
+                    <p className="text-sm text-muted-foreground">Importe um arquivo de backup para restaurar os dados</p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-destructive/5 border border-destructive/20 rounded-xl space-y-2">
+                  <p className="text-sm font-medium text-destructive">⚠️ Atenção</p>
+                  <p className="text-sm text-muted-foreground">
+                    A restauração <strong>substituirá todos os dados atuais</strong> pelos dados do backup selecionado. 
+                    Recomendamos realizar um backup antes de restaurar.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <input ref={restoreInputRef} type="file" accept=".json" className="hidden" onChange={handleRestore} />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="outline"
+                        onClick={() => restoreInputRef.current?.click()}
+                        disabled={restoreLoading}
+                        className="rounded-xl px-6 h-11 font-bold border-2 border-amber-500/30 hover:bg-amber-50"
+                      >
+                        {restoreLoading ? <Loader2 size={18} className="animate-spin mr-2" /> : <UploadCloud size={18} className="mr-2" />}
+                        {restoreLoading ? "Restaurando..." : "Selecionar Arquivo de Backup"}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Substituir dados atuais por um arquivo de backup anterior</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              </CardContent>
+            </Card>
+
+            {backupHistory.length > 0 && (
+              <Card className="border-border">
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Clock size={20} className="text-muted-foreground" />
+                    <h3 className="font-display font-bold text-foreground text-lg">Histórico de Backups (persistência local)</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {backupHistory.map((b, i) => (
+                      <div key={i} className="flex items-center justify-between p-3 bg-muted rounded-lg text-sm">
+                        <div className="flex items-center gap-3">
+                          <Database size={14} className="text-primary" />
                           <span className="font-medium text-foreground">{formatDate(new Date(b.date), "dd/MM/yyyy 'às' HH:mm:ss")}</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-muted-foreground">
                         </div>
                         <div className="flex items-center gap-4 text-muted-foreground">
                           <span>{b.tables} tabelas</span>
