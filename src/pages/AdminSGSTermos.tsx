@@ -321,7 +321,7 @@ const AdminSGSTermos = () => {
     if (!win) return;
 
     const termDate = term.term_date ? new Date(term.term_date + "T12:00:00") : new Date();
-    const formattedDate = format(termDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+    const formattedDate = formatDate(termDate, "dd 'de' MMMM 'de' yyyy");
     
     const minorsHtml = term.sgs_risk_term_minors?.map((m: any, i: number) => `
       <div style="margin: 8px 0; padding-bottom: 5px; border-bottom: 1px solid #f0f0f0;">
