@@ -88,7 +88,7 @@ const AdminPacotes = () => {
   const openForm = (pkg?: any) => {
     if (pkg) {
       setEditingId(pkg.id);
-      setForm({ ...pkg });
+      setForm({ ...pkg, highlights: pkg.highlights || [] });
       
       const pkgTours = (pkg.package_tours || []).map((pt: any) => ({
         id: pt.tour_id, type: 'tour' as const, data: tours.find(t => t.id === pt.tour_id)
@@ -101,7 +101,7 @@ const AdminPacotes = () => {
       setSelectedItems([...pkgTours, ...pkgTrans]);
     } else {
       setEditingId(null);
-      setForm({ name: "", slug: "", description: "", days: 1, nights: 0, original_price: 0, discount_price: 0, banner_url: "", tag: "", active: true });
+      setForm({ name: "", slug: "", description: "", days: 1, nights: 0, original_price: 0, discount_price: 0, banner_url: "", tag: "", active: true, highlights: [] });
       setSelectedItems([]);
     }
     setShowForm(true);
