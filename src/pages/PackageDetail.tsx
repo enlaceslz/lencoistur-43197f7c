@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@/lib/utils";
+import { ShareWithFriend } from "@/components/ShareWithFriend";
 
 interface Package {
   id: string;
@@ -218,9 +219,12 @@ const PackageDetail = () => {
                 </a>
               </div>
               
-              <p className="text-[10px] text-center text-muted-foreground mt-4">
-                Ao reservar, você concorda com nossos termos de uso e política de cancelamento.
-              </p>
+              <div className="space-y-3">
+                <ShareWithFriend itemName={pkg.name} itemUrl={window.location.href} />
+                <p className="text-[10px] text-center text-muted-foreground mt-4">
+                  Ao reservar, você concorda com nossos termos de uso e política de cancelamento.
+                </p>
+              </div>
             </div>
           </div>
         </div>

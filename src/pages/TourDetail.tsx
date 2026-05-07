@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 import { formatCurrency } from "@/lib/utils";
+import { ShareWithFriend } from "@/components/ShareWithFriend";
 
 const TourDetail = () => {
   const { slug } = useParams<{ slug: string }>();
