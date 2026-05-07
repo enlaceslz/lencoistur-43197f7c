@@ -364,7 +364,8 @@ const AdminPasseios = () => {
             </Button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-6 md:space-y-8">
+          <form onSubmit={handleSubmit} className="flex flex-col h-[calc(90vh-80px)]">
+            <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Nome *</label>
@@ -609,7 +610,9 @@ const AdminPasseios = () => {
               </div>
             </div>
 
-            <div className="flex gap-3 pt-4 border-t border-border">
+            </div>
+            
+            <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0 z-10">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all">
