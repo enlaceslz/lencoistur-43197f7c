@@ -729,10 +729,25 @@ const AdminColaboradores = () => {
 
       {/* Collaborator Form Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{selectedCollab ? "Editar Colaborador" : "Novo Colaborador"}</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-3xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                <Users size={20} className="md:w-6 md:h-6" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                  {selectedCollab ? "Editar Colaborador" : "Novo Colaborador"}
+                </DialogTitle>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Dados profissionais e financeiros do especialista</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setDialogOpen(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <XCircle size={20} className="text-slate-400" />
+            </Button>
+          </div>
+
+          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
           <div className="grid md:grid-cols-2 gap-4 py-4">
             <div className="md:col-span-2 flex flex-col items-center justify-center space-y-4 mb-4 pb-4 border-b">
               <div className="relative group">
@@ -885,13 +900,14 @@ const AdminColaboradores = () => {
               <Textarea value={form.observation} onChange={(e) => setForm({...form, observation: e.target.value})} />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
-            <Button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white">
-              {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
-              {selectedCollab ? "Salvar Alterações" : "Cadastrar"}
-            </Button>
-          </DialogFooter>
+            <div className="flex gap-3 pt-6 border-t border-slate-100">
+              <Button variant="outline" onClick={() => setDialogOpen(false)} className="flex-1 h-12 rounded-xl font-bold">Cancelar</Button>
+              <Button onClick={handleSave} disabled={saving} className="flex-[2] h-12 rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white">
+                {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
+                {selectedCollab ? "Salvar Alterações" : "Cadastrar Colaborador"}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -947,13 +963,26 @@ const AdminColaboradores = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Launch Payment Dialog */}
+      {/* Payment Dialog */}
       <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Lançar Pagamento para {selectedCollab?.name}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
+        <DialogContent className="sm:max-w-lg w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                <Banknote size={20} className="md:w-6 md:h-6" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                  Lançar Pagamento
+                </DialogTitle>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Lançamento direto para o contas a pagar</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setPaymentDialogOpen(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <XCircle size={20} className="text-slate-400" />
+            </Button>
+          </div>
+          <div className="p-4 md:p-8 space-y-6">
             <div className="space-y-2">
               <Label>Valor do Pagamento</Label>
               <Input 
@@ -975,23 +1004,37 @@ const AdminColaboradores = () => {
               </p>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setPaymentDialogOpen(false)}>Cancelar</Button>
-            <Button onClick={handleSavePayment} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700 text-white">
-              {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : <Banknote size={16} className="mr-2" />}
-              Lançar no Financeiro
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <div className="flex gap-3 pt-6 border-t border-slate-100">
+              <Button variant="outline" onClick={() => setPaymentDialogOpen(false)} className="flex-1 h-12 rounded-xl font-bold">Cancelar</Button>
+              <Button onClick={handleSavePayment} disabled={saving} className="flex-[2] h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20 transition-all font-black">
+                {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : <Banknote size={16} className="mr-2" />}
+                Lançar no Financeiro
+              </Button>
+            </div>
+          </div>
 
       {/* Manage Types Dialog */}
       <Dialog open={typesDialogOpen} onOpenChange={setTypesDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Gerenciar Tipos de Colaborador</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
+        <DialogContent className="sm:max-w-md w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-600">
+                <Settings2 size={20} className="md:w-6 md:h-6" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                  Categorias
+                </DialogTitle>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Tipos de especialidade</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setTypesDialogOpen(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <XCircle size={20} className="text-slate-400" />
+            </Button>
+          </div>
+
+          <div className="p-4 md:p-8 space-y-6">
+          
             <div className="flex gap-2">
               <div className="flex-1 space-y-2">
                 <Label>Novo Tipo</Label>

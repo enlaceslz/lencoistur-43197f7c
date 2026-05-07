@@ -808,23 +808,36 @@ const AdminParceiros = () => {
               <Input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="Premium, VIP, Recorrente..." />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
-            <Button onClick={handleSave} disabled={saving}>
-              {saving && <Loader2 className="animate-spin mr-2" size={16} />}
-              {editPartner ? "Salvar" : "Cadastrar"}
-            </Button>
-          </DialogFooter>
+            <div className="flex gap-3 pt-6 border-t border-slate-100">
+              <Button variant="outline" onClick={() => setDialogOpen(false)} className="flex-1 h-12 rounded-xl font-bold">Cancelar</Button>
+              <Button onClick={handleSave} disabled={saving} className="flex-[2] h-12 rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white">
+                {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
+                {editPartner ? "Salvar Alterações" : "Cadastrar Parceiro"}
+              </Button>
+            </div>
         </DialogContent>
       </Dialog>
 
       {/* Types Management Dialog */}
       <Dialog open={typesDialogOpen} onOpenChange={setTypesDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Gerenciar Tipos de Parceiros</DialogTitle>
-            <DialogDescription>Adicione, edite ou remova categorias de parceiros.</DialogDescription>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-600">
+                <Settings2 size={20} className="md:w-6 md:h-6" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                  Categorias de Parceiros
+                </DialogTitle>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Gerencie os tipos de fornecedores</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setTypesDialogOpen(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <XCircle size={20} className="text-slate-400" />
+            </Button>
+          </div>
+          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
           
           <div className="grid md:grid-cols-2 gap-6 mt-4">
             <div className="space-y-4 border-r pr-6">
@@ -873,6 +886,7 @@ const AdminParceiros = () => {
               </div>
             </div>
           </div>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -896,33 +910,29 @@ const AdminParceiros = () => {
       
       {/* View Partner Details Dialog */}
       <Dialog open={!!viewPartner} onOpenChange={(open) => !open && setViewPartner(null)}>
-        <DialogContent className="max-w-2xl sm:max-w-xl">
-          <DialogHeader className="pb-4 border-b">
-            <div className="flex items-center gap-4">
-              <div className={`p-4 rounded-2xl ${partnerTypes.find(t => t.name === viewPartner?.type)?.color || "bg-primary/10 text-primary"}`}>
+        <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className={cn("w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center", partnerTypes.find(t => t.name === viewPartner?.type)?.color || "bg-primary/10 text-primary")}>
                 {(() => {
                   const Icon = getIcon(partnerTypes.find(t => t.name === viewPartner?.type)?.icon || "Building2");
-                  return <Icon size={32} />;
+                  return <Icon size={20} className="md:w-6 md:h-6" />;
                 })()}
               </div>
               <div>
-                <DialogTitle className="text-2xl font-bold">{viewPartner?.name}</DialogTitle>
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge variant="outline" className="text-xs uppercase font-semibold tracking-wider">
-                    {partnerTypes.find(t => t.name === viewPartner?.type)?.label || viewPartner?.type}
-                  </Badge>
-                  <Badge 
-                    className={viewPartner?.active 
-                      ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300" 
-                      : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
-                    }
-                  >
-                    {viewPartner?.active ? "Ativo" : "Inativo"}
-                  </Badge>
-                </div>
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                  {viewPartner?.name}
+                </DialogTitle>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium line-clamp-1">
+                  {partnerTypes.find(t => t.name === viewPartner?.type)?.label || viewPartner?.type} • {viewPartner?.active ? "Ativo" : "Inativo"}
+                </p>
               </div>
             </div>
-          </DialogHeader>
+            <Button variant="ghost" size="icon" onClick={() => setViewPartner(null)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <XCircle size={20} className="text-slate-400" />
+            </Button>
+          </div>
+          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6">
             <div className="space-y-6">
@@ -1069,19 +1079,18 @@ const AdminParceiros = () => {
             </div>
           </div>
 
-          <DialogFooter className="border-t pt-4 sm:justify-between gap-2">
-            <Button variant="outline" className="gap-2" onClick={() => {
-              if (viewPartner) {
-                openEdit(viewPartner);
-                setViewPartner(null);
-              }
-            }}>
-              <Edit size={16} /> Editar Dados
-            </Button>
-            <div className="flex gap-2">
+            <div className="flex gap-3 pt-6 border-t border-slate-100">
+              <Button variant="outline" onClick={() => {
+                if (viewPartner) {
+                  openEdit(viewPartner);
+                  setViewPartner(null);
+                }
+              }} className="flex-1 h-12 rounded-xl font-bold">
+                <Edit size={16} className="mr-2" /> Editar
+              </Button>
               <Button 
                 variant={viewPartner?.active ? "destructive" : "default"} 
-                className="gap-2"
+                className="flex-1 h-12 rounded-xl font-bold"
                 onClick={() => {
                   if (viewPartner) {
                     toggleActive(viewPartner);
@@ -1089,12 +1098,12 @@ const AdminParceiros = () => {
                   }
                 }}
               >
-                {viewPartner?.active ? <XCircle size={16} /> : <CheckCircle2 size={16} />}
-                {viewPartner?.active ? "Desativar Parceiro" : "Ativar Parceiro"}
+                {viewPartner?.active ? <XCircle size={16} className="mr-2" /> : <CheckCircle2 size={16} className="mr-2" />}
+                {viewPartner?.active ? "Desativar" : "Ativar"}
               </Button>
-              <Button onClick={() => setViewPartner(null)}>Fechar</Button>
+              <Button variant="secondary" onClick={() => setViewPartner(null)} className="h-12 rounded-xl font-bold">Fechar</Button>
             </div>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </AdminLayout>
