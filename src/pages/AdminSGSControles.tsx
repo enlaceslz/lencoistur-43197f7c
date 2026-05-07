@@ -284,22 +284,31 @@ const AdminSGSControles = () => {
                   Nenhum procedimento cadastrado.
                 </div>
               ) : procedures.map((proc) => (
-                <div key={proc.id} className="bg-card border border-border rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between hover:border-primary/30 transition-all gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center shrink-0">
-                      <FileText size={20} />
+                <div key={proc.id} className="bg-card border border-border rounded-[2rem] p-6 flex flex-col sm:flex-row sm:items-center justify-between hover:shadow-2xl hover:border-primary/30 transition-all gap-6 admin-card-hover group relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1.5 h-full bg-secondary transition-colors" />
+                  
+                  <div className="flex items-center gap-6">
+                    <div className="w-14 h-14 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center shrink-0 shadow-inner group-hover:bg-secondary group-hover:text-white transition-all">
+                      <FileText size={28} />
                     </div>
                     <div>
-                      <h4 className="font-bold text-sm text-foreground">{proc.title}</h4>
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{PROCEDURE_CATEGORIES[proc.category]} • v{proc.version}</p>
+                      <h4 className="font-display font-black text-lg text-foreground group-hover:text-secondary transition-colors leading-tight">{proc.title}</h4>
+                      <div className="flex items-center gap-3 mt-1">
+                        <Badge variant="outline" className="font-black text-[9px] uppercase px-2 py-0.5 rounded-lg border-secondary/20 text-secondary bg-secondary/5">
+                          {PROCEDURE_CATEGORIES[proc.category]}
+                        </Badge>
+                        <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Versão {proc.version}</span>
+                      </div>
+                      {proc.description && <p className="text-xs text-muted-foreground mt-3 line-clamp-1 italic">"{proc.description}"</p>}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button className="p-2 text-primary hover:bg-primary/5 rounded-lg transition-colors" title="Visualizar">
-                      <ExternalLink size={18} />
+                  
+                  <div className="flex items-center gap-3 pt-4 sm:pt-0 border-t sm:border-t-0 border-border/50">
+                    <button className="flex-1 sm:flex-none h-10 px-6 bg-secondary/10 text-secondary rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-secondary hover:text-white transition-all flex items-center gap-2">
+                      <ExternalLink size={14} /> Abrir Documento
                     </button>
-                    <button onClick={() => deleteProc(proc.id)} className="p-2 text-muted-foreground hover:text-destructive rounded-lg transition-colors">
-                      <Trash2 size={18} />
+                    <button onClick={() => deleteProc(proc.id)} className="h-10 w-10 bg-destructive/10 text-destructive rounded-xl flex items-center justify-center hover:bg-destructive hover:text-white transition-all">
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
