@@ -132,7 +132,9 @@ const AdminParceiros = () => {
       name: "", type: partnerTypes[0]?.name || "hotel", contact_name: "", phone: "", 
       email: "", commission_rate: "10", cpf_cnpj: "", address: "", 
       cnh: "", cnh_validade: "", cadastur: "",
-      remuneration_type: "comissao_percent", remuneration_value: "0"
+      remuneration_type: "comissao_percent", remuneration_value: "0",
+      bank_name: "", bank_agency: "", bank_account: "", bank_pix_key: "",
+      credit_limit: "0", tags: ""
     });
     setDialogOpen(true);
   };
@@ -146,7 +148,11 @@ const AdminParceiros = () => {
       cpf_cnpj: p.cpf_cnpj || "", address: p.address || "",
       cnh: p.cnh || "", cnh_validade: p.cnh_validade || "", cadastur: p.cadastur || "",
       remuneration_type: p.remuneration_type || "comissao_percent",
-      remuneration_value: String(p.remuneration_value || 0)
+      remuneration_value: String(p.remuneration_value || 0),
+      bank_name: p.bank_name || "", bank_agency: p.bank_agency || "",
+      bank_account: p.bank_account || "", bank_pix_key: p.bank_pix_key || "",
+      credit_limit: String(p.credit_limit || 0),
+      tags: p.tags ? p.tags.join(", ") : ""
     });
     setDialogOpen(true);
   };
