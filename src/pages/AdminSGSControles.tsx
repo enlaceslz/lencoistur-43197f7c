@@ -97,20 +97,26 @@ const AdminSGSControles = () => {
   };
 
   return (
-    <AdminLayout title="SGS - Controles Internos (P5)">
-      <div className="space-y-6">
-        <div className="flex flex-col md:flex-row justify-between gap-4">
-          <div>
-            <h2 className="text-sm text-muted-foreground">Gestão de Equipamentos e Procedimentos Operacionais Padrão (POP)</h2>
+    <AdminLayout title="SGS — Controles Internos (P5)">
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="glass-card p-6 rounded-[2.5rem] border border-border/50 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-2xl bg-primary/10 text-primary shadow-inner">
+              <Shield size={24} strokeWidth={2.5} />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-foreground tracking-tight">Gestão de Recursos P5</h2>
+              <p className="text-xs font-black text-muted-foreground uppercase tracking-widest mt-1">Equipamentos e Procedimentos Operacionais (POP)</p>
+            </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3 w-full md:w-auto">
             <button onClick={() => setShowEquipForm(!showEquipForm)}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-              <Wrench size={16} /> Novo Equipamento
+              className="flex-1 md:flex-none h-12 px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
+              <Wrench size={18} /> Novo Equipamento
             </button>
             <button onClick={() => setShowProcForm(!showProcForm)}
-              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-              <FileText size={16} /> Novo Procedimento
+              className="flex-1 md:flex-none h-12 px-6 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-secondary/20 transition-all flex items-center justify-center gap-2">
+              <FileText size={18} /> Novo Procedimento
             </button>
           </div>
         </div>
