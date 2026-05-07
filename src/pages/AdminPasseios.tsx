@@ -376,21 +376,35 @@ const AdminPasseios = () => {
                 <input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })}
                   className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" maxLength={200} />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Preço Coletivo (R$/pessoa)</label>
-                <input 
-                  value={maskCurrency(String(form.price))} 
-                  onChange={e => setForm({ ...form, price: parseCurrency(e.target.value) })}
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Coletivo (R$/pessoa)</Label>
+                <NumericFormat
+                  value={form.price / 100}
+                  onValueChange={(values) => setForm({ ...form, price: Math.round(Number(values.floatValue) * 100) })}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  prefix="R$ "
                   disabled={!form.mode_collective_enabled}
-                  className={`w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold ${!form.mode_collective_enabled ? "opacity-40 grayscale" : ""}`} />
+                  className={cn(
+                    "w-full bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 transition-all outline-none",
+                    !form.mode_collective_enabled && "opacity-40 grayscale"
+                  )}
+                />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Preço Privativo (R$/veículo)</label>
-                <input 
-                  value={maskCurrency(String(form.private_price))} 
-                  onChange={e => setForm({ ...form, private_price: parseCurrency(e.target.value) })}
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Privativo (R$/veículo)</Label>
+                <NumericFormat
+                  value={form.private_price / 100}
+                  onValueChange={(values) => setForm({ ...form, private_price: Math.round(Number(values.floatValue) * 100) })}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  prefix="R$ "
                   disabled={!form.mode_private_enabled}
-                  className={`w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold ${!form.mode_private_enabled ? "opacity-40 grayscale" : ""}`} />
+                  className={cn(
+                    "w-full bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 transition-all outline-none",
+                    !form.mode_private_enabled && "opacity-40 grayscale"
+                  )}
+                />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Lotação Máxima</label>
