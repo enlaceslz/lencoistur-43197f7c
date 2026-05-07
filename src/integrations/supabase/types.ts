@@ -969,6 +969,10 @@ export type Database = {
         Row: {
           active: boolean
           address: string | null
+          bank_account: string | null
+          bank_agency: string | null
+          bank_name: string | null
+          bank_pix_key: string | null
           cadastur: string | null
           cnh: string | null
           cnh_validade: string | null
@@ -976,18 +980,24 @@ export type Database = {
           contact_name: string | null
           cpf_cnpj: string | null
           created_at: string
+          credit_limit: number | null
           email: string | null
           id: string
           name: string
           phone: string | null
           remuneration_type: string | null
           remuneration_value: number | null
+          tags: string[] | null
           type: string
           updated_at: string
         }
         Insert: {
           active?: boolean
           address?: string | null
+          bank_account?: string | null
+          bank_agency?: string | null
+          bank_name?: string | null
+          bank_pix_key?: string | null
           cadastur?: string | null
           cnh?: string | null
           cnh_validade?: string | null
@@ -995,18 +1005,24 @@ export type Database = {
           contact_name?: string | null
           cpf_cnpj?: string | null
           created_at?: string
+          credit_limit?: number | null
           email?: string | null
           id?: string
           name: string
           phone?: string | null
           remuneration_type?: string | null
           remuneration_value?: number | null
+          tags?: string[] | null
           type: string
           updated_at?: string
         }
         Update: {
           active?: boolean
           address?: string | null
+          bank_account?: string | null
+          bank_agency?: string | null
+          bank_name?: string | null
+          bank_pix_key?: string | null
           cadastur?: string | null
           cnh?: string | null
           cnh_validade?: string | null
@@ -1014,12 +1030,14 @@ export type Database = {
           contact_name?: string | null
           cpf_cnpj?: string | null
           created_at?: string
+          credit_limit?: number | null
           email?: string | null
           id?: string
           name?: string
           phone?: string | null
           remuneration_type?: string | null
           remuneration_value?: number | null
+          tags?: string[] | null
           type?: string
           updated_at?: string
         }
