@@ -260,20 +260,22 @@ const modules: ModuleGuide[] = [
     id: "relatorios",
     icon: BarChart3,
     title: "Relatórios",
-    subtitle: "Business Intelligence",
+    subtitle: "Business Intelligence (BI)",
     color: "bg-slate-500",
-    badge: "Novo",
-    overview: "Painéis visuais e gráficos dinâmicos para análise profunda de Reservas, Financeiro, CRM e Marketing. Exporte dados em CSV para ferramentas externas.",
+    badge: "Professional",
+    overview: "Painéis analíticos avançados que processam o Big Data da sua operação. Visualize tendências de receita, performance por canal de marketing, produtividade da equipe e conformidade do SGS em tempo real.",
     steps: [
-      { title: "Gráficos de Performance", desc: "Visualize a evolução de vendas e leads através de gráficos de linha e barras." },
-      { title: "Análise de Receita", desc: "Veja a distribuição de faturamento por tipo de passeio e canal de venda." },
-      { title: "Exportação", desc: "Gere planilhas detalhadas para contabilidade ou auditorias externas." },
+      { title: "Dashboard Executivo", desc: "Monitore KPIs críticos como Receita Bruta, Ticket Médio e Taxa de Ocupação." },
+      { title: "BI Financeiro", desc: "Acesse o DRE automático e analise a lucratividade líquida após deduções de impostos e comissões." },
+      { title: "Exportação Técnica", desc: "Gere relatórios PDF assinados para prestação de contas ou auditorias externas ISO." }
     ],
     tips: [
-      "Compare os períodos (ano anterior vs atual) para medir o crescimento real",
-      "O relatório de ocupação ajuda a decidir sobre promoções em datas de baixa demanda",
+      "Utilize o filtro de 'Ano Anterior' para entender a sazonalidade da Rota das Emoções",
+      "A ferramenta de impressão gera documentos profissionais com logomarca e rodapé técnico"
     ],
-    faq: [],
+    faq: [
+      { q: "Os dados podem ser exportados?", a: "Sim, todos os relatórios suportam exportação integral em formato CSV e visual em PDF Professional." }
+    ]
   },
   {
     id: "sgs",
