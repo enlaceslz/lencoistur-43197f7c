@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, AlertCircle, Pencil, Trash2, MapPin, Clock } from "lucide-react";
+import { Plus, Search, AlertCircle, Pencil, Trash2, MapPin, Clock, Calendar, Shield } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 
 const SEVERITY: Record<string, { label: string; color: string }> = {
@@ -279,42 +280,83 @@ const AdminSGSIncidentes = () => {
               <p className="text-muted-foreground">Nenhum incidente registrado</p>
             </div>
           ) : filtered.map((inc) => (
-            <div key={inc.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-shadow">
-              <div className="flex flex-col lg:flex-row justify-between gap-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className="font-mono text-xs text-muted-foreground">{inc.incident_code}</span>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${SEVERITY[inc.severity]?.color}`}>{SEVERITY[inc.severity]?.label}</span>
-                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground">{TYPE_LABELS[inc.type] || inc.type}</span>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_COLORS[inc.status] || ""}`}>{inc.status}</span>
-                    {inc.pre_activated && <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-destructive text-white animate-pulse">🚨 PRE ATIVADO</span>}
+            <div key={inc.id} className="glass-card admin-card-hover rounded-[2.5rem] p-8 group relative overflow-hidden flex flex-col border border-border/50 transition-all">
+              <div className={`absolute top-0 left-0 w-2 h-full transition-colors ${inc.severity === 'critica' || inc.severity === 'alta' ? 'bg-destructive' : 'bg-primary'}`} />
+              
+              <div className="flex flex-col lg:flex-row justify-between gap-6">
+                <div className="flex-1 space-y-4">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="font-mono text-[10px] font-black text-muted-foreground tracking-tighter uppercase px-2 py-0.5 bg-muted/50 rounded-lg border border-border/40">{inc.incident_code}</span>
+                    <Badge variant="outline" className={`font-black text-[9px] uppercase px-3 py-1 rounded-full border shadow-sm ${SEVERITY[inc.severity]?.color}`}>
+                      Gravidade {SEVERITY[inc.severity]?.label}
+                    </Badge>
+                    <span className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-muted/50 text-muted-foreground border border-border/40">{TYPE_LABELS[inc.type] || inc.type}</span>
+                    <Badge variant="secondary" className={`font-black text-[9px] uppercase px-3 py-1 rounded-full border ${STATUS_COLORS[inc.status] || ""}`}>
+                      {inc.status}
+                    </Badge>
+                    {inc.pre_activated && <span className="px-3 py-1 rounded-full text-[9px] font-black bg-destructive text-white animate-pulse shadow-lg shadow-destructive/20">🚨 PRE ATIVADO</span>}
                   </div>
-                  <p className="text-foreground font-medium">{inc.description}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {inc.tours?.name && <><MapPin size={10} className="inline mr-1" />{inc.tours.name} • </>}
-                    {inc.bookings?.booking_code && <span className="text-primary font-bold">Reserva: {inc.bookings.booking_code} • </span>}
-                    📍 {inc.location} {inc.guide_name && `• Condutor: ${inc.guide_name}`}
-                  </p>
-                  {inc.people_involved && <p className="text-xs text-muted-foreground">👥 Envolvidos: {inc.people_involved}</p>}
-                  {inc.action_taken && <p className="text-xs text-primary mt-1 font-bold">✅ Ação: {inc.action_taken}</p>}
+
+                  <div>
+                    <p className="text-lg font-black text-foreground group-hover:text-primary transition-colors leading-tight mb-2">{inc.description}</p>
+                    <div className="flex items-center gap-4 flex-wrap text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                      <span className="flex items-center gap-1.5"><Calendar size={12} className="text-primary" /> {new Date(inc.date).toLocaleDateString("pt-BR")}</span>
+                      <span className="flex items-center gap-1.5"><MapPin size={12} className="text-primary" /> {inc.location}</span>
+                      {inc.guide_name && <span className="flex items-center gap-1.5"><Shield size={12} className="text-primary" /> Condutor: {inc.guide_name}</span>}
+                    </div>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {inc.tours?.name && (
+                      <div className="bg-muted/30 p-3 rounded-2xl border border-border/50">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Passeio</p>
+                        <p className="text-xs font-black text-foreground">{inc.tours.name}</p>
+                      </div>
+                    )}
+                    {inc.bookings?.booking_code && (
+                      <div className="bg-primary/5 p-3 rounded-2xl border border-primary/10">
+                        <p className="text-[9px] font-black text-primary uppercase tracking-widest mb-1">Reserva Relacionada</p>
+                        <p className="text-xs font-black text-primary">{inc.bookings.booking_code}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {inc.people_involved && (
+                    <div className="bg-muted/30 p-4 rounded-2xl border border-border/50">
+                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2 flex items-center gap-2">👥 Envolvidos / Vítimas</p>
+                      <p className="text-xs font-medium text-foreground">{inc.people_involved}</p>
+                    </div>
+                  )}
+
+                  {inc.action_taken && (
+                    <div className="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100">
+                      <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-2 flex items-center gap-2">✅ Resposta Imediata</p>
+                      <p className="text-xs font-black text-emerald-900 leading-relaxed">{inc.action_taken}</p>
+                    </div>
+                  )}
+
                   {inc.lessons_learned && (
-                    <div className="mt-2 p-2 bg-emerald-50 rounded-lg border border-emerald-100">
-                      <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-1">💡 Lições Aprendidas</p>
-                      <p className="text-[11px] text-emerald-800 italic">{inc.lessons_learned}</p>
+                    <div className="bg-amber-50/50 p-4 rounded-2xl border border-amber-100">
+                      <p className="text-[10px] font-black text-amber-700 uppercase tracking-widest mb-2 flex items-center gap-2">💡 Lições Aprendidas</p>
+                      <p className="text-xs font-medium text-amber-900 italic leading-relaxed">"{inc.lessons_learned}"</p>
                     </div>
                   )}
                 </div>
-                <div className="flex flex-col items-end gap-2">
-                  <p className="text-xs text-muted-foreground">{new Date(inc.date).toLocaleDateString("pt-BR")}</p>
-                  <div className="flex gap-1">
-                    {inc.status === "aberto" && (
-                      <button onClick={() => updateStatus(inc.id, "investigando")} className="text-primary text-xs font-semibold hover:underline">Investigar</button>
-                    )}
-                    {(inc.status === "aberto" || inc.status === "investigando") && (
-                      <button onClick={() => updateStatus(inc.id, "resolvido")} className="text-primary text-xs font-semibold hover:underline">Resolver</button>
-                    )}
-                    <button onClick={() => openEdit(inc)} className="p-1 rounded hover:bg-muted text-muted-foreground"><Pencil size={14} /></button>
-                    <button onClick={() => handleDelete(inc.id)} className="p-1 rounded hover:bg-destructive/10 text-destructive"><Trash2 size={14} /></button>
+
+                <div className="lg:w-48 flex flex-col gap-3 pt-4 lg:pt-0 lg:border-l border-border/40 lg:pl-6 justify-center">
+                  {inc.status === "aberto" && (
+                    <button onClick={() => updateStatus(inc.id, "investigando")} className="w-full h-10 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-105 transition-all">Investigar</button>
+                  )}
+                  {(inc.status === "aberto" || inc.status === "investigando") && (
+                    <button onClick={() => updateStatus(inc.id, "resolvido")} className="w-full h-10 rounded-xl bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all">Resolver</button>
+                  )}
+                  <div className="flex gap-2 w-full mt-2">
+                    <button onClick={() => openEdit(inc)} className="flex-1 h-10 rounded-xl bg-muted text-muted-foreground flex items-center justify-center hover:bg-muted/80 transition-all">
+                      <Pencil size={16} />
+                    </button>
+                    <button onClick={() => handleDelete(inc.id)} className="flex-1 h-10 rounded-xl bg-destructive/10 text-destructive flex items-center justify-center hover:bg-destructive hover:text-white transition-all">
+                      <Trash2 size={16} />
+                    </button>
                   </div>
                 </div>
               </div>
