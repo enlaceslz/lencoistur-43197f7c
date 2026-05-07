@@ -488,10 +488,10 @@ const AdminParceiros = () => {
       <div className="flex flex-wrap gap-3 mb-10 overflow-x-auto pb-4 no-scrollbar scroll-smooth animate-in-fade" style={{ animationDelay: '0.15s' }}>
         <button
           onClick={() => setTypeFilter("todos")} 
-          className={`text-[10px] font-black uppercase tracking-widest px-8 h-12 rounded-2xl transition-all whitespace-nowrap shadow-lg shadow-primary/5 ${
+          className={`text-[10px] font-black uppercase tracking-widest px-8 h-12 rounded-2xl transition-all whitespace-nowrap shadow-lg ${
             typeFilter === "todos"
-              ? "bg-primary text-primary-foreground shadow-primary/20 scale-105"
-              : "glass-card text-muted-foreground hover:bg-muted/80"
+              ? "bg-primary text-primary-foreground shadow-primary/30 scale-105"
+              : "bg-white dark:bg-slate-900 text-muted-foreground hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-800 shadow-slate-200/50"
           }`}
         >
           Todos Parceiros
@@ -500,14 +500,16 @@ const AdminParceiros = () => {
           const isActive = typeFilter === t.name;
           const count = partners.filter((p) => p.type === t.name).length;
           const Icon = getIcon(t.icon);
+          const colorClass = t.color?.split(' ')[0] || "from-blue-500 to-indigo-600";
+          
           return (
             <button 
               key={t.id} 
               onClick={() => setTypeFilter(t.name)}
-              className={`flex items-center gap-3 px-8 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap shadow-lg shadow-primary/5 ${
+              className={`flex items-center gap-3 px-8 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap shadow-lg ${
                 isActive 
-                  ? "bg-primary text-primary-foreground shadow-primary/20 scale-105" 
-                  : "glass-card text-muted-foreground hover:bg-muted/80"
+                  ? `bg-gradient-to-br ${colorClass} text-white shadow-primary/30 scale-105` 
+                  : "bg-white dark:bg-slate-900 text-muted-foreground hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-800 shadow-slate-200/50"
               }`}
             >
               <Icon size={16} strokeWidth={2.5} className={isActive ? "text-white" : "text-primary/40"} />
