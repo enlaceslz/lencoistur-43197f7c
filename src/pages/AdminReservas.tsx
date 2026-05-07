@@ -22,11 +22,10 @@ import {
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-import { maskCPF, maskPhone, maskDate } from "@/lib/masks";
+import { maskCPF, maskPhone, maskDate, maskCEP } from "@/lib/masks";
 import { PrintReceiptButton, type ReceiptData } from "@/components/BookingReceipt";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency, cn } from "@/lib/utils";
-import { maskCPF } from "@/lib/masks";
 import { BookingCalendar } from "@/components/admin/BookingCalendar";
 import { NumericFormat } from "react-number-format";
 
