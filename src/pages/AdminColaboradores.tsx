@@ -1014,8 +1014,6 @@ const AdminColaboradores = () => {
           </div>
         </DialogContent>
       </Dialog>
-        </DialogContent>
-      </Dialog>
 
       {/* Manage Types Dialog */}
       <Dialog open={typesDialogOpen} onOpenChange={setTypesDialogOpen}>
