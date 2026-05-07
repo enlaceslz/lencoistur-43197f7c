@@ -447,10 +447,6 @@ const AdminReservas = () => {
           />
         </div>
       ) : (
-      {/* List / Calendar View */}
-      {viewMode === "calendar" ? (
-        <BookingCalendar bookings={filtered} onSelectBooking={setSelected} />
-      ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
           {filtered.map((booking, index) => (
             <div 
@@ -567,6 +563,7 @@ const AdminReservas = () => {
           )}
         </div>
       )}
+
 
 
       {/* Detail Modal */}
