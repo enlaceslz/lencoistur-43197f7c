@@ -54,6 +54,8 @@ const mainGroups = [
     title: "Tecnologia",
     items: [
       { icon: Bot, label: "IA Gateway", path: "/admin/ia" },
+      { icon: Settings, label: "Configurações", path: "/admin/config" },
+      { icon: HelpCircle, label: "Ajuda", path: "/admin/ajuda" },
     ],
   },
 ];
