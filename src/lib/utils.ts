@@ -1,8 +1,17 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { formatInTimeZone } from "date-fns-tz";
+import { ptBR } from "date-fns/locale";
+
+const DEFAULT_TIMEZONE = "America/Fortaleza";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export function formatDate(date: Date | string | number, formatStr: string = "dd/MM/yyyy HH:mm:ss") {
+  const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+  return formatInTimeZone(dateObj, DEFAULT_TIMEZONE, formatStr, { locale: ptBR });
 }
 
 export function formatCurrency(value: number) {
