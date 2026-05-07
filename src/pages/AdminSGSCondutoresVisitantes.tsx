@@ -6,7 +6,7 @@ import { maskCPF } from "@/lib/masks";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
-import { Users, Plus, Search, AlertTriangle, CheckCircle, MapPin, Calendar, Pencil } from "lucide-react";
+import { Users, Plus, Search, AlertTriangle, CheckCircle, MapPin, Calendar, Pencil, Loader2 } from "lucide-react";
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   autorizado: { label: "Autorizado", color: "bg-primary/10 text-primary" },
