@@ -5,17 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter
 } from "@/components/ui/dialog";
 import {
   Search, ShoppingCart, CheckCircle, Clock, XCircle, Eye,
   DollarSign, Ban, Loader2, Users, Calendar, CreditCard, FileText,
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
-  Plus, Copy, Pencil, Car, Compass, LayoutGrid, List, X, XCircle as XCircleIcon
+  Plus, Copy, Pencil, Car, Compass, LayoutGrid, List, X, XCircle as XCircleIcon,
+  ChevronRight, ArrowRight, User, Hash, Info, Moon
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -25,6 +27,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency, cn } from "@/lib/utils";
 import { maskCPF } from "@/lib/masks";
 import { BookingCalendar } from "@/components/admin/BookingCalendar";
+import { NumericFormat } from "react-number-format";
 
 const statusConfig: Record<string, { label: string; className: string; icon: typeof CheckCircle }> = {
   confirmada: { label: "Confirmada", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border-emerald-200", icon: CheckCircle },
