@@ -47,13 +47,22 @@ const AdminSGSFornecedores = () => {
   };
 
   return (
-    <AdminLayout title="SGS - Monitoramento de Fornecedores">
-      <div className="space-y-6">
-        <div className="flex justify-between gap-4">
-          <p className="text-sm text-muted-foreground">Controle de documentação e conformidade de fornecedores</p>
+    <AdminLayout title="SGS — Monitoramento de Fornecedores">
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="glass-card p-6 rounded-[2.5rem] border border-border/50 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-2xl bg-primary/10 text-primary shadow-inner">
+              <ShieldCheck size={24} strokeWidth={2.5} />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-foreground tracking-tight">Qualificação de Fornecedores</h2>
+              <p className="text-xs font-black text-muted-foreground uppercase tracking-widest mt-1">Controle de Documentação e Conformidade</p>
+            </div>
+          </div>
           <button onClick={() => setShowForm(!showForm)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-            <Plus size={16} /> Novo Fornecedor
+            className="w-full md:w-auto flex items-center justify-center gap-3 px-8 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95"
+          >
+            <Plus size={20} strokeWidth={3} /> Homologar Fornecedor
           </button>
         </div>
 
