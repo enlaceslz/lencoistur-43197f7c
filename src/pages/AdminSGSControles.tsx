@@ -121,13 +121,13 @@ const AdminSGSControles = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="equipamentos">
-          <TabsList className="bg-muted p-1 rounded-xl w-full md:w-auto overflow-x-auto no-scrollbar justify-start">
-            <TabsTrigger value="equipamentos" className="rounded-lg">
-              <ClipboardList size={14} className="mr-2" /> Equipamentos (EPIs/Resgate)
+        <Tabs defaultValue="equipamentos" className="w-full">
+          <TabsList className="bg-muted/50 p-1.5 rounded-[1.5rem] border border-border/50 h-auto gap-1">
+            <TabsTrigger value="equipamentos" className="rounded-xl px-6 py-2.5 text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-lg">
+              <ClipboardList size={16} className="mr-2" /> Equipamentos
             </TabsTrigger>
-            <TabsTrigger value="procedimentos" className="rounded-lg">
-              <Shield size={14} className="mr-2" /> Procedimentos (POPs)
+            <TabsTrigger value="procedimentos" className="rounded-xl px-6 py-2.5 text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:text-secondary data-[state=active]:shadow-lg">
+              <Shield size={16} className="mr-2" /> Procedimentos (POPs)
             </TabsTrigger>
           </TabsList>
 
