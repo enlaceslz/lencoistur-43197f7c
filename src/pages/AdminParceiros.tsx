@@ -587,7 +587,7 @@ const AdminParceiros = () => {
                       </div>
                     )}
                     {(p.type === "guia" || p.type === "agencia") && p.cadastur && (
-                      <div className="flex items-center gap-2 bg-emerald-500/5 text-emerald-700 dark:text-amber-400 px-3 py-1.5 rounded-xl border border-emerald-200/20">
+                      <div className="flex items-center gap-2 bg-emerald-500/5 text-emerald-700 dark:text-emerald-400 px-3 py-1.5 rounded-xl border border-emerald-200/20">
                         <Compass size={14} />
                         <span className="text-[10px] font-black uppercase tracking-tight">CADASTUR: {p.cadastur}</span>
                       </div>
