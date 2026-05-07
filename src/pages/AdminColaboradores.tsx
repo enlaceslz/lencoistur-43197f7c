@@ -1004,13 +1004,15 @@ const AdminColaboradores = () => {
               </p>
             </div>
           </div>
-            <div className="flex gap-3 pt-6 border-t border-slate-100">
-              <Button variant="outline" onClick={() => setPaymentDialogOpen(false)} className="flex-1 h-12 rounded-xl font-bold">Cancelar</Button>
-              <Button onClick={handleSavePayment} disabled={saving} className="flex-[2] h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20 transition-all font-black">
-                {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : <Banknote size={16} className="mr-2" />}
-                Lançar no Financeiro
-              </Button>
-            </div>
+          <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0">
+            <Button variant="outline" onClick={() => setPaymentDialogOpen(false)} className="flex-1 h-12 rounded-xl font-bold">Cancelar</Button>
+            <Button onClick={handleSavePayment} disabled={saving} className="flex-[2] h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20 transition-all font-black">
+              {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : <Banknote size={16} className="mr-2" />}
+              Lançar no Financeiro
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Manage Types Dialog */}
       <Dialog open={typesDialogOpen} onOpenChange={setTypesDialogOpen}>
