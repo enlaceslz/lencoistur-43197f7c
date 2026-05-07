@@ -699,6 +699,7 @@ const AdminParceiros = () => {
             </Button>
           </div>
 
+
           <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col h-[calc(90vh-80px)]">
             <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
               <div className="space-y-4">
@@ -1160,3 +1161,6 @@ const AdminParceiros = () => {
 };
 
 export default AdminParceiros;
+
+
+

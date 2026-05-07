@@ -193,22 +193,59 @@ const AdminSGSRiscos = () => {
           ))}
         </div>
 
-        {/* Header */}
-        <div className="flex flex-col xl:flex-row gap-6">
+        {/* Header Toolbar */}
+        <div className="flex flex-col xl:flex-row gap-6 items-center justify-between glass-card p-8 rounded-[2.5rem] mb-10 animate-in-fade border border-white/20 shadow-xl shadow-black/5" style={{ animationDelay: '0.2s' }}>
+          <div className="flex flex-col sm:flex-row gap-4 flex-1 w-full">
+            <div className="relative flex-1 group">
+              <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" />
+              <input 
+                value={search} 
+                onChange={(e) => setSearch(e.target.value)} 
+                placeholder="Buscar por atividade ou perigo..."
+                className="w-full pl-14 pr-4 h-14 bg-white/40 dark:bg-black/20 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-2xl text-sm font-semibold outline-none focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-muted-foreground/40" 
+              />
+            </div>
+            <select 
+              value={filterStage} 
+              onChange={(e) => setFilterStage(e.target.value)}
+              className="h-14 bg-white/40 dark:bg-black/20 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-2xl px-6 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer min-w-[200px]"
+            >
+              <option value="todas">Todas etapas</option>
+              {Object.entries(STAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+            </select>
+          </div>
+          
+          <div className="flex flex-wrap gap-3 w-full xl:w-auto justify-center">
+            <button onClick={() => window.print()}
+              className="h-14 px-6 rounded-2xl bg-white/50 dark:bg-white/5 border border-white/20 font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-white/80 transition-all shadow-lg">
+              <Printer size={16} strokeWidth={3} /> IMPRIMIR
+            </button>
+            <button onClick={() => setShowLegend(!showLegend)}
+              className="h-14 px-6 rounded-2xl bg-white/50 dark:bg-white/5 border border-white/20 font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-white/80 transition-all shadow-lg">
+              <Info size={16} strokeWidth={3} /> CRITÉRIOS NR
+            </button>
+            <button onClick={() => { setEditing(null); setForm(emptyForm); setShowForm(!showForm); }}
+              className="h-14 px-8 rounded-[1.5rem] bg-gradient-to-r from-primary to-indigo-600 font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all text-white flex items-center gap-2">
+              <Plus size={20} strokeWidth={3} /> NOVO RISCO
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           {/* Heatmap Matrix */}
-          <div className="glass-card rounded-[2.5rem] p-8 shadow-sm flex-shrink-0 animate-in-fade" style={{ animationDelay: '0.2s' }}>
-            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-6 flex items-center gap-3">
-              <AlertTriangle size={16} className="text-secondary" />
+          <div className="xl:col-span-1 glass-card rounded-[2.5rem] p-8 shadow-sm animate-in-fade h-fit" style={{ animationDelay: '0.3s' }}>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-8 flex items-center gap-3">
+              <AlertTriangle size={16} className="text-secondary" strokeWidth={3} />
               Matriz de Riscos (PxC)
             </h3>
-            <div className="grid grid-cols-6 gap-1 w-full max-w-[300px]">
-              <div className="aspect-square flex items-center justify-center text-[10px] font-bold text-muted-foreground italic">C \ P</div>
+            <div className="grid grid-cols-6 gap-2 w-full">
+              <div className="aspect-square flex items-center justify-center text-[9px] font-black uppercase tracking-tighter text-muted-foreground italic">C \ P</div>
               {[1, 2, 3, 4, 5].map(p => (
-                <div key={p} className="aspect-square flex items-center justify-center text-[10px] font-bold text-muted-foreground">{p}</div>
+                <div key={p} className="aspect-square flex items-center justify-center text-[10px] font-black text-muted-foreground">{p}</div>
               ))}
               {[5, 4, 3, 2, 1].map(c => (
                 <div key={`row-${c}`} className="contents">
-                  <div className="aspect-square flex items-center justify-center text-[10px] font-bold text-muted-foreground">{c}</div>
+                  <div className="aspect-square flex items-center justify-center text-[10px] font-black text-muted-foreground">{c}</div>
                   {[1, 2, 3, 4, 5].map(p => {
                     const level = p * c;
                     const count = risks.filter(r => r.probability === p && r.impact === c).length;
@@ -219,7 +256,7 @@ const AdminSGSRiscos = () => {
                     return (
                       <div 
                         key={`${p}-${c}`} 
-                        className={`aspect-square rounded-md flex items-center justify-center text-xs font-bold transition-all ${count > 0 ? bgColor + " text-white shadow-sm scale-105" : "bg-muted/30 text-muted-foreground/30"}`}
+                        className={`aspect-square rounded-xl flex items-center justify-center text-xs font-black transition-all ${count > 0 ? bgColor + " text-white shadow-lg scale-105" : "bg-muted/10 text-muted-foreground/10"}`}
                         title={`P=${p}, C=${c}, NR=${level}: ${count} riscos`}
                       >
                         {count > 0 ? count : ""}
@@ -229,61 +266,26 @@ const AdminSGSRiscos = () => {
                 </div>
               ))}
             </div>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                <div className="w-2.5 h-2.5 rounded-full bg-primary/30" /> Aceitável
+            <div className="mt-8 space-y-3">
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-primary/5 border border-primary/10">
+                <div className="w-3 h-3 rounded-full bg-primary/40" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Aceitável</p>
               </div>
-              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                <div className="w-2.5 h-2.5 rounded-full bg-secondary/60" /> Temp. Aceitável
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/5 border border-secondary/10">
+                <div className="w-3 h-3 rounded-full bg-secondary/60" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Temp. Aceitável</p>
               </div>
-              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                <div className="w-2.5 h-2.5 rounded-full bg-destructive/80" /> Inaceitável
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-destructive/5 border border-destructive/10">
+                <div className="w-3 h-3 rounded-full bg-destructive/80" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Inaceitável</p>
               </div>
             </div>
           </div>
 
-          <div className="flex-1 space-y-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
-            <div className="flex flex-col sm:flex-row justify-between gap-4">
-              <div className="flex gap-3 flex-1">
-                <div className="relative flex-1 max-w-md group">
-                  <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" />
-                  <input 
-                    value={search} 
-                    onChange={(e) => setSearch(e.target.value)} 
-                    placeholder="Buscar por atividade ou perigo..."
-                    className="w-full pl-12 pr-4 h-12 glass-card border-border/40 rounded-2xl text-sm text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all font-medium placeholder:text-muted-foreground/40" 
-                  />
-                </div>
-                <select 
-                  value={filterStage} 
-                  onChange={(e) => setFilterStage(e.target.value)}
-                  className="glass-card border-border/40 rounded-2xl px-5 h-12 text-xs font-black uppercase tracking-tight outline-none focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer"
-                >
-                  <option value="todas">Todas etapas</option>
-                  {Object.entries(STAGES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                </select>
-              </div>
-              <div className="flex gap-2">
-                <button onClick={() => window.print()}
-                  className="bg-muted text-muted-foreground px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-1 hidden sm:flex">
-                  <Printer size={16} /> Imprimir
-                </button>
-                <button onClick={() => setShowLegend(!showLegend)}
-                  className="bg-muted text-muted-foreground px-3 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-1">
-                  <Info size={16} /> Critérios NR
-                </button>
-                <button onClick={() => { setEditing(null); setForm(emptyForm); setShowForm(!showForm); }}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-sm shadow-primary/20">
-                  <Plus size={16} /> Novo Risco
-                </button>
-              </div>
-            </div>
-            
-            <p className="text-xs text-muted-foreground italic">
-              A matriz acima visualiza a distribuição dos riscos cadastrados. Clique em "Critérios NR" para entender a pontuação.
-            </p>
           </div>
         </div>
+
+        {/* NR Legend - VATTI criteria */}
 
         {/* NR Legend - VATTI criteria */}
         {showLegend && (
@@ -539,9 +541,10 @@ const AdminSGSRiscos = () => {
           );
         })}
       </div>
-      </div>
     </AdminLayout>
   );
 };
+
+
 
 export default AdminSGSRiscos;
