@@ -401,7 +401,7 @@ const AdminTranslados = () => {
               </Button>
               <Button type="button" variant="outline" onClick={() => setShowForm(false)} className="h-12 rounded-xl font-bold">Cancelar</Button>
             </div>
-          
+          </form>
         </DialogContent>
       </Dialog>
 
@@ -520,7 +520,6 @@ const AdminTranslados = () => {
               </div>
             </div>
           )}
-        </div>
         </DialogContent>
       </Dialog>
     </AdminLayout>
