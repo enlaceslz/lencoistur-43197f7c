@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Clock, Sparkles, CheckCircle, Shield, Info, ArrowRight } from "lucide-react";
+import { ArrowLeft, Clock, Sparkles, CheckCircle, Shield, Info, ArrowRight, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useTranslation } from "react-i18next";
@@ -53,20 +53,25 @@ const PackageDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Carregando pacote...</h1>
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
+        <Loader2 className="animate-spin text-primary mb-4" size={48} />
+        <p className="text-muted-foreground animate-pulse font-medium">Carregando experiências...</p>
       </div>
     );
   }
 
   if (!pkg) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Pacote não encontrado</h1>
-          <Link to="/" className="text-primary hover:underline">Voltar para Início</Link>
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="text-center max-w-md">
+          <div className="w-20 h-20 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mx-auto mb-6">
+            <Info size={40} />
+          </div>
+          <h1 className="font-display text-2xl font-bold mb-2">Ops! Experiência não encontrada</h1>
+          <p className="text-muted-foreground mb-8">O pacote que você está procurando pode ter sido removido ou o link está incorreto.</p>
+          <Link to="/" className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground rounded-xl font-bold transition-all hover:bg-primary/90">
+            Voltar para Início
+          </Link>
         </div>
       </div>
     );
@@ -198,7 +203,7 @@ const PackageDetail = () => {
 
               <div className="space-y-3">
                 <Link
-                  to={`/checkout?type=package&package=${pkg.slug}`}
+                  to={`/checkout?type=package&id=${pkg.id}`}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2"
                 >
                   Reservar Pacote
