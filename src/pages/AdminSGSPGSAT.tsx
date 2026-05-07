@@ -110,40 +110,54 @@ const AdminSGSPGSAT = () => {
             {docs.map(d => {
               const content = d.conteudo_json as any;
               return (
-                <div key={d.id} className="bg-card border border-border rounded-2xl p-5">
-                  <div className="flex items-center justify-between mb-3">
+                <div key={d.id} className="bg-card border border-border rounded-[2.5rem] p-8 hover:shadow-2xl hover:border-primary/30 transition-all group admin-card-hover relative overflow-hidden">
+                  <div className={`absolute top-0 left-0 w-2 h-full transition-colors ${d.status === "vigente" ? "bg-emerald-500" : "bg-primary"}`} />
+                  
+                  <div className="flex items-center justify-between mb-8">
                     <div>
-                      <span className="font-bold text-foreground text-sm">{d.titulo}</span>
-                      <span className="text-xs text-muted-foreground ml-2">v{d.versao} · {d.data_emissao}</span>
+                      <h4 className="font-display font-black text-xl text-foreground group-hover:text-primary transition-colors">{d.titulo}</h4>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Versão {d.versao}</span>
+                        <span className="text-muted-foreground">•</span>
+                        <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Emitido em {new Date(d.data_emissao + "T12:00").toLocaleDateString("pt-BR")}</span>
+                      </div>
                     </div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${d.status === "emitido" ? "bg-primary/10 text-primary" : d.status === "vigente" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                      {d.status}
-                    </span>
+                    <Badge variant="outline" className={`font-black text-[10px] px-4 py-1.5 rounded-full border shadow-sm ${d.status === "vigente" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-primary/5 text-primary border-primary/20"}`}>
+                      {d.status.toUpperCase()}
+                    </Badge>
                   </div>
+
                   {content && (
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
-                      <div className="bg-muted rounded-lg p-2 text-center">
-                        <p className="text-lg font-bold text-foreground">{content.riscos_ativos || 0}</p>
-                        <p className="text-[10px] text-muted-foreground">Riscos</p>
-                      </div>
-                      <div className="bg-muted rounded-lg p-2 text-center">
-                        <p className="text-lg font-bold text-foreground">{content.rotas_ativas || 0}</p>
-                        <p className="text-[10px] text-muted-foreground">Rotas</p>
-                      </div>
-                      <div className="bg-muted rounded-lg p-2 text-center">
-                        <p className="text-lg font-bold text-foreground">{content.veiculos_ativos || 0}</p>
-                        <p className="text-[10px] text-muted-foreground">Veículos</p>
-                      </div>
-                      <div className="bg-muted rounded-lg p-2 text-center">
-                        <p className="text-lg font-bold text-foreground">{content.condutores_ativos || 0}</p>
-                        <p className="text-[10px] text-muted-foreground">Condutores</p>
-                      </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                      {[
+                        { label: "Riscos", val: content.riscos_ativos, icon: Shield },
+                        { label: "Rotas", val: content.rotas_ativas, icon: FileText },
+                        { label: "Frota", val: content.veiculos_ativos, icon: FileText },
+                        { label: "Condutores", val: content.condutores_ativos, icon: FileText }
+                      ].map((item, i) => (
+                        <div key={i} className="bg-muted/30 border border-border/50 rounded-2xl p-4 text-center group/item hover:bg-white hover:shadow-lg transition-all">
+                          <p className="text-2xl font-black text-foreground font-display mb-1">{item.val || 0}</p>
+                          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">{item.label}</p>
+                        </div>
+                      ))}
                     </div>
                   )}
-                  <div className="flex gap-2">
-                    {d.status === "emitido" && <button onClick={() => updateStatus(d.id, "vigente")} className="text-xs px-3 py-1 bg-primary/10 text-primary rounded-lg hover:bg-primary/20">Marcar como Vigente</button>}
-                    {d.status === "vigente" && <button onClick={() => updateStatus(d.id, "revogado")} className="text-xs px-3 py-1 bg-destructive/10 text-destructive rounded-lg hover:bg-destructive/20">Revogar</button>}
-                    {d.responsavel && <span className="text-xs text-muted-foreground ml-auto">Resp.: {d.responsavel}</span>}
+
+                  <div className="flex flex-wrap items-center gap-4 pt-6 border-t border-border/50">
+                    {d.status === "emitido" && (
+                      <button onClick={() => updateStatus(d.id, "vigente")} className="h-10 px-6 bg-primary text-primary-foreground rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-105 transition-all">Ativar como Vigente</button>
+                    )}
+                    {d.status === "vigente" && (
+                      <button onClick={() => updateStatus(d.id, "revogado")} className="h-10 px-6 bg-destructive/10 text-destructive rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-destructive hover:text-white transition-all">Revogar Documento</button>
+                    )}
+                    <button className="h-10 px-6 bg-muted text-muted-foreground rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-muted/80 transition-all flex items-center gap-2">
+                      <Download size={14} /> Baixar PDF
+                    </button>
+                    {d.responsavel && (
+                      <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-auto">
+                        Assinado por: <span className="text-foreground">{d.responsavel}</span>
+                      </span>
+                    )}
                   </div>
                 </div>
               );
