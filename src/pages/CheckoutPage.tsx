@@ -21,6 +21,7 @@ const CheckoutPage = () => {
   const slug = params.get("tour") || "";
   const transferId = params.get("transfer") || "";
   const packageSlug = params.get("package") || "";
+  const packageId = params.get("id") || "";
   const guests = Number(params.get("pax")) || 2;
   const date = params.get("date") || "";
   const tourMode = (params.get("mode") || "coletivo") as "coletivo" | "privativo";
@@ -38,12 +39,15 @@ const CheckoutPage = () => {
       } else if (type === "transfer" && transferId) {
         const { data } = await supabase.from("transfer_routes").select("*").eq("id", transferId).single();
         setTransfer(data);
-      } else if (type === "package" && packageSlug) {
-        const { data } = await supabase
-          .from("packages")
-          .select("*")
-          .eq("slug", packageSlug)
-          .maybeSingle();
+      } else if (type === "package" && (packageSlug || packageId)) {
+        let query = supabase.from("packages").select("*");
+        if (packageId) {
+          query = query.eq("id", packageId);
+        } else {
+          query = query.eq("slug", packageSlug);
+        }
+        
+        const { data } = await query.maybeSingle();
         
         if (data) {
           setPkg({
@@ -56,7 +60,7 @@ const CheckoutPage = () => {
       setLoadingItem(false);
     };
     load();
-  }, [type, slug, transferId, packageSlug]);
+  }, [type, slug, transferId, packageSlug, packageId]);
 
   const isPrivate = tourMode === "privativo";
   const itemName = tour ? `${tour.name}${isPrivate ? " (Privativo)" : " (Coletivo)"}` : (pkg ? pkg.name : (transfer ? `${transfer.origin} → ${transfer.destination}` : ""));
