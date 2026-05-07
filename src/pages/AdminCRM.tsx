@@ -1455,7 +1455,7 @@ const AdminCRMContent = () => {
 
           <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col h-[calc(90vh-80px)]">
             <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
             <div className="md:col-span-2">
               <Label htmlFor="customer-name">Nome *</Label>
               <Input

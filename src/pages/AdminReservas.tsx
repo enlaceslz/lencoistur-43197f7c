@@ -1072,7 +1072,9 @@ const AdminReservas = () => {
               </div>
             </div>
 
-            <div className="flex gap-4 sticky bottom-0 bg-white/80 backdrop-blur-md p-6 border-t border-slate-100 -mx-8 -mb-8 mt-8">
+            </div>
+            
+            <div className="flex gap-4 sticky bottom-0 bg-white border-t border-slate-100 p-4 md:p-6 z-10">
               <Button type="button" variant="ghost" onClick={() => setShowNewForm(false)} className="flex-1 h-14 rounded-2xl font-black uppercase text-[11px] tracking-widest">
                 Cancelar
               </Button>
