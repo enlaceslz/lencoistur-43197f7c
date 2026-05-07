@@ -744,17 +744,21 @@ const AdminParceiros = () => {
               <Label className="mb-1.5 block">Email</Label>
               <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             </div>
-            <div className="p-4 border border-blue-100 dark:border-blue-900 rounded-xl bg-blue-50/30 dark:bg-blue-900/10 space-y-4">
-              <p className="text-sm font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-1">
-                <Landmark size={14} /> Regra de Remuneração
-              </p>
-              <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 md:p-6 border border-blue-100 dark:border-blue-900 rounded-[2rem] bg-blue-50/30 dark:bg-blue-900/10 space-y-6">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600">
+                  <Landmark size={18} />
+                </div>
+                <h3 className="font-black text-blue-900 uppercase tracking-wider text-xs">Regra de Remuneração</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <Label className="mb-1.5 block">Tipo de Remuneração</Label>
+                  <Label className="text-[10px] font-black uppercase text-blue-400 tracking-widest mb-1.5 block ml-1">Modalidade</Label>
                   <select 
                     value={form.remuneration_type} 
                     onChange={(e) => setForm({ ...form, remuneration_type: e.target.value })}
-                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                    className="w-full h-11 bg-white border border-blue-100 rounded-xl px-4 py-2 text-sm font-bold text-blue-900 outline-none focus:ring-2 focus:ring-blue-200 transition-all shadow-sm"
                   >
                     <option value="comissao_percent">Comissão %</option>
                     <option value="valor_por_passeio">Por Passeio R$</option>
@@ -762,15 +766,33 @@ const AdminParceiros = () => {
                   </select>
                 </div>
                 <div>
-                  <Label className="mb-1.5 block">
-                    {form.remuneration_type === "comissao_percent" ? "Porcentagem (%)" : "Valor (R$)"}
+                  <Label className="text-[10px] font-black uppercase text-blue-400 tracking-widest mb-1.5 block ml-1">
+                    {form.remuneration_type === "comissao_percent" ? "Porcentagem (%)" : "Valor Base (R$)"}
                   </Label>
-                  <Input 
-                    type="number" 
-                    min="0" 
-                    value={form.remuneration_value} 
-                    onChange={(e) => setForm({ ...form, remuneration_value: e.target.value })} 
-                  />
+                  {form.remuneration_type === "comissao_percent" ? (
+                    <div className="relative">
+                      <Input 
+                        type="number" 
+                        min="0" 
+                        max="100"
+                        value={form.remuneration_value} 
+                        onChange={(e) => setForm({ ...form, remuneration_value: e.target.value })} 
+                        className="h-11 px-4 rounded-xl border-blue-100 bg-white focus:ring-2 focus:ring-blue-200 transition-all font-black text-blue-900 shadow-sm"
+                      />
+                      <Percent className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-300" size={16} />
+                    </div>
+                  ) : (
+                    <NumericFormat
+                      value={form.remuneration_value}
+                      onValueChange={(values) => setForm({ ...form, remuneration_value: String(values.floatValue || 0) })}
+                      thousandSeparator="."
+                      decimalSeparator=","
+                      prefix="R$ "
+                      decimalScale={2}
+                      fixedDecimalScale
+                      className="flex h-11 w-full px-4 rounded-xl border border-blue-100 bg-white focus:ring-2 focus:ring-blue-200 transition-all font-black text-blue-900 shadow-sm outline-none"
+                    />
+                  )}
                 </div>
               </div>
             </div>
