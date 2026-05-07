@@ -199,26 +199,65 @@ const AdminPacotes = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {packages.filter(p => p.name.toLowerCase().includes(search.toLowerCase())).map((pkg, idx) => (
-          <div key={pkg.id} className="glass-card admin-card-hover rounded-[2.5rem] overflow-hidden border border-white/20 bg-white/40 backdrop-blur-xl shadow-2xl group animate-in-slide-up" style={{ animationDelay: `${idx * 0.05}s` }}>
-            <div className="relative h-48 overflow-hidden">
-              <img src={pkg.banner_url || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80"} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={pkg.name} />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-              <div className="absolute bottom-4 left-6 right-6"><h3 className="text-xl font-black text-white">{pkg.name}</h3></div>
-            </div>
-            <div className="p-8 space-y-6">
-              <div className="flex justify-between items-center text-sm font-bold text-foreground/80">
-                <span className="flex items-center gap-2"><Clock size={14} className="text-primary" /> {pkg.days} Dias</span>
-                <span className="text-lg font-black text-primary">{fmt(pkg.discount_price)}</span>
+          <Card key={pkg.id} className="overflow-hidden border border-border shadow-sm rounded-2xl group hover:shadow-md transition-all duration-300">
+            <div className="relative h-44 overflow-hidden">
+              <img 
+                src={pkg.banner_url || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80"} 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                alt={pkg.name} 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute top-3 left-3">
+                <Badge className={cn("text-[9px] uppercase font-black", pkg.active ? "bg-green-500" : "bg-slate-500")}>
+                  {pkg.active ? "Ativo" : "Inativo"}
+                </Badge>
               </div>
-              <div className="flex gap-3 pt-6 border-t border-border/40">
-                <Button variant="outline" onClick={() => sharePackage(pkg)} className="flex-1 rounded-2xl h-12 font-black text-[10px] uppercase border-white/40"><Share2 size={16} className="mr-2" /> Campanha</Button>
-                <Button onClick={() => openForm(pkg)} className="h-12 w-12 rounded-2xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all"><Pencil size={18} /></Button>
-                <Button onClick={() => handleDelete(pkg.id)} className="h-12 w-12 rounded-2xl bg-red-50 text-red-500 border-none"><Trash2 size={18} /></Button>
+              <div className="absolute bottom-3 left-4 right-4">
+                <h3 className="text-lg font-bold text-white line-clamp-1">{pkg.name}</h3>
               </div>
             </div>
-          </div>
+            <CardContent className="p-5">
+              <div className="flex justify-between items-center mb-5">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Clock size={14} className="text-primary" />
+                  <span className="text-xs font-bold">{pkg.days} Dias</span>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] text-muted-foreground uppercase font-black leading-none mb-1">Preço Especial</p>
+                  <p className="text-lg font-black text-primary">{fmt(pkg.discount_price)}</p>
+                </div>
+              </div>
+              
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => sharePackage(pkg)} 
+                  className="flex-1 rounded-xl h-10 text-[10px] font-black uppercase tracking-widest"
+                >
+                  <Share2 size={14} className="mr-2 text-primary" /> Campanha
+                </Button>
+                <Button 
+                  variant="secondary"
+                  size="icon"
+                  onClick={() => openForm(pkg)} 
+                  className="h-10 w-10 rounded-xl"
+                >
+                  <Pencil size={16} />
+                </Button>
+                <Button 
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleDelete(pkg.id)} 
+                  className="h-10 w-10 rounded-xl text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
