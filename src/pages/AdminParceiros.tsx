@@ -27,6 +27,7 @@ import { maskCPF, maskCNPJ, maskPhone, maskCpfCnpj } from "@/lib/masks";
 import { Separator } from "@/components/ui/separator";
 import { ptBR } from "date-fns/locale";
 import { formatDate } from "@/lib/utils";
+import { NumericFormat } from "react-number-format";
 
 
 interface PartnerType {
