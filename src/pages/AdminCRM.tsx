@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import { Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, Pencil, Trash2, X, Save, UserPlus, Baby, FileText, Printer, Paperclip, Upload, History, Tag as TagIcon, Target } from "lucide-react";
+import { Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, Pencil, Trash2, X, Save, UserPlus, Baby, FileText, Printer, Paperclip, Upload, History, Tag as TagIcon, Target, CheckCircle2 } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { supabase } from "@/integrations/supabase/client";
@@ -1427,10 +1427,25 @@ const AdminCRMContent = () => {
       </Dialog>
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingCustomer ? "Editar Cliente" : "Novo Cliente"}</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                {editingCustomer ? <Pencil size={20} className="md:w-6 md:h-6" /> : <UserPlus size={20} className="md:w-6 md:h-6" />}
+              </div>
+              <div>
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                  {editingCustomer ? "Editar Cliente" : "Novo Cliente"}
+                </DialogTitle>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Gestão de perfil e dados de contato</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setModalOpen(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <X size={20} className="text-slate-400" />
+            </Button>
+          </div>
+
+          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
             <div className="md:col-span-2">
               <Label htmlFor="customer-name">Nome *</Label>
@@ -1675,16 +1690,17 @@ const AdminCRMContent = () => {
                 className="w-full min-h-[100px] rounded-2xl border border-input bg-amber-50/30 dark:bg-amber-900/10 px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/30 focus-visible:border-amber-500/50 transition-all font-medium"
               />
             </div>
+            </div>
           </div>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => setModalOpen(false)} disabled={saving} className="rounded-xl">
+          <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0">
+            <Button variant="outline" onClick={() => setModalOpen(false)} disabled={saving} className="flex-1 h-12 rounded-xl font-bold">
               Cancelar
             </Button>
-            <Button onClick={handleSave} disabled={saving} className="rounded-xl">
-              {saving ? <Loader2 size={14} className="animate-spin mr-1" /> : <Save size={14} className="mr-1" />}
-              {editingCustomer ? "Salvar" : "Cadastrar"}
+            <Button onClick={handleSave} disabled={saving} className="flex-[2] h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-black shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
+              {saving ? <Loader2 size={18} className="animate-spin mr-2" /> : <CheckCircle2 size={18} className="mr-2" />}
+              {editingCustomer ? "Salvar Alterações" : "Cadastrar Cliente"}
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 
