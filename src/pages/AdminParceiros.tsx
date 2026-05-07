@@ -1078,6 +1078,7 @@ const AdminParceiros = () => {
               )}
             </div>
           </div>
+          </div>
 
           <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0">
             <Button variant="outline" onClick={() => {
