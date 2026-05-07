@@ -352,14 +352,17 @@ const AdminTranslados = () => {
                 <label className="text-sm font-black uppercase tracking-widest text-muted-foreground/60 mb-2 block ml-1">Destino *</label>
                 <Input required value={form.destination} onChange={e => setForm({ ...form, destination: e.target.value })} placeholder="Ex: Barreirinhas" className="h-12 rounded-xl bg-muted/30" />
               </div>
-              <div>
-                <label className="text-sm font-black uppercase tracking-widest text-muted-foreground/60 mb-2 block ml-1">Preço (R$) *</label>
-                <Input 
-                  required 
-                  value={maskCurrency(String(form.price))} 
-                  onChange={e => setForm({ ...form, price: parseCurrency(e.target.value) })} 
-                  placeholder="250,00" 
-                  className="h-12 rounded-xl bg-muted/30 font-bold text-primary" />
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço (R$) *</Label>
+                <NumericFormat
+                  value={form.price / 100}
+                  onValueChange={(values) => setForm({ ...form, price: Math.round(Number(values.floatValue) * 100) })}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  prefix="R$ "
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                  required
+                />
               </div>
               <div>
                 <label className="text-sm font-black uppercase tracking-widest text-muted-foreground/60 mb-2 block ml-1">Desconto PIX (%)</label>
