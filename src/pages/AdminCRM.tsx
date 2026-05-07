@@ -1456,9 +1456,9 @@ const AdminCRMContent = () => {
           <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col h-[calc(90vh-80px)]">
             <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2">
-            <div className="md:col-span-2">
-              <Label htmlFor="customer-name">Nome *</Label>
-              <Input
+                <div className="md:col-span-2">
+                  <Label htmlFor="customer-name">Nome *</Label>
+                  <Input
                 id="customer-name"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -1697,9 +1697,10 @@ const AdminCRMContent = () => {
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
                 placeholder="Notas internas importantes sobre as preferências ou restrições do cliente..."
                 className="w-full min-h-[100px] rounded-2xl border border-input bg-amber-50/30 dark:bg-amber-900/10 px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/30 focus-visible:border-amber-500/50 transition-all font-medium"
-              />
+                />
+              </div>
             </div>
-            </div>
+          </div>
             <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0">
               <Button type="button" variant="outline" onClick={() => setModalOpen(false)} disabled={saving} className="flex-1 h-12 rounded-xl font-bold">
                 Cancelar
