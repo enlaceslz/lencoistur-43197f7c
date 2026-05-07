@@ -264,8 +264,8 @@ const AdminPacotes = () => {
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-8 pb-4">
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="space-y-6">
+            <div className="grid md:grid-cols-5 gap-8">
+              <div className="md:col-span-2 space-y-6">
                 <div className="space-y-2">
                   <Label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">Nome do Pacote</Label>
                   <Input value={form.name} onChange={e => setForm({...form, name: e.target.value, slug: generateSlug(e.target.value)})} placeholder="Ex: Rota das Emoções VIP" className="h-12 rounded-xl bg-muted/30 font-bold" required />
@@ -284,29 +284,77 @@ const AdminPacotes = () => {
                     <Input type="number" value={form.days} onChange={e => setForm({...form, days: Number(e.target.value)})} className="h-12 rounded-xl bg-muted/30 font-bold" required />
                   </div>
                 </div>
-              </div>
-
-              <div className="space-y-6">
                 <div className="space-y-2">
                   <Label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/60 ml-1">URL da Imagem de Banner</Label>
                   <Input value={form.banner_url} onChange={e => setForm({...form, banner_url: e.target.value})} placeholder="https://..." className="h-12 rounded-xl bg-muted/30" />
-                  {form.banner_url && <div className="mt-2 rounded-2xl overflow-hidden h-32 border border-border"><img src={form.banner_url} className="w-full h-full object-cover" alt="Preview" /></div>}
+                  {form.banner_url && <div className="mt-2 rounded-2xl overflow-hidden h-32 border border-border shadow-inner"><img src={form.banner_url} className="w-full h-full object-cover" alt="Preview" /></div>}
                 </div>
-                
-                <div className="bg-primary/5 rounded-[2rem] p-6 border border-primary/10 space-y-4">
-                  <Label className="text-[11px] font-black uppercase tracking-widest text-primary flex items-center gap-2 mb-2"><Calendar size={14} strokeWidth={3} /> Roteiro Digital (Timeline)</Label>
-                  
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    <Button type="button" variant="outline" className="rounded-xl h-10 text-[10px] font-black uppercase tracking-widest border-amber-200 text-amber-600 hover:bg-amber-50" onClick={() => {}}>
-                      + Passeio
-                    </Button>
-                    <Button type="button" variant="outline" className="rounded-xl h-10 text-[10px] font-black uppercase tracking-widest border-blue-200 text-blue-600 hover:bg-blue-50" onClick={() => {}}>
-                      + Translado
-                    </Button>
+              </div>
+
+              <div className="md:col-span-3 space-y-6">
+                <div className="bg-primary/5 rounded-[2rem] p-8 border border-primary/10 space-y-6">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-[11px] font-black uppercase tracking-widest text-primary flex items-center gap-2"><Calendar size={14} strokeWidth={3} /> Roteiro e Logística (Timeline)</Label>
+                    <Badge variant="outline" className="text-[10px] font-bold border-primary/20 text-primary">
+                      {selectedItems.length} itens no roteiro
+                    </Badge>
                   </div>
                   
-                  <div className="text-center py-6 border-2 border-dashed border-primary/20 rounded-2xl">
-                    <p className="text-[10px] font-black uppercase text-primary/40">Selecione itens no inventário ao lado</p>
+                  <div className="flex flex-col gap-4">
+                    {/* Item Selectors */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Adicionar Passeio</Label>
+                        <select 
+                          className="w-full h-10 rounded-xl bg-white border border-amber-200 text-xs font-bold px-3 outline-none focus:ring-2 focus:ring-amber-500/20"
+                          onChange={(e) => {
+                            const tour = tours.find(t => t.id === e.target.value);
+                            if (tour) setSelectedItems([...selectedItems, { id: tour.id, type: 'tour', data: tour }]);
+                            e.target.value = "";
+                          }}
+                        >
+                          <option value="">Selecione...</option>
+                          {tours.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Adicionar Translado</Label>
+                        <select 
+                          className="w-full h-10 rounded-xl bg-white border border-blue-200 text-xs font-bold px-3 outline-none focus:ring-2 focus:ring-blue-500/20"
+                          onChange={(e) => {
+                            const trans = transfers.find(t => t.id === e.target.value);
+                            if (trans) setSelectedItems([...selectedItems, { id: trans.id, type: 'transfer', data: trans }]);
+                            e.target.value = "";
+                          }}
+                        >
+                          <option value="">Selecione...</option>
+                          {transfers.map(t => <option key={t.id} value={t.id}>{t.origin} → {t.destination}</option>)}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Timeline List */}
+                    <div className="min-h-[200px] space-y-3">
+                      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
+                        <SortableContext items={selectedItems.map(i => `${i.type}-${i.id}`)} strategy={verticalListSortingStrategy}>
+                          {selectedItems.map((item, idx) => (
+                            <SortableItem 
+                              key={`${item.type}-${item.id}-${idx}`} 
+                              item={item.data} 
+                              type={item.type} 
+                              index={idx} 
+                              onRemove={() => setSelectedItems(selectedItems.filter((_, i) => i !== idx))}
+                            />
+                          ))}
+                        </SortableContext>
+                      </DndContext>
+                      {selectedItems.length === 0 && (
+                        <div className="h-40 flex flex-col items-center justify-center border-2 border-dashed border-primary/20 rounded-[2rem] bg-white/50">
+                          <PackageIcon className="text-primary/20 mb-2" size={32} />
+                          <p className="text-[10px] font-black uppercase tracking-widest text-primary/40">Roteiro vazio</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
