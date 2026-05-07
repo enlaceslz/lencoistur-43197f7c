@@ -3,6 +3,7 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Building2, Save, Upload, Loader2, X, Image } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { maskCNPJ, maskPhone } from "@/lib/masks";
 
 import { Button } from "@/components/ui/button";
@@ -167,119 +168,157 @@ const AdminSGSEmpresa = () => {
 
   return (
     <AdminLayout title="SGS — Perfil Organizacional">
-      <form onSubmit={handleSave} className="space-y-6 max-w-5xl">
-        {/* Logo */}
-        <div className="bg-card border border-border rounded-3xl p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2.5 rounded-xl bg-primary/10 text-primary shadow-inner">
-              <Image size={24} strokeWidth={2.5} />
-            </div>
-            <div>
-              <h3 className="text-xl font-black text-foreground tracking-tight">Identidade Visual</h3>
-              <p className="text-xs font-medium text-muted-foreground">Logo oficial da agência para documentos e relatórios SGS.</p>
-            </div>
-          </div>
+      <div className="max-w-5xl space-y-8 animate-in fade-in duration-500">
+        <div className="glass-card p-8 rounded-[2.5rem] border border-border/50 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-6">
-            {logoPreview ? (
-              <div className="relative">
-                <img
-                  src={logoPreview}
-                  alt="Logo da empresa"
-                  className="w-28 h-28 object-contain rounded-xl border border-border bg-muted p-2"
-                  onError={() => setLogoPreview(null)}
-                />
-                <button
-                  type="button"
-                  onClick={removeLogo}
-                  className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 hover:opacity-80"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            ) : (
-              <div className="w-28 h-28 rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-muted/50">
-                <Building2 size={32} className="text-muted-foreground/40" />
-              </div>
-            )}
-            <div className="space-y-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/webp,image/svg+xml"
-                onChange={handleLogoUpload}
-                className="hidden"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploading}
-              >
-                {uploading ? (
-                  <><Loader2 size={14} className="animate-spin mr-1" /> Enviando...</>
-                ) : (
-                  <><Upload size={14} className="mr-1" /> {logoPreview ? "Trocar Logo" : "Enviar Logo"}</>
-                )}
-              </Button>
-              <p className="text-xs text-muted-foreground">PNG, JPG, WebP ou SVG. Máx 2MB.</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Dados Gerais */}
-        <div className="bg-card border border-border rounded-3xl p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2.5 rounded-xl bg-primary/10 text-primary shadow-inner">
-              <Building2 size={24} strokeWidth={2.5} />
+            <div className="p-4 rounded-3xl bg-primary/10 text-primary shadow-inner">
+              <Building2 size={32} strokeWidth={2.5} />
             </div>
             <div>
-              <h3 className="text-xl font-black text-foreground tracking-tight">Dados Jurídicos e Localização</h3>
-              <p className="text-xs font-medium text-muted-foreground">Informações cadastrais oficiais da Lençóis Tour.</p>
+              <h2 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">Lençóis Tour</h2>
+              <p className="text-sm font-medium text-muted-foreground uppercase tracking-widest">Configuração do Sistema de Gestão de Segurança</p>
             </div>
           </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Razão Social *" field="razao_social" span={2} />
-            <Field label="Nome Fantasia" field="nome_fantasia" />
-            <Field label="CNPJ" field="cnpj" />
-            <Field label="CADASTUR" field="cadastur" />
-            <Field label="Telefone" field="telefone" />
-            <Field label="E-mail" field="email" type="email" />
-            <Field label="Endereço" field="endereco" span={2} />
-            <Field label="Cidade" field="cidade" />
-            <Field label="Estado" field="estado" />
+          <div className="flex gap-3">
+             <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 font-black px-4 py-1.5 rounded-full uppercase text-[10px]">Sistema Ativo</Badge>
           </div>
         </div>
 
-        {/* Responsáveis */}
-        <div className="bg-card border border-border rounded-2xl p-6">
-          <h3 className="font-display font-bold text-foreground mb-4">Responsáveis</h3>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Responsável Legal" field="responsavel_nome" />
-            <Field label="Cargo" field="responsavel_cargo" />
-            <Field label="Responsável Técnico" field="responsavel_tecnico" span={2} />
+        <form onSubmit={handleSave} className="space-y-8">
+          {/* Logo */}
+          <div className="bg-card/50 backdrop-blur-xl border border-border rounded-[2.5rem] p-8 md:p-10 shadow-sm admin-card-hover transition-all">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 rounded-2xl bg-primary/10 text-primary shadow-inner">
+                <Image size={24} strokeWidth={2.5} />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-foreground tracking-tight">Identidade Visual</h3>
+                <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">Logo oficial para documentos e relatórios SGS</p>
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center gap-10">
+              {logoPreview ? (
+                <div className="relative group">
+                  <div className="w-40 h-40 rounded-[2rem] border-2 border-border bg-white p-4 shadow-inner flex items-center justify-center overflow-hidden transition-all group-hover:border-primary/50">
+                    <img
+                      src={logoPreview}
+                      alt="Logo da empresa"
+                      className="w-full h-full object-contain"
+                      onError={() => setLogoPreview(null)}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeLogo}
+                    className="absolute -top-3 -right-3 bg-destructive text-destructive-foreground rounded-full p-2 hover:scale-110 transition-transform shadow-lg"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ) : (
+                <div className="w-40 h-40 rounded-[2rem] border-2 border-dashed border-border flex items-center justify-center bg-muted/50 shadow-inner">
+                  <Building2 size={48} className="text-muted-foreground/20" />
+                </div>
+              )}
+              <div className="space-y-4 text-center sm:text-left">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="h-12 px-8 rounded-2xl font-black uppercase tracking-widest text-xs border-2 hover:bg-primary hover:text-white hover:border-primary transition-all active:scale-95"
+                >
+                  {uploading ? (
+                    <><Loader2 size={16} className="animate-spin mr-2" /> Enviando...</>
+                  ) : (
+                    <><Upload size={16} className="mr-2" /> {logoPreview ? "Trocar Logotipo" : "Selecionar Logotipo"}</>
+                  )}
+                </Button>
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Formatos aceitos: PNG, JPG, WebP ou SVG (Máx 2MB)</p>
+              </div>
+            </div>
           </div>
-        </div>
 
+          {/* Dados Gerais */}
+          <div className="bg-card/50 backdrop-blur-xl border border-border rounded-[2.5rem] p-8 md:p-10 shadow-sm admin-card-hover transition-all">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 rounded-2xl bg-primary/10 text-primary shadow-inner">
+                <Building2 size={24} strokeWidth={2.5} />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-foreground tracking-tight">Dados Jurídicos e Localização</h3>
+                <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">Informações cadastrais e endereço oficial</p>
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div className="sm:col-span-2">
+                <label className="block text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1.5 ml-1">Razão Social *</label>
+                <input type="text" value={form.razao_social} onChange={e => set("razao_social", e.target.value)}
+                  className="w-full h-12 px-5 rounded-2xl border border-border bg-background text-foreground text-sm font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all" 
+                />
+              </div>
+              <Field label="Nome Fantasia" field="nome_fantasia" />
+              <Field label="CNPJ" field="cnpj" />
+              <Field label="CADASTUR" field="cadastur" />
+              <Field label="Telefone" field="telefone" />
+              <Field label="E-mail Corporativo" field="email" type="email" />
+              <Field label="Endereço" field="endereco" span={2} />
+              <Field label="Cidade" field="cidade" />
+              <Field label="Estado" field="estado" />
+            </div>
+          </div>
 
-        {/* Observações */}
-        <div className="bg-card border border-border rounded-2xl p-6">
-          <label className="block text-xs font-medium text-muted-foreground mb-1">Observações</label>
-          <textarea value={form.observacoes} onChange={e => set("observacoes", e.target.value)} rows={3}
-            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" />
-        </div>
+          {/* Responsáveis */}
+          <div className="bg-card/50 backdrop-blur-xl border border-border rounded-[2.5rem] p-8 md:p-10 shadow-sm admin-card-hover transition-all">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-3 rounded-2xl bg-primary/10 text-primary shadow-inner">
+                <Building2 size={24} strokeWidth={2.5} />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-foreground tracking-tight">Corpo Técnico e Responsabilidade</h3>
+                <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">Responsáveis legais e operacionais</p>
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-6">
+              <Field label="Responsável Legal" field="responsavel_nome" />
+              <Field label="Cargo / Função" field="responsavel_cargo" />
+              <div className="sm:col-span-2">
+                <label className="block text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1.5 ml-1">Responsável Técnico (RT)</label>
+                <input type="text" value={form.responsavel_tecnico} onChange={e => set("responsavel_tecnico", e.target.value)}
+                  className="w-full h-12 px-5 rounded-2xl border border-border bg-background text-foreground text-sm font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all" 
+                />
+              </div>
+            </div>
+          </div>
 
-        <div className="flex justify-end pt-4">
-          <Button 
-            type="submit" 
-            disabled={saving}
-            className="h-14 px-12 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95 flex items-center gap-3"
-          >
-            {saving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} strokeWidth={3} />}
-            Finalizar e Salvar Perfil
-          </Button>
-        </div>
-      </form>
+          {/* Observações */}
+          <div className="bg-card/50 backdrop-blur-xl border border-border rounded-[2.5rem] p-8 md:p-10 shadow-sm admin-card-hover transition-all">
+            <label className="block text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-3 ml-1">Observações Gerais</label>
+            <textarea value={form.observacoes} onChange={e => set("observacoes", e.target.value)} rows={4}
+              className="w-full p-5 rounded-3xl border border-border bg-background text-foreground text-sm font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all resize-none" 
+            />
+          </div>
+
+          <div className="flex justify-end pt-4 pb-20">
+            <Button 
+              type="submit" 
+              disabled={saving}
+              className="h-16 px-12 rounded-[2rem] bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest shadow-2xl shadow-primary/40 transition-all active:scale-95 flex items-center gap-4 group"
+            >
+              {saving ? <Loader2 className="animate-spin" size={24} /> : <Save size={24} strokeWidth={3} className="group-hover:scale-110 transition-transform" />}
+              Finalizar e Atualizar Perfil
+            </Button>
+          </div>
+        </form>
+      </div>
     </AdminLayout>
   );
 };

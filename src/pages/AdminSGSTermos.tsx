@@ -3,6 +3,7 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, CheckCircle, XCircle, Shield, FileText, Printer, Users, Trash2, UserPlus, Search, Edit, Eye, Settings, Save, Send, Link as LinkIcon, Loader2, MessageCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 import { ptBR } from "date-fns/locale";
 import { formatDate } from "@/lib/utils";
 
@@ -495,48 +496,46 @@ const AdminSGSTermos = () => {
   });
 
   return (
-    <AdminLayout title="SGS - Termos de Ciência de Risco">
+    <AdminLayout title="SGS — Termos de Ciência de Risco">
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <div className="glass-card p-6 rounded-[2.5rem] border border-border/50 flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="relative flex-1 max-w-md w-full">
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input 
               value={search} 
               onChange={e => setSearch(e.target.value)} 
               placeholder="Buscar por cliente ou passeio..."
-              className="w-full pl-9 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30" 
+              className="w-full pl-11 pr-4 h-12 bg-background border border-border rounded-2xl text-sm text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all font-medium" 
             />
           </div>
-          <div className="flex bg-muted p-1 rounded-xl">
-            <button 
-              onClick={() => setStatusFilter("todos")}
-              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${statusFilter === "todos" ? "bg-white text-primary shadow-sm" : "text-muted-foreground"}`}
-            >
-              Todos
-            </button>
-            <button 
-              onClick={() => setStatusFilter("assinado")}
-              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${statusFilter === "assinado" ? "bg-white text-green-600 shadow-sm" : "text-muted-foreground"}`}
-            >
-              Assinados
-            </button>
-            <button 
-              onClick={() => setStatusFilter("pendente")}
-              className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${statusFilter === "pendente" ? "bg-white text-amber-600 shadow-sm" : "text-muted-foreground"}`}
-            >
-              Pendentes
-            </button>
+          
+          <div className="flex bg-muted/50 p-1.5 rounded-2xl border border-border/50">
+            {[
+              { id: "todos", label: "Todos", color: "primary" },
+              { id: "assinado", label: "Assinados", color: "emerald-600" },
+              { id: "pendente", label: "Pendentes", color: "amber-600" }
+            ].map(tab => (
+              <button 
+                key={tab.id}
+                onClick={() => setStatusFilter(tab.id)}
+                className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                  statusFilter === tab.id 
+                  ? "bg-white text-primary shadow-lg shadow-black/5" 
+                  : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
-          <div className="flex gap-2">
+
+          <div className="flex gap-3 w-full lg:w-auto">
             <button 
-              onClick={() => {
-                setShowConfig(!showConfig);
-                setShowForm(false);
-              }}
-              className="bg-muted hover:bg-muted/80 text-muted-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
+              onClick={() => { setShowConfig(!showConfig); setShowForm(false); }}
+              className="flex-1 lg:flex-none h-12 px-6 bg-muted/50 hover:bg-muted text-muted-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 border border-border"
             >
-              <Settings size={16} />
-              Configurar Conteúdo
+              <Settings size={18} />
+              Configurações
             </button>
             <button 
               onClick={() => {
@@ -544,10 +543,10 @@ const AdminSGSTermos = () => {
                 setShowForm(!showForm);
                 setShowConfig(false);
               }}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
+              className="flex-1 lg:flex-none h-12 px-8 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95 flex items-center justify-center gap-3"
             >
-              {showForm ? <XCircle size={16} /> : <Plus size={16} />} 
-              {showForm ? "Fechar Formulário" : "Novo Termo"}
+              {showForm ? <XCircle size={20} /> : <Plus size={20} strokeWidth={3} />} 
+              {showForm ? "Fechar" : "Novo Termo"}
             </button>
           </div>
         </div>
@@ -900,26 +899,31 @@ const AdminSGSTermos = () => {
               <p>Nenhum termo gerado ainda</p>
             </div>
           ) : filtered.map(t => (
-            <div key={t.id} className="bg-card border border-border rounded-2xl p-4 sm:p-5 hover:shadow-md transition-shadow group">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${t.signature_data ? "bg-green-500/10 text-green-500" : "bg-amber-500/10 text-amber-500"}`}>
-                    {t.signature_data ? <CheckCircle size={24} /> : <FileText size={24} />}
+            <div key={t.id} className="bg-card border border-border rounded-[2.5rem] p-6 hover:shadow-2xl hover:border-primary/30 transition-all group relative overflow-hidden admin-card-hover flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+              <div className={`absolute top-0 left-0 w-2 h-full transition-colors ${t.signature_data ? "bg-emerald-500" : "bg-amber-500"}`} />
+              
+              <div className="flex items-center gap-6">
+                <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center transition-all shadow-inner ${t.signature_data ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"}`}>
+                  {t.signature_data ? <CheckCircle size={32} /> : <FileText size={32} />}
+                </div>
+                <div>
+                  <h4 className="font-display font-black text-xl text-foreground group-hover:text-primary transition-colors leading-tight">{t.customer_name}</h4>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
+                    <p className="text-[10px] font-black text-primary uppercase tracking-widest">{t.tour_name}</p>
+                    {t.sgs_veiculos?.modelo && <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">• {t.sgs_veiculos.modelo}</p>}
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">• {formatDate(new Date(t.created_at), "dd/MM/yyyy")}</p>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-foreground text-lg">{t.customer_name}</h4>
-                    <p className="text-sm text-muted-foreground flex items-center gap-2">
-                      <span className="font-medium text-primary">{t.tour_name}</span>
-                      {t.sgs_veiculos?.modelo && <span>• {t.sgs_veiculos.modelo}</span>}
-                    </p>
-                    <div className="flex gap-4 mt-1">
-                      <p className="text-xs text-muted-foreground">Gerado em: {formatDate(new Date(t.created_at), "dd/MM/yyyy")}</p>
-                      <p className="text-xs text-muted-foreground">Status: <span className={t.signature_data ? "text-green-600 font-semibold" : "text-amber-600 font-semibold"}>{t.signature_data ? "Assinado" : "Pendente de Assinatura"}</span></p>
-                    </div>
+                  <div className="mt-3 flex items-center gap-2">
+                    <Badge variant="outline" className={`font-black text-[9px] uppercase px-3 py-1 rounded-full border ${t.signature_data ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}>
+                      {t.signature_data ? "Documento Assinado" : "Pendente de Assinatura"}
+                    </Badge>
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2 justify-end">
-                  {!t.signature_data && (
+              </div>
+
+              <div className="flex flex-wrap gap-2 lg:justify-end">
+                {!t.signature_data && (
+                  <>
                     <button 
                       onClick={async () => {
                         const customer = customers.find(c => c.id === t.customer_id);
@@ -931,16 +935,9 @@ const AdminSGSTermos = () => {
                         try {
                           const baseUrl = window.location.origin;
                           const signUrl = `${baseUrl}/assinatura-termo?id=${t.id}${t.booking_id ? `&booking_id=${t.booking_id}` : ''}`;
-                          
                           const { error } = await supabase.functions.invoke("send-term-email", {
-                            body: {
-                              customerEmail: customer.email,
-                              customerName: customer.name,
-                              signUrl: signUrl,
-                              tourName: t.tour_name
-                            }
+                            body: { customerEmail: customer.email, customerName: customer.name, signUrl: signUrl, tourName: t.tour_name }
                           });
-                          
                           if (error) throw error;
                           toast({ title: "E-mail enviado!", description: "Link de assinatura enviado ao cliente." });
                         } catch (err) {
@@ -950,14 +947,11 @@ const AdminSGSTermos = () => {
                         }
                       }}
                       disabled={sendingEmail === t.id}
-                      className="p-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold disabled:opacity-50"
-                      title="Enviar Link por E-mail"
+                      className="h-11 px-5 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
                     >
-                      {sendingEmail === t.id ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-                      <span className="hidden sm:inline">Enviar Link</span>
+                      {sendingEmail === t.id ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                      Enviar E-mail
                     </button>
-                  )}
-                  {!t.signature_data && (
                     <button 
                       onClick={() => {
                         const customer = customers.find(c => c.id === t.customer_id);
@@ -965,46 +959,39 @@ const AdminSGSTermos = () => {
                           toast({ title: "Cliente sem telefone", description: "Cadastre um número para enviar o link.", variant: "destructive" });
                           return;
                         }
-                        
                         const baseUrl = window.location.origin;
                         const signUrl = `${baseUrl}/assinatura-termo?id=${t.id}${t.booking_id ? `&booking_id=${t.booking_id}` : ''}`;
                         const message = `Olá ${customer.name}! Aqui está o seu link para assinatura do Termo de Ciência de Risco para o passeio ${t.tour_name}: ${signUrl}`;
-                        
                         const cleanPhone = customer.phone.replace(/\D/g, "");
                         const whatsappUrl = `https://wa.me/${cleanPhone.startsWith('55') ? cleanPhone : '55' + cleanPhone}?text=${encodeURIComponent(message)}`;
                         window.open(whatsappUrl, '_blank');
-                        
-                        toast({ title: "WhatsApp aberto", description: "A janela do WhatsApp foi iniciada." });
+                        toast({ title: "WhatsApp aberto" });
                       }}
-                      className="p-3 bg-green-500/10 hover:bg-green-500/20 text-green-600 rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
-                      title="Enviar Link por WhatsApp"
+                      className="h-11 px-5 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 hover:text-white rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
                     >
-                      <MessageCircle size={18} />
-                      <span className="hidden sm:inline">WhatsApp</span>
+                      <MessageCircle size={16} />
+                      WhatsApp
                     </button>
-                  )}
-                  <button 
-                    onClick={() => printTerm(t.id)}
-                    className="p-3 bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
-                    title="Visualizar Termo"
-                  >
-                    <Eye size={18} /> <span className="hidden sm:inline">Visualizar</span>
-                  </button>
-                  <button 
-                    onClick={() => handleEdit(t)}
-                    className="p-3 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
-                    title="Editar Termo"
-                  >
-                    <Edit size={18} /> <span className="hidden sm:inline">Editar</span>
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(t.id)}
-                    className="p-3 bg-destructive/10 hover:bg-destructive/20 text-destructive rounded-xl transition-colors flex items-center gap-2 text-sm font-semibold"
-                    title="Excluir Termo"
-                  >
-                    <Trash2 size={18} /> <span className="hidden sm:inline">Excluir</span>
-                  </button>
-                </div>
+                  </>
+                )}
+                <button 
+                  onClick={() => printTerm(t.id)}
+                  className="h-11 px-5 bg-blue-500/10 hover:bg-blue-500 text-blue-600 hover:text-white rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
+                >
+                  <Eye size={16} /> Visualizar
+                </button>
+                <button 
+                  onClick={() => handleEdit(t)}
+                  className="h-11 px-5 bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-white rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
+                >
+                  <Edit size={16} /> Editar
+                </button>
+                <button 
+                  onClick={() => handleDelete(t.id)}
+                  className="h-11 px-5 bg-destructive/10 hover:bg-destructive text-destructive hover:text-white rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
+                >
+                  <Trash2 size={16} /> Excluir
+                </button>
               </div>
             </div>
           ))}

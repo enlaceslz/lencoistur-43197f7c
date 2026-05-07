@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, CheckCircle, Clock, AlertTriangle } from "lucide-react";
+import { Plus, Search, CheckCircle, Clock, AlertTriangle, Loader2, Shield } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof CheckCircle }> = {

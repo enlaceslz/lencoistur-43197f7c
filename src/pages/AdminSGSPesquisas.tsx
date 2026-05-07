@@ -61,38 +61,38 @@ const AdminSGSPesquisas = () => {
   const dangerPct = surveys.length ? ((surveys.filter(v => v.danger_situations).length / surveys.length) * 100).toFixed(0) : "0";
 
   return (
-    <AdminLayout title="SGS - Pesquisas de Segurança">
-      <div className="space-y-6">
-        {/* KPIs */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          <div className="bg-card border border-border rounded-3xl p-6 hover:shadow-lg transition-all flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-3">
-              <Shield size={24} />
+    <AdminLayout title="SGS — Feedback de Segurança">
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="glass-card p-6 rounded-[2.5rem] border border-border/50 flex flex-col items-center text-center group admin-card-hover transition-all">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-4 shadow-inner group-hover:bg-primary group-hover:text-white transition-all">
+              <Shield size={28} />
             </div>
-            <p className="text-3xl font-black text-foreground font-display">{avgSafe}</p>
-            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">Sensação de Segurança (1-5)</p>
+            <p className="text-4xl font-black text-foreground font-display">{avgSafe}</p>
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-2">Segurança Percebida (1-5)</p>
           </div>
-          <div className="bg-card border border-border rounded-3xl p-6 hover:shadow-lg transition-all flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary mb-3">
-              <Star size={24} />
+          <div className="glass-card p-6 rounded-[2.5rem] border border-border/50 flex flex-col items-center text-center group admin-card-hover transition-all">
+            <div className="w-14 h-14 rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary mb-4 shadow-inner group-hover:bg-secondary group-hover:text-white transition-all">
+              <Star size={28} />
             </div>
-            <p className="text-3xl font-black text-foreground font-display">{avgRating}</p>
-            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">Avaliação Geral (1-5)</p>
+            <p className="text-4xl font-black text-foreground font-display">{avgRating}</p>
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-2">Satisfação Geral (1-5)</p>
           </div>
-          <div className="bg-card border border-border rounded-3xl p-6 hover:shadow-lg transition-all flex flex-col items-center text-center">
-            <div className="w-12 h-12 rounded-2xl bg-destructive/10 flex items-center justify-center text-destructive mb-3">
-              <AlertTriangle size={24} />
+          <div className="glass-card p-6 rounded-[2.5rem] border border-border/50 flex flex-col items-center text-center group admin-card-hover transition-all">
+            <div className="w-14 h-14 rounded-2xl bg-destructive/10 flex items-center justify-center text-destructive mb-4 shadow-inner group-hover:bg-destructive group-hover:text-white transition-all">
+              <AlertTriangle size={28} />
             </div>
-            <p className="text-3xl font-black text-foreground font-display">{dangerPct}%</p>
-            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">Relataram Perigo</p>
+            <p className="text-4xl font-black text-foreground font-display">{dangerPct}%</p>
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-2">Alertas de Perigo</p>
           </div>
         </div>
 
-        <div className="flex justify-between gap-4">
-          <p className="text-sm text-muted-foreground">{surveys.length} pesquisas registradas</p>
+        <div className="glass-card p-4 rounded-3xl border border-border/50 flex flex-wrap gap-4 items-center justify-between">
+          <p className="text-xs font-black text-muted-foreground uppercase tracking-widest ml-4">{surveys.length} feedbacks analisados</p>
           <button onClick={() => setShowForm(!showForm)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-            <Plus size={16} /> Nova Pesquisa
+            className="w-full md:w-auto flex items-center justify-center gap-3 px-8 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95"
+          >
+            <Plus size={20} strokeWidth={3} /> Registrar Pesquisa
           </button>
         </div>
 
@@ -162,24 +162,21 @@ const AdminSGSPesquisas = () => {
               Nenhuma pesquisa registrada pós-passeio.
             </div>
           ) : surveys.map(s => (
-            <div key={s.id} className={`bg-card border border-border rounded-3xl p-6 hover:shadow-xl transition-all group relative overflow-hidden flex flex-col ${s.danger_situations ? "border-destructive/30" : "hover:border-primary/30"}`}>
-              <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${s.danger_situations ? "bg-destructive" : "bg-primary"}`} />
+            <div key={s.id} className={`bg-card border border-border rounded-[2.5rem] p-6 hover:shadow-2xl transition-all group relative overflow-hidden flex flex-col admin-card-hover ${s.danger_situations ? "border-destructive/30" : "hover:border-primary/30"}`}>
+              <div className={`absolute top-0 left-0 w-2 h-full transition-colors ${s.danger_situations ? "bg-destructive" : "bg-primary"}`} />
               
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.danger_situations ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"}`}>
-                    {s.danger_situations ? <AlertTriangle size={20} /> : <Star size={20} />}
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-4">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner transition-all ${s.danger_situations ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white"}`}>
+                    {s.danger_situations ? <AlertTriangle size={28} /> : <Star size={28} />}
                   </div>
                   <div>
-                    <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
-                      {s.bookings?.customer_name ? `Pesquisa: ${s.bookings.customer_name}` : `Pesquisa #${s.id.slice(0, 4).toUpperCase()}`}
-                      {s.danger_situations && <Badge variant="destructive" className="text-[8px] font-black uppercase py-0 px-1">Alerta</Badge>}
+                    <h4 className="font-display font-black text-sm text-foreground flex items-center gap-2">
+                      {s.bookings?.customer_name ? `Feedback: ${s.bookings.customer_name}` : `Anônimo #${s.id.slice(0, 4).toUpperCase()}`}
+                      {s.danger_situations && <Badge variant="destructive" className="text-[8px] font-black uppercase py-0 px-2 rounded-full">Alerta de Risco</Badge>}
                     </h4>
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-0.5">
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">
                       {new Date(s.created_at).toLocaleDateString("pt-BR")} • {s.bookings?.item_name || "Passeio Geral"}
-                    </p>
-                    <p className="text-[9px] font-medium text-muted-foreground">
-                      Guia explicou riscos: {s.guide_explained_risks ? "Sim" : "Não"}
                     </p>
                   </div>
                 </div>
@@ -188,22 +185,23 @@ const AdminSGSPesquisas = () => {
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="bg-muted/30 p-2.5 rounded-xl border border-border/50 text-center">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter mb-0.5">Segurança</p>
-                  <p className="text-xl font-black text-primary font-display">{s.felt_safe}/5</p>
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="bg-muted/30 p-4 rounded-2xl border border-border/50 text-center">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Segurança</p>
+                  <p className="text-2xl font-black text-primary font-display">{s.felt_safe}/5</p>
                 </div>
-                <div className="bg-muted/30 p-2.5 rounded-xl border border-border/50 text-center">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter mb-0.5">Geral</p>
-                  <p className="text-xl font-black text-secondary font-display">{s.overall_rating}/5</p>
+                <div className="bg-muted/30 p-4 rounded-2xl border border-border/50 text-center">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Nota Geral</p>
+                  <p className="text-2xl font-black text-secondary font-display">{s.overall_rating}/5</p>
                 </div>
               </div>
 
-              {(s.comments || s.danger_description) && (
-                <div className={`flex-1 p-3 rounded-2xl text-xs leading-relaxed italic ${s.danger_situations ? "bg-destructive/5 text-destructive border border-destructive/10" : "bg-muted/20 text-muted-foreground"}`}>
-                  "{s.danger_description || s.comments}"
+              <div className="space-y-3 flex-1">
+                 <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest px-1">Comentário do Cliente</p>
+                 <div className={`p-4 rounded-3xl text-xs leading-relaxed italic ${s.danger_situations ? "bg-destructive/5 text-destructive border border-destructive/10" : "bg-muted/20 text-muted-foreground"}`}>
+                  "{s.danger_description || s.comments || "Sem observações escritas."}"
                 </div>
-              )}
+              </div>
             </div>
           ))}
         </div>

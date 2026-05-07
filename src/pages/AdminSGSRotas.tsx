@@ -64,15 +64,20 @@ const AdminSGSRotas = () => {
 
   return (
     <AdminLayout title="SGS — Rotas e Trilhas">
-      <div className="space-y-6">
-        <div className="flex flex-wrap gap-3 items-center justify-between">
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="glass-card p-4 rounded-3xl border border-border/50 flex flex-wrap gap-4 items-center justify-between">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar rota..." className="w-full pl-9 pr-4 py-2 rounded-xl border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30" />
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input 
+              value={search} 
+              onChange={e => setSearch(e.target.value)} 
+              placeholder="Buscar rota..." 
+              className="w-full pl-11 pr-4 h-12 rounded-2xl border border-border bg-background text-sm font-medium outline-none focus:ring-4 focus:ring-primary/10 transition-all" 
+            />
           </div>
           <button 
             onClick={() => { setForm(emptyForm); setEditId(null); setShowForm(!showForm); }} 
-            className="flex items-center gap-3 px-8 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95"
+            className="flex items-center gap-3 px-8 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95"
           >
             <Plus size={20} strokeWidth={3} /> Nova Rota
           </button>

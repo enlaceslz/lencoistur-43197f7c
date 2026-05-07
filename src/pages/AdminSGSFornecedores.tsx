@@ -3,6 +3,7 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Search, Truck, AlertTriangle, ShieldCheck } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 const TYPES: Record<string, string> = { veiculo: "Veículo", condutor: "Condutor", parceiro: "Parceiro" };
 const STATUS_COLORS: Record<string, string> = {
@@ -47,13 +48,22 @@ const AdminSGSFornecedores = () => {
   };
 
   return (
-    <AdminLayout title="SGS - Monitoramento de Fornecedores">
-      <div className="space-y-6">
-        <div className="flex justify-between gap-4">
-          <p className="text-sm text-muted-foreground">Controle de documentação e conformidade de fornecedores</p>
+    <AdminLayout title="SGS — Monitoramento de Fornecedores">
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="glass-card p-6 rounded-[2.5rem] border border-border/50 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-2xl bg-primary/10 text-primary shadow-inner">
+              <ShieldCheck size={24} strokeWidth={2.5} />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-foreground tracking-tight">Qualificação de Fornecedores</h2>
+              <p className="text-xs font-black text-muted-foreground uppercase tracking-widest mt-1">Controle de Documentação e Conformidade</p>
+            </div>
+          </div>
           <button onClick={() => setShowForm(!showForm)}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-            <Plus size={16} /> Novo Fornecedor
+            className="w-full md:w-auto flex items-center justify-center gap-3 px-8 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95"
+          >
+            <Plus size={20} strokeWidth={3} /> Homologar Fornecedor
           </button>
         </div>
 
@@ -103,23 +113,37 @@ const AdminSGSFornecedores = () => {
           ) : suppliers.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">Nenhum fornecedor cadastrado</p>
           ) : suppliers.map((s) => (
-            <div key={s.id} className={`bg-card border rounded-2xl p-5 ${s.blocked ? "border-destructive" : "border-border"}`}>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${s.blocked ? "bg-destructive/10" : "bg-primary/10"}`}>
-                    {s.blocked ? <AlertTriangle size={20} className="text-destructive" /> : <ShieldCheck size={20} className="text-primary" />}
+            <div key={s.id} className={`bg-card border rounded-[2rem] p-6 hover:shadow-2xl transition-all group admin-card-hover relative overflow-hidden ${s.blocked ? "border-destructive/50" : "border-border hover:border-primary/30"}`}>
+              <div className={`absolute top-0 left-0 w-2 h-full transition-colors ${s.blocked ? "bg-destructive" : "bg-emerald-500"}`} />
+              
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-4">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner transition-all ${s.blocked ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white"}`}>
+                    {s.blocked ? <AlertTriangle size={28} /> : <ShieldCheck size={28} />}
                   </div>
                   <div>
-                    <h4 className="font-bold text-foreground">{s.supplier_name}</h4>
-                    <p className="text-xs text-muted-foreground">{TYPES[s.supplier_type]} {s.blocked && `• ⛔ ${s.block_reason}`}</p>
+                    <h4 className="font-display font-black text-lg text-foreground group-hover:text-primary transition-colors">{s.supplier_name}</h4>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{TYPES[s.supplier_type]} {s.blocked && <span className="text-destructive ml-1">· ⛔ {s.block_reason}</span>}</p>
                   </div>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_COLORS[s.status]}`}>{s.status}</span>
+                <Badge variant="outline" className={`font-black text-[9px] uppercase px-3 py-1 rounded-full border ${STATUS_COLORS[s.status]}`}>
+                  {s.status}
+                </Badge>
               </div>
-              <div className="mt-3 flex gap-4 text-xs text-muted-foreground">
-                <span>📄 Doc: {s.documentation_ok ? "✅" : "❌"}</span>
-                <span>🔧 Revisão: {s.vehicle_inspection_ok ? "✅" : "❌"}</span>
-                {s.certification_expiry && <span>📅 Validade: {new Date(s.certification_expiry + "T12:00").toLocaleDateString("pt-BR")}</span>}
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+                <div className={`flex flex-col items-center justify-center p-3 rounded-2xl border ${s.documentation_ok ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-destructive/5 border-destructive/10 text-destructive'}`}>
+                  <p className="text-[9px] font-black uppercase tracking-tighter mb-1">Documentação</p>
+                  <p className="text-[10px] font-black">{s.documentation_ok ? "REGULAR" : "PENDENTE"}</p>
+                </div>
+                <div className={`flex flex-col items-center justify-center p-3 rounded-2xl border ${s.vehicle_inspection_ok ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-destructive/5 border-destructive/10 text-destructive'}`}>
+                  <p className="text-[9px] font-black uppercase tracking-tighter mb-1">Inspeção</p>
+                  <p className="text-[10px] font-black">{s.vehicle_inspection_ok ? "APROVADO" : "PENDENTE"}</p>
+                </div>
+                <div className="flex flex-col items-center justify-center p-3 rounded-2xl border border-border/50 bg-muted/30 col-span-2 sm:col-span-1">
+                  <p className="text-[9px] font-black uppercase tracking-tighter mb-1 text-muted-foreground">Validade</p>
+                  <p className="text-[10px] font-black text-foreground">{s.certification_expiry ? new Date(s.certification_expiry + "T12:00").toLocaleDateString("pt-BR") : "—"}</p>
+                </div>
               </div>
             </div>
           ))}

@@ -97,31 +97,37 @@ const AdminSGSControles = () => {
   };
 
   return (
-    <AdminLayout title="SGS - Controles Internos (P5)">
-      <div className="space-y-6">
-        <div className="flex flex-col md:flex-row justify-between gap-4">
-          <div>
-            <h2 className="text-sm text-muted-foreground">Gestão de Equipamentos e Procedimentos Operacionais Padrão (POP)</h2>
+    <AdminLayout title="SGS — Controles Internos (P5)">
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="glass-card p-6 rounded-[2.5rem] border border-border/50 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-2xl bg-primary/10 text-primary shadow-inner">
+              <Shield size={24} strokeWidth={2.5} />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-foreground tracking-tight">Gestão de Recursos P5</h2>
+              <p className="text-xs font-black text-muted-foreground uppercase tracking-widest mt-1">Equipamentos e Procedimentos Operacionais (POP)</p>
+            </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3 w-full md:w-auto">
             <button onClick={() => setShowEquipForm(!showEquipForm)}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-              <Wrench size={16} /> Novo Equipamento
+              className="flex-1 md:flex-none h-12 px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
+              <Wrench size={18} /> Novo Equipamento
             </button>
             <button onClick={() => setShowProcForm(!showProcForm)}
-              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-              <FileText size={16} /> Novo Procedimento
+              className="flex-1 md:flex-none h-12 px-6 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-secondary/20 transition-all flex items-center justify-center gap-2">
+              <FileText size={18} /> Novo Procedimento
             </button>
           </div>
         </div>
 
-        <Tabs defaultValue="equipamentos">
-          <TabsList className="bg-muted p-1 rounded-xl w-full md:w-auto overflow-x-auto no-scrollbar justify-start">
-            <TabsTrigger value="equipamentos" className="rounded-lg">
-              <ClipboardList size={14} className="mr-2" /> Equipamentos (EPIs/Resgate)
+        <Tabs defaultValue="equipamentos" className="w-full">
+          <TabsList className="bg-muted/50 p-1.5 rounded-[1.5rem] border border-border/50 h-auto gap-1">
+            <TabsTrigger value="equipamentos" className="rounded-xl px-6 py-2.5 text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-lg">
+              <ClipboardList size={16} className="mr-2" /> Equipamentos
             </TabsTrigger>
-            <TabsTrigger value="procedimentos" className="rounded-lg">
-              <Shield size={14} className="mr-2" /> Procedimentos (POPs)
+            <TabsTrigger value="procedimentos" className="rounded-xl px-6 py-2.5 text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-white data-[state=active]:text-secondary data-[state=active]:shadow-lg">
+              <Shield size={16} className="mr-2" /> Procedimentos (POPs)
             </TabsTrigger>
           </TabsList>
 
@@ -187,42 +193,48 @@ const AdminSGSControles = () => {
                   Nenhum equipamento cadastrado. Comece adicionando um novo item de segurança.
                 </div>
               ) : equipment.map((item) => (
-                <div key={item.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-all group">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className={`p-2 rounded-lg ${
-                      item.status === 'operacional' ? 'bg-primary/10 text-primary' : 
+                <div key={item.id} className="bg-card border border-border rounded-[2rem] p-6 hover:shadow-2xl hover:border-primary/30 transition-all group admin-card-hover relative overflow-hidden flex flex-col">
+                  <div className={`absolute top-0 left-0 w-2 h-full transition-colors ${
+                    item.status === 'operacional' ? 'bg-primary' : 
+                    item.status === 'manutencao' ? 'bg-secondary' : 'bg-destructive'
+                  }`} />
+                  
+                  <div className="flex justify-between items-start mb-6">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all shadow-inner ${
+                      item.status === 'operacional' ? 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white' : 
                       item.status === 'manutencao' ? 'bg-secondary/10 text-secondary' : 'bg-destructive/10 text-destructive'
                     }`}>
-                      <Wrench size={20} />
+                      <Wrench size={28} />
                     </div>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => deleteEquip(item.id)} className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"><Trash2 size={16} /></button>
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                      <button onClick={() => deleteEquip(item.id)} className="p-2 rounded-lg hover:bg-destructive/10 text-destructive transition-colors"><Trash2 size={16} /></button>
                     </div>
                   </div>
-                  <h4 className="font-bold text-foreground mb-1">{item.name}</h4>
-                  <p className="text-xs text-muted-foreground mb-3">{EQUIPMENT_CATEGORIES[item.category]}</p>
                   
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-[10px] uppercase tracking-wider font-bold">
-                      <span className="text-muted-foreground">Status</span>
+                  <h4 className="font-display font-black text-lg text-foreground mb-1 group-hover:text-primary transition-colors">{item.name}</h4>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-4">{EQUIPMENT_CATEGORIES[item.category]}</p>
+                  
+                  <div className="space-y-3 mb-6 flex-1">
+                    <div className="flex justify-between p-2 rounded-xl bg-muted/30 border border-border/50 text-[10px] font-black uppercase tracking-widest">
+                      <span className="text-muted-foreground">Status Operacional</span>
                       <span className={
                         item.status === 'operacional' ? 'text-primary' : 
                         item.status === 'manutencao' ? 'text-secondary' : 'text-destructive'
                       }>{item.status}</span>
                     </div>
                     {item.next_inspection && (
-                      <div className="flex justify-between text-[10px] uppercase tracking-wider font-bold">
-                        <span className="text-muted-foreground">Próx. Inspeção</span>
-                        <span className={new Date(item.next_inspection) < new Date() ? 'text-destructive' : 'text-foreground'}>
+                      <div className="flex justify-between p-2 rounded-xl bg-muted/30 border border-border/50 text-[10px] font-black uppercase tracking-widest">
+                        <span className="text-muted-foreground">Próxima Inspeção</span>
+                        <span className={new Date(item.next_inspection) < new Date() ? 'text-destructive animate-pulse' : 'text-foreground'}>
                           {new Date(item.next_inspection + "T12:00").toLocaleDateString("pt-BR")}
                         </span>
                       </div>
                     )}
                   </div>
                   
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground border-t border-border pt-3">
-                    <Activity size={12} />
-                    <span>Resp: {item.responsible || "N/A"}</span>
+                  <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-t border-border/50 pt-4">
+                    <Activity size={14} className="text-primary" />
+                    <span>Responsável: {item.responsible || "N/A"}</span>
                   </div>
                 </div>
               ))}
