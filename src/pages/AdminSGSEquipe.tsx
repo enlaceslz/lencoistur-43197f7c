@@ -111,6 +111,7 @@ const AdminSGSEquipe = () => {
   const getStaffTrainings = (staffId: string) => trainings.filter((t) => t.staff_id === staffId);
   const hasExpiredTraining = (staffId: string) => getStaffTrainings(staffId).some((t) => t.status === "vencido");
 
+  return (
     <AdminLayout title="SGS — Equipe e Competências (ISO 21102)">
       <div className="space-y-8 animate-in fade-in duration-500">
         <div className="glass-card p-6 rounded-[2.5rem] border border-border/50 flex flex-col md:flex-row justify-between items-center gap-6">
