@@ -308,17 +308,17 @@ const AdminPacotes = () => {
       </div>
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
-          <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between sticky top-0 z-10">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                <PackageIcon size={24} />
+        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                <PackageIcon size={20} className="md:w-6 md:h-6" />
               </div>
               <div>
-                <DialogTitle className="text-xl font-black text-slate-900 leading-none mb-1">
+                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
                   {editingId ? "Editar Pacote" : "Novo Pacote Turístico"}
                 </DialogTitle>
-                <p className="text-sm text-slate-500 font-medium">Configure os detalhes e o itinerário da campanha</p>
+                <p className="text-[11px] md:text-sm text-slate-500 font-medium line-clamp-1">Configure os detalhes e o itinerário da campanha</p>
               </div>
             </div>
             <Button variant="ghost" size="icon" onClick={() => setShowForm(false)} className="rounded-full hover:bg-slate-100 transition-colors">
@@ -326,8 +326,8 @@ const AdminPacotes = () => {
             </Button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-8 space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-6 md:space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
               {/* Coluna Principal: Informações Básicas */}
               <div className="lg:col-span-7 space-y-6">
                 <div className="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm space-y-4">
