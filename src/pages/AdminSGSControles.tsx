@@ -193,42 +193,48 @@ const AdminSGSControles = () => {
                   Nenhum equipamento cadastrado. Comece adicionando um novo item de segurança.
                 </div>
               ) : equipment.map((item) => (
-                <div key={item.id} className="bg-card border border-border rounded-2xl p-5 hover:shadow-md transition-all group">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className={`p-2 rounded-lg ${
-                      item.status === 'operacional' ? 'bg-primary/10 text-primary' : 
+                <div key={item.id} className="bg-card border border-border rounded-[2rem] p-6 hover:shadow-2xl hover:border-primary/30 transition-all group admin-card-hover relative overflow-hidden flex flex-col">
+                  <div className={`absolute top-0 left-0 w-2 h-full transition-colors ${
+                    item.status === 'operacional' ? 'bg-primary' : 
+                    item.status === 'manutencao' ? 'bg-secondary' : 'bg-destructive'
+                  }`} />
+                  
+                  <div className="flex justify-between items-start mb-6">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all shadow-inner ${
+                      item.status === 'operacional' ? 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white' : 
                       item.status === 'manutencao' ? 'bg-secondary/10 text-secondary' : 'bg-destructive/10 text-destructive'
                     }`}>
-                      <Wrench size={20} />
+                      <Wrench size={28} />
                     </div>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => deleteEquip(item.id)} className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"><Trash2 size={16} /></button>
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                      <button onClick={() => deleteEquip(item.id)} className="p-2 rounded-lg hover:bg-destructive/10 text-destructive transition-colors"><Trash2 size={16} /></button>
                     </div>
                   </div>
-                  <h4 className="font-bold text-foreground mb-1">{item.name}</h4>
-                  <p className="text-xs text-muted-foreground mb-3">{EQUIPMENT_CATEGORIES[item.category]}</p>
                   
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-[10px] uppercase tracking-wider font-bold">
-                      <span className="text-muted-foreground">Status</span>
+                  <h4 className="font-display font-black text-lg text-foreground mb-1 group-hover:text-primary transition-colors">{item.name}</h4>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-4">{EQUIPMENT_CATEGORIES[item.category]}</p>
+                  
+                  <div className="space-y-3 mb-6 flex-1">
+                    <div className="flex justify-between p-2 rounded-xl bg-muted/30 border border-border/50 text-[10px] font-black uppercase tracking-widest">
+                      <span className="text-muted-foreground">Status Operacional</span>
                       <span className={
                         item.status === 'operacional' ? 'text-primary' : 
                         item.status === 'manutencao' ? 'text-secondary' : 'text-destructive'
                       }>{item.status}</span>
                     </div>
                     {item.next_inspection && (
-                      <div className="flex justify-between text-[10px] uppercase tracking-wider font-bold">
-                        <span className="text-muted-foreground">Próx. Inspeção</span>
-                        <span className={new Date(item.next_inspection) < new Date() ? 'text-destructive' : 'text-foreground'}>
+                      <div className="flex justify-between p-2 rounded-xl bg-muted/30 border border-border/50 text-[10px] font-black uppercase tracking-widest">
+                        <span className="text-muted-foreground">Próxima Inspeção</span>
+                        <span className={new Date(item.next_inspection) < new Date() ? 'text-destructive animate-pulse' : 'text-foreground'}>
                           {new Date(item.next_inspection + "T12:00").toLocaleDateString("pt-BR")}
                         </span>
                       </div>
                     )}
                   </div>
                   
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground border-t border-border pt-3">
-                    <Activity size={12} />
-                    <span>Resp: {item.responsible || "N/A"}</span>
+                  <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-t border-border/50 pt-4">
+                    <Activity size={14} className="text-primary" />
+                    <span>Responsável: {item.responsible || "N/A"}</span>
                   </div>
                 </div>
               ))}
