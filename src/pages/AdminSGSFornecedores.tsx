@@ -3,6 +3,7 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Search, Truck, AlertTriangle, ShieldCheck } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 const TYPES: Record<string, string> = { veiculo: "Veículo", condutor: "Condutor", parceiro: "Parceiro" };
 const STATUS_COLORS: Record<string, string> = {
