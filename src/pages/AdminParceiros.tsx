@@ -851,11 +851,12 @@ const AdminParceiros = () => {
               </div>
             </div>
 
-            <div>
+            <div className="pb-8">
               <Label className="mb-1.5 block flex items-center gap-1"><Percent size={14} /> Tags (Separadas por vírgula)</Label>
               <Input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="Premium, VIP, Recorrente..." />
             </div>
           </div>
+        </div>
 
           <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0 z-10">
             <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="flex-1 h-12 rounded-xl font-bold">Cancelar</Button>
