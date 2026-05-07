@@ -747,8 +747,9 @@ const AdminColaboradores = () => {
             </Button>
           </div>
 
-          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
-          <div className="grid md:grid-cols-2 gap-4 py-4">
+          <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col h-[calc(90vh-80px)]">
+            <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
+              <div className="grid md:grid-cols-2 gap-4 py-4">
             <div className="md:col-span-2 flex flex-col items-center justify-center space-y-4 mb-4 pb-4 border-b">
               <div className="relative group">
                 <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-100 border-2 border-slate-200 flex items-center justify-center">
@@ -899,17 +900,18 @@ const AdminColaboradores = () => {
               <Label>Observações</Label>
               <Textarea value={form.observation} onChange={(e) => setForm({...form, observation: e.target.value})} />
             </div>
-            </div>
           </div>
-            <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0">
-              <Button variant="outline" onClick={() => setDialogOpen(false)} className="flex-1 h-12 rounded-xl font-bold">Cancelar</Button>
-              <Button onClick={handleSave} disabled={saving} className="flex-[2] h-12 rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white">
-                {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
-                {selectedCollab ? "Salvar Alterações" : "Cadastrar Colaborador"}
-              </Button>
-            </div>
-        </DialogContent>
-      </Dialog>
+
+          <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0 z-10">
+            <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="flex-1 h-12 rounded-xl font-bold">Cancelar</Button>
+            <Button type="submit" disabled={saving} className="flex-[2] h-12 rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white">
+              {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
+              {selectedCollab ? "Salvar Alterações" : "Cadastrar Colaborador"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
 
       {/* History Dialog */}
       <Dialog open={historyDialogOpen} onOpenChange={setHistoryDialogOpen}>

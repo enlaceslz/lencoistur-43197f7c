@@ -342,7 +342,8 @@ const AdminTranslados = () => {
             </Button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-6 md:space-y-8">
+          <form onSubmit={handleSubmit} className="flex flex-col h-[calc(90vh-80px)]">
+            <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-black uppercase tracking-widest text-muted-foreground/60 mb-2 block ml-1">Origem *</label>
@@ -400,7 +401,9 @@ const AdminTranslados = () => {
               </label>
             </div>
 
-            <div className="flex gap-3 pt-4 border-t border-border">
+            </div>
+
+            <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0 z-10">
               <Button type="submit" disabled={saving} className="flex-1 h-12 rounded-xl font-black uppercase tracking-widest">
                 {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
                 {editingId ? "Salvar Alterações" : "Criar Nova Rota"}

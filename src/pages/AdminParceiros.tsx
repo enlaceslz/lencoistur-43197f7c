@@ -699,8 +699,9 @@ const AdminParceiros = () => {
             </Button>
           </div>
 
-          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
-          <div className="space-y-4">
+          <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col h-[calc(90vh-80px)]">
+            <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
+              <div className="space-y-4">
             <div>
               <Label className="mb-1.5 block">CPF / CNPJ</Label>
               <div className="relative">
@@ -854,16 +855,17 @@ const AdminParceiros = () => {
               <Input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="Premium, VIP, Recorrente..." />
             </div>
           </div>
-          </div>
-          <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0">
-            <Button variant="outline" onClick={() => setDialogOpen(false)} className="flex-1 h-12 rounded-xl font-bold">Cancelar</Button>
-            <Button onClick={handleSave} disabled={saving} className="flex-[2] h-12 rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white">
+
+          <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0 z-10">
+            <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="flex-1 h-12 rounded-xl font-bold">Cancelar</Button>
+            <Button type="submit" disabled={saving} className="flex-[2] h-12 rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white">
               {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
               {editPartner ? "Salvar Alterações" : "Cadastrar Parceiro"}
             </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+        </form>
+      </DialogContent>
+    </Dialog>
 
       {/* Types Management Dialog */}
       <Dialog open={typesDialogOpen} onOpenChange={setTypesDialogOpen}>
