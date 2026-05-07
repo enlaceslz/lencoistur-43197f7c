@@ -294,30 +294,30 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
     <TooltipProvider>
       <div className="min-h-screen bg-[hsl(220,30%,98%)] flex font-body">
       {/* === SIDEBAR === */}
-      <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[80px]" : "w-[280px]"} admin-sidebar transform transition-all duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[80px]" : "w-[280px]"} admin-sidebar transform transition-all duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col border-r border-white/5`}>
         {/* Brand */}
-        <div className={`px-6 py-8 border-b border-white/[0.05] ${sidebarCollapsed ? "flex justify-center" : ""}`}>
+        <div className={`px-6 py-10 border-b border-white/[0.05] ${sidebarCollapsed ? "flex justify-center" : ""}`}>
           <Link to="/" className="flex items-center gap-3 group">
             {settings?.logoUrl ? (
               <div className="relative">
                 <img 
                   src={settings.logoUrl} 
                   alt={settings.titulo || "LençóisTour"} 
-                  className={`${sidebarCollapsed ? "h-8" : "h-12"} w-auto object-contain brightness-0 invert transition-all duration-300 group-hover:scale-105`} 
+                  className={`${sidebarCollapsed ? "h-8" : "h-12"} w-auto object-contain brightness-0 invert transition-all duration-500 group-hover:scale-110`} 
                 />
               </div>
             ) : (
               <>
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[hsl(217,91%,60%)] to-[hsl(195,80%,45%)] flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 transition-transform duration-300 group-hover:rotate-12">
-                  <span className="text-white font-black text-lg">LT</span>
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-ocean flex items-center justify-center shrink-0 shadow-2xl shadow-primary/20 transition-all duration-500 group-hover:rotate-6 group-hover:scale-105">
+                  <span className="text-white font-black text-xl">LT</span>
                 </div>
                 {!sidebarCollapsed && (
                   <div className="flex flex-col">
                     <div className="flex items-baseline gap-0.5">
-                      <span className="font-display text-xl font-black text-white tracking-tight">Lençóis</span>
-                      <span className="font-display text-xl font-black text-[hsl(217,91%,60%)]">Tour</span>
+                      <span className="font-display text-2xl font-black text-white tracking-tighter">Lençóis</span>
+                      <span className="font-display text-2xl font-black text-primary">Tour</span>
                     </div>
-                    <p className="text-[10px] text-white/40 uppercase font-black tracking-[0.2em] -mt-0.5">Premium CRM</p>
+                    <p className="text-[9px] text-white/30 uppercase font-black tracking-[0.3em] -mt-0.5">Management Suite</p>
                   </div>
                 )}
               </>
