@@ -325,7 +325,7 @@ const AdminPacotes = () => {
               </div>
             </div>
             <Button variant="ghost" size="icon" onClick={() => setShowForm(false)} className="rounded-full hover:bg-slate-100 transition-colors">
-              <X size={20} className="text-slate-400" />
+              <XCircle size={20} className="text-slate-400" />
             </Button>
           </div>
 
