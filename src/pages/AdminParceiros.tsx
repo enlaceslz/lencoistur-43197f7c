@@ -531,119 +531,133 @@ const AdminParceiros = () => {
             {filtered.map((p) => {
               const type = partnerTypes.find(t => t.name === p.type) || partnerTypes[0];
               const Icon = getIcon(type?.icon || "Building2");
+              const colorClass = type?.color?.split(' ')[0] || "from-blue-500 to-indigo-600";
               
               return (
                 <div 
                   key={p.id} 
-                  className={`glass-card admin-card-hover rounded-[2rem] p-6 flex flex-col relative overflow-hidden group transition-all duration-300 ${!p.active ? "opacity-60 grayscale" : ""}`}
+                  className={`group relative flex flex-col overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${!p.active ? "opacity-60 grayscale" : ""}`}
                   onClick={() => setViewPartner(p)}
                 >
-                  <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${type?.color?.split(' ')[0] || "bg-primary/5"} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
-                  
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-lg ${type?.color?.split(' ')[1] || "bg-primary/10 text-primary"} shadow-primary/5`}>
-                      <Icon size={22} strokeWidth={2.5} />
+                  {/* Banner Colorido */}
+                  <div className={`h-24 w-full bg-gradient-to-br ${colorClass} relative overflow-hidden`}>
+                    <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-20 transition-opacity" />
+                    <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/20 rounded-full blur-2xl transition-transform duration-700 group-hover:scale-150" />
+                    <div className="absolute top-4 right-4 z-10">
+                      <Badge
+                        variant="secondary"
+                        className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full cursor-pointer transition-all border-none backdrop-blur-md active:scale-95 shadow-lg ${p.active
+                          ? "bg-white/90 text-emerald-600"
+                          : "bg-white/90 text-rose-600"
+                        }`}
+                        onClick={(e) => { e.stopPropagation(); toggleActive(p); }}
+                      >
+                        {p.active ? "Ativo" : "Inativo"}
+                      </Badge>
                     </div>
-                    <Badge
-                      variant="secondary"
-                      className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg cursor-pointer transition-all active:scale-95 ${p.active
-                        ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/10"
-                        : "bg-rose-500/10 text-rose-600 border border-rose-500/10"
-                      }`}
-                      onClick={(e) => { e.stopPropagation(); toggleActive(p); }}
-                    >
-                      {p.active ? "Ativo" : "Inativo"}
-                    </Badge>
                   </div>
 
-                  <div className="mb-4">
-                    <h3 className="font-black text-lg text-foreground tracking-tight line-clamp-1 group-hover:text-primary transition-colors">{p.name}</h3>
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1 flex items-center gap-1">
-                      {type?.label}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2.5 mb-6 flex-1">
-                    {p.cpf_cnpj && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <FileText size={14} className="text-primary/40" />
-                        <span className="text-xs font-mono tracking-tighter">{p.cpf_cnpj}</span>
+                  {/* Conteúdo */}
+                  <div className="relative flex flex-1 flex-col p-6 pt-0">
+                    <div className="relative -mt-8 mb-4 flex items-center justify-between">
+                      <div className={`w-16 h-16 rounded-[1.5rem] bg-white dark:bg-slate-800 flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
+                        <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${colorClass} flex items-center justify-center text-white shadow-lg shadow-primary/20`}>
+                          <Icon size={24} strokeWidth={2.5} />
+                        </div>
                       </div>
-                    )}
-                    {p.phone && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Phone size={14} className="text-primary/40" />
-                        <span className="text-xs font-bold">{p.phone}</span>
-                      </div>
-                    )}
-                    {p.address && (
-                      <div className="flex items-start gap-2 text-muted-foreground">
-                        <MapPin size={14} className="text-primary/40 mt-0.5 shrink-0" />
-                        <span className="text-[11px] leading-tight line-clamp-2">{p.address}</span>
-                      </div>
-                    )}
-                    
-                    {(p.type === "motorista" || p.type === "fretista") && p.cnh && (
-                      <div className="flex items-center gap-2 bg-amber-500/5 text-amber-700 dark:text-amber-400 px-3 py-1.5 rounded-xl border border-amber-200/20">
-                        <Car size={14} />
-                        <span className="text-[10px] font-black uppercase tracking-tight">CNH: {p.cnh}</span>
-                      </div>
-                    )}
-                    {(p.type === "guia" || p.type === "agencia") && p.cadastur && (
-                      <div className="flex items-center gap-2 bg-emerald-500/5 text-emerald-700 dark:text-emerald-400 px-3 py-1.5 rounded-xl border border-emerald-200/20">
-                        <Compass size={14} />
-                        <span className="text-[10px] font-black uppercase tracking-tight">CADASTUR: {p.cadastur}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between pt-4 border-t border-border/10">
-                    <div className="bg-primary/5 px-3 py-2 rounded-xl">
-                      <p className="text-[8px] font-black text-primary/60 uppercase tracking-widest mb-0.5">Remuneração</p>
-                      <p className="text-xs font-black text-primary">
-                        {p.remuneration_type === "comissao_percent" && `${p.remuneration_value || 0}%`}
-                        {p.remuneration_type === "valor_por_passeio" && `R$ ${p.remuneration_value || 0}`}
-                        {p.remuneration_type === "valor_mensal" && `R$ ${p.remuneration_value || 0}`}
-                        {!p.remuneration_type && `${p.commission_rate || 0}%`}
-                        <span className="text-[9px] ml-1 opacity-60">
-                          {p.remuneration_type === "valor_por_passeio" ? "/pass" : p.remuneration_type === "valor_mensal" ? "/mês" : ""}
-                        </span>
-                      </p>
                     </div>
 
-                    <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary transition-all" onClick={() => setViewPartner(p)}>
-                              <Eye size={16} />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Ver detalhes</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                    <div className="mb-4">
+                      <h3 className="font-black text-xl text-foreground tracking-tight line-clamp-1 group-hover:text-primary transition-colors leading-tight">{p.name}</h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="outline" className="text-[9px] font-black uppercase tracking-widest border-primary/20 text-primary/70 bg-primary/5 rounded-md py-0.5">
+                          {type?.label}
+                        </Badge>
+                      </div>
+                    </div>
 
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-blue-500/10 hover:text-blue-600 transition-all" onClick={() => openEdit(p)}>
-                              <Edit size={16} />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Editar</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                    <div className="space-y-3 mb-6 flex-1">
+                      {p.cpf_cnpj && (
+                        <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400">
+                          <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
+                            <FileText size={14} className="text-primary/60" />
+                          </div>
+                          <span className="text-xs font-mono font-medium tracking-tighter">{p.cpf_cnpj}</span>
+                        </div>
+                      )}
+                      {p.phone && (
+                        <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400">
+                          <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
+                            <Phone size={14} className="text-primary/60" />
+                          </div>
+                          <span className="text-xs font-bold">{p.phone}</span>
+                        </div>
+                      )}
+                      {p.address && (
+                        <div className="flex items-start gap-3 text-slate-500 dark:text-slate-400">
+                          <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                            <MapPin size={14} className="text-primary/60" />
+                          </div>
+                          <span className="text-[11px] leading-snug font-medium line-clamp-2">{p.address}</span>
+                        </div>
+                      )}
+                      
+                      {(p.type === "motorista" || p.type === "fretista") && p.cnh && (
+                        <div className="flex items-center gap-3 bg-amber-500/5 text-amber-700 dark:text-amber-400 px-3 py-2 rounded-2xl border border-amber-200/30">
+                          <Car size={16} />
+                          <span className="text-[10px] font-black uppercase tracking-tight">CNH: {p.cnh}</span>
+                        </div>
+                      )}
+                    </div>
 
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-rose-500/10 hover:text-rose-600 transition-all text-rose-500" onClick={() => setDeleteId(p.id)}>
-                              <Trash2 size={16} />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Excluir</TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                    <div className="flex items-center justify-between pt-5 border-t border-slate-100 dark:border-slate-800">
+                      <div className="bg-primary/5 px-4 py-2 rounded-2xl border border-primary/10">
+                        <p className="text-[8px] font-black text-primary/50 uppercase tracking-[0.2em] mb-0.5">Remuneração</p>
+                        <p className="text-sm font-black text-primary flex items-baseline gap-1">
+                          {p.remuneration_type === "comissao_percent" && `${p.remuneration_value || 0}%`}
+                          {p.remuneration_type === "valor_por_passeio" && `R$ ${p.remuneration_value || 0}`}
+                          {p.remuneration_type === "valor_mensal" && `R$ ${p.remuneration_value || 0}`}
+                          {!p.remuneration_type && `${p.commission_rate || 0}%`}
+                          <span className="text-[9px] opacity-60 font-black">
+                            {p.remuneration_type === "valor_por_passeio" ? "/pass" : p.remuneration_type === "valor_mensal" ? "/mês" : ""}
+                          </span>
+                        </p>
+                      </div>
+
+                      <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-primary hover:text-white transition-all duration-300 shadow-sm" onClick={() => setViewPartner(p)}>
+                                <Eye size={18} />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Ver detalhes</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-blue-500 hover:text-white transition-all duration-300 shadow-sm" onClick={() => openEdit(p)}>
+                                <Edit size={18} />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Editar</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-rose-500 hover:text-white transition-all duration-300 shadow-sm text-rose-500" onClick={() => setDeleteId(p.id)}>
+                                <Trash2 size={18} />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Excluir</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
                     </div>
                   </div>
                 </div>
