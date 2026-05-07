@@ -468,7 +468,7 @@ const AdminSGSTermos = () => {
           <div class="signature-box">
             Assinatura do Cliente
           </div>
-          ${term.signature_data ? `<div><img src="${term.signature_data}" style="height: 60px; margin-bottom: -20px;"/><br/><span class="small">Assinado digitalmente em ${format(new Date(term.signed_at), "dd/MM/yyyy HH:mm")}</span></div>` : ""}
+          ${term.signature_data ? `<div><img src="${term.signature_data}" style="height: 60px; margin-bottom: -20px;"/><br/><span class="small">Assinado digitalmente em ${formatDate(new Date(term.signed_at), "dd/MM/yyyy HH:mm")}</span></div>` : ""}
         </div>
         
         <div class="no-print" style="margin-top: 40px; text-align: center;">
