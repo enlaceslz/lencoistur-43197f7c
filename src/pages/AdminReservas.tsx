@@ -160,14 +160,13 @@ const AdminReservas = () => {
   };
 
   const resetNewForm = () => {
-    setNewForm({
-      type: "tour", tourMode: "coletivo", itemName: "", date: "", guests: 2, payMethod: "pix",
-      customerName: "", customerEmail: "", customerPhone: "",
-      cpf: "", passport: "", country: "Brasil", birthDate: "", notes: "", collaboratorId: ""
-    });
-    setSelectedCustomerId("");
-    setCustomerSearch("");
+...
     setEditingId(null);
+  };
+
+  const openNew = () => {
+    resetNewForm();
+    setShowNewForm(true);
   };
 
   // Calculate prices for the new form
