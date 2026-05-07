@@ -587,8 +587,8 @@ const AdminReservas = () => {
           </div>
 
           <div className="p-4 md:p-8 space-y-6 md:space-y-8">
-          {selected && (
-            <div className="space-y-4">
+            {selected && (
+              <div className="space-y-4">
               {/* Customer */}
               <div className="bg-muted rounded-xl p-4 space-y-2">
                 <h4 className="font-semibold text-sm text-foreground">Cliente</h4>
@@ -784,8 +784,9 @@ const AdminReservas = () => {
                   </a>
                 )}
               </div>
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 
