@@ -531,7 +531,7 @@ const AdminFinanceiro = () => {
                 <div className="space-y-8">
                   <FluxoCaixaTab bookings={bookings} contasPagar={contasPagar} selectedMonth={selectedMonth} selectedYear={selectedYear} />
                   
-                  <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem]">
+                  <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] bg-white">
                     <CardHeader className="p-8 border-b border-border/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div>
                         <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1">Livro Caixa</p>
@@ -554,7 +554,7 @@ const AdminFinanceiro = () => {
 
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-border/20 bg-muted/10">
+                          <tr className="border-b border-border/20 bg-muted/5">
                             <th className="text-left px-8 py-5 font-black text-muted-foreground uppercase tracking-widest text-[10px]">Data</th>
                             <th className="text-left px-8 py-5 font-black text-muted-foreground uppercase tracking-widest text-[10px]">Descrição / Origem</th>
                             <th className="text-left px-8 py-5 font-black text-muted-foreground uppercase tracking-widest text-[10px]">Meio</th>
@@ -564,7 +564,16 @@ const AdminFinanceiro = () => {
 
                         </thead>
                         <tbody className="divide-y divide-border/50">
-                          {filteredTransactions.map((t, i) => (
+                          {filteredTransactions.length === 0 ? (
+                            <tr>
+                              <td colSpan={5} className="py-20 text-center text-muted-foreground">
+                                <div className="flex flex-col items-center gap-2 opacity-50">
+                                  <TrendingUp size={40} />
+                                  <p className="font-bold">Nenhuma transação no período</p>
+                                </div>
+                              </td>
+                            </tr>
+                          ) : filteredTransactions.map((t, i) => (
                             <tr key={i} className="hover:bg-primary/5 transition-colors group">
                               <td className="px-8 py-5 whitespace-nowrap text-[11px] font-bold text-muted-foreground">{fmtDate(t.date)}</td>
                               <td className="px-8 py-5">
