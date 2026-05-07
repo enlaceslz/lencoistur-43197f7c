@@ -256,7 +256,137 @@ const AdminRelatorios = () => {
               </div>
               <p className="text-sm font-medium text-muted-foreground">Relatório Gerencial</p>
               <p className="text-xs text-muted-foreground/80">Gerado em {formatDate(new Date(), "dd 'de' MMMM 'de' yyyy, HH:mm")}</p>
-...
+              <p className="text-xs text-muted-foreground/80">Período: Últimos {period} dias</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="no-print flex flex-col xl:flex-row xl:items-center justify-between gap-6 glass-card p-8 rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.1s' }}>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Análise de Performance</p>
+            <h2 className="text-4xl font-black text-foreground tracking-tight leading-none">Relatórios Gerenciais</h2>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 bg-muted/50 border border-border/50 rounded-2xl px-4 h-12 shadow-inner group">
+              <Calendar size={16} className="text-muted-foreground group-hover:text-primary transition-colors" />
+              <select 
+                value={period} 
+                onChange={(e) => setPeriod(e.target.value)}
+                className="bg-transparent border-none text-sm font-black focus:ring-0 cursor-pointer outline-none text-foreground"
+              >
+                <option value="7">Últimos 7 dias</option>
+                <option value="30">Últimos 30 dias</option>
+                <option value="90">Últimos 90 dias</option>
+                <option value="365">Último ano</option>
+              </select>
+            </div>
+            
+            <div className="flex items-center gap-2 bg-muted/50 border border-border/50 rounded-2xl px-4 h-12 shadow-inner group">
+              <Filter size={16} className="text-muted-foreground group-hover:text-primary transition-colors" />
+              <select 
+                value={statusFilter} 
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="bg-transparent border-none text-sm font-black focus:ring-0 cursor-pointer outline-none text-foreground"
+              >
+                <option value="all">Todos Status</option>
+                <option value="confirmed">Confirmados</option>
+                <option value="pending">Pendentes</option>
+                <option value="cancelled">Cancelados</option>
+              </select>
+            </div>
+
+            <button onClick={printReport} className="flex items-center gap-2 bg-primary text-primary-foreground px-6 h-12 rounded-2xl font-black text-sm hover:brightness-110 transition-all shadow-lg shadow-primary/20 active:scale-95">
+              <Printer size={16} strokeWidth={3} />
+              IMPRIMIR
+            </button>
+          </div>
+        </div>
+
+        <div className="no-print flex items-center gap-2 overflow-x-auto pb-4 scrollbar-hide">
+          {REPORT_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                "flex items-center gap-3 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all whitespace-nowrap border-2",
+                activeTab === tab.id
+                  ? "bg-primary text-primary-foreground border-primary shadow-xl shadow-primary/20 scale-105"
+                  : "bg-muted/30 text-muted-foreground border-transparent hover:bg-muted/50 hover:border-border"
+              )}
+            >
+              <tab.icon size={18} strokeWidth={activeTab === tab.id ? 3 : 2} />
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-32 space-y-4 glass-card rounded-[3rem]">
+            <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+            <p className="text-sm font-black uppercase tracking-widest text-muted-foreground animate-pulse">Processando Inteligência de Dados...</p>
+          </div>
+        ) : (
+          <div className="space-y-8 animate-in-fade">
+            {/* KPI Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {activeTab === "reservas" && (
+                <>
+                  <KPICard label="Total Reservas" value={data.total} icon={ShoppingCart} color="text-blue-500" />
+                  <KPICard label="Receita Bruta" value={fmt(data.revenue)} icon={TrendingUp} color="text-emerald-500" />
+                  <KPICard label="Ticket Médio" value={fmt(data.avgTicket)} icon={Activity} color="text-amber-500" />
+                  <KPICard label="Total Pax" value={data.guests} icon={Users} color="text-purple-500" />
+                </>
+              )}
+              {activeTab === "financeiro" && (
+                <>
+                  <KPICard label="Saldo Atual" value={fmt(data.saldo)} icon={CreditCard} color={data.saldo >= 0 ? "text-emerald-500" : "text-destructive"} />
+                  <KPICard label="Total Recebido" value={fmt(data.recebido)} icon={TrendingUp} color="text-emerald-500" />
+                  <KPICard label="Total Pago" value={fmt(data.pago)} icon={Activity} color="text-destructive" />
+                  <KPICard label="A Receber" value={fmt(data.totalReceber)} icon={Calendar} color="text-blue-500" />
+                </>
+              )}
+              {activeTab === "passeios" && (
+                <>
+                  <KPICard label="Receita Passeios" value={fmt(data.totalRevenue)} icon={TrendingUp} color="text-emerald-500" />
+                  <KPICard label="Pax Transportados" value={data.totalGuests} icon={Users} color="text-blue-500" />
+                </>
+              )}
+              {activeTab === "sgs" && (
+                <>
+                  <KPICard label="Riscos Mapeados" value={data.totalRisks} icon={Shield} color="text-blue-500" />
+                  <KPICard label="Incidentes Total" value={data.totalIncidents} icon={Activity} color="text-amber-500" />
+                  <KPICard label="Casos em Aberto" value={data.openIncidents} icon={Activity} color="text-destructive" />
+                </>
+              )}
+              {activeTab === "marketing" && (
+                <>
+                  <KPICard label="Total Leads" value={data.totalLeads} icon={Users} color="text-blue-500" />
+                  <KPICard label="Leads Quentes" value={data.hotLeads} icon={Activity} color="text-orange-500" />
+                </>
+              )}
+              {activeTab === "parceiros" && (
+                <>
+                  <KPICard label="Total Parceiros" value={data.total} icon={UserPlus} color="text-blue-500" />
+                  <KPICard label="Parceiros Ativos" value={data.active} icon={Activity} color="text-emerald-500" />
+                </>
+              )}
+              {activeTab === "usuarios" && (
+                <>
+                  <KPICard label="Total Usuários" value={data.total} icon={Users} color="text-blue-500" />
+                  <KPICard label="Usuários Ativos" value={data.active} icon={Activity} color="text-emerald-500" />
+                </>
+              )}
+            </div>
+
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {activeTab === "reservas" && (
+                <>
+                  <ChartCard title="Evolução da Receita">
+                    <ResponsiveContainer width="100%" height={280}>
+                      <AreaChart data={data.byDay}>
+                        <defs><linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/></linearGradient></defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                         <XAxis dataKey="date" fontSize={10} tick={{fill: '#9ca3af', fontWeight: '900'}} axisLine={false} tickLine={false} tickFormatter={(v) => formatDate(parseISO(v), 'dd MMM')} />
                         <YAxis fontSize={10} tick={{fill: '#9ca3af', fontWeight: '900'}} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v/100}`} />
                         <ChartTooltip content={<CustomTooltip />} />
