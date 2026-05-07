@@ -53,10 +53,16 @@ interface Partner {
   cadastur: string | null;
   remuneration_type: string | null;
   remuneration_value: number | null;
+  bank_name: string | null;
+  bank_agency: string | null;
+  bank_account: string | null;
+  bank_pix_key: string | null;
+  credit_limit: number | null;
+  tags: string[] | null;
 }
 
 const iconMap: Record<string, any> = {
-  Building2, Compass, Car, Users, MapPin, Search, Plus, Edit, Trash2, Loader2
+  Building2, Compass, Car, Users, MapPin, Search, Plus, Edit, Trash2, Loader2, Banknote, Landmark, Percent, FileText, Calendar, Clock
 };
 
 const getIcon = (name: string) => iconMap[name] || Building2;
@@ -86,7 +92,9 @@ const AdminParceiros = () => {
   const [form, setForm] = useState({
     name: "", type: "hotel", contact_name: "", phone: "", email: "",
     commission_rate: "10", cpf_cnpj: "", address: "", cnh: "", cnh_validade: "", cadastur: "",
-    remuneration_type: "comissao_percent", remuneration_value: "0"
+    remuneration_type: "comissao_percent", remuneration_value: "0",
+    bank_name: "", bank_agency: "", bank_account: "", bank_pix_key: "",
+    credit_limit: "0", tags: ""
   });
 
   const [typeForm, setTypeForm] = useState({
@@ -124,7 +132,9 @@ const AdminParceiros = () => {
       name: "", type: partnerTypes[0]?.name || "hotel", contact_name: "", phone: "", 
       email: "", commission_rate: "10", cpf_cnpj: "", address: "", 
       cnh: "", cnh_validade: "", cadastur: "",
-      remuneration_type: "comissao_percent", remuneration_value: "0"
+      remuneration_type: "comissao_percent", remuneration_value: "0",
+      bank_name: "", bank_agency: "", bank_account: "", bank_pix_key: "",
+      credit_limit: "0", tags: ""
     });
     setDialogOpen(true);
   };
@@ -138,7 +148,11 @@ const AdminParceiros = () => {
       cpf_cnpj: p.cpf_cnpj || "", address: p.address || "",
       cnh: p.cnh || "", cnh_validade: p.cnh_validade || "", cadastur: p.cadastur || "",
       remuneration_type: p.remuneration_type || "comissao_percent",
-      remuneration_value: String(p.remuneration_value || 0)
+      remuneration_value: String(p.remuneration_value || 0),
+      bank_name: p.bank_name || "", bank_agency: p.bank_agency || "",
+      bank_account: p.bank_account || "", bank_pix_key: p.bank_pix_key || "",
+      credit_limit: String(p.credit_limit || 0),
+      tags: p.tags ? p.tags.join(", ") : ""
     });
     setDialogOpen(true);
   };
@@ -230,6 +244,12 @@ const AdminParceiros = () => {
       cadastur: form.type === "guia" || form.type === "agencia" ? (form.cadastur.trim() || null) : null,
       remuneration_type: form.remuneration_type,
       remuneration_value: Number(form.remuneration_value) || 0,
+      bank_name: form.bank_name.trim() || null,
+      bank_agency: form.bank_agency.trim() || null,
+      bank_account: form.bank_account.trim() || null,
+      bank_pix_key: form.bank_pix_key.trim() || null,
+      credit_limit: Number(form.credit_limit) || 0,
+      tags: form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : null,
     };
 
     try {
@@ -705,6 +725,37 @@ const AdminParceiros = () => {
                 </div>
               </div>
             )}
+
+            <div className="space-y-4 p-4 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/10">
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-400 flex items-center gap-1"><Banknote size={14} /> Dados Bancários e Financeiros</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="mb-1.5 block text-xs">Banco</Label>
+                  <Input value={form.bank_name} onChange={(e) => setForm({ ...form, bank_name: e.target.value })} placeholder="Ex: NuBank, Bradesco" />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs">Chave PIX</Label>
+                  <Input value={form.bank_pix_key} onChange={(e) => setForm({ ...form, bank_pix_key: e.target.value })} placeholder="Email, CPF ou Celular" />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs">Agência</Label>
+                  <Input value={form.bank_agency} onChange={(e) => setForm({ ...form, bank_agency: e.target.value })} placeholder="0001" />
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs">Conta</Label>
+                  <Input value={form.bank_account} onChange={(e) => setForm({ ...form, bank_account: e.target.value })} placeholder="12345-6" />
+                </div>
+                <div className="col-span-2">
+                  <Label className="mb-1.5 block text-xs">Limite de Crédito (R$)</Label>
+                  <Input type="number" value={form.credit_limit} onChange={(e) => setForm({ ...form, credit_limit: e.target.value })} />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <Label className="mb-1.5 block flex items-center gap-1"><Percent size={14} /> Tags (Separadas por vírgula)</Label>
+              <Input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="Premium, VIP, Recorrente..." />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
@@ -866,6 +917,19 @@ const AdminParceiros = () => {
                       )}
                     </div>
                   </div>
+                  {viewPartner?.credit_limit !== null && (
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Limite de Crédito</Label>
+                      <p className="font-bold text-emerald-600">R$ {viewPartner?.credit_limit || 0}</p>
+                    </div>
+                  )}
+                  {viewPartner?.tags && viewPartner.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {viewPartner.tags.map((tag, i) => (
+                        <Badge key={i} variant="secondary" className="text-[9px] h-5 bg-primary/5 text-primary border-primary/20">{tag}</Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </section>
 
@@ -892,6 +956,31 @@ const AdminParceiros = () => {
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
                     <div className="p-2 rounded-full bg-primary/10 text-primary"><Mail size={14} /></div>
                     <span className="text-sm font-medium truncate">{viewPartner?.email || "Sem e-mail"}</span>
+                  </div>
+                </div>
+              </section>
+
+              <section>
+                <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Landmark size={14} /> Dados Bancários
+                </h4>
+                <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">Banco</span>
+                    <span className="text-sm font-semibold">{viewPartner?.bank_name || "—"}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">Agência</span>
+                    <span className="text-sm font-semibold">{viewPartner?.bank_agency || "—"}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">Conta</span>
+                    <span className="text-sm font-semibold">{viewPartner?.bank_account || "—"}</span>
+                  </div>
+                  <Separator />
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-muted-foreground">Chave PIX</span>
+                    <span className="text-sm font-mono font-bold text-primary bg-primary/5 p-2 rounded block text-center truncate">{viewPartner?.bank_pix_key || "—"}</span>
                   </div>
                 </div>
               </section>
