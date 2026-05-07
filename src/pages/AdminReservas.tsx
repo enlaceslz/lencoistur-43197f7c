@@ -160,7 +160,13 @@ const AdminReservas = () => {
   };
 
   const resetNewForm = () => {
-...
+    setNewForm({
+      type: "tour", tourMode: "coletivo", itemName: "", date: "", guests: 2, payMethod: "pix",
+      customerName: "", customerEmail: "", customerPhone: "",
+      cpf: "", passport: "", country: "Brasil", birthDate: "", notes: "", collaboratorId: ""
+    });
+    setSelectedCustomerId("");
+    setCustomerSearch("");
     setEditingId(null);
   };
 
@@ -1069,8 +1075,6 @@ const AdminReservas = () => {
                   </div>
                 )}
               </div>
-            </div>
-
             </div>
             
             <div className="flex gap-4 sticky bottom-0 bg-white border-t border-slate-100 p-4 md:p-6 z-10">
