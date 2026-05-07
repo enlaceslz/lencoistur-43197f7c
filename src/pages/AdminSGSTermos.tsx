@@ -3,6 +3,7 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, CheckCircle, XCircle, Shield, FileText, Printer, Users, Trash2, UserPlus, Search, Edit, Eye, Settings, Save, Send, Link as LinkIcon, Loader2, MessageCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 import { ptBR } from "date-fns/locale";
 import { formatDate } from "@/lib/utils";
 
