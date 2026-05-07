@@ -25,8 +25,8 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { maskCPF, maskCNPJ, maskPhone, maskCpfCnpj } from "@/lib/masks";
 import { Separator } from "@/components/ui/separator";
-import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { formatDate } from "@/lib/utils";
 
 
 interface PartnerType {
@@ -913,7 +913,7 @@ const AdminParceiros = () => {
                           <span className="text-xs text-muted-foreground">Validade</span>
                           <span className="text-sm font-bold flex items-center gap-2 text-amber-600">
                             <Calendar size={14} />
-                            {viewPartner.cnh_validade ? format(new Date(viewPartner.cnh_validade + "T12:00:00"), "dd/MM/yyyy", { locale: ptBR }) : "N/A"}
+                            {viewPartner.cnh_validade ? formatDate(new Date(viewPartner.cnh_validade + "T12:00:00"), "dd/MM/yyyy") : "N/A"}
                           </span>
                         </div>
                       </div>

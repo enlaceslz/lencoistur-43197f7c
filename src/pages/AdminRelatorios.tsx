@@ -13,8 +13,9 @@ import {
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 type ReportType = "reservas" | "financeiro" | "clientes" | "passeios" | "sgs" | "marketing" | "parceiros" | "usuarios";
@@ -205,7 +206,7 @@ const AdminRelatorios = () => {
       return (
         <div className="glass-card p-4 rounded-2xl border-none shadow-xl">
           <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
-            {label ? format(parseISO(label), "dd 'de' MMMM", { locale: ptBR }) : ''}
+            {label ? formatDate(parseISO(label), "dd 'de' MMMM") : ''}
           </p>
           <p className="text-sm font-black text-primary">
             {fmt(payload[0].value)}
@@ -254,7 +255,7 @@ const AdminRelatorios = () => {
                 <p className="text-primary font-bold text-lg uppercase tracking-wider">{REPORT_TABS.find(t => t.id === activeTab)?.label}</p>
               </div>
               <p className="text-sm font-medium text-muted-foreground">Relatório Gerencial</p>
-              <p className="text-xs text-muted-foreground/80">Gerado em {format(new Date(), "dd 'de' MMMM 'de' yyyy, HH:mm", { locale: ptBR })}</p>
+              <p className="text-xs text-muted-foreground/80">Gerado em {formatDate(new Date(), "dd 'de' MMMM 'de' yyyy, HH:mm")}</p>
               <p className="text-xs text-muted-foreground/80">Período: Últimos {period} dias</p>
             </div>
           </div>
@@ -267,103 +268,118 @@ const AdminRelatorios = () => {
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 bg-muted/50 border border-border/50 rounded-2xl px-4 h-12 shadow-inner group">
-              <Calendar size={18} className="text-primary group-hover:scale-110 transition-transform" />
-              <select value={period} onChange={e => setPeriod(e.target.value)} className="bg-transparent text-[11px] font-black uppercase tracking-widest outline-none cursor-pointer">
+              <Calendar size={16} className="text-muted-foreground group-hover:text-primary transition-colors" />
+              <select 
+                value={period} 
+                onChange={(e) => setPeriod(e.target.value)}
+                className="bg-transparent border-none text-sm font-black focus:ring-0 cursor-pointer outline-none text-foreground"
+              >
                 <option value="7">Últimos 7 dias</option>
                 <option value="30">Últimos 30 dias</option>
-                <option value="90">90 dias</option>
-                <option value="365">Anual</option>
+                <option value="90">Últimos 90 dias</option>
+                <option value="365">Último ano</option>
               </select>
             </div>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button onClick={printReport} className="flex items-center gap-3 bg-primary hover:bg-primary/90 text-primary-foreground px-8 h-12 rounded-2xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-95">
-                    <Printer size={18} strokeWidth={3} /> Imprimir
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Gerar PDF para impressão</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            
+            <div className="flex items-center gap-2 bg-muted/50 border border-border/50 rounded-2xl px-4 h-12 shadow-inner group">
+              <Filter size={16} className="text-muted-foreground group-hover:text-primary transition-colors" />
+              <select 
+                value={statusFilter} 
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="bg-transparent border-none text-sm font-black focus:ring-0 cursor-pointer outline-none text-foreground"
+              >
+                <option value="all">Todos Status</option>
+                <option value="confirmed">Confirmados</option>
+                <option value="pending">Pendentes</option>
+                <option value="cancelled">Cancelados</option>
+              </select>
+            </div>
+
+            <button onClick={printReport} className="flex items-center gap-2 bg-primary text-primary-foreground px-6 h-12 rounded-2xl font-black text-sm hover:brightness-110 transition-all shadow-lg shadow-primary/20 active:scale-95">
+              <Printer size={16} strokeWidth={3} />
+              IMPRIMIR
+            </button>
           </div>
         </div>
 
-        <div className="no-print flex gap-2 overflow-x-auto pb-4 no-scrollbar scroll-smooth mb-4">
-          {REPORT_TABS.map(tab => (
-            <button 
-              key={tab.id} 
+        <div className="no-print flex items-center gap-2 overflow-x-auto pb-4 scrollbar-hide">
+          {REPORT_TABS.map((tab) => (
+            <button
+              key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 h-11 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border ${
-                activeTab === tab.id 
-                ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 scale-105" 
-                : "bg-muted/50 text-muted-foreground border-border/50 hover:bg-muted"
-              }`}>
-              <tab.icon size={16} strokeWidth={2.5} /> {tab.label}
+              className={cn(
+                "flex items-center gap-3 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all whitespace-nowrap border-2",
+                activeTab === tab.id
+                  ? "bg-primary text-primary-foreground border-primary shadow-xl shadow-primary/20 scale-105"
+                  : "bg-muted/30 text-muted-foreground border-transparent hover:bg-muted/50 hover:border-border"
+              )}
+            >
+              <tab.icon size={18} strokeWidth={activeTab === tab.id ? 3 : 2} />
+              {tab.label}
             </button>
           ))}
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 space-y-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
-            <p className="text-muted-foreground font-medium">Processando dados...</p>
+          <div className="flex flex-col items-center justify-center py-32 space-y-4 glass-card rounded-[3rem]">
+            <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+            <p className="text-sm font-black uppercase tracking-widest text-muted-foreground animate-pulse">Processando Inteligência de Dados...</p>
           </div>
         ) : (
-          <div id="report-content" className="space-y-8">
-            {/* KPI Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="space-y-8 animate-in-fade">
+            {/* KPI Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {activeTab === "reservas" && (
                 <>
-                  <KPICard label="Total de Reservas" value={data.total || 0} icon={ShoppingCart} color="text-primary" />
-                  <KPICard label="Receita Bruta" value={fmt(data.revenue || 0)} icon={CreditCard} color="text-secondary" />
-                  <KPICard label="Ticket Médio" value={fmt(data.avgTicket || 0)} icon={TrendingUp} color="text-blue-500" />
-                  <KPICard label="Total Hóspedes" value={data.guests || 0} icon={Users} color="text-purple-500" />
+                  <KPICard label="Total Reservas" value={data.total} icon={ShoppingCart} color="text-blue-500" />
+                  <KPICard label="Receita Bruta" value={fmt(data.revenue)} icon={TrendingUp} color="text-emerald-500" />
+                  <KPICard label="Ticket Médio" value={fmt(data.avgTicket)} icon={Activity} color="text-amber-500" />
+                  <KPICard label="Total Pax" value={data.guests} icon={Users} color="text-purple-500" />
                 </>
               )}
               {activeTab === "financeiro" && (
                 <>
-                  <KPICard label="Recebido" value={fmt(data.recebido || 0)} icon={CreditCard} color="text-primary" />
-                  <KPICard label="Pago" value={fmt(data.pago || 0)} icon={ShoppingCart} color="text-destructive" />
-                  <KPICard label="Saldo Atual" value={fmt(data.saldo || 0)} icon={TrendingUp} color="text-secondary" />
-                  <KPICard label="A Receber" value={fmt(data.totalReceber || 0)} icon={Activity} color="text-blue-500" />
+                  <KPICard label="Saldo Atual" value={fmt(data.saldo)} icon={CreditCard} color={data.saldo >= 0 ? "text-emerald-500" : "text-destructive"} />
+                  <KPICard label="Total Recebido" value={fmt(data.recebido)} icon={TrendingUp} color="text-emerald-500" />
+                  <KPICard label="Total Pago" value={fmt(data.pago)} icon={Activity} color="text-destructive" />
+                  <KPICard label="A Receber" value={fmt(data.totalReceber)} icon={Calendar} color="text-blue-500" />
+                </>
+              )}
+              {activeTab === "passeios" && (
+                <>
+                  <KPICard label="Receita Passeios" value={fmt(data.totalRevenue)} icon={TrendingUp} color="text-emerald-500" />
+                  <KPICard label="Pax Transportados" value={data.totalGuests} icon={Users} color="text-blue-500" />
                 </>
               )}
               {activeTab === "sgs" && (
                 <>
-                  <KPICard label="Riscos Ativos" value={data.totalRisks || 0} icon={Shield} color="text-primary" />
-                  <KPICard label="Incidentes" value={data.totalIncidents || 0} icon={Activity} color="text-destructive" />
-                  <KPICard label="Abertos" value={data.openIncidents || 0} icon={Activity} color="text-secondary" />
+                  <KPICard label="Riscos Mapeados" value={data.totalRisks} icon={Shield} color="text-blue-500" />
+                  <KPICard label="Incidentes Total" value={data.totalIncidents} icon={Activity} color="text-amber-500" />
+                  <KPICard label="Casos em Aberto" value={data.openIncidents} icon={Activity} color="text-destructive" />
                 </>
               )}
               {activeTab === "marketing" && (
                 <>
-                  <KPICard label="Total Leads" value={data.totalLeads || 0} icon={Users} color="text-primary" />
-                  <KPICard label="Leads Quentes" value={data.hotLeads || 0} icon={TrendingUp} color="text-secondary" />
-                </>
-              )}
-              {activeTab === "clientes" && (
-                <>
-                  <KPICard label="Total Clientes" value={data.total || 0} icon={Users} color="text-primary" />
+                  <KPICard label="Total Leads" value={data.totalLeads} icon={Users} color="text-blue-500" />
+                  <KPICard label="Leads Quentes" value={data.hotLeads} icon={Activity} color="text-orange-500" />
                 </>
               )}
               {activeTab === "parceiros" && (
                 <>
-                  <KPICard label="Total Parceiros" value={data.total || 0} icon={UserPlus} color="text-primary" />
-                  <KPICard label="Parceiros Ativos" value={data.active || 0} icon={Activity} color="text-secondary" />
+                  <KPICard label="Total Parceiros" value={data.total} icon={UserPlus} color="text-blue-500" />
+                  <KPICard label="Parceiros Ativos" value={data.active} icon={Activity} color="text-emerald-500" />
                 </>
               )}
               {activeTab === "usuarios" && (
                 <>
-                  <KPICard label="Total de Usuários" value={data.total || 0} icon={Users} color="text-primary" />
-                  <KPICard label="Usuários Ativos" value={data.active || 0} icon={Activity} color="text-emerald-500" />
+                  <KPICard label="Total Usuários" value={data.total} icon={Users} color="text-blue-500" />
+                  <KPICard label="Usuários Ativos" value={data.active} icon={Activity} color="text-emerald-500" />
                 </>
               )}
             </div>
 
             {/* Charts Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {activeTab === "reservas" && (
                 <>
                   <ChartCard title="Evolução da Receita">
@@ -371,7 +387,7 @@ const AdminRelatorios = () => {
                       <AreaChart data={data.byDay}>
                         <defs><linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/></linearGradient></defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                        <XAxis dataKey="date" fontSize={10} tick={{fill: '#9ca3af', fontWeight: '900'}} axisLine={false} tickLine={false} tickFormatter={(v) => format(parseISO(v), 'dd MMM', { locale: ptBR })} />
+                        <XAxis dataKey="date" fontSize={10} tick={{fill: '#9ca3af', fontWeight: '900'}} axisLine={false} tickLine={false} tickFormatter={(v) => formatDate(parseISO(v), 'dd MMM')} />
                         <YAxis fontSize={10} tick={{fill: '#9ca3af', fontWeight: '900'}} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v/100}`} />
                         <ChartTooltip content={<CustomTooltip />} />
                         <Area type="monotone" dataKey="total" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />

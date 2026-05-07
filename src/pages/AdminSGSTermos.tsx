@@ -3,8 +3,8 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, CheckCircle, XCircle, Shield, FileText, Printer, Users, Trash2, UserPlus, Search, Edit, Eye, Settings, Save, Send, Link as LinkIcon, Loader2, MessageCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { formatDate } from "@/lib/utils";
 
 const HEALTH_QUESTIONS_LIST = [
   { id: "has_allergy", label: "Alergia", detailKey: "allergy_details" },
@@ -81,7 +81,7 @@ const AdminSGSTermos = () => {
     medication_details: "",
     emergency_contact_name: "",
     emergency_contact_phone: "",
-    term_date: format(new Date(), "yyyy-MM-dd"),
+    term_date: formatDate(new Date(), "yyyy-MM-dd"),
     minors: [] as any[],
   });
 
@@ -225,7 +225,7 @@ const AdminSGSTermos = () => {
       company_id: company.id,
       customer_name: selectedCustomer?.name,
       tour_name: selectedTour?.name,
-      term_date: format(new Date(), "yyyy-MM-dd"), // Sempre usa a data atual ao salvar/enviar
+      term_date: formatDate(new Date(), "yyyy-MM-dd"), // Sempre usa a data atual ao salvar/enviar
       has_allergy: form.has_allergy,
       allergy_details: form.allergy_details,
       has_fainting_convulsions: form.has_fainting_convulsions,
@@ -300,7 +300,7 @@ const AdminSGSTermos = () => {
       medication_details: "",
       emergency_contact_name: "",
       emergency_contact_phone: "",
-      term_date: format(new Date(), "yyyy-MM-dd"),
+      term_date: formatDate(new Date(), "yyyy-MM-dd"),
       minors: [],
     });
   };
@@ -321,16 +321,16 @@ const AdminSGSTermos = () => {
     if (!win) return;
 
     const termDate = term.term_date ? new Date(term.term_date + "T12:00:00") : new Date();
-    const formattedDate = format(termDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+    const formattedDate = formatDate(termDate, "dd 'de' MMMM 'de' yyyy");
     
     const minorsHtml = term.sgs_risk_term_minors?.map((m: any, i: number) => `
       <div style="margin: 8px 0; padding-bottom: 5px; border-bottom: 1px solid #f0f0f0;">
         <p style="margin: 2px 0;"><strong>${i + 1}- ${m.full_name}</strong> ${m.is_adult ? "(Maior de Idade)" : "(Menor de Idade)"}</p>
         <p style="margin: 2px 0; font-size: 10px; color: #666;">
-          ${m.cpf ? `CPF: ${m.cpf}` : ""} ${m.birth_date ? `| Nasc: ${format(new Date(m.birth_date), "dd/MM/yyyy")}` : ""} 
+          ${m.cpf ? `CPF: ${m.cpf}` : ""} ${m.birth_date ? `| Nasc: ${formatDate(new Date(m.birth_date), "dd/MM/yyyy")}` : ""} 
           ${!m.is_adult && m.responsible_name ? `| Responsável: ${m.responsible_name}` : ""}
         </p>
-        ${m.signature_data ? `<div style="margin-top: 5px;"><img src="${m.signature_data}" style="height: 40px;" /><br/><span style="font-size: 8px;">Assinado em ${format(new Date(m.signed_at), "dd/MM/yyyy HH:mm")}</span></div>` : ""}
+        ${m.signature_data ? `<div style="margin-top: 5px;"><img src="${m.signature_data}" style="height: 40px;" /><br/><span style="font-size: 8px;">Assinado em ${formatDate(new Date(m.signed_at), "dd/MM/yyyy HH:mm")}</span></div>` : ""}
       </div>
     `).join("") || "Nenhum dependente declarado.";
 
@@ -417,7 +417,7 @@ const AdminSGSTermos = () => {
           <div class="grid">
             <div><strong>Nome:</strong> ${customerName}</div>
             <div><strong>CPF/Passaporte:</strong> ${(term.customers as any)?.cpf || term.cpf || "___"}</div>
-            <div><strong>Data Nasc:</strong> ${(term.customers as any)?.birth_date ? format(new Date((term.customers as any).birth_date), "dd/MM/yyyy") : "___"}</div>
+            <div><strong>Data Nasc:</strong> ${(term.customers as any)?.birth_date ? formatDate(new Date((term.customers as any).birth_date), "dd/MM/yyyy") : "___"}</div>
             <div><strong>Telefone:</strong> ${(term.customers as any)?.phone || term.phone || "___"}</div>
             <div><strong>Cidade/UF:</strong> ${customerCityState}</div>
             <div><strong>E-mail:</strong> ${(term.customers as any)?.email || term.email || "___"}</div>
@@ -468,7 +468,7 @@ const AdminSGSTermos = () => {
           <div class="signature-box">
             Assinatura do Cliente
           </div>
-          ${term.signature_data ? `<div><img src="${term.signature_data}" style="height: 60px; margin-bottom: -20px;"/><br/><span class="small">Assinado digitalmente em ${format(new Date(term.signed_at), "dd/MM/yyyy HH:mm")}</span></div>` : ""}
+          ${term.signature_data ? `<div><img src="${term.signature_data}" style="height: 60px; margin-bottom: -20px;"/><br/><span class="small">Assinado digitalmente em ${formatDate(new Date(term.signed_at), "dd/MM/yyyy HH:mm")}</span></div>` : ""}
         </div>
         
         <div class="no-print" style="margin-top: 40px; text-align: center;">
@@ -861,7 +861,7 @@ const AdminSGSTermos = () => {
                         <div className="flex flex-col">
                           <span className="font-bold">{m.full_name} {m.is_adult ? "(Adulto)" : "(Menor)"}</span>
                           <span className="text-[10px] text-muted-foreground">
-                            {m.birth_date ? `Nascimento: ${format(new Date(m.birth_date), "dd/MM/yyyy")}` : ""} 
+                            {m.birth_date ? `Nascimento: ${formatDate(new Date(m.birth_date), "dd/MM/yyyy")}` : ""} 
                             {!m.is_adult && m.responsible_name ? ` • Responsável: ${m.responsible_name}` : ""}
                           </span>
                         </div>
@@ -913,7 +913,7 @@ const AdminSGSTermos = () => {
                       {t.sgs_veiculos?.modelo && <span>• {t.sgs_veiculos.modelo}</span>}
                     </p>
                     <div className="flex gap-4 mt-1">
-                      <p className="text-xs text-muted-foreground">Gerado em: {format(new Date(t.created_at), "dd/MM/yyyy")}</p>
+                      <p className="text-xs text-muted-foreground">Gerado em: {formatDate(new Date(t.created_at), "dd/MM/yyyy")}</p>
                       <p className="text-xs text-muted-foreground">Status: <span className={t.signature_data ? "text-green-600 font-semibold" : "text-amber-600 font-semibold"}>{t.signature_data ? "Assinado" : "Pendente de Assinatura"}</span></p>
                     </div>
                   </div>
