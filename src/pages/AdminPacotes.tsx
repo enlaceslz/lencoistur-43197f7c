@@ -366,13 +366,19 @@ const AdminPacotes = () => {
                     <div className="space-y-2">
                       <Label htmlFor="pkg-price" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Final (R$)</Label>
                       <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">R$</span>
-                        <Input 
-                          id="pkg-price" 
-                          type="number" 
-                          value={form.discount_price} 
-                          onChange={e => setForm({...form, discount_price: Number(e.target.value)})} 
-                          className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-black text-primary" 
+                        <NumericFormat
+                          id="pkg-price"
+                          value={form.discount_price / 100}
+                          onValueChange={(values) => {
+                            const { floatValue } = values;
+                            setForm({ ...form, discount_price: Math.round((floatValue || 0) * 100) });
+                          }}
+                          thousandSeparator="."
+                          decimalSeparator=","
+                          prefix="R$ "
+                          decimalScale={2}
+                          fixedDecimalScale
+                          className="flex h-12 w-full px-4 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-black text-primary outline-none focus:ring-2 focus:ring-primary/20"
                         />
                       </div>
                     </div>
