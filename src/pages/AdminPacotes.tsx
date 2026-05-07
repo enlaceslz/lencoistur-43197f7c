@@ -572,6 +572,140 @@ const AdminPacotes = () => {
           </form>
         </DialogContent>
       </Dialog>
+      <Dialog open={showView} onOpenChange={setShowView}>
+        <DialogContent className="sm:max-w-3xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          {viewingPackage && (
+            <>
+              <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                    <Eye size={24} />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl font-black text-slate-900 leading-none mb-1">
+                      Visualizar Campanha
+                    </DialogTitle>
+                    <p className="text-sm text-slate-500 font-medium">Preview e compartilhamento do pacote</p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setShowView(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+                  <XCircle size={20} className="text-slate-400" />
+                </Button>
+              </div>
+
+              <div className="p-6 md:p-8 space-y-8">
+                <div className="relative aspect-[21/9] rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white">
+                  <img 
+                    src={viewingPackage.banner_url || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80"} 
+                    className="w-full h-full object-cover" 
+                    alt={viewingPackage.name} 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-8">
+                    <Badge className="w-fit mb-3 bg-primary text-white font-black uppercase tracking-widest px-4 py-1.5 rounded-full text-xs border-none shadow-lg">
+                      Oportunidade Única
+                    </Badge>
+                    <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight uppercase">{viewingPackage.name}</h2>
+                    <div className="flex items-center gap-6 mt-4">
+                      <div className="flex items-center gap-2 text-white/90 font-bold text-sm">
+                        <Clock size={18} className="text-primary" /> {viewingPackage.days} Dias
+                      </div>
+                      {viewingPackage.nights > 0 && (
+                        <div className="flex items-center gap-2 text-white/90 font-bold text-sm">
+                          <Moon size={18} className="text-blue-400" /> {viewingPackage.nights} Noites
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 text-primary font-black text-2xl">
+                        {fmt(viewingPackage.discount_price)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div className="space-y-6">
+                    <div className="bg-white p-6 rounded-[2rem] border border-slate-200/60 shadow-sm">
+                      <h3 className="font-black text-slate-800 uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
+                        <FileText size={16} className="text-primary" /> Descrição da Campanha
+                      </h3>
+                      <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-line font-medium italic">
+                        "{viewingPackage.description || "Sem descrição definida para este pacote."}"
+                      </p>
+                    </div>
+
+                    <div className="flex gap-4">
+                      <Button 
+                        onClick={() => sharePackage(viewingPackage)} 
+                        className="flex-1 h-16 rounded-2xl bg-[#25D366] hover:bg-[#20ba5a] text-white font-black uppercase tracking-widest shadow-lg shadow-green-500/20 transition-all active:scale-95"
+                      >
+                        <Share2 size={20} className="mr-3" /> WhatsApp
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          const url = `${window.location.origin}/pacote/${viewingPackage.slug}`;
+                          navigator.clipboard.writeText(url);
+                          toast.success("Link copiado!");
+                        }}
+                        className="h-16 px-6 rounded-2xl border-slate-200 font-bold text-slate-500 hover:bg-slate-50 transition-all active:scale-95"
+                      >
+                        <Copy size={20} />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-[2rem] border border-slate-200/60 shadow-sm">
+                    <h3 className="font-black text-slate-800 uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
+                      <Target size={16} className="text-amber-500" /> Gerenciar Banner
+                    </h3>
+                    <div className="space-y-4">
+                      <p className="text-[11px] text-slate-500 font-medium">Troque a imagem desta campanha para atrair mais clientes.</p>
+                      <div className="relative group cursor-pointer" onClick={() => document.getElementById('view-banner-upload')?.click()}>
+                        <div className="aspect-[16/9] rounded-2xl overflow-hidden bg-slate-100 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center transition-all group-hover:border-primary/40 group-hover:bg-primary/5">
+                          {uploading ? (
+                            <Loader2 size={32} className="animate-spin text-primary" />
+                          ) : (
+                            <>
+                              <Upload size={32} className="text-slate-300 mb-2 group-hover:text-primary transition-colors" />
+                              <p className="text-[10px] font-black uppercase text-slate-400 group-hover:text-primary tracking-widest">Subir Novo Banner</p>
+                            </>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          id="view-banner-upload"
+                          className="hidden"
+                          accept="image/*"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setUploading(true);
+                            try {
+                              const fileExt = file.name.split('.').pop();
+                              const fileName = `${Math.random()}.${fileExt}`;
+                              const filePath = `package-banners/${fileName}`;
+                              await supabase.storage.from('images').upload(filePath, file);
+                              const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(filePath);
+                              
+                              await supabase.from("packages").update({ banner_url: publicUrl }).eq("id", viewingPackage.id);
+                              setViewingPackage({ ...viewingPackage, banner_url: publicUrl });
+                              loadData();
+                              toast.success("Banner atualizado!");
+                            } catch (error: any) {
+                              toast.error("Erro: " + error.message);
+                            } finally {
+                              setUploading(false);
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
