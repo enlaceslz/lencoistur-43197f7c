@@ -417,7 +417,7 @@ const AdminSGSTermos = () => {
           <div class="grid">
             <div><strong>Nome:</strong> ${customerName}</div>
             <div><strong>CPF/Passaporte:</strong> ${(term.customers as any)?.cpf || term.cpf || "___"}</div>
-            <div><strong>Data Nasc:</strong> ${(term.customers as any)?.birth_date ? format(new Date((term.customers as any).birth_date), "dd/MM/yyyy") : "___"}</div>
+            <div><strong>Data Nasc:</strong> ${(term.customers as any)?.birth_date ? formatDate(new Date((term.customers as any).birth_date), "dd/MM/yyyy") : "___"}</div>
             <div><strong>Telefone:</strong> ${(term.customers as any)?.phone || term.phone || "___"}</div>
             <div><strong>Cidade/UF:</strong> ${customerCityState}</div>
             <div><strong>E-mail:</strong> ${(term.customers as any)?.email || term.email || "___"}</div>
