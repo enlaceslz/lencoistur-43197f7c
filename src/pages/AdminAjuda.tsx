@@ -522,12 +522,12 @@ const AdminAjuda = () => {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
-                  { color: "bg-emerald-500", label: "Sucesso / Ativo", desc: "Confirmado, conforme ou pago" },
-                  { color: "bg-amber-500", label: "Pendente / Atenção", desc: "Requer verificação manual" },
-                  { color: "bg-rose-500", label: "Urgente / Bloqueado", desc: "Vencido, erro ou impedimento" },
-                  { color: "bg-blue-500", label: "Informativo", desc: "Dados extras ou andamento" },
-                  { badge: true, label: "Categorização", desc: "Filtros, tags e tipos de dados" },
-                  { icon: AlertTriangle, label: "Alertas SGS", desc: "Avisos críticos de segurança" },
+                  { color: "bg-emerald-500", label: "Sucesso / Ativo", desc: "Confirmado, conforme, pago ou aprovado" },
+                  { color: "bg-amber-500", label: "Pendente / Atenção", desc: "Aguardando ação manual ou vencimento próximo" },
+                  { color: "bg-rose-500", label: "Urgente / Bloqueado", desc: "Vencido, erro, incidente ou risco inaceitável" },
+                  { color: "bg-blue-500", label: "Informativo", desc: "Documentação, metadados ou andamento" },
+                  { badge: true, label: "Hierarquia / Tag", desc: "Nível de acesso, categorias e classificações" },
+                  { icon: AlertTriangle, label: "Matriz de Risco", desc: "Heatmap de segurança e classificação NR" },
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-muted/20 border border-border/40 hover:bg-white hover:shadow-lg transition-all">
                     {item.color ? (
