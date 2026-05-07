@@ -1111,5 +1111,3 @@ const AdminParceiros = () => {
 };
 
 export default AdminParceiros;
-
-export default AdminParceiros;
