@@ -53,10 +53,16 @@ interface Partner {
   cadastur: string | null;
   remuneration_type: string | null;
   remuneration_value: number | null;
+  bank_name: string | null;
+  bank_agency: string | null;
+  bank_account: string | null;
+  bank_pix_key: string | null;
+  credit_limit: number | null;
+  tags: string[] | null;
 }
 
 const iconMap: Record<string, any> = {
-  Building2, Compass, Car, Users, MapPin, Search, Plus, Edit, Trash2, Loader2
+  Building2, Compass, Car, Users, MapPin, Search, Plus, Edit, Trash2, Loader2, Banknote, Landmark, Percent, FileText, Calendar, Clock
 };
 
 const getIcon = (name: string) => iconMap[name] || Building2;
