@@ -203,7 +203,6 @@ const AdminSGSPesquisas = () => {
                 </div>
               </div>
             </div>
-            </div>
           ))}
         </div>
       </div>
