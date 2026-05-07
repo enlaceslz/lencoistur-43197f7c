@@ -1225,5 +1225,7 @@ const AdminColaboradores = () => {
     </AdminLayout>
   );
 };
+  );
+};
 
 export default AdminColaboradores;
