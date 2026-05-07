@@ -361,19 +361,19 @@ const modules: ModuleGuide[] = [
 
 const flowDiagrams = [
   {
-    title: "Ciclo de Vida da Reserva",
+    title: "Motor de Reservas & SGS",
     icon: Workflow,
-    steps: ["Cliente escolhe no site", "Preenchimento de dados e dependentes", "Pagamento (PIX/Cartão)", "Confirmação automática/manual", "Geração de registro no Financeiro", "Check-in e Briefing de Segurança", "Realização do passeio ✅"],
+    steps: ["Reserva gerada no Motor (Site/Painel)", "Identificação do perfil no CRM 360º", "Cálculo de Descontos & Confirmação", "Assinatura do Termo ISO 21103", "Briefing de Segurança (ISO 21103)", "Checklist Operacional de Frota", "Operação Segura ✅"],
   },
   {
-    title: "Gestão Financeira Integrada",
+    title: "Governança de Dados (BI)",
     icon: Zap,
-    steps: ["Venda realizada (Receita)", "Lançamento automático no Contas a Receber", "Registro de custos (Combustível/Guias)", "Cálculo de comissões de parceiros", "Fechamento de Caixa", "Análise de DRE e Lucratividade 📊"],
+    steps: ["Venda consolidada no Financeiro", "Lançamento de Custos Operacionais", "Integração de Comissões em Tempo Real", "Processamento no IA Gateway", "Geração de KPIs de Performance", "Fechamento de DRE Executivo", "Insight Estratégico 📊"],
   },
   {
-    title: "Segurança e Conformidade (SGS)",
+    title: "Conformidade Técnica",
     icon: Shield,
-    steps: ["Matriz de Riscos atualizada", "Verificação de equipamentos e veículos", "Briefing obrigatório com turistas", "Coleta de Termo de Responsabilidade", "Execução segura com condutor habilitado", "Registro de feedback ou incidentes 🔍"],
+    steps: ["Mapeamento de Riscos P2", "Controle de Recursos P5 (POPs)", "Verificação de Competências (ISO 21102)", "Auditoria Interna de Segurança", "Geração de Ações Corretivas", "Emissão de PGSAT (ICMBio)", "Certificação de Segurança 🔍"],
   },
 ];
 
