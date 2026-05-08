@@ -83,23 +83,26 @@ export default function ContasReceberTab({ company }: { company?: any }) {
   const [uploading, setUploading] = useState(false);
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [bookings, setBookings] = useState<BookingOption[]>([]);
+  const [partners, setPartners] = useState<PartnerOption[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("todos");
   const [categoryFilter, setCategoryFilter] = useState<string>("todos");
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("contas_receber").select("*").order("vencimento", { ascending: true });
+    const { data } = await supabase.from("contas_receber").select("*, partners(name)").order("vencimento", { ascending: true });
     if (data) setContas(data as any);
     setLoading(false);
   };
 
   const loadRelations = async () => {
-    const [{ data: cust }, { data: bk }] = await Promise.all([
+    const [{ data: cust }, { data: bk }, { data: part }] = await Promise.all([
       supabase.from("customers").select("id, name, email").order("name"),
       supabase.from("bookings").select("id, booking_code, item_name, final_total, customers(name)").order("created_at", { ascending: false }),
+      supabase.from("partners").select("id, name").order("name"),
     ]);
     if (cust) setCustomers(cust);
+    if (part) setPartners(part);
     if (bk) setBookings(bk.map((b: any) => ({
       id: b.id,
       booking_code: b.booking_code,
