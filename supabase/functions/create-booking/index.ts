@@ -32,13 +32,12 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json();
 
-    // Validate required fields
     const { 
       type, itemName, date, guests, payMethod, customerName, 
       customerEmail, customerPhone, cpf, passport, country, 
       birthDate, notes, companions, collaboratorId, partner_id,
-      publicUnitPrice: clientPublicUnitPrice, // allow optional override
-      publicTotal: clientPublicTotal // allow optional override
+      publicUnitPrice: clientPublicUnitPrice,
+      publicTotal: clientPublicTotal
     } = body;
 
     if (!type || !itemName || !customerName || !customerEmail || !payMethod) {
@@ -48,57 +47,15 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (!["passeio", "translado", "package"].includes(type)) {
-      return new Response(
-        JSON.stringify({ error: "Tipo inválido" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    if (!["pix", "cartao", "card", "dinheiro", "transferencia", "info"].includes(payMethod)) {
-      return new Response(
-        JSON.stringify({ error: "Método de pagamento inválido" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
     const guestsNum = Number(guests);
-    if (!Number.isInteger(guestsNum) || guestsNum < 1 || guestsNum > 50) {
-      return new Response(
-        JSON.stringify({ error: "Número de convidados inválido (1-50)" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Validate customer fields
-    const trimmedName = String(customerName).trim();
-    const trimmedEmail = String(customerEmail).trim();
-    const trimmedPhone = customerPhone ? String(customerPhone).trim() : null;
-
-    if (trimmedName.length < 2 || trimmedName.length > 200) {
-      return new Response(
-        JSON.stringify({ error: "Nome deve ter entre 2 e 200 caracteres" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(trimmedEmail) || trimmedEmail.length > 254) {
-      return new Response(
-        JSON.stringify({ error: "Email inválido" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Get the user ID from the authorization header if present
-    const authHeader = req.headers.get("Authorization");
-    let userId = null;
-
+    
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    const authHeader = req.headers.get("Authorization");
+    let userId = null;
     if (authHeader) {
       const supabaseClient = createClient(
         Deno.env.get("SUPABASE_URL")!,
@@ -109,7 +66,6 @@ Deno.serve(async (req) => {
       userId = user?.id;
     }
 
-    // Look up the actual price and pix_discount from the database
     let unitPrice: number;
     let publicUnitPrice: number;
     let pixDiscountPercent = 0;
@@ -140,7 +96,7 @@ Deno.serve(async (req) => {
 
     const partnerData = partner_id ? await getPartnerData(partner_id) : null;
 
-    if (type === "passeio") {
+    if (type === "passeio" || type === "tour") {
       const cleanItemName = itemName.replace(/\s*\((Coletivo|Privativo)\)$/, "");
       
       const { data: tour, error: tourErr } = await supabaseAdmin
@@ -151,9 +107,8 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (tourErr || !tour) {
-        console.error(`Tour not found: "${cleanItemName}" (original: "${itemName}")`);
         return new Response(
-          JSON.stringify({ error: `Passeio não encontrado ou inativo: ${cleanItemName}` }),
+          JSON.stringify({ error: `Passeio não encontrado: ${cleanItemName}` }),
           { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -175,7 +130,7 @@ Deno.serve(async (req) => {
 
       if (pkgErr || !pkg) {
         return new Response(
-          JSON.stringify({ error: `Pacote não encontrado ou inativo: ${itemName}` }),
+          JSON.stringify({ error: `Pacote não encontrado: ${itemName}` }),
           { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -183,29 +138,19 @@ Deno.serve(async (req) => {
       const basePrice = pkg.discount_price || pkg.original_price;
       publicUnitPrice = basePrice;
       unitPrice = calculatePartnerPrice(basePrice, pkg.partner_price, partnerData);
-      pixDiscountPercent = 5; // Default for packages
+      pixDiscountPercent = 5;
     } else {
-      // translado - itemName format: "origin → destination"
       const parts = itemName.split(" → ");
-      if (parts.length !== 2) {
-        return new Response(
-          JSON.stringify({ error: "Formato de translado inválido" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
       const { data: route, error: routeErr } = await supabaseAdmin
         .from("transfer_routes")
         .select("price, partner_price, pix_discount")
-        .eq("origin", parts[0])
-        .eq("destination", parts[1])
+        .eq("origin", parts[0] || "")
+        .eq("destination", parts[1] || "")
         .eq("active", true)
         .maybeSingle();
 
       if (routeErr || !route) {
-        return new Response(
-          JSON.stringify({ error: "Translado não encontrado ou inativo" }),
-          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ error: "Translado não encontrado" }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
       publicUnitPrice = route.price;
       unitPrice = calculatePartnerPrice(route.price, route.partner_price, partnerData);
@@ -216,24 +161,19 @@ Deno.serve(async (req) => {
     const total = isPrivate ? unitPrice : unitPrice * guestsNum;
     const publicTotal = isPrivate ? publicUnitPrice : publicUnitPrice * guestsNum;
     
-    // Apply PIX discount server-side (only for PIX payments, capped 0-50%)
-    const validPixDiscount = Math.max(0, Math.min(50, pixDiscountPercent));
-    // Partners don't get PIX discount as they already have a net tariff
-    const discount = payMethod === "pix" && validPixDiscount > 0 && !partner_id
-      ? Math.round(total * validPixDiscount / 100)
+    const discount = payMethod === "pix" && pixDiscountPercent > 0 && !partner_id
+      ? Math.round(total * pixDiscountPercent / 100)
       : 0;
     const finalTotal = total - discount;
-    
     const pixCode = payMethod === "pix" ? generatePixCode() : null;
 
-    // Helper to create booking
-    const createBooking = async (customerId: string) => {
+    const createBookingRecord = async (customerId: string) => {
       const { data: booking, error: bookingErr } = await supabaseAdmin
         .from("bookings")
         .insert({
           customer_id: customerId,
           user_id: userId,
-          type,
+          type: type === "translado" ? "transfer" : type === "passeio" ? "tour" : type,
           item_name: itemName,
           date: date || null,
           guests: guestsNum,
@@ -255,91 +195,61 @@ Deno.serve(async (req) => {
         .select("*, customers!fk_bookings_customer(*)")
         .single();
 
-      if (bookingErr || !booking) {
+      if (bookingErr) {
         console.error("Error inserting booking:", bookingErr);
-        return null;
+        throw bookingErr;
       }
-      // ... keep existing code
-
-      if (companions && Array.isArray(companions) && companions.length > 0) {
-        const dependents = companions.map(c => ({
+      
+      if (companions?.length > 0) {
+        const deps = companions.map((c: any) => ({
           customer_id: customerId,
           name: c.name,
           cpf: c.cpf || null,
           birth_date: c.birthDate || null,
           relationship: c.relationship || 'Acompanhante'
         }));
-        await supabaseAdmin.from("dependents").insert(dependents);
+        await supabaseAdmin.from("dependents").insert(deps);
       }
       return booking;
     };
 
-    // Create customer atomically
-    const { data: customer, error: customerErr } = await supabaseAdmin
+    const trimmedEmail = String(customerEmail).trim().toLowerCase();
+    const { data: existingCustomer } = await supabaseAdmin
       .from("customers")
-      .insert({
-        name: trimmedName,
-        email: trimmedEmail,
-        phone: trimmedPhone,
-        cpf: cpf || null,
-        passport: passport || null,
-        country: country || "Brasil",
-        birth_date: birthDate || null,
-      })
-      .select()
-      .single();
+      .select("id")
+      .eq("email", trimmedEmail)
+      .maybeSingle();
 
-    if (customerErr || !customer) {
-      // If email already exists, try to find existing
-      if (customerErr?.code === "23505") {
-        const { data: existing } = await supabaseAdmin
-          .from("customers")
-          .select()
-          .eq("email", trimmedEmail)
-          .single();
-        if (!existing) {
-          return new Response(
-            JSON.stringify({ error: "Erro ao processar cliente" }),
-            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
+    let customerId = existingCustomer?.id;
 
-        const booking = await createBooking(existing.id);
-        if (!booking) {
-          return new Response(
-            JSON.stringify({ error: "Erro ao criar reserva" }),
-            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
+    if (!customerId) {
+      const { data: newCustomer, error: custErr } = await supabaseAdmin
+        .from("customers")
+        .insert({
+          name: String(customerName).trim(),
+          email: trimmedEmail,
+          phone: customerPhone ? String(customerPhone).trim() : null,
+          cpf: cpf || null,
+          passport: passport || null,
+          country: country || "Brasil",
+          birth_date: birthDate || null,
+        })
+        .select("id")
+        .single();
 
-        return new Response(JSON.stringify(booking), {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      return new Response(
-        JSON.stringify({ error: "Erro ao cadastrar cliente" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      if (custErr) throw custErr;
+      customerId = newCustomer.id;
     }
 
-    // Create booking with server-validated price and discount
-    const booking = await createBooking(customer.id);
-    if (!booking) {
-      return new Response(
-        JSON.stringify({ error: "Erro ao criar reserva" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
+    const booking = await createBookingRecord(customerId);
     return new Response(JSON.stringify(booking), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (err) {
+  } catch (err: any) {
+    console.error("Unhandled error:", err);
     return new Response(
-      JSON.stringify({ error: "Erro interno do servidor" }),
+      JSON.stringify({ error: err.message || "Erro interno" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
