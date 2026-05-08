@@ -327,123 +327,153 @@ const TermoAssinatura = () => {
       // 2. Generate PDF
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
       
-      // Header
-      doc.setFillColor(0, 102, 204);
-      doc.rect(0, 0, pageWidth, 40, 'F');
-      doc.setFontSize(22);
-      doc.setTextColor(255, 255, 255);
-      doc.text("Termo de Ciência de Risco", pageWidth / 2, 20, { align: "center" });
+      // Load Logo
+      if (company?.logo_url) {
+        try {
+          doc.addImage(company.logo_url, 'PNG', 14, 10, 40, 20);
+        } catch (e) {
+          console.error("Error adding logo to PDF:", e);
+        }
+      }
+      
+      // Header Info
       doc.setFontSize(10);
-      doc.text("Sistema de Gestão de Segurança (SGS) - ISO 21103", pageWidth / 2, 30, { align: "center" });
+      doc.setTextColor(100, 100, 100);
+      const companyName = company?.razao_social || company?.nome_fantasia || "LENÇÓIS TOUR";
+      const companyCNPJ = company?.cnpj || "";
+      const companyAddress = `${company?.endereco || ""}, ${company?.cidade || ""}-${company?.estado || ""}`;
       
+      doc.text(companyName, pageWidth - 14, 15, { align: "right" });
+      doc.text(`CNPJ: ${companyCNPJ}`, pageWidth - 14, 20, { align: "right" });
+      doc.text(companyAddress, pageWidth - 14, 25, { align: "right" });
+      
+      doc.setDrawColor(200, 200, 200);
+      doc.line(14, 32, pageWidth - 14, 32);
+      
+      // Title
+      doc.setFontSize(16);
       doc.setTextColor(0, 0, 0);
-      let currentY = 50;
+      doc.setFont("helvetica", "bold");
+      doc.text("Termo de Ciência de Risco e Corresponsabilidade", pageWidth / 2, 42, { align: "center" });
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
+      doc.text("Sistema de Gestão de Segurança (SGS) - ISO 21103", pageWidth / 2, 47, { align: "center" });
       
-      // Booking Info
-      doc.setFontSize(14);
-      doc.text("Informações da Reserva", 14, currentY);
-      currentY += 10;
+      let currentY = 55;
       
+      // Booking Info (Table)
       autoTable(doc, {
         startY: currentY,
         body: [
-          ["Código da Reserva", booking.booking_code],
-          ["Passeio / Atividade", booking.item_name],
-          ["Data da Atividade", new Date(booking.date + "T12:00").toLocaleDateString("pt-BR")],
-          ["Participante", booking.customers?.name || booking.customer_name],
-          ["Documento / CPF", booking.customers?.cpf || "Não informado"],
+          ["Cliente:", booking.customers?.name || booking.customer_name, "Reserva:", booking.booking_code],
+          ["Atividade:", booking.item_name, "Data:", new Date(booking.date + "T12:00").toLocaleDateString("pt-BR")],
+          ["Documento:", booking.customers?.cpf || "Não informado", "Cidade:", company?.cidade || "Santo Amaro - MA"],
         ],
-        theme: 'grid',
-        styles: { fontSize: 10, cellPadding: 3 },
-        columnStyles: { 0: { fontStyle: 'bold', cellWidth: 50 } }
+        theme: 'plain',
+        styles: { fontSize: 9, cellPadding: 1 },
+        columnStyles: { 
+          0: { fontStyle: 'bold', cellWidth: 20 },
+          1: { cellWidth: 70 },
+          2: { fontStyle: 'bold', cellWidth: 20 },
+          3: { cellWidth: 40 }
+        }
       });
       
-      currentY = (doc as any).lastAutoTable.finalY + 10;
+      currentY = (doc as any).lastAutoTable.finalY + 8;
       
-      // Recommendations
-      doc.setFontSize(11);
-      doc.text("Recomendações e Informações:", 14, currentY);
-      currentY += 5;
-      doc.setFontSize(8);
-      const recText = company?.term_recommendations || "Atividade não requer habilidade específica. Recomenda-se: saber nadar; trajes de banho e roupas confortáveis; levar toalha, casaco, chapéu, repelente e protetor solar; não usar acessórios; água e lanche. Não há sanitários no percurso.";
-      doc.text(doc.splitTextToSize(recText, pageWidth - 28), 14, currentY);
+      // Content Sections - Optimized for 1 page
+      const addSection = (title: string, content: string, fontSize = 8) => {
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "bold");
+        doc.text(title, 14, currentY);
+        currentY += 5;
+        doc.setFontSize(fontSize);
+        doc.setFont("helvetica", "normal");
+        const lines = doc.splitTextToSize(content, pageWidth - 28);
+        doc.text(lines, 14, currentY);
+        currentY += (lines.length * (fontSize / 2)) + 5;
+      };
+
+      const recText = company?.term_recommendations || "Atividade de turismo de aventura.";
+      addSection("Recomendações e Informações:", recText, 7.5);
       
       if (company?.term_safety_risks) {
-        currentY += (doc.splitTextToSize(recText, pageWidth - 28).length * 4) + 5;
-        doc.setFontSize(11);
-        doc.text("Riscos e Segurança:", 14, currentY);
-        currentY += 5;
-        doc.setFontSize(8);
-        doc.text(doc.splitTextToSize(company.term_safety_risks, pageWidth - 28), 14, currentY);
-        currentY += (doc.splitTextToSize(company.term_safety_risks, pageWidth - 28).length * 4) + 5;
-      } else {
-        currentY += 12;
+        addSection("Riscos e Segurança:", company.term_safety_risks, 7.5);
       }
 
-      // Risks section with high contrast
-      doc.setFontSize(14);
-      doc.setTextColor(0, 102, 204);
-      doc.text("Ciência de Riscos e Segurança", 14, currentY);
-      currentY += 5;
-      const risksRows = acceptedRisks.map(r => [`[X] ${r}`]);
+      // Risks Checklist (Compact)
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "bold");
+      doc.text("Ciência de Riscos:", 14, currentY);
+      currentY += 4;
+      doc.setFontSize(7.5);
+      doc.setFont("helvetica", "normal");
+      
+      const risksSplit = [];
+      for (let i = 0; i < acceptedRisks.length; i += 2) {
+        risksSplit.push([
+          `[X] ${acceptedRisks[i]}`,
+          acceptedRisks[i+1] ? `[X] ${acceptedRisks[i+1]}` : ""
+        ]);
+      }
+      
       autoTable(doc, {
         startY: currentY,
-        body: risksRows,
+        body: risksSplit,
         theme: 'plain',
-        styles: { fontSize: 9, cellPadding: 1, textColor: [51, 51, 51] }
+        styles: { fontSize: 7, cellPadding: 0.5 },
       });
       
-      currentY = (doc as any).lastAutoTable.finalY + 15;
-      
-      // Health
-      doc.setFontSize(14);
-      doc.text("Informações de Saúde", 14, currentY);
-      currentY += 7;
-      doc.setFontSize(10);
-      const healthText = healthInfo.length > 0 ? `Condições informadas: ${healthInfo.join(", ")}` : "Nenhuma condição de saúde informada pelo participante.";
-      doc.text(healthText, 14, currentY, { maxWidth: pageWidth - 28 });
-      
-      currentY += 15;
+      currentY = (doc as any).lastAutoTable.finalY + 8;
 
-      // Companions
-      if (companions.length > 0) {
-        doc.setFontSize(14);
-        doc.text("Autorização para Dependentes", 14, currentY);
-        currentY += 5;
-        const companionsRows = companions.map(c => [
-          c.full_name, 
-          c.is_adult ? "Adulto" : "Menor", 
-          c.is_adult ? (signatures[c.id] || c.signature_data ? "Assinado" : "Pendente") : `Resp: ${c.responsible_name || '-'}`
-        ]);
-        autoTable(doc, {
-          startY: currentY,
-          head: [['Nome', 'Tipo', 'Status / Resp.']],
-          body: companionsRows,
-          theme: 'grid',
-          styles: { fontSize: 9, cellPadding: 2 }
-        });
-        currentY = (doc as any).lastAutoTable.finalY + 15;
+      // Health Info
+      if (healthInfo.length > 0) {
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.text(`Saúde: ${healthInfo.join(", ")}`, 14, currentY);
+        currentY += 6;
       }
-      
-      currentY += 5;
-      
+
       // Declaration
-      doc.setFontSize(12);
-      doc.text("Declaração", 14, currentY);
-      currentY += 7;
+      const declaration = `Declaro que fui informado sobre os riscos inerentes à atividade e procedimentos de segurança. Comprometo-me a seguir as orientações da equipe e assumo a corresponsabilidade por meus atos. Esta operação segue a NBR ISO 21103.`;
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "italic");
+      const declLines = doc.splitTextToSize(declaration, pageWidth - 28);
+      doc.text(declLines, 14, currentY);
+      currentY += (declLines.length * 4) + 10;
+
+      // Signatures Area
+      const signatureY = currentY;
+      
+      // Main Participant
       doc.setFontSize(9);
-      const declaration = `Declaro que fui informado sobre os riscos inerentes à atividade, bem como sobre os procedimentos de segurança. Comprometo-me a seguir as orientações da equipe técnica e assumo a responsabilidade por meus atos durante a execução do passeio. Observação: Esta operação segue as normas da ABNT NBR ISO 21103 e demais legislações pertinentes ao turismo de aventura. É de responsabilidade do contratante comunicar aos demais participantes que virão em sua companhia, todas as informações contidas neste documento.`;
-      doc.text(doc.splitTextToSize(declaration, pageWidth - 28), 14, currentY);
-      
-      currentY += 25;
-      
-      // Signature
-      doc.text("Assinatura Digital do Participante:", 14, currentY);
-      doc.addImage(signatureData, 'PNG', 14, currentY + 5, 50, 20);
-      doc.line(14, currentY + 26, 80, currentY + 26);
-      doc.text(booking.customers?.name || booking.customer_name, 14, currentY + 31);
-      doc.text(`Assinado em: ${new Date().toLocaleString("pt-BR")}`, 14, currentY + 36);
+      doc.setFont("helvetica", "bold");
+      doc.text("Assinatura do Participante:", 14, signatureY);
+      doc.addImage(signatureData, 'PNG', 14, signatureY + 2, 40, 15);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.text(booking.customers?.name || booking.customer_name, 14, signatureY + 20);
+      doc.text(`${company?.cidade || "Santo Amaro"}, ${new Date().toLocaleDateString("pt-BR")}`, 14, signatureY + 24);
+
+      // Companions Signatures (if any)
+      const adultCompanions = companions.filter(c => c.is_adult);
+      if (adultCompanions.length > 0) {
+        let compX = 80;
+        adultCompanions.forEach((comp, idx) => {
+          const sig = signatures[comp.id] || comp.signature_data;
+          if (sig) {
+            if (compX + 50 > pageWidth) {
+              // No room on this row
+            }
+            doc.text(`Dependente: ${comp.full_name}`, compX, signatureY);
+            doc.addImage(sig, 'PNG', compX, signatureY + 2, 40, 15);
+            compX += 60;
+          }
+        });
+      }
+
 
       const pdfBlob = doc.output('blob');
       const fileName = `termo_${booking?.booking_code || 'manual'}_${Date.now()}.pdf`;
