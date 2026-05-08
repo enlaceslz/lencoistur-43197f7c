@@ -79,9 +79,17 @@ const TourDetail = () => {
   const privateOn = tour.mode_private_enabled ?? true;
   const showModeToggle = collectiveOn && privateOn;
   const isPrivate = tourMode === "privativo";
-  const unitPrice = partner
-    ? (isPrivate ? (tour.partner_private_price || tour.private_price || 110000) : (tour.partner_price || tour.price))
-    : (isPrivate ? (tour.private_price || 130000) : tour.price);
+  const basePublicPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
+  let unitPrice = basePublicPrice;
+  
+  if (partner) {
+    const specificPartnerPrice = isPrivate ? tour.partner_private_price : tour.partner_price;
+    if (specificPartnerPrice && specificPartnerPrice > 0) {
+      unitPrice = specificPartnerPrice;
+    } else if (partner.commission_rate > 0) {
+      unitPrice = Math.round(basePublicPrice * (1 - partner.commission_rate / 100));
+    }
+  }
   const totalPrice = isPrivate ? unitPrice : unitPrice * guests;
   const maxGuests = vehicleCapacity;
 

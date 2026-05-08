@@ -271,8 +271,9 @@ const AdminPacotes = () => {
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] text-muted-foreground uppercase font-black leading-none mb-1">Preço Especial</p>
+                  <p className="text-[10px] text-muted-foreground uppercase font-black leading-none mb-1">Preço Site</p>
                   <p className="text-lg font-black text-primary">{fmt(pkg.discount_price)}</p>
+                  <p className="text-[9px] text-primary/60 font-black mt-1">Parceiro: {pkg.partner_price ? fmt(pkg.partner_price) : "Padrão"}</p>
                 </div>
               </div>
               

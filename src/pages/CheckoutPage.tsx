@@ -77,13 +77,32 @@ const CheckoutPage = () => {
   
   let unitPrice = 0;
   if (tour) {
+    const basePublicPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
     if (partner) {
-      unitPrice = isPrivate ? (tour.partner_private_price || tour.private_price || 110000) : (tour.partner_price || tour.price);
+      const specificPartnerPrice = isPrivate ? tour.partner_private_price : tour.partner_price;
+      if (specificPartnerPrice && specificPartnerPrice > 0) {
+        unitPrice = specificPartnerPrice;
+      } else if (partner.commission_rate > 0) {
+        unitPrice = Math.round(basePublicPrice * (1 - partner.commission_rate / 100));
+      } else {
+        unitPrice = basePublicPrice;
+      }
     } else {
-      unitPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
+      unitPrice = basePublicPrice;
     }
   } else if (pkg) {
-    unitPrice = partner ? (pkg.partner_price || pkg.price) : pkg.price;
+    const basePublicPrice = pkg.price;
+    if (partner) {
+      if (pkg.partner_price && pkg.partner_price > 0) {
+        unitPrice = pkg.partner_price;
+      } else if (partner.commission_rate > 0) {
+        unitPrice = Math.round(basePublicPrice * (1 - partner.commission_rate / 100));
+      } else {
+        unitPrice = basePublicPrice;
+      }
+    } else {
+      unitPrice = basePublicPrice;
+    }
   } else if (transfer) {
     unitPrice = transfer.price || 0;
   }

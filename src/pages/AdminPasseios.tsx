@@ -12,7 +12,7 @@ import {
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import {
   Search, Plus, Pencil, Trash2, Eye, EyeOff, Compass, Users, Clock, Star, X, Upload, Link as LinkIcon, Image as ImageIcon, GripVertical, Percent, MapPin, CheckCircle, Sparkles, Copy, Shield, Loader2,
-  Save, XCircle
+  Save, XCircle, Building2
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -678,7 +678,8 @@ const AdminPasseios = () => {
             <TableRow className="hover:bg-transparent">
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest pl-6">Passeio / Localização</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Categoria</TableHead>
-              <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Preços & Modalidades</TableHead>
+              <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Preço Site</TableHead>
+              <TableHead className="font-bold text-primary/60 uppercase text-[10px] tracking-widest">Preço Parceiro</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Segurança & Avaliação</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest text-center">Status</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest text-right pr-6">Ações</TableHead>
@@ -686,10 +687,10 @@ const AdminPasseios = () => {
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow><TableCell colSpan={6} className="text-center py-20"><Loader2 className="animate-spin text-primary mx-auto" size={32} /></TableCell></TableRow>
+              <TableRow><TableCell colSpan={7} className="text-center py-20"><Loader2 className="animate-spin text-primary mx-auto" size={32} /></TableCell></TableRow>
             ) : filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="py-20 text-center text-muted-foreground">
+                <TableCell colSpan={7} className="py-20 text-center text-muted-foreground">
                   <div className="flex flex-col items-center gap-2 opacity-50">
                     <Compass size={40} />
                     <p className="font-bold">Nenhum passeio encontrado</p>
@@ -749,6 +750,25 @@ const AdminPasseios = () => {
                             <span className="text-xs font-bold text-primary">{fmt(t.private_price || 130000)}</span>
                             <span className="text-[9px] font-bold text-primary/60 uppercase bg-primary/5 px-1.5 rounded">Privativo</span>
                           </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1.5">
+                        {t.mode_collective_enabled && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-black text-primary/80">{t.partner_price ? fmt(t.partner_price) : "--"}</span>
+                            <span className="text-[9px] font-bold text-primary/40 uppercase bg-primary/5 px-1.5 rounded">Coletivo</span>
+                          </div>
+                        )}
+                        {t.mode_private_enabled && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-primary/80">{t.partner_private_price ? fmt(t.partner_private_price) : "--"}</span>
+                            <span className="text-[9px] font-bold text-primary/40 uppercase bg-primary/5 px-1.5 rounded">Privativo</span>
+                          </div>
+                        )}
+                        {!t.partner_price && !t.partner_private_price && (
+                          <span className="text-[9px] font-bold text-muted-foreground italic tracking-tight block">Comissão padrão</span>
                         )}
                       </div>
                     </TableCell>
@@ -879,8 +899,20 @@ const AdminPasseios = () => {
                 </div>
                 <div className="bg-muted rounded-xl p-3 flex flex-col justify-center">
                   <p className="text-xs text-muted-foreground flex items-center gap-1"><Shield size={12} className="text-secondary" /> Privativo</p>
-                  <p className="text-sm font-bold text-secondary mt-1">{fmt(detailTour.private_price || 1300)}</p>
+                  <p className="text-sm font-bold text-secondary mt-1">{fmt(detailTour.private_price || 130000)}</p>
                 </div>
+                {detailTour.partner_price && (
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex flex-col justify-center">
+                    <p className="text-xs text-primary/60 flex items-center gap-1"><Building2 size={12} /> Parceiro Col.</p>
+                    <p className="text-sm font-bold text-primary mt-1">{fmt(detailTour.partner_price)}</p>
+                  </div>
+                )}
+                {detailTour.partner_private_price && (
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex flex-col justify-center">
+                    <p className="text-xs text-primary/60 flex items-center gap-1"><Building2 size={12} /> Parceiro Priv.</p>
+                    <p className="text-sm font-bold text-primary mt-1">{fmt(detailTour.partner_private_price)}</p>
+                  </div>
+                )}
                 <div className="bg-muted rounded-xl p-3">
                   <p className="text-xs text-muted-foreground flex items-center gap-1"><Star size={12} /> Avaliação</p>
                   <p className="text-sm font-semibold text-foreground mt-1">{Number(detailTour.rating || 0).toFixed(1)} ({detailTour.reviews_count || 0})</p>
