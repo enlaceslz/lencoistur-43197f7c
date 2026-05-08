@@ -40,6 +40,8 @@ const localImageMap: Record<string, string> = {
 
 const ToursSection = () => {
   const { t } = useTranslation();
+  const [params] = useSearchParams();
+  const partnerId = params.get("partner_id") || params.get("partner");
   const [tours, setTours] = useState<any[]>([]);
 
   useEffect(() => {
