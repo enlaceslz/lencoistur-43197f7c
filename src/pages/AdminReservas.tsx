@@ -1009,7 +1009,7 @@ const AdminReservas = () => {
                         size="sm" 
                         className="bg-white border-amber-200 text-amber-700 hover:bg-amber-50 h-9"
                         onClick={() => {
-                          const link = `${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode)}`;
+                          const link = `${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`;
                           navigator.clipboard.writeText(link);
                           toast.success("Link do termo copiado!");
                         }}
