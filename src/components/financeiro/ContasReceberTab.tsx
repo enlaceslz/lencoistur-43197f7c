@@ -51,21 +51,25 @@ interface Conta {
   recebido_em: string | null;
   booking_id: string | null;
   anexo_url: string | null;
+  partner_id?: string | null;
+  partners?: { name: string } | null;
 }
 
 interface CustomerOption { id: string; name: string; email: string; }
 interface BookingOption { id: string; booking_code: string; item_name: string; final_total: number; customer_name: string; }
+interface PartnerOption { id: string; name: string; }
 
 const emptyForm = { 
   descricao: "", 
   valor: 0, 
-  vencimento: "", 
+  vencimento: new Date().toISOString().slice(0, 10), 
   categoria: "reserva", 
   cliente: "", 
   observacoes: "", 
   status: "pendente", 
   booking_id: "", 
   customer_id: "",
+  partner_id: "",
   anexo_url: ""
 };
 
@@ -79,23 +83,26 @@ export default function ContasReceberTab({ company }: { company?: any }) {
   const [uploading, setUploading] = useState(false);
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [bookings, setBookings] = useState<BookingOption[]>([]);
+  const [partners, setPartners] = useState<PartnerOption[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("todos");
   const [categoryFilter, setCategoryFilter] = useState<string>("todos");
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("contas_receber").select("*").order("vencimento", { ascending: true });
+    const { data } = await supabase.from("contas_receber").select("*, partners(name)").order("vencimento", { ascending: true });
     if (data) setContas(data as any);
     setLoading(false);
   };
 
   const loadRelations = async () => {
-    const [{ data: cust }, { data: bk }] = await Promise.all([
+    const [{ data: cust }, { data: bk }, { data: part }] = await Promise.all([
       supabase.from("customers").select("id, name, email").order("name"),
       supabase.from("bookings").select("id, booking_code, item_name, final_total, customers(name)").order("created_at", { ascending: false }),
+      supabase.from("partners").select("id, name").order("name"),
     ]);
     if (cust) setCustomers(cust);
+    if (part) setPartners(part);
     if (bk) setBookings(bk.map((b: any) => ({
       id: b.id,
       booking_code: b.booking_code,
@@ -122,6 +129,7 @@ export default function ContasReceberTab({ company }: { company?: any }) {
       status: c.status,
       booking_id: c.booking_id || "",
       customer_id: "",
+      partner_id: c.partner_id || "",
       anexo_url: c.anexo_url || "",
     });
     setOpen(true);
@@ -196,6 +204,7 @@ export default function ContasReceberTab({ company }: { company?: any }) {
       status: form.status,
       recebido_em: form.status === "recebido" ? new Date().toISOString().slice(0, 10) : null,
       booking_id: form.booking_id || null,
+      partner_id: form.partner_id || null,
       anexo_url: form.anexo_url || null,
     };
     if (editing) {
@@ -387,6 +396,12 @@ export default function ContasReceberTab({ company }: { company?: any }) {
                                 <User size={10} className="text-primary/60" />
                                 {c.cliente || "Consumidor Final"}
                               </span>
+                              {c.partners?.name && (
+                                <span className="text-[10px] text-emerald-600 font-black uppercase tracking-widest flex items-center gap-1 mt-1">
+                                  <Link2 size={10} />
+                                  Parceiro: {c.partners.name}
+                                </span>
+                              )}
                             </div>
                           </td>
                           <td className="px-6 py-4">
@@ -555,6 +570,21 @@ export default function ContasReceberTab({ company }: { company?: any }) {
                     <Input value={form.cliente} onChange={e => setForm({ ...form, cliente: e.target.value })} placeholder="Nome manual..." className="h-10 rounded-xl" />
                   )}
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Parceiro / Canal de Venda</Label>
+                <Select value={form.partner_id} onValueChange={v => setForm({ ...form, partner_id: v })}>
+                  <SelectTrigger className="h-12 rounded-xl font-bold bg-white">
+                    <SelectValue placeholder="Vincular parceiro..." />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    <SelectItem value="none" className="font-bold text-muted-foreground italic">— Nenhum parceiro —</SelectItem>
+                    {partners.map(p => (
+                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">

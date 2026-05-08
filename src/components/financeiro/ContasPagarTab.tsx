@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Loader2, Pencil, Trash2, Calendar, Tag, User, AlertCircle, CheckCircle2, Printer, Search, FileText, Upload, X, ExternalLink, DollarSign, Save, XCircle } from "lucide-react";
+import { Plus, Loader2, Pencil, Trash2, Calendar, Tag, User, AlertCircle, CheckCircle2, Printer, Search, FileText, Upload, X, ExternalLink, DollarSign, Save, XCircle, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { formatCurrency, cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -50,20 +50,26 @@ interface Conta {
   observacoes: string | null;
   pago_em: string | null;
   booking_id: string | null;
+  collaborator_id?: string | null;
+  partner_id?: string | null;
   anexo_url: string | null;
   bookings?: {
     booking_code: string;
   } | null;
+  collaborators?: { name: string } | null;
+  partners?: { name: string } | null;
 }
 
 const emptyForm = { 
   descricao: "", 
   valor: 0, 
-  vencimento: "", 
+  vencimento: new Date().toISOString().slice(0, 10), 
   categoria: "operacional", 
   fornecedor: "", 
   observacoes: "", 
   status: "pendente",
+  collaborator_id: "",
+  partner_id: "",
   anexo_url: "" 
 };
 
@@ -81,7 +87,7 @@ export default function ContasPagarTab({ company }: { company?: any }) {
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("contas_pagar").select("*, bookings(booking_code)").order("vencimento", { ascending: true });
+    const { data } = await supabase.from("contas_pagar").select("*, bookings(booking_code), collaborators(name), partners(name)").order("vencimento", { ascending: true });
     if (data) setContas(data as any);
     setLoading(false);
   };
@@ -101,6 +107,8 @@ export default function ContasPagarTab({ company }: { company?: any }) {
       fornecedor: c.fornecedor || "", 
       observacoes: c.observacoes || "", 
       status: c.status,
+      collaborator_id: c.collaborator_id || "",
+      partner_id: c.partner_id || "",
       anexo_url: c.anexo_url || "" 
     });
     setOpen(true);
@@ -146,6 +154,8 @@ export default function ContasPagarTab({ company }: { company?: any }) {
       fornecedor: form.fornecedor || null,
       observacoes: form.observacoes || null,
       status: form.status,
+      collaborator_id: form.collaborator_id || null,
+      partner_id: form.partner_id || null,
       pago_em: form.status === "pago" ? new Date().toISOString().slice(0, 10) : null,
       anexo_url: form.anexo_url || null,
     };
@@ -338,6 +348,18 @@ export default function ContasPagarTab({ company }: { company?: any }) {
                                 {c.bookings?.booking_code && (
                                   <Badge variant="secondary" className="text-[9px] h-4 px-1.5 font-mono font-bold bg-primary/5 text-primary border-primary/10">
                                     {c.bookings.booking_code}
+                                  </Badge>
+                                )}
+                                {c.collaborators?.name && (
+                                  <Badge variant="outline" className="text-[9px] h-4 px-1.5 font-bold bg-blue-50 text-blue-600 border-blue-100 uppercase tracking-widest">
+                                    <User size={8} className="mr-1" />
+                                    {c.collaborators.name}
+                                  </Badge>
+                                )}
+                                {c.partners?.name && (
+                                  <Badge variant="outline" className="text-[9px] h-4 px-1.5 font-bold bg-emerald-50 text-emerald-600 border-emerald-100 uppercase tracking-widest">
+                                    <Link2 size={8} className="mr-1" />
+                                    {c.partners.name}
                                   </Badge>
                                 )}
                               </div>

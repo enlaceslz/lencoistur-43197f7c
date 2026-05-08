@@ -102,6 +102,14 @@ const AdminFinanceiro = () => {
     [contasPagar, selectedMonth, selectedYear]
   );
 
+  const monthContasReceber = useMemo(
+    () => contasReceber.filter(c => {
+      const d = new Date(c.vencimento + "T12:00:00");
+      return d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
+    }),
+    [contasReceber, selectedMonth, selectedYear]
+  );
+
   const filteredTransactions = useMemo(() => {
     const all = [
       ...monthBookings.map(b => ({
@@ -110,6 +118,14 @@ const AdminFinanceiro = () => {
         method: (b.pay_method || "N/A").toUpperCase(),
         value: b.final_total,
         status: b.payment_status === "pago" ? "PAGO" : "PENDENTE",
+        type: 'entrada' as const
+      })),
+      ...monthContasReceber.map(c => ({
+        date: c.vencimento,
+        desc: `[RECEBER] ${c.descricao} - ${c.cliente || "N/A"}`,
+        method: "RECEBÍVEL",
+        value: c.valor,
+        status: c.status === "recebido" ? "PAGO" : "PENDENTE",
         type: 'entrada' as const
       })),
       ...monthContasPagar.map(c => ({
@@ -136,7 +152,8 @@ const AdminFinanceiro = () => {
     }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }, [monthBookings, monthContasPagar, searchTerm, statusFilter, typeFilter]);
 
-  const receitaPaga = monthBookings.filter(b => b.payment_status === "pago").reduce((s, b) => s + b.final_total, 0);
+  const receitaPaga = monthBookings.filter(b => b.payment_status === "pago").reduce((s, b) => s + b.final_total, 0) + 
+                     monthContasReceber.filter(c => c.status === "recebido").reduce((s, c) => s + c.valor, 0);
   const despesasMes = monthContasPagar.filter(c => c.status === "pago").reduce((s, c) => s + c.valor, 0);
   const lucroMes = receitaPaga - despesasMes;
   const pagos = monthBookings.filter(b => b.payment_status === "pago");
