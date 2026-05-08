@@ -198,6 +198,15 @@ const AdminReservas = () => {
     return basePrice;
   };
 
+  const publicUnitPrice = newForm.type === "tour" 
+    ? (newForm.tourMode === "privativo" 
+        ? (selectedTour?.private_price || 0)
+        : (selectedTour?.price || 0)
+      )
+    : newForm.type === "package"
+      ? (selectedPackage?.discount_price || selectedPackage?.original_price || 0)
+      : (selectedTransfer?.price || 0);
+
   const unitPrice = newForm.type === "tour" 
     ? (newForm.tourMode === "privativo" 
         ? calculatePartnerPrice(selectedTour?.private_price || 0, selectedTour?.partner_private_price)
@@ -208,6 +217,8 @@ const AdminReservas = () => {
       : calculatePartnerPrice(selectedTransfer?.price || 0, selectedTransfer?.partner_price);
 
   const total = (newForm.type === "tour" && newForm.tourMode === "privativo") ? unitPrice : unitPrice * newForm.guests;
+  const publicTotal = (newForm.type === "tour" && newForm.tourMode === "privativo") ? publicUnitPrice : publicUnitPrice * newForm.guests;
+  
   const pixDiscountPercent = (selectedTour?.pix_discount || selectedTransfer?.pix_discount || 0);
   const discount = (newForm.payMethod === "pix" && pixDiscountPercent > 0 && !newForm.partnerId) 
     ? Math.round(total * pixDiscountPercent / 100) 
