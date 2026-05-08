@@ -19,7 +19,7 @@ import {
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
   Plus, Copy, Pencil, Car, Compass, LayoutGrid, List, X, XCircle as XCircleIcon,
   ChevronRight, ArrowRight, User, Hash, Info, Moon, Save, Package as PackageIcon,
-  Shield
+  Shield, ExternalLink
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -717,9 +717,9 @@ const AdminReservas = () => {
                 ) : (
                   <p className="text-sm text-muted-foreground">{selected.notes || "Nenhuma observação."}</p>
                 )}
-                {/* Links */}
-                {(selected.invoiceUrl || selected.voucherUrl) && (
-                  <div className="flex gap-2 w-full mt-4">
+                {/* Links e Termo de Risco */}
+                <div className="flex flex-col gap-3 mt-4">
+                  <div className="flex gap-2 w-full">
                     {selected.invoiceUrl && (
                       <Button variant="outline" size="sm" className="flex-1" asChild>
                         <a href={selected.invoiceUrl} target="_blank" rel="noopener noreferrer">
@@ -734,13 +734,44 @@ const AdminReservas = () => {
                         </a>
                       </Button>
                     )}
-                    <Button variant="outline" size="sm" className="flex-1 bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100" asChild>
-                      <a href={`/assinatura-termo?booking=${selected.bookingCode}`} target="_blank" rel="noopener noreferrer">
-                        <Shield size={14} className="mr-1" /> Termo de Risco
-                      </a>
-                    </Button>
                   </div>
-                )}
+                  
+                  <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-amber-700">
+                        <Shield size={16} />
+                        <span className="text-sm font-bold uppercase tracking-tight">Termo de Risco</span>
+                      </div>
+                      <Badge variant="outline" className="bg-white/50 text-amber-600 border-amber-200 text-[10px]">
+                        SGS ISO 21103
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="bg-white border-amber-200 text-amber-700 hover:bg-amber-50 h-9"
+                        onClick={() => {
+                          const link = `${window.location.origin}/assinatura-termo?booking=${selected.bookingCode}`;
+                          navigator.clipboard.writeText(link);
+                          toast.success("Link do termo copiado!");
+                        }}
+                      >
+                        <Copy size={14} className="mr-2" /> Copiar Link
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="bg-amber-600 text-white border-transparent hover:bg-amber-700 h-9"
+                        asChild
+                      >
+                        <a href={`/assinatura-termo?booking=${selected.bookingCode}`} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink size={14} className="mr-2" /> Abrir Termo
+                        </a>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Status badges */}
@@ -823,26 +854,6 @@ const AdminReservas = () => {
                     </Button>
                   </a>
                 )}
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => {
-                    const link = `${window.location.origin}/assinatura-termo?booking=${selected.bookingCode}`;
-                    navigator.clipboard.writeText(link);
-                    toast.success("Link do termo copiado!");
-                  }}
-                  className="text-amber-600 border-amber-200"
-                >
-                  <Copy size={14} className="mr-1" /> Copiar Link Termo
-                </Button>
-                <Link 
-                  to={`/assinatura-termo?booking=${selected.bookingCode}`}
-                  className="inline-flex"
-                >
-                  <Button variant="outline" size="sm" className="text-amber-600 border-amber-200">
-                    <Shield size={14} className="mr-1" /> Assinar Agora
-                  </Button>
-                </Link>
               </div>
               </div>
             )}
