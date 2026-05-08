@@ -45,7 +45,7 @@ const getTourImage = (tour: any) => {
 
 const ToursPage = () => {
   const [params] = useSearchParams();
-  const partnerId = params.get("partner_id");
+  const partnerId = params.get("partner_id") || params.get("partner");
   const [tours, setTours] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");

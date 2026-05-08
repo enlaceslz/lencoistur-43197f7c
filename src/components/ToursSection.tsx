@@ -1,5 +1,5 @@
 import { Star, Clock, MapPin } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -69,7 +69,7 @@ const ToursSection = () => {
           {tours.map((tour) => {
             const image = getTourImage(tour);
             return (
-              <Link to={`/passeios/${tour.slug}`} key={tour.id}
+              <Link to={`/passeios/${tour.slug}${partnerId ? `?partner_id=${partnerId}` : ''}`} key={tour.id}
                 className="group bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
                 <div className="relative h-64 overflow-hidden">
                   {image ? (
