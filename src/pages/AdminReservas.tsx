@@ -1037,9 +1037,9 @@ const AdminReservas = () => {
                       >
                         <option value="">Selecione um item...</option>
                         {newForm.type === "tour"
-                          ? tours.map(t => <option key={t.id} value={t.name}>{t.name} — {fmt(newForm.tourMode === "privativo" ? (newForm.partnerId ? t.partner_private_price || t.private_price : t.private_price) : (newForm.partnerId ? t.partner_price || t.price : t.price))}</option>)
+                          ? tours.map(t => <option key={t.id} value={t.name}>{t.name} — {fmt(newForm.tourMode === "privativo" ? t.private_price : t.price)}</option>)
                           : newForm.type === "package"
-                            ? packages.map(p => <option key={p.id} value={p.name}>{p.name} — {fmt(newForm.partnerId ? p.partner_price || p.discount_price : p.discount_price)}</option>)
+                            ? packages.map(p => <option key={p.id} value={p.name}>{p.name} — {fmt(p.discount_price || p.original_price)}</option>)
                             : transfers.map(t => <option key={t.id} value={t.label}>{t.label} — {fmt(t.price)}</option>)
                         }
                       </select>
