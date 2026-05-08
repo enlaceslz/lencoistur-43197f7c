@@ -264,6 +264,12 @@ const MinhasReservas = () => {
                           <p>Cancelar reserva confirmada</p>
                         </TooltipContent>
                       </Tooltip>
+                      <Link
+                        to={`/assinatura-termo?booking=${b.bookingCode}`}
+                        className="text-primary text-sm font-semibold hover:underline flex items-center gap-1"
+                      >
+                        <Shield size={14} /> Assinar Termo de Risco
+                      </Link>
                     </div>
                   )}
 
