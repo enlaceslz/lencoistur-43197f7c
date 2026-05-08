@@ -798,99 +798,126 @@ const AdminReservas = () => {
 
           <div className="p-4 md:p-8 space-y-6 md:space-y-8 overflow-y-auto flex-1 custom-scrollbar">
             {selected && (
-              <div className="space-y-4">
-              {/* Customer */}
-              <div className="bg-muted rounded-xl p-4 space-y-2">
-                <h4 className="font-semibold text-sm text-foreground">Cliente</h4>
-                <div className="grid grid-cols-1 gap-1.5 text-sm">
-                  <span className="flex items-center gap-2 text-muted-foreground">
-                    <Users size={14} /> {selected.customerName}
-                  </span>
-                  <span className="flex items-center gap-2 text-muted-foreground">
-                    <Mail size={14} /> {selected.customerEmail}
-                  </span>
-                  {selected.customerPhone && (
-                    <span className="flex items-center gap-2 text-muted-foreground">
-                      <Phone size={14} /> {selected.customerPhone}
-                    </span>
-                  )}
-                  {selected.cpf && (
-                    <span className="flex items-center gap-2 text-muted-foreground text-xs">
-                      <FileText size={12} /> CPF: {maskCPF(selected.cpf)}
-                    </span>
-                  )}
-                  {selected.passport && (
-                    <span className="flex items-center gap-2 text-muted-foreground text-xs">
-                      <FileText size={12} /> Passaporte: {selected.passport}
-                    </span>
-                  )}
-                </div>
-                {selected.collaboratorName && (
-                  <div className="mt-2 pt-2 border-t border-border/50">
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Colaborador / Vendedor</p>
-                    <p className="text-sm font-medium text-blue-600">{selected.collaboratorName}</p>
+              <div className="space-y-4 md:space-y-6 overflow-y-auto max-h-[calc(100vh-250px)] custom-scrollbar pr-1">
+                {/* Customer */}
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm space-y-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <User size={16} className="text-primary" />
+                    <h4 className="font-black text-[10px] md:text-xs text-slate-400 uppercase tracking-widest leading-none">Dados do Cliente</h4>
                   </div>
-                )}
-              </div>
-
-              {/* Booking details */}
-              <div className="bg-muted rounded-xl p-4 space-y-2">
-                <h4 className="font-semibold text-sm text-foreground">Detalhes</h4>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <span className="flex items-center gap-2 text-muted-foreground">
-                    <MapPin size={14} className="shrink-0" /> <span className="break-words">{selected.itemName}</span>
-                  </span>
-                  <span className="flex items-center gap-2 text-muted-foreground">
-                    <Calendar size={14} /> {fmtDate(selected.date)}
-                  </span>
-                  <span className="flex items-center gap-2 text-muted-foreground">
-                    <Users size={14} /> {selected.guests} pessoa(s)
-                  </span>
-                  <span className="flex items-center gap-2 text-muted-foreground">
-                    <CreditCard size={14} /> {selected.payMethod === "pix" ? "PIX" : selected.payMethod === "card" ? "Cartão" : selected.payMethod}
-                  </span>
+                  <div className="grid grid-cols-1 gap-2.5">
+                    <span className="text-base font-bold text-slate-800 dark:text-slate-100">
+                      {selected.customerName}
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                      <span className="flex items-center gap-2 text-slate-500 dark:text-slate-400 truncate">
+                        <Mail size={14} className="shrink-0" /> {selected.customerEmail}
+                      </span>
+                      {selected.customerPhone && (
+                        <span className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                          <Phone size={14} className="shrink-0" /> {selected.customerPhone}
+                        </span>
+                      )}
+                    </div>
+                    {(selected.cpf || selected.passport) && (
+                      <div className="flex flex-wrap gap-4 pt-1">
+                        {selected.cpf && (
+                          <span className="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider">
+                            <FileText size={12} /> CPF: {maskCPF(selected.cpf)}
+                          </span>
+                        )}
+                        {selected.passport && (
+                          <span className="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider">
+                            <FileText size={12} /> Passaporte: {selected.passport}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {selected.collaboratorName && (
+                    <div className="mt-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Colaborador / Vendedor</p>
+                      <Badge variant="secondary" className="bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 border-none font-bold">
+                        {selected.collaboratorName}
+                      </Badge>
+                    </div>
+                  )}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Criado em: {fmtDateTime(selected.createdAt)}
-                </p>
-              </div>
 
-              {/* Financials */}
-              <div className="bg-muted rounded-xl p-4">
-                <h4 className="font-semibold text-sm text-foreground mb-2">Financeiro</h4>
-                
-                {selected.publicTotal && selected.publicTotal !== selected.finalTotal ? (
-                  <div className="space-y-1 mb-2">
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>Valor de Venda (Cliente)</span>
-                      <span className="line-through opacity-50">{fmt(selected.publicTotal)}</span>
+                {/* Booking details */}
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Compass size={16} className="text-primary" />
+                    <h4 className="font-black text-[10px] md:text-xs text-slate-400 uppercase tracking-widest leading-none">Detalhes do Serviço</h4>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Serviço</p>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                        <MapPin size={14} className="shrink-0 text-primary/60" /> {selected.itemName}
+                      </span>
                     </div>
-                    <div className="flex justify-between text-xs text-blue-600 font-bold">
-                      <span>Tarifa NET (Parceiro)</span>
-                      <span>{fmt(selected.finalTotal)}</span>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Data</p>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                        <Calendar size={14} className="shrink-0 text-primary/60" /> {fmtDate(selected.date)}
+                      </span>
                     </div>
-                    <div className="flex justify-between text-xs font-bold text-blue-600 border-b border-border/50 pb-2">
-                      <span>Valor Líquido (A Receber)</span>
-                      <span>{fmt(selected.finalTotal)}</span>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Passageiros</p>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                        <Users size={14} className="shrink-0 text-primary/60" /> {selected.guests} pessoa(s)
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Pagamento</p>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                        <CreditCard size={14} className="shrink-0 text-primary/60" /> {selected.payMethod === "pix" ? "PIX" : selected.payMethod === "card" ? "Cartão" : selected.payMethod}
+                      </span>
                     </div>
                   </div>
-                ) : null}
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest pt-2 border-t border-slate-50 dark:border-slate-800">
+                    Criado em: {fmtDateTime(selected.createdAt)}
+                  </p>
+                </div>
 
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Subtotal ({selected.guests}x {fmt(selected.unitPrice)})</span>
-                  <span>{fmt(selected.total)}</span>
-                </div>
-                {selected.discount > 0 && (
-                  <div className="flex justify-between text-sm text-green-600">
-                    <span>Desconto PIX</span>
-                    <span>-{fmt(selected.discount)}</span>
+                {/* Financials */}
+                <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm">
+                  <div className="flex items-center gap-2 mb-4">
+                    <DollarSign size={16} className="text-emerald-500" />
+                    <h4 className="font-black text-[10px] md:text-xs text-slate-400 uppercase tracking-widest leading-none">Resumo Financeiro</h4>
                   </div>
-                )}
-                <div className="flex justify-between font-bold text-foreground border-t border-border mt-2 pt-2">
-                  <span>Total Final</span>
-                  <span>{fmt(selected.finalTotal)}</span>
+                  
+                  {selected.publicTotal && selected.publicTotal !== selected.finalTotal ? (
+                    <div className="space-y-2 mb-4 p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+                      <div className="flex justify-between text-xs text-slate-400">
+                        <span className="font-bold uppercase tracking-widest">Preço Balcão (Cliente)</span>
+                        <span className="line-through opacity-50">{fmt(selected.publicTotal)}</span>
+                      </div>
+                      <div className="flex justify-between text-xs text-blue-600 dark:text-blue-400 font-black">
+                        <span className="uppercase tracking-widest">Tarifa NET (Parceiro)</span>
+                        <span>{fmt(selected.finalTotal)}</span>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm text-slate-500 dark:text-slate-400">
+                      <span className="font-medium">Subtotal ({selected.guests}x {fmt(selected.unitPrice)})</span>
+                      <span>{fmt(selected.total)}</span>
+                    </div>
+                    {selected.discount > 0 && (
+                      <div className="flex justify-between text-sm text-emerald-600 dark:text-emerald-400 font-bold">
+                        <span>Desconto Aplicado</span>
+                        <span>-{fmt(selected.discount)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-center font-black text-slate-900 dark:text-slate-100 border-t border-slate-200 dark:border-slate-800 mt-3 pt-3">
+                      <span className="text-base uppercase tracking-tighter">Total Final</span>
+                      <span className="text-xl text-primary">{fmt(selected.finalTotal)}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
 
               {/* Notes */}
               <div className="bg-muted rounded-xl p-4">
@@ -1082,7 +1109,7 @@ const AdminReservas = () => {
 
       {/* New Booking Dialog */}
       <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
-        <DialogContent className="max-w-[100vw] w-full h-[100dvh] sm:max-w-4xl sm:w-[95vw] sm:h-[95vh] overflow-y-auto p-0 border-none shadow-3xl sm:rounded-[2.5rem] overflow-hidden bg-slate-50 flex flex-col focus-visible:outline-none">
+        <DialogContent className="max-w-[100vw] w-full h-[100dvh] sm:max-w-4xl sm:w-[95vw] sm:h-[95vh] overflow-hidden p-0 border-none shadow-3xl sm:rounded-[2.5rem] bg-slate-50 flex flex-col focus-visible:outline-none">
           <div className="bg-white border-b border-slate-100 p-4 md:p-8 flex items-center justify-between sticky top-0 z-20 shrink-0">
             <div className="flex items-center gap-3 md:gap-5">
               <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-[1.5rem] bg-primary/10 flex items-center justify-center text-primary shadow-inner">
@@ -1100,7 +1127,7 @@ const AdminReservas = () => {
             </Button>
           </div>
 
-          <form onSubmit={handleNewBooking} className="flex flex-col flex-1 min-h-0">
+          <form onSubmit={handleNewBooking} className="flex flex-col flex-1 min-h-0 overflow-hidden">
             <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10 overflow-y-auto flex-1 custom-scrollbar">
 
               {/* Coluna 1: Dados do Serviço */}
