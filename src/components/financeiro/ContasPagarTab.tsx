@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Loader2, Pencil, Trash2, Calendar, Tag, User, AlertCircle, CheckCircle2, Printer, Search, FileText, Upload, X, ExternalLink, DollarSign, Save, XCircle } from "lucide-react";
+import { Plus, Loader2, Pencil, Trash2, Calendar, Tag, User, AlertCircle, CheckCircle2, Printer, Search, FileText, Upload, X, ExternalLink, DollarSign, Save, XCircle, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { formatCurrency, cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
