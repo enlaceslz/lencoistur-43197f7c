@@ -204,7 +204,7 @@ const AdminReservas = () => {
         : calculatePartnerPrice(selectedTour?.price || 0, selectedTour?.partner_price)
       )
     : newForm.type === "package"
-      ? calculatePartnerPrice(selectedPackage?.discount_price || 0, selectedPackage?.partner_price)
+      ? calculatePartnerPrice(selectedPackage?.discount_price || selectedPackage?.original_price || 0, selectedPackage?.partner_price)
       : calculatePartnerPrice(selectedTransfer?.price || 0, selectedTransfer?.partner_price);
 
   const total = (newForm.type === "tour" && newForm.tourMode === "privativo") ? unitPrice : unitPrice * newForm.guests;
