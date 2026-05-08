@@ -105,11 +105,20 @@ const ToursSection = () => {
                       </span>
                       <div className="flex items-baseline gap-1">
                         <p className={`text-lg font-bold ${tour.mode_collective_enabled !== false ? "text-primary" : "text-secondary"}`}>
-                          {formatCurrency(tour.mode_collective_enabled !== false ? tour.price : tour.private_price)}
+                          {formatCurrency(
+                            partnerId 
+                              ? (tour.mode_collective_enabled !== false ? (tour.partner_price || tour.price) : (tour.partner_private_price || tour.private_price))
+                              : (tour.mode_collective_enabled !== false ? tour.price : tour.private_price)
+                          )}
                         </p>
-                        {tour.pix_discount > 0 && (
+                        {tour.pix_discount > 0 && !partnerId && (
                           <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">
                             -{tour.pix_discount}% PIX
+                          </span>
+                        )}
+                        {partnerId && (
+                          <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold">
+                            Tarifa Parceiro
                           </span>
                         )}
                       </div>

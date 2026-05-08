@@ -27,12 +27,18 @@ const PackageDetail = () => {
   const partnerId = params.get("partner_id") || params.get("partner");
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [pkg, setPkg] = useState<Package | null>(null);
+  const [pkg, setPkg] = useState<any>(null);
+  const [partner, setPartner] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPackage = async () => {
+    const load = async () => {
       setLoading(true);
+      if (partnerId) {
+        const { data: pData } = await supabase.from("partners").select("*").eq("id", partnerId).maybeSingle();
+        if (pData) setPartner(pData);
+      }
+
       const { data, error } = await supabase
         .from("packages")
         .select(`
@@ -51,8 +57,8 @@ const PackageDetail = () => {
       setLoading(false);
     };
 
-    fetchPackage();
-  }, [slug]);
+    load();
+  }, [slug, partnerId]);
 
   if (loading) {
     return (
@@ -97,7 +103,14 @@ const PackageDetail = () => {
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <span className="bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1.5 rounded-full">{pkg.tag}</span>
-                <span className="bg-destructive text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full">Economia de {discount}%</span>
+                {!partner && pkg.original_price > 0 && (
+                  <span className="bg-destructive text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full">Economia de {discount}%</span>
+                )}
+                {partner && (
+                  <span className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1">
+                    <Shield size={12} /> Tarifa Parceiro: {partner.name}
+                  </span>
+                )}
               </div>
               <h1 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">{pkg.name}</h1>
               <p className="text-muted-foreground text-lg leading-relaxed">{pkg.description}</p>
@@ -178,12 +191,21 @@ const PackageDetail = () => {
           <div className="space-y-6">
             <div className="bg-card border border-border rounded-2xl p-6 shadow-sm sticky top-28">
               <div className="mb-6">
-                <p className="text-sm text-muted-foreground line-through">De {formatCurrency(pkg.original_price)}</p>
+                {!partner && pkg.original_price > 0 && (
+                  <p className="text-sm text-muted-foreground line-through">De {formatCurrency(pkg.original_price)}</p>
+                )}
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold text-primary font-display">{formatCurrency(pkg.discount_price)}</span>
+                  <span className="text-4xl font-bold text-primary font-display">
+                    {formatCurrency(partner ? (pkg.partner_price || pkg.discount_price) : pkg.discount_price)}
+                  </span>
                   <span className="text-muted-foreground">/ pessoa</span>
                 </div>
-                <p className="text-xs text-green-600 font-semibold mt-1">Você economiza {formatCurrency(pkg.original_price - pkg.discount_price)} neste combo!</p>
+                {!partner && pkg.original_price > 0 && (
+                  <p className="text-xs text-green-600 font-semibold mt-1">Você economiza {formatCurrency(pkg.original_price - pkg.discount_price)} neste combo!</p>
+                )}
+                {partner && (
+                  <p className="text-xs text-primary font-semibold mt-1">Aplicada tarifa líquida de parceiro</p>
+                )}
               </div>
 
               <div className="space-y-4 mb-6">

@@ -271,6 +271,44 @@ export function useBookings() {
       }
     }
 
+    // Se houver um parceiro vinculado, gerar a remuneração/comissão do parceiro
+    if (booking.partner_id) {
+      const { data: partner } = await supabase
+        .from("partners")
+        .select("*")
+        .eq("id", booking.partner_id)
+        .single();
+
+      if (partner) {
+        let partnerRemuneration = 0;
+        const rType = partner.remuneration_type || "comissao_percent";
+        const rValue = partner.remuneration_value || partner.commission_rate || 0;
+
+        if (rType === "comissao_percent") {
+          partnerRemuneration = Math.round((booking.final_total * rValue) / 100);
+        } else if (rType === "valor_por_passeio") {
+          partnerRemuneration = rValue * 100; // converter para centavos
+        }
+
+        if (partnerRemuneration > 0) {
+          const description = `Comissão Parceiro: ${booking.item_name} (Reserva ${booking.booking_code})`;
+          
+          // Registrar no financeiro (Contas a Pagar)
+          await supabase.from("contas_pagar").insert({
+            descricao: `${partner.name} - ${description}`,
+            valor: partnerRemuneration / 100,
+            vencimento: new Date().toISOString().slice(0, 10),
+            status: "pendente",
+            categoria: "comissão parceiro",
+            fornecedor: partner.name,
+            booking_id: booking.id,
+            partner_id: partner.id,
+            observacoes: `Gerado automaticamente na conclusão da reserva ${booking.booking_code}`
+          });
+        }
+      }
+    }
+
     // Registrar o custo operacional base se não houver colaborador (ou adicionalmente)
     if (!booking.collaborator_id) {
       const { error: costError } = await supabase

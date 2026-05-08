@@ -13,6 +13,7 @@ interface Package {
   days: number;
   original_price: number;
   discount_price: number;
+  partner_price?: number;
   tag: string;
   highlights: string[];
   package_tours?: any[];
@@ -115,12 +116,14 @@ const PackagesSection = () => {
 
                   <div className="border-t border-border pt-4 flex items-end justify-between">
                     <div>
-                      <span className="text-sm text-muted-foreground line-through">
-                        {formatCurrency(pkg.original_price)}
-                      </span>
+                      {!partnerId && pkg.original_price > 0 && (
+                        <span className="text-sm text-muted-foreground line-through">
+                          {formatCurrency(pkg.original_price)}
+                        </span>
+                      )}
                       <div className="flex items-baseline gap-1">
                         <span className="font-display text-2xl font-bold text-primary">
-                          {formatCurrency(pkg.discount_price)}
+                          {formatCurrency(partnerId ? (pkg.partner_price || pkg.discount_price) : pkg.discount_price)}
                         </span>
                         <span className="text-xs text-muted-foreground">{t("packages.perPerson")}</span>
                       </div>
