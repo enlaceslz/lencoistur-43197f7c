@@ -221,12 +221,23 @@ const MinhasReservas = () => {
                             label="Ver Detalhes"
                           />
                         )}
-                        <Link
-                          to={`/assinatura-termo?booking=${b.bookingCode}`}
-                          className="bg-primary/10 text-primary px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary/20 transition-colors flex items-center gap-1"
-                        >
-                          <Shield size={14} /> Assinar Termo de Risco
-                        </Link>
+                        {b.termStatus === "assinado" ? (
+                          <a
+                            href={supabase.storage.from("customer-documents").getPublicUrl(b.termPdfUrl!).data.publicUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-green-500/10 text-green-600 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-500/20 transition-colors flex items-center gap-1"
+                          >
+                            <Shield size={14} /> Termo Assinado
+                          </a>
+                        ) : (
+                          <Link
+                            to={`/assinatura-termo?booking=${b.bookingCode}`}
+                            className="bg-primary/10 text-primary px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary/20 transition-colors flex items-center gap-1"
+                          >
+                            <Shield size={14} /> Assinar Termo de Risco
+                          </Link>
+                        )}
                       </div>
                     </div>
                   )}
