@@ -767,7 +767,10 @@ const AdminPasseios = () => {
                           </div>
                         )}
                         {!t.partner_price && !t.partner_private_price && (
-                          <span className="text-[9px] font-bold text-muted-foreground italic">Comissão padrão</span>
+                          <span className="text-[9px] font-bold text-muted-foreground italic tracking-tight block">Comissão padrão</span>
+                        )}
+                      </div>
+                    </TableCell>
                         )}
                       </div>
                     <TableCell>
