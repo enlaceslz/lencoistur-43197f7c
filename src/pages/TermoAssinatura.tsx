@@ -344,10 +344,14 @@ const TermoAssinatura = () => {
           signed_at: new Date().toISOString(),
           term_date: new Date().toISOString().split('T')[0],
           cancellation_policy: "Conforme política da agência aceita no momento da reserva."
-        }]).select().single();
-
-        if (termError) throw termError;
-        if (!termData) throw new Error("Erro ao criar o termo no banco de dados.");
+        }]);
+        
+        if (termError) {
+          console.error("Error inserting term:", termError);
+          throw termError;
+        }
+        
+        const termData = termResult ? termResult[0] : null;
         currentTermId = termData.id;
       } else {
         // Update existing term
