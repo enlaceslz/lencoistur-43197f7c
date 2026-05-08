@@ -1052,7 +1052,7 @@ const AdminReservas = () => {
                           className="bg-amber-600 text-white border-transparent hover:bg-amber-700 h-9"
                           asChild
                         >
-                          <a href={`/assinatura-termo?booking=${selected.bookingCode}`} target="_blank" rel="noopener noreferrer">
+                          <a href={`/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode)}`} target="_blank" rel="noopener noreferrer">
                             <ExternalLink size={14} className="mr-2" /> Abrir Termo
                           </a>
                         </Button>
