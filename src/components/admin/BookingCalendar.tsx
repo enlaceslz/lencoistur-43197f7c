@@ -100,26 +100,26 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
   }, [bookingsByDay, searchQuery]);
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-700">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center bg-white/40 dark:bg-black/20 backdrop-blur-xl rounded-[1.5rem] p-1.5 border border-white/40 dark:border-white/10 shadow-xl shadow-black/5">
-            <Button variant="ghost" size="icon" onClick={prevMonth} className="rounded-xl hover:bg-white dark:hover:bg-white/10 h-11 w-11 transition-all">
-              <ChevronLeft size={22} className="text-primary" />
+    <div className="space-y-4 md:space-y-6 animate-in fade-in duration-700">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 md:gap-6">
+        <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-center bg-white/40 dark:bg-black/20 backdrop-blur-xl rounded-2xl md:rounded-[1.5rem] p-1 md:p-1.5 border border-white/40 dark:border-white/10 shadow-xl shadow-black/5">
+            <Button variant="ghost" size="icon" onClick={prevMonth} className="rounded-lg md:rounded-xl hover:bg-white dark:hover:bg-white/10 h-10 w-10 md:h-11 md:w-11 transition-all">
+              <ChevronLeft size={20} className="text-primary" />
             </Button>
-            <div className="px-6 min-w-[200px] text-center">
-              <h2 className="text-lg font-black uppercase tracking-widest text-foreground drop-shadow-sm">
+            <div className="px-4 md:px-6 min-w-[150px] md:min-w-[200px] text-center">
+              <h2 className="text-sm md:text-lg font-black uppercase tracking-widest text-foreground drop-shadow-sm">
                 {format(currentDate, 'MMMM yyyy', { locale: ptBR })}
               </h2>
             </div>
-            <Button variant="ghost" size="icon" onClick={nextMonth} className="rounded-xl hover:bg-white dark:hover:bg-white/10 h-11 w-11 transition-all">
-              <ChevronRight size={22} className="text-primary" />
+            <Button variant="ghost" size="icon" onClick={nextMonth} className="rounded-lg md:rounded-xl hover:bg-white dark:hover:bg-white/10 h-10 w-10 md:h-11 md:w-11 transition-all">
+              <ChevronRight size={20} className="text-primary" />
             </Button>
           </div>
           <Button 
             variant="outline" 
             onClick={goToToday} 
-            className="rounded-[1.5rem] h-14 px-8 border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/20 backdrop-blur-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-black/5 hover:bg-primary hover:text-white transition-all group"
+            className="rounded-2xl md:rounded-[1.5rem] h-12 md:h-14 px-4 md:px-8 border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/20 backdrop-blur-xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-black/5 hover:bg-primary hover:text-white transition-all group hidden sm:flex"
           >
             <CalendarDays size={16} className="mr-2 group-hover:rotate-12 transition-transform" />
             Hoje
@@ -132,21 +132,20 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
           </div>
           <input 
             type="text"
-            placeholder="Pesquisar por cliente, passeio ou código..."
+            placeholder="Pesquisar..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-14 h-14 rounded-[1.5rem] border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/20 backdrop-blur-xl focus:bg-white/80 dark:focus:bg-black/40 focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-semibold shadow-xl shadow-black/5 placeholder:text-muted-foreground/50"
+            className="w-full pl-14 h-12 md:h-14 rounded-2xl md:rounded-[1.5rem] border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/20 backdrop-blur-xl focus:bg-white/80 dark:focus:bg-black/40 focus:ring-4 focus:ring-primary/10 outline-none transition-all text-sm font-semibold shadow-xl shadow-black/5 placeholder:text-muted-foreground/50"
           />
         </div>
       </div>
 
-      <Card className="border-none shadow-2xl shadow-primary/5 overflow-hidden glass-card rounded-[2.5rem] border border-white/20">
+      <Card className="border-none shadow-2xl shadow-primary/5 overflow-hidden glass-card rounded-2xl md:rounded-[2.5rem] border border-white/20">
         <div className="grid grid-cols-7 border-b border-border/40 bg-muted/20 backdrop-blur-sm">
-          {['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'].map(day => (
-            <div key={day} className="py-5 text-center">
-              <span className="text-[11px] font-black uppercase tracking-[0.25em] text-primary/60">
-                <span className="hidden md:inline">{day}</span>
-                <span className="md:hidden">{day.substring(0, 3)}</span>
+          {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => (
+            <div key={day} className="py-3 md:py-5 text-center">
+              <span className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.1em] md:tracking-[0.25em] text-primary/60">
+                {day}
               </span>
             </div>
           ))}
@@ -166,29 +165,29 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.005 }}
                 className={cn(
-                  "min-h-[220px] p-5 transition-all relative group/cell flex flex-col border-r border-b border-border/10",
-                  !isCurrentMonth && "bg-muted/10 opacity-60 grayscale-[0.2]",
-                  isTodayDay && "bg-primary/[0.12] ring-4 ring-inset ring-primary/60 shadow-[inset_0_0_80px_rgba(var(--primary),0.1)] z-10",
-                  dayBookings.length > 0 && isCurrentMonth && "bg-gradient-to-br from-white/10 to-primary/[0.08]"
+                  "min-h-[120px] md:min-h-[220px] p-2 md:p-5 transition-all relative group/cell flex flex-col border-r border-b border-border/10",
+                  !isCurrentMonth && "bg-muted/5 opacity-30 grayscale-[0.2]",
+                  isTodayDay && "bg-primary/[0.08] ring-2 md:ring-4 ring-inset ring-primary/40 z-10",
+                  dayBookings.length > 0 && isCurrentMonth && "bg-gradient-to-br from-white/10 to-primary/[0.05]"
                 )}
               >
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start justify-between mb-2 md:mb-4">
                   <span className={cn(
-                    "text-base font-black w-11 h-11 flex items-center justify-center rounded-2xl transition-all duration-500",
+                    "text-xs md:text-base font-black w-7 h-7 md:w-11 md:h-11 flex items-center justify-center rounded-lg md:rounded-2xl transition-all duration-500",
                     isTodayDay 
-                      ? "bg-primary text-primary-foreground shadow-2xl shadow-primary/40 scale-110 rotate-3 z-10" 
-                      : "text-foreground/80 group-hover/cell:text-primary group-hover/cell:bg-primary/10 group-hover/cell:rotate-6",
+                      ? "bg-primary text-primary-foreground shadow-xl md:shadow-2xl shadow-primary/40 scale-105 md:scale-110 rotate-3 z-10" 
+                      : "text-foreground/80 group-hover/cell:text-primary group-hover/cell:bg-primary/10",
                     !isCurrentMonth && "font-medium opacity-50"
                   )}>
                     {format(day, 'd')}
                   </span>
                   
                   {dayBookings.length > 0 && (
-                    <div className="flex flex-col items-end gap-1.5">
-                      <Badge variant="secondary" className="bg-primary/10 text-primary border border-primary/20 text-[9px] font-black h-5 px-2.5 rounded-full animate-pulse shadow-sm">
-                        {dayBookings.length} {dayBookings.length === 1 ? 'RESERVA' : 'RESERVAS'}
+                    <div className="flex flex-col items-end gap-1 md:gap-1.5">
+                      <Badge variant="secondary" className="bg-primary/10 text-primary border border-primary/20 text-[7px] md:text-[9px] font-black h-4 md:h-5 px-1 md:px-2.5 rounded-full animate-pulse">
+                        {dayBookings.length}
                       </Badge>
-                      <div className="flex -space-x-2 overflow-hidden p-0.5">
+                      <div className="hidden md:flex -space-x-2 overflow-hidden p-0.5">
                         {dayBookings.slice(0, 4).map((b, i) => (
                           <div 
                             key={b.id} 
@@ -204,7 +203,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                   )}
                 </div>
 
-                <div className="space-y-2.5 flex-1 overflow-y-auto no-scrollbar pb-2">
+                <div className="space-y-1 md:space-y-2.5 flex-1 overflow-y-auto no-scrollbar pb-1 md:pb-2">
                   <AnimatePresence mode="popLayout">
                     {dayBookings.slice(0, 6).map((booking) => (
                       <TooltipProvider key={booking.id}>
@@ -217,24 +216,24 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                               exit={{ opacity: 0, scale: 0.95 }}
                               onClick={() => onSelectBooking(booking)}
                               className={cn(
-                                "group/item cursor-pointer p-3.5 rounded-[1.25rem] border border-white/40 dark:border-white/10 hover:border-primary/50 hover:bg-white dark:hover:bg-white/20 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-1.5 transition-all relative overflow-hidden bg-white/80 dark:bg-black/40 backdrop-blur-md shadow-md",
+                                "group/item cursor-pointer p-1.5 md:p-3.5 rounded-lg md:rounded-[1.25rem] border border-white/40 dark:border-white/10 hover:border-primary/50 hover:bg-white dark:hover:bg-white/20 hover:shadow-2xl transition-all relative overflow-hidden bg-white/80 dark:bg-black/40 backdrop-blur-md shadow-sm",
                               )}
                             >
                               <div className={cn(
-                                "absolute left-0 top-0 bottom-0 w-2.5 bg-gradient-to-b transition-all group-hover/item:w-4",
+                                "absolute left-0 top-0 bottom-0 w-1 md:w-2.5 bg-gradient-to-b transition-all group-hover/item:w-1.5 md:group-hover/item:4",
                                 statusConfig[booking.status]?.gradient
                               )} />
-                              <div className="pl-6">
-                                <div className="flex items-center justify-between mb-2">
-                                  <p className="text-[14px] font-black text-foreground truncate leading-none tracking-tight group-hover/item:text-primary transition-colors drop-shadow-sm">
-                                    {booking.customerName}
+                              <div className="pl-2 md:pl-6">
+                                <div className="flex items-center justify-between mb-0.5 md:mb-2">
+                                  <p className="text-[8px] md:text-[14px] font-black text-foreground truncate leading-none tracking-tight group-hover/item:text-primary transition-colors">
+                                    {booking.customerName.split(' ')[0]}
                                   </p>
-                                  <span className="text-[10px] font-black opacity-100 bg-primary/10 text-primary border border-primary/30 px-2 py-0.5 rounded-full uppercase shadow-sm">#{booking.bookingCode.slice(-4)}</span>
+                                  <span className="hidden md:inline text-[10px] font-black opacity-100 bg-primary/10 text-primary border border-primary/30 px-2 py-0.5 rounded-full uppercase">#{booking.bookingCode.slice(-4)}</span>
                                 </div>
-                                <div className="flex items-center gap-2.5">
-                                  <div className={cn("w-2.5 h-2.5 rounded-full ring-4 ring-white/30 shadow-md", statusConfig[booking.status]?.color)} />
-                                  <p className="text-[11px] font-black text-muted-foreground truncate opacity-100 uppercase tracking-[0.15em] leading-none drop-shadow-sm">
-                                    {booking.itemName.split('(')[0].trim()}
+                                <div className="flex items-center gap-1 md:gap-2.5">
+                                  <div className={cn("w-1.5 h-1.5 md:w-2.5 md:h-2.5 rounded-full ring-2 md:ring-4 ring-white/30", statusConfig[booking.status]?.color)} />
+                                  <p className="text-[7px] md:text-[11px] font-black text-muted-foreground truncate opacity-100 uppercase tracking-tight md:tracking-[0.15em] leading-none">
+                                    {booking.itemName.split('(')[0].trim().substring(0, 10)}
                                   </p>
                                 </div>
                               </div>
@@ -264,7 +263,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                                 </div>
                               </div>
 
-                              <div className="bg-primary/5 p-3 rounded-2xl border border-primary/10 flex items-center justify-between group-hover:bg-primary/10 transition-colors">
+                              <div className="bg-primary/5 p-3 rounded-2xl border border-primary/10 flex items-center justify-between">
                                 <span className="text-[10px] font-black text-primary uppercase tracking-widest">Código</span>
                                 <span className="text-xs font-mono font-black text-primary">{booking.bookingCode}</span>
                               </div>
@@ -281,20 +280,14 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                   
                   {dayBookings.length > 6 && (
                     <button 
-                      className="w-full py-2.5 mt-1 rounded-[1.25rem] border-2 border-dashed border-primary/30 hover:border-primary/60 hover:bg-primary/10 transition-all group/more active:scale-95 bg-white/40 dark:bg-black/20"
+                      className="w-full py-1 md:py-2.5 mt-1 rounded-lg md:rounded-[1.25rem] border-2 border-dashed border-primary/30 hover:border-primary/60 hover:bg-primary/10 transition-all group/more active:scale-95 bg-white/40 dark:bg-black/20"
                     >
-                      <span className="text-[10px] font-black text-primary group-hover/more:text-primary-foreground uppercase tracking-[0.25em] flex items-center justify-center gap-2">
-                        + {dayBookings.length - 6} RESERVAS
-                        <ChevronDown size={12} className="group-hover/more:translate-y-0.5 transition-transform" />
+                      <span className="text-[7px] md:text-[10px] font-black text-primary group-hover/more:text-primary-foreground uppercase tracking-[0.1em] md:tracking-[0.25em] flex items-center justify-center gap-1 md:gap-2">
+                        + {dayBookings.length - 6}
+                        <ChevronDown size={10} className="md:w-3" />
                       </span>
                     </button>
                   )}
-                </div>
-                
-                <div className="absolute bottom-2 right-2 opacity-0 group-hover/cell:opacity-100 transition-all duration-300 translate-y-2 group-hover/cell:translate-y-0">
-                  <div className="bg-primary/10 backdrop-blur-md p-2 rounded-xl border border-primary/20 shadow-lg">
-                    <Eye size={14} className="text-primary" />
-                  </div>
                 </div>
               </motion.div>
             );
@@ -302,15 +295,15 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
         </div>
       </Card>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
         {Object.entries(statusConfig).map(([key, config]) => (
-          <div key={key} className="glass-card p-4 rounded-2xl border border-white/20 flex items-center gap-4 group hover:scale-[1.02] transition-transform cursor-default">
-            <div className={cn("w-10 h-10 rounded-xl shadow-lg flex items-center justify-center text-white bg-gradient-to-br", config.gradient)}>
-              <config.icon size={20} />
+          <div key={key} className="glass-card p-2 md:p-4 rounded-xl md:rounded-2xl border border-white/20 flex items-center gap-2 md:gap-4 group hover:scale-[1.02] transition-transform cursor-default">
+            <div className={cn("w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl shadow-lg flex items-center justify-center text-white bg-gradient-to-br", config.gradient)}>
+              <config.icon size={16} className="md:w-5" />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5">Status</p>
-              <p className="text-xs font-black text-foreground">{config.label}</p>
+              <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5 opacity-60">Status</p>
+              <p className="text-[10px] md:text-xs font-black text-foreground">{config.label}</p>
             </div>
           </div>
         ))}
