@@ -1197,11 +1197,11 @@ const AdminReservas = () => {
               </div>
             </div>
             
-            <div className="flex gap-4 sticky bottom-0 bg-white border-t border-slate-100 p-4 md:p-6 z-10">
-              <Button type="button" variant="ghost" onClick={() => setShowNewForm(false)} className="flex-1 h-14 rounded-2xl font-black uppercase text-[11px] tracking-widest">
-                Cancelar
+            <div className="flex gap-4 sticky bottom-0 bg-white border-t border-slate-100 p-4 md:p-8 z-20">
+              <Button type="button" variant="ghost" onClick={() => setShowNewForm(false)} className="flex-1 h-12 md:h-16 rounded-xl md:rounded-2xl font-black uppercase text-[10px] md:text-[12px] tracking-widest hover:bg-slate-50">
+                Descartar
               </Button>
-              <Button type="submit" className="flex-[2] h-14 rounded-2xl bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20 font-black uppercase text-[11px] tracking-widest" disabled={newLoading || !newForm.itemName}>
+              <Button type="submit" className="flex-[2] h-12 md:h-16 rounded-xl md:rounded-2xl bg-primary hover:bg-primary/90 shadow-2xl shadow-primary/20 font-black uppercase text-[10px] md:text-[12px] tracking-widest transition-all hover:scale-[1.02]" disabled={newLoading || !newForm.itemName}>
                 {newLoading ? <Loader2 className="animate-spin mr-2" size={18} /> : (editingId ? <Save size={18} className="mr-2" /> : <Plus size={18} className="mr-2" />)}
                 {editingId ? "Salvar Alterações" : "Confirmar Reserva"}
               </Button>
@@ -1209,6 +1209,7 @@ const AdminReservas = () => {
           </form>
         </DialogContent>
       </Dialog>
+
     </AdminLayout>
   );
 };
