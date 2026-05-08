@@ -753,6 +753,24 @@ const AdminPasseios = () => {
                       </div>
                     </TableCell>
                     <TableCell>
+                      <div className="space-y-1.5">
+                        {t.mode_collective_enabled && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-black text-primary/80">{t.partner_price ? fmt(t.partner_price) : "--"}</span>
+                            <span className="text-[9px] font-bold text-primary/40 uppercase bg-primary/5 px-1.5 rounded">Coletivo</span>
+                          </div>
+                        )}
+                        {t.mode_private_enabled && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-primary/80">{t.partner_private_price ? fmt(t.partner_private_price) : "--"}</span>
+                            <span className="text-[9px] font-bold text-primary/40 uppercase bg-primary/5 px-1.5 rounded">Privativo</span>
+                          </div>
+                        )}
+                        {!t.partner_price && !t.partner_private_price && (
+                          <span className="text-[9px] font-bold text-muted-foreground italic">Comissão padrão</span>
+                        )}
+                      </div>
+                    <TableCell>
                       <div className="flex flex-col gap-1.5">
                         <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded-lg w-fit">
                           <Shield size={10} className="fill-emerald-700/20" />
