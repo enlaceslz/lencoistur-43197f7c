@@ -601,7 +601,7 @@ const TermoAssinatura = () => {
     );
   }
 
-  if (!booking) {
+  if (!booking && !term) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
