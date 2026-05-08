@@ -60,7 +60,7 @@ const ToursPage = () => {
         const { data: pData } = await supabase.from("partners").select("*").eq("id", partnerId).maybeSingle();
         if (pData) setPartner(pData);
       }
-      const { data } = await supabase.from("tours").select("*").eq("active", true).order("name");
+      const { data } = await supabase.from("public_tours" as "tours").select("*").order("name");
       setTours(data || []);
       setLoading(false);
     };
