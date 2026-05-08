@@ -223,9 +223,9 @@ const MinhasReservas = () => {
                         )}
                         <Link
                           to={`/assinatura-termo?booking=${b.bookingCode}`}
-                          className="text-primary text-sm font-semibold hover:underline flex items-center gap-1"
+                          className="bg-primary/10 text-primary px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary/20 transition-colors flex items-center gap-1"
                         >
-                          <Shield size={14} /> Assinar Termo
+                          <Shield size={14} /> Assinar Termo de Risco
                         </Link>
                       </div>
                     </div>
@@ -272,7 +272,7 @@ const MinhasReservas = () => {
                       </Tooltip>
                       <Link
                         to={`/assinatura-termo?booking=${b.bookingCode}`}
-                        className="text-primary text-sm font-semibold hover:underline flex items-center gap-1"
+                        className="bg-primary/10 text-primary px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary/20 transition-colors flex items-center gap-1"
                       >
                         <Shield size={14} /> Assinar Termo de Risco
                       </Link>
