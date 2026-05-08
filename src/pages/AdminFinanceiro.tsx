@@ -152,7 +152,8 @@ const AdminFinanceiro = () => {
     }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }, [monthBookings, monthContasPagar, searchTerm, statusFilter, typeFilter]);
 
-  const receitaPaga = monthBookings.filter(b => b.payment_status === "pago").reduce((s, b) => s + b.final_total, 0);
+  const receitaPaga = monthBookings.filter(b => b.payment_status === "pago").reduce((s, b) => s + b.final_total, 0) + 
+                     monthContasReceber.filter(c => c.status === "recebido").reduce((s, c) => s + c.valor, 0);
   const despesasMes = monthContasPagar.filter(c => c.status === "pago").reduce((s, c) => s + c.valor, 0);
   const lucroMes = receitaPaga - despesasMes;
   const pagos = monthBookings.filter(b => b.payment_status === "pago");
