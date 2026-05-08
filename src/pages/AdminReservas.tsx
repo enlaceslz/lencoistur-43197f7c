@@ -876,33 +876,47 @@ const AdminReservas = () => {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 pt-2 flex-wrap">
-                <Button variant="outline" onClick={() => { setSelected(null); openEdit(selected); }} disabled={actionLoading} className="flex-1 min-w-[140px]">
-                  <Pencil size={16} className="mr-2" /> Editar Reserva
+              <div className="flex gap-3 pt-4 flex-wrap border-t border-slate-200 mt-6">
+                <Button variant="outline" onClick={() => { setSelected(null); openEdit(selected); }} disabled={actionLoading} className="flex-1 min-w-[140px] border-slate-300">
+                  <Pencil size={16} className="mr-2 text-amber-500" /> Editar Reserva
                 </Button>
+                
                 {selected.status === "pendente" && selected.paymentStatus === "pendente" && (
-                  <Button onClick={() => handleAction(() => confirmPayment(selected.id), "Pagamento confirmado!")} disabled={actionLoading} className="flex-1 min-w-[140px]">
+                  <Button onClick={() => handleAction(() => confirmPayment(selected.id), "Pagamento confirmado!")} disabled={actionLoading} className="flex-1 min-w-[140px] bg-emerald-600 hover:bg-emerald-700">
                     {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle size={16} className="mr-2" />}
                     Confirmar Pagamento
                   </Button>
                 )}
+                
                 {selected.status === "confirmada" && (
                   <Button variant="secondary" onClick={() => handleAction(() => completeBooking(selected.id), "Reserva concluída!")} disabled={actionLoading} className="flex-1 min-w-[140px]">
                     {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
-                    Marcar Concluída
+                    Concluir Serviço
                   </Button>
                 )}
+                
                 {selected.status !== "cancelada" && (
                   <Button 
-                    variant="destructive" 
-                    onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada com sucesso.", true)} 
+                    variant="outline" 
+                    onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada.", true)} 
                     disabled={actionLoading} 
-                    className="flex-1 min-w-[140px]"
+                    className="flex-1 min-w-[140px] border-rose-200 text-rose-600 hover:bg-rose-50"
                   >
                     {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
-                    Cancelar Reserva
+                    Cancelar
                   </Button>
                 )}
+
+                <Button 
+                  variant="destructive" 
+                  onClick={() => handleDelete(selected.id)} 
+                  disabled={actionLoading} 
+                  className="flex-1 min-w-[140px] bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-200"
+                >
+                  {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Trash2 size={16} className="mr-2" />}
+                  Excluir Permanente
+                </Button>
+              </div>
                 {/* Print Receipt */}
                 {selected.payMethod !== "info" && (
                   <PrintReceiptButton
