@@ -50,20 +50,26 @@ interface Conta {
   observacoes: string | null;
   pago_em: string | null;
   booking_id: string | null;
+  collaborator_id?: string | null;
+  partner_id?: string | null;
   anexo_url: string | null;
   bookings?: {
     booking_code: string;
   } | null;
+  collaborators?: { name: string } | null;
+  partners?: { name: string } | null;
 }
 
 const emptyForm = { 
   descricao: "", 
   valor: 0, 
-  vencimento: "", 
+  vencimento: new Date().toISOString().slice(0, 10), 
   categoria: "operacional", 
   fornecedor: "", 
   observacoes: "", 
   status: "pendente",
+  collaborator_id: "",
+  partner_id: "",
   anexo_url: "" 
 };
 
