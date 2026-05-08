@@ -16,6 +16,8 @@ export interface ReceiptData {
   total: number;
   discount: number;
   finalTotal: number;
+  publicUnitPrice?: number;
+  publicTotal?: number;
   payMethod: string;
   paymentStatus: string;
   status: string;
@@ -262,10 +264,10 @@ function generateReceiptHTML(data: ReceiptData, company?: any): string {
     <div class="section-title">Resumo Financeiro</div>
     <div class="financial-card">
       <div class="fin-row">
-        <span>${data.guests}x ${data.itemName} (${fmt(data.unitPrice)})</span>
-        <span>${fmt(data.total)}</span>
+        <span>${data.guests}x ${data.itemName} (${fmt(data.publicUnitPrice || data.unitPrice)})</span>
+        <span>${fmt(data.publicTotal || data.total)}</span>
       </div>
-      ${data.discount > 0 ? `
+      ${data.discount > 0 && !data.publicTotal ? `
       <div class="fin-row discount">
         <span>Desconto Especial (PIX/Promoção)</span>
         <span>-${fmt(data.discount)}</span>
@@ -277,7 +279,7 @@ function generateReceiptHTML(data: ReceiptData, company?: any): string {
       </div>
       <div class="fin-total">
         <span>VALOR TOTAL</span>
-        <span>${fmt(data.finalTotal)}</span>
+        <span>${fmt(data.publicTotal || data.finalTotal)}</span>
       </div>
     </div>
 
