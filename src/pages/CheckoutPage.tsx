@@ -303,7 +303,7 @@ const CheckoutPage = () => {
             {confirmedBooking.payMethod !== "info" && (
               <Link 
                 to={`/assinatura-termo?booking=${confirmedBooking.bookingCode}`}
-                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-6 py-4 rounded-xl font-bold transition-all text-center flex items-center justify-center gap-2 shadow-lg hover:scale-[1.02]"
+                className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-4 rounded-xl font-bold transition-all text-center flex items-center justify-center gap-2 shadow-lg hover:scale-[1.02]"
               >
                 <Shield size={20} />
                 Assinar Termo de Risco (Obrigatório)
