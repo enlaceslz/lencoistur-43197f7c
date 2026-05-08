@@ -92,8 +92,9 @@ const TermoAssinatura = () => {
         }
       } else if (bookingCode) {
         console.log("Searching by bookingCode:", bookingCode);
-        const bookingRes = await supabase.from("bookings").select("*, customers!customer_id(*)").ilike("booking_code", bookingCode).maybeSingle();
-        bookingData = bookingRes.data;
+        const { data: bData, error: bError } = await supabase.from("bookings").select("*, customers!customer_id(*)").ilike("booking_code", bookingCode).maybeSingle();
+        if (bError) console.error("Search error:", bError);
+        bookingData = bData;
         if (bookingData) {
           const termRes = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
           termData = termRes.data;
