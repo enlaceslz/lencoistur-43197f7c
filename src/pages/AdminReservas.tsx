@@ -130,7 +130,7 @@ const AdminReservas = () => {
     const cleanName = b.itemName.replace(/\s*\((Coletivo|Privativo)\)$/, "");
     
     setNewForm({
-      type: b.type === "transfer" ? "transfer" : "tour",
+      type: b.type === "transfer" ? "transfer" : b.type === "package" ? "package" : "tour",
       tourMode: mode as "coletivo" | "privativo",
       itemName: b.type === "transfer" ? b.itemName : cleanName,
       date: b.date,
@@ -145,6 +145,7 @@ const AdminReservas = () => {
       birthDate: b.birthDate || "",
       notes: b.notes || "",
       collaboratorId: b.collaboratorId || "",
+      partnerId: b.partnerId || "",
     });
     setSelectedCustomerId(b.customerId || "");
     setShowNewForm(true);
@@ -154,7 +155,7 @@ const AdminReservas = () => {
     setNewForm({
       type: "tour", tourMode: "coletivo", itemName: "", date: "", guests: 2, payMethod: "pix",
       customerName: "", customerEmail: "", customerPhone: "",
-      cpf: "", passport: "", country: "Brasil", birthDate: "", notes: "", collaboratorId: ""
+      cpf: "", passport: "", country: "Brasil", birthDate: "", notes: "", collaboratorId: "", partnerId: ""
     });
     setSelectedCustomerId("");
     setCustomerSearch("");
