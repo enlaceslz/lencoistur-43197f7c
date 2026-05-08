@@ -1,5 +1,6 @@
-import { useParams, Link } from "react-router-dom";
-import { Star, MapPin, Clock, Users, ArrowLeft, Shield, CheckCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { useParams, Link, useSearchParams } from "react-router-dom";
+import { Star, MapPin, Clock, Users, ArrowLeft, Shield, CheckCircle, ChevronLeft, ChevronRight, Building2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
@@ -10,7 +11,9 @@ import { ShareWithFriend } from "@/components/ShareWithFriend";
 
 const TourDetail = () => {
   const { slug } = useParams<{ slug: string }>();
+  const [params] = useSearchParams();
   const [tour, setTour] = useState<any>(null);
+  const [partner, setPartner] = useState<any>(null);
   const [tourReviews, setTourReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentImg, setCurrentImg] = useState(0);
@@ -20,11 +23,17 @@ const TourDetail = () => {
 
   useEffect(() => {
     if (!slug) return;
+    const partnerId = params.get("partner_id");
     const load = async () => {
+      if (partnerId) {
+        const { data: partnerData } = await supabase.from("partners").select("*").eq("id", partnerId).maybeSingle();
+        if (partnerData) setPartner(partnerData);
+      }
+      
       const { data: t } = await supabase.from("tours").select("*").eq("slug", slug).eq("active", true).single();
       setTour(t);
       if (t) {
-        // Apply admin-configured default mode, fallback respects which modes are enabled
+        // Apply admin-configured default mode
         const collectiveOn = t.mode_collective_enabled ?? true;
         const privateOn = t.mode_private_enabled ?? true;
         const adminDefault = (t.default_mode === "coletivo" || t.default_mode === "privativo") ? t.default_mode : "privativo";
@@ -39,7 +48,7 @@ const TourDetail = () => {
       setLoading(false);
     };
     load();
-  }, [slug]);
+  }, [slug, params]);
 
   if (loading) {
     return (
@@ -70,7 +79,10 @@ const TourDetail = () => {
   const privateOn = tour.mode_private_enabled ?? true;
   const showModeToggle = collectiveOn && privateOn;
   const isPrivate = tourMode === "privativo";
-  const totalPrice = isPrivate ? (tour.private_price || 1300) : tour.price * guests;
+  const unitPrice = partner
+    ? (isPrivate ? (tour.partner_private_price || tour.private_price || 110000) : (tour.partner_price || tour.price))
+    : (isPrivate ? (tour.private_price || 130000) : tour.price);
+  const totalPrice = isPrivate ? unitPrice : unitPrice * guests;
   const maxGuests = vehicleCapacity;
 
   return (
@@ -219,6 +231,18 @@ const TourDetail = () => {
 
           <div className="lg:col-span-1">
             <div className="sticky top-24 bg-card border border-border rounded-2xl p-6 shadow-lg space-y-6">
+              {partner && (
+                <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <Building2 size={16} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-primary/60 leading-none mb-1">Preço Parceiro</p>
+                    <p className="text-xs font-bold text-slate-800 truncate">{partner.name}</p>
+                  </div>
+                  <Badge className="bg-primary text-[9px] text-white font-black uppercase">Ativo</Badge>
+                </div>
+              )}
               {/* Tour Mode Toggle */}
               {showModeToggle ? (
                 <div>
@@ -276,7 +300,7 @@ const TourDetail = () => {
                   <>
                     <span className="text-xs text-muted-foreground">{vehicleLabel} exclusiva</span>
                     <div className="flex items-baseline gap-1">
-                      <span className="font-display text-3xl font-bold text-secondary">{formatCurrency(tour.private_price || 1300)}</span>
+                      <span className="font-display text-3xl font-bold text-secondary">{formatCurrency(unitPrice)}</span>
                       <span className="text-muted-foreground text-sm">/ até {vehicleCapacity} pessoas</span>
                     </div>
                   </>
@@ -284,7 +308,7 @@ const TourDetail = () => {
                   <>
                     <span className="text-xs text-muted-foreground">a partir de</span>
                     <div className="flex items-baseline gap-1">
-                      <span className="font-display text-3xl font-bold text-primary">{formatCurrency(tour.price)}</span>
+                      <span className="font-display text-3xl font-bold text-primary">{formatCurrency(unitPrice)}</span>
                       <span className="text-muted-foreground text-sm">/ pessoa</span>
                     </div>
                   </>
@@ -319,7 +343,7 @@ const TourDetail = () => {
                   </div>
                 ) : (
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">{formatCurrency(tour.price)} × {guests} pessoas</span>
+                    <span className="text-muted-foreground">{formatCurrency(unitPrice)} × {guests} pessoas</span>
                     <span className="text-foreground font-semibold">{formatCurrency(totalPrice)}</span>
                   </div>
                 )}
