@@ -204,6 +204,7 @@ export default function ContasReceberTab({ company }: { company?: any }) {
       status: form.status,
       recebido_em: form.status === "recebido" ? new Date().toISOString().slice(0, 10) : null,
       booking_id: form.booking_id || null,
+      partner_id: form.partner_id || null,
       anexo_url: form.anexo_url || null,
     };
     if (editing) {
