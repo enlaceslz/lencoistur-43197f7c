@@ -19,7 +19,7 @@ import {
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
   Plus, Copy, Pencil, Car, Compass, LayoutGrid, List, X, XCircle as XCircleIcon,
   ChevronRight, ArrowRight, User, Hash, Info, Moon, Save, Package as PackageIcon,
-  Shield, ExternalLink, Trash2, CalendarDays
+  Shield, ExternalLink, Trash2, CalendarDays, Smartphone
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
