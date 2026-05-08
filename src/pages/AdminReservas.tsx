@@ -522,6 +522,11 @@ const AdminReservas = () => {
                   )}>
                     {statusConfig[booking.status]?.label}
                   </Badge>
+                  {booking.partnerId && (
+                    <Badge variant="outline" className="ml-2 bg-primary/5 text-primary border-primary/20 text-[8px] font-bold">
+                      NET
+                    </Badge>
+                  )}
                 </div>
 
 
@@ -734,7 +739,11 @@ const AdminReservas = () => {
                   <div className="space-y-1 mb-2">
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span>Valor de Venda (Cliente)</span>
-                      <span>{fmt(selected.publicTotal)}</span>
+                      <span className="line-through opacity-50">{fmt(selected.publicTotal)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-blue-600 font-bold">
+                      <span>Tarifa NET (Parceiro)</span>
+                      <span>{fmt(selected.finalTotal)}</span>
                     </div>
                     <div className="flex justify-between text-xs font-bold text-blue-600 border-b border-border/50 pb-2">
                       <span>Valor Líquido (A Receber)</span>
