@@ -260,6 +260,8 @@ const AdminReservas = () => {
         total,
         discount,
         finalTotal,
+        publicUnitPrice,
+        publicTotal,
         collaboratorId: newForm.collaboratorId || undefined,
         partnerId: newForm.partnerId || undefined,
       };
