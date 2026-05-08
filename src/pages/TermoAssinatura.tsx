@@ -256,20 +256,23 @@ const TermoAssinatura = () => {
         // 1. Save term record if it doesn't exist
         const { data: termData, error: termError } = await supabase.from("sgs_risk_terms").insert({
           booking_id: booking.id,
-          customer_name: booking.customers?.name || booking.customer_name,
+          customer_id: booking.customer_id,
+          customer_name: booking.customers?.name || "Cliente",
           nationality: booking.customers?.country || "Brasil",
-          phone: booking.customers?.phone || booking.customer_phone,
-          tour_name: booking.item_name,
+          phone: booking.customers?.phone || "",
+          tour_name: booking.item_name || "Passeio",
           risks_informed: acceptedRisks,
           health_questions: healthInfo,
           safety_controls_informed: true,
           accepted: true,
           signature_data: signatureData,
           signed_at: new Date().toISOString(),
+          term_date: new Date().toISOString().split('T')[0],
           cancellation_policy: "Conforme política da agência aceita no momento da reserva."
         }).select().single();
 
         if (termError) throw termError;
+        if (!termData) throw new Error("Erro ao criar o termo no banco de dados.");
         currentTermId = termData.id;
       } else {
         // Update existing term
