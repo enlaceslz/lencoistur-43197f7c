@@ -31,6 +31,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
+    console.log("Receiving booking request:", body);
 
     const { 
       type, itemName, date, guests, payMethod, customerName, 
@@ -41,6 +42,7 @@ Deno.serve(async (req) => {
     } = body;
 
     if (!type || !itemName || !customerName || !customerEmail || !payMethod) {
+      console.error("Missing required fields:", { type, itemName, customerName, customerEmail, payMethod });
       return new Response(
         JSON.stringify({ error: "Campos obrigatórios faltando" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -107,6 +109,7 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (tourErr || !tour) {
+        console.error("Tour not found or error:", { cleanItemName, tourErr });
         return new Response(
           JSON.stringify({ error: `Passeio não encontrado: ${cleanItemName}` }),
           { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -129,6 +132,7 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (pkgErr || !pkg) {
+        console.error("Package not found or error:", { itemName, pkgErr });
         return new Response(
           JSON.stringify({ error: `Pacote não encontrado: ${itemName}` }),
           { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -150,6 +154,7 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (routeErr || !route) {
+        console.error("Route not found or error:", { origin: parts[0], destination: parts[1], routeErr });
         return new Response(JSON.stringify({ error: "Translado não encontrado" }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
       publicUnitPrice = route.price;
@@ -192,7 +197,7 @@ Deno.serve(async (req) => {
           collaborator_id: collaboratorId || null,
           partner_id: partner_id || null,
         })
-        .select("*, customers!fk_bookings_customer(*)")
+        .select("*, customers!customer_id(*)")
         .single();
 
       if (bookingErr) {
@@ -223,6 +228,7 @@ Deno.serve(async (req) => {
     let customerId = existingCustomer?.id;
 
     if (!customerId) {
+      console.log("Creating new customer:", { name: customerName, email: trimmedEmail });
       const { data: newCustomer, error: custErr } = await supabaseAdmin
         .from("customers")
         .insert({
@@ -237,11 +243,15 @@ Deno.serve(async (req) => {
         .select("id")
         .single();
 
-      if (custErr) throw custErr;
+      if (custErr) {
+        console.error("Error creating customer:", custErr);
+        throw custErr;
+      }
       customerId = newCustomer.id;
     }
 
     const booking = await createBookingRecord(customerId);
+    console.log("Booking created successfully:", booking.id);
     return new Response(JSON.stringify(booking), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

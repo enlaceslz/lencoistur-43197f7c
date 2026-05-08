@@ -140,7 +140,7 @@ export function useBookings() {
     ): Promise<BookingItem> => {
       const { data: result, error } = await supabase.functions.invoke("create-booking", {
         body: {
-          type: data.type === "transfer" ? "translado" : "passeio",
+          type: data.type === "transfer" ? "translado" : data.type === "package" ? "package" : "passeio",
           itemName: data.itemName,
           date: data.date || null,
           guests: data.guests,
@@ -155,6 +155,7 @@ export function useBookings() {
           notes: data.notes,
           companions: data.companions,
           partner_id: data.partnerId,
+          collaboratorId: data.collaboratorId,
           publicUnitPrice: data.publicUnitPrice,
           publicTotal: data.publicTotal,
         },
