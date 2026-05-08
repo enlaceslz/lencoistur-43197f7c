@@ -158,15 +158,16 @@ const ToursPage = () => {
                     </span>
                     <div className="flex items-baseline gap-1">
                       <p className={`text-lg font-bold ${tour.mode_collective_enabled !== false ? "text-primary" : "text-secondary"}`}>
-                        {formatCurrency(() => {
+                        {(() => {
                           const isPrivate = tour.mode_collective_enabled === false;
                           const basePublicPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
+                          let priceToFormat = basePublicPrice;
                           if (partner) {
                             const specificPartnerPrice = isPrivate ? tour.partner_private_price : tour.partner_price;
-                            if (specificPartnerPrice && specificPartnerPrice > 0) return specificPartnerPrice;
-                            if (partner.commission_rate > 0) return Math.round(basePublicPrice * (1 - partner.commission_rate / 100));
+                            if (specificPartnerPrice && specificPartnerPrice > 0) priceToFormat = specificPartnerPrice;
+                            else if (partner.commission_rate > 0) priceToFormat = Math.round(basePublicPrice * (1 - partner.commission_rate / 100));
                           }
-                          return basePublicPrice;
+                          return formatCurrency(priceToFormat);
                         })()}
                       </p>
                       {tour.pix_discount > 0 && !partnerId && (
