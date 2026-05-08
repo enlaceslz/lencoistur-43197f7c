@@ -205,13 +205,7 @@ const PackageDetail = () => {
                 )}
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-bold text-primary font-display">
-                    {formatCurrency(partner 
-                      ? (pkg.partner_price && pkg.partner_price > 0 
-                          ? pkg.partner_price 
-                          : (partner.commission_rate > 0 
-                              ? Math.round(pkg.discount_price * (1 - partner.commission_rate / 100)) 
-                              : pkg.discount_price)) 
-                      : pkg.discount_price)}
+                    {formatCurrency(partnerPrice ?? pkg.discount_price)}
                   </span>
                   <span className="text-muted-foreground">/ pessoa</span>
                 </div>
