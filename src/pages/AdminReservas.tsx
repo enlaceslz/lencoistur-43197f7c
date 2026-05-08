@@ -562,8 +562,15 @@ const AdminReservas = () => {
                 {/* Footer with Price and Actions */}
                 <div className="flex items-center justify-between pt-4 md:pt-6 border-t border-border/40">
                   <div>
-                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-0.5 md:mb-1">Valor Total</span>
-                    <p className="text-xl md:text-2xl font-black text-foreground tracking-tighter">{fmt(booking.finalTotal)}</p>
+                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-0.5 md:mb-1">
+                      {booking.publicTotal && booking.publicTotal !== booking.finalTotal ? "Valor Líquido" : "Valor Total"}
+                    </span>
+                    <div className="flex flex-col">
+                      <p className="text-xl md:text-2xl font-black text-foreground tracking-tighter leading-none">{fmt(booking.finalTotal)}</p>
+                      {booking.publicTotal && booking.publicTotal !== booking.finalTotal && (
+                        <span className="text-[8px] font-bold text-muted-foreground/40 uppercase mt-1">Venda: {fmt(booking.publicTotal)}</span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex gap-1.5 md:gap-2">
                     <TooltipProvider>
@@ -888,6 +895,8 @@ const AdminReservas = () => {
                       total: selected.total,
                       discount: selected.discount,
                       finalTotal: selected.finalTotal,
+                      publicUnitPrice: selected.publicUnitPrice,
+                      publicTotal: selected.publicTotal,
                       payMethod: selected.payMethod,
                       paymentStatus: selected.paymentStatus,
                       status: selected.status,

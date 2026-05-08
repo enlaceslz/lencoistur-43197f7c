@@ -111,19 +111,25 @@ const AdminFinanceiro = () => {
   );
 
   const filteredTransactions = useMemo(() => {
+    // Bookings that are NOT in contas_receber (to avoid double counting)
+    // Actually, it's safer to only count confirmed bookings here if they don't have a booking_id in contas_receber
+    const bookingIdsInFinance = new Set(monthContasReceber.map(c => c.booking_id).filter(Boolean));
+
     const all = [
-      ...monthBookings.map(b => ({
-        date: b.created_at,
-        desc: `[ENTRADA] ${b.item_name} - ${b.customers?.name || "N/A"}`,
-        method: (b.pay_method || "N/A").toUpperCase(),
-        value: b.final_total,
-        status: b.payment_status === "pago" ? "PAGO" : "PENDENTE",
-        type: 'entrada' as const
-      })),
+      ...monthBookings
+        .filter(b => !bookingIdsInFinance.has(b.id))
+        .map(b => ({
+          date: b.created_at,
+          desc: `[ENTRADA] ${b.item_name} - ${b.customers?.name || "N/A"}`,
+          method: (b.pay_method || "N/A").toUpperCase(),
+          value: b.final_total,
+          status: b.payment_status === "pago" ? "PAGO" : "PENDENTE",
+          type: 'entrada' as const
+        })),
       ...monthContasReceber.map(c => ({
-        date: c.vencimento,
+        date: c.recebido_em || c.vencimento,
         desc: c.partner_id 
-          ? `[COMISSÃO/PARCEIRO] ${c.descricao}`
+          ? `[PARCEIRO NET] ${c.descricao}`
           : `[RECEBER] ${c.descricao} - ${c.cliente || "N/A"}`,
         method: c.partner_id ? "PARCEIRO" : "RECEBÍVEL",
         value: c.valor,
@@ -131,9 +137,9 @@ const AdminFinanceiro = () => {
         type: 'entrada' as const
       })),
       ...monthContasPagar.map(c => ({
-        date: c.vencimento,
+        date: c.pagamento_em || c.vencimento,
         desc: c.collaborator_id
-          ? `[OPERACIONAL] ${c.descricao}`
+          ? `[COMISSÃO] ${c.descricao}`
           : `[SAÍDA] ${c.descricao} - ${c.fornecedor || "N/A"}`,
         method: c.collaborator_id ? "COLABORADOR" : "TRANSFERÊNCIA",
         value: -c.valor,
@@ -156,9 +162,23 @@ const AdminFinanceiro = () => {
     }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }, [monthBookings, monthContasPagar, monthContasReceber, searchTerm, statusFilter, typeFilter]);
 
-  const receitaPaga = monthBookings.filter(b => b.payment_status === "pago").reduce((s, b) => s + b.final_total, 0) + 
-                      monthContasReceber.filter(c => c.status === "recebido").reduce((s, c) => s + (c.valor * 100), 0) / 100;
-  const despesasMes = monthContasPagar.filter(c => c.status === "pago").reduce((s, c) => s + (c.valor * 100), 0) / 100;
+  const receitaPaga = useMemo(() => {
+    const fromBookings = monthBookings
+      .filter(b => b.payment_status === "pago" && !monthContasReceber.some(c => c.booking_id === b.id))
+      .reduce((s, b) => s + b.final_total, 0);
+    
+    const fromFinance = monthContasReceber
+      .filter(c => c.status === "recebido")
+      .reduce((s, c) => s + (c.valor * 100), 0) / 100;
+      
+    return fromBookings + fromFinance;
+  }, [monthBookings, monthContasReceber]);
+
+  const despesasMes = useMemo(() => {
+    return monthContasPagar
+      .filter(c => c.status === "pago")
+      .reduce((s, c) => s + (c.valor * 100), 0) / 100;
+  }, [monthContasPagar]);
   const lucroMes = receitaPaga - despesasMes;
   const pagos = monthBookings.filter(b => b.payment_status === "pago");
   const ticketMedio = pagos.length > 0 ? Math.round(receitaPaga / pagos.length) : 0;
