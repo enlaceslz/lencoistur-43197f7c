@@ -285,12 +285,30 @@ const TermoAssinatura = () => {
         if (termError) throw termError;
       }
 
-      // 2. Update companion signatures
-      for (const companionId in signatures) {
-        await supabase.from("sgs_risk_term_minors").update({
-          signature_data: signatures[companionId],
-          signed_at: new Date().toISOString()
-        }).eq("id", companionId);
+      // 2. Save/Update companion signatures
+      for (const companion of companions) {
+        const signature = signatures[companion.id] || companion.signature_data;
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(companion.id);
+        
+        if (!isUUID) {
+          // If it's a pre-loaded companion (doesn't exist in sgs_risk_term_minors yet)
+          const { error: minorError } = await supabase.from("sgs_risk_term_minors").insert({
+            risk_term_id: currentTermId,
+            full_name: companion.full_name,
+            is_adult: companion.is_adult,
+            responsible_name: companion.responsible_name,
+            signature_data: signature,
+            signed_at: signature ? new Date().toISOString() : null
+          });
+          if (minorError) console.error("Error inserting companion:", minorError);
+        } else {
+          // It's an existing companion record, just update signature if provided
+          const { error: minorError } = await supabase.from("sgs_risk_term_minors").update({
+            signature_data: signature,
+            signed_at: signature ? new Date().toISOString() : null
+          }).eq("id", companion.id);
+          if (minorError) console.error("Error updating companion:", minorError);
+        }
       }
 
       // 2. Generate PDF
