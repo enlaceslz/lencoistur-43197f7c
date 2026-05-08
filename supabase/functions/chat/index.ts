@@ -32,6 +32,50 @@ Regras:
 const MAX_MESSAGES = 20;
 const MAX_MESSAGE_LENGTH = 2000;
 const VALID_ROLES = ["user", "assistant"];
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 12;
+const allowedOrigins = new Set([
+  "https://lencoistur.lovable.app",
+  "https://id-preview--16dcb051-a2c2-428e-b885-595f7b457f88.lovable.app",
+  "http://localhost:3000",
+  "http://localhost:4173",
+  "http://localhost:5173",
+]);
+const requestCounts = new Map<string, { count: number; resetAt: number }>();
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("origin");
+  const allowOrigin = origin && allowedOrigins.has(origin) ? origin : "https://lencoistur.lovable.app";
+  return { ...corsHeaders, "Access-Control-Allow-Origin": allowOrigin, Vary: "Origin" };
+}
+
+function getClientKey(req: Request) {
+  const forwarded = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  const cfIp = req.headers.get("cf-connecting-ip")?.trim();
+  return forwarded || cfIp || "unknown";
+}
+
+function isAllowedOrigin(req: Request) {
+  const origin = req.headers.get("origin");
+  return Boolean(origin && allowedOrigins.has(origin));
+}
+
+function isRateLimited(key: string) {
+  const now = Date.now();
+  const current = requestCounts.get(key);
+  if (!current || current.resetAt <= now) {
+    requestCounts.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+
+  if (current.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return true;
+  }
+
+  current.count += 1;
+  requestCounts.set(key, current);
+  return false;
+}
 
 // Cache tour/transfer data for 5 minutes
 let cachedPrompt: string | null = null;
@@ -80,23 +124,39 @@ async function buildSystemPrompt(): Promise<string> {
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const responseHeaders = getCorsHeaders(req);
+
+  if (req.method === "OPTIONS") return new Response(null, { headers: responseHeaders });
 
   try {
+    if (!isAllowedOrigin(req)) {
+      return new Response(JSON.stringify({ error: "Origem não autorizada." }), {
+        status: 403,
+        headers: { ...responseHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (isRateLimited(getClientKey(req))) {
+      return new Response(JSON.stringify({ error: "Muitas requisições. Tente novamente em alguns segundos." }), {
+        status: 429,
+        headers: { ...responseHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const body = await req.json();
     const { messages } = body;
 
     if (!messages || !Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: "messages array is required" }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...responseHeaders, "Content-Type": "application/json" },
       });
     }
 
     if (messages.length > MAX_MESSAGES) {
       return new Response(JSON.stringify({ error: `Máximo de ${MAX_MESSAGES} mensagens permitidas.` }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...responseHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -105,19 +165,19 @@ serve(async (req) => {
       if (!msg || typeof msg.content !== "string" || typeof msg.role !== "string") {
         return new Response(JSON.stringify({ error: "Formato de mensagem inválido." }), {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...responseHeaders, "Content-Type": "application/json" },
         });
       }
       if (!VALID_ROLES.includes(msg.role)) {
         return new Response(JSON.stringify({ error: "Role de mensagem inválido." }), {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...responseHeaders, "Content-Type": "application/json" },
         });
       }
       if (msg.content.length > MAX_MESSAGE_LENGTH) {
         return new Response(JSON.stringify({ error: `Mensagem excede ${MAX_MESSAGE_LENGTH} caracteres.` }), {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...responseHeaders, "Content-Type": "application/json" },
         });
       }
       sanitizedMessages.push({ role: msg.role, content: msg.content.trim() });
@@ -148,31 +208,31 @@ serve(async (req) => {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Muitas requisições. Tente novamente em alguns segundos." }), {
           status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...responseHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "Créditos de IA esgotados." }), {
           status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...responseHeaders, "Content-Type": "application/json" },
         });
       }
       const t = await response.text();
       console.error("AI gateway error:", response.status, t);
       return new Response(JSON.stringify({ error: "Erro no serviço de IA" }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...responseHeaders, "Content-Type": "application/json" },
       });
     }
 
     return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+      headers: { ...responseHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (e) {
     console.error("chat error:", e);
     return new Response(JSON.stringify({ error: "Erro interno do servidor" }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...responseHeaders, "Content-Type": "application/json" },
     });
   }
 });
