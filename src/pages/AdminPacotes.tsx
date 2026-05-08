@@ -63,7 +63,7 @@ const AdminPacotes = () => {
 
   const [form, setForm] = useState({
     name: "", slug: "", description: "", days: 1, nights: 0,
-    original_price: 0, discount_price: 0, banner_url: "", tag: "", active: true,
+    original_price: 0, discount_price: 0, partner_price: 0, banner_url: "", tag: "", active: true,
     highlights: [] as string[]
   });
 
@@ -119,7 +119,7 @@ const AdminPacotes = () => {
   const openForm = (pkg?: any) => {
     if (pkg) {
       setEditingId(pkg.id);
-      setForm({ ...pkg, highlights: pkg.highlights || [] });
+      setForm({ ...pkg, highlights: pkg.highlights || [], partner_price: pkg.partner_price || pkg.discount_price || 0 });
       
       const pkgTours = (pkg.package_tours || []).map((pt: any) => ({
         id: pt.tour_id, type: 'tour' as const, data: tours.find(t => t.id === pt.tour_id)
@@ -132,7 +132,7 @@ const AdminPacotes = () => {
       setSelectedItems([...pkgTours, ...pkgTrans]);
     } else {
       setEditingId(null);
-      setForm({ name: "", slug: "", description: "", days: 1, nights: 0, original_price: 0, discount_price: 0, banner_url: "", tag: "", active: true, highlights: [] });
+      setForm({ name: "", slug: "", description: "", days: 1, nights: 0, original_price: 0, discount_price: 0, partner_price: 0, banner_url: "", tag: "", active: true, highlights: [] });
       setSelectedItems([]);
     }
     setShowForm(true);
@@ -369,24 +369,44 @@ const AdminPacotes = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="pkg-price" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Final (R$)</Label>
-                      <div className="relative">
-                        <NumericFormat
-                          id="pkg-price"
-                          value={form.discount_price / 100}
-                          onValueChange={(values) => {
-                            const { floatValue } = values;
-                            setForm({ ...form, discount_price: Math.round((floatValue || 0) * 100) });
-                          }}
-                          thousandSeparator="."
-                          decimalSeparator=","
-                          prefix="R$ "
-                          decimalScale={2}
-                          fixedDecimalScale
-                          className="flex h-12 w-full px-4 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-black text-primary outline-none focus:ring-2 focus:ring-primary/20"
-                        />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="pkg-price" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Site (R$)</Label>
+                        <div className="relative">
+                          <NumericFormat
+                            id="pkg-price"
+                            value={form.discount_price / 100}
+                            onValueChange={(values) => {
+                              const { floatValue } = values;
+                              setForm({ ...form, discount_price: Math.round((floatValue || 0) * 100) });
+                            }}
+                            thousandSeparator="."
+                            decimalSeparator=","
+                            prefix="R$ "
+                            decimalScale={2}
+                            fixedDecimalScale
+                            className="flex h-12 w-full px-4 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-black text-primary outline-none focus:ring-2 focus:ring-primary/20"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="pkg-partner-price" className="text-[10px] font-black uppercase text-primary/60 tracking-widest ml-1">Preço Parceiro (R$)</Label>
+                        <div className="relative">
+                          <NumericFormat
+                            id="pkg-partner-price"
+                            value={form.partner_price / 100}
+                            onValueChange={(values) => {
+                              const { floatValue } = values;
+                              setForm({ ...form, partner_price: Math.round((floatValue || 0) * 100) });
+                            }}
+                            thousandSeparator="."
+                            decimalSeparator=","
+                            prefix="R$ "
+                            decimalScale={2}
+                            fixedDecimalScale
+                            className="flex h-12 w-full px-4 rounded-xl border border-primary/20 bg-primary/5 focus:bg-white transition-all font-black text-primary outline-none focus:ring-2 focus:ring-primary/20"
+                          />
+                        </div>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
@@ -417,10 +437,9 @@ const AdminPacotes = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="pkg-banner" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Banner do Pacote (Upload ou URL)</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="pkg-banner" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Banner do Pacote (Upload ou URL)</Label>
                     <div className="flex gap-2">
                       <div className="relative group flex-1">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">

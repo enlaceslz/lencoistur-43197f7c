@@ -39,7 +39,10 @@ const DIFFICULTIES = ["Fácil", "Moderada", "Moderada a Difícil", "Difícil"];
 
 const emptyForm = {
   name: "", slug: "", location: "", duration: "", price: 16000,
-  private_price: 130000, vehicle_capacity: 9,
+  private_price: 130000, 
+  partner_price: 14000,
+  partner_private_price: 110000,
+  vehicle_capacity: 9,
   pix_discount: 0,
   tag: "", description: "", category: "Ecoturismo", difficulty: "Fácil",
   group_size: "Até 9 pessoas", departure: "Santo Amaro do Maranhão",
@@ -87,7 +90,11 @@ const AdminPasseios = () => {
     setEditingId(t.id);
     setForm({
       name: t.name, slug: t.slug, location: t.location || "",
-      duration: t.duration || "", price: t.price, private_price: t.private_price || 130000,
+      duration: t.duration || "", 
+      price: t.price, 
+      private_price: t.private_price || 130000,
+      partner_price: t.partner_price || t.price,
+      partner_private_price: t.partner_private_price || t.private_price || 110000,
       vehicle_capacity: t.vehicle_capacity || 9, pix_discount: t.pix_discount || 0,
       tag: t.tag || "",
       description: t.description || "", category: t.category || "Ecoturismo",
@@ -186,6 +193,8 @@ const AdminPasseios = () => {
       name: form.name.trim(), slug,
       location: form.location.trim(), duration: form.duration.trim(),
       price: Number(form.price), private_price: Number(form.private_price),
+      partner_price: Number(form.partner_price),
+      partner_private_price: Number(form.partner_private_price),
       vehicle_capacity: Number(form.vehicle_capacity) || 9,
       pix_discount: pixDiscount,
       tag: form.tag.trim() || null,
@@ -405,6 +414,28 @@ const AdminPasseios = () => {
                     "w-full bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 transition-all outline-none",
                     !form.mode_private_enabled && "opacity-40 grayscale"
                   )}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-primary/60 tracking-widest ml-1">Preço Parceiro Coletivo (R$)</Label>
+                <NumericFormat
+                  value={form.partner_price / 100}
+                  onValueChange={(values) => setForm({ ...form, partner_price: Math.round(Number(values.floatValue) * 100) })}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  prefix="R$ "
+                  className="w-full bg-primary/5 border border-primary/20 rounded-xl px-4 h-12 text-sm font-bold text-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-primary/60 tracking-widest ml-1">Preço Parceiro Privativo (R$)</Label>
+                <NumericFormat
+                  value={form.partner_private_price / 100}
+                  onValueChange={(values) => setForm({ ...form, partner_private_price: Math.round(Number(values.floatValue) * 100) })}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  prefix="R$ "
+                  className="w-full bg-primary/5 border border-primary/20 rounded-xl px-4 h-12 text-sm font-bold text-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
                 />
               </div>
               <div>

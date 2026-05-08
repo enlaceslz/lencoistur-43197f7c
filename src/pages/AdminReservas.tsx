@@ -17,7 +17,7 @@ import {
   DollarSign, Ban, Loader2, Users, Calendar, CreditCard, FileText,
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
   Plus, Copy, Pencil, Car, Compass, LayoutGrid, List, X, XCircle as XCircleIcon,
-  ChevronRight, ArrowRight, User, Hash, Info, Moon, Save
+  ChevronRight, ArrowRight, User, Hash, Info, Moon, Save, Package as PackageIcon
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -54,7 +54,8 @@ const fmtDateTime = (d: string) => {
   try { return new Date(d).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }); } catch { return d; }
 };
 
-interface TourOption { id: string; name: string; price: number; private_price?: number; pix_discount?: number; }
+interface TourOption { id: string; name: string; price: number; private_price?: number; partner_price?: number; partner_private_price?: number; pix_discount?: number; }
+interface PackageOption { id: string; name: string; original_price: number; discount_price: number; partner_price?: number; }
 interface TransferOption { id: string; label: string; price: number; pix_discount?: number; }
 
 // Utilizando máscaras de @/lib/masks.ts
@@ -76,13 +77,15 @@ const AdminReservas = () => {
   const [showNewForm, setShowNewForm] = useState(false);
   const [newLoading, setNewLoading] = useState(false);
   const [tours, setTours] = useState<TourOption[]>([]);
+  const [packages, setPackages] = useState<PackageOption[]>([]);
   const [transfers, setTransfers] = useState<TransferOption[]>([]);
   const [existingCustomers, setExistingCustomers] = useState<{ id: string; name: string; email: string; phone: string | null; cpf?: string; passport?: string; country?: string; birth_date?: string }[]>([]);
   const [collaborators, setCollaborators] = useState<{ id: string; name: string }[]>([]);
+  const [partners, setPartners] = useState<{ id: string; name: string }[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
   const [customerSearch, setCustomerSearch] = useState("");
   const [newForm, setNewForm] = useState({
-    type: "tour" as "tour" | "transfer",
+    type: "tour" as "tour" | "transfer" | "package",
     tourMode: "coletivo" as "coletivo" | "privativo",
     itemName: "",
     date: "",
@@ -97,21 +100,26 @@ const AdminReservas = () => {
     birthDate: "",
     notes: "",
     collaboratorId: "",
+    partnerId: "",
   });
 
   useEffect(() => {
     if (!showNewForm) return;
     const loadOptions = async () => {
-      const [{ data: t }, { data: tr }, { data: cust }, { data: collabs }] = await Promise.all([
-        supabase.from("tours").select("id, name, price, private_price, pix_discount").eq("active", true).order("name"),
+      const [{ data: t }, { data: tr }, { data: cust }, { data: collabs }, { data: parts }, { data: pkgs }] = await Promise.all([
+        supabase.from("tours").select("id, name, price, private_price, partner_price, partner_private_price, pix_discount").eq("active", true).order("name"),
         supabase.from("transfer_routes").select("id, origin, destination, price, pix_discount").eq("active", true).order("origin"),
         supabase.from("customers").select("id, name, email, phone, cpf, passport, country, birth_date").order("name"),
         supabase.from("collaborators").select("id, name").eq("status", "active").order("name"),
+        supabase.from("partners").select("id, name").eq("active", true).order("name"),
+        supabase.from("packages").select("id, name, original_price, discount_price, partner_price").eq("active", true).order("name"),
       ]);
-      if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price, private_price: r.private_price, pix_discount: r.pix_discount })));
+      if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price, private_price: r.private_price, partner_price: r.partner_price, partner_private_price: r.partner_private_price, pix_discount: r.pix_discount })));
       if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price, pix_discount: r.pix_discount })));
       if (cust) setExistingCustomers(cust);
       if (collabs) setCollaborators(collabs);
+      if (parts) setPartners(parts);
+      if (pkgs) setPackages(pkgs);
     };
     loadOptions();
   }, [showNewForm]);
@@ -122,7 +130,7 @@ const AdminReservas = () => {
     const cleanName = b.itemName.replace(/\s*\((Coletivo|Privativo)\)$/, "");
     
     setNewForm({
-      type: b.type === "transfer" ? "transfer" : "tour",
+      type: b.type === "transfer" ? "transfer" : b.type === "package" ? "package" : "tour",
       tourMode: mode as "coletivo" | "privativo",
       itemName: b.type === "transfer" ? b.itemName : cleanName,
       date: b.date,
@@ -137,6 +145,7 @@ const AdminReservas = () => {
       birthDate: b.birthDate || "",
       notes: b.notes || "",
       collaboratorId: b.collaboratorId || "",
+      partnerId: b.partnerId || "",
     });
     setSelectedCustomerId(b.customerId || "");
     setShowNewForm(true);
@@ -146,7 +155,7 @@ const AdminReservas = () => {
     setNewForm({
       type: "tour", tourMode: "coletivo", itemName: "", date: "", guests: 2, payMethod: "pix",
       customerName: "", customerEmail: "", customerPhone: "",
-      cpf: "", passport: "", country: "Brasil", birthDate: "", notes: "", collaboratorId: ""
+      cpf: "", passport: "", country: "Brasil", birthDate: "", notes: "", collaboratorId: "", partnerId: ""
     });
     setSelectedCustomerId("");
     setCustomerSearch("");
@@ -161,13 +170,20 @@ const AdminReservas = () => {
   // Calculate prices for the new form
   const selectedTour = newForm.type === "tour" ? tours.find(t => t.name === newForm.itemName) : null;
   const selectedTransfer = newForm.type === "transfer" ? transfers.find(t => t.label === newForm.itemName) : null;
+  const selectedPackage = newForm.type === "package" ? packages.find(t => t.name === newForm.itemName) : null;
   
   const unitPrice = newForm.type === "tour" 
-    ? (newForm.tourMode === "privativo" ? (selectedTour?.private_price || 0) : (selectedTour?.price || 0))
-    : (selectedTransfer?.price || 0);
-  const total = newForm.type === "tour" && newForm.tourMode === "privativo" ? unitPrice : unitPrice * newForm.guests;
+    ? (newForm.partnerId 
+        ? (newForm.tourMode === "privativo" ? (selectedTour?.partner_private_price || selectedTour?.private_price || 0) : (selectedTour?.partner_price || selectedTour?.price || 0))
+        : (newForm.tourMode === "privativo" ? (selectedTour?.private_price || 0) : (selectedTour?.price || 0))
+      )
+    : newForm.type === "package"
+      ? (newForm.partnerId ? (selectedPackage?.partner_price || selectedPackage?.discount_price || 0) : (selectedPackage?.discount_price || 0))
+      : (selectedTransfer?.price || 0);
+
+  const total = (newForm.type === "tour" && newForm.tourMode === "privativo") || newForm.type === "package" ? unitPrice : unitPrice * newForm.guests;
   const pixDiscountPercent = (selectedTour?.pix_discount || selectedTransfer?.pix_discount || 0);
-  const discount = (newForm.payMethod === "pix" && pixDiscountPercent > 0) 
+  const discount = (newForm.payMethod === "pix" && pixDiscountPercent > 0 && !newForm.partnerId) 
     ? Math.round(total * pixDiscountPercent / 100) 
     : 0;
   const finalTotal = total - discount;
@@ -208,6 +224,7 @@ const AdminReservas = () => {
         discount,
         finalTotal,
         collaboratorId: newForm.collaboratorId || undefined,
+        partnerId: newForm.partnerId || undefined,
       };
 
       if (editingId) {
@@ -839,22 +856,30 @@ const AdminReservas = () => {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Tipo de Serviço</Label>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-3 gap-2">
                         <Button 
                           type="button" 
                           variant={newForm.type === "tour" ? "default" : "outline"} 
                           onClick={() => setNewForm(f => ({ ...f, type: "tour", itemName: "" }))}
-                          className={cn("h-11 rounded-xl font-bold", newForm.type === "tour" && "shadow-lg shadow-primary/20")}
+                          className={cn("h-11 rounded-xl font-bold px-1", newForm.type === "tour" && "shadow-lg shadow-primary/20")}
                         >
-                          <Compass size={16} className="mr-2" /> Passeio
+                          <Compass size={16} className="mr-1 hidden sm:inline" /> Passeio
                         </Button>
                         <Button 
                           type="button" 
                           variant={newForm.type === "transfer" ? "default" : "outline"} 
                           onClick={() => setNewForm(f => ({ ...f, type: "transfer", itemName: "" }))}
-                          className={cn("h-11 rounded-xl font-bold", newForm.type === "transfer" && "shadow-lg shadow-primary/20")}
+                          className={cn("h-11 rounded-xl font-bold px-1", newForm.type === "transfer" && "shadow-lg shadow-primary/20")}
                         >
-                          <Car size={16} className="mr-2" /> Translado
+                          <Car size={16} className="mr-1 hidden sm:inline" /> Transf.
+                        </Button>
+                        <Button 
+                          type="button" 
+                          variant={newForm.type === "package" ? "default" : "outline"} 
+                          onClick={() => setNewForm(f => ({ ...f, type: "package", itemName: "" }))}
+                          className={cn("h-11 rounded-xl font-bold px-1", newForm.type === "package" && "shadow-lg shadow-primary/20")}
+                        >
+                          <PackageIcon size={16} className="mr-1 hidden sm:inline" /> Pacote
                         </Button>
                       </div>
                     </div>
@@ -885,7 +910,7 @@ const AdminReservas = () => {
 
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">
-                        {newForm.type === "tour" ? "Selecionar Passeio" : "Selecionar Rota"}
+                        {newForm.type === "tour" ? "Selecionar Passeio" : newForm.type === "package" ? "Selecionar Pacote" : "Selecionar Rota"}
                       </Label>
                       <select
                         value={newForm.itemName}
@@ -895,8 +920,10 @@ const AdminReservas = () => {
                       >
                         <option value="">Selecione um item...</option>
                         {newForm.type === "tour"
-                          ? tours.map(t => <option key={t.id} value={t.name}>{t.name} — {fmt(newForm.tourMode === "privativo" ? t.private_price : t.price)}</option>)
-                          : transfers.map(t => <option key={t.id} value={t.label}>{t.label} — {fmt(t.price)}</option>)
+                          ? tours.map(t => <option key={t.id} value={t.name}>{t.name} — {fmt(newForm.tourMode === "privativo" ? (newForm.partnerId ? t.partner_private_price || t.private_price : t.private_price) : (newForm.partnerId ? t.partner_price || t.price : t.price))}</option>)
+                          : newForm.type === "package"
+                            ? packages.map(p => <option key={p.id} value={p.name}>{p.name} — {fmt(newForm.partnerId ? p.partner_price || p.discount_price : p.discount_price)}</option>)
+                            : transfers.map(t => <option key={t.id} value={t.label}>{t.label} — {fmt(t.price)}</option>)
                         }
                       </select>
                     </div>
@@ -947,6 +974,19 @@ const AdminReservas = () => {
                           Cartão
                         </Button>
                       </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Parceiro (Tarifa Net)</Label>
+                      <select
+                        value={newForm.partnerId}
+                        onChange={(e) => setNewForm(f => ({ ...f, partnerId: e.target.value }))}
+                        className="w-full bg-primary/5 border border-primary/20 rounded-xl px-4 h-12 text-sm font-bold text-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                      >
+                        <option value="">Nenhum (Preço Público)</option>
+                        {partners.map(p => (
+                          <option key={p.id} value={p.id}>{p.name}</option>
+                        ))}
+                      </select>
                     </div>
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Vendedor</Label>

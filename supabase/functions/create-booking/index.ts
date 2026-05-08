@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
 
     // Validate required fields
-    const { type, itemName, date, guests, payMethod, customerName, customerEmail, customerPhone, cpf, passport, country, birthDate, notes, companions, collaboratorId } = body;
+    const { type, itemName, date, guests, payMethod, customerName, customerEmail, customerPhone, cpf, passport, country, birthDate, notes, companions, collaboratorId, partner_id } = body;
 
     if (!type || !itemName || !customerName || !customerEmail || !payMethod) {
       return new Response(
@@ -113,7 +113,7 @@ Deno.serve(async (req) => {
       
       const { data: tour, error: tourErr } = await supabaseAdmin
         .from("tours")
-        .select("price, private_price, name, pix_discount")
+        .select("price, private_price, partner_price, partner_private_price, name, pix_discount")
         .eq("name", cleanItemName)
         .eq("active", true)
         .maybeSingle();
@@ -127,12 +127,16 @@ Deno.serve(async (req) => {
       }
       
       const isPrivate = itemName.includes("(Privativo)");
-      unitPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
+      if (partner_id) {
+        unitPrice = isPrivate ? (tour.partner_private_price || tour.private_price || 110000) : (tour.partner_price || tour.price);
+      } else {
+        unitPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
+      }
       pixDiscountPercent = tour.pix_discount || 0;
     } else if (type === "package") {
       const { data: pkg, error: pkgErr } = await supabaseAdmin
         .from("packages")
-        .select("discount_price, name")
+        .select("discount_price, partner_price, name")
         .eq("name", itemName)
         .eq("active", true)
         .maybeSingle();
@@ -143,7 +147,11 @@ Deno.serve(async (req) => {
           { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      unitPrice = pkg.discount_price;
+      if (partner_id) {
+        unitPrice = pkg.partner_price || pkg.discount_price;
+      } else {
+        unitPrice = pkg.discount_price;
+      }
       pixDiscountPercent = 5; // Default for packages
     } else {
       // translado - itemName format: "origin → destination"
@@ -177,7 +185,8 @@ Deno.serve(async (req) => {
     
     // Apply PIX discount server-side (only for PIX payments, capped 0-50%)
     const validPixDiscount = Math.max(0, Math.min(50, pixDiscountPercent));
-    const discount = payMethod === "pix" && validPixDiscount > 0
+    // Partners don't get PIX discount as they already have a net tariff
+    const discount = payMethod === "pix" && validPixDiscount > 0 && !partner_id
       ? Math.round(total * validPixDiscount / 100)
       : 0;
     const finalTotal = total - discount;
@@ -206,6 +215,7 @@ Deno.serve(async (req) => {
           notes: notes || null,
           booking_code: generateBookingCode(),
           collaborator_id: collaboratorId || null,
+          partner_id: partner_id || null,
         })
         .select("*, customers!fk_bookings_customer(*)")
         .single();
