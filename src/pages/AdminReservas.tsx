@@ -896,8 +896,8 @@ const AdminReservas = () => {
 
       {/* New Booking Dialog */}
       <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
-        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[95vh] overflow-y-auto p-0 border-none shadow-3xl rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden bg-slate-50">
-          <div className="bg-white border-b border-slate-100 p-4 md:p-8 flex items-center justify-between sticky top-0 z-20">
+        <DialogContent className="max-w-[100vw] w-full h-[100dvh] sm:max-w-4xl sm:w-[95vw] sm:h-[95vh] overflow-y-auto p-0 border-none shadow-3xl sm:rounded-[2.5rem] overflow-hidden bg-slate-50 flex flex-col">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-8 flex items-center justify-between sticky top-0 z-20 shrink-0">
             <div className="flex items-center gap-3 md:gap-5">
               <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-[1.5rem] bg-primary/10 flex items-center justify-center text-primary shadow-inner">
                 {editingId ? <Pencil size={20} className="md:w-7 md:h-7" /> : <Plus size={20} className="md:w-7 md:h-7" />}
@@ -914,8 +914,8 @@ const AdminReservas = () => {
             </Button>
           </div>
 
-          <form onSubmit={handleNewBooking} className="flex flex-col h-full">
-            <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10 overflow-y-auto">
+          <form onSubmit={handleNewBooking} className="flex flex-col flex-1 min-h-0">
+            <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10 overflow-y-auto flex-1">
 
               {/* Coluna 1: Dados do Serviço */}
               <div className="lg:col-span-6 space-y-6">
@@ -1197,13 +1197,13 @@ const AdminReservas = () => {
               </div>
             </div>
             
-            <div className="flex gap-4 sticky bottom-0 bg-white border-t border-slate-100 p-4 md:p-8 z-20">
-              <Button type="button" variant="ghost" onClick={() => setShowNewForm(false)} className="flex-1 h-12 md:h-16 rounded-xl md:rounded-2xl font-black uppercase text-[10px] md:text-[12px] tracking-widest hover:bg-slate-50">
+            <div className="flex gap-4 sticky bottom-0 bg-white border-t border-slate-100 p-4 md:p-8 z-20 shrink-0">
+              <Button type="button" variant="ghost" onClick={() => setShowNewForm(false)} className="flex-1 h-12 md:h-14 rounded-xl md:rounded-2xl font-black uppercase text-[10px] md:text-[12px] tracking-widest hover:bg-slate-50">
                 Descartar
               </Button>
-              <Button type="submit" className="flex-[2] h-12 md:h-16 rounded-xl md:rounded-2xl bg-primary hover:bg-primary/90 shadow-2xl shadow-primary/20 font-black uppercase text-[10px] md:text-[12px] tracking-widest transition-all hover:scale-[1.02]" disabled={newLoading || !newForm.itemName}>
+              <Button type="submit" className="flex-[2] h-12 md:h-14 rounded-xl md:rounded-2xl bg-primary hover:bg-primary/90 shadow-2xl shadow-primary/20 font-black uppercase text-[10px] md:text-[12px] tracking-widest transition-all hover:scale-[1.02]" disabled={newLoading || !newForm.itemName}>
                 {newLoading ? <Loader2 className="animate-spin mr-2" size={18} /> : (editingId ? <Save size={18} className="mr-2" /> : <Plus size={18} className="mr-2" />)}
-                {editingId ? "Salvar Alterações" : "Confirmar Reserva"}
+                {editingId ? "Salvar" : "Confirmar"}
               </Button>
             </div>
           </form>
