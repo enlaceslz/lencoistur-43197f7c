@@ -465,14 +465,14 @@ const TermoAssinatura = () => {
       // 4. Save to CRM Customer Documents
       const customerId = booking?.customer_id || term?.customer_id;
       if (customerId) {
-        const { error: docError } = await supabase.from("customer_documents").insert({
+        const { error: docError } = await supabase.from("customer_documents").insert([{
           customer_id: customerId,
           name: `Termo Assinado - ${booking?.item_name || term?.tour_name}`,
           file_url: supabase.storage.from("customer-documents").getPublicUrl(filePath).data.publicUrl,
           file_type: "application/pdf",
           file_size: pdfBlob.size,
           category: "termo"
-        });
+        }]);
         if (docError) console.error("Error saving to customer_documents:", docError);
       }
 
