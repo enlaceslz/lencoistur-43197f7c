@@ -29,6 +29,7 @@ const PackageDetail = () => {
   const { t } = useTranslation();
   const [pkg, setPkg] = useState<any>(null);
   const [partner, setPartner] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {

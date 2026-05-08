@@ -13,6 +13,7 @@ interface Package {
   days: number;
   original_price: number;
   discount_price: number;
+  partner_price?: number;
   tag: string;
   highlights: string[];
   package_tours?: any[];
