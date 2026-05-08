@@ -2710,6 +2710,7 @@ export type Database = {
           duration: string | null
           id: string
           origin: string
+          partner_price: number | null
           pix_discount: number
           preferred_partner_id: string | null
           price: number
@@ -2726,6 +2727,7 @@ export type Database = {
           duration?: string | null
           id?: string
           origin: string
+          partner_price?: number | null
           pix_discount?: number
           preferred_partner_id?: string | null
           price: number
@@ -2742,6 +2744,7 @@ export type Database = {
           duration?: string | null
           id?: string
           origin?: string
+          partner_price?: number | null
           pix_discount?: number
           preferred_partner_id?: string | null
           price?: number
