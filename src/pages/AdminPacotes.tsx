@@ -437,10 +437,9 @@ const AdminPacotes = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="pkg-banner" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Banner do Pacote (Upload ou URL)</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="pkg-banner" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Banner do Pacote (Upload ou URL)</Label>
                     <div className="flex gap-2">
                       <div className="relative group flex-1">
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
