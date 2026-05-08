@@ -355,7 +355,7 @@ const TourDetail = () => {
                   <span className="text-foreground">Total</span>
                   <div className="text-right">
                     <span className={isPrivate ? "text-secondary" : "text-primary"}>{formatCurrency(totalPrice)}</span>
-                    {tour.pix_discount > 0 && (
+                    {tour.pix_discount > 0 && !partner && (
                       <p className="text-[11px] text-green-600 font-semibold">
                         ou {formatCurrency(Math.round(totalPrice * (1 - tour.pix_discount / 100)))} no PIX
                       </p>
@@ -365,7 +365,7 @@ const TourDetail = () => {
               </div>
 
               <div className="space-y-3">
-                <Link to={`/checkout?tour=${tour.slug}&pax=${guests}&date=${selectedDate}&mode=${tourMode}`}
+                <Link to={`/checkout?tour=${tour.slug}&pax=${guests}&date=${selectedDate}&mode=${tourMode}${partner ? `&partner_id=${partner.id}` : ''}`}
                   className={`w-full py-4 rounded-xl font-semibold text-lg transition-colors block text-center ${
                     isPrivate
                       ? "bg-secondary hover:bg-secondary/90 text-secondary-foreground"
