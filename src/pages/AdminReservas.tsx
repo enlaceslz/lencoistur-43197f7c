@@ -243,7 +243,7 @@ const AdminReservas = () => {
     setNewLoading(true);
     try {
       const bookingData = {
-        type: newForm.type === "transfer" ? "transfer" : "tour",
+        type: newForm.type,
         itemName: newForm.type === "tour" ? `${newForm.itemName} (${newForm.tourMode === "privativo" ? "Privativo" : "Coletivo"})` : newForm.itemName,
         date: newForm.date || "",
         guests: newForm.guests,
