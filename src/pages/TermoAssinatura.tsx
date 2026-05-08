@@ -291,10 +291,17 @@ const TermoAssinatura = () => {
       // 2. Save/Update companion signatures
       for (const companion of companions) {
         const signature = signatures[companion.id] || companion.signature_data;
-        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(companion.id);
         
-        if (!isUUID) {
-          // If it's a pre-loaded companion (doesn't exist in sgs_risk_term_minors yet)
+        // Check if this specific companion already exists in sgs_risk_term_minors for this term
+        const { data: existingMinor } = await supabase
+          .from("sgs_risk_term_minors")
+          .select("id")
+          .eq("risk_term_id", currentTermId)
+          .eq("full_name", companion.full_name)
+          .maybeSingle();
+        
+        if (!existingMinor) {
+          // If it's a new companion for this term
           const { error: minorError } = await supabase.from("sgs_risk_term_minors").insert({
             risk_term_id: currentTermId,
             full_name: companion.full_name,
@@ -309,7 +316,7 @@ const TermoAssinatura = () => {
           const { error: minorError } = await supabase.from("sgs_risk_term_minors").update({
             signature_data: signature,
             signed_at: signature ? new Date().toISOString() : null
-          }).eq("id", companion.id);
+          }).eq("id", existingMinor.id);
           if (minorError) console.error("Error updating companion:", minorError);
         }
       }
