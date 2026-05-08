@@ -513,12 +513,15 @@ const AdminConfig = () => {
     if (!confirmRestore) { e.target.value = ""; return; }
 
     setRestoreLoading(true);
+    setBackupProgress({ current: "Analisando arquivo...", total: 100, count: 0 });
     try {
       const text = await file.text();
       const parsed = JSON.parse(text);
 
       if (!parsed.metadata || !parsed.data) {
         toast.error("Arquivo de backup inválido. Formato não reconhecido.");
+        setRestoreLoading(false);
+        setBackupProgress(null);
         return;
       }
 
@@ -529,7 +532,11 @@ const AdminConfig = () => {
       const confirmFinal = window.confirm(
         `Backup de: ${backupDate}\n${parsed.metadata.total_records || "?"} registros e ${parsed.metadata.total_files || "0"} arquivos.\n\nConfirmar restauração completa?`
       );
-      if (!confirmFinal) return;
+      if (!confirmFinal) {
+        setRestoreLoading(false);
+        setBackupProgress(null);
+        return;
+      }
 
       let restored = 0;
       let restoredFiles = 0;
@@ -537,11 +544,16 @@ const AdminConfig = () => {
 
       // Restore Storage Files
       if (parsed.storage) {
+        const totalFiles = Object.values(parsed.storage).reduce((acc: number, val: any) => acc + (val?.length || 0), 0) as number;
+        let fileCount = 0;
+
         for (const bucket of STORAGE_BUCKETS) {
           const files = parsed.storage[bucket];
           if (!files || !Array.isArray(files)) continue;
 
           for (const fileObj of files) {
+            fileCount++;
+            setBackupProgress({ current: `Restaurando arquivo: ${fileObj.name}`, total: totalFiles, count: fileCount });
             try {
               const response = await fetch(fileObj.data);
               const blob = await response.blob();
@@ -561,24 +573,33 @@ const AdminConfig = () => {
       }
 
       // Restore Database Tables
-      // Step 1: Delete all current data in reverse order (children first) to avoid FK conflicts
-      const DELETE_ORDER = [...BACKUP_TABLES].reverse();
-      for (const table of DELETE_ORDER) {
+      // Step 1: Delete all current data in reverse order (children first)
+      // Only delete tables that are present in the backup to avoid wiping data that isn't being replaced
+      const tablesInBackup = Object.keys(parsed.data);
+      const DELETE_ORDER = [...BACKUP_TABLES].reverse().filter(t => tablesInBackup.includes(t));
+      
+      for (let i = 0; i < DELETE_ORDER.length; i++) {
+        const table = DELETE_ORDER[i];
+        setBackupProgress({ current: `Limpando tabela: ${table}`, total: DELETE_ORDER.length, count: i });
         const { error: delError } = await supabase.from(table as any).delete().neq("id", "00000000-0000-0000-0000-000000000000" as any);
         if (delError) {
           console.error(`Erro ao limpar ${table}:`, delError.message);
-          // If we can't delete, we continue anyway to try to restore as many as possible
         }
       }
 
       // Step 2: Insert backup data in original order (parents first)
-      for (const table of BACKUP_TABLES) {
+      for (let i = 0; i < BACKUP_TABLES.length; i++) {
+        const table = BACKUP_TABLES[i];
+        if (!tablesInBackup.includes(table)) continue;
+        
         const rows = parsed.data[table];
         if (!rows || !Array.isArray(rows) || rows.length === 0) continue;
 
+        setBackupProgress({ current: `Restaurando tabela: ${table}`, total: BACKUP_TABLES.length, count: i });
+
         // Insert backup data in batches of 100
-        for (let i = 0; i < rows.length; i += 100) {
-          const batch = rows.slice(i, i + 100);
+        for (let j = 0; j < rows.length; j += 100) {
+          const batch = rows.slice(j, j + 100);
           const { error: insError } = await supabase.from(table as any).insert(batch);
           if (insError) {
             console.error(`Erro ao restaurar ${table}:`, insError.message);
@@ -600,6 +621,7 @@ const AdminConfig = () => {
       toast.error("Erro ao processar arquivo de backup: " + (err instanceof Error ? err.message : "Erro desconhecido"));
     } finally {
       setRestoreLoading(false);
+      setBackupProgress(null);
       if (e.target) e.target.value = "";
     }
   };
