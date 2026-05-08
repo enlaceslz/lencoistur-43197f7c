@@ -6,6 +6,25 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+const allowedTypes = new Set(["passeio", "tour", "package", "translado", "transfer"]);
+const allowedPayMethods = new Set(["pix", "card", "info"]);
+
+function previewEmail(email?: string | null): string | null {
+  if (!email) return null;
+  const normalized = email.trim().toLowerCase();
+  const [local = "", domain = ""] = normalized.split("@");
+  if (!domain) return "***";
+  return `${local.slice(0, 3)}***@${domain}`;
+}
+
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isNonEmptyString(value: unknown, maxLength = 255): value is string {
+  return typeof value === "string" && value.trim().length > 0 && value.trim().length <= maxLength;
+}
+
 function generatePixCode(): string {
   const chars =
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -31,25 +50,48 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    console.log("Receiving booking request:", body);
 
     const { 
       type, itemName, date, guests, payMethod, customerName, 
       customerEmail, customerPhone, cpf, passport, country, 
-      birthDate, notes, companions, collaboratorId, partner_id,
-      publicUnitPrice: clientPublicUnitPrice,
-      publicTotal: clientPublicTotal
+      birthDate, notes, companions, collaboratorId, partner_id
     } = body;
 
-    if (!type || !itemName || !customerName || !customerEmail || !payMethod) {
-      console.error("Missing required fields:", { type, itemName, customerName, customerEmail, payMethod });
+    const trimmedEmail = typeof customerEmail === "string" ? customerEmail.trim().toLowerCase() : "";
+    const guestsNum = Number(guests);
+
+    if (
+      !allowedTypes.has(String(type)) ||
+      !isNonEmptyString(itemName) ||
+      !isNonEmptyString(customerName) ||
+      !isValidEmail(trimmedEmail) ||
+      !allowedPayMethods.has(String(payMethod)) ||
+      !Number.isInteger(guestsNum) ||
+      guestsNum < 1 ||
+      guestsNum > 50
+    ) {
+      console.error("Invalid booking payload received", {
+        type,
+        itemName: typeof itemName === "string" ? itemName.slice(0, 80) : null,
+        payMethod,
+        guests,
+        customerEmail: previewEmail(trimmedEmail),
+      });
       return new Response(
         JSON.stringify({ error: "Campos obrigatórios faltando" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const guestsNum = Number(guests);
+    console.log("Receiving booking request summary", {
+      type,
+      itemName: itemName.trim().slice(0, 80),
+      payMethod,
+      guests: guestsNum,
+      customerEmail: previewEmail(trimmedEmail),
+      hasPartner: Boolean(partner_id),
+      hasCollaborator: Boolean(collaboratorId),
+    });
     
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -58,14 +100,17 @@ Deno.serve(async (req) => {
 
     const authHeader = req.headers.get("Authorization");
     let userId = null;
-    if (authHeader) {
+    if (authHeader?.startsWith("Bearer ")) {
       const supabaseClient = createClient(
         Deno.env.get("SUPABASE_URL")!,
         Deno.env.get("SUPABASE_ANON_KEY")!,
         { global: { headers: { Authorization: authHeader } } }
       );
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      userId = user?.id;
+      const token = authHeader.replace("Bearer ", "");
+      const { data, error } = await supabaseClient.auth.getClaims(token);
+      if (!error) {
+        userId = data?.claims?.sub ?? null;
+      }
     }
 
     let unitPrice: number;
