@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/utils";
+import { fetchPartnerCatalogPricing } from "@/lib/catalogPricing";
 
 interface Package {
   id: string;
@@ -24,24 +25,39 @@ const PackagesSection = () => {
   const [params] = useSearchParams();
   const partnerId = params.get("partner_id") || params.get("partner");
   const [dbPackages, setDbPackages] = useState<Package[]>([]);
+  const [pricingByPackageId, setPricingByPackageId] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPackages = async () => {
       setLoading(true);
       const { data, error } = await supabase
-        .from("packages")
+        .from("public_packages" as "packages")
         .select(`
           *,
           package_tours (
-            tour:tours (id, name, slug, images)
+            tour:public_tours (id, name, slug, images)
           )
         `)
-        .eq("active", true)
         .order("created_at", { ascending: false });
 
       if (data) {
         setDbPackages(data);
+        if (partnerId && data.length > 0) {
+          try {
+            const pricing = await fetchPartnerCatalogPricing(
+              partnerId,
+              data.map((pkg) => ({ key: pkg.id, type: "package" as const, id: pkg.id })),
+            );
+            setPricingByPackageId(
+              Object.fromEntries(Object.entries(pricing.items).map(([key, value]) => [key, value.effectivePrice])),
+            );
+          } catch {
+            setPricingByPackageId({});
+          }
+        } else {
+          setPricingByPackageId({});
+        }
       }
       setLoading(false);
     };
@@ -123,7 +139,7 @@ const PackagesSection = () => {
                       )}
                       <div className="flex items-baseline gap-1">
                         <span className="font-display text-2xl font-bold text-primary">
-                          {formatCurrency(partnerId ? (pkg.partner_price || pkg.discount_price) : pkg.discount_price)}
+                          {formatCurrency(partnerId ? (pricingByPackageId[pkg.id] ?? pkg.discount_price) : pkg.discount_price)}
                         </span>
                         <span className="text-xs text-muted-foreground">{t("packages.perPerson")}</span>
                       </div>
