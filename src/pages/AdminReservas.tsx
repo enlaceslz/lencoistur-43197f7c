@@ -63,7 +63,7 @@ interface TransferOption { id: string; label: string; price: number; partner_pri
 // Utilizando máscaras de @/lib/masks.ts
 
 const AdminReservas = () => {
-  const { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
+  const { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, deleteBooking, completeBooking, updateBookingNotes } = useBookings();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
   const [dateStart, setDateStart] = useState("");
