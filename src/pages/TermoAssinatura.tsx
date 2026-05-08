@@ -221,7 +221,7 @@ const TermoAssinatura = () => {
                   id: d.id,
                   full_name: d.name,
                   is_adult: true,
-                  responsible_name: bookingData.customers?.name || bookingData.customer_name
+                  responsible_name: bookingData.customers?.name || ""
                 });
               }
             });
