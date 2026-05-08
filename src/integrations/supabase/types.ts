@@ -939,6 +939,7 @@ export type Database = {
           name: string
           nights: number | null
           original_price: number | null
+          partner_price: number | null
           slug: string
           tag: string | null
           updated_at: string
@@ -955,6 +956,7 @@ export type Database = {
           name: string
           nights?: number | null
           original_price?: number | null
+          partner_price?: number | null
           slug: string
           tag?: string | null
           updated_at?: string
@@ -971,6 +973,7 @@ export type Database = {
           name?: string
           nights?: number | null
           original_price?: number | null
+          partner_price?: number | null
           slug?: string
           tag?: string | null
           updated_at?: string
@@ -2597,6 +2600,8 @@ export type Database = {
           mode_private_enabled: boolean
           name: string
           operator: string | null
+          partner_price: number | null
+          partner_private_price: number | null
           pix_discount: number
           price: number
           private_price: number
@@ -2629,6 +2634,8 @@ export type Database = {
           mode_private_enabled?: boolean
           name: string
           operator?: string | null
+          partner_price?: number | null
+          partner_private_price?: number | null
           pix_discount?: number
           price: number
           private_price?: number
@@ -2661,6 +2668,8 @@ export type Database = {
           mode_private_enabled?: boolean
           name?: string
           operator?: string | null
+          partner_price?: number | null
+          partner_private_price?: number | null
           pix_discount?: number
           price?: number
           private_price?: number
