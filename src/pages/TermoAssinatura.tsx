@@ -464,17 +464,22 @@ const TermoAssinatura = () => {
       doc.text(`${company?.cidade || "Santo Amaro"}, ${new Date().toLocaleDateString("pt-BR")}`, 14, signatureY + 20);
 
       // Companions Signatures (if any)
-      const adultCompanions = companions.filter(c => c.is_adult);
+      const adultCompanions = companions.filter(c => c.is_adult && (signatures[c.id] || c.signature_data));
       if (adultCompanions.length > 0) {
-        let compX = 80;
+        let compX = 70;
+        let compY = signatureY;
+        
         adultCompanions.forEach((comp, idx) => {
           const sig = signatures[comp.id] || comp.signature_data;
           if (sig) {
-            if (compX + 50 > pageWidth) {
-              // No room on this row
+            if (compX + 60 > pageWidth) {
+              compX = 14;
+              compY += 25;
             }
-            doc.text(`Dependente: ${comp.full_name}`, compX, signatureY);
-            doc.addImage(sig, 'PNG', compX, signatureY + 2, 40, 15);
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "bold");
+            doc.text(`Dependente: ${comp.full_name}`, compX, compY);
+            doc.addImage(sig, 'PNG', compX, compY + 2, 35, 12);
             compX += 60;
           }
         });
