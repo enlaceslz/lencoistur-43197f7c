@@ -396,6 +396,12 @@ export default function ContasReceberTab({ company }: { company?: any }) {
                                 <User size={10} className="text-primary/60" />
                                 {c.cliente || "Consumidor Final"}
                               </span>
+                              {c.partners?.name && (
+                                <span className="text-[10px] text-emerald-600 font-black uppercase tracking-widest flex items-center gap-1 mt-1">
+                                  <Link2 size={10} />
+                                  Parceiro: {c.partners.name}
+                                </span>
+                              )}
                             </div>
                           </td>
                           <td className="px-6 py-4">
