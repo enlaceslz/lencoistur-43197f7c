@@ -373,14 +373,20 @@ const AdminConfig = () => {
 
   const STORAGE_BUCKETS = ["tour-images", "company-documents", "customer-documents", "avatars", "vouchers", "financeiro"] as const;
 
+  const [backupProgress, setBackupProgress] = useState<{ current: string; total: number; count: number } | null>(null);
+
   const handleBackup = async () => {
     setBackupLoading(true);
+    setBackupProgress({ current: "Iniciando backup...", total: BACKUP_TABLES.length + STORAGE_BUCKETS.length, count: 0 });
     try {
       const backup: Record<string, any> = {};
       let totalRecords = 0;
 
       // Backup Database Tables
-      for (const table of BACKUP_TABLES) {
+      for (let i = 0; i < BACKUP_TABLES.length; i++) {
+        const table = BACKUP_TABLES[i];
+        setBackupProgress(prev => prev ? { ...prev, current: `Exportando tabela: ${table}`, count: i } : null);
+        
         const { data, error } = await supabase.from(table as any).select("*");
         if (error) {
           console.error(`Erro ao exportar ${table}:`, error.message);
@@ -395,62 +401,61 @@ const AdminConfig = () => {
       const storageBackup: Record<string, Array<{ name: string; bucket: string; data: string }>> = {};
       let totalFiles = 0;
 
-      for (const bucket of STORAGE_BUCKETS) {
-        let hasMore = true;
-        let offset = 0;
+      for (let i = 0; i < STORAGE_BUCKETS.length; i++) {
+        const bucket = STORAGE_BUCKETS[i];
+        setBackupProgress(prev => prev ? { ...prev, current: `Escaneando arquivos: ${bucket}`, count: BACKUP_TABLES.length + i } : null);
         
-        while (hasMore) {
-          const { data: files, error: listError } = await supabase.storage.from(bucket).list("", {
-            limit: 100,
-            offset: offset,
-            sortBy: { column: 'name', order: 'desc' },
-          });
-
-          if (listError) {
-            console.error(`Erro ao listar arquivos do bucket ${bucket}:`, listError.message);
-            hasMore = false;
-            continue;
+        // Recursive function to list all files in a bucket
+        const listAllFiles = async (path: string = ""): Promise<string[]> => {
+          const { data: files, error } = await supabase.storage.from(bucket).list(path);
+          if (error) {
+            console.error(`Erro ao listar ${bucket}/${path}:`, error.message);
+            return [];
           }
-
-          if (!files || files.length === 0) {
-            hasMore = false;
-            continue;
-          }
-
-          if (!storageBackup[bucket]) storageBackup[bucket] = [];
           
+          let filePaths: string[] = [];
           for (const file of files) {
-            if (file.id && file.name !== '.emptyFolderPlaceholder') { 
-              try {
-                const { data: blob, error: downloadError } = await supabase.storage.from(bucket).download(file.name);
-                if (downloadError) {
-                  console.warn(`Pulando arquivo ${file.name} (erro no download):`, downloadError.message);
-                  continue;
-                }
-
-                const base64 = await new Promise<string>((resolve, reject) => {
-                  const reader = new FileReader();
-                  reader.onloadend = () => resolve(reader.result as string);
-                  reader.onerror = reject;
-                  reader.readAsDataURL(blob);
-                });
-
-                storageBackup[bucket].push({
-                  name: file.name,
-                  bucket: bucket,
-                  data: base64
-                });
-                totalFiles++;
-              } catch (err) {
-                console.error(`Erro ao processar arquivo ${file.name} do bucket ${bucket}:`, err);
+            const fullPath = path ? `${path}/${file.name}` : file.name;
+            if (file.id) { // It's a file
+              if (file.name !== '.emptyFolderPlaceholder') {
+                filePaths.push(fullPath);
               }
+            } else { // It's a folder
+              const subFiles = await listAllFiles(fullPath);
+              filePaths = [...filePaths, ...subFiles];
             }
           }
-          
-          if (files.length < 100) {
-            hasMore = false;
-          } else {
-            offset += 100;
+          return filePaths;
+        };
+
+        const allFilePaths = await listAllFiles();
+        
+        if (allFilePaths.length > 0) {
+          storageBackup[bucket] = [];
+          for (const filePath of allFilePaths) {
+            try {
+              const { data: blob, error: downloadError } = await supabase.storage.from(bucket).download(filePath);
+              if (downloadError) {
+                console.warn(`Erro no download de ${filePath}:`, downloadError.message);
+                continue;
+              }
+
+              const base64 = await new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result as string);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+              });
+
+              storageBackup[bucket].push({
+                name: filePath,
+                bucket: bucket,
+                data: base64
+              });
+              totalFiles++;
+            } catch (err) {
+              console.error(`Erro ao processar ${filePath}:`, err);
+            }
           }
         }
       }
@@ -458,7 +463,7 @@ const AdminConfig = () => {
       const now = new Date();
       const exportData = {
         metadata: {
-          version: "1.1",
+          version: "1.2",
           created_at: now.toISOString(),
           tables_count: BACKUP_TABLES.length,
           total_records: totalRecords,
@@ -493,6 +498,7 @@ const AdminConfig = () => {
       toast.error("Erro ao gerar backup: " + (err instanceof Error ? err.message : "Erro desconhecido"));
     } finally {
       setBackupLoading(false);
+      setBackupProgress(null);
     }
   };
 
