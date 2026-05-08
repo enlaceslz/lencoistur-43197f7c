@@ -1008,16 +1008,33 @@ const AdminReservas = () => {
                           <Smartphone size={14} className="mr-2" /> WhatsApp
                         </a>
                       </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="bg-amber-600 text-white border-transparent hover:bg-amber-700 h-9"
-                        asChild
-                      >
-                        <a href={`/assinatura-termo?booking=${selected.bookingCode}`} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink size={14} className="mr-2" /> Abrir Termo
-                        </a>
-                      </Button>
+                      {selected.termStatus === "assinado" ? (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-green-600 text-white border-transparent hover:bg-green-700 h-9"
+                          asChild
+                        >
+                          <a 
+                            href={supabase.storage.from("customer-documents").getPublicUrl(selected.termPdfUrl!).data.publicUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
+                            <FileText size={14} className="mr-2" /> Ver Termo
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-amber-600 text-white border-transparent hover:bg-amber-700 h-9"
+                          asChild
+                        >
+                          <a href={`/assinatura-termo?booking=${selected.bookingCode}`} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink size={14} className="mr-2" /> Abrir Termo
+                          </a>
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
