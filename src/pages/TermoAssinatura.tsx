@@ -615,13 +615,23 @@ const TermoAssinatura = () => {
 
       // 5. Update booking status if applicable
       if (booking?.id) {
-        // If booking is pending, mark as confirmed now that it's signed
-        if (booking.status === 'pendente') {
-          await supabase.from("bookings").update({ 
-            status: "confirmada",
-            updated_at: new Date().toISOString()
-          }).eq("id", booking.id);
-          console.log("Booking status updated to confirmed after signing.");
+        try {
+          // If booking is pending, mark as confirmed now that it's signed
+          if (booking.status === 'pendente') {
+            const { error: bookingUpdateError } = await supabase.from("bookings").update({ 
+              status: "confirmada",
+              updated_at: new Date().toISOString()
+            }).eq("id", booking.id);
+            
+            if (bookingUpdateError) {
+              console.error("Error updating booking status:", bookingUpdateError);
+              // We don't throw here to not block the user if the status update fails but the term was saved
+            } else {
+              console.log("Booking status updated to confirmed after signing.");
+            }
+          }
+        } catch (statusErr) {
+          console.error("Error in booking status update flow:", statusErr);
         }
       }
 
