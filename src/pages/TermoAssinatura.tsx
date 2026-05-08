@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { Shield, CheckCircle, AlertTriangle, FileText, Pencil, Trash2, Users } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 // Riscos inerentes conforme P6 VATTI
 const RISKS_OPTIONS = [
