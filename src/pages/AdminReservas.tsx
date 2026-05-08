@@ -522,6 +522,11 @@ const AdminReservas = () => {
                   )}>
                     {statusConfig[booking.status]?.label}
                   </Badge>
+                  {booking.partnerId && (
+                    <Badge variant="outline" className="ml-2 bg-primary/5 text-primary border-primary/20 text-[8px] font-bold">
+                      NET
+                    </Badge>
+                  )}
                 </div>
 
 
