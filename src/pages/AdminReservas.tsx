@@ -723,7 +723,7 @@ const AdminReservas = () => {
                               className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-500 hover:text-white transition-all duration-300 border border-emerald-100 dark:border-emerald-800"
                             >
                               <a 
-                                href={`https://wa.me/${booking.customerPhone?.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${booking.customerName}! Por favor, assine o Termo de Ciência de Risco para o passeio ${booking.itemName}: ${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(booking.bookingCode)}`)}`} 
+                                href={`https://wa.me/${booking.customerPhone?.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${booking.customerName}! Por favor, assine o Termo de Ciência de Risco para o passeio ${booking.itemName}: ${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(booking.bookingCode.trim())}`)}`} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                               >
@@ -1009,7 +1009,7 @@ const AdminReservas = () => {
                         size="sm" 
                         className="bg-white border-amber-200 text-amber-700 hover:bg-amber-50 h-9"
                         onClick={() => {
-                          const link = `${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode)}`;
+                          const link = `${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`;
                           navigator.clipboard.writeText(link);
                           toast.success("Link do termo copiado!");
                         }}
@@ -1023,7 +1023,7 @@ const AdminReservas = () => {
                         asChild
                       >
                         <a 
-                          href={`https://wa.me/${selected.customerPhone?.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}! Por favor, assine o Termo de Ciência de Risco para o passeio ${selected.itemName}: ${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode)}`)}`} 
+                          href={`https://wa.me/${selected.customerPhone?.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}! Por favor, assine o Termo de Ciência de Risco para o passeio ${selected.itemName}: ${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`)}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
                         >
@@ -1052,7 +1052,7 @@ const AdminReservas = () => {
                           className="bg-amber-600 text-white border-transparent hover:bg-amber-700 h-9"
                           asChild
                         >
-                          <a href={`/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode)}`} target="_blank" rel="noopener noreferrer">
+                          <a href={`/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`} target="_blank" rel="noopener noreferrer">
                             <ExternalLink size={14} className="mr-2" /> Abrir Termo
                           </a>
                         </Button>
