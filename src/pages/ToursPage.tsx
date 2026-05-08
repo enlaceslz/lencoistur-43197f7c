@@ -47,15 +47,25 @@ const ToursPage = () => {
   const [params] = useSearchParams();
   const partnerId = params.get("partner_id") || params.get("partner");
   const [tours, setTours] = useState<any[]>([]);
+  const [partner, setPartner] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("popular");
   const [maxPrice, setMaxPrice] = useState(3000);
 
   useEffect(() => {
-    supabase.from("tours").select("*").eq("active", true).order("name")
-      .then(({ data }) => { setTours(data || []); setLoading(false); });
-  }, []);
+    const load = async () => {
+      setLoading(true);
+      if (partnerId) {
+        const { data: pData } = await supabase.from("partners").select("*").eq("id", partnerId).maybeSingle();
+        if (pData) setPartner(pData);
+      }
+      const { data } = await supabase.from("tours").select("*").eq("active", true).order("name");
+      setTours(data || []);
+      setLoading(false);
+    };
+    load();
+  }, [partnerId]);
 
   const filtered = tours
     .filter((t) => {
@@ -148,11 +158,16 @@ const ToursPage = () => {
                     </span>
                     <div className="flex items-baseline gap-1">
                       <p className={`text-lg font-bold ${tour.mode_collective_enabled !== false ? "text-primary" : "text-secondary"}`}>
-                        {formatCurrency(
-                          partnerId 
-                            ? (tour.mode_collective_enabled !== false ? (tour.partner_price || tour.price) : (tour.partner_private_price || tour.private_price))
-                            : (tour.mode_collective_enabled !== false ? tour.price : tour.private_price)
-                        )}
+                        {formatCurrency(() => {
+                          const isPrivate = tour.mode_collective_enabled === false;
+                          const basePublicPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
+                          if (partner) {
+                            const specificPartnerPrice = isPrivate ? tour.partner_private_price : tour.partner_price;
+                            if (specificPartnerPrice && specificPartnerPrice > 0) return specificPartnerPrice;
+                            if (partner.commission_rate > 0) return Math.round(basePublicPrice * (1 - partner.commission_rate / 100));
+                          }
+                          return basePublicPrice;
+                        })()}
                       </p>
                       {tour.pix_discount > 0 && !partnerId && (
                         <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">
