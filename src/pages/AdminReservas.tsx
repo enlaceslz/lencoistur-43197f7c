@@ -896,26 +896,27 @@ const AdminReservas = () => {
 
       {/* New Booking Dialog */}
       <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
-        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
-          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
-            <div className="flex items-center gap-3 md:gap-4">
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                {editingId ? <Pencil size={20} className="md:w-6 md:h-6" /> : <Plus size={20} className="md:w-6 md:h-6" />}
+        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[95vh] overflow-y-auto p-0 border-none shadow-3xl rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden bg-slate-50">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-8 flex items-center justify-between sticky top-0 z-20">
+            <div className="flex items-center gap-3 md:gap-5">
+              <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-[1.5rem] bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                {editingId ? <Pencil size={20} className="md:w-7 md:h-7" /> : <Plus size={20} className="md:w-7 md:h-7" />}
               </div>
               <div>
-                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                <DialogTitle className="text-lg md:text-2xl font-black text-slate-900 tracking-tight leading-none mb-1">
                   {editingId ? "Editar Reserva" : "Nova Reserva"}
                 </DialogTitle>
-                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Configure os detalhes do cliente e do serviço</p>
+                <p className="text-[10px] md:text-sm text-slate-400 font-bold uppercase tracking-widest">{editingId ? "Atualize os dados da reserva" : "Preencha para confirmar"}</p>
               </div>
             </div>
             <Button variant="ghost" size="icon" onClick={() => setShowNewForm(false)} className="rounded-full hover:bg-slate-100 transition-colors">
-              <XCircleIcon size={20} className="text-slate-400" />
+              <X size={20} className="text-slate-400" />
             </Button>
           </div>
 
-          <form onSubmit={handleNewBooking} className="p-4 md:p-8 space-y-6 md:space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+          <form onSubmit={handleNewBooking} className="flex flex-col h-full">
+            <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10 overflow-y-auto">
+
               {/* Coluna 1: Dados do Serviço */}
               <div className="lg:col-span-6 space-y-6">
                 <div className="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm space-y-4">
