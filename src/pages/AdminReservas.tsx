@@ -54,7 +54,8 @@ const fmtDateTime = (d: string) => {
   try { return new Date(d).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }); } catch { return d; }
 };
 
-interface TourOption { id: string; name: string; price: number; private_price?: number; pix_discount?: number; }
+interface TourOption { id: string; name: string; price: number; private_price?: number; partner_price?: number; partner_private_price?: number; pix_discount?: number; }
+interface PackageOption { id: string; name: string; original_price: number; discount_price: number; partner_price?: number; }
 interface TransferOption { id: string; label: string; price: number; pix_discount?: number; }
 
 // Utilizando máscaras de @/lib/masks.ts
@@ -76,13 +77,15 @@ const AdminReservas = () => {
   const [showNewForm, setShowNewForm] = useState(false);
   const [newLoading, setNewLoading] = useState(false);
   const [tours, setTours] = useState<TourOption[]>([]);
+  const [packages, setPackages] = useState<PackageOption[]>([]);
   const [transfers, setTransfers] = useState<TransferOption[]>([]);
   const [existingCustomers, setExistingCustomers] = useState<{ id: string; name: string; email: string; phone: string | null; cpf?: string; passport?: string; country?: string; birth_date?: string }[]>([]);
   const [collaborators, setCollaborators] = useState<{ id: string; name: string }[]>([]);
+  const [partners, setPartners] = useState<{ id: string; name: string }[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
   const [customerSearch, setCustomerSearch] = useState("");
   const [newForm, setNewForm] = useState({
-    type: "tour" as "tour" | "transfer",
+    type: "tour" as "tour" | "transfer" | "package",
     tourMode: "coletivo" as "coletivo" | "privativo",
     itemName: "",
     date: "",
@@ -97,21 +100,26 @@ const AdminReservas = () => {
     birthDate: "",
     notes: "",
     collaboratorId: "",
+    partnerId: "",
   });
 
   useEffect(() => {
     if (!showNewForm) return;
     const loadOptions = async () => {
-      const [{ data: t }, { data: tr }, { data: cust }, { data: collabs }] = await Promise.all([
-        supabase.from("tours").select("id, name, price, private_price, pix_discount").eq("active", true).order("name"),
+      const [{ data: t }, { data: tr }, { data: cust }, { data: collabs }, { data: parts }, { data: pkgs }] = await Promise.all([
+        supabase.from("tours").select("id, name, price, private_price, partner_price, partner_private_price, pix_discount").eq("active", true).order("name"),
         supabase.from("transfer_routes").select("id, origin, destination, price, pix_discount").eq("active", true).order("origin"),
         supabase.from("customers").select("id, name, email, phone, cpf, passport, country, birth_date").order("name"),
         supabase.from("collaborators").select("id, name").eq("status", "active").order("name"),
+        supabase.from("partners").select("id, name").eq("active", true).order("name"),
+        supabase.from("packages").select("id, name, original_price, discount_price, partner_price").eq("active", true).order("name"),
       ]);
-      if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price, private_price: r.private_price, pix_discount: r.pix_discount })));
+      if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price, private_price: r.private_price, partner_price: r.partner_price, partner_private_price: r.partner_private_price, pix_discount: r.pix_discount })));
       if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price, pix_discount: r.pix_discount })));
       if (cust) setExistingCustomers(cust);
       if (collabs) setCollaborators(collabs);
+      if (parts) setPartners(parts);
+      if (pkgs) setPackages(pkgs);
     };
     loadOptions();
   }, [showNewForm]);
