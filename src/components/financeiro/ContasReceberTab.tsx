@@ -567,6 +567,21 @@ export default function ContasReceberTab({ company }: { company?: any }) {
               </div>
 
               <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Parceiro / Canal de Venda</Label>
+                <Select value={form.partner_id} onValueChange={v => setForm({ ...form, partner_id: v })}>
+                  <SelectTrigger className="h-12 rounded-xl font-bold bg-white">
+                    <SelectValue placeholder="Vincular parceiro..." />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    <SelectItem value="none" className="font-bold text-muted-foreground italic">— Nenhum parceiro —</SelectItem>
+                    {partners.map(p => (
+                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Status de Recebimento</Label>
                 <div className="flex gap-2">
                   <Button 
