@@ -1023,7 +1023,7 @@ const AdminReservas = () => {
                         asChild
                       >
                         <a 
-                          href={`https://wa.me/${selected.customerPhone?.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}! Por favor, assine o Termo de Ciência de Risco para o passeio ${selected.itemName}: ${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode)}`)}`} 
+                          href={`https://wa.me/${selected.customerPhone?.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}! Por favor, assine o Termo de Ciência de Risco para o passeio ${selected.itemName}: ${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`)}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
                         >
