@@ -156,6 +156,24 @@ const TermoAssinatura = () => {
         }
       }
 
+      if (!bookingData && !termData && customerIdParam) {
+        console.log("Searching directly for customer:", customerIdParam);
+        const { data: customerData } = await supabase.from("customers").select("*").eq("id", customerIdParam).maybeSingle();
+        if (customerData) {
+          bookingData = {
+            id: null,
+            customer_id: customerData.id,
+            customers: customerData,
+            item_name: "Passeio (A definir)",
+            date: new Date().toISOString().split('T')[0],
+            booking_code: "AVULSO"
+          };
+          
+          const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("customer_id", customerData.id).is("booking_id", null).maybeSingle();
+          termData = tData;
+        }
+      }
+
       if (bookingData || termData) {
         setBooking(bookingData);
         setTerm(termData);
@@ -185,7 +203,7 @@ const TermoAssinatura = () => {
               id: `booking-comp-${index}`,
               full_name: c.name,
               is_adult: true, // Default to adult, user can adjust
-              responsible_name: bookingData.customers?.name || bookingData.customer_name
+              responsible_name: bookingData.customers?.name || ""
             }));
           }
 
