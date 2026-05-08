@@ -17,7 +17,7 @@ import {
   DollarSign, Ban, Loader2, Users, Calendar, CreditCard, FileText,
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
   Plus, Copy, Pencil, Car, Compass, LayoutGrid, List, X, XCircle as XCircleIcon,
-  ChevronRight, ArrowRight, User, Hash, Info, Moon, Save
+  ChevronRight, ArrowRight, User, Hash, Info, Moon, Save, Package as PackageIcon
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
