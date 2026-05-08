@@ -58,7 +58,7 @@ const fmtDateTime = (d: string) => {
 
 interface TourOption { id: string; name: string; price: number; private_price?: number; partner_price?: number; partner_private_price?: number; pix_discount?: number; }
 interface PackageOption { id: string; name: string; original_price: number; discount_price: number; partner_price?: number; }
-interface TransferOption { id: string; label: string; price: number; pix_discount?: number; }
+interface TransferOption { id: string; label: string; price: number; partner_price?: number; pix_discount?: number; }
 
 // Utilizando máscaras de @/lib/masks.ts
 
@@ -110,14 +110,14 @@ const AdminReservas = () => {
     const loadOptions = async () => {
       const [{ data: t }, { data: tr }, { data: cust }, { data: collabs }, { data: parts }, { data: pkgs }] = await Promise.all([
         supabase.from("tours").select("id, name, price, private_price, partner_price, partner_private_price, pix_discount").eq("active", true).order("name"),
-        supabase.from("transfer_routes").select("id, origin, destination, price, pix_discount").eq("active", true).order("origin"),
+        supabase.from("transfer_routes").select("id, origin, destination, price, partner_price, pix_discount").eq("active", true).order("origin"),
         supabase.from("customers").select("id, name, email, phone, cpf, passport, country, birth_date").order("name"),
         supabase.from("collaborators").select("id, name").eq("status", "active").order("name"),
         supabase.from("partners").select("id, name, commission_rate, remuneration_type, remuneration_value").eq("active", true).order("name"),
         supabase.from("packages").select("id, name, original_price, discount_price, partner_price").eq("active", true).order("name"),
       ]);
       if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price, private_price: r.private_price, partner_price: r.partner_price, partner_private_price: r.partner_private_price, pix_discount: r.pix_discount })));
-      if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price, pix_discount: r.pix_discount })));
+      if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price, partner_price: r.partner_price, pix_discount: r.pix_discount })));
       if (cust) setExistingCustomers(cust);
       if (collabs) setCollaborators(collabs);
       if (parts) setPartners(parts as any);
@@ -205,7 +205,7 @@ const AdminReservas = () => {
       )
     : newForm.type === "package"
       ? calculatePartnerPrice(selectedPackage?.discount_price || 0, selectedPackage?.partner_price)
-      : calculatePartnerPrice(selectedTransfer?.price || 0, null);
+      : calculatePartnerPrice(selectedTransfer?.price || 0, selectedTransfer?.partner_price);
 
   const total = (newForm.type === "tour" && newForm.tourMode === "privativo") ? unitPrice : unitPrice * newForm.guests;
   const pixDiscountPercent = (selectedTour?.pix_discount || selectedTransfer?.pix_discount || 0);
