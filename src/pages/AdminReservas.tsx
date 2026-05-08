@@ -1101,7 +1101,7 @@ const AdminReservas = () => {
           </div>
 
           <form onSubmit={handleNewBooking} className="flex flex-col flex-1 min-h-0">
-            <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10 overflow-y-auto flex-1">
+            <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10 overflow-y-auto flex-1 custom-scrollbar">
 
               {/* Coluna 1: Dados do Serviço */}
               <div className="lg:col-span-6 space-y-6">
