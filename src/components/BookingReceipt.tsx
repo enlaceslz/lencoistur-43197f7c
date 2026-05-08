@@ -62,14 +62,37 @@ const statusLabel = (s: string) => {
   return map[s] || s;
 };
 
-function generateReceiptHTML(data: ReceiptData, company?: any): string {
-  const brandName = company?.nome_fantasia || company?.razao_social || "LENÇÓIS TOUR";
-  const cnpj = company?.cnpj || "00.000.000/0001-00";
-  const cadastur = company?.cadastur || "00.000.000/0001-00";
-  const address = company?.endereco || "Santo Amaro do Maranhão, MA";
-  const phone = company?.telefone || "(98) 98588-0954";
-  const email = company?.email || "contato@lencoistur.com";
-  const logoUrl = company?.logo_url;
+const esc = (v: any): string => {
+  if (v === null || v === undefined) return "";
+  return String(v)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+};
+
+function generateReceiptHTML(rawData: ReceiptData, company?: any): string {
+  // Sanitize all string fields to prevent XSS via document.write
+  const data: ReceiptData = {
+    ...rawData,
+    bookingCode: esc(rawData.bookingCode) as string,
+    customerName: esc(rawData.customerName) as string,
+    customerEmail: esc(rawData.customerEmail) as string,
+    customerPhone: rawData.customerPhone ? esc(rawData.customerPhone) : rawData.customerPhone,
+    itemName: esc(rawData.itemName) as string,
+    notes: rawData.notes ? esc(rawData.notes) : rawData.notes,
+    pixCode: rawData.pixCode ? esc(rawData.pixCode) : rawData.pixCode,
+    cpf: rawData.cpf ? esc(rawData.cpf) : rawData.cpf,
+    passport: rawData.passport ? esc(rawData.passport) : rawData.passport,
+  };
+  const brandName = esc(company?.nome_fantasia || company?.razao_social || "LENÇÓIS TOUR");
+  const cnpj = esc(company?.cnpj || "00.000.000/0001-00");
+  const cadastur = esc(company?.cadastur || "00.000.000/0001-00");
+  const address = esc(company?.endereco || "Santo Amaro do Maranhão, MA");
+  const phone = esc(company?.telefone || "(98) 98588-0954");
+  const email = esc(company?.email || "contato@lencoistur.com");
+  const logoUrl = company?.logo_url ? esc(company.logo_url) : null;
 
   return `
 <!DOCTYPE html>
