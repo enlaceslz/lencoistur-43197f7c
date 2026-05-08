@@ -822,6 +822,18 @@ const AdminReservas = () => {
                     </Button>
                   </a>
                 )}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    const link = `${window.location.origin}/assinatura-termo?booking=${selected.bookingCode}`;
+                    navigator.clipboard.writeText(link);
+                    toast.success("Link do termo copiado!");
+                  }}
+                  className="text-amber-600 border-amber-200"
+                >
+                  <Copy size={14} className="mr-1" /> Copiar Link Termo
+                </Button>
               </div>
               </div>
             )}
