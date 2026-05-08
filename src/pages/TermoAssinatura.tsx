@@ -708,7 +708,7 @@ const TermoAssinatura = () => {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Participante</p>
-                  <p className="text-sm font-bold">{booking.customers?.name || booking.customer_name}</p>
+                  <p className="text-sm font-bold">{booking.customers?.name || "Cliente"}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Reserva</p>
