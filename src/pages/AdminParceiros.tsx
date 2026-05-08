@@ -686,6 +686,22 @@ const AdminParceiros = () => {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-10 w-10 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all duration-300 shadow-sm text-emerald-600" 
+                                onClick={() => openReceivable(p)}
+                              >
+                                <DollarSign size={18} />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Lançar Recebimento</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
                               <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-primary hover:text-white transition-all duration-300 shadow-sm" onClick={() => setViewPartner(p)}>
                                 <Eye size={18} />
                               </Button>
