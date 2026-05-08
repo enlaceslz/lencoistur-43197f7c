@@ -19,7 +19,7 @@ import {
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
   Plus, Copy, Pencil, Car, Compass, LayoutGrid, List, X, XCircle as XCircleIcon,
   ChevronRight, ArrowRight, User, Hash, Info, Moon, Save, Package as PackageIcon,
-  Shield, ExternalLink, Trash2, CalendarDays
+  Shield, ExternalLink, Trash2, CalendarDays, Smartphone
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -973,7 +973,7 @@ const AdminReservas = () => {
                         SGS ISO 21103
                       </Badge>
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                       <Button 
                         variant="outline" 
                         size="sm" 
@@ -985,6 +985,20 @@ const AdminReservas = () => {
                         }}
                       >
                         <Copy size={14} className="mr-2" /> Copiar Link
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="bg-white border-green-200 text-green-700 hover:bg-green-50 h-9"
+                        asChild
+                      >
+                        <a 
+                          href={`https://wa.me/${selected.customerPhone?.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}! Por favor, assine o Termo de Ciência de Risco para o passeio ${selected.itemName}: ${window.location.origin}/assinatura-termo?booking=${selected.bookingCode}`)}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                        >
+                          <Smartphone size={14} className="mr-2" /> WhatsApp
+                        </a>
                       </Button>
                       <Button 
                         variant="outline" 
