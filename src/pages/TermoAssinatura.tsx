@@ -122,20 +122,40 @@ const TermoAssinatura = () => {
             setSigned(true);
           }
         } else if (bookingData) {
-          // No term yet, pre-load companions from dependents table
+          // No term yet, pre-load companions from booking and dependents table
+          let preLoadedCompanions: any[] = [];
+          
+          // 1. Add companions from the booking record (if they were filled during checkout)
+          if (bookingData.companions && Array.isArray(bookingData.companions)) {
+            preLoadedCompanions = bookingData.companions.map((c: any, index: number) => ({
+              id: `booking-comp-${index}`,
+              full_name: c.name,
+              is_adult: true, // Default to adult, user can adjust
+              responsible_name: bookingData.customers?.name || bookingData.customer_name
+            }));
+          }
+
+          // 2. Add dependents from the customer record
           const { data: dependentsData } = await supabase
             .from("dependents")
             .select("*")
             .eq("customer_id", bookingData.customer_id);
           
           if (dependentsData) {
-            setCompanions(dependentsData.map(d => ({
-              id: d.id,
-              full_name: d.name,
-              is_adult: true, // Assume adult for signing, user can adjust if we had age
-              responsible_name: bookingData.customers?.name || bookingData.customer_name
-            })));
+            const existingNames = new Set(preLoadedCompanions.map(c => c.full_name.toLowerCase()));
+            dependentsData.forEach(d => {
+              if (!existingNames.has(d.name.toLowerCase())) {
+                preLoadedCompanions.push({
+                  id: d.id,
+                  full_name: d.name,
+                  is_adult: true,
+                  responsible_name: bookingData.customers?.name || bookingData.customer_name
+                });
+              }
+            });
           }
+
+          setCompanions(preLoadedCompanions);
         }
       }
     } catch (err) {
