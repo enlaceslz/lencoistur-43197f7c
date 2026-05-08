@@ -373,7 +373,7 @@ Deno.serve(async (req) => {
   } catch (err: any) {
     console.error("Unhandled error:", err);
     return new Response(
-      JSON.stringify({ error: err.message || "Erro interno" }),
+      JSON.stringify({ error: "Erro interno. Tente novamente." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
