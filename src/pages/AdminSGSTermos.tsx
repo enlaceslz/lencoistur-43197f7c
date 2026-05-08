@@ -974,12 +974,24 @@ const AdminSGSTermos = () => {
                     </button>
                   </>
                 )}
-                <button 
-                  onClick={() => printTerm(t.id)}
-                  className="h-11 px-5 bg-blue-500/10 hover:bg-blue-500 text-blue-600 hover:text-white rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
-                >
-                  <Eye size={16} /> Visualizar
-                </button>
+                {t.pdf_url ? (
+                  <button 
+                    onClick={() => {
+                      const url = supabase.storage.from("customer-documents").getPublicUrl(t.pdf_url).data.publicUrl;
+                      window.open(url, '_blank');
+                    }}
+                    className="h-11 px-5 bg-green-500/10 hover:bg-green-500 text-green-600 hover:text-white rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
+                  >
+                    <FileText size={16} /> PDF Assinado
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => printTerm(t.id)}
+                    className="h-11 px-5 bg-blue-500/10 hover:bg-blue-500 text-blue-600 hover:text-white rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
+                  >
+                    <Eye size={16} /> Visualizar
+                  </button>
+                )}
                 <button 
                   onClick={() => handleEdit(t)}
                   className="h-11 px-5 bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-white rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
