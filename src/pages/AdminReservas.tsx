@@ -83,7 +83,7 @@ const AdminReservas = () => {
   const [transfers, setTransfers] = useState<TransferOption[]>([]);
   const [existingCustomers, setExistingCustomers] = useState<{ id: string; name: string; email: string; phone: string | null; cpf?: string; passport?: string; country?: string; birth_date?: string }[]>([]);
   const [collaborators, setCollaborators] = useState<{ id: string; name: string }[]>([]);
-  const [partners, setPartners] = useState<{ id: string; name: string }[]>([]);
+  const [partners, setPartners] = useState<{ id: string; name: string; commission_rate: number | null; remuneration_type: string | null; remuneration_value: number | null }[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
   const [customerSearch, setCustomerSearch] = useState("");
   const [newForm, setNewForm] = useState({
@@ -113,14 +113,14 @@ const AdminReservas = () => {
         supabase.from("transfer_routes").select("id, origin, destination, price, pix_discount").eq("active", true).order("origin"),
         supabase.from("customers").select("id, name, email, phone, cpf, passport, country, birth_date").order("name"),
         supabase.from("collaborators").select("id, name").eq("status", "active").order("name"),
-        supabase.from("partners").select("id, name").eq("active", true).order("name"),
+        supabase.from("partners").select("id, name, commission_rate, remuneration_type, remuneration_value").eq("active", true).order("name"),
         supabase.from("packages").select("id, name, original_price, discount_price, partner_price").eq("active", true).order("name"),
       ]);
       if (t) setTours(t.map(r => ({ id: r.id, name: r.name, price: r.price, private_price: r.private_price, partner_price: r.partner_price, partner_private_price: r.partner_private_price, pix_discount: r.pix_discount })));
       if (tr) setTransfers(tr.map(r => ({ id: r.id, label: `${r.origin} → ${r.destination}`, price: r.price, pix_discount: r.pix_discount })));
       if (cust) setExistingCustomers(cust);
       if (collabs) setCollaborators(collabs);
-      if (parts) setPartners(parts);
+      if (parts) setPartners(parts as any);
       if (pkgs) setPackages(pkgs);
     };
     loadOptions();
@@ -173,15 +173,39 @@ const AdminReservas = () => {
   const selectedTour = newForm.type === "tour" ? tours.find(t => t.name === newForm.itemName) : null;
   const selectedTransfer = newForm.type === "transfer" ? transfers.find(t => t.label === newForm.itemName) : null;
   const selectedPackage = newForm.type === "package" ? packages.find(t => t.name === newForm.itemName) : null;
-  
+  const selectedPartner = partners.find(p => p.id === newForm.partnerId);
+
+  const calculatePartnerPrice = (basePrice: number, partnerPriceDefined: number | undefined | null) => {
+    if (!selectedPartner) return basePrice;
+    
+    // If a specific partner price is defined for this item, use it
+    if (partnerPriceDefined && partnerPriceDefined > 0) return partnerPriceDefined;
+    
+    // Otherwise, apply the partner's commission or remuneration
+    if (selectedPartner.remuneration_type === "comissao_percent") {
+      const rate = selectedPartner.remuneration_value || selectedPartner.commission_rate || 0;
+      return Math.round(basePrice * (1 - rate / 100));
+    } else if (selectedPartner.remuneration_type === "valor_por_passeio") {
+      const discountValue = (selectedPartner.remuneration_value || 0) * 100; // Assuming it's in BRL, convert to cents
+      return Math.max(0, basePrice - discountValue);
+    }
+    
+    // Default to commission_rate if remuneration_type is not set but rate is
+    if (selectedPartner.commission_rate) {
+      return Math.round(basePrice * (1 - selectedPartner.commission_rate / 100));
+    }
+    
+    return basePrice;
+  };
+
   const unitPrice = newForm.type === "tour" 
-    ? (newForm.partnerId 
-        ? (newForm.tourMode === "privativo" ? (selectedTour?.partner_private_price || selectedTour?.private_price || 0) : (selectedTour?.partner_price || selectedTour?.price || 0))
-        : (newForm.tourMode === "privativo" ? (selectedTour?.private_price || 0) : (selectedTour?.price || 0))
+    ? (newForm.tourMode === "privativo" 
+        ? calculatePartnerPrice(selectedTour?.private_price || 0, selectedTour?.partner_private_price)
+        : calculatePartnerPrice(selectedTour?.price || 0, selectedTour?.partner_price)
       )
     : newForm.type === "package"
-      ? (newForm.partnerId ? (selectedPackage?.partner_price || selectedPackage?.discount_price || 0) : (selectedPackage?.discount_price || 0))
-      : (selectedTransfer?.price || 0);
+      ? calculatePartnerPrice(selectedPackage?.discount_price || 0, selectedPackage?.partner_price)
+      : calculatePartnerPrice(selectedTransfer?.price || 0, null);
 
   const total = (newForm.type === "tour" && newForm.tourMode === "privativo") ? unitPrice : unitPrice * newForm.guests;
   const pixDiscountPercent = (selectedTour?.pix_discount || selectedTransfer?.pix_discount || 0);
