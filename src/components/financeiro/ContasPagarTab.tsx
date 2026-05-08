@@ -154,6 +154,8 @@ export default function ContasPagarTab({ company }: { company?: any }) {
       fornecedor: form.fornecedor || null,
       observacoes: form.observacoes || null,
       status: form.status,
+      collaborator_id: form.collaborator_id || null,
+      partner_id: form.partner_id || null,
       pago_em: form.status === "pago" ? new Date().toISOString().slice(0, 10) : null,
       anexo_url: form.anexo_url || null,
     };
