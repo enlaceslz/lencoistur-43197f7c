@@ -52,6 +52,8 @@ function generatePixCode(): string {
 }
 
 function mapDbToBooking(row: any, customer?: any): BookingItem {
+  const term = row.sgs_risk_terms && row.sgs_risk_terms[0];
+  
   return {
     id: row.id,
     bookingCode: row.booking_code,
@@ -84,6 +86,8 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
     collaboratorId: row.collaborator_id || undefined,
     collaboratorName: row.collaborators?.name || undefined,
     partnerId: row.partner_id || undefined,
+    termStatus: term?.pdf_url ? "assinado" : "pendente",
+    termPdfUrl: term?.pdf_url || undefined,
   };
 }
 
