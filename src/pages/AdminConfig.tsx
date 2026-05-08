@@ -352,20 +352,26 @@ const AdminConfig = () => {
   };
 
   const BACKUP_TABLES = [
-    "site_settings", "ai_settings", "tours", "transfer_routes", "customers", "dependents",
-    "bookings", "packages", "package_tours", "partners", "partner_types", 
-    "contas_pagar", "contas_receber", "reviews", "documents", "document_types",
-    "collaborators", "collaborator_types", "collaborator_payments",
-    "marketing_campaigns", "marketing_leads", "remarketing_rules",
-    "sgs_risks", "sgs_incidents", "sgs_corrective_actions", "sgs_staff",
-    "sgs_staff_trainings", "sgs_audits", "sgs_audit_items", "sgs_briefings",
-    "sgs_risk_terms", "sgs_risk_term_minors", "sgs_safety_surveys", "sgs_supplier_compliance",
-    "sgs_empresa", "sgs_veiculos", "sgs_condutores", "sgs_rotas", 
-    "sgs_checklists", "sgs_checklist_items", "sgs_pgsat", "sgs_condutores_visitantes",
-    "sgs_procedures", "sgs_equipment", "customer_documents"
+    // 1. Independent / Metadata / Types
+    "site_settings", "ai_settings", "collaborator_types", "partner_types", "document_types",
+    "sgs_empresa", "sgs_risk_terms", "sgs_procedures", "sgs_equipment", "sgs_rotas",
+    "user_roles", "user_management",
+    
+    // 2. Main Entities (Base data)
+    "tours", "transfer_routes", "partners", "collaborators", "marketing_campaigns", "customers",
+    "sgs_staff", "sgs_risks", "sgs_veiculos",
+    
+    // 3. Child Entities (Transactional / Related)
+    "bookings", "packages", "package_tours", "package_transfers", "dependents", "documents",
+    "customer_documents", "customer_interactions", "contas_pagar", "contas_receber", "reviews",
+    "sgs_incidents", "sgs_corrective_actions", "sgs_staff_trainings", "sgs_audits", 
+    "sgs_audit_items", "sgs_briefings", "sgs_risk_term_minors", "sgs_safety_surveys", 
+    "sgs_supplier_compliance", "sgs_checklists", "sgs_checklist_items", "sgs_pgsat", 
+    "sgs_condutores", "sgs_condutores_visitantes", "notifications", "remarketing_rules", 
+    "marketing_leads", "collaborator_payments"
   ] as string[];
 
-  const STORAGE_BUCKETS = ["tour-images", "company-documents", "customer-documents", "avatars"] as const;
+  const STORAGE_BUCKETS = ["tour-images", "company-documents", "customer-documents", "avatars", "vouchers", "financeiro"] as const;
 
   const handleBackup = async () => {
     setBackupLoading(true);
@@ -549,17 +555,20 @@ const AdminConfig = () => {
       }
 
       // Restore Database Tables
-      for (const table of BACKUP_TABLES) {
-        const rows = parsed.data[table];
-        if (!rows || !Array.isArray(rows) || rows.length === 0) continue;
-
-        // Delete existing data
+      // Step 1: Delete all current data in reverse order (children first) to avoid FK conflicts
+      const DELETE_ORDER = [...BACKUP_TABLES].reverse();
+      for (const table of DELETE_ORDER) {
         const { error: delError } = await supabase.from(table as any).delete().neq("id", "00000000-0000-0000-0000-000000000000" as any);
         if (delError) {
           console.error(`Erro ao limpar ${table}:`, delError.message);
-          errors++;
-          continue;
+          // If we can't delete, we continue anyway to try to restore as many as possible
         }
+      }
+
+      // Step 2: Insert backup data in original order (parents first)
+      for (const table of BACKUP_TABLES) {
+        const rows = parsed.data[table];
+        if (!rows || !Array.isArray(rows) || rows.length === 0) continue;
 
         // Insert backup data in batches of 100
         for (let i = 0; i < rows.length; i += 100) {
@@ -1468,7 +1477,6 @@ const AdminConfig = () => {
           </Card>
         </TabsContent>
 
-        {/* BACKUP & RESTAURAÇÃO */}
         <TabsContent value="backup">
           <div className="space-y-6">
             <Card className="border-none shadow-sm glass-card rounded-[2.5rem] overflow-hidden">
@@ -1479,8 +1487,8 @@ const AdminConfig = () => {
                       <HardDrive size={32} strokeWidth={2.5} />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-black text-foreground tracking-tight leading-none">Cópia de Segurança</h3>
-                      <p className="text-sm font-medium text-muted-foreground mt-2">Segurança máxima para seus dados e mídias.</p>
+                      <h3 className="text-2xl font-black text-foreground tracking-tight leading-none">Módulo de Backup</h3>
+                      <p className="text-sm font-medium text-muted-foreground mt-2">Segurança máxima para seus dados, configurações e mídias.</p>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-3">
@@ -1514,7 +1522,9 @@ const AdminConfig = () => {
                       <p className="text-xs font-bold text-foreground">O pacote de backup contém:</p>
                       <div className="grid grid-cols-2 gap-3">
                         {[
-                          "Configurações", "Reservas", "Clientes", "Financeiro", "Marketing", "SGS Segurança", "Documentação", "Mídias/Fotos"
+                          "Configurações Globais", "Reservas e Vendas", "CRM e Clientes", "Financeiro (C/P e C/R)", 
+                          "Marketing e Leads", "SGS (Segurança e Riscos)", "Documentos e Arquivos", "Mídias e Imagens",
+                          "Usuários e Permissões", "Dados dos Passeios"
                         ].map((item, i) => (
                           <div key={i} className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
@@ -1524,88 +1534,59 @@ const AdminConfig = () => {
                       </div>
                     </div>
                   </div>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button 
-                        onClick={handleBackup} 
-                        disabled={backupLoading} 
-                        className="rounded-xl px-6 h-11 font-bold shadow-sm bg-blue-600 hover:bg-blue-700 text-white"
-                      >
-                        {backupLoading ? <Loader2 size={18} className="animate-spin mr-2" /> : <Download size={18} className="mr-2" />}
-                        {backupLoading ? "Gerando backup..." : "Gerar Backup Completo"}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Exportar todos os dados do banco para um arquivo JSON</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              </CardContent>
-            </Card>
 
-            <Card className="border-border">
-              <CardContent className="p-6 space-y-5">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                    <RefreshCw size={20} className="text-amber-600" />
+                  <div className="space-y-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 ml-2">Recomendações</p>
+                    <div className="p-6 bg-amber-500/5 border border-amber-500/20 rounded-[2rem] space-y-4">
+                      <div className="flex gap-3">
+                        <AlertCircle className="text-amber-600 shrink-0" size={18} />
+                        <div className="space-y-1">
+                          <p className="text-xs font-bold text-amber-900">Atenção ao Restaurar</p>
+                          <p className="text-[11px] text-amber-700 leading-relaxed">
+                            A restauração substitui permanentemente todos os dados atuais. Recomendamos baixar um backup local antes de qualquer importação.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <Clock className="text-indigo-600 shrink-0" size={18} />
+                        <div className="space-y-1">
+                          <p className="text-xs font-bold text-indigo-900">Periodicidade</p>
+                          <p className="text-[11px] text-indigo-700 leading-relaxed">
+                            Mantenha uma rotina semanal de backups para garantir que sua operação esteja sempre protegida contra erros humanos.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-display font-bold text-foreground text-lg">Restaurar Backup</h3>
-                    <p className="text-sm text-muted-foreground">Importe um arquivo de backup para restaurar os dados</p>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-destructive/5 border border-destructive/20 rounded-xl space-y-2">
-                  <p className="text-sm font-medium text-destructive">⚠️ Atenção</p>
-                  <p className="text-sm text-muted-foreground">
-                    A restauração <strong>substituirá todos os dados atuais</strong> pelos dados do backup selecionado. 
-                    Recomendamos realizar um backup antes de restaurar.
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-                  <input ref={restoreInputRef} type="file" accept=".json" className="hidden" onChange={handleRestore} />
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        onClick={() => restoreInputRef.current?.click()}
-                        disabled={restoreLoading}
-                        className="rounded-xl px-6 h-11 font-bold border-2 border-amber-500/30 hover:bg-amber-50"
-                      >
-                        {restoreLoading ? <Loader2 size={18} className="animate-spin mr-2" /> : <UploadCloud size={18} className="mr-2" />}
-                        {restoreLoading ? "Restaurando..." : "Selecionar Arquivo de Backup"}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Substituir dados atuais por um arquivo de backup anterior</p>
-                    </TooltipContent>
-                  </Tooltip>
                 </div>
               </CardContent>
             </Card>
 
             {backupHistory.length > 0 && (
-              <Card className="border-border">
+              <Card className="border-border/60 shadow-sm rounded-[2rem]">
                 <CardContent className="p-6 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Clock size={20} className="text-muted-foreground" />
-                    <h3 className="font-display font-bold text-foreground text-lg">Histórico de Backups (persistência local)</h3>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Clock size={20} className="text-muted-foreground" />
+                      <h3 className="font-display font-bold text-foreground text-lg">Histórico Local</h3>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => { localStorage.removeItem("backup_history"); setBackupHistory([]); }} className="text-[10px] uppercase font-bold text-muted-foreground">
+                      Limpar Histórico
+                    </Button>
                   </div>
-                  <div className="space-y-2">
+                  <div className="grid gap-2">
                     {backupHistory.map((b, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 bg-muted rounded-lg text-sm">
+                      <div key={i} className="flex items-center justify-between p-4 bg-muted/30 hover:bg-muted/50 transition-colors rounded-2xl text-sm border border-transparent hover:border-border">
                         <div className="flex items-center gap-3">
-                          <Database size={14} className="text-primary" />
-                          <span className="font-medium text-foreground">{formatDate(new Date(b.date), "dd/MM/yyyy 'às' HH:mm:ss")}</span>
+                          <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center border border-border">
+                            <Database size={14} className="text-indigo-600" />
+                          </div>
+                          <div>
+                            <span className="font-bold text-foreground block">{formatDate(new Date(b.date), "dd/MM/yyyy 'às' HH:mm:ss")}</span>
+                            <span className="text-[10px] text-muted-foreground uppercase font-black">{b.size} • {b.records} registros • {b.tables} tabelas</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-4 text-muted-foreground">
-                        </div>
-                        <div className="flex items-center gap-4 text-muted-foreground">
-                          <span>{b.tables} tabelas</span>
-                          <span>{b.records} registros</span>
-                          <span>{b.size}</span>
-                        </div>
+                        <CheckCircle size={16} className="text-emerald-500" />
                       </div>
                     ))}
                   </div>
