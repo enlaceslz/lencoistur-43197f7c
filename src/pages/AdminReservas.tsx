@@ -484,72 +484,75 @@ const AdminReservas = () => {
           />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
           {filtered.map((booking, index) => (
             <div 
               key={booking.id}
-              className="glass-card admin-card-hover rounded-[2.5rem] overflow-hidden border border-white/20 group animate-in-slide-up bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-2xl shadow-black/5"
+              className="glass-card admin-card-hover rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden border border-white/20 group animate-in-slide-up bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-xl shadow-black/5"
               style={{ animationDelay: `${0.05 * (index % 10)}s` }}
             >
-              <div className="p-8">
+              <div className="p-6 md:p-8">
+
                 {/* Card Header */}
-                <div className="flex justify-between items-start mb-6">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 mb-2 bg-primary/5 px-2 py-1 rounded-lg self-start">
+                <div className="flex justify-between items-start mb-4 md:mb-6">
+                  <div className="flex flex-col min-w-0 pr-2">
+                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 mb-1.5 md:mb-2 bg-primary/5 px-2 py-1 rounded-lg self-start">
                       #{booking.bookingCode}
                     </span>
-                    <h3 className="text-xl font-black text-foreground tracking-tight line-clamp-1 group-hover:text-primary transition-colors duration-300">
+                    <h3 className="text-lg md:text-xl font-black text-foreground tracking-tight truncate group-hover:text-primary transition-colors duration-300">
                       {booking.customerName}
                     </h3>
                   </div>
                   <Badge className={cn(
-                    "rounded-2xl px-4 py-1.5 font-black text-[10px] uppercase tracking-widest border-none shadow-xl",
+                    "rounded-2xl px-3 md:px-4 py-1 md:py-1.5 font-black text-[9px] md:text-[10px] uppercase tracking-widest border-none shadow-xl shrink-0",
                     statusConfig[booking.status]?.className
                   )}>
                     {statusConfig[booking.status]?.label}
                   </Badge>
                 </div>
 
+
                 {/* Tour Info */}
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-center gap-4 group/item">
-                    <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
-                      {booking.type === 'tour' ? <Compass size={18} /> : <Car size={18} />}
+                <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
+                  <div className="flex items-center gap-3 md:gap-4 group/item">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
+                      {booking.type === 'tour' ? <Compass size={16} className="md:w-[18px]" /> : <Car size={16} className="md:w-[18px]" />}
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Serviço</span>
-                      <span className="text-sm font-bold text-foreground/80 line-clamp-1">{booking.itemName}</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Serviço</span>
+                      <span className="text-xs md:text-sm font-bold text-foreground/80 truncate">{booking.itemName}</span>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-4 group/item">
-                    <div className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
-                      <Calendar size={18} />
+                  <div className="flex items-center gap-3 md:gap-4 group/item">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
+                      <Calendar size={16} className="md:w-[18px]" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Data Agendada</span>
-                      <span className="text-sm font-bold text-foreground/80">{fmtDate(booking.date)}</span>
+                      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Data Agendada</span>
+                      <span className="text-xs md:text-sm font-bold text-foreground/80">{fmtDate(booking.date)}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 group/item">
-                    <div className="w-10 h-10 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
-                      <Users size={18} />
+                  <div className="flex items-center gap-3 md:gap-4 group/item">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
+                      <Users size={16} className="md:w-[18px]" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Capacidade</span>
-                      <span className="text-sm font-bold text-foreground/80">{booking.guests} {booking.guests === 1 ? 'passageiro' : 'passageiros'}</span>
+                      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Capacidade</span>
+                      <span className="text-xs md:text-sm font-bold text-foreground/80">{booking.guests} {booking.guests === 1 ? 'passageiro' : 'passageiros'}</span>
                     </div>
                   </div>
                 </div>
 
+
                 {/* Footer with Price and Actions */}
-                <div className="flex items-center justify-between pt-6 border-t border-border/40">
+                <div className="flex items-center justify-between pt-4 md:pt-6 border-t border-border/40">
                   <div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-1">Valor Total</span>
-                    <p className="text-2xl font-black text-foreground tracking-tighter">{fmt(booking.finalTotal)}</p>
+                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-0.5 md:mb-1">Valor Total</span>
+                    <p className="text-xl md:text-2xl font-black text-foreground tracking-tighter">{fmt(booking.finalTotal)}</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5 md:gap-2">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -557,14 +560,15 @@ const AdminReservas = () => {
                             variant="ghost" 
                             size="icon" 
                             onClick={() => setSelected(booking)}
-                            className="h-10 w-10 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-primary hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10"
+                            className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl bg-white/50 dark:bg-white/5 hover:bg-primary hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10"
                           >
-                            <Eye size={18} />
+                            <Eye size={16} className="md:w-[18px]" />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>Ver Detalhes</TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
+
                     
                     <TooltipProvider>
                       <Tooltip>
@@ -573,10 +577,11 @@ const AdminReservas = () => {
                             variant="ghost" 
                             size="icon" 
                             onClick={() => openEdit(booking)}
-                            className="h-10 w-10 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-amber-500 hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10"
+                            className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl bg-white/50 dark:bg-white/5 hover:bg-amber-500 hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10"
                           >
-                            <Pencil size={18} />
+                            <Pencil size={16} className="md:w-[18px]" />
                           </Button>
+
                         </TooltipTrigger>
                         <TooltipContent>Editar Reserva</TooltipContent>
                       </Tooltip>
@@ -590,10 +595,11 @@ const AdminReservas = () => {
                               variant="ghost" 
                               size="icon" 
                               onClick={() => handleAction(() => cancelBooking(booking.id), "Reserva cancelada com sucesso.", true)}
-                              className="h-10 w-10 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-rose-500 hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10 text-rose-500"
+                              className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl bg-white/50 dark:bg-white/5 hover:bg-rose-500 hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10 text-rose-500"
                             >
-                              <Ban size={18} />
+                              <Ban size={16} className="md:w-[18px]" />
                             </Button>
+
                           </TooltipTrigger>
                           <TooltipContent>Cancelar Reserva</TooltipContent>
                         </Tooltip>
