@@ -43,9 +43,10 @@ const HEALTH_QUESTIONS = [
 const TermoAssinatura = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const bookingCode = params.get("booking") || "";
+  const bookingCode = params.get("booking")?.trim() || "";
   const bookingIdParam = params.get("booking_id") || "";
   const termId = params.get("id") || "";
+  const customerIdParam = params.get("customer_id") || params.get("id") || ""; // Handle cases where 'id' might be a customer ID from CRM
   
   const [booking, setBooking] = useState<any>(null);
   const [term, setTerm] = useState<any>(null);
@@ -92,15 +93,30 @@ const TermoAssinatura = () => {
         }
       } else if (bookingCode) {
         console.log("Searching by bookingCode:", bookingCode);
-        const bookingRes = await supabase.from("bookings").select("*, customers!customer_id(*)").ilike("booking_code", bookingCode).maybeSingle();
-        bookingData = bookingRes.data;
+        const { data: bData, error: bError } = await supabase.from("bookings").select("*, customers!customer_id(*)").ilike("booking_code", bookingCode).maybeSingle();
+        if (bError) console.error("Search error:", bError);
+        bookingData = bData;
         if (bookingData) {
-          const termRes = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
-          termData = termRes.data;
+          const { data: tData, error: tError } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
+          if (tError) console.error("Term search error:", tError);
+          termData = tData;
         }
       } else if (bookingIdParam) {
-        const bookingRes = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", bookingIdParam).maybeSingle();
-        bookingData = bookingRes.data;
+        const { data: bById, error: bIdError } = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", bookingIdParam).maybeSingle();
+        if (bIdError) console.error("Booking search error:", bIdError);
+        bookingData = bById;
+      } else if (customerIdParam) {
+        // Fallback: try to find the most recent booking for this customer
+        const { data: bByCust, error: bCustError } = await supabase
+          .from("bookings")
+          .select("*, customers!customer_id(*)")
+          .eq("customer_id", customerIdParam)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        if (bCustError) console.error("Customer search error:", bCustError);
+        bookingData = bByCust;
       }
 
       if (bookingData || termData) {

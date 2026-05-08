@@ -1237,7 +1237,7 @@ const AdminCRMContent = () => {
                             toast.error("Cliente sem telefone cadastrado.");
                             return;
                           }
-                          const message = `Olá ${selectedCustomer.name}! Por favor, complete os seus dados e assine o Termo de Ciência de Risco para a sua próxima aventura: ${window.location.origin}/assinatura-termo?id=${selectedCustomer.id}`;
+                          const message = `Olá ${selectedCustomer.name}! Por favor, complete os seus dados e assine o Termo de Ciência de Risco para a sua próxima aventura: ${window.location.origin}/assinatura-termo?customer_id=${selectedCustomer.id}`;
                           const cleanPhone = selectedCustomer.phone.replace(/\D/g, "");
                           const whatsappUrl = `https://wa.me/${cleanPhone.startsWith('55') ? cleanPhone : '55' + cleanPhone}?text=${encodeURIComponent(message)}`;
                           window.open(whatsappUrl, '_blank');
