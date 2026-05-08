@@ -1203,6 +1203,19 @@ const AdminReservas = () => {
                       <DollarSign className="text-emerald-400" size={18} />
                       <h3 className="font-black uppercase tracking-widest text-[11px]">Resumo do Checkout</h3>
                     </div>
+
+                    {newForm.partnerId && (
+                      <div className="space-y-2 mb-4 p-3 bg-white/5 rounded-2xl border border-white/10">
+                        <div className="flex justify-between text-[9px] font-black uppercase text-white/40 tracking-widest">
+                          <span>Valor para o Cliente (Site)</span>
+                          <span>{fmt(publicTotal)}</span>
+                        </div>
+                        <p className="text-[10px] text-emerald-400 font-bold leading-tight">
+                          O cliente verá o preço do site no recibo. O financeiro registrará o valor NET a receber.
+                        </p>
+                      </div>
+                    )}
+
                     <div className="space-y-2 border-b border-white/10 pb-4 mb-4">
                       <div className="flex justify-between text-[11px] font-bold text-white/60 uppercase tracking-wider">
                         <span>{newForm.type === "tour" && newForm.tourMode === "privativo" ? "Veículo Privativo" : `${newForm.guests} Passageiro(s)`}</span>
@@ -1216,7 +1229,9 @@ const AdminReservas = () => {
                       )}
                     </div>
                     <div className="flex justify-between items-end">
-                      <span className="text-[10px] font-black uppercase text-white/40 tracking-[0.2em]">Total a Pagar</span>
+                      <span className="text-[10px] font-black uppercase text-white/40 tracking-[0.2em]">
+                        {newForm.partnerId ? "A Receber (NET)" : "Total a Pagar"}
+                      </span>
                       <span className="text-3xl font-black text-white tracking-tighter">{fmt(finalTotal)}</span>
                     </div>
                   </div>
