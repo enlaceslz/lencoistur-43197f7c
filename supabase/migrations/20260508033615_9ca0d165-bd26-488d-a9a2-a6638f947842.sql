@@ -1,0 +1,1 @@
+ALTER TABLE public.transfer_routes ADD COLUMN IF NOT EXISTS partner_price INTEGER;

@@ -104,7 +104,18 @@ const CheckoutPage = () => {
       unitPrice = basePublicPrice;
     }
   } else if (transfer) {
-    unitPrice = transfer.price || 0;
+    const basePublicPrice = transfer.price || 0;
+    if (partner) {
+      if (transfer.partner_price && transfer.partner_price > 0) {
+        unitPrice = transfer.partner_price;
+      } else if (partner.commission_rate > 0) {
+        unitPrice = Math.round(basePublicPrice * (1 - partner.commission_rate / 100));
+      } else {
+        unitPrice = basePublicPrice;
+      }
+    } else {
+      unitPrice = basePublicPrice;
+    }
   }
 
   const pixDiscountPercent = partner ? 0 : (tour?.pix_discount || transfer?.pix_discount || (pkg ? 5 : 0));
