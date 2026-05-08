@@ -33,6 +33,8 @@ export interface BookingItem {
   collaboratorId?: string;
   collaboratorName?: string;
   partnerId?: string;
+  termStatus?: "pendente" | "assinado";
+  termPdfUrl?: string;
 }
 
 function generateBookingCode(): string {
