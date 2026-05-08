@@ -217,6 +217,69 @@ Deno.serve(async (req) => {
     const finalTotal = total - discount;
     const pixCode = payMethod === "pix" ? generatePixCode() : null;
 
+    if (date && (typeof date !== "string" || date.length > 100)) {
+      return new Response(
+        JSON.stringify({ error: "Data inválida" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (notes && (typeof notes !== "string" || notes.length > 2000)) {
+      return new Response(
+        JSON.stringify({ error: "Observações inválidas" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (customerPhone && (typeof customerPhone !== "string" || customerPhone.length > 30)) {
+      return new Response(
+        JSON.stringify({ error: "Telefone inválido" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (cpf && (typeof cpf !== "string" || cpf.length > 20)) {
+      return new Response(
+        JSON.stringify({ error: "CPF inválido" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (passport && (typeof passport !== "string" || passport.length > 40)) {
+      return new Response(
+        JSON.stringify({ error: "Passaporte inválido" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (country && (typeof country !== "string" || country.length > 80)) {
+      return new Response(
+        JSON.stringify({ error: "País inválido" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (birthDate && (typeof birthDate !== "string" || birthDate.length > 20)) {
+      return new Response(
+        JSON.stringify({ error: "Data de nascimento inválida" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (companions && (!Array.isArray(companions) || companions.length > 20)) {
+      return new Response(
+        JSON.stringify({ error: "Acompanhantes inválidos" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (companions?.some((c: any) => !isNonEmptyString(c?.name, 120))) {
+      return new Response(
+        JSON.stringify({ error: "Nome de acompanhante inválido" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const createBookingRecord = async (customerId: string) => {
       const { data: booking, error: bookingErr } = await supabaseAdmin
         .from("bookings")
@@ -231,8 +294,8 @@ Deno.serve(async (req) => {
           total,
           discount,
           final_total: finalTotal,
-          public_unit_price: clientPublicUnitPrice || publicUnitPrice,
-          public_total: clientPublicTotal || publicTotal,
+          public_unit_price: publicUnitPrice,
+          public_total: publicTotal,
           pay_method: payMethod,
           status: "pendente",
           payment_status: "pendente",
@@ -263,7 +326,6 @@ Deno.serve(async (req) => {
       return booking;
     };
 
-    const trimmedEmail = String(customerEmail).trim().toLowerCase();
     const { data: existingCustomer } = await supabaseAdmin
       .from("customers")
       .select("id")
@@ -273,7 +335,9 @@ Deno.serve(async (req) => {
     let customerId = existingCustomer?.id;
 
     if (!customerId) {
-      console.log("Creating new customer:", { name: customerName, email: trimmedEmail });
+      console.log("Creating customer record for booking", {
+        customerEmail: previewEmail(trimmedEmail),
+      });
       const { data: newCustomer, error: custErr } = await supabaseAdmin
         .from("customers")
         .insert({
@@ -296,7 +360,12 @@ Deno.serve(async (req) => {
     }
 
     const booking = await createBookingRecord(customerId);
-    console.log("Booking created successfully:", booking.id);
+    console.log("Booking created successfully", {
+      bookingId: booking.id,
+      customerId,
+      type: booking.type,
+      payMethod: booking.pay_method,
+    });
     return new Response(JSON.stringify(booking), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
