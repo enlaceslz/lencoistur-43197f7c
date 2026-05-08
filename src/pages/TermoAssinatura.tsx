@@ -329,7 +329,7 @@ const TermoAssinatura = () => {
         const { data: termData, error: termError } = await supabase.from("sgs_risk_terms").insert([{
           booking_id: booking.id,
           customer_id: booking.customer_id,
-          customer_name: booking.customers?.name || booking.customer_name || "Cliente",
+          customer_name: booking.customers?.name || "Cliente",
           nationality: booking.customers?.country || "Brasil",
           phone: booking.customers?.phone || booking.customer_phone || "",
           email: booking.customers?.email || booking.customer_email || "",
