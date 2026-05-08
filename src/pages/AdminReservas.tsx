@@ -356,117 +356,120 @@ const AdminReservas = () => {
 
   return (
     <AdminLayout title="Reservas">
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+      {/* Stats - Responsive Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
         {[
           { label: "Total Reservas", value: bookings.length, icon: ShoppingCart, color: "from-blue-500 to-indigo-600", desc: "Histórico geral" },
           { label: "Confirmadas", value: bookings.filter((b) => b.status === "confirmada").length, icon: CheckCircle, color: "from-emerald-500 to-teal-600", desc: "Vendas firmes" },
           { label: "Pendentes", value: bookings.filter((b) => b.status === "pendente").length, icon: Clock, color: "from-amber-500 to-orange-600", desc: "Aguardando" },
           { label: "Receita Paga", value: fmt(totalPago), icon: DollarSign, color: "from-purple-500 to-pink-600", desc: "LTV Financeiro" },
         ].map((stat, i) => (
-          <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group">
+          <div key={i} className="glass-card admin-card-hover rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-6 relative overflow-hidden group">
             <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
-            <div className="flex items-center justify-between mb-4">
-              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-primary/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
-                <stat.icon size={22} strokeWidth={2.5} />
+            <div className="flex items-center justify-between mb-2 md:mb-4">
+              <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-primary/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+                <stat.icon size={20} className="md:w-[22px]" strokeWidth={2.5} />
               </div>
-              <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{stat.desc}</div>
+              <div className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{stat.desc}</div>
             </div>
-            <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
-            <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
+            <p className="text-xl md:text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
+            <p className="text-[9px] md:text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
           </div>
         ))}
       </div>
 
-      {/* View Switcher & Filters */}
-      <Card className="mb-8 border-none shadow-2xl shadow-primary/5 overflow-hidden glass-card rounded-[2.5rem] animate-in-fade border border-white/20" style={{ animationDelay: '0.2s' }}>
-        <CardContent className="p-8 space-y-8">
-          <div className="flex flex-col xl:flex-row gap-8 items-center justify-between">
-            <div className="flex bg-white/40 dark:bg-black/20 backdrop-blur-xl p-1.5 rounded-[1.5rem] border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 w-full xl:w-auto">
+      {/* View Switcher & Filters - More Responsive */}
+      <Card className="mb-6 md:mb-8 border-none shadow-2xl shadow-primary/5 overflow-hidden glass-card rounded-[1.5rem] md:rounded-[2.5rem] animate-in-fade border border-white/20" style={{ animationDelay: '0.2s' }}>
+        <CardContent className="p-4 md:p-8 space-y-6 md:space-y-8">
+          <div className="flex flex-col lg:flex-row gap-4 md:gap-8 items-stretch lg:items-center justify-between">
+            <div className="flex bg-white/40 dark:bg-black/20 backdrop-blur-xl p-1.5 rounded-[1.2rem] md:rounded-[1.5rem] border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 w-full lg:w-auto">
+
               <Button 
                 variant={viewMode === "list" ? "default" : "ghost"} 
                 onClick={() => setViewMode("list")}
                 className={cn(
-                  "flex-1 xl:flex-none h-12 px-8 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] transition-all",
+                  "flex-1 lg:flex-none h-11 md:h-12 px-4 md:px-8 rounded-xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] transition-all",
                   viewMode === "list" ? "shadow-lg shadow-primary/25 scale-[1.02]" : "text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5"
                 )}
               >
-                <List size={18} className="mr-2" /> Lista
+                <List size={16} className="mr-2 md:w-[18px]" /> Lista
               </Button>
               <Button 
                 variant={viewMode === "calendar" ? "default" : "ghost"} 
                 onClick={() => setViewMode("calendar")}
                 className={cn(
-                  "flex-1 xl:flex-none h-12 px-8 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] transition-all",
+                  "flex-1 lg:flex-none h-11 md:h-12 px-4 md:px-8 rounded-xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] transition-all",
                   viewMode === "calendar" ? "shadow-lg shadow-primary/25 scale-[1.02]" : "text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5"
                 )}
               >
-                <LayoutGrid size={18} className="mr-2" /> Calendário
+                <LayoutGrid size={16} className="mr-2 md:w-[18px]" /> Agenda
               </Button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto">
-              <div className="relative flex-1 xl:w-[400px] group">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
+              <div className="relative flex-1 lg:w-[350px] group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
                 <Input
-                  placeholder="Pesquisar por nome, passeio ou código..."
+                  placeholder="Nome, passeio ou código..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-14 h-14 rounded-[1.5rem] border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/20 backdrop-blur-xl focus:bg-white/80 dark:focus:bg-black/40 focus:ring-4 focus:ring-primary/10 transition-all font-semibold"
+                  className="pl-12 h-12 md:h-14 rounded-[1.2rem] md:rounded-[1.5rem] border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/20 backdrop-blur-xl focus:bg-white/80 dark:focus:bg-black/40 focus:ring-4 focus:ring-primary/10 transition-all font-semibold text-sm"
                 />
               </div>
 
-              <div className="flex gap-2 w-full sm:w-auto">
+              <div className="flex gap-2">
                 <Button 
                   onClick={() => { resetNewForm(); setShowNewForm(true); }} 
-                  className="flex-1 sm:flex-none h-14 px-8 rounded-[1.5rem] bg-gradient-to-r from-primary to-indigo-600 hover:shadow-2xl hover:shadow-primary/30 transition-all font-black text-[11px] uppercase tracking-[0.2em]"
+                  className="flex-1 sm:flex-none h-12 md:h-14 px-4 md:px-8 rounded-[1.2rem] md:rounded-[1.5rem] bg-gradient-to-r from-primary to-indigo-600 hover:shadow-2xl hover:shadow-primary/30 transition-all font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em]"
                 >
-                  <Plus size={20} className="mr-2" /> Nova Reserva
+                  <Plus size={18} className="mr-1 md:mr-2" /> Reserva
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={exportCSV} 
-                  className="flex-1 sm:flex-none h-14 px-8 rounded-[1.5rem] border-white/40 dark:border-white/10 backdrop-blur-xl hover:bg-white/50 transition-all font-black text-[11px] uppercase tracking-[0.2em]"
+                  className="flex-1 sm:flex-none h-12 md:h-14 px-4 md:px-8 rounded-[1.2rem] md:rounded-[1.5rem] border-white/40 dark:border-white/10 backdrop-blur-xl hover:bg-white/50 transition-all font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em]"
                 >
-                  <Download size={20} className="mr-2" /> Exportar
+                  <Download size={18} className="mr-1 md:mr-2" /> CSV
                 </Button>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-border/40">
-            <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 md:gap-6 pt-6 border-t border-border/40">
+            <div className="flex overflow-x-auto pb-2 md:pb-0 gap-2 no-scrollbar">
+
               {["todos", "confirmada", "pendente", "cancelada", "concluida"].map((s) => (
                 <button
                   key={s}
                   onClick={() => setStatusFilter(s)}
-                  className={`text-[10px] font-black uppercase tracking-widest px-5 py-3 rounded-xl transition-all whitespace-nowrap shadow-sm border border-border/20 ${
+                  className={`text-[9px] md:text-[10px] font-black uppercase tracking-widest px-4 md:px-5 py-2 md:py-3 rounded-xl transition-all whitespace-nowrap shadow-sm border border-border/20 ${
                     statusFilter === s
                       ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
                       : "bg-white/40 dark:bg-black/20 backdrop-blur-sm text-muted-foreground hover:bg-primary/5 hover:text-primary hover:border-primary/20"
                   }`}
                 >
-                  {s === "todos" ? `Todos os Status` : statusConfig[s]?.label}
+                  {s === "todos" ? `Status: Todos` : statusConfig[s]?.label}
                 </button>
               ))}
             </div>
 
-            <div className="flex items-center gap-4 bg-white/40 dark:bg-black/20 backdrop-blur-xl px-5 py-3 rounded-xl border border-white/40 dark:border-white/10 shadow-sm ml-auto">
-              <Calendar size={16} className="text-primary" />
-              <div className="flex items-center gap-3">
-                <input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="bg-transparent text-[11px] font-black uppercase tracking-widest outline-none w-28 text-foreground" />
-                <span className="text-muted-foreground text-[10px] font-black opacity-40">ATÉ</span>
-                <input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="bg-transparent text-[11px] font-black uppercase tracking-widest outline-none w-28 text-foreground" />
+            <div className="flex items-center gap-3 md:gap-4 bg-white/40 dark:bg-black/20 backdrop-blur-xl px-4 md:px-5 py-2 md:py-3 rounded-xl border border-white/40 dark:border-white/10 shadow-sm md:ml-auto w-full md:w-auto justify-center md:justify-start">
+              <Calendar size={14} className="text-primary" />
+              <div className="flex items-center gap-2 md:gap-3">
+                <input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="bg-transparent text-[10px] md:text-[11px] font-black uppercase tracking-widest outline-none w-24 md:w-28 text-foreground" />
+                <span className="text-muted-foreground text-[9px] md:text-[10px] font-black opacity-40">ATÉ</span>
+                <input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="bg-transparent text-[10px] md:text-[11px] font-black uppercase tracking-widest outline-none w-24 md:w-28 text-foreground" />
               </div>
               {(dateStart || dateEnd) && (
-                <button onClick={() => { setDateStart(""); setDateEnd(""); }} className="ml-2 text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline px-2 py-1 rounded-md bg-rose-500/5">
-                  Limpar
+                <button onClick={() => { setDateStart(""); setDateEnd(""); }} className="ml-1 text-[9px] font-black text-rose-500 uppercase tracking-widest hover:underline px-2 py-1 rounded-md bg-rose-500/5">
+                  X
                 </button>
               )}
             </div>
           </div>
         </CardContent>
       </Card>
+
 
       {/* Main Content */}
       {viewMode === "calendar" ? (
@@ -481,72 +484,75 @@ const AdminReservas = () => {
           />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
           {filtered.map((booking, index) => (
             <div 
               key={booking.id}
-              className="glass-card admin-card-hover rounded-[2.5rem] overflow-hidden border border-white/20 group animate-in-slide-up bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-2xl shadow-black/5"
+              className="glass-card admin-card-hover rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden border border-white/20 group animate-in-slide-up bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-xl shadow-black/5"
               style={{ animationDelay: `${0.05 * (index % 10)}s` }}
             >
-              <div className="p-8">
+              <div className="p-6 md:p-8">
+
                 {/* Card Header */}
-                <div className="flex justify-between items-start mb-6">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 mb-2 bg-primary/5 px-2 py-1 rounded-lg self-start">
+                <div className="flex justify-between items-start mb-4 md:mb-6">
+                  <div className="flex flex-col min-w-0 pr-2">
+                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 mb-1.5 md:mb-2 bg-primary/5 px-2 py-1 rounded-lg self-start">
                       #{booking.bookingCode}
                     </span>
-                    <h3 className="text-xl font-black text-foreground tracking-tight line-clamp-1 group-hover:text-primary transition-colors duration-300">
+                    <h3 className="text-lg md:text-xl font-black text-foreground tracking-tight truncate group-hover:text-primary transition-colors duration-300">
                       {booking.customerName}
                     </h3>
                   </div>
                   <Badge className={cn(
-                    "rounded-2xl px-4 py-1.5 font-black text-[10px] uppercase tracking-widest border-none shadow-xl",
+                    "rounded-2xl px-3 md:px-4 py-1 md:py-1.5 font-black text-[9px] md:text-[10px] uppercase tracking-widest border-none shadow-xl shrink-0",
                     statusConfig[booking.status]?.className
                   )}>
                     {statusConfig[booking.status]?.label}
                   </Badge>
                 </div>
 
+
                 {/* Tour Info */}
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-center gap-4 group/item">
-                    <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
-                      {booking.type === 'tour' ? <Compass size={18} /> : <Car size={18} />}
+                <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
+                  <div className="flex items-center gap-3 md:gap-4 group/item">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
+                      {booking.type === 'tour' ? <Compass size={16} className="md:w-[18px]" /> : <Car size={16} className="md:w-[18px]" />}
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Serviço</span>
-                      <span className="text-sm font-bold text-foreground/80 line-clamp-1">{booking.itemName}</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Serviço</span>
+                      <span className="text-xs md:text-sm font-bold text-foreground/80 truncate">{booking.itemName}</span>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-4 group/item">
-                    <div className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
-                      <Calendar size={18} />
+                  <div className="flex items-center gap-3 md:gap-4 group/item">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
+                      <Calendar size={16} className="md:w-[18px]" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Data Agendada</span>
-                      <span className="text-sm font-bold text-foreground/80">{fmtDate(booking.date)}</span>
+                      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Data Agendada</span>
+                      <span className="text-xs md:text-sm font-bold text-foreground/80">{fmtDate(booking.date)}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 group/item">
-                    <div className="w-10 h-10 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
-                      <Users size={18} />
+                  <div className="flex items-center gap-3 md:gap-4 group/item">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
+                      <Users size={16} className="md:w-[18px]" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Capacidade</span>
-                      <span className="text-sm font-bold text-foreground/80">{booking.guests} {booking.guests === 1 ? 'passageiro' : 'passageiros'}</span>
+                      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Capacidade</span>
+                      <span className="text-xs md:text-sm font-bold text-foreground/80">{booking.guests} {booking.guests === 1 ? 'passageiro' : 'passageiros'}</span>
                     </div>
                   </div>
                 </div>
 
+
                 {/* Footer with Price and Actions */}
-                <div className="flex items-center justify-between pt-6 border-t border-border/40">
+                <div className="flex items-center justify-between pt-4 md:pt-6 border-t border-border/40">
                   <div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-1">Valor Total</span>
-                    <p className="text-2xl font-black text-foreground tracking-tighter">{fmt(booking.finalTotal)}</p>
+                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-0.5 md:mb-1">Valor Total</span>
+                    <p className="text-xl md:text-2xl font-black text-foreground tracking-tighter">{fmt(booking.finalTotal)}</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5 md:gap-2">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -554,14 +560,15 @@ const AdminReservas = () => {
                             variant="ghost" 
                             size="icon" 
                             onClick={() => setSelected(booking)}
-                            className="h-10 w-10 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-primary hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10"
+                            className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl bg-white/50 dark:bg-white/5 hover:bg-primary hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10"
                           >
-                            <Eye size={18} />
+                            <Eye size={16} className="md:w-[18px]" />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>Ver Detalhes</TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
+
                     
                     <TooltipProvider>
                       <Tooltip>
@@ -570,10 +577,11 @@ const AdminReservas = () => {
                             variant="ghost" 
                             size="icon" 
                             onClick={() => openEdit(booking)}
-                            className="h-10 w-10 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-amber-500 hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10"
+                            className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl bg-white/50 dark:bg-white/5 hover:bg-amber-500 hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10"
                           >
-                            <Pencil size={18} />
+                            <Pencil size={16} className="md:w-[18px]" />
                           </Button>
+
                         </TooltipTrigger>
                         <TooltipContent>Editar Reserva</TooltipContent>
                       </Tooltip>
@@ -587,10 +595,11 @@ const AdminReservas = () => {
                               variant="ghost" 
                               size="icon" 
                               onClick={() => handleAction(() => cancelBooking(booking.id), "Reserva cancelada com sucesso.", true)}
-                              className="h-10 w-10 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-rose-500 hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10 text-rose-500"
+                              className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl bg-white/50 dark:bg-white/5 hover:bg-rose-500 hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10 text-rose-500"
                             >
-                              <Ban size={18} />
+                              <Ban size={16} className="md:w-[18px]" />
                             </Button>
+
                           </TooltipTrigger>
                           <TooltipContent>Cancelar Reserva</TooltipContent>
                         </Tooltip>
@@ -887,26 +896,27 @@ const AdminReservas = () => {
 
       {/* New Booking Dialog */}
       <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
-        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
-          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
-            <div className="flex items-center gap-3 md:gap-4">
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                {editingId ? <Pencil size={20} className="md:w-6 md:h-6" /> : <Plus size={20} className="md:w-6 md:h-6" />}
+        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[95vh] overflow-y-auto p-0 border-none shadow-3xl rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden bg-slate-50">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-8 flex items-center justify-between sticky top-0 z-20">
+            <div className="flex items-center gap-3 md:gap-5">
+              <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-[1.5rem] bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+                {editingId ? <Pencil size={20} className="md:w-7 md:h-7" /> : <Plus size={20} className="md:w-7 md:h-7" />}
               </div>
               <div>
-                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                <DialogTitle className="text-lg md:text-2xl font-black text-slate-900 tracking-tight leading-none mb-1">
                   {editingId ? "Editar Reserva" : "Nova Reserva"}
                 </DialogTitle>
-                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Configure os detalhes do cliente e do serviço</p>
+                <p className="text-[10px] md:text-sm text-slate-400 font-bold uppercase tracking-widest">{editingId ? "Atualize os dados da reserva" : "Preencha para confirmar"}</p>
               </div>
             </div>
             <Button variant="ghost" size="icon" onClick={() => setShowNewForm(false)} className="rounded-full hover:bg-slate-100 transition-colors">
-              <XCircleIcon size={20} className="text-slate-400" />
+              <X size={20} className="text-slate-400" />
             </Button>
           </div>
 
-          <form onSubmit={handleNewBooking} className="p-4 md:p-8 space-y-6 md:space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+          <form onSubmit={handleNewBooking} className="flex flex-col h-full">
+            <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10 overflow-y-auto">
+
               {/* Coluna 1: Dados do Serviço */}
               <div className="lg:col-span-6 space-y-6">
                 <div className="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm space-y-4">
@@ -1187,11 +1197,11 @@ const AdminReservas = () => {
               </div>
             </div>
             
-            <div className="flex gap-4 sticky bottom-0 bg-white border-t border-slate-100 p-4 md:p-6 z-10">
-              <Button type="button" variant="ghost" onClick={() => setShowNewForm(false)} className="flex-1 h-14 rounded-2xl font-black uppercase text-[11px] tracking-widest">
-                Cancelar
+            <div className="flex gap-4 sticky bottom-0 bg-white border-t border-slate-100 p-4 md:p-8 z-20">
+              <Button type="button" variant="ghost" onClick={() => setShowNewForm(false)} className="flex-1 h-12 md:h-16 rounded-xl md:rounded-2xl font-black uppercase text-[10px] md:text-[12px] tracking-widest hover:bg-slate-50">
+                Descartar
               </Button>
-              <Button type="submit" className="flex-[2] h-14 rounded-2xl bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20 font-black uppercase text-[11px] tracking-widest" disabled={newLoading || !newForm.itemName}>
+              <Button type="submit" className="flex-[2] h-12 md:h-16 rounded-xl md:rounded-2xl bg-primary hover:bg-primary/90 shadow-2xl shadow-primary/20 font-black uppercase text-[10px] md:text-[12px] tracking-widest transition-all hover:scale-[1.02]" disabled={newLoading || !newForm.itemName}>
                 {newLoading ? <Loader2 className="animate-spin mr-2" size={18} /> : (editingId ? <Save size={18} className="mr-2" /> : <Plus size={18} className="mr-2" />)}
                 {editingId ? "Salvar Alterações" : "Confirmar Reserva"}
               </Button>
@@ -1199,6 +1209,7 @@ const AdminReservas = () => {
           </form>
         </DialogContent>
       </Dialog>
+
     </AdminLayout>
   );
 };
