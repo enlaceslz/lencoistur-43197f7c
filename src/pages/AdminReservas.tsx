@@ -198,6 +198,15 @@ const AdminReservas = () => {
     return basePrice;
   };
 
+  const publicUnitPrice = newForm.type === "tour" 
+    ? (newForm.tourMode === "privativo" 
+        ? (selectedTour?.private_price || 0)
+        : (selectedTour?.price || 0)
+      )
+    : newForm.type === "package"
+      ? (selectedPackage?.discount_price || selectedPackage?.original_price || 0)
+      : (selectedTransfer?.price || 0);
+
   const unitPrice = newForm.type === "tour" 
     ? (newForm.tourMode === "privativo" 
         ? calculatePartnerPrice(selectedTour?.private_price || 0, selectedTour?.partner_private_price)
@@ -208,6 +217,8 @@ const AdminReservas = () => {
       : calculatePartnerPrice(selectedTransfer?.price || 0, selectedTransfer?.partner_price);
 
   const total = (newForm.type === "tour" && newForm.tourMode === "privativo") ? unitPrice : unitPrice * newForm.guests;
+  const publicTotal = (newForm.type === "tour" && newForm.tourMode === "privativo") ? publicUnitPrice : publicUnitPrice * newForm.guests;
+  
   const pixDiscountPercent = (selectedTour?.pix_discount || selectedTransfer?.pix_discount || 0);
   const discount = (newForm.payMethod === "pix" && pixDiscountPercent > 0 && !newForm.partnerId) 
     ? Math.round(total * pixDiscountPercent / 100) 
@@ -249,6 +260,8 @@ const AdminReservas = () => {
         total,
         discount,
         finalTotal,
+        publicUnitPrice,
+        publicTotal,
         collaboratorId: newForm.collaboratorId || undefined,
         partnerId: newForm.partnerId || undefined,
       };
@@ -709,6 +722,20 @@ const AdminReservas = () => {
               {/* Financials */}
               <div className="bg-muted rounded-xl p-4">
                 <h4 className="font-semibold text-sm text-foreground mb-2">Financeiro</h4>
+                
+                {selected.publicTotal && selected.publicTotal !== selected.finalTotal ? (
+                  <div className="space-y-1 mb-2">
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>Valor de Venda (Cliente)</span>
+                      <span>{fmt(selected.publicTotal)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs font-bold text-blue-600 border-b border-border/50 pb-2">
+                      <span>Valor Líquido (A Receber)</span>
+                      <span>{fmt(selected.finalTotal)}</span>
+                    </div>
+                  </div>
+                ) : null}
+
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Subtotal ({selected.guests}x {fmt(selected.unitPrice)})</span>
                   <span>{fmt(selected.total)}</span>
@@ -720,7 +747,7 @@ const AdminReservas = () => {
                   </div>
                 )}
                 <div className="flex justify-between font-bold text-foreground border-t border-border mt-2 pt-2">
-                  <span>Total</span>
+                  <span>Total Final</span>
                   <span>{fmt(selected.finalTotal)}</span>
                 </div>
               </div>
@@ -1176,6 +1203,19 @@ const AdminReservas = () => {
                       <DollarSign className="text-emerald-400" size={18} />
                       <h3 className="font-black uppercase tracking-widest text-[11px]">Resumo do Checkout</h3>
                     </div>
+
+                    {newForm.partnerId && (
+                      <div className="space-y-2 mb-4 p-3 bg-white/5 rounded-2xl border border-white/10">
+                        <div className="flex justify-between text-[9px] font-black uppercase text-white/40 tracking-widest">
+                          <span>Valor para o Cliente (Site)</span>
+                          <span>{fmt(publicTotal)}</span>
+                        </div>
+                        <p className="text-[10px] text-emerald-400 font-bold leading-tight">
+                          O cliente verá o preço do site no recibo. O financeiro registrará o valor NET a receber.
+                        </p>
+                      </div>
+                    )}
+
                     <div className="space-y-2 border-b border-white/10 pb-4 mb-4">
                       <div className="flex justify-between text-[11px] font-bold text-white/60 uppercase tracking-wider">
                         <span>{newForm.type === "tour" && newForm.tourMode === "privativo" ? "Veículo Privativo" : `${newForm.guests} Passageiro(s)`}</span>
@@ -1189,7 +1229,9 @@ const AdminReservas = () => {
                       )}
                     </div>
                     <div className="flex justify-between items-end">
-                      <span className="text-[10px] font-black uppercase text-white/40 tracking-[0.2em]">Total a Pagar</span>
+                      <span className="text-[10px] font-black uppercase text-white/40 tracking-[0.2em]">
+                        {newForm.partnerId ? "A Receber (NET)" : "Total a Pagar"}
+                      </span>
                       <span className="text-3xl font-black text-white tracking-tighter">{fmt(finalTotal)}</span>
                     </div>
                   </div>

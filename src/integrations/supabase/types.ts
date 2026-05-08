@@ -68,6 +68,8 @@ export type Database = {
           pay_method: string
           payment_status: string
           pix_code: string | null
+          public_total: number | null
+          public_unit_price: number | null
           receipt_issued: boolean | null
           status: string
           total: number
@@ -97,6 +99,8 @@ export type Database = {
           pay_method: string
           payment_status?: string
           pix_code?: string | null
+          public_total?: number | null
+          public_unit_price?: number | null
           receipt_issued?: boolean | null
           status?: string
           total: number
@@ -126,6 +130,8 @@ export type Database = {
           pay_method?: string
           payment_status?: string
           pix_code?: string | null
+          public_total?: number | null
+          public_unit_price?: number | null
           receipt_issued?: boolean | null
           status?: string
           total?: number
