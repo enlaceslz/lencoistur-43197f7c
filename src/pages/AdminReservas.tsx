@@ -1082,7 +1082,7 @@ const AdminReservas = () => {
 
       {/* New Booking Dialog */}
       <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
-        <DialogContent className="max-w-[100vw] w-full h-[100dvh] sm:max-w-4xl sm:w-[95vw] sm:h-[95vh] overflow-y-auto p-0 border-none shadow-3xl sm:rounded-[2.5rem] overflow-hidden bg-slate-50 flex flex-col focus-visible:outline-none">
+        <DialogContent className="max-w-[100vw] w-full h-[100dvh] sm:max-w-4xl sm:w-[95vw] sm:h-[95vh] overflow-hidden p-0 border-none shadow-3xl sm:rounded-[2.5rem] bg-slate-50 flex flex-col focus-visible:outline-none">
           <div className="bg-white border-b border-slate-100 p-4 md:p-8 flex items-center justify-between sticky top-0 z-20 shrink-0">
             <div className="flex items-center gap-3 md:gap-5">
               <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-[1.5rem] bg-primary/10 flex items-center justify-center text-primary shadow-inner">
@@ -1100,7 +1100,7 @@ const AdminReservas = () => {
             </Button>
           </div>
 
-          <form onSubmit={handleNewBooking} className="flex flex-col flex-1 min-h-0">
+          <form onSubmit={handleNewBooking} className="flex flex-col flex-1 min-h-0 overflow-hidden">
             <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10 overflow-y-auto flex-1 custom-scrollbar">
 
               {/* Coluna 1: Dados do Serviço */}
