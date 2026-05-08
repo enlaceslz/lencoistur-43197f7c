@@ -1250,6 +1250,91 @@ const AdminParceiros = () => {
           </div>
         </DialogContent>
       </Dialog>
+      {/* Receivabled Dialog */}
+      <Dialog open={receivableDialogOpen} onOpenChange={setReceivableDialogOpen}>
+        <DialogContent className="sm:max-w-md w-[95vw] rounded-3xl border-none shadow-2xl p-0 overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                <DollarSign size={24} strokeWidth={2.5} />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-black text-slate-900 leading-none mb-1">
+                  Lançar Recebimento
+                </DialogTitle>
+                <p className="text-sm text-slate-500 font-medium">{selectedPartner?.name}</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setReceivableDialogOpen(false)} className="rounded-full">
+              <XCircle size={20} className="text-slate-400" />
+            </Button>
+          </div>
+
+          <div className="p-8 space-y-6">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Valor a Receber (R$) *</Label>
+              <NumericFormat
+                value={Number(receivableForm.valor) / 100}
+                onValueChange={(values) => setReceivableForm({ ...receivableForm, valor: String(Math.round(Number(values.floatValue) * 100)) })}
+                thousandSeparator="."
+                decimalSeparator=","
+                prefix="R$ "
+                className="w-full bg-white border border-slate-200 rounded-xl px-4 h-14 text-lg font-black text-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all outline-none"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Descrição / Referência</Label>
+              <Input 
+                value={receivableForm.descricao} 
+                onChange={e => setReceivableForm({ ...receivableForm, descricao: e.target.value })}
+                placeholder="Ex: Faturamento Março/2024"
+                className="h-12 rounded-xl font-bold"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Vencimento</Label>
+                <Input 
+                  type="date" 
+                  value={receivableForm.vencimento} 
+                  onChange={e => setReceivableForm({ ...receivableForm, vencimento: e.target.value })}
+                  className="h-12 rounded-xl font-bold"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Categoria</Label>
+                <select 
+                  value={receivableForm.categoria} 
+                  onChange={e => setReceivableForm({ ...receivableForm, categoria: e.target.value })}
+                  className="w-full h-12 bg-white border border-slate-200 rounded-xl px-3 font-bold text-sm outline-none"
+                >
+                  <option value="comissao">Comissão</option>
+                  <option value="venda">Venda de Passeio</option>
+                  <option value="pacote">Pacote Turístico</option>
+                  <option value="servico">Serviço</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white border-t border-slate-100 p-6 flex gap-3">
+            <Button variant="ghost" onClick={() => setReceivableDialogOpen(false)} className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest">
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleSaveReceivable} 
+              disabled={saving} 
+              className="flex-[2] h-12 rounded-xl bg-emerald-500 hover:bg-emerald-600 shadow-xl shadow-emerald-500/20 font-black uppercase text-[10px] tracking-widest text-white"
+            >
+              {saving ? <Loader2 className="animate-spin mr-2" size={18} /> : <CheckCircle2 size={18} className="mr-2" />}
+              Confirmar Lançamento
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </AdminLayout>
   );
 };
