@@ -36,19 +36,31 @@ const PackageDetail = () => {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("public_packages" as "packages")
-        .select(`
-          *,
-          package_tours (
-            tour:public_tours (*)
-          )
-        `)
+        .select(`*`)
         .eq("slug", slug)
         .maybeSingle();
 
       if (data) {
-        setPkg(data);
+        const { data: tours } = await supabase
+          .from("public_package_tour_items" as "package_tours")
+          .select("tour_id, tour_name, tour_slug, tour_images, tour_description")
+          .eq("package_id", data.id)
+          .order("sort_order");
+
+        setPkg({
+          ...data,
+          package_tours: (tours || []).map((tour: any) => ({
+            tour: {
+              id: tour.tour_id,
+              name: tour.tour_name,
+              slug: tour.tour_slug,
+              images: tour.tour_images,
+              description: tour.tour_description,
+            },
+          })),
+        });
         if (partnerId) {
           try {
             const pricing = await fetchPartnerCatalogPricing(partnerId, [{ key: data.id, type: "package", id: data.id }]);
