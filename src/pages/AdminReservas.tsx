@@ -170,13 +170,20 @@ const AdminReservas = () => {
   // Calculate prices for the new form
   const selectedTour = newForm.type === "tour" ? tours.find(t => t.name === newForm.itemName) : null;
   const selectedTransfer = newForm.type === "transfer" ? transfers.find(t => t.label === newForm.itemName) : null;
+  const selectedPackage = newForm.type === "package" ? packages.find(t => t.name === newForm.itemName) : null;
   
   const unitPrice = newForm.type === "tour" 
-    ? (newForm.tourMode === "privativo" ? (selectedTour?.private_price || 0) : (selectedTour?.price || 0))
-    : (selectedTransfer?.price || 0);
-  const total = newForm.type === "tour" && newForm.tourMode === "privativo" ? unitPrice : unitPrice * newForm.guests;
+    ? (newForm.partnerId 
+        ? (newForm.tourMode === "privativo" ? (selectedTour?.partner_private_price || selectedTour?.private_price || 0) : (selectedTour?.partner_price || selectedTour?.price || 0))
+        : (newForm.tourMode === "privativo" ? (selectedTour?.private_price || 0) : (selectedTour?.price || 0))
+      )
+    : newForm.type === "package"
+      ? (newForm.partnerId ? (selectedPackage?.partner_price || selectedPackage?.discount_price || 0) : (selectedPackage?.discount_price || 0))
+      : (selectedTransfer?.price || 0);
+
+  const total = (newForm.type === "tour" && newForm.tourMode === "privativo") || newForm.type === "package" ? unitPrice : unitPrice * newForm.guests;
   const pixDiscountPercent = (selectedTour?.pix_discount || selectedTransfer?.pix_discount || 0);
-  const discount = (newForm.payMethod === "pix" && pixDiscountPercent > 0) 
+  const discount = (newForm.payMethod === "pix" && pixDiscountPercent > 0 && !newForm.partnerId) 
     ? Math.round(total * pixDiscountPercent / 100) 
     : 0;
   const finalTotal = total - discount;
