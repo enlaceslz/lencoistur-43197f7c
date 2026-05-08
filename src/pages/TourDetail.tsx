@@ -8,12 +8,14 @@ import { supabase } from "@/integrations/supabase/client";
 
 import { formatCurrency } from "@/lib/utils";
 import { ShareWithFriend } from "@/components/ShareWithFriend";
+import { fetchPartnerCatalogPricing } from "@/lib/catalogPricing";
 
 const TourDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const [params] = useSearchParams();
   const [tour, setTour] = useState<any>(null);
-  const [partner, setPartner] = useState<any>(null);
+  const [partner, setPartner] = useState<{ id: string; name: string } | null>(null);
+  const [partnerPricing, setPartnerPricing] = useState<{ effectivePrice: number; effectivePrivatePrice?: number | null } | null>(null);
   const [tourReviews, setTourReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentImg, setCurrentImg] = useState(0);
@@ -25,14 +27,24 @@ const TourDetail = () => {
     if (!slug) return;
     const partnerId = params.get("partner_id") || params.get("partner");
     const load = async () => {
-      if (partnerId) {
-        const { data: partnerData } = await supabase.from("partners").select("*").eq("id", partnerId).maybeSingle();
-        if (partnerData) setPartner(partnerData);
-      }
-      
-      const { data: t } = await supabase.from("tours").select("*").eq("slug", slug).eq("active", true).single();
+      const { data: t } = await supabase.from("public_tours" as "tours").select("*").eq("slug", slug).single();
       setTour(t);
       if (t) {
+        if (partnerId) {
+          try {
+            const pricing = await fetchPartnerCatalogPricing(partnerId, [{ key: t.id, type: "tour", id: t.id }]);
+            setPartner(pricing.partner);
+            const item = pricing.items[t.id];
+            setPartnerPricing(item ? { effectivePrice: item.effectivePrice, effectivePrivatePrice: item.effectivePrivatePrice } : null);
+          } catch {
+            setPartner(null);
+            setPartnerPricing(null);
+          }
+        } else {
+          setPartner(null);
+          setPartnerPricing(null);
+        }
+
         // Apply admin-configured default mode
         const collectiveOn = t.mode_collective_enabled ?? true;
         const privateOn = t.mode_private_enabled ?? true;
@@ -80,16 +92,9 @@ const TourDetail = () => {
   const showModeToggle = collectiveOn && privateOn;
   const isPrivate = tourMode === "privativo";
   const basePublicPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
-  let unitPrice = basePublicPrice;
-  
-  if (partner) {
-    const specificPartnerPrice = isPrivate ? tour.partner_private_price : tour.partner_price;
-    if (specificPartnerPrice && specificPartnerPrice > 0) {
-      unitPrice = specificPartnerPrice;
-    } else if (partner.commission_rate > 0) {
-      unitPrice = Math.round(basePublicPrice * (1 - partner.commission_rate / 100));
-    }
-  }
+  const unitPrice = partnerPricing
+    ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePublicPrice) : partnerPricing.effectivePrice)
+    : basePublicPrice;
   const totalPrice = isPrivate ? unitPrice : unitPrice * guests;
   const maxGuests = vehicleCapacity;
 
