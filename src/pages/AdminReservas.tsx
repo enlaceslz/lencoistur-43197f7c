@@ -838,7 +838,7 @@ const AdminReservas = () => {
                 <h4 className="font-semibold text-sm text-foreground">Detalhes</h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <span className="flex items-center gap-2 text-muted-foreground">
-                    <MapPin size={14} /> {selected.itemName}
+                    <MapPin size={14} className="shrink-0" /> <span className="break-words">{selected.itemName}</span>
                   </span>
                   <span className="flex items-center gap-2 text-muted-foreground">
                     <Calendar size={14} /> {fmtDate(selected.date)}
