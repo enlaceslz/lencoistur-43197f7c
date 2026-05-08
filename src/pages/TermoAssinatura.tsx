@@ -102,8 +102,21 @@ const TermoAssinatura = () => {
           termData = tData;
         }
       } else if (bookingIdParam) {
-        const bookingRes = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", bookingIdParam).maybeSingle();
-        bookingData = bookingRes.data;
+        const { data: bById, error: bIdError } = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", bookingIdParam).maybeSingle();
+        if (bIdError) console.error("Booking search error:", bIdError);
+        bookingData = bById;
+      } else if (customerIdParam) {
+        // Fallback: try to find the most recent booking for this customer
+        const { data: bByCust, error: bCustError } = await supabase
+          .from("bookings")
+          .select("*, customers!customer_id(*)")
+          .eq("customer_id", customerIdParam)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        if (bCustError) console.error("Customer search error:", bCustError);
+        bookingData = bByCust;
       }
 
       if (bookingData || termData) {
