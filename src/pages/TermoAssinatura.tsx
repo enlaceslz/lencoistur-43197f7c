@@ -46,6 +46,7 @@ const TermoAssinatura = () => {
   const bookingCode = params.get("booking")?.trim() || "";
   const bookingIdParam = params.get("booking_id") || "";
   const termId = params.get("id") || "";
+  const customerIdParam = params.get("customer_id") || params.get("id") || ""; // Handle cases where 'id' might be a customer ID from CRM
   
   const [booking, setBooking] = useState<any>(null);
   const [term, setTerm] = useState<any>(null);
