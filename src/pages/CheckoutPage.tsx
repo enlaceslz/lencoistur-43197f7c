@@ -93,9 +93,32 @@ const CheckoutPage = () => {
   const location = tour?.location || (pkg ? "Santo Amaro" : (transfer ? `${transfer.origin} → ${transfer.destination}` : ""));
 
   const [payMethod, setPayMethod] = useState<"pix" | "card" | "info">("pix");
-// ... keep existing code
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [notes, setNotes] = useState("");
+  const [nationality, setNationality] = useState<"br" | "foreign">("br");
+  const [passport, setPassport] = useState("");
+  const [country, setCountry] = useState("Brasil");
+  const [birthDate, setBirthDate] = useState("");
+  const [companions, setCompanions] = useState<{ name: string; cpf: string; birthDate: string }[]>([]);
+  const [confirmedBooking, setConfirmedBooking] = useState<BookingItem | null>(null);
+  const [pixCopied, setPixCopied] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
     if (guests > 1) {
-// ... keep existing code
+      const count = guests - 1;
+      setCompanions(prev => {
+        const newCompanions = [...prev];
+        if (newCompanions.length < count) {
+          for (let i = newCompanions.length; i < count; i++) {
+            newCompanions.push({ name: "", cpf: "", birthDate: "" });
+          }
+        }
+        return newCompanions.slice(0, count);
+      });
     } else {
       setCompanions([]);
     }
