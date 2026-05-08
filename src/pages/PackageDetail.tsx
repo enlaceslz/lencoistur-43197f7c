@@ -1,4 +1,4 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { ArrowLeft, Clock, Sparkles, CheckCircle, Shield, Info, ArrowRight, Loader2 } from "lucide-react";
@@ -23,6 +23,8 @@ interface Package {
 
 const PackageDetail = () => {
   const { slug } = useParams();
+  const [params] = useSearchParams();
+  const partnerId = params.get("partner_id") || params.get("partner");
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [pkg, setPkg] = useState<Package | null>(null);

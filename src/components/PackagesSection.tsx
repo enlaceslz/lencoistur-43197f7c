@@ -20,6 +20,8 @@ interface Package {
 
 const PackagesSection = () => {
   const { t } = useTranslation();
+  const [params] = useSearchParams();
+  const partnerId = params.get("partner_id") || params.get("partner");
   const [dbPackages, setDbPackages] = useState<Package[]>([]);
   const [loading, setLoading] = useState(true);
 
