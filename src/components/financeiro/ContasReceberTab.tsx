@@ -129,6 +129,7 @@ export default function ContasReceberTab({ company }: { company?: any }) {
       status: c.status,
       booking_id: c.booking_id || "",
       customer_id: "",
+      partner_id: c.partner_id || "",
       anexo_url: c.anexo_url || "",
     });
     setOpen(true);
