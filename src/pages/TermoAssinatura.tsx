@@ -337,44 +337,44 @@ const TermoAssinatura = () => {
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
       
-      // Border
-      doc.setDrawColor(0);
-      doc.setLineWidth(0.5);
+      // Fine Border
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.2);
       doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
       
       // Load Logo
       if (company?.logo_url) {
         try {
-          doc.addImage(company.logo_url, 'PNG', 14, 10, 35, 15);
+          doc.addImage(company.logo_url, 'PNG', 14, 10, 30, 12);
         } catch (e) {
           console.error("Error adding logo to PDF:", e);
         }
       }
       
-      // Header Info
-      doc.setFontSize(8);
-      doc.setTextColor(60, 60, 60);
+      // Header Info - Right Aligned
+      doc.setFontSize(7);
+      doc.setTextColor(100, 100, 100);
       const companyName = company?.razao_social || company?.nome_fantasia || "LENÇÓIS TOUR";
       const companyCNPJ = company?.cnpj || "";
       const companyAddress = `${company?.endereco || ""}, ${company?.cidade || ""}-${company?.estado || ""}`;
       
-      doc.text(companyName, pageWidth - 14, 14, { align: "right" });
-      doc.text(`CNPJ: ${companyCNPJ}`, pageWidth - 14, 18, { align: "right" });
-      doc.text(companyAddress, pageWidth - 14, 22, { align: "right" });
+      doc.text(companyName, pageWidth - 14, 12, { align: "right" });
+      doc.text(`CNPJ: ${companyCNPJ}`, pageWidth - 14, 15, { align: "right" });
+      doc.text(companyAddress, pageWidth - 14, 18, { align: "right" });
       
-      doc.setDrawColor(200, 200, 200);
-      doc.line(14, 28, pageWidth - 14, 28);
+      doc.setDrawColor(230, 230, 230);
+      doc.line(14, 25, pageWidth - 14, 25);
       
       // Title
-      doc.setFontSize(14);
+      doc.setFontSize(13);
       doc.setTextColor(0, 0, 0);
       doc.setFont("helvetica", "bold");
-      doc.text("Termo de Ciência de Risco e Corresponsabilidade", pageWidth / 2, 36, { align: "center" });
-      doc.setFontSize(9);
+      doc.text("Termo de Ciência de Risco e Corresponsabilidade", pageWidth / 2, 33, { align: "center" });
+      doc.setFontSize(8);
       doc.setFont("helvetica", "normal");
-      doc.text("Sistema de Gestão de Segurança (SGS) - ISO 21103", pageWidth / 2, 42, { align: "center" });
+      doc.text("Sistema de Gestão de Segurança (SGS) - ABNT NBR ISO 21103", pageWidth / 2, 38, { align: "center" });
       
-      let currentY = 48;
+      let currentY = 44;
       
       // Booking Info (Table)
       autoTable(doc, {
@@ -382,26 +382,28 @@ const TermoAssinatura = () => {
         body: [
           ["Participante:", booking.customers?.name || booking.customer_name, "Reserva:", booking.booking_code],
           ["Atividade:", booking.item_name, "Data:", new Date(booking.date + "T12:00").toLocaleDateString("pt-BR")],
-          ["Documento:", booking.customers?.cpf || "Não informado", "Local:", `${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}`],
+          ["Documento:", booking.customers?.cpf || booking.customers?.passport || "Não informado", "Local:", `${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}`],
         ],
         theme: 'grid',
-        styles: { fontSize: 8, cellPadding: 1.5, lineColor: [200, 200, 200] },
+        styles: { fontSize: 8, cellPadding: 2, lineColor: [230, 230, 230] },
         columnStyles: { 
-          0: { fontStyle: 'bold', fillColor: [245, 245, 245], cellWidth: 25 },
+          0: { fontStyle: 'bold', fillColor: [250, 250, 250], cellWidth: 25 },
           1: { cellWidth: 65 },
-          2: { fontStyle: 'bold', fillColor: [245, 245, 245], cellWidth: 25 },
+          2: { fontStyle: 'bold', fillColor: [250, 250, 250], cellWidth: 25 },
           3: { cellWidth: 40 }
         }
       });
       
       currentY = (doc as any).lastAutoTable.finalY + 8;
       
-      // Content Sections - Optimized for 1 page
-      const addSection = (title: string, content: string, fontSize = 7.5) => {
+      // Content Sections - Compacted
+      const addSection = (title: string, content: string, fontSize = 7) => {
+        if (currentY > pageHeight - 60) doc.addPage();
+        
         doc.setFontSize(9);
         doc.setFont("helvetica", "bold");
         doc.text(title, 14, currentY);
-        currentY += 5;
+        currentY += 4;
         doc.setFontSize(fontSize);
         doc.setFont("helvetica", "normal");
         const lines = doc.splitTextToSize(content, pageWidth - 28);
@@ -416,15 +418,15 @@ const TermoAssinatura = () => {
         addSection("Riscos e Segurança:", company.term_safety_risks);
       }
 
-      // Risks Checklist (Compact)
+      // Risks Checklist (Two Columns Compact)
       doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
-      doc.text("Ciência de Riscos:", 14, currentY);
+      doc.text("Declaração de Ciência de Riscos:", 14, currentY);
       currentY += 4;
       
-      const risksSplit = [];
+      const risksGrid = [];
       for (let i = 0; i < acceptedRisks.length; i += 2) {
-        risksSplit.push([
+        risksGrid.push([
           `[X] ${acceptedRisks[i]}`,
           acceptedRisks[i+1] ? `[X] ${acceptedRisks[i+1]}` : ""
         ]);
@@ -432,98 +434,111 @@ const TermoAssinatura = () => {
       
       autoTable(doc, {
         startY: currentY,
-        body: risksSplit,
+        body: risksGrid,
         theme: 'plain',
-        styles: { fontSize: 7.5, cellPadding: 0.5 },
+        styles: { fontSize: 7, cellPadding: 1 },
       });
       
       currentY = (doc as any).lastAutoTable.finalY + 6;
 
-      // Health Info & Declaration
+      // Health Info
       if (healthInfo.length > 0) {
-        doc.setFontSize(8.5);
+        doc.setFontSize(8);
         doc.setFont("helvetica", "bold");
-        doc.text(`Informações de Saúde: ${healthInfo.join(", ")}`, 14, currentY);
+        doc.text(`Informações de Saúde Declaradas: ${healthInfo.join(", ")}`, 14, currentY);
         currentY += 6;
       }
 
-      const declaration = `Declaro que fui informado sobre os riscos inerentes à atividade e procedimentos de segurança. Comprometo-me a seguir as orientações da equipe e assumo a corresponsabilidade por meus atos. Esta operação segue a NBR ISO 21103.`;
-      doc.setFontSize(8);
+      const declarationText = `Declaro estar ciente dos riscos e das normas de segurança da atividade. Comprometo-me a seguir as orientações dos condutores e assumo a responsabilidade por minha conduta pessoal durante todo o percurso. Esta operação segue as normas técnicas de segurança (ISO 21103).`;
+      doc.setFontSize(7.5);
       doc.setFont("helvetica", "italic");
-      const declLines = doc.splitTextToSize(declaration, pageWidth - 28);
+      const declLines = doc.splitTextToSize(declarationText, pageWidth - 28);
       doc.text(declLines, 14, currentY);
-      currentY += (declLines.length * 4) + 10;
+      currentY += (declLines.length * 4) + 12;
 
       // Signatures Area
-      const signatureY = currentY;
+      const sigBoxWidth = (pageWidth - 40) / 2;
       
-      // Main Participant
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "bold");
-      doc.text("Assinatura do Participante:", 14, signatureY);
-      doc.addImage(signatureData, 'PNG', 14, signatureY + 2, 45, 15);
-      
-      doc.setFont("helvetica", "normal");
+      // Participant Signature
       doc.setFontSize(8);
-      doc.text(booking.customers?.name || booking.customer_name, 14, signatureY + 20);
-      doc.text(`${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}, ${new Date().toLocaleDateString("pt-BR")}`, 14, signatureY + 24);
+      doc.setFont("helvetica", "bold");
+      doc.text("Assinatura do Participante:", 14, currentY);
+      doc.addImage(signatureData, 'PNG', 14, currentY + 2, 40, 12);
+      doc.line(14, currentY + 15, 14 + sigBoxWidth, currentY + 15);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.text(booking.customers?.name || booking.customer_name, 14, currentY + 19);
+      doc.text(`${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}, ${new Date().toLocaleString("pt-BR")}`, 14, currentY + 22);
 
-      // Companions Signatures (if any)
+      // Companions Signatures
       const adultCompanions = companions.filter(c => c.is_adult && (signatures[c.id] || c.signature_data));
       if (adultCompanions.length > 0) {
-        let compX = 85;
-        let compY = signatureY;
+        let compX = 14 + sigBoxWidth + 12;
+        let compY = currentY;
         
-        adultCompanions.forEach((comp) => {
+        adultCompanions.forEach((comp, idx) => {
           const sig = signatures[comp.id] || comp.signature_data;
           if (sig) {
-            if (compX + 60 > pageWidth) {
+            // Check if we need a new row for signatures
+            if (idx > 0 && idx % 2 === 0) {
               compX = 14;
               compY += 30;
+              currentY = compY;
+            } else if (idx > 0) {
+              compX = 14 + sigBoxWidth + 12;
             }
-            doc.setFontSize(9);
+
+            doc.setFontSize(8);
             doc.setFont("helvetica", "bold");
-            doc.text(`Dependente: ${comp.full_name}`, compX, compY);
-            doc.addImage(sig, 'PNG', compX, compY + 2, 40, 15);
-            compX += 65;
+            doc.text(`Assinatura: ${comp.full_name}`, compX, compY);
+            doc.addImage(sig, 'PNG', compX, compY + 2, 40, 12);
+            doc.line(compX, compY + 15, compX + sigBoxWidth, compY + 15);
+            doc.setFontSize(7);
+            doc.text(`Dependente Adulto`, compX, compY + 19);
+            doc.text(`Assinado em: ${new Date().toLocaleString("pt-BR")}`, compX, compY + 22);
           }
         });
       }
 
+      // Final Footer
+      doc.setFontSize(6);
+      doc.setTextColor(150, 150, 150);
+      doc.text(`Documento gerado digitalmente por Lençóis Tour - SGS - ${new Date().toLocaleDateString("pt-BR")}`, pageWidth / 2, pageHeight - 8, { align: "center" });
 
       const pdfBlob = doc.output('blob');
-      const fileName = `termo_${booking?.booking_code || 'manual'}_${Date.now()}.pdf`;
+      const fileName = `termo_${booking?.booking_code || 'SGS'}_${Date.now()}.pdf`;
       const filePath = `termos_assinados/${fileName}`;
 
       // 3. Upload to Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from("customer-documents")
         .upload(filePath, pdfBlob, {
           contentType: 'application/pdf',
           cacheControl: '3600'
         });
 
-      if (uploadError) {
-        console.error("Storage upload error:", uploadError);
-        // Continue even if storage fails, we still have the record
-      }
+      if (uploadError) console.error("Storage upload error:", uploadError);
 
       // 4. Save to CRM Customer Documents
       const customerId = booking?.customer_id || term?.customer_id;
       if (customerId) {
-        const { error: docError } = await supabase.from("customer_documents").insert([{
+        const publicUrl = supabase.storage.from("customer-documents").getPublicUrl(filePath).data.publicUrl;
+        
+        await supabase.from("customer_documents").insert([{
           customer_id: customerId,
           name: `Termo Assinado - ${booking?.item_name || term?.tour_name}`,
-          file_url: supabase.storage.from("customer-documents").getPublicUrl(filePath).data.publicUrl,
+          file_url: publicUrl,
           file_type: "application/pdf",
           file_size: pdfBlob.size,
           category: "termo"
         }]);
-        if (docError) console.error("Error saving to customer_documents:", docError);
       }
 
+      // Also update sgs_risk_terms record with the PDF path
+      await supabase.from("sgs_risk_terms").update({ pdf_url: filePath }).eq("id", currentTermId);
+
       // Also save to generic Documents Module
-      const { error: genericDocError } = await supabase.from("documents").insert([{
+      await supabase.from("documents").insert([{
         name: `Termo Assinado - ${booking?.item_name || term?.tour_name} - ${booking?.booking_code || 'SGS'}`,
         type: "termo_assinado",
         description: `Termo assinado por ${booking?.customers?.name || booking?.customer_name || term?.customer_name} em ${new Date().toLocaleDateString("pt-BR")}`,
@@ -532,26 +547,7 @@ const TermoAssinatura = () => {
         status: "vigente"
       }]);
 
-      if (genericDocError) console.error("Error saving to generic documents:", genericDocError);
-
-      // 5. Update term with PDF URL
-      await supabase.from("sgs_risk_terms").update({ pdf_url: filePath }).eq("id", currentTermId);
-
-      // 6. Send Confirmation Email
-      try {
-        await supabase.functions.invoke("send-term-email", {
-          body: {
-            customerEmail: booking?.customers?.email || booking?.customer_email || term?.customers?.email || term?.email,
-            customerName: booking?.customers?.name || booking?.customer_name || term?.customer_name,
-            signUrl: null, // Just a confirmation
-            tourName: booking?.item_name || term?.tour_name
-          }
-        });
-      } catch (emailErr) {
-        console.error("Error calling send-term-email function:", emailErr);
-      }
-
-      toast({ title: "Termo Assinado!", description: "Obrigado por completar este passo de segurança." });
+      toast({ title: "Termo Assinado!", description: "Documento salvo e anexado ao cadastro." });
       setSigned(true);
       
     } catch (err: any) {
