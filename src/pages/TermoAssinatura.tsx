@@ -254,7 +254,7 @@ const TermoAssinatura = () => {
 
       if (!currentTermId) {
         // 1. Save term record if it doesn't exist
-        const { data: termData, error: termError } = await supabase.from("sgs_risk_terms").insert({
+        const { data: termData, error: termError } = await supabase.from("sgs_risk_terms").insert([{
           booking_id: booking.id,
           customer_id: booking.customer_id,
           customer_name: booking.customers?.name || booking.customer_name || "Cliente",
@@ -272,7 +272,7 @@ const TermoAssinatura = () => {
           signed_at: new Date().toISOString(),
           term_date: new Date().toISOString().split('T')[0],
           cancellation_policy: "Conforme política da agência aceita no momento da reserva."
-        }).select().single();
+        }]).select().single();
 
         if (termError) throw termError;
         if (!termData) throw new Error("Erro ao criar o termo no banco de dados.");
@@ -305,14 +305,14 @@ const TermoAssinatura = () => {
         
         if (!existingMinor) {
           // If it's a new companion for this term
-          const { error: minorError } = await supabase.from("sgs_risk_term_minors").insert({
+          const { error: minorError } = await supabase.from("sgs_risk_term_minors").insert([{
             risk_term_id: currentTermId,
             full_name: companion.full_name,
             is_adult: companion.is_adult,
             responsible_name: companion.responsible_name,
             signature_data: signature,
             signed_at: signature ? new Date().toISOString() : null
-          });
+          }]);
           if (minorError) console.error("Error inserting companion:", minorError);
         } else {
           // It's an existing companion record, just update signature if provided
@@ -465,26 +465,26 @@ const TermoAssinatura = () => {
       // 4. Save to CRM Customer Documents
       const customerId = booking?.customer_id || term?.customer_id;
       if (customerId) {
-        const { error: docError } = await supabase.from("customer_documents").insert({
+        const { error: docError } = await supabase.from("customer_documents").insert([{
           customer_id: customerId,
           name: `Termo Assinado - ${booking?.item_name || term?.tour_name}`,
           file_url: supabase.storage.from("customer-documents").getPublicUrl(filePath).data.publicUrl,
           file_type: "application/pdf",
           file_size: pdfBlob.size,
           category: "termo"
-        });
+        }]);
         if (docError) console.error("Error saving to customer_documents:", docError);
       }
 
       // Also save to generic Documents Module
-      const { error: genericDocError } = await supabase.from("documents").insert({
+      const { error: genericDocError } = await supabase.from("documents").insert([{
         name: `Termo Assinado - ${booking?.item_name || term?.tour_name} - ${booking?.booking_code || 'SGS'}`,
         type: "termo_assinado",
         description: `Termo assinado por ${booking?.customers?.name || booking?.customer_name || term?.customer_name} em ${new Date().toLocaleDateString("pt-BR")}`,
         file_url: filePath,
         file_name: fileName,
         status: "vigente"
-      });
+      }]);
 
       if (genericDocError) console.error("Error saving to generic documents:", genericDocError);
 
