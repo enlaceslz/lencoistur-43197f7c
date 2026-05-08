@@ -1203,7 +1203,7 @@ const AdminReservas = () => {
               </Button>
               <Button type="submit" className="flex-[2] h-12 md:h-14 rounded-xl md:rounded-2xl bg-primary hover:bg-primary/90 shadow-2xl shadow-primary/20 font-black uppercase text-[10px] md:text-[12px] tracking-widest transition-all hover:scale-[1.02]" disabled={newLoading || !newForm.itemName}>
                 {newLoading ? <Loader2 className="animate-spin mr-2" size={18} /> : (editingId ? <Save size={18} className="mr-2" /> : <Plus size={18} className="mr-2" />)}
-                {editingId ? "Salvar Alterações" : "Confirmar Reserva"}
+                {editingId ? "Salvar" : "Confirmar"}
               </Button>
             </div>
           </form>
