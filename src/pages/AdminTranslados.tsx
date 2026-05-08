@@ -29,7 +29,7 @@ const parseCurrency = (v: string) => {
 
 const emptyForm = {
   origin: "", destination: "", duration: "", distance: "",
-  price: 0, vehicle_type: "Van Executiva", seats: 10,
+  price: 0, partner_price: 0, vehicle_type: "Van Executiva", seats: 10,
   departures: "", active: true, pix_discount: 0,
 };
 
@@ -64,7 +64,7 @@ const AdminTranslados = () => {
     setForm({
       origin: r.origin, destination: r.destination,
       duration: r.duration || "", distance: r.distance || "",
-      price: r.price,
+      price: r.price, partner_price: r.partner_price || 0,
       vehicle_type: r.vehicle_type || "",
       seats: r.seats || 10,
       departures: (r.departures || []).join(", "),
@@ -88,6 +88,7 @@ const AdminTranslados = () => {
       duration: form.duration.trim(),
       distance: form.distance.trim(),
       price: priceNum,
+      partner_price: Number(form.partner_price) || 0,
       vehicle_type: form.vehicle_type.trim(),
       seats: Number(form.seats) || 10,
       departures: form.departures.split(",").map(d => d.trim()).filter(Boolean),
@@ -253,6 +254,9 @@ const AdminTranslados = () => {
                         </Badge>
                       )}
                     </div>
+                    {route.partner_price > 0 && (
+                      <p className="text-[10px] font-bold text-primary mt-1">Parceiro: {fmt(route.partner_price)}</p>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     <TooltipProvider>
@@ -344,6 +348,31 @@ const AdminTranslados = () => {
 
           <form onSubmit={handleSubmit} className="flex flex-col h-[calc(90vh-80px)]">
             <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Site (R$)</Label>
+                  <NumericFormat
+                    value={form.price / 100}
+                    onValueChange={(values) => setForm({ ...form, price: Math.round((values.floatValue || 0) * 100) })}
+                    thousandSeparator="."
+                    decimalSeparator=","
+                    prefix="R$ "
+                    className="flex h-12 w-full px-4 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-black text-foreground outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase text-primary/60 tracking-widest ml-1">Preço Parceiro (R$)</Label>
+                  <NumericFormat
+                    value={form.partner_price / 100}
+                    onValueChange={(values) => setForm({ ...form, partner_price: Math.round((values.floatValue || 0) * 100) })}
+                    thousandSeparator="."
+                    decimalSeparator=","
+                    prefix="R$ "
+                    className="flex h-12 w-full px-4 rounded-xl border border-primary/20 bg-primary/5 focus:bg-white transition-all font-black text-primary outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+              </div>
+
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-black uppercase tracking-widest text-muted-foreground/60 mb-2 block ml-1">Origem *</label>
