@@ -113,6 +113,21 @@ const TermoAssinatura = () => {
         if (bError) console.error("Search error:", bError);
         bookingData = bData;
 
+        // Try searching without prefix if cleanBookingCode doesn't have it but DB does, or vice versa
+        if (!bookingData) {
+          const alternativeCode = cleanBookingCode.startsWith("RES-") 
+            ? cleanBookingCode 
+            : `RES-${new Date().getFullYear()}-${cleanBookingCode.padStart(4, "0")}`;
+          
+          console.log("Trying alternative bookingCode:", alternativeCode);
+          const { data: bDataAlt } = await supabase
+            .from("bookings")
+            .select("*, customers!customer_id(*)")
+            .ilike("booking_code", alternativeCode)
+            .maybeSingle();
+          bookingData = bDataAlt;
+        }
+
         // Fallback: try searching by ID if bookingCode looks like a UUID
         if (!bookingData && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanBookingCode)) {
           console.log("Trying bookingCode as UUID fallback");
@@ -120,12 +135,13 @@ const TermoAssinatura = () => {
           bookingData = bByIdFallback;
         }
         
-        // Final fallback for booking_code: exact match
+        // Final fallback for booking_code: exact match with variations
         if (!bookingData) {
           const { data: bDataExact } = await supabase
             .from("bookings")
             .select("*, customers!customer_id(*)")
-            .eq("booking_code", cleanBookingCode)
+            .or(`booking_code.eq.${cleanBookingCode},booking_code.ilike.%${cleanBookingCode}%`)
+            .limit(1)
             .maybeSingle();
           bookingData = bDataExact;
         }
@@ -615,13 +631,23 @@ const TermoAssinatura = () => {
 
       // 5. Update booking status if applicable
       if (booking?.id) {
-        // If booking is pending, mark as confirmed now that it's signed
-        if (booking.status === 'pendente') {
-          await supabase.from("bookings").update({ 
-            status: "confirmada",
-            updated_at: new Date().toISOString()
-          }).eq("id", booking.id);
-          console.log("Booking status updated to confirmed after signing.");
+        try {
+          // If booking is pending, mark as confirmed now that it's signed
+          if (booking.status === 'pendente') {
+            const { error: bookingUpdateError } = await supabase.from("bookings").update({ 
+              status: "confirmada",
+              updated_at: new Date().toISOString()
+            }).eq("id", booking.id);
+            
+            if (bookingUpdateError) {
+              console.error("Error updating booking status:", bookingUpdateError);
+              // We don't throw here to not block the user if the status update fails but the term was saved
+            } else {
+              console.log("Booking status updated to confirmed after signing.");
+            }
+          }
+        } catch (statusErr) {
+          console.error("Error in booking status update flow:", statusErr);
         }
       }
 
