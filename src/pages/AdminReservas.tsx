@@ -73,7 +73,7 @@ const AdminReservas = () => {
   const [editNotes, setEditNotes] = useState("");
   const [showNotes, setShowNotes] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [viewMode, setViewMode] = useState<"list" | "calendar" | "table">("list");
 
   // New booking form state
   const [showNewForm, setShowNewForm] = useState(false);
