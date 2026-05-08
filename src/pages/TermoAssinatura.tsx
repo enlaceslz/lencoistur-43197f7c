@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { Shield, CheckCircle, AlertTriangle, FileText, Pencil, Trash2, Users } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 // Riscos inerentes conforme P6 VATTI
 const RISKS_OPTIONS = [
@@ -257,9 +257,12 @@ const TermoAssinatura = () => {
         const { data: termData, error: termError } = await supabase.from("sgs_risk_terms").insert({
           booking_id: booking.id,
           customer_id: booking.customer_id,
-          customer_name: booking.customers?.name || "Cliente",
+          customer_name: booking.customers?.name || booking.customer_name || "Cliente",
           nationality: booking.customers?.country || "Brasil",
-          phone: booking.customers?.phone || "",
+          phone: booking.customers?.phone || booking.customer_phone || "",
+          email: booking.customers?.email || booking.customer_email || "",
+          cpf: booking.customers?.cpf || "",
+          birth_date: booking.customers?.birth_date || null,
           tour_name: booking.item_name || "Passeio",
           risks_informed: acceptedRisks,
           health_questions: healthInfo,
@@ -342,7 +345,7 @@ const TermoAssinatura = () => {
       doc.text("Informações da Reserva", 14, currentY);
       currentY += 10;
       
-      (doc as any).autoTable({
+      autoTable(doc, {
         startY: currentY,
         body: [
           ["Código da Reserva", booking.booking_code],
@@ -353,7 +356,7 @@ const TermoAssinatura = () => {
         ],
         theme: 'grid',
         styles: { fontSize: 10, cellPadding: 3 },
-        columnStyles: { 0: { fontStyle: 'bold', width: 50 } }
+        columnStyles: { 0: { fontStyle: 'bold', cellWidth: 50 } }
       });
       
       currentY = (doc as any).lastAutoTable.finalY + 10;
@@ -384,7 +387,7 @@ const TermoAssinatura = () => {
       doc.text("Ciência de Riscos e Segurança", 14, currentY);
       currentY += 5;
       const risksRows = acceptedRisks.map(r => [`[X] ${r}`]);
-      (doc as any).autoTable({
+      autoTable(doc, {
         startY: currentY,
         body: risksRows,
         theme: 'plain',
@@ -413,7 +416,7 @@ const TermoAssinatura = () => {
           c.is_adult ? "Adulto" : "Menor", 
           c.is_adult ? (signatures[c.id] || c.signature_data ? "Assinado" : "Pendente") : `Resp: ${c.responsible_name || '-'}`
         ]);
-        (doc as any).autoTable({
+        autoTable(doc, {
           startY: currentY,
           head: [['Nome', 'Tipo', 'Status / Resp.']],
           body: companionsRows,
