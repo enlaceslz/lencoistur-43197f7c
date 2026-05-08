@@ -733,6 +733,11 @@ const AdminReservas = () => {
                         </a>
                       </Button>
                     )}
+                    <Button variant="outline" size="sm" className="flex-1 bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100" asChild>
+                      <a href={`/assinatura-termo?booking=${selected.bookingCode}`} target="_blank" rel="noopener noreferrer">
+                        <Shield size={14} className="mr-1" /> Termo de Risco
+                      </a>
+                    </Button>
                   </div>
                 )}
               </div>
