@@ -477,14 +477,14 @@ const TermoAssinatura = () => {
       }
 
       // Also save to generic Documents Module
-      const { error: genericDocError } = await supabase.from("documents").insert({
+      const { error: genericDocError } = await supabase.from("documents").insert([{
         name: `Termo Assinado - ${booking?.item_name || term?.tour_name} - ${booking?.booking_code || 'SGS'}`,
         type: "termo_assinado",
         description: `Termo assinado por ${booking?.customers?.name || booking?.customer_name || term?.customer_name} em ${new Date().toLocaleDateString("pt-BR")}`,
         file_url: filePath,
         file_name: fileName,
         status: "vigente"
-      });
+      }]);
 
       if (genericDocError) console.error("Error saving to generic documents:", genericDocError);
 
