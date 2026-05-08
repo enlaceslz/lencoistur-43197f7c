@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Clock, Sparkles, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
@@ -123,7 +123,7 @@ const PackagesSection = () => {
                         <span className="text-xs text-muted-foreground">{t("packages.perPerson")}</span>
                       </div>
                     </div>
-                    <Link to={`/pacotes/${pkg.slug}`} className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2">
+                    <Link to={`/pacotes/${pkg.slug}${partnerId ? `?partner_id=${partnerId}` : ''}`} className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2">
                       {t("packages.view")} <ArrowRight size={14} />
                     </Link>
                   </div>

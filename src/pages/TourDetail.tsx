@@ -23,7 +23,7 @@ const TourDetail = () => {
 
   useEffect(() => {
     if (!slug) return;
-    const partnerId = params.get("partner_id");
+    const partnerId = params.get("partner_id") || params.get("partner");
     const load = async () => {
       if (partnerId) {
         const { data: partnerData } = await supabase.from("partners").select("*").eq("id", partnerId).maybeSingle();

@@ -204,7 +204,7 @@ const PackageDetail = () => {
 
               <div className="space-y-3">
                 <Link
-                  to={`/checkout?type=package&id=${pkg.id}`}
+                  to={`/checkout?type=package&id=${pkg.id}${partnerId ? `&partner_id=${partnerId}` : ''}`}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2"
                 >
                   Reservar Pacote
