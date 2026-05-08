@@ -452,7 +452,7 @@ const TermoAssinatura = () => {
       autoTable(doc, {
         startY: currentY,
         body: [
-          ["Participante:", booking.customers?.name || booking.customer_name, "Reserva:", booking.booking_code],
+          ["Participante:", booking.customers?.name || "Cliente", "Reserva:", booking.booking_code],
           ["Atividade:", booking.item_name, "Data:", new Date(booking.date + "T12:00").toLocaleDateString("pt-BR")],
           ["Documento:", booking.customers?.cpf || booking.customers?.passport || "Não informado", "Local:", `${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}`],
         ],
