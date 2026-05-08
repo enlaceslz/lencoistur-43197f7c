@@ -678,7 +678,8 @@ const AdminPasseios = () => {
             <TableRow className="hover:bg-transparent">
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest pl-6">Passeio / Localização</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Categoria</TableHead>
-              <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Preços & Modalidades</TableHead>
+              <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Preço Site</TableHead>
+              <TableHead className="font-bold text-primary/60 uppercase text-[10px] tracking-widest">Preço Parceiro</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Segurança & Avaliação</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest text-center">Status</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest text-right pr-6">Ações</TableHead>
@@ -686,10 +687,10 @@ const AdminPasseios = () => {
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow><TableCell colSpan={6} className="text-center py-20"><Loader2 className="animate-spin text-primary mx-auto" size={32} /></TableCell></TableRow>
+              <TableRow><TableCell colSpan={7} className="text-center py-20"><Loader2 className="animate-spin text-primary mx-auto" size={32} /></TableCell></TableRow>
             ) : filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="py-20 text-center text-muted-foreground">
+                <TableCell colSpan={7} className="py-20 text-center text-muted-foreground">
                   <div className="flex flex-col items-center gap-2 opacity-50">
                     <Compass size={40} />
                     <p className="font-bold">Nenhum passeio encontrado</p>
