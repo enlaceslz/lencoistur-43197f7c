@@ -5,6 +5,7 @@ import { Star, MapPin, Clock, Search, SlidersHorizontal } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { formatCurrency } from "@/lib/utils";
+import { fetchPartnerCatalogPricing } from "@/lib/catalogPricing";
 
 import tourLagoasAzuis from "@/assets/tour-lagoas-azuis-hero.jpg";
 import tourRioPreguicas from "@/assets/tour-rio-preguicas.jpg";
@@ -47,7 +48,8 @@ const ToursPage = () => {
   const [params] = useSearchParams();
   const partnerId = params.get("partner_id") || params.get("partner");
   const [tours, setTours] = useState<any[]>([]);
-  const [partner, setPartner] = useState<any>(null);
+  const [partner, setPartner] = useState<{ id: string; name: string } | null>(null);
+  const [pricingByTourId, setPricingByTourId] = useState<Record<string, { effectivePrice: number; effectivePrivatePrice?: number | null }>>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("popular");
@@ -56,12 +58,38 @@ const ToursPage = () => {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      if (partnerId) {
-        const { data: pData } = await supabase.from("partners").select("*").eq("id", partnerId).maybeSingle();
-        if (pData) setPartner(pData);
-      }
       const { data } = await supabase.from("public_tours" as "tours").select("*").order("name");
-      setTours(data || []);
+      const safeTours = data || [];
+      setTours(safeTours);
+
+      if (partnerId && safeTours.length > 0) {
+        try {
+          const pricing = await fetchPartnerCatalogPricing(
+            partnerId,
+            safeTours.map((tour) => ({ key: tour.id, type: "tour" as const, id: tour.id })),
+          );
+
+          setPartner(pricing.partner);
+          setPricingByTourId(
+            Object.fromEntries(
+              Object.entries(pricing.items).map(([key, value]) => [
+                key,
+                {
+                  effectivePrice: value.effectivePrice,
+                  effectivePrivatePrice: value.effectivePrivatePrice,
+                },
+              ]),
+            ),
+          );
+        } catch {
+          setPartner(null);
+          setPricingByTourId({});
+        }
+      } else {
+        setPartner(null);
+        setPricingByTourId({});
+      }
+
       setLoading(false);
     };
     load();
@@ -161,12 +189,10 @@ const ToursPage = () => {
                         {(() => {
                           const isPrivate = tour.mode_collective_enabled === false;
                           const basePublicPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
-                          let priceToFormat = basePublicPrice;
-                          if (partner) {
-                            const specificPartnerPrice = isPrivate ? tour.partner_private_price : tour.partner_price;
-                            if (specificPartnerPrice && specificPartnerPrice > 0) priceToFormat = specificPartnerPrice;
-                            else if (partner.commission_rate > 0) priceToFormat = Math.round(basePublicPrice * (1 - partner.commission_rate / 100));
-                          }
+                          const partnerPricing = pricingByTourId[tour.id];
+                          const priceToFormat = partnerPricing
+                            ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePublicPrice) : partnerPricing.effectivePrice)
+                            : basePublicPrice;
                           return formatCurrency(priceToFormat);
                         })()}
                       </p>
