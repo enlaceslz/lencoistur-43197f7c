@@ -141,10 +141,10 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
       </div>
 
       <Card className="border-none shadow-2xl shadow-primary/5 overflow-hidden glass-card rounded-2xl md:rounded-[2.5rem] border border-white/20">
-        <div className="grid grid-cols-7 border-b border-border/40 bg-muted/20 backdrop-blur-sm">
+        <div className="grid grid-cols-7 border-b border-border/60 bg-muted/30 backdrop-blur-sm divide-x divide-border/60 border-l border-border/60">
           {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => (
-            <div key={day} className="py-3 md:py-5 text-center">
-              <span className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.1em] md:tracking-[0.25em] text-primary/60">
+            <div key={day} className="py-3 md:py-4 text-center border-t border-border/60">
+              <span className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.1em] md:tracking-[0.2em] text-slate-600 dark:text-slate-300">
                 {day}
               </span>
             </div>
