@@ -350,6 +350,18 @@ export default function ContasPagarTab({ company }: { company?: any }) {
                                     {c.bookings.booking_code}
                                   </Badge>
                                 )}
+                                {c.collaborators?.name && (
+                                  <Badge variant="outline" className="text-[9px] h-4 px-1.5 font-bold bg-blue-50 text-blue-600 border-blue-100 uppercase tracking-widest">
+                                    <User size={8} className="mr-1" />
+                                    {c.collaborators.name}
+                                  </Badge>
+                                )}
+                                {c.partners?.name && (
+                                  <Badge variant="outline" className="text-[9px] h-4 px-1.5 font-bold bg-emerald-50 text-emerald-600 border-emerald-100 uppercase tracking-widest">
+                                    <Link2 size={8} className="mr-1" />
+                                    {c.partners.name}
+                                  </Badge>
+                                )}
                               </div>
                             </div>
                           </td>
