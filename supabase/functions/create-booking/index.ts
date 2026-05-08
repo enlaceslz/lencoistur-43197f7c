@@ -107,8 +107,33 @@ Deno.serve(async (req) => {
     let unitPrice: number;
     let pixDiscountPercent = 0;
 
+    const getPartnerData = async (id: string) => {
+      const { data } = await supabaseAdmin
+        .from("partners")
+        .select("commission_rate, remuneration_type, remuneration_value")
+        .eq("id", id)
+        .maybeSingle();
+      return data;
+    };
+
+    const calculatePartnerPrice = (basePrice: number, partnerPriceDefined: number | undefined | null, partner: any) => {
+      if (!partner) return basePrice;
+      if (partnerPriceDefined && partnerPriceDefined > 0) return partnerPriceDefined;
+      
+      const rType = partner.remuneration_type || "comissao_percent";
+      const rValue = partner.remuneration_value || partner.commission_rate || 0;
+
+      if (rType === "comissao_percent") {
+        return Math.round(basePrice * (1 - rValue / 100));
+      } else if (rType === "valor_por_passeio") {
+        return Math.max(0, basePrice - (rValue * 100));
+      }
+      return basePrice;
+    };
+
+    const partnerData = partner_id ? await getPartnerData(partner_id) : null;
+
     if (type === "passeio") {
-      // Strip suffix like " (Coletivo)" or " (Privativo)" if present
       const cleanItemName = itemName.replace(/\s*\((Coletivo|Privativo)\)$/, "");
       
       const { data: tour, error: tourErr } = await supabaseAdmin
@@ -127,11 +152,10 @@ Deno.serve(async (req) => {
       }
       
       const isPrivate = itemName.includes("(Privativo)");
-      if (partner_id) {
-        unitPrice = isPrivate ? (tour.partner_private_price || tour.private_price || 110000) : (tour.partner_price || tour.price);
-      } else {
-        unitPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
-      }
+      const basePrice = isPrivate ? (tour.private_price || 130000) : tour.price;
+      const partnerPriceDef = isPrivate ? tour.partner_private_price : tour.partner_price;
+      
+      unitPrice = calculatePartnerPrice(basePrice, partnerPriceDef, partnerData);
       pixDiscountPercent = tour.pix_discount || 0;
     } else if (type === "package") {
       const { data: pkg, error: pkgErr } = await supabaseAdmin
@@ -147,11 +171,8 @@ Deno.serve(async (req) => {
           { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (partner_id) {
-        unitPrice = pkg.partner_price || pkg.discount_price;
-      } else {
-        unitPrice = pkg.discount_price;
-      }
+      
+      unitPrice = calculatePartnerPrice(pkg.discount_price, pkg.partner_price, partnerData);
       pixDiscountPercent = 5; // Default for packages
     } else {
       // translado - itemName format: "origin → destination"
@@ -164,11 +185,11 @@ Deno.serve(async (req) => {
       }
       const { data: route, error: routeErr } = await supabaseAdmin
         .from("transfer_routes")
-        .select("price, pix_discount")
+        .select("price, partner_price, pix_discount")
         .eq("origin", parts[0])
         .eq("destination", parts[1])
         .eq("active", true)
-        .single();
+        .maybeSingle();
 
       if (routeErr || !route) {
         return new Response(
@@ -176,7 +197,7 @@ Deno.serve(async (req) => {
           { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      unitPrice = route.price;
+      unitPrice = calculatePartnerPrice(route.price, route.partner_price, partnerData);
       pixDiscountPercent = route.pix_discount || 0;
     }
     
