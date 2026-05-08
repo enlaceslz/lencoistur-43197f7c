@@ -778,8 +778,8 @@ const AdminReservas = () => {
 
       {/* Detail Modal */}
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="max-w-[100vw] w-full h-[100dvh] sm:max-w-2xl sm:w-[95vw] sm:h-[90vh] overflow-y-auto p-0 border-none shadow-2xl sm:rounded-3xl overflow-hidden bg-[#F8FAFC] focus-visible:outline-none">
-          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+        <DialogContent className="max-w-[100vw] w-full h-[100dvh] sm:max-w-2xl sm:w-[95vw] sm:h-[90vh] p-0 border-none shadow-2xl sm:rounded-3xl overflow-hidden bg-[#F8FAFC] focus-visible:outline-none flex flex-col">
+          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between shrink-0 z-10">
             <div className="flex items-center gap-3 md:gap-4">
               <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                 <FileText size={20} className="md:w-6 md:h-6" />
@@ -796,7 +796,7 @@ const AdminReservas = () => {
             </Button>
           </div>
 
-          <div className="p-4 md:p-8 space-y-6 md:space-y-8">
+          <div className="p-4 md:p-8 space-y-6 md:space-y-8 overflow-y-auto flex-1 custom-scrollbar">
             {selected && (
               <div className="space-y-4">
               {/* Customer */}
@@ -838,7 +838,7 @@ const AdminReservas = () => {
                 <h4 className="font-semibold text-sm text-foreground">Detalhes</h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <span className="flex items-center gap-2 text-muted-foreground">
-                    <MapPin size={14} /> {selected.itemName}
+                    <MapPin size={14} className="shrink-0" /> <span className="break-words">{selected.itemName}</span>
                   </span>
                   <span className="flex items-center gap-2 text-muted-foreground">
                     <Calendar size={14} /> {fmtDate(selected.date)}
@@ -1101,7 +1101,7 @@ const AdminReservas = () => {
           </div>
 
           <form onSubmit={handleNewBooking} className="flex flex-col flex-1 min-h-0">
-            <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10 overflow-y-auto flex-1">
+            <div className="p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10 overflow-y-auto flex-1 custom-scrollbar">
 
               {/* Coluna 1: Dados do Serviço */}
               <div className="lg:col-span-6 space-y-6">
