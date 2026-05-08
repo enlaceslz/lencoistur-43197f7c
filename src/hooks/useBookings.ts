@@ -309,44 +309,37 @@ export function useBookings() {
     if (error) throw error;
   }, []);
 
-  const updateBooking = useCallback(async (id: string, customerId: string, data: any) => {
-    const { error: customerError } = await supabase
-      .from("customers")
-      .update({
-        name: data.customerName,
-        email: data.customerEmail,
-        phone: data.customerPhone,
-        cpf: data.cpf,
-        passport: data.passport,
-        country: data.country,
-        birth_date: data.birthDate,
-      })
-      .eq("id", customerId);
-    
-    if (customerError) throw customerError;
-
+  const deleteBooking = useCallback(async (id: string) => {
     const { error: bookingError } = await supabase
       .from("bookings")
-      .update({
-        type: data.type,
-        item_name: data.itemName,
-        date: data.date,
-        guests: data.guests,
-        pay_method: data.payMethod,
-        unit_price: data.unitPrice,
-        total: data.total,
-        discount: data.discount,
-         final_total: data.finalTotal,
-        public_unit_price: data.publicUnitPrice || null,
-        public_total: data.publicTotal || null,
-        notes: data.notes,
-        collaborator_id: data.collaboratorId || null,
-        partner_id: data.partnerId || null,
-      })
+      .delete()
       .eq("id", id);
+    
+    if (bookingError) throw bookingError;
+
+    // Também remover do financeiro (Contas a Receber)
+    await supabase
+      .from("contas_receber")
+      .delete()
+      .eq("booking_id", id);
+    
+    // Remover do financeiro (Contas a Pagar)
+    await supabase
+      .from("contas_pagar")
+      .delete()
+      .eq("booking_id", id);
       
+    // Remover do histórico de colaboradores
+    await supabase
+      .from("collaborator_payments")
+      .delete()
+      .eq("booking_id", id);
+  }, []);
+
+  const updateBooking = useCallback(async (id: string, customerId: string, data: any) => {
+// ... keep existing code
     if (bookingError) throw bookingError;
   }, []);
 
-  return { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes, refresh: fetchBookings };
+  return { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, deleteBooking, completeBooking, updateBookingNotes, refresh: fetchBookings };
 }
