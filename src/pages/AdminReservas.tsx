@@ -969,8 +969,16 @@ const AdminReservas = () => {
                         <Shield size={16} />
                         <span className="text-sm font-bold uppercase tracking-tight">Termo de Risco</span>
                       </div>
-                      <Badge variant="outline" className="bg-white/50 text-amber-600 border-amber-200 text-[10px]">
-                        SGS ISO 21103
+                      <Badge 
+                        variant="outline" 
+                        className={cn(
+                          "text-[10px]",
+                          selected.termStatus === "assinado" 
+                            ? "bg-green-100 text-green-700 border-green-200" 
+                            : "bg-white/50 text-amber-600 border-amber-200"
+                        )}
+                      >
+                        {selected.termStatus === "assinado" ? "ASSINADO" : "PENDENTE"}
                       </Badge>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
