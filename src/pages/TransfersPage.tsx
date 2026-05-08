@@ -14,7 +14,7 @@ const TransfersPage = () => {
   const [passengers, setPassengers] = useState(1);
 
   useEffect(() => {
-    supabase.from("transfer_routes").select("*").eq("active", true).order("origin")
+    supabase.from("public_transfer_routes" as "transfer_routes").select("*").order("origin")
       .then(({ data }) => { setRoutes(data || []); setLoading(false); });
   }, []);
 

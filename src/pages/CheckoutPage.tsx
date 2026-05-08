@@ -10,6 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import { maskCPF, maskPhone } from "@/lib/masks";
 import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { fetchPartnerCatalogPricing } from "@/lib/catalogPricing";
 
 const CheckoutPage = () => {
 
@@ -31,24 +32,48 @@ const CheckoutPage = () => {
   const [pkg, setPkg] = useState<any>(null);
   const [loadingItem, setLoadingItem] = useState(true);
 
-  const [partner, setPartner] = useState<any>(null);
+  const [partner, setPartner] = useState<{ id: string; name: string } | null>(null);
+  const [partnerPricing, setPartnerPricing] = useState<{ effectivePrice: number; effectivePrivatePrice?: number | null } | null>(null);
   const partnerId = params.get("partner_id");
 
   useEffect(() => {
     const load = async () => {
-      if (partnerId) {
-        const { data: partnerData } = await supabase.from("partners").select("*").eq("id", partnerId).maybeSingle();
-        if (partnerData) setPartner(partnerData);
-      }
-
       if (type === "tour" && slug) {
-        const { data } = await supabase.from("tours").select("*").eq("slug", slug).single();
+        const { data } = await supabase.from("public_tours" as "tours").select("*").eq("slug", slug).single();
         setTour(data);
+        if (partnerId && data?.id) {
+          try {
+            const pricing = await fetchPartnerCatalogPricing(partnerId, [{ key: data.id, type: "tour", id: data.id }]);
+            setPartner(pricing.partner);
+            const item = pricing.items[data.id];
+            setPartnerPricing(item ? { effectivePrice: item.effectivePrice, effectivePrivatePrice: item.effectivePrivatePrice } : null);
+          } catch {
+            setPartner(null);
+            setPartnerPricing(null);
+          }
+        } else {
+          setPartner(null);
+          setPartnerPricing(null);
+        }
       } else if (type === "transfer" && transferId) {
-        const { data } = await supabase.from("transfer_routes").select("*").eq("id", transferId).single();
+        const { data } = await supabase.from("public_transfer_routes" as "transfer_routes").select("*").eq("id", transferId).single();
         setTransfer(data);
+        if (partnerId && data?.id) {
+          try {
+            const pricing = await fetchPartnerCatalogPricing(partnerId, [{ key: data.id, type: "transfer", id: data.id }]);
+            setPartner(pricing.partner);
+            const item = pricing.items[data.id];
+            setPartnerPricing(item ? { effectivePrice: item.effectivePrice } : null);
+          } catch {
+            setPartner(null);
+            setPartnerPricing(null);
+          }
+        } else {
+          setPartner(null);
+          setPartnerPricing(null);
+        }
       } else if (type === "package" && (packageSlug || packageId)) {
-        let query = supabase.from("packages").select("*");
+        let query = supabase.from("public_packages" as "packages").select("*");
         if (packageId) {
           query = query.eq("id", packageId);
         } else {
@@ -63,8 +88,22 @@ const CheckoutPage = () => {
             name: data.name,
             slug: data.slug,
             price: data.discount_price,
-            partner_price: data.partner_price
           });
+
+          if (partnerId) {
+            try {
+              const pricing = await fetchPartnerCatalogPricing(partnerId, [{ key: data.id, type: "package", id: data.id }]);
+              setPartner(pricing.partner);
+              const item = pricing.items[data.id];
+              setPartnerPricing(item ? { effectivePrice: item.effectivePrice } : null);
+            } catch {
+              setPartner(null);
+              setPartnerPricing(null);
+            }
+          } else {
+            setPartner(null);
+            setPartnerPricing(null);
+          }
         }
       }
       setLoadingItem(false);
@@ -78,44 +117,15 @@ const CheckoutPage = () => {
   let unitPrice = 0;
   if (tour) {
     const basePublicPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
-    if (partner) {
-      const specificPartnerPrice = isPrivate ? tour.partner_private_price : tour.partner_price;
-      if (specificPartnerPrice && specificPartnerPrice > 0) {
-        unitPrice = specificPartnerPrice;
-      } else if (partner.commission_rate > 0) {
-        unitPrice = Math.round(basePublicPrice * (1 - partner.commission_rate / 100));
-      } else {
-        unitPrice = basePublicPrice;
-      }
-    } else {
-      unitPrice = basePublicPrice;
-    }
+    unitPrice = partnerPricing
+      ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePublicPrice) : partnerPricing.effectivePrice)
+      : basePublicPrice;
   } else if (pkg) {
     const basePublicPrice = pkg.price;
-    if (partner) {
-      if (pkg.partner_price && pkg.partner_price > 0) {
-        unitPrice = pkg.partner_price;
-      } else if (partner.commission_rate > 0) {
-        unitPrice = Math.round(basePublicPrice * (1 - partner.commission_rate / 100));
-      } else {
-        unitPrice = basePublicPrice;
-      }
-    } else {
-      unitPrice = basePublicPrice;
-    }
+    unitPrice = partnerPricing?.effectivePrice ?? basePublicPrice;
   } else if (transfer) {
     const basePublicPrice = transfer.price || 0;
-    if (partner) {
-      if (transfer.partner_price && transfer.partner_price > 0) {
-        unitPrice = transfer.partner_price;
-      } else if (partner.commission_rate > 0) {
-        unitPrice = Math.round(basePublicPrice * (1 - partner.commission_rate / 100));
-      } else {
-        unitPrice = basePublicPrice;
-      }
-    } else {
-      unitPrice = basePublicPrice;
-    }
+    unitPrice = partnerPricing?.effectivePrice ?? basePublicPrice;
   }
 
   const pixDiscountPercent = partner ? 0 : (tour?.pix_discount || transfer?.pix_discount || (pkg ? 5 : 0));

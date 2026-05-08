@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/utils";
+import { fetchPartnerCatalogPricing } from "@/lib/catalogPricing";
 
 interface Package {
   id: string;
@@ -24,24 +25,50 @@ const PackagesSection = () => {
   const [params] = useSearchParams();
   const partnerId = params.get("partner_id") || params.get("partner");
   const [dbPackages, setDbPackages] = useState<Package[]>([]);
+  const [pricingByPackageId, setPricingByPackageId] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPackages = async () => {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("packages")
+      const [{ data: data }, { data: packageTours }] = await Promise.all([
+        supabase
+        .from("public_packages" as "packages")
         .select(`
-          *,
-          package_tours (
-            tour:tours (id, name, slug, images)
-          )
+          *
         `)
-        .eq("active", true)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false }),
+        supabase.from("public_package_tour_items" as "package_tours").select("package_id, tour_id, tour_name, tour_slug, tour_images")
+      ]);
 
       if (data) {
-        setDbPackages(data);
+        const toursByPackage = (packageTours || []).reduce((acc: Record<string, any[]>, item: any) => {
+          acc[item.package_id] = acc[item.package_id] || [];
+          acc[item.package_id].push({
+            id: item.tour_id,
+            name: item.tour_name,
+            slug: item.tour_slug,
+            images: item.tour_images,
+          });
+          return acc;
+        }, {});
+
+        setDbPackages(data.map((pkg: any) => ({ ...pkg, package_tours: (toursByPackage[pkg.id] || []).map((tour) => ({ tour })) })));
+        if (partnerId && data.length > 0) {
+          try {
+            const pricing = await fetchPartnerCatalogPricing(
+              partnerId,
+              data.map((pkg) => ({ key: pkg.id, type: "package" as const, id: pkg.id })),
+            );
+            setPricingByPackageId(
+              Object.fromEntries(Object.entries(pricing.items).map(([key, value]) => [key, value.effectivePrice])),
+            );
+          } catch {
+            setPricingByPackageId({});
+          }
+        } else {
+          setPricingByPackageId({});
+        }
       }
       setLoading(false);
     };
@@ -123,7 +150,7 @@ const PackagesSection = () => {
                       )}
                       <div className="flex items-baseline gap-1">
                         <span className="font-display text-2xl font-bold text-primary">
-                          {formatCurrency(partnerId ? (pkg.partner_price || pkg.discount_price) : pkg.discount_price)}
+                          {formatCurrency(partnerId ? (pricingByPackageId[pkg.id] ?? pkg.discount_price) : pkg.discount_price)}
                         </span>
                         <span className="text-xs text-muted-foreground">{t("packages.perPerson")}</span>
                       </div>

@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@/lib/utils";
 import { ShareWithFriend } from "@/components/ShareWithFriend";
+import { fetchPartnerCatalogPricing } from "@/lib/catalogPricing";
 
 interface Package {
   id: string;
@@ -28,31 +29,51 @@ const PackageDetail = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [pkg, setPkg] = useState<any>(null);
-  const [partner, setPartner] = useState<any>(null);
+  const [partner, setPartner] = useState<{ id: string; name: string } | null>(null);
+  const [partnerPrice, setPartnerPrice] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      if (partnerId) {
-        const { data: pData } = await supabase.from("partners").select("*").eq("id", partnerId).maybeSingle();
-        if (pData) setPartner(pData);
-      }
-
-      const { data, error } = await supabase
-        .from("packages")
-        .select(`
-          *,
-          package_tours (
-            tour:tours (*)
-          )
-        `)
+      const { data } = await supabase
+        .from("public_packages" as "packages")
+        .select(`*`)
         .eq("slug", slug)
-        .eq("active", true)
         .maybeSingle();
 
       if (data) {
-        setPkg(data);
+        const { data: tours } = await supabase
+          .from("public_package_tour_items" as "package_tours")
+          .select("tour_id, tour_name, tour_slug, tour_images, tour_description")
+          .eq("package_id", data.id)
+          .order("sort_order");
+
+        setPkg({
+          ...data,
+          package_tours: (tours || []).map((tour: any) => ({
+            tour: {
+              id: tour.tour_id,
+              name: tour.tour_name,
+              slug: tour.tour_slug,
+              images: tour.tour_images,
+              description: tour.tour_description,
+            },
+          })),
+        });
+        if (partnerId) {
+          try {
+            const pricing = await fetchPartnerCatalogPricing(partnerId, [{ key: data.id, type: "package", id: data.id }]);
+            setPartner(pricing.partner);
+            setPartnerPrice(pricing.items[data.id]?.effectivePrice ?? null);
+          } catch {
+            setPartner(null);
+            setPartnerPrice(null);
+          }
+        } else {
+          setPartner(null);
+          setPartnerPrice(null);
+        }
       }
       setLoading(false);
     };
@@ -196,13 +217,7 @@ const PackageDetail = () => {
                 )}
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-bold text-primary font-display">
-                    {formatCurrency(partner 
-                      ? (pkg.partner_price && pkg.partner_price > 0 
-                          ? pkg.partner_price 
-                          : (partner.commission_rate > 0 
-                              ? Math.round(pkg.discount_price * (1 - partner.commission_rate / 100)) 
-                              : pkg.discount_price)) 
-                      : pkg.discount_price)}
+                    {formatCurrency(partnerPrice ?? pkg.discount_price)}
                   </span>
                   <span className="text-muted-foreground">/ pessoa</span>
                 </div>
