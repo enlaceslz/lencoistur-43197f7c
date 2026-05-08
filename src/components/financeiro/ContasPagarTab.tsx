@@ -87,7 +87,7 @@ export default function ContasPagarTab({ company }: { company?: any }) {
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("contas_pagar").select("*, bookings(booking_code)").order("vencimento", { ascending: true });
+    const { data } = await supabase.from("contas_pagar").select("*, bookings(booking_code), collaborators(name), partners(name)").order("vencimento", { ascending: true });
     if (data) setContas(data as any);
     setLoading(false);
   };
@@ -107,6 +107,8 @@ export default function ContasPagarTab({ company }: { company?: any }) {
       fornecedor: c.fornecedor || "", 
       observacoes: c.observacoes || "", 
       status: c.status,
+      collaborator_id: c.collaborator_id || "",
+      partner_id: c.partner_id || "",
       anexo_url: c.anexo_url || "" 
     });
     setOpen(true);
