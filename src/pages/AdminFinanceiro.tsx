@@ -162,9 +162,23 @@ const AdminFinanceiro = () => {
     }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }, [monthBookings, monthContasPagar, monthContasReceber, searchTerm, statusFilter, typeFilter]);
 
-  const receitaPaga = monthBookings.filter(b => b.payment_status === "pago").reduce((s, b) => s + b.final_total, 0) + 
-                      monthContasReceber.filter(c => c.status === "recebido").reduce((s, c) => s + (c.valor * 100), 0) / 100;
-  const despesasMes = monthContasPagar.filter(c => c.status === "pago").reduce((s, c) => s + (c.valor * 100), 0) / 100;
+  const receitaPaga = useMemo(() => {
+    const fromBookings = monthBookings
+      .filter(b => b.payment_status === "pago" && !monthContasReceber.some(c => c.booking_id === b.id))
+      .reduce((s, b) => s + b.final_total, 0);
+    
+    const fromFinance = monthContasReceber
+      .filter(c => c.status === "recebido")
+      .reduce((s, c) => s + (c.valor * 100), 0) / 100;
+      
+    return fromBookings + fromFinance;
+  }, [monthBookings, monthContasReceber]);
+
+  const despesasMes = useMemo(() => {
+    return monthContasPagar
+      .filter(c => c.status === "pago")
+      .reduce((s, c) => s + (c.valor * 100), 0) / 100;
+  }, [monthContasPagar]);
   const lucroMes = receitaPaga - despesasMes;
   const pagos = monthBookings.filter(b => b.payment_status === "pago");
   const ticketMedio = pagos.length > 0 ? Math.round(receitaPaga / pagos.length) : 0;
