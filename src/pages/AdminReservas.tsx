@@ -649,7 +649,7 @@ const AdminReservas = () => {
                 <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
                   <div className="flex items-center gap-3 md:gap-4 group/item">
                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl md:rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover/item:scale-110 group-hover/item:rotate-3 transition-all duration-500">
-                      {booking.type === 'tour' ? <Compass size={16} className="md:w-[18px]" /> : <Car size={16} className="md:w-[18px]" />}
+                      {booking.type === 'tour' ? <Compass size={16} className="md:w-[18px]" /> : booking.type === 'package' ? <PackageIcon size={16} className="md:w-[18px]" /> : <Car size={16} className="md:w-[18px]" />}
                     </div>
                     <div className="flex flex-col min-w-0">
                       <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Serviço</span>
