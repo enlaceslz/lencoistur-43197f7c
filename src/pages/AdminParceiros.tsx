@@ -315,6 +315,46 @@ const AdminParceiros = () => {
     }
   };
 
+  const handleSaveReceivable = async () => {
+    if (!selectedPartner) return;
+    setSaving(true);
+    try {
+      const valorNumerico = Math.round(Number(receivableForm.valor.replace(/\D/g, "")) / 100 * 100); // Já em centavos
+      const { error } = await supabase.from("contas_receber").insert({
+        descricao: `Parceiro: ${selectedPartner.name} - ${receivableForm.descricao}`,
+        valor: Number(receivableForm.valor.replace(/\D/g, "")),
+        vencimento: receivableForm.vencimento,
+        categoria: receivableForm.categoria,
+        status: "pendente",
+        partner_id: selectedPartner.id,
+        cliente: selectedPartner.name
+      });
+
+      if (error) throw error;
+      toast.success("Recebimento lançado no financeiro!");
+      setReceivableDialogOpen(false);
+    } catch (error: any) {
+      toast.error("Erro ao lançar recebimento: " + error.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const openReceivable = (p: Partner) => {
+    setSelectedPartner(p);
+    let defaultVal = "0";
+    if (p.remuneration_type !== "comissao_percent" && p.remuneration_value) {
+      defaultVal = String(p.remuneration_value * 100);
+    }
+    setReceivableForm({
+      valor: defaultVal,
+      descricao: `Faturamento / Comissão`,
+      vencimento: new Date().toISOString().slice(0, 10),
+      categoria: "comissao"
+    });
+    setReceivableDialogOpen(true);
+  };
+
   const confirmDelete = async () => {
     if (!deleteId) return;
     const { error } = await supabase.from("partners").delete().eq("id", deleteId);
