@@ -342,7 +342,7 @@ const TermoAssinatura = () => {
       doc.text("Informações da Reserva", 14, currentY);
       currentY += 10;
       
-      (doc as any).autoTable({
+      autoTable(doc, {
         startY: currentY,
         body: [
           ["Código da Reserva", booking.booking_code],
@@ -384,7 +384,7 @@ const TermoAssinatura = () => {
       doc.text("Ciência de Riscos e Segurança", 14, currentY);
       currentY += 5;
       const risksRows = acceptedRisks.map(r => [`[X] ${r}`]);
-      (doc as any).autoTable({
+      autoTable(doc, {
         startY: currentY,
         body: risksRows,
         theme: 'plain',
@@ -413,7 +413,7 @@ const TermoAssinatura = () => {
           c.is_adult ? "Adulto" : "Menor", 
           c.is_adult ? (signatures[c.id] || c.signature_data ? "Assinado" : "Pendente") : `Resp: ${c.responsible_name || '-'}`
         ]);
-        (doc as any).autoTable({
+        autoTable(doc, {
           startY: currentY,
           head: [['Nome', 'Tipo', 'Status / Resp.']],
           body: companionsRows,
