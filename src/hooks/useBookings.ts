@@ -183,11 +183,12 @@ export function useBookings() {
         valor: booking.final_total,
         vencimento: booking.date || new Date().toISOString().slice(0, 10),
         status: "recebido",
-        categoria: "reserva",
+        categoria: booking.partner_id ? "parceiro" : "reserva",
         cliente: booking.customers?.name || "Cliente",
         booking_id: booking.id,
+        partner_id: booking.partner_id || null,
         recebido_em: new Date().toISOString().slice(0, 10),
-        observacoes: `Gerado automaticamente via CRM (Reserva ${booking.booking_code})`
+        observacoes: `Gerado automaticamente via CRM (Reserva ${booking.booking_code})${booking.partner_id ? ' - Venda via Parceiro' : ''}`
       });
 
     if (financeError) {
