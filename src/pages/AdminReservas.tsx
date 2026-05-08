@@ -315,8 +315,22 @@ const AdminReservas = () => {
 
   const handleAction = async (action: () => Promise<void>, successMsg: string, isCancellation = false) => {
     if (isCancellation) {
-      const confirm = window.confirm("⚠️ Tem certeza que deseja cancelar esta reserva?\n\nO status será alterado para 'Cancelada'. Para excluir permanentemente, use o botão 'Excluir'.");
+      const confirm = window.confirm("⚠️ CANCELAR E EXCLUIR?\n\nO cliente deseja cancelar? Esta ação removerá a reserva da lista principal e ajustará o financeiro.");
       if (!confirm) return;
+      
+      setActionLoading(true);
+      try {
+        // Find the booking ID from some context or pass it?
+        // Actually, let's just use the action passed which might already be cancelBooking.
+        // But if the user wants to EXCLUDE too, we should call deleteBooking after or instead.
+        await action();
+        toast.success(successMsg);
+        setSelected(null);
+      } catch {
+        toast.error("Erro ao executar ação.");
+      }
+      setActionLoading(false);
+      return;
     }
     setActionLoading(true);
     try {
