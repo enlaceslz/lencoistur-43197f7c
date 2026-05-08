@@ -19,7 +19,7 @@ import {
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
   Plus, Copy, Pencil, Car, Compass, LayoutGrid, List, X, XCircle as XCircleIcon,
   ChevronRight, ArrowRight, User, Hash, Info, Moon, Save, Package as PackageIcon,
-  Shield, ExternalLink, Trash2
+  Shield, ExternalLink, Trash2, CalendarDays
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -73,7 +73,7 @@ const AdminReservas = () => {
   const [editNotes, setEditNotes] = useState("");
   const [showNotes, setShowNotes] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [viewMode, setViewMode] = useState<"list" | "calendar" | "table">("list");
 
   // New booking form state
   const [showNewForm, setShowNewForm] = useState(false);
@@ -315,8 +315,22 @@ const AdminReservas = () => {
 
   const handleAction = async (action: () => Promise<void>, successMsg: string, isCancellation = false) => {
     if (isCancellation) {
-      const confirm = window.confirm("⚠️ Tem certeza que deseja cancelar esta reserva?\n\nO status será alterado para 'Cancelada'. Para excluir permanentemente, use o botão 'Excluir'.");
+      const confirm = window.confirm("⚠️ CANCELAR E EXCLUIR?\n\nO cliente deseja cancelar? Esta ação removerá a reserva da lista principal e ajustará o financeiro.");
       if (!confirm) return;
+      
+      setActionLoading(true);
+      try {
+        // Find the booking ID from some context or pass it?
+        // Actually, let's just use the action passed which might already be cancelBooking.
+        // But if the user wants to EXCLUDE too, we should call deleteBooking after or instead.
+        await action();
+        toast.success(successMsg);
+        setSelected(null);
+      } catch {
+        toast.error("Erro ao executar ação.");
+      }
+      setActionLoading(false);
+      return;
     }
     setActionLoading(true);
     try {
@@ -420,7 +434,17 @@ const AdminReservas = () => {
                   viewMode === "list" ? "shadow-lg shadow-primary/25 scale-[1.02]" : "text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5"
                 )}
               >
-                <List size={16} className="mr-2 md:w-[18px]" /> Lista
+                <LayoutGrid size={16} className="mr-2 md:w-[18px]" /> Cards
+              </Button>
+              <Button 
+                variant={viewMode === "table" ? "default" : "ghost"} 
+                onClick={() => setViewMode("table")}
+                className={cn(
+                  "flex-1 lg:flex-none h-11 md:h-12 px-4 md:px-8 rounded-xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] transition-all",
+                  viewMode === "table" ? "shadow-lg shadow-primary/25 scale-[1.02]" : "text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5"
+                )}
+              >
+                <List size={16} className="mr-2 md:w-[18px]" /> Tabela
               </Button>
               <Button 
                 variant={viewMode === "calendar" ? "default" : "ghost"} 
@@ -430,7 +454,7 @@ const AdminReservas = () => {
                   viewMode === "calendar" ? "shadow-lg shadow-primary/25 scale-[1.02]" : "text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5"
                 )}
               >
-                <LayoutGrid size={16} className="mr-2 md:w-[18px]" /> Agenda
+                <CalendarDays size={16} className="mr-2 md:w-[18px]" /> Agenda
               </Button>
             </div>
 
@@ -511,6 +535,82 @@ const AdminReservas = () => {
             }}
           />
         </div>
+      ) : viewMode === "table" ? (
+        <Card className="border-none shadow-2xl shadow-primary/5 overflow-hidden glass-card rounded-[1.5rem] md:rounded-[2.5rem] animate-in-fade border border-white/20">
+          <Table>
+            <TableHeader className="bg-slate-50/50 dark:bg-slate-900/50">
+              <TableRow className="border-b border-border/40 hover:bg-transparent">
+                <TableHead className="text-[10px] font-black uppercase tracking-widest h-14">Código</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest h-14">Cliente</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest h-14">Serviço</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest h-14 text-center">Data</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest h-14 text-center">Pax</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest h-14 text-right">Valor</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest h-14 text-center">Status</TableHead>
+                <TableHead className="text-[10px] font-black uppercase tracking-widest h-14 text-right pr-8">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((booking) => (
+                <TableRow key={booking.id} className="border-b border-border/40 hover:bg-primary/5 transition-colors group">
+                  <TableCell className="py-4">
+                    <span className="text-[10px] font-black text-primary bg-primary/5 px-2 py-1 rounded-md">#{booking.bookingCode}</span>
+                  </TableCell>
+                  <TableCell className="py-4">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{booking.customerName}</span>
+                      <span className="text-[10px] text-muted-foreground font-medium">{booking.customerEmail}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                        {booking.type === 'tour' ? <Compass size={14} /> : <Car size={14} />}
+                      </div>
+                      <span className="text-xs font-bold text-slate-600 dark:text-slate-400 max-w-[150px] truncate">{booking.itemName}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-4 text-center">
+                    <span className="text-xs font-black text-slate-500">{fmtDate(booking.date)}</span>
+                  </TableCell>
+                  <TableCell className="py-4 text-center">
+                    <span className="text-xs font-black text-slate-500">{booking.guests}</span>
+                  </TableCell>
+                  <TableCell className="py-4 text-right">
+                    <div className="flex flex-col items-end">
+                      <span className="text-sm font-black text-slate-900 dark:text-slate-100">{fmt(booking.finalTotal)}</span>
+                      {booking.partnerId && <Badge className="text-[8px] h-4 bg-primary/10 text-primary border-none">NET</Badge>}
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-4 text-center">
+                    <Badge className={cn("text-[8px] font-black uppercase tracking-widest", statusConfig[booking.status]?.className)}>
+                      {statusConfig[booking.status]?.label}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="py-4 text-right pr-8">
+                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="icon" onClick={() => setSelected(booking)} className="h-8 w-8 rounded-lg hover:bg-primary hover:text-white">
+                        <Eye size={14} />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(booking)} className="h-8 w-8 rounded-lg hover:bg-amber-500 hover:text-white">
+                        <Pencil size={14} />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(booking.id)} className="h-8 w-8 rounded-lg hover:bg-rose-600 hover:text-white">
+                        <Trash2 size={14} />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          {filtered.length === 0 && (
+             <div className="h-60 flex flex-col items-center justify-center text-muted-foreground/40">
+               <Calendar size={40} className="mb-4" />
+               <p className="font-bold">Nenhuma reserva encontrada</p>
+             </div>
+          )}
+        </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
           {filtered.map((booking, index) => (
@@ -636,10 +736,10 @@ const AdminReservas = () => {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        onClick={() => handleAction(() => cancelBooking(booking.id), "Reserva cancelada.", true)}
+                        onClick={() => handleAction(() => deleteBooking(booking.id), "Reserva cancelada e removida.", true)}
                         className="h-9 md:h-10 rounded-xl border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white transition-all duration-300 font-bold text-[10px] uppercase tracking-widest"
                       >
-                        <Ban size={14} className="mr-2" /> Cancelar
+                        <Ban size={14} className="mr-2" /> Cancelar/Excluir
                       </Button>
                     )}
                     
@@ -907,12 +1007,12 @@ const AdminReservas = () => {
                 {selected.status !== "cancelada" && (
                   <Button 
                     variant="outline" 
-                    onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada.", true)} 
+                    onClick={() => handleAction(() => deleteBooking(selected.id), "Reserva removida.", true)} 
                     disabled={actionLoading} 
                     className="flex-1 min-w-[140px] border-rose-200 text-rose-600 hover:bg-rose-50"
                   >
                     {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
-                    Cancelar
+                    Cancelar e Excluir
                   </Button>
                 )}
 
