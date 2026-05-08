@@ -6,6 +6,25 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+const allowedTypes = new Set(["passeio", "tour", "package", "translado", "transfer"]);
+const allowedPayMethods = new Set(["pix", "card", "info"]);
+
+function previewEmail(email?: string | null): string | null {
+  if (!email) return null;
+  const normalized = email.trim().toLowerCase();
+  const [local = "", domain = ""] = normalized.split("@");
+  if (!domain) return "***";
+  return `${local.slice(0, 3)}***@${domain}`;
+}
+
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isNonEmptyString(value: unknown, maxLength = 255): value is string {
+  return typeof value === "string" && value.trim().length > 0 && value.trim().length <= maxLength;
+}
+
 function generatePixCode(): string {
   const chars =
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -31,25 +50,48 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    console.log("Receiving booking request:", body);
 
     const { 
       type, itemName, date, guests, payMethod, customerName, 
       customerEmail, customerPhone, cpf, passport, country, 
-      birthDate, notes, companions, collaboratorId, partner_id,
-      publicUnitPrice: clientPublicUnitPrice,
-      publicTotal: clientPublicTotal
+      birthDate, notes, companions, collaboratorId, partner_id
     } = body;
 
-    if (!type || !itemName || !customerName || !customerEmail || !payMethod) {
-      console.error("Missing required fields:", { type, itemName, customerName, customerEmail, payMethod });
+    const trimmedEmail = typeof customerEmail === "string" ? customerEmail.trim().toLowerCase() : "";
+    const guestsNum = Number(guests);
+
+    if (
+      !allowedTypes.has(String(type)) ||
+      !isNonEmptyString(itemName) ||
+      !isNonEmptyString(customerName) ||
+      !isValidEmail(trimmedEmail) ||
+      !allowedPayMethods.has(String(payMethod)) ||
+      !Number.isInteger(guestsNum) ||
+      guestsNum < 1 ||
+      guestsNum > 50
+    ) {
+      console.error("Invalid booking payload received", {
+        type,
+        itemName: typeof itemName === "string" ? itemName.slice(0, 80) : null,
+        payMethod,
+        guests,
+        customerEmail: previewEmail(trimmedEmail),
+      });
       return new Response(
         JSON.stringify({ error: "Campos obrigatórios faltando" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const guestsNum = Number(guests);
+    console.log("Receiving booking request summary", {
+      type,
+      itemName: itemName.trim().slice(0, 80),
+      payMethod,
+      guests: guestsNum,
+      customerEmail: previewEmail(trimmedEmail),
+      hasPartner: Boolean(partner_id),
+      hasCollaborator: Boolean(collaboratorId),
+    });
     
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -58,14 +100,17 @@ Deno.serve(async (req) => {
 
     const authHeader = req.headers.get("Authorization");
     let userId = null;
-    if (authHeader) {
+    if (authHeader?.startsWith("Bearer ")) {
       const supabaseClient = createClient(
         Deno.env.get("SUPABASE_URL")!,
         Deno.env.get("SUPABASE_ANON_KEY")!,
         { global: { headers: { Authorization: authHeader } } }
       );
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      userId = user?.id;
+      const token = authHeader.replace("Bearer ", "");
+      const { data, error } = await supabaseClient.auth.getClaims(token);
+      if (!error) {
+        userId = data?.claims?.sub ?? null;
+      }
     }
 
     let unitPrice: number;
@@ -172,6 +217,69 @@ Deno.serve(async (req) => {
     const finalTotal = total - discount;
     const pixCode = payMethod === "pix" ? generatePixCode() : null;
 
+    if (date && (typeof date !== "string" || date.length > 100)) {
+      return new Response(
+        JSON.stringify({ error: "Data inválida" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (notes && (typeof notes !== "string" || notes.length > 2000)) {
+      return new Response(
+        JSON.stringify({ error: "Observações inválidas" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (customerPhone && (typeof customerPhone !== "string" || customerPhone.length > 30)) {
+      return new Response(
+        JSON.stringify({ error: "Telefone inválido" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (cpf && (typeof cpf !== "string" || cpf.length > 20)) {
+      return new Response(
+        JSON.stringify({ error: "CPF inválido" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (passport && (typeof passport !== "string" || passport.length > 40)) {
+      return new Response(
+        JSON.stringify({ error: "Passaporte inválido" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (country && (typeof country !== "string" || country.length > 80)) {
+      return new Response(
+        JSON.stringify({ error: "País inválido" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (birthDate && (typeof birthDate !== "string" || birthDate.length > 20)) {
+      return new Response(
+        JSON.stringify({ error: "Data de nascimento inválida" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (companions && (!Array.isArray(companions) || companions.length > 20)) {
+      return new Response(
+        JSON.stringify({ error: "Acompanhantes inválidos" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (companions?.some((c: any) => !isNonEmptyString(c?.name, 120))) {
+      return new Response(
+        JSON.stringify({ error: "Nome de acompanhante inválido" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const createBookingRecord = async (customerId: string) => {
       const { data: booking, error: bookingErr } = await supabaseAdmin
         .from("bookings")
@@ -186,8 +294,8 @@ Deno.serve(async (req) => {
           total,
           discount,
           final_total: finalTotal,
-          public_unit_price: clientPublicUnitPrice || publicUnitPrice,
-          public_total: clientPublicTotal || publicTotal,
+          public_unit_price: publicUnitPrice,
+          public_total: publicTotal,
           pay_method: payMethod,
           status: "pendente",
           payment_status: "pendente",
@@ -218,7 +326,6 @@ Deno.serve(async (req) => {
       return booking;
     };
 
-    const trimmedEmail = String(customerEmail).trim().toLowerCase();
     const { data: existingCustomer } = await supabaseAdmin
       .from("customers")
       .select("id")
@@ -228,7 +335,9 @@ Deno.serve(async (req) => {
     let customerId = existingCustomer?.id;
 
     if (!customerId) {
-      console.log("Creating new customer:", { name: customerName, email: trimmedEmail });
+      console.log("Creating customer record for booking", {
+        customerEmail: previewEmail(trimmedEmail),
+      });
       const { data: newCustomer, error: custErr } = await supabaseAdmin
         .from("customers")
         .insert({
@@ -251,7 +360,12 @@ Deno.serve(async (req) => {
     }
 
     const booking = await createBookingRecord(customerId);
-    console.log("Booking created successfully:", booking.id);
+    console.log("Booking created successfully", {
+      bookingId: booking.id,
+      customerId,
+      type: booking.type,
+      payMethod: booking.pay_method,
+    });
     return new Response(JSON.stringify(booking), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
