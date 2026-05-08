@@ -122,16 +122,20 @@ const AdminFinanceiro = () => {
       })),
       ...monthContasReceber.map(c => ({
         date: c.vencimento,
-        desc: `[RECEBER] ${c.descricao} - ${c.cliente || "N/A"}`,
-        method: "RECEBÍVEL",
+        desc: c.partner_id 
+          ? `[COMISSÃO/PARCEIRO] ${c.descricao}`
+          : `[RECEBER] ${c.descricao} - ${c.cliente || "N/A"}`,
+        method: c.partner_id ? "PARCEIRO" : "RECEBÍVEL",
         value: c.valor,
         status: c.status === "recebido" ? "PAGO" : "PENDENTE",
         type: 'entrada' as const
       })),
       ...monthContasPagar.map(c => ({
         date: c.vencimento,
-        desc: `[SAÍDA] ${c.descricao} - ${c.fornecedor || "N/A"}`,
-        method: "TRANSFERÊNCIA",
+        desc: c.collaborator_id
+          ? `[OPERACIONAL] ${c.descricao}`
+          : `[SAÍDA] ${c.descricao} - ${c.fornecedor || "N/A"}`,
+        method: c.collaborator_id ? "COLABORADOR" : "TRANSFERÊNCIA",
         value: -c.valor,
         status: c.status === "pago" ? "PAGO" : "PENDENTE",
         type: 'saida' as const
@@ -150,7 +154,7 @@ const AdminFinanceiro = () => {
 
       return matchesSearch && matchesStatus && matchesType;
     }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  }, [monthBookings, monthContasPagar, searchTerm, statusFilter, typeFilter]);
+  }, [monthBookings, monthContasPagar, monthContasReceber, searchTerm, statusFilter, typeFilter]);
 
   const receitaPaga = monthBookings.filter(b => b.payment_status === "pago").reduce((s, b) => s + b.final_total, 0) + 
                      monthContasReceber.filter(c => c.status === "recebido").reduce((s, c) => s + c.valor, 0);
