@@ -917,6 +917,9 @@ const AdminReservas = () => {
                   Excluir Permanente
                 </Button>
               </div>
+              
+              {/* Other Actions Group */}
+              <div className="flex flex-col sm:flex-row gap-3 mt-4 pt-4 border-t border-slate-100">
                 {/* Print Receipt */}
                 {selected.payMethod !== "info" && (
                   <PrintReceiptButton
@@ -944,7 +947,7 @@ const AdminReservas = () => {
                       cpf: selected.cpf,
                       passport: selected.passport,
                     }}
-                    className="flex-1 min-w-[140px]"
+                    className="flex-1"
                     label="Imprimir Recibo"
                   />
                 )}
@@ -954,10 +957,10 @@ const AdminReservas = () => {
                     href={`https://wa.me/${selected.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}! Sobre sua reserva ${selected.bookingCode} - ${selected.itemName}.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex"
+                    className="flex-1"
                   >
-                    <Button variant="outline" size="sm" className="text-green-600">
-                      📱 WhatsApp
+                    <Button variant="outline" className="w-full text-green-600 border-green-200 hover:bg-green-50 h-10">
+                      📱 Enviar no WhatsApp
                     </Button>
                   </a>
                 )}
