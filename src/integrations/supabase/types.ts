@@ -2024,6 +2024,8 @@ export type Database = {
           recent_surgery: boolean | null
           risks_informed: string[]
           safety_controls_informed: boolean | null
+          sign_access_expires_at: string | null
+          sign_access_token: string | null
           signature_data: string | null
           signed_at: string | null
           takes_medication: boolean | null
@@ -2068,6 +2070,8 @@ export type Database = {
           recent_surgery?: boolean | null
           risks_informed?: string[]
           safety_controls_informed?: boolean | null
+          sign_access_expires_at?: string | null
+          sign_access_token?: string | null
           signature_data?: string | null
           signed_at?: string | null
           takes_medication?: boolean | null
@@ -2112,6 +2116,8 @@ export type Database = {
           recent_surgery?: boolean | null
           risks_informed?: string[]
           safety_controls_informed?: boolean | null
+          sign_access_expires_at?: string | null
+          sign_access_token?: string | null
           signature_data?: string | null
           signed_at?: string | null
           takes_medication?: boolean | null
