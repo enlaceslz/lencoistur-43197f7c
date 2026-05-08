@@ -256,20 +256,23 @@ const TermoAssinatura = () => {
         // 1. Save term record if it doesn't exist
         const { data: termData, error: termError } = await supabase.from("sgs_risk_terms").insert({
           booking_id: booking.id,
-          customer_name: booking.customers?.name || booking.customer_name,
+          customer_id: booking.customer_id,
+          customer_name: booking.customers?.name || "Cliente",
           nationality: booking.customers?.country || "Brasil",
-          phone: booking.customers?.phone || booking.customer_phone,
-          tour_name: booking.item_name,
+          phone: booking.customers?.phone || "",
+          tour_name: booking.item_name || "Passeio",
           risks_informed: acceptedRisks,
           health_questions: healthInfo,
           safety_controls_informed: true,
           accepted: true,
           signature_data: signatureData,
           signed_at: new Date().toISOString(),
+          term_date: new Date().toISOString().split('T')[0],
           cancellation_policy: "Conforme política da agência aceita no momento da reserva."
         }).select().single();
 
         if (termError) throw termError;
+        if (!termData) throw new Error("Erro ao criar o termo no banco de dados.");
         currentTermId = termData.id;
       } else {
         // Update existing term
@@ -285,12 +288,37 @@ const TermoAssinatura = () => {
         if (termError) throw termError;
       }
 
-      // 2. Update companion signatures
-      for (const companionId in signatures) {
-        await supabase.from("sgs_risk_term_minors").update({
-          signature_data: signatures[companionId],
-          signed_at: new Date().toISOString()
-        }).eq("id", companionId);
+      // 2. Save/Update companion signatures
+      for (const companion of companions) {
+        const signature = signatures[companion.id] || companion.signature_data;
+        
+        // Check if this specific companion already exists in sgs_risk_term_minors for this term
+        const { data: existingMinor } = await supabase
+          .from("sgs_risk_term_minors")
+          .select("id")
+          .eq("risk_term_id", currentTermId)
+          .eq("full_name", companion.full_name)
+          .maybeSingle();
+        
+        if (!existingMinor) {
+          // If it's a new companion for this term
+          const { error: minorError } = await supabase.from("sgs_risk_term_minors").insert({
+            risk_term_id: currentTermId,
+            full_name: companion.full_name,
+            is_adult: companion.is_adult,
+            responsible_name: companion.responsible_name,
+            signature_data: signature,
+            signed_at: signature ? new Date().toISOString() : null
+          });
+          if (minorError) console.error("Error inserting companion:", minorError);
+        } else {
+          // It's an existing companion record, just update signature if provided
+          const { error: minorError } = await supabase.from("sgs_risk_term_minors").update({
+            signature_data: signature,
+            signed_at: signature ? new Date().toISOString() : null
+          }).eq("id", existingMinor.id);
+          if (minorError) console.error("Error updating companion:", minorError);
+        }
       }
 
       // 2. Generate PDF
