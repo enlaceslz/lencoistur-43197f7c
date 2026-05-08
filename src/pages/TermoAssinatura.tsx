@@ -80,21 +80,30 @@ const TermoAssinatura = () => {
       let termData = null;
 
       if (termId) {
+        console.log("Searching by termId:", termId);
         const termRes = await supabase.from("sgs_risk_terms").select("*, customers!customer_id(*)").eq("id", termId).maybeSingle();
         if (termRes.data) {
           termData = termRes.data;
+          console.log("Term found:", termData.id);
           if (termData.booking_id) {
             const bookingRes = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", termData.booking_id).maybeSingle();
             bookingData = bookingRes.data;
-          } else if (bookingIdParam) {
-            const bookingRes = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", bookingIdParam).maybeSingle();
-            bookingData = bookingRes.data;
           }
         }
-      } else if (bookingCode) {
+      }
+
+      if (!bookingData && bookingIdParam) {
+        console.log("Searching by bookingIdParam:", bookingIdParam);
+        const { data: bById, error: bIdError } = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", bookingIdParam).maybeSingle();
+        if (bIdError) console.error("Booking search error:", bIdError);
+        bookingData = bById;
+      }
+
+      if (!bookingData && bookingCode) {
         console.log("Searching by bookingCode:", bookingCode);
-        // Trim and remove any invisible characters or excessive whitespace
         const cleanBookingCode = bookingCode.trim();
+        
+        // Try searching by booking_code first
         const { data: bData, error: bError } = await supabase
           .from("bookings")
           .select("*, customers!customer_id(*)")
@@ -104,7 +113,14 @@ const TermoAssinatura = () => {
         if (bError) console.error("Search error:", bError);
         bookingData = bData;
 
-        // Fallback: try to search for the exact match if ilike fails or if there are multiple matches
+        // Fallback: try searching by ID if bookingCode looks like a UUID
+        if (!bookingData && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanBookingCode)) {
+          console.log("Trying bookingCode as UUID fallback");
+          const { data: bByIdFallback } = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", cleanBookingCode).maybeSingle();
+          bookingData = bByIdFallback;
+        }
+        
+        // Final fallback for booking_code: exact match
         if (!bookingData) {
           const { data: bDataExact } = await supabase
             .from("bookings")
@@ -114,16 +130,14 @@ const TermoAssinatura = () => {
           bookingData = bDataExact;
         }
 
-        if (bookingData) {
-          const { data: tData, error: tError } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
-          if (tError) console.error("Term search error:", tError);
+        if (bookingData && !termData) {
+          const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
           termData = tData;
         }
-      } else if (bookingIdParam) {
-        const { data: bById, error: bIdError } = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", bookingIdParam).maybeSingle();
-        if (bIdError) console.error("Booking search error:", bIdError);
-        bookingData = bById;
-      } else if (customerIdParam) {
+      }
+
+      if (!bookingData && customerIdParam) {
+        console.log("Searching by customerIdParam:", customerIdParam);
         // Fallback: try to find the most recent booking for this customer
         const { data: bByCust, error: bCustError } = await supabase
           .from("bookings")
@@ -135,6 +149,29 @@ const TermoAssinatura = () => {
         
         if (bCustError) console.error("Customer search error:", bCustError);
         bookingData = bByCust;
+
+        if (bookingData && !termData) {
+          const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
+          termData = tData;
+        }
+      }
+
+      if (!bookingData && !termData && customerIdParam) {
+        console.log("Searching directly for customer:", customerIdParam);
+        const { data: customerData } = await supabase.from("customers").select("*").eq("id", customerIdParam).maybeSingle();
+        if (customerData) {
+          bookingData = {
+            id: null,
+            customer_id: customerData.id,
+            customers: customerData,
+            item_name: "Passeio (A definir)",
+            date: new Date().toISOString().split('T')[0],
+            booking_code: "AVULSO"
+          };
+          
+          const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("customer_id", customerData.id).is("booking_id", null).maybeSingle();
+          termData = tData;
+        }
       }
 
       if (bookingData || termData) {
@@ -166,7 +203,7 @@ const TermoAssinatura = () => {
               id: `booking-comp-${index}`,
               full_name: c.name,
               is_adult: true, // Default to adult, user can adjust
-              responsible_name: bookingData.customers?.name || bookingData.customer_name
+              responsible_name: bookingData.customers?.name || ""
             }));
           }
 
@@ -184,7 +221,7 @@ const TermoAssinatura = () => {
                   id: d.id,
                   full_name: d.name,
                   is_adult: true,
-                  responsible_name: bookingData.customers?.name || bookingData.customer_name
+                  responsible_name: bookingData.customers?.name || ""
                 });
               }
             });
@@ -292,7 +329,7 @@ const TermoAssinatura = () => {
         const { data: termData, error: termError } = await supabase.from("sgs_risk_terms").insert([{
           booking_id: booking.id,
           customer_id: booking.customer_id,
-          customer_name: booking.customers?.name || booking.customer_name || "Cliente",
+          customer_name: booking.customers?.name || "Cliente",
           nationality: booking.customers?.country || "Brasil",
           phone: booking.customers?.phone || booking.customer_phone || "",
           email: booking.customers?.email || booking.customer_email || "",
@@ -415,7 +452,7 @@ const TermoAssinatura = () => {
       autoTable(doc, {
         startY: currentY,
         body: [
-          ["Participante:", booking.customers?.name || booking.customer_name, "Reserva:", booking.booking_code],
+          ["Participante:", booking.customers?.name || "Cliente", "Reserva:", booking.booking_code],
           ["Atividade:", booking.item_name, "Data:", new Date(booking.date + "T12:00").toLocaleDateString("pt-BR")],
           ["Documento:", booking.customers?.cpf || booking.customers?.passport || "Não informado", "Local:", `${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}`],
         ],
@@ -502,7 +539,7 @@ const TermoAssinatura = () => {
       doc.line(14, currentY + 15, 14 + sigBoxWidth, currentY + 15);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(7);
-      doc.text(booking.customers?.name || booking.customer_name, 14, currentY + 19);
+      doc.text(booking.customers?.name || "Cliente", 14, currentY + 19);
       doc.text(`${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}, ${new Date().toLocaleString("pt-BR")}`, 14, currentY + 22);
 
       // Companions Signatures
@@ -671,7 +708,7 @@ const TermoAssinatura = () => {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Participante</p>
-                  <p className="text-sm font-bold">{booking.customers?.name || booking.customer_name}</p>
+                  <p className="text-sm font-bold">{booking.customers?.name || "Cliente"}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Reserva</p>
