@@ -51,21 +51,25 @@ interface Conta {
   recebido_em: string | null;
   booking_id: string | null;
   anexo_url: string | null;
+  partner_id?: string | null;
+  partners?: { name: string } | null;
 }
 
 interface CustomerOption { id: string; name: string; email: string; }
 interface BookingOption { id: string; booking_code: string; item_name: string; final_total: number; customer_name: string; }
+interface PartnerOption { id: string; name: string; }
 
 const emptyForm = { 
   descricao: "", 
   valor: 0, 
-  vencimento: "", 
+  vencimento: new Date().toISOString().slice(0, 10), 
   categoria: "reserva", 
   cliente: "", 
   observacoes: "", 
   status: "pendente", 
   booking_id: "", 
   customer_id: "",
+  partner_id: "",
   anexo_url: ""
 };
 
