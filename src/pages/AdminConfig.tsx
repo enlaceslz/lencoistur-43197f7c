@@ -1557,29 +1557,6 @@ const AdminConfig = () => {
                     </div>
                   </div>
                 )}
-                  <div className="flex flex-wrap gap-3">
-                    <Button 
-                      onClick={handleBackup} 
-                      disabled={backupLoading}
-                      className="rounded-2xl px-8 h-12 font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20 bg-indigo-600 hover:bg-indigo-700 text-white transition-all active:scale-95 flex items-center gap-2"
-                    >
-                      {backupLoading ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
-                      Gerar Backup Completo
-                    </Button>
-                    <div className="relative">
-                      <input type="file" ref={restoreInputRef} onChange={handleRestore} className="hidden" accept=".json" />
-                      <Button 
-                        variant="outline"
-                        onClick={() => restoreInputRef.current?.click()} 
-                        disabled={restoreLoading}
-                        className="rounded-2xl px-8 h-12 font-black uppercase tracking-widest border-2 hover:bg-muted transition-all active:scale-95 flex items-center gap-2"
-                      >
-                        {restoreLoading ? <Loader2 size={18} className="animate-spin" /> : <UploadCloud size={18} />}
-                        Restaurar Sistema
-                      </Button>
-                    </div>
-                  </div>
-                </div>
 
                 <div className="grid md:grid-cols-2 gap-8">
                   <div className="space-y-4">
