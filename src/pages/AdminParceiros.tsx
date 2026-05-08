@@ -14,7 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Loader2, MapPin, Settings2, Eye, Phone, Mail, User, Percent, FileText, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileDown
+  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Loader2, MapPin, Settings2, Eye, Phone, Mail, User, Percent, FileText, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileDown, Copy
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
