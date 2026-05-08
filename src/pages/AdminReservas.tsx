@@ -1007,12 +1007,12 @@ const AdminReservas = () => {
                 {selected.status !== "cancelada" && (
                   <Button 
                     variant="outline" 
-                    onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada.", true)} 
+                    onClick={() => handleAction(() => deleteBooking(selected.id), "Reserva removida.", true)} 
                     disabled={actionLoading} 
                     className="flex-1 min-w-[140px] border-rose-200 text-rose-600 hover:bg-rose-50"
                   >
                     {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
-                    Cancelar
+                    Cancelar e Excluir
                   </Button>
                 )}
 
