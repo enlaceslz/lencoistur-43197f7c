@@ -332,7 +332,7 @@ const CheckoutPage = () => {
           <div className="flex flex-col gap-3 justify-center mb-8">
             {confirmedBooking.payMethod !== "info" && (
               <Link 
-                to={`/assinatura-termo?booking=${confirmedBooking.bookingCode}`}
+                to={`/assinatura-termo?booking=${encodeURIComponent(confirmedBooking.bookingCode)}`}
                 className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-4 rounded-xl font-bold transition-all text-center flex items-center justify-center gap-2 shadow-lg hover:scale-[1.02]"
               >
                 <Shield size={20} />
