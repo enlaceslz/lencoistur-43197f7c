@@ -80,21 +80,30 @@ const TermoAssinatura = () => {
       let termData = null;
 
       if (termId) {
+        console.log("Searching by termId:", termId);
         const termRes = await supabase.from("sgs_risk_terms").select("*, customers!customer_id(*)").eq("id", termId).maybeSingle();
         if (termRes.data) {
           termData = termRes.data;
+          console.log("Term found:", termData.id);
           if (termData.booking_id) {
             const bookingRes = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", termData.booking_id).maybeSingle();
             bookingData = bookingRes.data;
-          } else if (bookingIdParam) {
-            const bookingRes = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", bookingIdParam).maybeSingle();
-            bookingData = bookingRes.data;
           }
         }
-      } else if (bookingCode) {
+      }
+
+      if (!bookingData && bookingIdParam) {
+        console.log("Searching by bookingIdParam:", bookingIdParam);
+        const { data: bById, error: bIdError } = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", bookingIdParam).maybeSingle();
+        if (bIdError) console.error("Booking search error:", bIdError);
+        bookingData = bById;
+      }
+
+      if (!bookingData && bookingCode) {
         console.log("Searching by bookingCode:", bookingCode);
-        // Trim and remove any invisible characters or excessive whitespace
         const cleanBookingCode = bookingCode.trim();
+        
+        // Try searching by booking_code first
         const { data: bData, error: bError } = await supabase
           .from("bookings")
           .select("*, customers!customer_id(*)")
@@ -104,7 +113,14 @@ const TermoAssinatura = () => {
         if (bError) console.error("Search error:", bError);
         bookingData = bData;
 
-        // Fallback: try to search for the exact match if ilike fails or if there are multiple matches
+        // Fallback: try searching by ID if bookingCode looks like a UUID
+        if (!bookingData && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanBookingCode)) {
+          console.log("Trying bookingCode as UUID fallback");
+          const { data: bByIdFallback } = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", cleanBookingCode).maybeSingle();
+          bookingData = bByIdFallback;
+        }
+        
+        // Final fallback for booking_code: exact match
         if (!bookingData) {
           const { data: bDataExact } = await supabase
             .from("bookings")
@@ -114,16 +130,14 @@ const TermoAssinatura = () => {
           bookingData = bDataExact;
         }
 
-        if (bookingData) {
-          const { data: tData, error: tError } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
-          if (tError) console.error("Term search error:", tError);
+        if (bookingData && !termData) {
+          const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
           termData = tData;
         }
-      } else if (bookingIdParam) {
-        const { data: bById, error: bIdError } = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", bookingIdParam).maybeSingle();
-        if (bIdError) console.error("Booking search error:", bIdError);
-        bookingData = bById;
-      } else if (customerIdParam) {
+      }
+
+      if (!bookingData && customerIdParam) {
+        console.log("Searching by customerIdParam:", customerIdParam);
         // Fallback: try to find the most recent booking for this customer
         const { data: bByCust, error: bCustError } = await supabase
           .from("bookings")
@@ -135,6 +149,11 @@ const TermoAssinatura = () => {
         
         if (bCustError) console.error("Customer search error:", bCustError);
         bookingData = bByCust;
+
+        if (bookingData && !termData) {
+          const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
+          termData = tData;
+        }
       }
 
       if (bookingData || termData) {
