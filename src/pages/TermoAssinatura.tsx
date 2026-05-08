@@ -539,7 +539,7 @@ const TermoAssinatura = () => {
       doc.line(14, currentY + 15, 14 + sigBoxWidth, currentY + 15);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(7);
-      doc.text(booking.customers?.name || booking.customer_name, 14, currentY + 19);
+      doc.text(booking.customers?.name || "Cliente", 14, currentY + 19);
       doc.text(`${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}, ${new Date().toLocaleString("pt-BR")}`, 14, currentY + 22);
 
       // Companions Signatures
