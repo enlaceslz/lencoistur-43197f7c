@@ -723,7 +723,7 @@ const AdminReservas = () => {
                               className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-500 hover:text-white transition-all duration-300 border border-emerald-100 dark:border-emerald-800"
                             >
                               <a 
-                                href={`https://wa.me/${booking.customerPhone?.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${booking.customerName}! Por favor, assine o Termo de Ciência de Risco para o passeio ${booking.itemName}: ${window.location.origin}/assinatura-termo?booking=${booking.bookingCode}`)}`} 
+                                href={`https://wa.me/${booking.customerPhone?.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${booking.customerName}! Por favor, assine o Termo de Ciência de Risco para o passeio ${booking.itemName}: ${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(booking.bookingCode)}`)}`} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
                               >
