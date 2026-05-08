@@ -353,7 +353,7 @@ const TermoAssinatura = () => {
         ],
         theme: 'grid',
         styles: { fontSize: 10, cellPadding: 3 },
-        columnStyles: { 0: { fontStyle: 'bold', width: 50 } }
+        columnStyles: { 0: { fontStyle: 'bold', cellWidth: 50 } }
       });
       
       currentY = (doc as any).lastAutoTable.finalY + 10;
