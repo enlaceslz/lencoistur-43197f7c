@@ -45,7 +45,7 @@ const ToursSection = () => {
   const [tours, setTours] = useState<any[]>([]);
 
   useEffect(() => {
-    supabase.from("tours").select("*").eq("active", true).order("reviews_count", { ascending: false }).limit(8)
+    supabase.from("public_tours" as "tours").select("*").order("reviews_count", { ascending: false }).limit(8)
       .then(({ data }) => setTours(data || []));
   }, []);
 
@@ -105,11 +105,7 @@ const ToursSection = () => {
                       </span>
                       <div className="flex items-baseline gap-1">
                         <p className={`text-lg font-bold ${tour.mode_collective_enabled !== false ? "text-primary" : "text-secondary"}`}>
-                          {formatCurrency(
-                            partnerId 
-                              ? (tour.mode_collective_enabled !== false ? (tour.partner_price || tour.price) : (tour.partner_private_price || tour.private_price))
-                              : (tour.mode_collective_enabled !== false ? tour.price : tour.private_price)
-                          )}
+                          {formatCurrency(tour.mode_collective_enabled !== false ? tour.price : tour.private_price)}
                         </p>
                         {tour.pix_discount > 0 && !partnerId && (
                           <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">

@@ -888,6 +888,20 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "package_tours_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "public_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_tours_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "public_tours"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "package_tours_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
@@ -924,6 +938,20 @@ export type Database = {
             columns: ["package_id"]
             isOneToOne: false
             referencedRelation: "packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_transfers_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "public_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_transfers_transfer_route_id_fkey"
+            columns: ["transfer_route_id"]
+            isOneToOne: false
+            referencedRelation: "public_transfer_routes"
             referencedColumns: ["id"]
           },
           {
@@ -1189,6 +1217,13 @@ export type Database = {
             foreignKeyName: "reviews_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
+            referencedRelation: "public_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
             referencedRelation: "tours"
             referencedColumns: ["id"]
           },
@@ -1337,6 +1372,13 @@ export type Database = {
             columns: ["booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sgs_briefings_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "public_tours"
             referencedColumns: ["id"]
           },
           {
@@ -1855,6 +1897,13 @@ export type Database = {
             foreignKeyName: "sgs_incidents_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
+            referencedRelation: "public_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sgs_incidents_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
             referencedRelation: "tours"
             referencedColumns: ["id"]
           },
@@ -2153,6 +2202,13 @@ export type Database = {
             foreignKeyName: "sgs_risk_terms_tour_id_fkey"
             columns: ["tour_id"]
             isOneToOne: false
+            referencedRelation: "public_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sgs_risk_terms_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
             referencedRelation: "tours"
             referencedColumns: ["id"]
           },
@@ -2230,6 +2286,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "sgs_risks_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "public_tours"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sgs_risks_tour_id_fkey"
             columns: ["tour_id"]
@@ -2823,7 +2886,242 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_package_tour_items: {
+        Row: {
+          package_id: string | null
+          sort_order: number | null
+          tour_description: string | null
+          tour_id: string | null
+          tour_images: string[] | null
+          tour_name: string | null
+          tour_slug: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "package_tours_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_tours_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "public_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_tours_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "public_tours"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_tours_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      public_packages: {
+        Row: {
+          active: boolean | null
+          banner_url: string | null
+          created_at: string | null
+          days: number | null
+          description: string | null
+          discount_price: number | null
+          highlights: string[] | null
+          id: string | null
+          name: string | null
+          nights: number | null
+          original_price: number | null
+          slug: string | null
+          tag: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          banner_url?: string | null
+          created_at?: string | null
+          days?: number | null
+          description?: string | null
+          discount_price?: number | null
+          highlights?: string[] | null
+          id?: string | null
+          name?: string | null
+          nights?: number | null
+          original_price?: number | null
+          slug?: string | null
+          tag?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          banner_url?: string | null
+          created_at?: string | null
+          days?: number | null
+          description?: string | null
+          discount_price?: number | null
+          highlights?: string[] | null
+          id?: string | null
+          name?: string | null
+          nights?: number | null
+          original_price?: number | null
+          slug?: string | null
+          tag?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      public_tours: {
+        Row: {
+          active: boolean | null
+          category: string | null
+          created_at: string | null
+          default_mode: string | null
+          departure: string | null
+          description: string | null
+          difficulty: string | null
+          duration: string | null
+          group_size: string | null
+          highlights: string[] | null
+          id: string | null
+          images: string[] | null
+          includes: string[] | null
+          location: string | null
+          meta_description: string | null
+          meta_title: string | null
+          mode_collective_enabled: boolean | null
+          mode_private_enabled: boolean | null
+          name: string | null
+          operator: string | null
+          pix_discount: number | null
+          price: number | null
+          private_price: number | null
+          rating: number | null
+          reviews_count: number | null
+          slug: string | null
+          tag: string | null
+          updated_at: string | null
+          vehicle_capacity: number | null
+        }
+        Insert: {
+          active?: boolean | null
+          category?: string | null
+          created_at?: string | null
+          default_mode?: string | null
+          departure?: string | null
+          description?: string | null
+          difficulty?: string | null
+          duration?: string | null
+          group_size?: string | null
+          highlights?: string[] | null
+          id?: string | null
+          images?: string[] | null
+          includes?: string[] | null
+          location?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          mode_collective_enabled?: boolean | null
+          mode_private_enabled?: boolean | null
+          name?: string | null
+          operator?: string | null
+          pix_discount?: number | null
+          price?: number | null
+          private_price?: number | null
+          rating?: number | null
+          reviews_count?: number | null
+          slug?: string | null
+          tag?: string | null
+          updated_at?: string | null
+          vehicle_capacity?: number | null
+        }
+        Update: {
+          active?: boolean | null
+          category?: string | null
+          created_at?: string | null
+          default_mode?: string | null
+          departure?: string | null
+          description?: string | null
+          difficulty?: string | null
+          duration?: string | null
+          group_size?: string | null
+          highlights?: string[] | null
+          id?: string | null
+          images?: string[] | null
+          includes?: string[] | null
+          location?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          mode_collective_enabled?: boolean | null
+          mode_private_enabled?: boolean | null
+          name?: string | null
+          operator?: string | null
+          pix_discount?: number | null
+          price?: number | null
+          private_price?: number | null
+          rating?: number | null
+          reviews_count?: number | null
+          slug?: string | null
+          tag?: string | null
+          updated_at?: string | null
+          vehicle_capacity?: number | null
+        }
+        Relationships: []
+      }
+      public_transfer_routes: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          departures: string[] | null
+          destination: string | null
+          distance: string | null
+          duration: string | null
+          id: string | null
+          origin: string | null
+          pix_discount: number | null
+          price: number | null
+          seats: number | null
+          updated_at: string | null
+          vehicle_type: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          departures?: string[] | null
+          destination?: string | null
+          distance?: string | null
+          duration?: string | null
+          id?: string | null
+          origin?: string | null
+          pix_discount?: number | null
+          price?: number | null
+          seats?: number | null
+          updated_at?: string | null
+          vehicle_type?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          departures?: string[] | null
+          destination?: string | null
+          distance?: string | null
+          duration?: string | null
+          id?: string | null
+          origin?: string | null
+          pix_discount?: number | null
+          price?: number | null
+          seats?: number | null
+          updated_at?: string | null
+          vehicle_type?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
