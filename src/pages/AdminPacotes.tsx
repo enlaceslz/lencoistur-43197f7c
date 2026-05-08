@@ -369,24 +369,44 @@ const AdminPacotes = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="pkg-price" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Final (R$)</Label>
-                      <div className="relative">
-                        <NumericFormat
-                          id="pkg-price"
-                          value={form.discount_price / 100}
-                          onValueChange={(values) => {
-                            const { floatValue } = values;
-                            setForm({ ...form, discount_price: Math.round((floatValue || 0) * 100) });
-                          }}
-                          thousandSeparator="."
-                          decimalSeparator=","
-                          prefix="R$ "
-                          decimalScale={2}
-                          fixedDecimalScale
-                          className="flex h-12 w-full px-4 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-black text-primary outline-none focus:ring-2 focus:ring-primary/20"
-                        />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="pkg-price" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Site (R$)</Label>
+                        <div className="relative">
+                          <NumericFormat
+                            id="pkg-price"
+                            value={form.discount_price / 100}
+                            onValueChange={(values) => {
+                              const { floatValue } = values;
+                              setForm({ ...form, discount_price: Math.round((floatValue || 0) * 100) });
+                            }}
+                            thousandSeparator="."
+                            decimalSeparator=","
+                            prefix="R$ "
+                            decimalScale={2}
+                            fixedDecimalScale
+                            className="flex h-12 w-full px-4 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-black text-primary outline-none focus:ring-2 focus:ring-primary/20"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="pkg-partner-price" className="text-[10px] font-black uppercase text-primary/60 tracking-widest ml-1">Preço Parceiro (R$)</Label>
+                        <div className="relative">
+                          <NumericFormat
+                            id="pkg-partner-price"
+                            value={form.partner_price / 100}
+                            onValueChange={(values) => {
+                              const { floatValue } = values;
+                              setForm({ ...form, partner_price: Math.round((floatValue || 0) * 100) });
+                            }}
+                            thousandSeparator="."
+                            decimalSeparator=","
+                            prefix="R$ "
+                            decimalScale={2}
+                            fixedDecimalScale
+                            className="flex h-12 w-full px-4 rounded-xl border border-primary/20 bg-primary/5 focus:bg-white transition-all font-black text-primary outline-none focus:ring-2 focus:ring-primary/20"
+                          />
+                        </div>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
