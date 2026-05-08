@@ -899,8 +899,20 @@ const AdminPasseios = () => {
                 </div>
                 <div className="bg-muted rounded-xl p-3 flex flex-col justify-center">
                   <p className="text-xs text-muted-foreground flex items-center gap-1"><Shield size={12} className="text-secondary" /> Privativo</p>
-                  <p className="text-sm font-bold text-secondary mt-1">{fmt(detailTour.private_price || 1300)}</p>
+                  <p className="text-sm font-bold text-secondary mt-1">{fmt(detailTour.private_price || 130000)}</p>
                 </div>
+                {detailTour.partner_price && (
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex flex-col justify-center">
+                    <p className="text-xs text-primary/60 flex items-center gap-1"><Building2 size={12} /> Parceiro Col.</p>
+                    <p className="text-sm font-bold text-primary mt-1">{fmt(detailTour.partner_price)}</p>
+                  </div>
+                )}
+                {detailTour.partner_private_price && (
+                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex flex-col justify-center">
+                    <p className="text-xs text-primary/60 flex items-center gap-1"><Building2 size={12} /> Parceiro Priv.</p>
+                    <p className="text-sm font-bold text-primary mt-1">{fmt(detailTour.partner_private_price)}</p>
+                  </div>
+                )}
                 <div className="bg-muted rounded-xl p-3">
                   <p className="text-xs text-muted-foreground flex items-center gap-1"><Star size={12} /> Avaliação</p>
                   <p className="text-sm font-semibold text-foreground mt-1">{Number(detailTour.rating || 0).toFixed(1)} ({detailTour.reviews_count || 0})</p>
