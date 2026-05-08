@@ -1225,11 +1225,30 @@ const AdminCRMContent = () => {
                     </TabsContent>
                   </Tabs>
                 <div className="border-t border-border pt-6">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                     <h4 className="font-display font-bold text-foreground">Dependentes / Acompanhantes</h4>
-                    <Button variant="ghost" size="sm" className="h-7 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary/20 rounded-lg" onClick={openCreateDependentModal}>
-                      <Plus size={12} className="mr-1" /> Adicionar
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 rounded-lg"
+                        onClick={() => {
+                          if (!selectedCustomer?.phone) {
+                            toast.error("Cliente sem telefone cadastrado.");
+                            return;
+                          }
+                          const message = `Olá ${selectedCustomer.name}! Por favor, complete os seus dados e assine o Termo de Ciência de Risco para a sua próxima aventura: ${window.location.origin}/assinatura-termo?id=${selectedCustomer.id}`;
+                          const cleanPhone = selectedCustomer.phone.replace(/\D/g, "");
+                          const whatsappUrl = `https://wa.me/${cleanPhone.startsWith('55') ? cleanPhone : '55' + cleanPhone}?text=${encodeURIComponent(message)}`;
+                          window.open(whatsappUrl, '_blank');
+                        }}
+                      >
+                        <Smartphone size={12} className="mr-1" /> Termo via WhatsApp
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-7 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary/20 rounded-lg" onClick={openCreateDependentModal}>
+                        <Plus size={12} className="mr-1" /> Adicionar
+                      </Button>
+                    </div>
                   </div>
                   
                   {dependents.length === 0 ? (
