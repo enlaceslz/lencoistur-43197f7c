@@ -103,7 +103,6 @@ const TermoAssinatura = () => {
         bookingData = bookingRes.data;
       }
 
-      console.log("Found bookingData:", bookingData?.booking_code, "termData:", termData?.id);
       if (bookingData || termData) {
         setBooking(bookingData);
         setTerm(termData);
