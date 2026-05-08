@@ -1513,7 +1513,22 @@ const AdminConfig = () => {
                   <div className="flex items-center gap-5">
                     <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center shadow-inner">
                       <HardDrive size={32} strokeWidth={2.5} />
-                    </div>
+                </div>
+1517: 
+1518:                 {backupProgress && (
+1519:                   <div className="bg-indigo-500/10 p-6 rounded-3xl border border-indigo-500/20 space-y-3 animate-pulse">
+1520:                     <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest text-indigo-600">
+1521:                       <span>{backupProgress.current}</span>
+1522:                       <span>{Math.round((backupProgress.count / backupProgress.total) * 100)}%</span>
+1523:                     </div>
+1524:                     <div className="w-full h-2 bg-indigo-500/20 rounded-full overflow-hidden">
+1525:                       <div 
+1526:                         className="h-full bg-indigo-600 transition-all duration-300 ease-out"
+1527:                         style={{ width: `${(backupProgress.count / backupProgress.total) * 100}%` }}
+1528:                       />
+1529:                     </div>
+1530:                   </div>
+1531:                 )}
                     <div>
                       <h3 className="text-2xl font-black text-foreground tracking-tight leading-none">Módulo de Backup</h3>
                       <p className="text-sm font-medium text-muted-foreground mt-2">Segurança máxima para seus dados, configurações e mídias.</p>
