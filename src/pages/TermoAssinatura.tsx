@@ -121,6 +121,21 @@ const TermoAssinatura = () => {
           if (termData.signature_data && adultsNeedSigning) {
             setSigned(true);
           }
+        } else if (bookingData) {
+          // No term yet, pre-load companions from dependents table
+          const { data: dependentsData } = await supabase
+            .from("dependents")
+            .select("*")
+            .eq("customer_id", bookingData.customer_id);
+          
+          if (dependentsData) {
+            setCompanions(dependentsData.map(d => ({
+              id: d.id,
+              full_name: d.name,
+              is_adult: true, // Assume adult for signing, user can adjust if we had age
+              responsible_name: bookingData.customers?.name || bookingData.customer_name
+            })));
+          }
         }
       }
     } catch (err) {
@@ -222,7 +237,7 @@ const TermoAssinatura = () => {
         const { data: termData, error: termError } = await supabase.from("sgs_risk_terms").insert({
           booking_id: booking.id,
           customer_name: booking.customers?.name || booking.customer_name,
-          nationality: booking.customers?.nationality || "BR",
+          nationality: booking.customers?.country || "Brasil",
           phone: booking.customers?.phone || booking.customer_phone,
           tour_name: booking.item_name,
           risks_informed: acceptedRisks,

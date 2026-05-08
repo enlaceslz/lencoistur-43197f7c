@@ -17,7 +17,8 @@ import {
   DollarSign, Ban, Loader2, Users, Calendar, CreditCard, FileText,
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
   Plus, Copy, Pencil, Car, Compass, LayoutGrid, List, X, XCircle as XCircleIcon,
-  ChevronRight, ArrowRight, User, Hash, Info, Moon, Save, Package as PackageIcon
+  ChevronRight, ArrowRight, User, Hash, Info, Moon, Save, Package as PackageIcon,
+  Shield
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -732,6 +733,11 @@ const AdminReservas = () => {
                         </a>
                       </Button>
                     )}
+                    <Button variant="outline" size="sm" className="flex-1 bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100" asChild>
+                      <a href={`/assinatura-termo?booking=${selected.bookingCode}`} target="_blank" rel="noopener noreferrer">
+                        <Shield size={14} className="mr-1" /> Termo de Risco
+                      </a>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -816,6 +822,18 @@ const AdminReservas = () => {
                     </Button>
                   </a>
                 )}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    const link = `${window.location.origin}/assinatura-termo?booking=${selected.bookingCode}`;
+                    navigator.clipboard.writeText(link);
+                    toast.success("Link do termo copiado!");
+                  }}
+                  className="text-amber-600 border-amber-200"
+                >
+                  <Copy size={14} className="mr-1" /> Copiar Link Termo
+                </Button>
               </div>
               </div>
             )}
