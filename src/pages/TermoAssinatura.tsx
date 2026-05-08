@@ -344,11 +344,15 @@ const TermoAssinatura = () => {
           signed_at: new Date().toISOString(),
           term_date: new Date().toISOString().split('T')[0],
           cancellation_policy: "Conforme política da agência aceita no momento da reserva."
-        }]).select().single();
-
-        if (termError) throw termError;
-        if (!termData) throw new Error("Erro ao criar o termo no banco de dados.");
-        currentTermId = termData.id;
+        }]).select();
+        
+        if (termError) {
+          console.error("Error inserting term:", termError);
+          throw termError;
+        }
+        
+        if (!termData || termData.length === 0) throw new Error("Erro ao criar o termo no banco de dados.");
+        currentTermId = termData[0].id;
       } else {
         // Update existing term
         const { error: termError } = await supabase.from("sgs_risk_terms").update({
