@@ -834,6 +834,14 @@ const AdminReservas = () => {
                 >
                   <Copy size={14} className="mr-1" /> Copiar Link Termo
                 </Button>
+                <Link 
+                  to={`/assinatura-termo?booking=${selected.bookingCode}`}
+                  className="inline-flex"
+                >
+                  <Button variant="outline" size="sm" className="text-amber-600 border-amber-200">
+                    <Shield size={14} className="mr-1" /> Assinar Agora
+                  </Button>
+                </Link>
               </div>
               </div>
             )}
