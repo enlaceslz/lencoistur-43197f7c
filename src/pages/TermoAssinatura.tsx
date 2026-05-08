@@ -83,22 +83,22 @@ const TermoAssinatura = () => {
         if (termRes.data) {
           termData = termRes.data;
           if (termData.booking_id) {
-            const bookingRes = await supabase.from("bookings").select("*, customers!fk_bookings_customer(*)").eq("id", termData.booking_id).maybeSingle();
+            const bookingRes = await supabase.from("bookings").select("*, customers(*)").eq("id", termData.booking_id).maybeSingle();
             bookingData = bookingRes.data;
           } else if (bookingIdParam) {
-            const bookingRes = await supabase.from("bookings").select("*, customers!fk_bookings_customer(*)").eq("id", bookingIdParam).maybeSingle();
+            const bookingRes = await supabase.from("bookings").select("*, customers(*)").eq("id", bookingIdParam).maybeSingle();
             bookingData = bookingRes.data;
           }
         }
       } else if (bookingCode) {
-        const bookingRes = await supabase.from("bookings").select("*, customers!fk_bookings_customer(*)").eq("booking_code", bookingCode).maybeSingle();
+        const bookingRes = await supabase.from("bookings").select("*, customers(*)").eq("booking_code", bookingCode).maybeSingle();
         bookingData = bookingRes.data;
         if (bookingData) {
           const termRes = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
           termData = termRes.data;
         }
       } else if (bookingIdParam) {
-        const bookingRes = await supabase.from("bookings").select("*, customers!fk_bookings_customer(*)").eq("id", bookingIdParam).maybeSingle();
+        const bookingRes = await supabase.from("bookings").select("*, customers(*)").eq("id", bookingIdParam).maybeSingle();
         bookingData = bookingRes.data;
       }
 
@@ -292,6 +292,9 @@ const TermoAssinatura = () => {
       }
 
       // 2. Save/Update companion signatures
+      const minorsToInsert = [];
+      const minorsToUpdate = [];
+
       for (const companion of companions) {
         const signature = signatures[companion.id] || companion.signature_data;
         
@@ -303,25 +306,30 @@ const TermoAssinatura = () => {
           .eq("full_name", companion.full_name)
           .maybeSingle();
         
+        const minorPayload = {
+          risk_term_id: currentTermId,
+          full_name: companion.full_name,
+          is_adult: companion.is_adult,
+          responsible_name: companion.responsible_name,
+          signature_data: signature,
+          signed_at: signature ? new Date().toISOString() : null
+        };
+
         if (!existingMinor) {
-          // If it's a new companion for this term
-          const { error: minorError } = await supabase.from("sgs_risk_term_minors").insert([{
-            risk_term_id: currentTermId,
-            full_name: companion.full_name,
-            is_adult: companion.is_adult,
-            responsible_name: companion.responsible_name,
-            signature_data: signature,
-            signed_at: signature ? new Date().toISOString() : null
-          }]);
-          if (minorError) console.error("Error inserting companion:", minorError);
+          minorsToInsert.push(minorPayload);
         } else {
-          // It's an existing companion record, just update signature if provided
-          const { error: minorError } = await supabase.from("sgs_risk_term_minors").update({
-            signature_data: signature,
-            signed_at: signature ? new Date().toISOString() : null
-          }).eq("id", existingMinor.id);
-          if (minorError) console.error("Error updating companion:", minorError);
+          minorsToUpdate.push({ id: existingMinor.id, ...minorPayload });
         }
+      }
+
+      if (minorsToInsert.length > 0) {
+        const { error: insertError } = await supabase.from("sgs_risk_term_minors").insert(minorsToInsert);
+        if (insertError) console.error("Error inserting companions:", insertError);
+      }
+
+      for (const minor of minorsToUpdate) {
+        const { error: updateError } = await supabase.from("sgs_risk_term_minors").update(minor).eq("id", minor.id);
+        if (updateError) console.error("Error updating companion:", updateError);
       }
 
       // 2. Generate PDF
@@ -332,47 +340,47 @@ const TermoAssinatura = () => {
       // Load Logo
       if (company?.logo_url) {
         try {
-          doc.addImage(company.logo_url, 'PNG', 14, 10, 40, 20);
+          doc.addImage(company.logo_url, 'PNG', 14, 8, 35, 15);
         } catch (e) {
           console.error("Error adding logo to PDF:", e);
         }
       }
       
       // Header Info
-      doc.setFontSize(10);
+      doc.setFontSize(8);
       doc.setTextColor(100, 100, 100);
       const companyName = company?.razao_social || company?.nome_fantasia || "LENÇÓIS TOUR";
       const companyCNPJ = company?.cnpj || "";
       const companyAddress = `${company?.endereco || ""}, ${company?.cidade || ""}-${company?.estado || ""}`;
       
-      doc.text(companyName, pageWidth - 14, 15, { align: "right" });
-      doc.text(`CNPJ: ${companyCNPJ}`, pageWidth - 14, 20, { align: "right" });
-      doc.text(companyAddress, pageWidth - 14, 25, { align: "right" });
+      doc.text(companyName, pageWidth - 14, 12, { align: "right" });
+      doc.text(`CNPJ: ${companyCNPJ}`, pageWidth - 14, 16, { align: "right" });
+      doc.text(companyAddress, pageWidth - 14, 20, { align: "right" });
       
-      doc.setDrawColor(200, 200, 200);
-      doc.line(14, 32, pageWidth - 14, 32);
+      doc.setDrawColor(220, 220, 220);
+      doc.line(14, 25, pageWidth - 14, 25);
       
       // Title
-      doc.setFontSize(16);
+      doc.setFontSize(13);
       doc.setTextColor(0, 0, 0);
       doc.setFont("helvetica", "bold");
-      doc.text("Termo de Ciência de Risco e Corresponsabilidade", pageWidth / 2, 42, { align: "center" });
-      doc.setFontSize(9);
+      doc.text("Termo de Ciência de Risco e Corresponsabilidade", pageWidth / 2, 33, { align: "center" });
+      doc.setFontSize(8);
       doc.setFont("helvetica", "normal");
-      doc.text("Sistema de Gestão de Segurança (SGS) - ISO 21103", pageWidth / 2, 47, { align: "center" });
+      doc.text("Sistema de Gestão de Segurança (SGS) - ISO 21103", pageWidth / 2, 38, { align: "center" });
       
-      let currentY = 55;
+      let currentY = 44;
       
       // Booking Info (Table)
       autoTable(doc, {
         startY: currentY,
         body: [
-          ["Cliente:", booking.customers?.name || booking.customer_name, "Reserva:", booking.booking_code],
+          ["Participante:", booking.customers?.name || booking.customer_name, "Reserva:", booking.booking_code],
           ["Atividade:", booking.item_name, "Data:", new Date(booking.date + "T12:00").toLocaleDateString("pt-BR")],
-          ["Documento:", booking.customers?.cpf || "Não informado", "Cidade:", company?.cidade || "Santo Amaro - MA"],
+          ["Documento:", booking.customers?.cpf || "Não informado", "Local:", `${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}`],
         ],
         theme: 'plain',
-        styles: { fontSize: 9, cellPadding: 1 },
+        styles: { fontSize: 8, cellPadding: 0.8 },
         columnStyles: { 
           0: { fontStyle: 'bold', cellWidth: 20 },
           1: { cellWidth: 70 },
@@ -381,35 +389,33 @@ const TermoAssinatura = () => {
         }
       });
       
-      currentY = (doc as any).lastAutoTable.finalY + 8;
+      currentY = (doc as any).lastAutoTable.finalY + 6;
       
       // Content Sections - Optimized for 1 page
-      const addSection = (title: string, content: string, fontSize = 8) => {
-        doc.setFontSize(10);
+      const addSection = (title: string, content: string, fontSize = 7) => {
+        doc.setFontSize(9);
         doc.setFont("helvetica", "bold");
         doc.text(title, 14, currentY);
-        currentY += 5;
+        currentY += 4;
         doc.setFontSize(fontSize);
         doc.setFont("helvetica", "normal");
         const lines = doc.splitTextToSize(content, pageWidth - 28);
         doc.text(lines, 14, currentY);
-        currentY += (lines.length * (fontSize / 2)) + 5;
+        currentY += (lines.length * (fontSize / 2.5)) + 4;
       };
 
-      const recText = company?.term_recommendations || "Atividade de turismo de aventura.";
-      addSection("Recomendações e Informações:", recText, 7.5);
+      const recText = company?.term_recommendations || "Atividade de turismo de aventura que requer atenção às normas de segurança e uso de equipamentos adequados.";
+      addSection("Recomendações e Informações:", recText, 7);
       
       if (company?.term_safety_risks) {
-        addSection("Riscos e Segurança:", company.term_safety_risks, 7.5);
+        addSection("Riscos e Segurança:", company.term_safety_risks, 7);
       }
 
       // Risks Checklist (Compact)
-      doc.setFontSize(10);
+      doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
       doc.text("Ciência de Riscos:", 14, currentY);
-      currentY += 4;
-      doc.setFontSize(7.5);
-      doc.setFont("helvetica", "normal");
+      currentY += 3;
       
       const risksSplit = [];
       for (let i = 0; i < acceptedRisks.length; i += 2) {
@@ -426,36 +432,36 @@ const TermoAssinatura = () => {
         styles: { fontSize: 7, cellPadding: 0.5 },
       });
       
-      currentY = (doc as any).lastAutoTable.finalY + 8;
+      currentY = (doc as any).lastAutoTable.finalY + 5;
 
       // Health Info
       if (healthInfo.length > 0) {
-        doc.setFontSize(9);
+        doc.setFontSize(8);
         doc.setFont("helvetica", "bold");
         doc.text(`Saúde: ${healthInfo.join(", ")}`, 14, currentY);
-        currentY += 6;
+        currentY += 5;
       }
 
       // Declaration
       const declaration = `Declaro que fui informado sobre os riscos inerentes à atividade e procedimentos de segurança. Comprometo-me a seguir as orientações da equipe e assumo a corresponsabilidade por meus atos. Esta operação segue a NBR ISO 21103.`;
-      doc.setFontSize(8);
+      doc.setFontSize(7.5);
       doc.setFont("helvetica", "italic");
       const declLines = doc.splitTextToSize(declaration, pageWidth - 28);
       doc.text(declLines, 14, currentY);
-      currentY += (declLines.length * 4) + 10;
+      currentY += (declLines.length * 3.5) + 6;
 
       // Signatures Area
       const signatureY = currentY;
       
       // Main Participant
-      doc.setFontSize(9);
+      doc.setFontSize(8);
       doc.setFont("helvetica", "bold");
       doc.text("Assinatura do Participante:", 14, signatureY);
-      doc.addImage(signatureData, 'PNG', 14, signatureY + 2, 40, 15);
+      doc.addImage(signatureData, 'PNG', 14, signatureY + 2, 35, 12);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text(booking.customers?.name || booking.customer_name, 14, signatureY + 20);
-      doc.text(`${company?.cidade || "Santo Amaro"}, ${new Date().toLocaleDateString("pt-BR")}`, 14, signatureY + 24);
+      doc.setFontSize(7.5);
+      doc.text(booking.customers?.name || booking.customer_name, 14, signatureY + 16);
+      doc.text(`${company?.cidade || "Santo Amaro"}, ${new Date().toLocaleDateString("pt-BR")}`, 14, signatureY + 20);
 
       // Companions Signatures (if any)
       const adultCompanions = companions.filter(c => c.is_adult);
