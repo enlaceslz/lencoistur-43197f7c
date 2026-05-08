@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@/lib/utils";
 import { ShareWithFriend } from "@/components/ShareWithFriend";
+import { fetchPartnerCatalogPricing } from "@/lib/catalogPricing";
 
 interface Package {
   id: string;
@@ -28,31 +29,39 @@ const PackageDetail = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [pkg, setPkg] = useState<any>(null);
-  const [partner, setPartner] = useState<any>(null);
+  const [partner, setPartner] = useState<{ id: string; name: string } | null>(null);
+  const [partnerPrice, setPartnerPrice] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      if (partnerId) {
-        const { data: pData } = await supabase.from("partners").select("*").eq("id", partnerId).maybeSingle();
-        if (pData) setPartner(pData);
-      }
-
       const { data, error } = await supabase
-        .from("packages")
+        .from("public_packages" as "packages")
         .select(`
           *,
           package_tours (
-            tour:tours (*)
+            tour:public_tours (*)
           )
         `)
         .eq("slug", slug)
-        .eq("active", true)
         .maybeSingle();
 
       if (data) {
         setPkg(data);
+        if (partnerId) {
+          try {
+            const pricing = await fetchPartnerCatalogPricing(partnerId, [{ key: data.id, type: "package", id: data.id }]);
+            setPartner(pricing.partner);
+            setPartnerPrice(pricing.items[data.id]?.effectivePrice ?? null);
+          } catch {
+            setPartner(null);
+            setPartnerPrice(null);
+          }
+        } else {
+          setPartner(null);
+          setPartnerPrice(null);
+        }
       }
       setLoading(false);
     };
