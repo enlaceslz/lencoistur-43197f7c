@@ -14,7 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Loader2, MapPin, Settings2, Eye, Phone, Mail, User, Percent, FileText, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileDown
+  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Loader2, MapPin, Settings2, Eye, Phone, Mail, User, Percent, FileText, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileDown, Copy
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -1035,8 +1035,39 @@ const AdminParceiros = () => {
                       <p className="font-bold text-emerald-600">R$ {viewPartner?.credit_limit || 0}</p>
                     </div>
                   )}
+                  {viewPartner && (
+                    <div className="pt-4 mt-4 border-t border-border">
+                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-2">Links de Venda Direta</Label>
+                      <div className="space-y-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full justify-start gap-2 h-10 rounded-xl text-xs font-bold border-primary/20 hover:bg-primary/5 text-primary"
+                          onClick={() => {
+                            const url = `${window.location.origin}/passeios?partner_id=${viewPartner.id}`;
+                            navigator.clipboard.writeText(url);
+                            toast.success("Link do Catálogo copiado!");
+                          }}
+                        >
+                          <Copy size={14} /> Catálogo de Passeios
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full justify-start gap-2 h-10 rounded-xl text-xs font-bold border-amber-200 hover:bg-amber-50 text-amber-600"
+                          onClick={() => {
+                            const url = `${window.location.origin}/pacotes?partner_id=${viewPartner.id}`;
+                            navigator.clipboard.writeText(url);
+                            toast.success("Link de Pacotes copiado!");
+                          }}
+                        >
+                          <Copy size={14} /> Pacotes & Campanhas
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                   {viewPartner?.tags && viewPartner.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
+                    <div className="flex flex-wrap gap-1 mt-4">
                       {viewPartner.tags.map((tag, i) => (
                         <Badge key={i} variant="secondary" className="text-[9px] h-5 bg-primary/5 text-primary border-primary/20">{tag}</Badge>
                       ))}

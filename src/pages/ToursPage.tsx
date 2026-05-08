@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Star, MapPin, Clock, Search, SlidersHorizontal } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -44,6 +44,8 @@ const getTourImage = (tour: any) => {
 };
 
 const ToursPage = () => {
+  const [params] = useSearchParams();
+  const partnerId = params.get("partner_id");
   const [tours, setTours] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -110,7 +112,7 @@ const ToursPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((tour) => (
-            <Link to={`/passeios/${tour.slug}`} key={tour.id}
+            <Link to={`/passeios/${tour.slug}${partnerId ? `?partner_id=${partnerId}` : ''}`} key={tour.id}
               className="group bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
               <div className="relative h-56 overflow-hidden">
                 {getTourImage(tour) ? (
