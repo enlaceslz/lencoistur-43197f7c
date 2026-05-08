@@ -371,7 +371,7 @@ const AdminConfig = () => {
     "marketing_leads", "collaborator_payments"
   ] as string[];
 
-  const STORAGE_BUCKETS = ["tour-images", "company-documents", "customer-documents", "avatars"] as const;
+  const STORAGE_BUCKETS = ["tour-images", "company-documents", "customer-documents", "avatars", "vouchers", "financeiro"] as const;
 
   const handleBackup = async () => {
     setBackupLoading(true);
