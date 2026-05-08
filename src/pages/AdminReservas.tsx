@@ -856,22 +856,30 @@ const AdminReservas = () => {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Tipo de Serviço</Label>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-3 gap-2">
                         <Button 
                           type="button" 
                           variant={newForm.type === "tour" ? "default" : "outline"} 
                           onClick={() => setNewForm(f => ({ ...f, type: "tour", itemName: "" }))}
-                          className={cn("h-11 rounded-xl font-bold", newForm.type === "tour" && "shadow-lg shadow-primary/20")}
+                          className={cn("h-11 rounded-xl font-bold px-1", newForm.type === "tour" && "shadow-lg shadow-primary/20")}
                         >
-                          <Compass size={16} className="mr-2" /> Passeio
+                          <Compass size={16} className="mr-1 hidden sm:inline" /> Passeio
                         </Button>
                         <Button 
                           type="button" 
                           variant={newForm.type === "transfer" ? "default" : "outline"} 
                           onClick={() => setNewForm(f => ({ ...f, type: "transfer", itemName: "" }))}
-                          className={cn("h-11 rounded-xl font-bold", newForm.type === "transfer" && "shadow-lg shadow-primary/20")}
+                          className={cn("h-11 rounded-xl font-bold px-1", newForm.type === "transfer" && "shadow-lg shadow-primary/20")}
                         >
-                          <Car size={16} className="mr-2" /> Translado
+                          <Car size={16} className="mr-1 hidden sm:inline" /> Transf.
+                        </Button>
+                        <Button 
+                          type="button" 
+                          variant={newForm.type === "package" ? "default" : "outline"} 
+                          onClick={() => setNewForm(f => ({ ...f, type: "package", itemName: "" }))}
+                          className={cn("h-11 rounded-xl font-bold px-1", newForm.type === "package" && "shadow-lg shadow-primary/20")}
+                        >
+                          <PackageIcon size={16} className="mr-1 hidden sm:inline" /> Pacote
                         </Button>
                       </div>
                     </div>
@@ -902,7 +910,7 @@ const AdminReservas = () => {
 
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">
-                        {newForm.type === "tour" ? "Selecionar Passeio" : "Selecionar Rota"}
+                        {newForm.type === "tour" ? "Selecionar Passeio" : newForm.type === "package" ? "Selecionar Pacote" : "Selecionar Rota"}
                       </Label>
                       <select
                         value={newForm.itemName}
@@ -912,8 +920,10 @@ const AdminReservas = () => {
                       >
                         <option value="">Selecione um item...</option>
                         {newForm.type === "tour"
-                          ? tours.map(t => <option key={t.id} value={t.name}>{t.name} — {fmt(newForm.tourMode === "privativo" ? t.private_price : t.price)}</option>)
-                          : transfers.map(t => <option key={t.id} value={t.label}>{t.label} — {fmt(t.price)}</option>)
+                          ? tours.map(t => <option key={t.id} value={t.name}>{t.name} — {fmt(newForm.tourMode === "privativo" ? (newForm.partnerId ? t.partner_private_price || t.private_price : t.private_price) : (newForm.partnerId ? t.partner_price || t.price : t.price))}</option>)
+                          : newForm.type === "package"
+                            ? packages.map(p => <option key={p.id} value={p.name}>{p.name} — {fmt(newForm.partnerId ? p.partner_price || p.discount_price : p.discount_price)}</option>)
+                            : transfers.map(t => <option key={t.id} value={t.label}>{t.label} — {fmt(t.price)}</option>)
                         }
                       </select>
                     </div>
@@ -964,6 +974,19 @@ const AdminReservas = () => {
                           Cartão
                         </Button>
                       </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Parceiro (Tarifa Net)</Label>
+                      <select
+                        value={newForm.partnerId}
+                        onChange={(e) => setNewForm(f => ({ ...f, partnerId: e.target.value }))}
+                        className="w-full bg-primary/5 border border-primary/20 rounded-xl px-4 h-12 text-sm font-bold text-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                      >
+                        <option value="">Nenhum (Preço Público)</option>
+                        {partners.map(p => (
+                          <option key={p.id} value={p.id}>{p.name}</option>
+                        ))}
+                      </select>
                     </div>
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Vendedor</Label>
