@@ -403,6 +403,7 @@ export type Database = {
           descricao: string
           id: string
           observacoes: string | null
+          partner_id: string | null
           recebido_em: string | null
           status: string
           updated_at: string
@@ -418,6 +419,7 @@ export type Database = {
           descricao: string
           id?: string
           observacoes?: string | null
+          partner_id?: string | null
           recebido_em?: string | null
           status?: string
           updated_at?: string
@@ -433,6 +435,7 @@ export type Database = {
           descricao?: string
           id?: string
           observacoes?: string | null
+          partner_id?: string | null
           recebido_em?: string | null
           status?: string
           updated_at?: string
@@ -445,6 +448,13 @@ export type Database = {
             columns: ["booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contas_receber_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
             referencedColumns: ["id"]
           },
           {
