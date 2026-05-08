@@ -609,6 +609,18 @@ const TermoAssinatura = () => {
       // Also update sgs_risk_terms record with the PDF path
       await supabase.from("sgs_risk_terms").update({ pdf_url: filePath }).eq("id", currentTermId);
 
+      // 5. Update booking status if applicable
+      if (booking?.id) {
+        // If booking is pending, mark as confirmed now that it's signed
+        if (booking.status === 'pendente') {
+          await supabase.from("bookings").update({ 
+            status: "confirmada",
+            updated_at: new Date().toISOString()
+          }).eq("id", booking.id);
+          console.log("Booking status updated to confirmed after signing.");
+        }
+      }
+
       // Also save to generic Documents Module
       await supabase.from("documents").insert([{
         name: `Termo Assinado - ${booking?.item_name || term?.tour_name} - ${booking?.booking_code || 'SGS'}`,
