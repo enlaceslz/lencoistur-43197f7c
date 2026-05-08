@@ -1,0 +1,1 @@
+ALTER TABLE public.bookings DROP CONSTRAINT IF EXISTS fk_bookings_customer;
