@@ -170,13 +170,6 @@ export type Database = {
             referencedRelation: "partners"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "fk_bookings_customer"
-            columns: ["customer_id"]
-            isOneToOne: false
-            referencedRelation: "customers"
-            referencedColumns: ["id"]
-          },
         ]
       }
       collaborator_payments: {
