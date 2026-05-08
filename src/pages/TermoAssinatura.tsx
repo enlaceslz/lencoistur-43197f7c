@@ -43,7 +43,7 @@ const HEALTH_QUESTIONS = [
 const TermoAssinatura = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const bookingCode = params.get("booking") || "";
+  const bookingCode = params.get("booking")?.trim() || "";
   const bookingIdParam = params.get("booking_id") || "";
   const termId = params.get("id") || "";
   
