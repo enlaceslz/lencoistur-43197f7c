@@ -659,24 +659,39 @@ const TermoAssinatura = () => {
 
           <div className="p-6 space-y-6">
             {/* Booking Summary */}
-            <div className="bg-muted/50 rounded-2xl p-4 grid sm:grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Passeio / Atividade</p>
-                <p className="text-sm font-bold">{booking.item_name}</p>
+            {booking && (
+              <div className="bg-muted/50 rounded-2xl p-4 grid sm:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Passeio / Atividade</p>
+                  <p className="text-sm font-bold">{booking.item_name}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Data</p>
+                  <p className="text-sm font-bold">{new Date(booking.date + "T12:00").toLocaleDateString("pt-BR")}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Participante</p>
+                  <p className="text-sm font-bold">{booking.customers?.name || booking.customer_name}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Reserva</p>
+                  <p className="text-sm font-bold font-mono text-primary">{booking.booking_code}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Data</p>
-                <p className="text-sm font-bold">{new Date(booking.date + "T12:00").toLocaleDateString("pt-BR")}</p>
+            )}
+
+            {term && !booking && (
+              <div className="bg-muted/50 rounded-2xl p-4 grid sm:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Atividade</p>
+                  <p className="text-sm font-bold">{term.tour_name}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Participante</p>
+                  <p className="text-sm font-bold">{term.customers?.name || term.customer_name}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Participante</p>
-                <p className="text-sm font-bold">{booking.customers?.name || booking.customer_name}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Reserva</p>
-                <p className="text-sm font-bold font-mono text-primary">{booking.booking_code}</p>
-              </div>
-            </div>
+            )}
 
             {/* Description */}
             <div className="space-y-3">
