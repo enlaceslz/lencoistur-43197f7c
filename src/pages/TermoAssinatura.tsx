@@ -468,7 +468,7 @@ const TermoAssinatura = () => {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(7);
       doc.text(booking.customers?.name || booking.customer_name, 14, currentY + 19);
-      doc.text(`Assinado em: ${new Date().toLocaleString("pt-BR")}`, 14, currentY + 22);
+      doc.text(`${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}, ${new Date().toLocaleString("pt-BR")}`, 14, currentY + 22);
 
       // Companions Signatures
       const adultCompanions = companions.filter(c => c.is_adult && (signatures[c.id] || c.signature_data));
