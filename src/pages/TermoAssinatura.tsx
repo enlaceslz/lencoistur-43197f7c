@@ -189,8 +189,8 @@ const TermoAssinatura = () => {
           
           if (companionsData) setCompanions(companionsData);
 
-          const adultsNeedSigning = companionsData?.filter(c => c.is_adult && !c.signature_data).length === 0;
-          if (termData.signature_data && adultsNeedSigning) {
+          const allAdultsSigned = !companionsData || companionsData.filter(c => c.is_adult && !c.signature_data).length === 0;
+          if (termData.signature_data && allAdultsSigned) {
             setSigned(true);
           }
         } else if (bookingData) {
