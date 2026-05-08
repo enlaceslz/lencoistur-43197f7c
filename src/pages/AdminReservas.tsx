@@ -434,7 +434,17 @@ const AdminReservas = () => {
                   viewMode === "list" ? "shadow-lg shadow-primary/25 scale-[1.02]" : "text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5"
                 )}
               >
-                <List size={16} className="mr-2 md:w-[18px]" /> Lista
+                <LayoutGrid size={16} className="mr-2 md:w-[18px]" /> Cards
+              </Button>
+              <Button 
+                variant={viewMode === "table" ? "default" : "ghost"} 
+                onClick={() => setViewMode("table")}
+                className={cn(
+                  "flex-1 lg:flex-none h-11 md:h-12 px-4 md:px-8 rounded-xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] transition-all",
+                  viewMode === "table" ? "shadow-lg shadow-primary/25 scale-[1.02]" : "text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5"
+                )}
+              >
+                <List size={16} className="mr-2 md:w-[18px]" /> Tabela
               </Button>
               <Button 
                 variant={viewMode === "calendar" ? "default" : "ghost"} 
@@ -444,7 +454,7 @@ const AdminReservas = () => {
                   viewMode === "calendar" ? "shadow-lg shadow-primary/25 scale-[1.02]" : "text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5"
                 )}
               >
-                <LayoutGrid size={16} className="mr-2 md:w-[18px]" /> Agenda
+                <CalendarDays size={16} className="mr-2 md:w-[18px]" /> Agenda
               </Button>
             </div>
 
