@@ -79,26 +79,26 @@ const TermoAssinatura = () => {
       let termData = null;
 
       if (termId) {
-        const termRes = await supabase.from("sgs_risk_terms").select("*, customers(*)").eq("id", termId).maybeSingle();
+        const termRes = await supabase.from("sgs_risk_terms").select("*, customers!customer_id(*)").eq("id", termId).maybeSingle();
         if (termRes.data) {
           termData = termRes.data;
           if (termData.booking_id) {
-            const bookingRes = await supabase.from("bookings").select("*, customers(*)").eq("id", termData.booking_id).maybeSingle();
+            const bookingRes = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", termData.booking_id).maybeSingle();
             bookingData = bookingRes.data;
           } else if (bookingIdParam) {
-            const bookingRes = await supabase.from("bookings").select("*, customers(*)").eq("id", bookingIdParam).maybeSingle();
+            const bookingRes = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", bookingIdParam).maybeSingle();
             bookingData = bookingRes.data;
           }
         }
       } else if (bookingCode) {
-        const bookingRes = await supabase.from("bookings").select("*, customers(*)").eq("booking_code", bookingCode).maybeSingle();
+        const bookingRes = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("booking_code", bookingCode).maybeSingle();
         bookingData = bookingRes.data;
         if (bookingData) {
           const termRes = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
           termData = termRes.data;
         }
       } else if (bookingIdParam) {
-        const bookingRes = await supabase.from("bookings").select("*, customers(*)").eq("id", bookingIdParam).maybeSingle();
+        const bookingRes = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", bookingIdParam).maybeSingle();
         bookingData = bookingRes.data;
       }
 
