@@ -33,6 +33,8 @@ export interface BookingItem {
   collaboratorId?: string;
   collaboratorName?: string;
   partnerId?: string;
+  termStatus?: "pendente" | "assinado";
+  termPdfUrl?: string;
 }
 
 function generateBookingCode(): string {
@@ -50,6 +52,8 @@ function generatePixCode(): string {
 }
 
 function mapDbToBooking(row: any, customer?: any): BookingItem {
+  const term = row.sgs_risk_terms && row.sgs_risk_terms[0];
+  
   return {
     id: row.id,
     bookingCode: row.booking_code,
@@ -82,6 +86,8 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
     collaboratorId: row.collaborator_id || undefined,
     collaboratorName: row.collaborators?.name || undefined,
     partnerId: row.partner_id || undefined,
+    termStatus: term?.pdf_url ? "assinado" : "pendente",
+    termPdfUrl: term?.pdf_url || undefined,
   };
 }
 
@@ -93,7 +99,7 @@ export function useBookings() {
     setLoading(true);
     const { data: bookingsData } = await supabase
       .from("bookings")
-      .select("*, customers!fk_bookings_customer(*), collaborators(name)")
+      .select("*, customers!fk_bookings_customer(*), collaborators(name), sgs_risk_terms(pdf_url)")
       .order("created_at", { ascending: false });
 
     if (bookingsData) {

@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Calendar, Users, Copy, QrCode, Clock, CheckCircle, XCircle, AlertCircle, Printer, LogIn, Shield } from "lucide-react";
+import { Calendar, Users, Copy, QrCode, Clock, CheckCircle, XCircle, AlertCircle, Printer, LogIn, Shield, FileText } from "lucide-react";
 import { useBookings } from "@/hooks/useBookings";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { PrintReceiptButton } from "@/components/BookingReceipt";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { supabase } from "@/integrations/supabase/client";
 
 const statusConfig: Record<string, { label: string; className: string; icon: typeof CheckCircle }> = {
   confirmada: { label: "Confirmada", className: "bg-primary/10 text-primary", icon: CheckCircle },
@@ -221,12 +222,23 @@ const MinhasReservas = () => {
                             label="Ver Detalhes"
                           />
                         )}
-                        <Link
-                          to={`/assinatura-termo?booking=${b.bookingCode}`}
-                          className="bg-primary/10 text-primary px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary/20 transition-colors flex items-center gap-1"
-                        >
-                          <Shield size={14} /> Assinar Termo de Risco
-                        </Link>
+                        {b.termStatus === "assinado" ? (
+                          <a
+                            href={supabase.storage.from("customer-documents").getPublicUrl(b.termPdfUrl!).data.publicUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-green-500/10 text-green-600 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-500/20 transition-colors flex items-center gap-1"
+                          >
+                            <Shield size={14} /> Termo Assinado
+                          </a>
+                        ) : (
+                          <Link
+                            to={`/assinatura-termo?booking=${b.bookingCode}`}
+                            className="bg-primary/10 text-primary px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary/20 transition-colors flex items-center gap-1"
+                          >
+                            <Shield size={14} /> Assinar Termo de Risco
+                          </Link>
+                        )}
                       </div>
                     </div>
                   )}
@@ -270,12 +282,23 @@ const MinhasReservas = () => {
                           <p>Cancelar reserva confirmada</p>
                         </TooltipContent>
                       </Tooltip>
-                      <Link
-                        to={`/assinatura-termo?booking=${b.bookingCode}`}
-                        className="bg-primary/10 text-primary px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary/20 transition-colors flex items-center gap-1"
-                      >
-                        <Shield size={14} /> Assinar Termo de Risco
-                      </Link>
+                      {b.termStatus === "assinado" ? (
+                        <a
+                          href={supabase.storage.from("customer-documents").getPublicUrl(b.termPdfUrl!).data.publicUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-green-500/10 text-green-600 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-500/20 transition-colors flex items-center gap-1"
+                        >
+                          <Shield size={14} /> Termo Assinado
+                        </a>
+                      ) : (
+                        <Link
+                          to={`/assinatura-termo?booking=${b.bookingCode}`}
+                          className="bg-primary/10 text-primary px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary/20 transition-colors flex items-center gap-1"
+                        >
+                          <Shield size={14} /> Assinar Termo de Risco
+                        </Link>
+                      )}
                     </div>
                   )}
 

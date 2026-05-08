@@ -969,8 +969,16 @@ const AdminReservas = () => {
                         <Shield size={16} />
                         <span className="text-sm font-bold uppercase tracking-tight">Termo de Risco</span>
                       </div>
-                      <Badge variant="outline" className="bg-white/50 text-amber-600 border-amber-200 text-[10px]">
-                        SGS ISO 21103
+                      <Badge 
+                        variant="outline" 
+                        className={cn(
+                          "text-[10px]",
+                          selected.termStatus === "assinado" 
+                            ? "bg-green-100 text-green-700 border-green-200" 
+                            : "bg-white/50 text-amber-600 border-amber-200"
+                        )}
+                      >
+                        {selected.termStatus === "assinado" ? "ASSINADO" : "PENDENTE"}
                       </Badge>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -1000,16 +1008,33 @@ const AdminReservas = () => {
                           <Smartphone size={14} className="mr-2" /> WhatsApp
                         </a>
                       </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="bg-amber-600 text-white border-transparent hover:bg-amber-700 h-9"
-                        asChild
-                      >
-                        <a href={`/assinatura-termo?booking=${selected.bookingCode}`} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink size={14} className="mr-2" /> Abrir Termo
-                        </a>
-                      </Button>
+                      {selected.termStatus === "assinado" ? (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-green-600 text-white border-transparent hover:bg-green-700 h-9"
+                          asChild
+                        >
+                          <a 
+                            href={supabase.storage.from("customer-documents").getPublicUrl(selected.termPdfUrl!).data.publicUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
+                            <FileText size={14} className="mr-2" /> Ver Termo
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-amber-600 text-white border-transparent hover:bg-amber-700 h-9"
+                          asChild
+                        >
+                          <a href={`/assinatura-termo?booking=${selected.bookingCode}`} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink size={14} className="mr-2" /> Abrir Termo
+                          </a>
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
