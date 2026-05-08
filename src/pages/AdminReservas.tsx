@@ -19,7 +19,7 @@ import {
   MapPin, Phone, Mail, CheckCircle2, MessageSquare, Download, Printer,
   Plus, Copy, Pencil, Car, Compass, LayoutGrid, List, X, XCircle as XCircleIcon,
   ChevronRight, ArrowRight, User, Hash, Info, Moon, Save, Package as PackageIcon,
-  Shield, ExternalLink
+  Shield, ExternalLink, Trash2
 } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -63,7 +63,7 @@ interface TransferOption { id: string; label: string; price: number; partner_pri
 // Utilizando máscaras de @/lib/masks.ts
 
 const AdminReservas = () => {
-  const { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes } = useBookings();
+  const { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, deleteBooking, completeBooking, updateBookingNotes } = useBookings();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
   const [dateStart, setDateStart] = useState("");
@@ -315,7 +315,7 @@ const AdminReservas = () => {
 
   const handleAction = async (action: () => Promise<void>, successMsg: string, isCancellation = false) => {
     if (isCancellation) {
-      const confirm = window.confirm("⚠️ Tem certeza que deseja cancelar esta reserva?\n\nO status será alterado para 'Cancelada'.");
+      const confirm = window.confirm("⚠️ Tem certeza que deseja cancelar esta reserva?\n\nO status será alterado para 'Cancelada'. Para excluir permanentemente, use o botão 'Excluir'.");
       if (!confirm) return;
     }
     setActionLoading(true);
@@ -325,6 +325,21 @@ const AdminReservas = () => {
       setSelected(null);
     } catch {
       toast.error("Erro ao executar ação.");
+    }
+    setActionLoading(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    const confirm = window.confirm("🚨 EXCLUIR RESERVA PERMANENTEMENTE?\n\nEsta ação não pode ser desfeita e removerá todos os registros financeiros associados.");
+    if (!confirm) return;
+    
+    setActionLoading(true);
+    try {
+      await deleteBooking(id);
+      toast.success("Reserva excluída permanentemente.");
+      setSelected(null);
+    } catch (err: any) {
+      toast.error(err?.message || "Erro ao excluir reserva.");
     }
     setActionLoading(false);
   };
@@ -565,71 +580,80 @@ const AdminReservas = () => {
 
 
                 {/* Footer with Price and Actions */}
-                <div className="flex items-center justify-between pt-4 md:pt-6 border-t border-border/40">
-                  <div>
-                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-0.5 md:mb-1">
-                      {booking.publicTotal && booking.publicTotal !== booking.finalTotal ? "Valor Líquido" : "Valor Total"}
-                    </span>
-                    <div className="flex flex-col">
-                      <p className="text-xl md:text-2xl font-black text-foreground tracking-tighter leading-none">{fmt(booking.finalTotal)}</p>
-                      {booking.publicTotal && booking.publicTotal !== booking.finalTotal && (
-                        <span className="text-[8px] font-bold text-muted-foreground/40 uppercase mt-1">Venda: {fmt(booking.publicTotal)}</span>
-                      )}
+                <div className="flex flex-col gap-4 pt-4 md:pt-6 border-t border-border/40">
+                  <div className="flex items-center justify-between w-full">
+                    <div>
+                      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-0.5 md:mb-1">
+                        {booking.publicTotal && booking.publicTotal !== booking.finalTotal ? "Valor Líquido (NET)" : "Valor Total"}
+                      </span>
+                      <div className="flex flex-col">
+                        <p className="text-xl md:text-2xl font-black text-foreground tracking-tighter leading-none">
+                          {fmt(booking.finalTotal)}
+                        </p>
+                        {booking.publicTotal && booking.publicTotal !== booking.finalTotal && (
+                          <span className="text-[8px] font-bold text-muted-foreground/40 uppercase mt-1">Venda Site: {fmt(booking.publicTotal)}</span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex gap-1.5 md:gap-2">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            onClick={() => setSelected(booking)}
-                            className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl bg-white/50 dark:bg-white/5 hover:bg-primary hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10"
-                          >
-                            <Eye size={16} className="md:w-[18px]" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Ver Detalhes</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-
                     
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            onClick={() => openEdit(booking)}
-                            className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl bg-white/50 dark:bg-white/5 hover:bg-amber-500 hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10"
-                          >
-                            <Pencil size={16} className="md:w-[18px]" />
-                          </Button>
-
-                        </TooltipTrigger>
-                        <TooltipContent>Editar Reserva</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-
-                    {booking.status !== "cancelada" && (
+                    <div className="flex gap-1.5 md:gap-2">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button 
                               variant="ghost" 
                               size="icon" 
-                              onClick={() => handleAction(() => cancelBooking(booking.id), "Reserva cancelada com sucesso.", true)}
-                              className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl bg-white/50 dark:bg-white/5 hover:bg-rose-500 hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10 text-rose-500"
+                              onClick={() => setSelected(booking)}
+                              className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl bg-white/50 dark:bg-white/5 hover:bg-primary hover:text-white transition-all duration-300 border border-white/40 dark:border-white/10"
                             >
-                              <Ban size={16} className="md:w-[18px]" />
+                              <Eye size={16} className="md:w-[18px]" />
                             </Button>
-
                           </TooltipTrigger>
-                          <TooltipContent>Cancelar Reserva</TooltipContent>
+                          <TooltipContent>Ver Detalhes</TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
+
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => openEdit(booking)}
+                              className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl bg-white/50 dark:bg-white/5 hover:bg-amber-500 hover:text-white transition-all duration-300 border border-white/40 dark:border-white/10"
+                            >
+                              <Pencil size={16} className="md:w-[18px]" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Editar</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 w-full">
+                    {booking.status !== "cancelada" && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleAction(() => cancelBooking(booking.id), "Reserva cancelada.", true)}
+                        className="h-9 md:h-10 rounded-xl border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white transition-all duration-300 font-bold text-[10px] uppercase tracking-widest"
+                      >
+                        <Ban size={14} className="mr-2" /> Cancelar
+                      </Button>
                     )}
+                    
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleDelete(booking.id)}
+                      className={cn(
+                        "h-9 md:h-10 rounded-xl border-slate-200 text-slate-400 hover:bg-rose-600 hover:text-white hover:border-transparent transition-all duration-300 font-bold text-[10px] uppercase tracking-widest",
+                        booking.status === "cancelada" && "col-span-2"
+                      )}
+                    >
+                      <Trash2 size={14} className="mr-2" /> Excluir
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -861,33 +885,50 @@ const AdminReservas = () => {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 pt-2 flex-wrap">
-                <Button variant="outline" onClick={() => { setSelected(null); openEdit(selected); }} disabled={actionLoading} className="flex-1 min-w-[140px]">
-                  <Pencil size={16} className="mr-2" /> Editar Reserva
+              <div className="flex gap-3 pt-4 flex-wrap border-t border-slate-200 mt-6">
+                <Button variant="outline" onClick={() => { setSelected(null); openEdit(selected); }} disabled={actionLoading} className="flex-1 min-w-[140px] border-slate-300">
+                  <Pencil size={16} className="mr-2 text-amber-500" /> Editar Reserva
                 </Button>
+                
                 {selected.status === "pendente" && selected.paymentStatus === "pendente" && (
-                  <Button onClick={() => handleAction(() => confirmPayment(selected.id), "Pagamento confirmado!")} disabled={actionLoading} className="flex-1 min-w-[140px]">
+                  <Button onClick={() => handleAction(() => confirmPayment(selected.id), "Pagamento confirmado!")} disabled={actionLoading} className="flex-1 min-w-[140px] bg-emerald-600 hover:bg-emerald-700">
                     {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle size={16} className="mr-2" />}
                     Confirmar Pagamento
                   </Button>
                 )}
+                
                 {selected.status === "confirmada" && (
                   <Button variant="secondary" onClick={() => handleAction(() => completeBooking(selected.id), "Reserva concluída!")} disabled={actionLoading} className="flex-1 min-w-[140px]">
                     {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
-                    Marcar Concluída
+                    Concluir Serviço
                   </Button>
                 )}
+                
                 {selected.status !== "cancelada" && (
                   <Button 
-                    variant="destructive" 
-                    onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada com sucesso.", true)} 
+                    variant="outline" 
+                    onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada.", true)} 
                     disabled={actionLoading} 
-                    className="flex-1 min-w-[140px]"
+                    className="flex-1 min-w-[140px] border-rose-200 text-rose-600 hover:bg-rose-50"
                   >
                     {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
-                    Cancelar Reserva
+                    Cancelar
                   </Button>
                 )}
+
+                <Button 
+                  variant="destructive" 
+                  onClick={() => handleDelete(selected.id)} 
+                  disabled={actionLoading} 
+                  className="flex-1 min-w-[140px] bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-200"
+                >
+                  {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Trash2 size={16} className="mr-2" />}
+                  Excluir Permanente
+                </Button>
+              </div>
+              
+              {/* Other Actions Group */}
+              <div className="flex flex-col sm:flex-row gap-3 mt-4 pt-4 border-t border-slate-100">
                 {/* Print Receipt */}
                 {selected.payMethod !== "info" && (
                   <PrintReceiptButton
@@ -915,7 +956,7 @@ const AdminReservas = () => {
                       cpf: selected.cpf,
                       passport: selected.passport,
                     }}
-                    className="flex-1 min-w-[140px]"
+                    className="flex-1"
                     label="Imprimir Recibo"
                   />
                 )}
@@ -925,10 +966,10 @@ const AdminReservas = () => {
                     href={`https://wa.me/${selected.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}! Sobre sua reserva ${selected.bookingCode} - ${selected.itemName}.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex"
+                    className="flex-1"
                   >
-                    <Button variant="outline" size="sm" className="text-green-600">
-                      📱 WhatsApp
+                    <Button variant="outline" className="w-full text-green-600 border-green-200 hover:bg-green-50 h-10">
+                      📱 Enviar no WhatsApp
                     </Button>
                   </a>
                 )}

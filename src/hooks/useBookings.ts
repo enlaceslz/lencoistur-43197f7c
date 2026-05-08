@@ -309,6 +309,33 @@ export function useBookings() {
     if (error) throw error;
   }, []);
 
+  const deleteBooking = useCallback(async (id: string) => {
+    const { error: bookingError } = await supabase
+      .from("bookings")
+      .delete()
+      .eq("id", id);
+    
+    if (bookingError) throw bookingError;
+
+    // Também remover do financeiro (Contas a Receber)
+    await supabase
+      .from("contas_receber")
+      .delete()
+      .eq("booking_id", id);
+    
+    // Remover do financeiro (Contas a Pagar)
+    await supabase
+      .from("contas_pagar")
+      .delete()
+      .eq("booking_id", id);
+      
+    // Remover do histórico de colaboradores
+    await supabase
+      .from("collaborator_payments")
+      .delete()
+      .eq("booking_id", id);
+  }, []);
+
   const updateBooking = useCallback(async (id: string, customerId: string, data: any) => {
     const { error: customerError } = await supabase
       .from("customers")
@@ -336,7 +363,7 @@ export function useBookings() {
         unit_price: data.unitPrice,
         total: data.total,
         discount: data.discount,
-         final_total: data.finalTotal,
+        final_total: data.finalTotal,
         public_unit_price: data.publicUnitPrice || null,
         public_total: data.publicTotal || null,
         notes: data.notes,
@@ -348,5 +375,5 @@ export function useBookings() {
     if (bookingError) throw bookingError;
   }, []);
 
-  return { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, completeBooking, updateBookingNotes, refresh: fetchBookings };
+  return { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, deleteBooking, completeBooking, updateBookingNotes, refresh: fetchBookings };
 }

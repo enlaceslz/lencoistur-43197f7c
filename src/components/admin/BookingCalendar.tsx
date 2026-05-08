@@ -141,17 +141,17 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
       </div>
 
       <Card className="border-none shadow-2xl shadow-primary/5 overflow-hidden glass-card rounded-2xl md:rounded-[2.5rem] border border-white/20">
-        <div className="grid grid-cols-7 border-b border-border/40 bg-muted/20 backdrop-blur-sm">
+        <div className="grid grid-cols-7 border-b border-border/60 bg-muted/30 backdrop-blur-sm divide-x divide-border/60 border-l border-border/60">
           {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(day => (
-            <div key={day} className="py-3 md:py-5 text-center">
-              <span className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.1em] md:tracking-[0.25em] text-primary/60">
+            <div key={day} className="py-3 md:py-4 text-center border-t border-border/60">
+              <span className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.1em] md:tracking-[0.2em] text-slate-600 dark:text-slate-300">
                 {day}
               </span>
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-7 bg-background/50 divide-x divide-y divide-border/20">
+        <div className="grid grid-cols-7 bg-background/50 divide-x divide-y divide-border/60 border-t border-l border-border/60">
           {calendarDays.map((day, idx) => {
             const dateKey = format(day, 'yyyy-MM-dd');
             const dayBookings = filteredBookingsByDay[dateKey] || [];
@@ -165,10 +165,10 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: idx * 0.005 }}
                 className={cn(
-                  "min-h-[120px] md:min-h-[220px] p-2 md:p-5 transition-all relative group/cell flex flex-col border-r border-b border-border/10",
-                  !isCurrentMonth && "bg-muted/5 opacity-30 grayscale-[0.2]",
-                  isTodayDay && "bg-primary/[0.08] ring-2 md:ring-4 ring-inset ring-primary/40 z-10",
-                  dayBookings.length > 0 && isCurrentMonth && "bg-gradient-to-br from-white/10 to-primary/[0.05]"
+                  "min-h-[120px] md:min-h-[220px] p-2 md:p-5 transition-all relative group/cell flex flex-col border-r border-b border-border/60",
+                  !isCurrentMonth && "bg-slate-50/50 dark:bg-slate-900/50 opacity-40 grayscale-[0.5]",
+                  isTodayDay && "bg-primary/[0.05] ring-1 md:ring-2 ring-inset ring-primary/60 z-10",
+                  dayBookings.length > 0 && isCurrentMonth && "bg-gradient-to-br from-white/10 to-primary/[0.03]"
                 )}
               >
                 <div className="flex items-start justify-between mb-2 md:mb-4">
