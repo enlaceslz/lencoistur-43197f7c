@@ -650,10 +650,10 @@ const AdminReservas = () => {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        onClick={() => handleAction(() => cancelBooking(booking.id), "Reserva cancelada.", true)}
+                        onClick={() => handleAction(() => deleteBooking(booking.id), "Reserva cancelada e removida.", true)}
                         className="h-9 md:h-10 rounded-xl border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white transition-all duration-300 font-bold text-[10px] uppercase tracking-widest"
                       >
-                        <Ban size={14} className="mr-2" /> Cancelar
+                        <Ban size={14} className="mr-2" /> Cancelar/Excluir
                       </Button>
                     )}
                     
