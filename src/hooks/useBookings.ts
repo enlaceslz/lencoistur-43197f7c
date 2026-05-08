@@ -99,7 +99,7 @@ export function useBookings() {
     setLoading(true);
     const { data: bookingsData } = await supabase
       .from("bookings")
-      .select("*, customers!fk_bookings_customer(*), collaborators(name)")
+      .select("*, customers!fk_bookings_customer(*), collaborators(name), sgs_risk_terms(pdf_url)")
       .order("created_at", { ascending: false });
 
     if (bookingsData) {
