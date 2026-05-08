@@ -315,7 +315,7 @@ const AdminReservas = () => {
 
   const handleAction = async (action: () => Promise<void>, successMsg: string, isCancellation = false) => {
     if (isCancellation) {
-      const confirm = window.confirm("⚠️ Tem certeza que deseja cancelar esta reserva?\n\nO status será alterado para 'Cancelada'.");
+      const confirm = window.confirm("⚠️ Tem certeza que deseja cancelar esta reserva?\n\nO status será alterado para 'Cancelada'. Para excluir permanentemente, use o botão 'Excluir'.");
       if (!confirm) return;
     }
     setActionLoading(true);
@@ -325,6 +325,21 @@ const AdminReservas = () => {
       setSelected(null);
     } catch {
       toast.error("Erro ao executar ação.");
+    }
+    setActionLoading(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    const confirm = window.confirm("🚨 EXCLUIR RESERVA PERMANENTEMENTE?\n\nEsta ação não pode ser desfeita e removerá todos os registros financeiros associados.");
+    if (!confirm) return;
+    
+    setActionLoading(true);
+    try {
+      await deleteBooking(id);
+      toast.success("Reserva excluída permanentemente.");
+      setSelected(null);
+    } catch (err: any) {
+      toast.error(err?.message || "Erro ao excluir reserva.");
     }
     setActionLoading(false);
   };
