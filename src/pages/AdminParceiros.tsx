@@ -98,6 +98,8 @@ const AdminParceiros = () => {
   const [cnpjLoading, setCnpjLoading] = useState(false);
   const [viewPartner, setViewPartner] = useState<Partner | null>(null);
   const [company, setCompany] = useState<any>(null);
+  const [receivableDialogOpen, setReceivableDialogOpen] = useState(false);
+  const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   
   const [form, setForm] = useState({
     name: "", type: "hotel", contact_name: "", phone: "", email: "",
@@ -105,6 +107,10 @@ const AdminParceiros = () => {
     remuneration_type: "comissao_percent", remuneration_value: "0",
     bank_name: "", bank_agency: "", bank_account: "", bank_pix_key: "",
     credit_limit: "0", tags: ""
+  });
+
+  const [receivableForm, setReceivableForm] = useState({
+    valor: "0", descricao: "", vencimento: new Date().toISOString().slice(0, 10), categoria: "comissao"
   });
 
   const [typeForm, setTypeForm] = useState({
