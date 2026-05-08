@@ -31,8 +31,16 @@ const CheckoutPage = () => {
   const [pkg, setPkg] = useState<any>(null);
   const [loadingItem, setLoadingItem] = useState(true);
 
+  const [partner, setPartner] = useState<any>(null);
+  const partnerId = params.get("partner_id");
+
   useEffect(() => {
     const load = async () => {
+      if (partnerId) {
+        const { data: partnerData } = await supabase.from("partners").select("*").eq("id", partnerId).maybeSingle();
+        if (partnerData) setPartner(partnerData);
+      }
+
       if (type === "tour" && slug) {
         const { data } = await supabase.from("tours").select("*").eq("slug", slug).single();
         setTour(data);
@@ -51,51 +59,43 @@ const CheckoutPage = () => {
         
         if (data) {
           setPkg({
+            id: data.id,
             name: data.name,
             slug: data.slug,
-            price: data.discount_price
+            price: data.discount_price,
+            partner_price: data.partner_price
           });
         }
       }
       setLoadingItem(false);
     };
     load();
-  }, [type, slug, transferId, packageSlug, packageId]);
+  }, [type, slug, transferId, packageSlug, packageId, partnerId]);
 
   const isPrivate = tourMode === "privativo";
   const itemName = tour ? `${tour.name}${isPrivate ? " (Privativo)" : " (Coletivo)"}` : (pkg ? pkg.name : (transfer ? `${transfer.origin} → ${transfer.destination}` : ""));
-  const unitPrice = tour ? (isPrivate ? (tour.private_price || 130000) : tour.price) : (pkg ? pkg.price : (transfer?.price || 0));
-  const pixDiscountPercent = tour?.pix_discount || transfer?.pix_discount || (pkg ? 5 : 0);
+  
+  let unitPrice = 0;
+  if (tour) {
+    if (partner) {
+      unitPrice = isPrivate ? (tour.partner_private_price || tour.private_price || 110000) : (tour.partner_price || tour.price);
+    } else {
+      unitPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
+    }
+  } else if (pkg) {
+    unitPrice = partner ? (pkg.partner_price || pkg.price) : pkg.price;
+  } else if (transfer) {
+    unitPrice = transfer.price || 0;
+  }
+
+  const pixDiscountPercent = partner ? 0 : (tour?.pix_discount || transfer?.pix_discount || (pkg ? 5 : 0));
   const image = tour?.images?.[0] || "";
   const location = tour?.location || (pkg ? "Santo Amaro" : (transfer ? `${transfer.origin} → ${transfer.destination}` : ""));
 
   const [payMethod, setPayMethod] = useState<"pix" | "card" | "info">("pix");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [notes, setNotes] = useState("");
-  const [nationality, setNationality] = useState<"br" | "foreign">("br");
-  const [passport, setPassport] = useState("");
-  const [country, setCountry] = useState("Brasil");
-  const [birthDate, setBirthDate] = useState("");
-  const [companions, setCompanions] = useState<{ name: string; cpf: string; birthDate: string }[]>([]);
-  const [confirmedBooking, setConfirmedBooking] = useState<BookingItem | null>(null);
-  const [pixCopied, setPixCopied] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
+// ... keep existing code
     if (guests > 1) {
-      const count = guests - 1;
-      setCompanions(prev => {
-        const newCompanions = [...prev];
-        if (newCompanions.length < count) {
-          for (let i = newCompanions.length; i < count; i++) {
-            newCompanions.push({ name: "", cpf: "", birthDate: "" });
-          }
-        }
-        return newCompanions.slice(0, count);
-      });
+// ... keep existing code
     } else {
       setCompanions([]);
     }
@@ -141,6 +141,7 @@ const CheckoutPage = () => {
         country: nationality === "foreign" ? country : "Brasil",
         birthDate: birthDate || undefined,
         companions: companions.filter(c => c.name.trim() !== ""),
+        partnerId: partnerId || undefined,
       });
       setConfirmedBooking(booking);
     } catch (error) {
@@ -349,6 +350,19 @@ const CheckoutPage = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Form */}
           <form onSubmit={handleSubmit} className="lg:col-span-2 space-y-6">
+            {partner && (
+              <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 flex items-center gap-3 animate-in-fade">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <Building2 size={20} />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-primary/60 leading-none mb-1">Reserva via Parceiro</p>
+                  <p className="text-sm font-bold text-slate-800">{partner.name}</p>
+                </div>
+                <Badge className="ml-auto bg-primary text-white font-bold border-none">Tarifa Líquida</Badge>
+              </div>
+            )}
+            
             {/* Personal info */}
             <div className="bg-card border border-border rounded-2xl p-6 space-y-4">
               <h2 className="font-display text-lg font-bold text-foreground">Dados Pessoais</h2>
