@@ -722,6 +722,20 @@ const AdminReservas = () => {
               {/* Financials */}
               <div className="bg-muted rounded-xl p-4">
                 <h4 className="font-semibold text-sm text-foreground mb-2">Financeiro</h4>
+                
+                {selected.publicTotal && selected.publicTotal !== selected.finalTotal ? (
+                  <div className="space-y-1 mb-2">
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>Valor de Venda (Cliente)</span>
+                      <span>{fmt(selected.publicTotal)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs font-bold text-blue-600 border-b border-border/50 pb-2">
+                      <span>Valor Líquido (A Receber)</span>
+                      <span>{fmt(selected.finalTotal)}</span>
+                    </div>
+                  </div>
+                ) : null}
+
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Subtotal ({selected.guests}x {fmt(selected.unitPrice)})</span>
                   <span>{fmt(selected.total)}</span>
@@ -733,7 +747,7 @@ const AdminReservas = () => {
                   </div>
                 )}
                 <div className="flex justify-between font-bold text-foreground border-t border-border mt-2 pt-2">
-                  <span>Total</span>
+                  <span>Total Final</span>
                   <span>{fmt(selected.finalTotal)}</span>
                 </div>
               </div>
