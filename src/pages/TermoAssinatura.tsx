@@ -305,14 +305,14 @@ const TermoAssinatura = () => {
         
         if (!existingMinor) {
           // If it's a new companion for this term
-          const { error: minorError } = await supabase.from("sgs_risk_term_minors").insert({
+          const { error: minorError } = await supabase.from("sgs_risk_term_minors").insert([{
             risk_term_id: currentTermId,
             full_name: companion.full_name,
             is_adult: companion.is_adult,
             responsible_name: companion.responsible_name,
             signature_data: signature,
             signed_at: signature ? new Date().toISOString() : null
-          });
+          }]);
           if (minorError) console.error("Error inserting companion:", minorError);
         } else {
           // It's an existing companion record, just update signature if provided
