@@ -888,6 +888,8 @@ const AdminReservas = () => {
                       total: selected.total,
                       discount: selected.discount,
                       finalTotal: selected.finalTotal,
+                      publicUnitPrice: selected.publicUnitPrice,
+                      publicTotal: selected.publicTotal,
                       payMethod: selected.payMethod,
                       paymentStatus: selected.paymentStatus,
                       status: selected.status,
