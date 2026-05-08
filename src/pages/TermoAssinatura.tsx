@@ -337,10 +337,15 @@ const TermoAssinatura = () => {
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
       
+      // Border
+      doc.setDrawColor(0);
+      doc.setLineWidth(0.5);
+      doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
+      
       // Load Logo
       if (company?.logo_url) {
         try {
-          doc.addImage(company.logo_url, 'PNG', 14, 8, 35, 15);
+          doc.addImage(company.logo_url, 'PNG', 14, 10, 35, 15);
         } catch (e) {
           console.error("Error adding logo to PDF:", e);
         }
@@ -348,28 +353,28 @@ const TermoAssinatura = () => {
       
       // Header Info
       doc.setFontSize(8);
-      doc.setTextColor(100, 100, 100);
+      doc.setTextColor(60, 60, 60);
       const companyName = company?.razao_social || company?.nome_fantasia || "LENÇÓIS TOUR";
       const companyCNPJ = company?.cnpj || "";
       const companyAddress = `${company?.endereco || ""}, ${company?.cidade || ""}-${company?.estado || ""}`;
       
-      doc.text(companyName, pageWidth - 14, 12, { align: "right" });
-      doc.text(`CNPJ: ${companyCNPJ}`, pageWidth - 14, 16, { align: "right" });
-      doc.text(companyAddress, pageWidth - 14, 20, { align: "right" });
+      doc.text(companyName, pageWidth - 14, 14, { align: "right" });
+      doc.text(`CNPJ: ${companyCNPJ}`, pageWidth - 14, 18, { align: "right" });
+      doc.text(companyAddress, pageWidth - 14, 22, { align: "right" });
       
-      doc.setDrawColor(220, 220, 220);
-      doc.line(14, 25, pageWidth - 14, 25);
+      doc.setDrawColor(200, 200, 200);
+      doc.line(14, 28, pageWidth - 14, 28);
       
       // Title
-      doc.setFontSize(13);
+      doc.setFontSize(14);
       doc.setTextColor(0, 0, 0);
       doc.setFont("helvetica", "bold");
-      doc.text("Termo de Ciência de Risco e Corresponsabilidade", pageWidth / 2, 33, { align: "center" });
-      doc.setFontSize(8);
+      doc.text("Termo de Ciência de Risco e Corresponsabilidade", pageWidth / 2, 36, { align: "center" });
+      doc.setFontSize(9);
       doc.setFont("helvetica", "normal");
-      doc.text("Sistema de Gestão de Segurança (SGS) - ISO 21103", pageWidth / 2, 38, { align: "center" });
+      doc.text("Sistema de Gestão de Segurança (SGS) - ISO 21103", pageWidth / 2, 42, { align: "center" });
       
-      let currentY = 44;
+      let currentY = 48;
       
       // Booking Info (Table)
       autoTable(doc, {
@@ -379,43 +384,43 @@ const TermoAssinatura = () => {
           ["Atividade:", booking.item_name, "Data:", new Date(booking.date + "T12:00").toLocaleDateString("pt-BR")],
           ["Documento:", booking.customers?.cpf || "Não informado", "Local:", `${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}`],
         ],
-        theme: 'plain',
-        styles: { fontSize: 8, cellPadding: 0.8 },
+        theme: 'grid',
+        styles: { fontSize: 8, cellPadding: 1.5, lineColor: [200, 200, 200] },
         columnStyles: { 
-          0: { fontStyle: 'bold', cellWidth: 20 },
-          1: { cellWidth: 70 },
-          2: { fontStyle: 'bold', cellWidth: 20 },
+          0: { fontStyle: 'bold', fillColor: [245, 245, 245], cellWidth: 25 },
+          1: { cellWidth: 65 },
+          2: { fontStyle: 'bold', fillColor: [245, 245, 245], cellWidth: 25 },
           3: { cellWidth: 40 }
         }
       });
       
-      currentY = (doc as any).lastAutoTable.finalY + 6;
+      currentY = (doc as any).lastAutoTable.finalY + 8;
       
       // Content Sections - Optimized for 1 page
-      const addSection = (title: string, content: string, fontSize = 7) => {
+      const addSection = (title: string, content: string, fontSize = 7.5) => {
         doc.setFontSize(9);
         doc.setFont("helvetica", "bold");
         doc.text(title, 14, currentY);
-        currentY += 4;
+        currentY += 5;
         doc.setFontSize(fontSize);
         doc.setFont("helvetica", "normal");
         const lines = doc.splitTextToSize(content, pageWidth - 28);
         doc.text(lines, 14, currentY);
-        currentY += (lines.length * (fontSize / 2.5)) + 4;
+        currentY += (lines.length * (fontSize / 2.5)) + 6;
       };
 
       const recText = company?.term_recommendations || "Atividade de turismo de aventura que requer atenção às normas de segurança e uso de equipamentos adequados.";
-      addSection("Recomendações e Informações:", recText, 7);
+      addSection("Recomendações e Informações:", recText);
       
       if (company?.term_safety_risks) {
-        addSection("Riscos e Segurança:", company.term_safety_risks, 7);
+        addSection("Riscos e Segurança:", company.term_safety_risks);
       }
 
       // Risks Checklist (Compact)
       doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
       doc.text("Ciência de Riscos:", 14, currentY);
-      currentY += 3;
+      currentY += 4;
       
       const risksSplit = [];
       for (let i = 0; i < acceptedRisks.length; i += 2) {
@@ -429,58 +434,58 @@ const TermoAssinatura = () => {
         startY: currentY,
         body: risksSplit,
         theme: 'plain',
-        styles: { fontSize: 7, cellPadding: 0.5 },
+        styles: { fontSize: 7.5, cellPadding: 0.5 },
       });
       
-      currentY = (doc as any).lastAutoTable.finalY + 5;
+      currentY = (doc as any).lastAutoTable.finalY + 6;
 
-      // Health Info
+      // Health Info & Declaration
       if (healthInfo.length > 0) {
-        doc.setFontSize(8);
+        doc.setFontSize(8.5);
         doc.setFont("helvetica", "bold");
-        doc.text(`Saúde: ${healthInfo.join(", ")}`, 14, currentY);
-        currentY += 5;
+        doc.text(`Informações de Saúde: ${healthInfo.join(", ")}`, 14, currentY);
+        currentY += 6;
       }
 
-      // Declaration
       const declaration = `Declaro que fui informado sobre os riscos inerentes à atividade e procedimentos de segurança. Comprometo-me a seguir as orientações da equipe e assumo a corresponsabilidade por meus atos. Esta operação segue a NBR ISO 21103.`;
-      doc.setFontSize(7.5);
+      doc.setFontSize(8);
       doc.setFont("helvetica", "italic");
       const declLines = doc.splitTextToSize(declaration, pageWidth - 28);
       doc.text(declLines, 14, currentY);
-      currentY += (declLines.length * 3.5) + 6;
+      currentY += (declLines.length * 4) + 10;
 
       // Signatures Area
       const signatureY = currentY;
       
       // Main Participant
-      doc.setFontSize(8);
+      doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
       doc.text("Assinatura do Participante:", 14, signatureY);
-      doc.addImage(signatureData, 'PNG', 14, signatureY + 2, 35, 12);
+      doc.addImage(signatureData, 'PNG', 14, signatureY + 2, 45, 15);
+      
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(7.5);
-      doc.text(booking.customers?.name || booking.customer_name, 14, signatureY + 16);
-      doc.text(`${company?.cidade || "Santo Amaro"}, ${new Date().toLocaleDateString("pt-BR")}`, 14, signatureY + 20);
+      doc.setFontSize(8);
+      doc.text(booking.customers?.name || booking.customer_name, 14, signatureY + 20);
+      doc.text(`${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}, ${new Date().toLocaleDateString("pt-BR")}`, 14, signatureY + 24);
 
       // Companions Signatures (if any)
       const adultCompanions = companions.filter(c => c.is_adult && (signatures[c.id] || c.signature_data));
       if (adultCompanions.length > 0) {
-        let compX = 70;
+        let compX = 85;
         let compY = signatureY;
         
-        adultCompanions.forEach((comp, idx) => {
+        adultCompanions.forEach((comp) => {
           const sig = signatures[comp.id] || comp.signature_data;
           if (sig) {
             if (compX + 60 > pageWidth) {
               compX = 14;
-              compY += 25;
+              compY += 30;
             }
-            doc.setFontSize(8);
+            doc.setFontSize(9);
             doc.setFont("helvetica", "bold");
             doc.text(`Dependente: ${comp.full_name}`, compX, compY);
-            doc.addImage(sig, 'PNG', compX, compY + 2, 35, 12);
-            compX += 60;
+            doc.addImage(sig, 'PNG', compX, compY + 2, 40, 15);
+            compX += 65;
           }
         });
       }
