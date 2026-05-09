@@ -200,6 +200,9 @@ const AdminDashboard = () => {
               <button onClick={() => navigate("/admin/reservas")} className="bg-primary hover:bg-primary/90 text-white px-8 h-14 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-3">
                 <Calendar size={18} /> Nova Reserva
               </button>
+              <button onClick={() => window.open('/', '_blank')} className="bg-white hover:bg-slate-50 text-foreground border border-slate-200 px-8 h-14 rounded-2xl text-xs font-black uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-3">
+                <LayoutDashboard size={18} /> Ver Site Público
+              </button>
             </div>
           </div>
         </div>

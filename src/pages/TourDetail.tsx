@@ -378,13 +378,13 @@ const TourDetail = () => {
               </div>
 
               <div className="space-y-3">
-                <Link to={`/checkout?tour=${tour.slug}&pax=${guests}&date=${selectedDate}&mode=${tourMode}${partner ? `&partner_id=${partner.id}` : ''}`}
-                  className={`w-full py-4 rounded-xl font-semibold text-lg transition-colors block text-center ${
+                <Link to={`/checkout?type=tour&tour=${tour.slug}&pax=${guests}&date=${selectedDate}&mode=${tourMode}${partner ? `&partner_id=${partner.id}` : ''}`}
+                  className={`w-full py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-xl block text-center active:scale-95 ${
                     isPrivate
-                      ? "bg-secondary hover:bg-secondary/90 text-secondary-foreground"
-                      : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                      ? "bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-secondary/20"
+                      : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-primary/20"
                   }`}>
-                  Reservar {isPrivate ? "Privativo" : "Agora"}
+                  Continuar Reserva
                 </Link>
                 <ShareWithFriend itemName={tour.name} itemUrl={window.location.href} />
                 <div className="flex items-center justify-center gap-2 text-muted-foreground text-[10px]">
