@@ -522,20 +522,21 @@ const AdminReservas = () => {
         </CardContent>
       </Card>
 
-
-      {/* Main Content */}
-      {viewMode === "calendar" ? (
-        <div className="animate-in-fade" style={{ animationDelay: '0.3s' }}>
-          <BookingCalendar 
-            bookings={bookings} 
-            onSelectBooking={(b) => {
-              setSelected(b);
-              setEditNotes(b.notes || "");
-              setShowNotes(false);
-            }}
-          />
-        </div>
-      ) : viewMode === "table" ? (
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        {/* Main Content Area */}
+        <div className={cn("space-y-6", selected ? "lg:col-span-2" : "lg:col-span-3")}>
+          {viewMode === "calendar" ? (
+            <div className="animate-in-fade" style={{ animationDelay: '0.3s' }}>
+              <BookingCalendar 
+                bookings={bookings} 
+                onSelectBooking={(b) => {
+                  setSelected(b);
+                  setEditNotes(b.notes || "");
+                  setShowNotes(false);
+                }}
+              />
+            </div>
+          ) : viewMode === "table" ? (
         <Card className="border-none shadow-2xl shadow-primary/5 overflow-hidden glass-card rounded-[1.5rem] md:rounded-[2.5rem] animate-in-fade border border-white/20">
           <Table>
             <TableHeader className="bg-slate-50/50 dark:bg-slate-900/50">
