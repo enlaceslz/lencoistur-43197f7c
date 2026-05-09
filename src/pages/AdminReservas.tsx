@@ -778,10 +778,11 @@ const AdminReservas = () => {
             </div>
           )}
         </div>
-      </div>
-      <div className={cn("hidden lg:block w-[380px] space-y-6 animate-in-fade shrink-0", !selected && "opacity-50 pointer-events-none")}>
+
+        {/* Detail View (Right Column) */}
+        <div className={cn("hidden lg:block w-[380px] space-y-6 animate-in-fade shrink-0", !selected && "opacity-50 pointer-events-none")}>
           {selected ? (
-            <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover sticky top-24 overflow-hidden flex flex-col max-h-[calc(100vh-120px)]">
+            <div className="glass-card rounded-[2.5rem] p-8 sticky top-24 overflow-hidden flex flex-col max-h-[calc(100vh-120px)] border border-border">
               <div className="text-center bg-primary/[0.02] p-8 rounded-[2rem] border border-primary/5 mb-8">
                 <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-primary to-ocean flex items-center justify-center text-white text-3xl font-black mx-auto mb-6 shadow-2xl shadow-primary/20 transition-transform duration-500 hover:rotate-6">
                   {selected.customerName.trim() ? selected.customerName.trim().split(" ").filter(Boolean).map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
