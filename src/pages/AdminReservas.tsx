@@ -826,16 +826,39 @@ const AdminReservas = () => {
 
               <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
                 <div className="space-y-4 md:space-y-6">
-                {/* Customer */}
-                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm space-y-3">
-                  <div className="flex items-center gap-2 mb-1">
+                {/* Customer Info Card */}
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm">
+                  <div className="flex items-center gap-2 mb-4">
                     <User size={16} className="text-primary" />
-                    <h4 className="font-black text-[10px] md:text-xs text-slate-400 uppercase tracking-widest leading-none">Dados do Cliente</h4>
+                    <h4 className="font-black text-[10px] md:text-xs text-slate-400 uppercase tracking-widest leading-none">Informações do Cliente</h4>
                   </div>
-                  <div className="grid grid-cols-1 gap-2.5">
-                    <span className="text-base font-bold text-slate-800 dark:text-slate-100">
-                      {selected.customerName}
-                    </span>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Nome Completo</p>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{selected.customerName}</span>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">E-mail</p>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                        <Mail size={14} className="shrink-0 text-primary/60" /> {selected.customerEmail}
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">WhatsApp / Telefone</p>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                        <Phone size={14} className="shrink-0 text-primary/60" /> {selected.customerPhone || "Não informado"}
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Documento</p>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                        <FileText size={14} className="shrink-0 text-primary/60" /> 
+                        {selected.cpf ? `CPF: ${selected.cpf}` : selected.passport ? `Passaporte: ${selected.passport}` : "Não informado"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                       <span className="flex items-center gap-2 text-slate-500 dark:text-slate-400 truncate">
                         <Mail size={14} className="shrink-0" /> {selected.customerEmail}
