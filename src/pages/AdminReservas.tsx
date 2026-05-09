@@ -884,8 +884,8 @@ const AdminReservas = () => {
                         rows={3} 
                       />
                       <div className="flex gap-2 justify-end">
-                        <Button size="xs" variant="outline" onClick={() => setShowNotes(false)}>Sair</Button>
-                        <Button size="xs" onClick={handleSaveNotes} disabled={actionLoading}>Salvar</Button>
+                        <Button size="sm" variant="outline" onClick={() => setShowNotes(false)}>Sair</Button>
+                        <Button size="sm" onClick={handleSaveNotes} disabled={actionLoading}>Salvar</Button>
                       </div>
                     </div>
                   ) : (
