@@ -387,7 +387,7 @@ const AdminReservas = () => {
 
   if (loading) {
     return (
-      <AdminLayout title="Reservas">
+      <AdminLayout title="Gestão de Reservas & Operações">
         <div className="flex flex-col items-center justify-center py-32 space-y-4">
           <Loader2 className="animate-spin text-primary" size={40} />
           <p className="text-muted-foreground animate-pulse">Carregando reservas...</p>
@@ -522,20 +522,21 @@ const AdminReservas = () => {
         </CardContent>
       </Card>
 
-
-      {/* Main Content */}
-      {viewMode === "calendar" ? (
-        <div className="animate-in-fade" style={{ animationDelay: '0.3s' }}>
-          <BookingCalendar 
-            bookings={bookings} 
-            onSelectBooking={(b) => {
-              setSelected(b);
-              setEditNotes(b.notes || "");
-              setShowNotes(false);
-            }}
-          />
-        </div>
-      ) : viewMode === "table" ? (
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        {/* Main Content Area */}
+        <div className={cn("space-y-6", selected ? "lg:col-span-2" : "lg:col-span-3")}>
+          {viewMode === "calendar" ? (
+            <div className="animate-in-fade" style={{ animationDelay: '0.3s' }}>
+              <BookingCalendar 
+                bookings={bookings} 
+                onSelectBooking={(b) => {
+                  setSelected(b);
+                  setEditNotes(b.notes || "");
+                  setShowNotes(false);
+                }}
+              />
+            </div>
+          ) : viewMode === "table" ? (
         <Card className="border-none shadow-2xl shadow-primary/5 overflow-hidden glass-card rounded-[1.5rem] md:rounded-[2.5rem] animate-in-fade border border-white/20">
           <Table>
             <TableHeader className="bg-slate-50/50 dark:bg-slate-900/50">
@@ -552,7 +553,14 @@ const AdminReservas = () => {
             </TableHeader>
             <TableBody>
               {filtered.map((booking) => (
-                <TableRow key={booking.id} className="border-b border-border/40 hover:bg-primary/5 transition-colors group">
+                <TableRow 
+                  key={booking.id} 
+                  onClick={() => setSelected(booking)}
+                  className={cn(
+                    "border-b border-border/40 hover:bg-primary/5 transition-all cursor-pointer group",
+                    selected?.id === booking.id && "bg-primary/5"
+                  )}
+                >
                   <TableCell className="py-4">
                     <span className="text-[10px] font-black text-primary bg-primary/5 px-2 py-1 rounded-md">#{booking.bookingCode}</span>
                   </TableCell>
@@ -616,7 +624,11 @@ const AdminReservas = () => {
           {filtered.map((booking, index) => (
             <div 
               key={booking.id}
-              className="glass-card admin-card-hover rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden border border-white/20 group animate-in-slide-up bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-xl shadow-black/5"
+              onClick={() => setSelected(booking)}
+              className={cn(
+                "glass-card admin-card-hover rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden border border-white/20 group animate-in-slide-up bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-xl shadow-black/5 cursor-pointer transition-all",
+                selected?.id === booking.id && "ring-4 ring-primary/20 bg-white dark:bg-black/40 scale-[1.02]"
+              )}
               style={{ animationDelay: `${0.05 * (index % 10)}s` }}
             >
               <div className="p-6 md:p-8">
@@ -795,377 +807,155 @@ const AdminReservas = () => {
           )}
         </div>
       )}
+    </div>
 
-
-      {/* Detail Modal */}
-      <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
-          {selected && (
-            <div className="flex flex-col h-[90vh]">
-              <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
-                <div className="flex items-center gap-3 md:gap-4">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                    <User size={20} className="md:w-6 md:h-6" />
-                  </div>
-                  <div>
-                    <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
-                      Perfil do Cliente
-                    </DialogTitle>
-                    <p className="text-[11px] md:text-sm text-slate-500 font-medium">{selected.customerName}</p>
-                  </div>
+        {/* Detail View (Right Column on Desktop, Modal on Mobile) */}
+        <div className={cn("hidden lg:block space-y-6 animate-in-fade", !selected && "opacity-50 pointer-events-none")}>
+          {selected ? (
+            <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover sticky top-24 overflow-hidden flex flex-col max-h-[calc(100vh-120px)]">
+              <div className="text-center bg-primary/[0.02] p-8 rounded-[2rem] border border-primary/5 mb-8">
+                <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-primary to-ocean flex items-center justify-center text-white text-3xl font-black mx-auto mb-6 shadow-2xl shadow-primary/20 transition-transform duration-500 hover:rotate-6">
+                  {selected.customerName.trim() ? selected.customerName.trim().split(" ").filter(Boolean).map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge className={cn("rounded-2xl px-3 py-1 font-black text-[10px] uppercase tracking-widest border-none", statusConfig[selected.status]?.className)}>
+                <h3 className="font-display text-xl font-black text-foreground">{selected.customerName}</h3>
+                <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
+                  <Badge className={cn("rounded-2xl px-3 py-1 font-black text-[10px] uppercase tracking-widest border-none shadow-sm", statusConfig[selected.status]?.className)}>
                     {statusConfig[selected.status]?.label}
                   </Badge>
-                  <Button variant="ghost" size="icon" onClick={() => setSelected(null)} className="rounded-full hover:bg-slate-100 transition-colors">
-                    <X size={20} className="text-slate-400" />
-                  </Button>
+                  <Badge className={cn("rounded-2xl px-3 py-1 font-black text-[10px] uppercase tracking-widest border-none shadow-sm", paymentConfig[selected.paymentStatus]?.className)}>
+                    {paymentConfig[selected.paymentStatus]?.label}
+                  </Badge>
                 </div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-4">
+                  Reserva #{selected.bookingCode}
+                </p>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
-                <div className="space-y-4 md:space-y-6">
-                {/* Customer Info Card */}
-                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm">
-                  <div className="flex items-center gap-2 mb-4">
-                    <User size={16} className="text-primary" />
-                    <h4 className="font-black text-[10px] md:text-xs text-slate-400 uppercase tracking-widest leading-none">Informações do Cliente</h4>
+              <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-6">
+                {/* Financial Overview */}
+                <div className="bg-slate-900 rounded-[2rem] p-6 text-white shadow-2xl shadow-slate-900/20">
+                  <div className="flex items-center gap-2 mb-4 text-emerald-400">
+                    <DollarSign size={18} />
+                    <h4 className="font-black text-[11px] uppercase tracking-widest leading-none">Resumo Financeiro</h4>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Nome Completo</p>
-                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{selected.customerName}</span>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">E-mail</p>
-                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                        <Mail size={14} className="shrink-0 text-primary/60" /> {selected.customerEmail}
-                      </span>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">WhatsApp / Telefone</p>
-                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                        <Phone size={14} className="shrink-0 text-primary/60" /> {selected.customerPhone || "Não informado"}
-                      </span>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Documento</p>
-                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                        <FileText size={14} className="shrink-0 text-primary/60" /> 
-                        {selected.cpf ? `CPF: ${selected.cpf}` : selected.passport ? `Passaporte: ${selected.passport}` : "Não informado"}
-                      </span>
-                    </div>
-                  </div>
-
-                {/* Booking details */}
-                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Compass size={16} className="text-primary" />
-                    <h4 className="font-black text-[10px] md:text-xs text-slate-400 uppercase tracking-widest leading-none">Detalhes do Serviço</h4>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Serviço</p>
-                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                        <MapPin size={14} className="shrink-0 text-primary/60" /> {selected.itemName}
-                      </span>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Data</p>
-                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                        <Calendar size={14} className="shrink-0 text-primary/60" /> {fmtDate(selected.date)}
-                      </span>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Passageiros</p>
-                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                        <Users size={14} className="shrink-0 text-primary/60" /> {selected.guests} pessoa(s)
-                      </span>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Pagamento</p>
-                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                        <CreditCard size={14} className="shrink-0 text-primary/60" /> {selected.payMethod === "pix" ? "PIX" : selected.payMethod === "card" ? "Cartão" : selected.payMethod}
-                      </span>
-                    </div>
-                  </div>
-                  <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest pt-2 border-t border-slate-50 dark:border-slate-800">
-                    Criado em: {fmtDateTime(selected.createdAt)}
-                  </p>
-                </div>
-
-                {/* Financials */}
-                <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm">
-                  <div className="flex items-center gap-2 mb-4">
-                    <DollarSign size={16} className="text-emerald-500" />
-                    <h4 className="font-black text-[10px] md:text-xs text-slate-400 uppercase tracking-widest leading-none">Resumo Financeiro</h4>
-                  </div>
-                  
-                  {selected.publicTotal && selected.publicTotal !== selected.finalTotal ? (
-                    <div className="space-y-2 mb-4 p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
-                      <div className="flex justify-between text-xs text-slate-400">
-                        <span className="font-bold uppercase tracking-widest">Preço Balcão (Cliente)</span>
-                        <span className="line-through opacity-50">{fmt(selected.publicTotal)}</span>
-                      </div>
-                      <div className="flex justify-between text-xs text-blue-600 dark:text-blue-400 font-black">
-                        <span className="uppercase tracking-widest">Tarifa NET (Parceiro)</span>
-                        <span>{fmt(selected.finalTotal)}</span>
-                      </div>
-                    </div>
-                  ) : null}
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm text-slate-500 dark:text-slate-400">
-                      <span className="font-medium">Subtotal ({selected.guests}x {fmt(selected.unitPrice)})</span>
-                      <span>{fmt(selected.total)}</span>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-xs text-white/60">
+                      <span className="font-medium">Subtotal</span>
+                      <span className="font-bold">{fmt(selected.total)}</span>
                     </div>
                     {selected.discount > 0 && (
-                      <div className="flex justify-between text-sm text-emerald-600 dark:text-emerald-400 font-bold">
-                        <span>Desconto Aplicado</span>
-                        <span>-{fmt(selected.discount)}</span>
+                      <div className="flex justify-between text-xs text-emerald-400">
+                        <span className="font-medium">Desconto</span>
+                        <span className="font-bold">-{fmt(selected.discount)}</span>
                       </div>
                     )}
-                    <div className="flex justify-between items-center font-black text-slate-900 dark:text-slate-100 border-t border-slate-200 dark:border-slate-800 mt-3 pt-3">
-                      <span className="text-base uppercase tracking-tighter">Total Final</span>
-                      <span className="text-xl text-primary">{fmt(selected.finalTotal)}</span>
+                    <div className="flex justify-between items-center font-black pt-3 border-t border-white/10">
+                      <span className="text-xs uppercase tracking-widest text-white/40">Total Final</span>
+                      <span className="text-2xl text-emerald-400">{fmt(selected.finalTotal)}</span>
                     </div>
                   </div>
                 </div>
 
-                  {/* Notes & Tools */}
-                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <MessageSquare size={16} className="text-primary" />
-                        <h4 className="font-black text-[10px] md:text-xs text-slate-400 uppercase tracking-widest leading-none">Observações Internas</h4>
-                      </div>
-                      {!showNotes && (
-                        <Button variant="ghost" size="sm" onClick={() => setShowNotes(true)} className="text-[10px] h-7 font-black uppercase tracking-widest text-primary hover:bg-primary/5">
-                          Editar
-                        </Button>
-                      )}
-                    </div>
-                    {showNotes ? (
-                      <div className="space-y-2">
-                        <Textarea 
-                          value={editNotes} 
-                          onChange={(e) => setEditNotes(e.target.value)} 
-                          placeholder="Adicionar observações importantes sobre esta reserva..." 
-                          className="min-h-[100px] rounded-xl bg-amber-50/30 border-amber-200/50"
-                          rows={3} 
-                        />
-                        <div className="flex gap-2 justify-end">
-                          <Button size="sm" variant="outline" onClick={() => setShowNotes(false)} className="rounded-lg h-9 text-[10px] font-black uppercase tracking-widest">Cancelar</Button>
-                          <Button size="sm" onClick={handleSaveNotes} disabled={actionLoading} className="rounded-lg h-9 text-[10px] font-black uppercase tracking-widest">
-                            {actionLoading ? <Loader2 className="animate-spin mr-1" size={12} /> : null} Salvar
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
-                        <p className="text-sm text-slate-600 dark:text-slate-400 italic">
-                          {selected.notes || "Nenhuma observação interna registrada para esta reserva."}
-                        </p>
-                      </div>
-                    )}
-                    
-                    {/* Document Tools */}
-                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
-                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Documentos e Links</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {selected.invoiceUrl && (
-                          <Button variant="outline" size="sm" className="h-10 rounded-xl border-slate-200 font-bold text-xs" asChild>
-                            <a href={selected.invoiceUrl} target="_blank" rel="noopener noreferrer">
-                              <FileText size={14} className="mr-2 text-primary" /> Nota Fiscal
-                            </a>
-                          </Button>
-                        )}
-                        {selected.voucherUrl && (
-                          <Button variant="outline" size="sm" className="h-10 rounded-xl border-slate-200 font-bold text-xs" asChild>
-                            <a href={selected.voucherUrl} target="_blank" rel="noopener noreferrer">
-                              <FileText size={14} className="mr-2 text-emerald-500" /> Voucher
-                            </a>
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Term of Risk */}
-                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2 text-amber-600">
-                          <Shield size={16} />
-                          <span className="text-[10px] font-black uppercase tracking-widest">Termo de Ciência de Risco</span>
-                        </div>
-                        <Badge 
-                          variant="outline" 
-                          className={cn(
-                            "text-[8px] font-black tracking-widest px-2 py-0.5",
-                            selected.termStatus === "assinado" 
-                              ? "bg-green-100 text-green-700 border-green-200" 
-                              : "bg-amber-100 text-amber-700 border-amber-200"
-                          )}
-                        >
-                          {selected.termStatus === "assinado" ? "ASSINADO" : "PENDENTE"}
-                        </Badge>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 h-9 rounded-xl text-[10px] font-bold"
-                          onClick={() => {
-                            const link = `${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`;
-                            navigator.clipboard.writeText(link);
-                            toast.success("Link do termo copiado!");
-                          }}
-                        >
-                          <Copy size={14} className="mr-2 text-primary" /> Copiar Link
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 h-9 rounded-xl text-[10px] font-bold"
-                          asChild
-                        >
-                          <a 
-                            href={`https://wa.me/${selected.customerPhone?.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}! Por favor, assine o Termo de Ciência de Risco para o passeio ${selected.itemName}: ${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`)}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                          >
-                            <Smartphone size={14} className="mr-2 text-green-500" /> WhatsApp
-                          </a>
-                        </Button>
-                        {selected.termStatus === "assinado" ? (
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="bg-green-600 text-white border-transparent hover:bg-green-700 h-9 rounded-xl text-[10px] font-bold shadow-lg shadow-green-200"
-                            asChild
-                          >
-                            <a 
-                              href={supabase.storage.from("customer-documents").getPublicUrl(selected.termPdfUrl!).data.publicUrl} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                            >
-                              <Eye size={14} className="mr-2" /> Ver Termo
-                            </a>
-                          </Button>
-                        ) : (
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="bg-amber-500 text-white border-transparent hover:bg-amber-600 h-9 rounded-xl text-[10px] font-bold shadow-lg shadow-amber-200"
-                            asChild
-                          >
-                            <a href={`/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink size={14} className="mr-2" /> Abrir Termo
-                            </a>
-                          </Button>
-                        )}
+                {/* Service Details */}
+                <div className="bg-muted/30 border border-border/50 rounded-2xl p-5 space-y-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Compass size={16} className="text-primary" />
+                    <h4 className="font-black text-[10px] text-muted-foreground uppercase tracking-widest leading-none">Serviço</h4>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-sm font-bold text-foreground">{selected.itemName}</p>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted-foreground font-medium uppercase tracking-tight">
+                        <span className="flex items-center gap-1.5"><Calendar size={12} /> {fmtDate(selected.date)}</span>
+                        <span className="flex items-center gap-1.5"><Users size={12} /> {selected.guests} Pax</span>
+                        <span className="flex items-center gap-1.5"><CreditCard size={12} /> {selected.payMethod === "pix" ? "PIX" : "Cartão"}</span>
                       </div>
                     </div>
                   </div>
-
                 </div>
 
-                <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex flex-wrap gap-3 sticky bottom-0 z-10">
-                  <Button variant="outline" onClick={() => { setSelected(null); openEdit(selected); }} disabled={actionLoading} className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl font-bold text-xs border-slate-200">
-                    <Pencil size={16} className="mr-2 text-amber-500" /> Editar
-                  </Button>
-                  
-                  {selected.status === "pendente" && selected.paymentStatus === "pendente" && (
-                    <Button onClick={() => handleAction(() => confirmPayment(selected.id), "Pagamento confirmado!")} disabled={actionLoading} className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg shadow-emerald-200">
-                      {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle size={16} className="mr-2" />}
-                      Confirmar Pago
+                {/* Internal Notes */}
+                <div className="bg-amber-50/50 dark:bg-amber-900/10 border border-amber-200/50 rounded-2xl p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-amber-600">
+                      <MessageSquare size={16} />
+                      <h4 className="font-black text-[10px] uppercase tracking-widest leading-none">Notas Internas</h4>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => setShowNotes(true)} className="h-6 px-2 text-[10px] font-black uppercase text-amber-600 hover:bg-amber-100">
+                      Editar
                     </Button>
+                  </div>
+                  {showNotes ? (
+                    <div className="space-y-2">
+                      <Textarea 
+                        value={editNotes} 
+                        onChange={(e) => setEditNotes(e.target.value)} 
+                        className="min-h-[80px] text-xs bg-white border-amber-200"
+                        rows={3} 
+                      />
+                      <div className="flex gap-2 justify-end">
+                        <Button size="sm" variant="outline" onClick={() => setShowNotes(false)}>Sair</Button>
+                        <Button size="sm" onClick={handleSaveNotes} disabled={actionLoading}>Salvar</Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-amber-900/70 italic leading-relaxed">
+                      {selected.notes || "Sem observações registradas."}
+                    </p>
                   )}
-                  
-                  {selected.status === "confirmada" && (
-                    <Button variant="secondary" onClick={() => handleAction(() => completeBooking(selected.id), "Reserva concluída!")} disabled={actionLoading} className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl font-bold text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 border-none">
-                      {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
-                      Concluir
+                </div>
+
+                {/* Actions */}
+                <div className="grid grid-cols-1 gap-2 pt-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button variant="outline" className="h-10 rounded-xl font-bold text-[10px] uppercase tracking-widest" onClick={() => openEdit(selected)}>
+                      <Pencil size={14} className="mr-2" /> Editar
                     </Button>
-                  )}
-                  
-                  {selected.status !== "cancelada" && (
+                    <PrintReceiptButton
+                      data={selected as any}
+                      className="h-10"
+                      label="Recibo"
+                    />
+                  </div>
+                  {selected.customerPhone && (
                     <Button 
-                      variant="outline" 
-                      onClick={() => handleAction(() => deleteBooking(selected.id), "Reserva removida.", true)} 
-                      disabled={actionLoading} 
-                      className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl border-rose-200 text-rose-600 hover:bg-rose-50 font-bold text-xs"
+                      className="h-10 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-[10px] uppercase tracking-widest"
+                      asChild
                     >
-                      {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
-                      Cancelar
+                      <a 
+                        href={`https://wa.me/${selected.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}!`)}`}
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                      >
+                        <Smartphone size={14} className="mr-2" /> WhatsApp
+                      </a>
                     </Button>
                   )}
-
-                  <Button 
-                    variant="destructive" 
-                    onClick={() => handleDelete(selected.id)} 
-                    disabled={actionLoading} 
-                    className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl bg-rose-600 hover:bg-rose-700 font-bold text-xs shadow-lg shadow-rose-200"
-                  >
-                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Trash2 size={16} className="mr-2" />}
-                    Excluir
-                  </Button>
-                </div>
-              
-                <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex flex-col gap-4">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Ações Rápidas</p>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                {/* Print Receipt */}
-                {selected.payMethod !== "info" && (
-                  <PrintReceiptButton
-                    data={{
-                      bookingCode: selected.bookingCode,
-                      customerName: selected.customerName,
-                      customerEmail: selected.customerEmail,
-                      customerPhone: selected.customerPhone,
-                      itemName: selected.itemName,
-                      type: selected.type,
-                      date: selected.date,
-                      guests: selected.guests,
-                      unitPrice: selected.unitPrice,
-                      total: selected.total,
-                      discount: selected.discount,
-                      finalTotal: selected.finalTotal,
-                      publicUnitPrice: selected.publicUnitPrice,
-                      publicTotal: selected.publicTotal,
-                      payMethod: selected.payMethod,
-                      paymentStatus: selected.paymentStatus,
-                      status: selected.status,
-                      pixCode: selected.pixCode,
-                      createdAt: selected.createdAt,
-                      notes: selected.notes,
-                      cpf: selected.cpf,
-                      passport: selected.passport,
-                    }}
-                    className="flex-1"
-                    label="Imprimir Recibo"
-                  />
-                )}
-                {/* WhatsApp */}
-                {selected.customerPhone && (
-                  <a
-                    href={`https://wa.me/${selected.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}! Sobre sua reserva ${selected.bookingCode} - ${selected.itemName}.`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1"
-                  >
-                    <Button variant="outline" className="w-full text-green-600 border-green-200 hover:bg-green-50 h-10">
-                      📱 Enviar no WhatsApp
+                  {selected.status === "pendente" && (
+                    <Button onClick={() => handleAction(() => confirmPayment(selected.id), "Pago!")} className="h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold text-[10px] uppercase tracking-widest text-white shadow-lg shadow-emerald-200">
+                      Confirmar Pagamento
                     </Button>
-                  </a>
-                )}
+                  )}
+                  <Button variant="ghost" onClick={() => setSelected(null)} className="h-10 text-[10px] font-black uppercase text-muted-foreground hover:bg-muted mt-2">
+                    Fechar Detalhes
+                  </Button>
                 </div>
               </div>
             </div>
+          ) : (
+            <div className="glass-card rounded-[2.5rem] p-12 text-center sticky top-24 border border-dashed border-border/50">
+              <div className="w-20 h-20 rounded-[2rem] bg-muted/20 flex items-center justify-center text-muted-foreground/30 mx-auto mb-6">
+                <LayoutGrid size={32} />
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-2">Painel de Detalhes</p>
+              <p className="text-xs font-bold text-muted-foreground/30 leading-relaxed">
+                Selecione uma reserva na lista ao lado para visualizar informações completas e ações rápidas.
+              </p>
+            </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </div>
+      </div>
 
       {/* New Booking Dialog */}
       <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
