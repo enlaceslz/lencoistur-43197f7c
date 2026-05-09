@@ -387,7 +387,7 @@ const AdminReservas = () => {
 
   if (loading) {
     return (
-      <AdminLayout title="Reservas">
+      <AdminLayout title="Gestão de Reservas & Operações">
         <div className="flex flex-col items-center justify-center py-32 space-y-4">
           <Loader2 className="animate-spin text-primary" size={40} />
           <p className="text-muted-foreground animate-pulse">Carregando reservas...</p>
