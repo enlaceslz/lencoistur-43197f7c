@@ -794,7 +794,7 @@ const AdminReservas = () => {
               </div>
             </div>
           )}
-          )}
+          )
         </div>
 
         {/* Detail View (Right Column on Desktop, Modal on Mobile) */}
