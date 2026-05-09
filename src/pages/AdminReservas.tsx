@@ -1257,6 +1257,7 @@ const AdminReservas = () => {
         </DialogContent>
       </Dialog>
 
+      </div>
     </AdminLayout>
   );
 };
