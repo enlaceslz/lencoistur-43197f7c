@@ -858,13 +858,12 @@ const AdminReservas = () => {
                       </span>
                     </div>
                   </div>
-                </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+            )}
+          </DialogContent>
+        </Dialog>
                 </div>
 
                 {/* Booking details */}
