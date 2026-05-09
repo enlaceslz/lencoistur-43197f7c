@@ -777,9 +777,9 @@ const AdminReservas = () => {
               </div>
             </div>
           )}
-          </div>
         </div>
       </div>
+    </div>
 
         {/* Detail View (Right Column) */}
         <div className={cn("hidden lg:block w-[380px] space-y-6 animate-in-fade shrink-0", !selected && "opacity-50 pointer-events-none")}>
