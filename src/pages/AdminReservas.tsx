@@ -794,8 +794,9 @@ const AdminReservas = () => {
               </div>
             </div>
           )}
-          )}
         </div>
+      )}
+    </div>
 
         {/* Detail View (Right Column on Desktop, Modal on Mobile) */}
         <div className={cn("hidden lg:block space-y-6 animate-in-fade", !selected && "opacity-50 pointer-events-none")}>
