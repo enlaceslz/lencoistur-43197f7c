@@ -797,74 +797,67 @@ const AdminReservas = () => {
       )}
 
 
-
       {/* Detail Modal */}
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="max-w-[100vw] w-full h-[100dvh] sm:max-w-2xl sm:w-[95vw] sm:h-[90vh] p-0 border-none shadow-2xl sm:rounded-3xl overflow-hidden bg-[#F8FAFC] focus-visible:outline-none flex flex-col">
-          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between shrink-0 z-10">
-            <div className="flex items-center gap-3 md:gap-4">
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                <FileText size={20} className="md:w-6 md:h-6" />
-              </div>
-              <div>
-                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
-                  Reserva {selected?.bookingCode}
-                </DialogTitle>
-                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Detalhes completos da reserva</p>
-              </div>
-            </div>
-            <Button variant="ghost" size="icon" onClick={() => setSelected(null)} className="rounded-full hover:bg-slate-100 transition-colors">
-              <X size={20} className="text-slate-400" />
-            </Button>
-          </div>
-
-          <div className="p-4 md:p-8 space-y-6 md:space-y-8 overflow-y-auto flex-1 custom-scrollbar">
-            {selected && (
-              <div className="space-y-4 md:space-y-6 overflow-y-auto max-h-[calc(100vh-250px)] custom-scrollbar pr-1">
-                {/* Customer */}
-                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm space-y-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <User size={16} className="text-primary" />
-                    <h4 className="font-black text-[10px] md:text-xs text-slate-400 uppercase tracking-widest leading-none">Dados do Cliente</h4>
+        <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          {selected && (
+            <div className="flex flex-col h-[90vh]">
+              <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+                <div className="flex items-center gap-3 md:gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                    <User size={20} className="md:w-6 md:h-6" />
                   </div>
-                  <div className="grid grid-cols-1 gap-2.5">
-                    <span className="text-base font-bold text-slate-800 dark:text-slate-100">
-                      {selected.customerName}
-                    </span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                      <span className="flex items-center gap-2 text-slate-500 dark:text-slate-400 truncate">
-                        <Mail size={14} className="shrink-0" /> {selected.customerEmail}
-                      </span>
-                      {selected.customerPhone && (
-                        <span className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                          <Phone size={14} className="shrink-0" /> {selected.customerPhone}
-                        </span>
-                      )}
-                    </div>
-                    {(selected.cpf || selected.passport) && (
-                      <div className="flex flex-wrap gap-4 pt-1">
-                        {selected.cpf && (
-                          <span className="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider">
-                            <FileText size={12} /> CPF: {maskCPF(selected.cpf)}
-                          </span>
-                        )}
-                        {selected.passport && (
-                          <span className="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider">
-                            <FileText size={12} /> Passaporte: {selected.passport}
-                          </span>
-                        )}
-                      </div>
-                    )}
+                  <div>
+                    <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                      Perfil do Cliente
+                    </DialogTitle>
+                    <p className="text-[11px] md:text-sm text-slate-500 font-medium">{selected.customerName}</p>
                   </div>
-                  {selected.collaboratorName && (
-                    <div className="mt-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Colaborador / Vendedor</p>
-                      <Badge variant="secondary" className="bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 border-none font-bold">
-                        {selected.collaboratorName}
-                      </Badge>
-                    </div>
-                  )}
                 </div>
+                <div className="flex items-center gap-2">
+                  <Badge className={cn("rounded-2xl px-3 py-1 font-black text-[10px] uppercase tracking-widest border-none", statusConfig[selected.status]?.className)}>
+                    {statusConfig[selected.status]?.label}
+                  </Badge>
+                  <Button variant="ghost" size="icon" onClick={() => setSelected(null)} className="rounded-full hover:bg-slate-100 transition-colors">
+                    <X size={20} className="text-slate-400" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
+                <div className="space-y-4 md:space-y-6">
+                {/* Customer Info Card */}
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm">
+                  <div className="flex items-center gap-2 mb-4">
+                    <User size={16} className="text-primary" />
+                    <h4 className="font-black text-[10px] md:text-xs text-slate-400 uppercase tracking-widest leading-none">Informações do Cliente</h4>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Nome Completo</p>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{selected.customerName}</span>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">E-mail</p>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                        <Mail size={14} className="shrink-0 text-primary/60" /> {selected.customerEmail}
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">WhatsApp / Telefone</p>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                        <Phone size={14} className="shrink-0 text-primary/60" /> {selected.customerPhone || "Não informado"}
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Documento</p>
+                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                        <FileText size={14} className="shrink-0 text-primary/60" /> 
+                        {selected.cpf ? `CPF: ${selected.cpf}` : selected.passport ? `Passaporte: ${selected.passport}` : "Não informado"}
+                      </span>
+                    </div>
+                  </div>
 
                 {/* Booking details */}
                 <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
@@ -941,182 +934,188 @@ const AdminReservas = () => {
                   </div>
                 </div>
 
-              {/* Notes */}
-              <div className="bg-muted rounded-xl p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-semibold text-sm text-foreground flex items-center gap-1">
-                    <MessageSquare size={14} /> Observações
-                  </h4>
-                  {!showNotes && (
-                    <Button variant="ghost" size="sm" onClick={() => setShowNotes(true)} className="text-xs h-7">
-                      Editar
-                    </Button>
-                  )}
-                </div>
-                {showNotes ? (
-                  <div className="space-y-2">
-                    <Textarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)} placeholder="Adicionar observações..." rows={3} />
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={handleSaveNotes} disabled={actionLoading}>
-                        {actionLoading ? <Loader2 className="animate-spin mr-1" size={14} /> : null} Salvar
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => setShowNotes(false)}>Cancelar</Button>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">{selected.notes || "Nenhuma observação."}</p>
-                )}
-                {/* Links e Termo de Risco */}
-                <div className="flex flex-col gap-3 mt-4">
-                  <div className="flex gap-2 w-full">
-                    {selected.invoiceUrl && (
-                      <Button variant="outline" size="sm" className="flex-1" asChild>
-                        <a href={selected.invoiceUrl} target="_blank" rel="noopener noreferrer">
-                          <FileText size={14} className="mr-1" /> Nota Fiscal
-                        </a>
-                      </Button>
-                    )}
-                    {selected.voucherUrl && (
-                      <Button variant="outline" size="sm" className="flex-1" asChild>
-                        <a href={selected.voucherUrl} target="_blank" rel="noopener noreferrer">
-                          <FileText size={14} className="mr-1" /> Voucher
-                        </a>
-                      </Button>
-                    )}
-                  </div>
-                  
-                  <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-amber-700">
-                        <Shield size={16} />
-                        <span className="text-sm font-bold uppercase tracking-tight">Termo de Risco</span>
+                  {/* Notes & Tools */}
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <MessageSquare size={16} className="text-primary" />
+                        <h4 className="font-black text-[10px] md:text-xs text-slate-400 uppercase tracking-widest leading-none">Observações Internas</h4>
                       </div>
-                      <Badge 
-                        variant="outline" 
-                        className={cn(
-                          "text-[10px]",
-                          selected.termStatus === "assinado" 
-                            ? "bg-green-100 text-green-700 border-green-200" 
-                            : "bg-white/50 text-amber-600 border-amber-200"
-                        )}
-                      >
-                        {selected.termStatus === "assinado" ? "ASSINADO" : "PENDENTE"}
-                      </Badge>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="bg-white border-amber-200 text-amber-700 hover:bg-amber-50 h-9"
-                        onClick={() => {
-                          const link = `${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`;
-                          navigator.clipboard.writeText(link);
-                          toast.success("Link do termo copiado!");
-                        }}
-                      >
-                        <Copy size={14} className="mr-2" /> Copiar Link
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="bg-white border-green-200 text-green-700 hover:bg-green-50 h-9"
-                        asChild
-                      >
-                        <a 
-                          href={`https://wa.me/${selected.customerPhone?.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}! Por favor, assine o Termo de Ciência de Risco para o passeio ${selected.itemName}: ${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`)}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                        >
-                          <Smartphone size={14} className="mr-2" /> WhatsApp
-                        </a>
-                      </Button>
-                      {selected.termStatus === "assinado" ? (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="bg-green-600 text-white border-transparent hover:bg-green-700 h-9"
-                          asChild
-                        >
-                          <a 
-                            href={supabase.storage.from("customer-documents").getPublicUrl(selected.termPdfUrl!).data.publicUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                          >
-                            <FileText size={14} className="mr-2" /> Ver Termo
-                          </a>
-                        </Button>
-                      ) : (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="bg-amber-600 text-white border-transparent hover:bg-amber-700 h-9"
-                          asChild
-                        >
-                          <a href={`/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink size={14} className="mr-2" /> Abrir Termo
-                          </a>
+                      {!showNotes && (
+                        <Button variant="ghost" size="sm" onClick={() => setShowNotes(true)} className="text-[10px] h-7 font-black uppercase tracking-widest text-primary hover:bg-primary/5">
+                          Editar
                         </Button>
                       )}
                     </div>
+                    {showNotes ? (
+                      <div className="space-y-2">
+                        <Textarea 
+                          value={editNotes} 
+                          onChange={(e) => setEditNotes(e.target.value)} 
+                          placeholder="Adicionar observações importantes sobre esta reserva..." 
+                          className="min-h-[100px] rounded-xl bg-amber-50/30 border-amber-200/50"
+                          rows={3} 
+                        />
+                        <div className="flex gap-2 justify-end">
+                          <Button size="sm" variant="outline" onClick={() => setShowNotes(false)} className="rounded-lg h-9 text-[10px] font-black uppercase tracking-widest">Cancelar</Button>
+                          <Button size="sm" onClick={handleSaveNotes} disabled={actionLoading} className="rounded-lg h-9 text-[10px] font-black uppercase tracking-widest">
+                            {actionLoading ? <Loader2 className="animate-spin mr-1" size={12} /> : null} Salvar
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+                        <p className="text-sm text-slate-600 dark:text-slate-400 italic">
+                          {selected.notes || "Nenhuma observação interna registrada para esta reserva."}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Document Tools */}
+                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Documentos e Links</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {selected.invoiceUrl && (
+                          <Button variant="outline" size="sm" className="h-10 rounded-xl border-slate-200 font-bold text-xs" asChild>
+                            <a href={selected.invoiceUrl} target="_blank" rel="noopener noreferrer">
+                              <FileText size={14} className="mr-2 text-primary" /> Nota Fiscal
+                            </a>
+                          </Button>
+                        )}
+                        {selected.voucherUrl && (
+                          <Button variant="outline" size="sm" className="h-10 rounded-xl border-slate-200 font-bold text-xs" asChild>
+                            <a href={selected.voucherUrl} target="_blank" rel="noopener noreferrer">
+                              <FileText size={14} className="mr-2 text-emerald-500" /> Voucher
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Term of Risk */}
+                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2 text-amber-600">
+                          <Shield size={16} />
+                          <span className="text-[10px] font-black uppercase tracking-widest">Termo de Ciência de Risco</span>
+                        </div>
+                        <Badge 
+                          variant="outline" 
+                          className={cn(
+                            "text-[8px] font-black tracking-widest px-2 py-0.5",
+                            selected.termStatus === "assinado" 
+                              ? "bg-green-100 text-green-700 border-green-200" 
+                              : "bg-amber-100 text-amber-700 border-amber-200"
+                          )}
+                        >
+                          {selected.termStatus === "assinado" ? "ASSINADO" : "PENDENTE"}
+                        </Badge>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 h-9 rounded-xl text-[10px] font-bold"
+                          onClick={() => {
+                            const link = `${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`;
+                            navigator.clipboard.writeText(link);
+                            toast.success("Link do termo copiado!");
+                          }}
+                        >
+                          <Copy size={14} className="mr-2 text-primary" /> Copiar Link
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 h-9 rounded-xl text-[10px] font-bold"
+                          asChild
+                        >
+                          <a 
+                            href={`https://wa.me/${selected.customerPhone?.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}! Por favor, assine o Termo de Ciência de Risco para o passeio ${selected.itemName}: ${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`)}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
+                            <Smartphone size={14} className="mr-2 text-green-500" /> WhatsApp
+                          </a>
+                        </Button>
+                        {selected.termStatus === "assinado" ? (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="bg-green-600 text-white border-transparent hover:bg-green-700 h-9 rounded-xl text-[10px] font-bold shadow-lg shadow-green-200"
+                            asChild
+                          >
+                            <a 
+                              href={supabase.storage.from("customer-documents").getPublicUrl(selected.termPdfUrl!).data.publicUrl} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                            >
+                              <Eye size={14} className="mr-2" /> Ver Termo
+                            </a>
+                          </Button>
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="bg-amber-500 text-white border-transparent hover:bg-amber-600 h-9 rounded-xl text-[10px] font-bold shadow-lg shadow-amber-200"
+                            asChild
+                          >
+                            <a href={`/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink size={14} className="mr-2" /> Abrir Termo
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                   </div>
+
                 </div>
-              </div>
 
-              {/* Status badges */}
-              <div className="flex gap-2">
-                <Badge className={statusConfig[selected.status]?.className}>
-                  {statusConfig[selected.status]?.label || selected.status}
-                </Badge>
-                <Badge className={paymentConfig[selected.paymentStatus]?.className}>
-                  {paymentConfig[selected.paymentStatus]?.label || selected.paymentStatus}
-                </Badge>
-              </div>
+                <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex flex-wrap gap-3 sticky bottom-0 z-10">
+                  <Button variant="outline" onClick={() => { setSelected(null); openEdit(selected); }} disabled={actionLoading} className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl font-bold text-xs border-slate-200">
+                    <Pencil size={16} className="mr-2 text-amber-500" /> Editar
+                  </Button>
+                  
+                  {selected.status === "pendente" && selected.paymentStatus === "pendente" && (
+                    <Button onClick={() => handleAction(() => confirmPayment(selected.id), "Pagamento confirmado!")} disabled={actionLoading} className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg shadow-emerald-200">
+                      {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle size={16} className="mr-2" />}
+                      Confirmar Pago
+                    </Button>
+                  )}
+                  
+                  {selected.status === "confirmada" && (
+                    <Button variant="secondary" onClick={() => handleAction(() => completeBooking(selected.id), "Reserva concluída!")} disabled={actionLoading} className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl font-bold text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 border-none">
+                      {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
+                      Concluir
+                    </Button>
+                  )}
+                  
+                  {selected.status !== "cancelada" && (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleAction(() => deleteBooking(selected.id), "Reserva removida.", true)} 
+                      disabled={actionLoading} 
+                      className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl border-rose-200 text-rose-600 hover:bg-rose-50 font-bold text-xs"
+                    >
+                      {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
+                      Cancelar
+                    </Button>
+                  )}
 
-              {/* Actions */}
-              <div className="flex gap-3 pt-4 flex-wrap border-t border-slate-200 mt-6">
-                <Button variant="outline" onClick={() => { setSelected(null); openEdit(selected); }} disabled={actionLoading} className="flex-1 min-w-[140px] border-slate-300">
-                  <Pencil size={16} className="mr-2 text-amber-500" /> Editar Reserva
-                </Button>
-                
-                {selected.status === "pendente" && selected.paymentStatus === "pendente" && (
-                  <Button onClick={() => handleAction(() => confirmPayment(selected.id), "Pagamento confirmado!")} disabled={actionLoading} className="flex-1 min-w-[140px] bg-emerald-600 hover:bg-emerald-700">
-                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle size={16} className="mr-2" />}
-                    Confirmar Pagamento
-                  </Button>
-                )}
-                
-                {selected.status === "confirmada" && (
-                  <Button variant="secondary" onClick={() => handleAction(() => completeBooking(selected.id), "Reserva concluída!")} disabled={actionLoading} className="flex-1 min-w-[140px]">
-                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
-                    Concluir Serviço
-                  </Button>
-                )}
-                
-                {selected.status !== "cancelada" && (
                   <Button 
-                    variant="outline" 
-                    onClick={() => handleAction(() => deleteBooking(selected.id), "Reserva removida.", true)} 
+                    variant="destructive" 
+                    onClick={() => handleDelete(selected.id)} 
                     disabled={actionLoading} 
-                    className="flex-1 min-w-[140px] border-rose-200 text-rose-600 hover:bg-rose-50"
+                    className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl bg-rose-600 hover:bg-rose-700 font-bold text-xs shadow-lg shadow-rose-200"
                   >
-                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
-                    Cancelar e Excluir
+                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Trash2 size={16} className="mr-2" />}
+                    Excluir
                   </Button>
-                )}
-
-                <Button 
-                  variant="destructive" 
-                  onClick={() => handleDelete(selected.id)} 
-                  disabled={actionLoading} 
-                  className="flex-1 min-w-[140px] bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-200"
-                >
-                  {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Trash2 size={16} className="mr-2" />}
-                  Excluir Permanente
-                </Button>
-              </div>
+                </div>
               
-              {/* Other Actions Group */}
-              <div className="flex flex-col sm:flex-row gap-3 mt-4 pt-4 border-t border-slate-100">
+                <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex flex-col gap-4">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Ações Rápidas</p>
+                  <div className="flex flex-col sm:flex-row gap-3">
                 {/* Print Receipt */}
                 {selected.payMethod !== "info" && (
                   <PrintReceiptButton
@@ -1161,10 +1160,10 @@ const AdminReservas = () => {
                     </Button>
                   </a>
                 )}
+                </div>
               </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
