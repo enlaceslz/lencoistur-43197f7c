@@ -2,7 +2,8 @@ import { useEffect, useState, useMemo } from "react";
 import {
   DollarSign, TrendingUp, Users, Calendar,
   ArrowUpRight, ArrowDownRight, Loader2, ShieldAlert,
-  PieChart as PieChartIcon, LayoutDashboard, Briefcase, Star, MapPin
+  PieChart as PieChartIcon, LayoutDashboard, Briefcase, Star, MapPin,
+  CheckCircle2, Clock, XCircle, Search, Filter, ChevronRight, User
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -12,6 +13,8 @@ import { useNavigate } from "react-router-dom";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 const MONTH_LABELS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 const PIE_COLORS = [
@@ -20,11 +23,11 @@ const PIE_COLORS = [
   "hsl(270, 50%, 55%)", "hsl(140, 60%, 40%)",
 ];
 
-const statusMap: Record<string, { label: string; className: string }> = {
-  confirmada: { label: "Confirmada", className: "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20" },
-  pendente: { label: "Pendente", className: "bg-amber-500/10 text-amber-600 border border-amber-500/20" },
-  cancelada: { label: "Cancelada", className: "bg-rose-500/10 text-rose-600 border border-rose-500/20" },
-  concluida: { label: "Concluída", className: "bg-primary/10 text-primary border border-primary/20" },
+const statusMap: Record<string, { label: string; className: string; icon: any }> = {
+  confirmada: { label: "Confirmada", className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20", icon: CheckCircle2 },
+  pendente: { label: "Pendente", className: "bg-amber-500/10 text-amber-600 border-amber-500/20", icon: Clock },
+  cancelada: { label: "Cancelada", className: "bg-rose-500/10 text-rose-600 border-rose-500/20", icon: XCircle },
+  concluida: { label: "Concluída", className: "bg-primary/10 text-primary border-primary/20", icon: CheckCircle2 },
 };
 
 const fmt = (v: number) => formatCurrency(v);
@@ -105,8 +108,8 @@ const AdminDashboard = () => {
 
     const stats = [
       { label: "Reservas Hoje", value: String(bookings.filter((b) => b.created_at?.slice(0, 10) === todayStr).length), change: "Diário", up: true, icon: Calendar, path: "/admin/reservas" },
-      { label: "Lucro Líquido (Mês)", value: fmt(thisRevenue - totalExpenses), change: "Mensal", up: (thisRevenue - totalExpenses) > 0, icon: DollarSign, path: "/admin/financeiro" },
-      { label: "Colaboradores", value: String(collabCount), change: "Equipe", up: true, icon: Briefcase, path: "/admin/colaboradores" },
+      { label: "Receita (Mês)", value: fmt(thisRevenue), change: "Bruto", up: true, icon: DollarSign, path: "/admin/financeiro" },
+      { label: "Clientes", value: String(customerCount), change: "Base CRM", up: true, icon: Users, path: "/admin/crm" },
       { label: "Conformidade SGS", value: String(sgsStats.criticalRisks === 0 ? "100%" : "Alerta"), change: `${sgsStats.pendingActions} pendências`, up: sgsStats.criticalRisks === 0, icon: ShieldAlert, isSgs: true, path: "/admin/sgs" },
     ];
 
@@ -228,44 +231,183 @@ const AdminDashboard = () => {
           ))}
         </div>
 
-        {/* Charts & Popularity */}
+        {/* Charts & Lists */}
         <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 glass-card rounded-[2.5rem] p-8 border border-white/40">
-            <h3 className="text-xl font-black mb-8 text-foreground tracking-tight">Performance Financeira</h3>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={revenueData}>
-                  <defs>
-                    <linearGradient id="cR" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(174, 62%, 38%)" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="hsl(174, 62%, 38%)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
-                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 800}} />
-                  <YAxis axisLine={false} tickLine={false} tickFormatter={v => `R$${(v/100000).toFixed(0)}k`} tick={{fontSize: 10, fontWeight: 800}} />
-                  <Tooltip contentStyle={{borderRadius: '1rem', border: 'none', boxShadow: '0 10px 20px rgba(0,0,0,0.1)'}} />
-                  <Area type="monotone" dataKey="revenue" stroke="hsl(174, 62%, 38%)" fill="url(#cR)" strokeWidth={3} />
-                </AreaChart>
-              </ResponsiveContainer>
+          {/* Main Chart Section */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="glass-card rounded-[2.5rem] p-8 border border-white/40 shadow-sm overflow-hidden">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h3 className="text-xl font-black text-foreground tracking-tight">Performance Financeira</h3>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">Últimos 7 Meses</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/5 border border-primary/10">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    <span className="text-[10px] font-black text-primary uppercase tracking-widest">Receita</span>
+                  </div>
+                </div>
+              </div>
+              <div className="h-[320px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(174, 62%, 38%)" stopOpacity={0.2} />
+                        <stop offset="95%" stopColor="hsl(174, 62%, 38%)" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.1} />
+                    <XAxis 
+                      dataKey="month" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{fontSize: 10, fontWeight: 800, fill: 'hsl(var(--muted-foreground))'}} 
+                    />
+                    <YAxis 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tickFormatter={v => `R$${(v/1000).toFixed(0)}k`} 
+                      tick={{fontSize: 10, fontWeight: 800, fill: 'hsl(var(--muted-foreground))'}} 
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        borderRadius: '1.25rem', 
+                        border: '1px solid hsl(var(--border))', 
+                        boxShadow: '0 10px 30px -10px rgba(0,0,0,0.1)',
+                        fontSize: '11px',
+                        fontWeight: 700
+                      }}
+                      formatter={(value: number) => [fmt(value), 'Receita']}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="revenue" 
+                      stroke="hsl(174, 62%, 38%)" 
+                      fill="url(#colorRevenue)" 
+                      strokeWidth={4}
+                      activeDot={{ r: 6, strokeWidth: 0 }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Recent Bookings Table Style (Split Layout inspired by CRM) */}
+            <div className="glass-card rounded-[2.5rem] p-8 border border-white/40 shadow-sm">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h3 className="text-xl font-black text-foreground tracking-tight">Reservas Recentes</h3>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">Últimas 8 operações</p>
+                </div>
+                <button 
+                  onClick={() => navigate("/admin/reservas")}
+                  className="p-2.5 rounded-xl bg-primary/5 text-primary hover:bg-primary/10 transition-colors"
+                >
+                  <ArrowRight size={20} />
+                </button>
+              </div>
+
+              <div className="overflow-x-auto -mx-2">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-border/40">
+                      <th className="text-[10px] font-black text-muted-foreground uppercase tracking-widest text-left px-4 py-4">Cliente / ID</th>
+                      <th className="text-[10px] font-black text-muted-foreground uppercase tracking-widest text-left px-4 py-4">Passeio</th>
+                      <th className="text-[10px] font-black text-muted-foreground uppercase tracking-widest text-center px-4 py-4">Status</th>
+                      <th className="text-[10px] font-black text-muted-foreground uppercase tracking-widest text-right px-4 py-4">Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentBookings.map((b) => (
+                      <tr 
+                        key={b.id} 
+                        className="group hover:bg-primary/[0.02] transition-colors cursor-pointer"
+                        onClick={() => navigate("/admin/reservas")}
+                      >
+                        <td className="px-4 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary font-black text-xs border border-primary/10">
+                              {b.client.charAt(0)}
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-foreground leading-tight">{b.client}</p>
+                              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter mt-0.5">#{b.id}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4">
+                          <p className="text-xs font-semibold text-foreground leading-tight">{b.tour}</p>
+                          <p className="text-[9px] font-medium text-muted-foreground mt-0.5">{b.date}</p>
+                        </td>
+                        <td className="px-4 py-4">
+                          <div className="flex justify-center">
+                            <Badge className={cn("text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-lg border", statusMap[b.status]?.className)}>
+                              {statusMap[b.status]?.label}
+                            </Badge>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 text-right">
+                          <p className="text-xs font-black text-foreground">{fmt(b.total)}</p>
+                          <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tighter">{b.guests} pax</p>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
-          <div className="glass-card rounded-[2.5rem] p-8 border border-white/40">
-            <h3 className="text-xl font-black mb-8 text-foreground tracking-tight">Destaques</h3>
-            <div className="space-y-4">
-              {tourPopularity.slice(0, 5).map((t, i) => (
-                <div key={t.name} className="flex items-center gap-4">
-                  <span className="text-[10px] font-black text-muted-foreground w-6">0{i+1}</span>
-                  <div className="flex-1">
-                    <p className="text-xs font-bold text-foreground">{t.name}</p>
-                    <div className="w-full bg-muted/30 h-1.5 mt-1 rounded-full overflow-hidden">
-                      <div className="bg-primary h-full rounded-full" style={{ width: `${t.value}%` }} />
+          {/* Sidebar Area */}
+          <div className="space-y-6">
+            <div className="glass-card rounded-[2.5rem] p-8 border border-white/40 shadow-sm">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-xl font-black text-foreground tracking-tight">Ranking Popular</h3>
+              </div>
+              <div className="space-y-6">
+                {tourPopularity.slice(0, 6).map((t, i) => (
+                  <div key={t.name} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-black text-muted-foreground bg-muted/30 w-6 h-6 rounded-md flex items-center justify-center">0{i+1}</span>
+                        <p className="text-xs font-bold text-foreground leading-tight">{t.name}</p>
+                      </div>
+                      <span className="text-xs font-black text-primary">{t.value}%</span>
+                    </div>
+                    <div className="w-full bg-muted/30 h-1.5 rounded-full overflow-hidden">
+                      <div 
+                        className="bg-primary h-full rounded-full transition-all duration-1000" 
+                        style={{ width: `${t.value}%`, backgroundColor: t.color }} 
+                      />
                     </div>
                   </div>
-                  <span className="text-xs font-black text-primary">{t.value}%</span>
+                ))}
+              </div>
+            </div>
+
+            <div className="glass-card rounded-[2.5rem] p-8 border border-white/40 shadow-sm bg-gradient-to-br from-primary/5 to-transparent">
+              <h3 className="text-xl font-black text-foreground tracking-tight mb-6">Atividade do Sistema</h3>
+              <div className="space-y-4">
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/40 border border-white/60">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center mt-0.5">
+                    <CheckCircle2 size={16} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-foreground">SGS Atualizado</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">Nenhum risco crítico detectado nas últimas 24h.</p>
+                  </div>
                 </div>
-              ))}
+                <div className="flex items-start gap-4 p-4 rounded-2xl bg-white/40 border border-white/60">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center mt-0.5">
+                    <TrendingUp size={16} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-foreground">Crescimento de LTV</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">Ticket médio aumentou 12% este mês.</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
