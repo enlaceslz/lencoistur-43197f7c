@@ -797,30 +797,35 @@ const AdminReservas = () => {
       )}
 
 
-
       {/* Detail Modal */}
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
-        <DialogContent className="max-w-[100vw] w-full h-[100dvh] sm:max-w-2xl sm:w-[95vw] sm:h-[90vh] p-0 border-none shadow-2xl sm:rounded-3xl overflow-hidden bg-[#F8FAFC] focus-visible:outline-none flex flex-col">
-          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between shrink-0 z-10">
-            <div className="flex items-center gap-3 md:gap-4">
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                <FileText size={20} className="md:w-6 md:h-6" />
+        <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          {selected && (
+            <div className="flex flex-col h-[90vh]">
+              <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+                <div className="flex items-center gap-3 md:gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                    <User size={20} className="md:w-6 md:h-6" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                      Perfil do Cliente
+                    </DialogTitle>
+                    <p className="text-[11px] md:text-sm text-slate-500 font-medium">{selected.customerName}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge className={cn("rounded-2xl px-3 py-1 font-black text-[10px] uppercase tracking-widest border-none", statusConfig[selected.status]?.className)}>
+                    {statusConfig[selected.status]?.label}
+                  </Badge>
+                  <Button variant="ghost" size="icon" onClick={() => setSelected(null)} className="rounded-full hover:bg-slate-100 transition-colors">
+                    <X size={20} className="text-slate-400" />
+                  </Button>
+                </div>
               </div>
-              <div>
-                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
-                  Reserva {selected?.bookingCode}
-                </DialogTitle>
-                <p className="text-[11px] md:text-sm text-slate-500 font-medium">Detalhes completos da reserva</p>
-              </div>
-            </div>
-            <Button variant="ghost" size="icon" onClick={() => setSelected(null)} className="rounded-full hover:bg-slate-100 transition-colors">
-              <X size={20} className="text-slate-400" />
-            </Button>
-          </div>
 
-          <div className="p-4 md:p-8 space-y-6 md:space-y-8 overflow-y-auto flex-1 custom-scrollbar">
-            {selected && (
-              <div className="space-y-4 md:space-y-6 overflow-y-auto max-h-[calc(100vh-250px)] custom-scrollbar pr-1">
+              <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
+                <div className="space-y-4 md:space-y-6">
                 {/* Customer */}
                 <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm space-y-3">
                   <div className="flex items-center gap-2 mb-1">
@@ -1109,19 +1114,11 @@ const AdminReservas = () => {
                     </Button>
                   )}
 
-                  <Button 
-                    variant="destructive" 
-                    onClick={() => handleDelete(selected.id)} 
-                    disabled={actionLoading} 
-                    className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl bg-rose-600 hover:bg-rose-700 font-bold text-xs shadow-lg shadow-rose-200"
-                  >
-                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Trash2 size={16} className="mr-2" />}
-                    Excluir
-                  </Button>
                 </div>
               
-              {/* Other Actions Group */}
-              <div className="flex flex-col sm:flex-row gap-3 mt-4 pt-4 border-t border-slate-100">
+                <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex flex-col gap-4">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Ações Rápidas</p>
+                  <div className="flex flex-col sm:flex-row gap-3">
                 {/* Print Receipt */}
                 {selected.payMethod !== "info" && (
                   <PrintReceiptButton
