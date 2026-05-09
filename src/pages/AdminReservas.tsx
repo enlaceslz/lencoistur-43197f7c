@@ -1161,11 +1161,11 @@ const AdminReservas = () => {
                   </a>
                 )}
                 </div>
+                </div>
               </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+            )}
+          </DialogContent>
+        </Dialog>
 
       {/* New Booking Dialog */}
       <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
