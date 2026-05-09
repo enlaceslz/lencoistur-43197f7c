@@ -777,8 +777,8 @@ const AdminReservas = () => {
               </div>
             </div>
           )}
+          </div>
         </div>
-      </div>
       <div className={cn("hidden lg:block w-[380px] space-y-6 animate-in-fade shrink-0", !selected && "opacity-50 pointer-events-none")}>
           {selected ? (
             <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover sticky top-24 overflow-hidden flex flex-col max-h-[calc(100vh-120px)]">
