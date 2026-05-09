@@ -859,39 +859,12 @@ const AdminReservas = () => {
                     </div>
                   </div>
                 </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                      <span className="flex items-center gap-2 text-slate-500 dark:text-slate-400 truncate">
-                        <Mail size={14} className="shrink-0" /> {selected.customerEmail}
-                      </span>
-                      {selected.customerPhone && (
-                        <span className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                          <Phone size={14} className="shrink-0" /> {selected.customerPhone}
-                        </span>
-                      )}
-                    </div>
-                    {(selected.cpf || selected.passport) && (
-                      <div className="flex flex-wrap gap-4 pt-1">
-                        {selected.cpf && (
-                          <span className="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider">
-                            <FileText size={12} /> CPF: {maskCPF(selected.cpf)}
-                          </span>
-                        )}
-                        {selected.passport && (
-                          <span className="flex items-center gap-2 text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider">
-                            <FileText size={12} /> Passaporte: {selected.passport}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  {selected.collaboratorName && (
-                    <div className="mt-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Colaborador / Vendedor</p>
-                      <Badge variant="secondary" className="bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 border-none font-bold">
-                        {selected.collaboratorName}
-                      </Badge>
-                    </div>
-                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
                 </div>
 
                 {/* Booking details */}
