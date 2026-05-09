@@ -496,7 +496,7 @@ const AdminReservas = () => {
             </CardContent>
           </Card>
 
-          <div className="min-h-0">
+          <div className="flex-1 min-w-0">
           {viewMode === "calendar" ? (
             <div className="animate-in-fade" style={{ animationDelay: '0.3s' }}>
               <BookingCalendar 
