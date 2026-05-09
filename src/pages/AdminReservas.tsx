@@ -795,10 +795,154 @@ const AdminReservas = () => {
             </div>
           )}
         </div>
-      )}
 
+        {/* Detail View (Right Column on Desktop, Modal on Mobile) */}
+        <div className={cn("hidden lg:block space-y-6 animate-in-fade", !selected && "opacity-50 pointer-events-none")}>
+          {selected ? (
+            <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover sticky top-24 overflow-hidden flex flex-col max-h-[calc(100vh-120px)]">
+              <div className="text-center bg-primary/[0.02] p-8 rounded-[2rem] border border-primary/5 mb-8">
+                <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-primary to-ocean flex items-center justify-center text-white text-3xl font-black mx-auto mb-6 shadow-2xl shadow-primary/20 transition-transform duration-500 hover:rotate-6">
+                  {selected.customerName.trim() ? selected.customerName.trim().split(" ").filter(Boolean).map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
+                </div>
+                <h3 className="font-display text-xl font-black text-foreground">{selected.customerName}</h3>
+                <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
+                  <Badge className={cn("rounded-2xl px-3 py-1 font-black text-[10px] uppercase tracking-widest border-none shadow-sm", statusConfig[selected.status]?.className)}>
+                    {statusConfig[selected.status]?.label}
+                  </Badge>
+                  <Badge className={cn("rounded-2xl px-3 py-1 font-black text-[10px] uppercase tracking-widest border-none shadow-sm", paymentConfig[selected.paymentStatus]?.className)}>
+                    {paymentConfig[selected.paymentStatus]?.label}
+                  </Badge>
+                </div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-4">
+                  Reserva #{selected.bookingCode}
+                </p>
+              </div>
 
-      {/* Detail Modal */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-6">
+                {/* Financial Overview */}
+                <div className="bg-slate-900 rounded-[2rem] p-6 text-white shadow-2xl shadow-slate-900/20">
+                  <div className="flex items-center gap-2 mb-4 text-emerald-400">
+                    <DollarSign size={18} />
+                    <h4 className="font-black text-[11px] uppercase tracking-widest leading-none">Resumo Financeiro</h4>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-xs text-white/60">
+                      <span className="font-medium">Subtotal</span>
+                      <span className="font-bold">{fmt(selected.total)}</span>
+                    </div>
+                    {selected.discount > 0 && (
+                      <div className="flex justify-between text-xs text-emerald-400">
+                        <span className="font-medium">Desconto</span>
+                        <span className="font-bold">-{fmt(selected.discount)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between items-center font-black pt-3 border-t border-white/10">
+                      <span className="text-xs uppercase tracking-widest text-white/40">Total Final</span>
+                      <span className="text-2xl text-emerald-400">{fmt(selected.finalTotal)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Service Details */}
+                <div className="bg-muted/30 border border-border/50 rounded-2xl p-5 space-y-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Compass size={16} className="text-primary" />
+                    <h4 className="font-black text-[10px] text-muted-foreground uppercase tracking-widest leading-none">Serviço</h4>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-sm font-bold text-foreground">{selected.itemName}</p>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted-foreground font-medium uppercase tracking-tight">
+                        <span className="flex items-center gap-1.5"><Calendar size={12} /> {fmtDate(selected.date)}</span>
+                        <span className="flex items-center gap-1.5"><Users size={12} /> {selected.guests} Pax</span>
+                        <span className="flex items-center gap-1.5"><CreditCard size={12} /> {selected.payMethod === "pix" ? "PIX" : "Cartão"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Internal Notes */}
+                <div className="bg-amber-50/50 dark:bg-amber-900/10 border border-amber-200/50 rounded-2xl p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-amber-600">
+                      <MessageSquare size={16} />
+                      <h4 className="font-black text-[10px] uppercase tracking-widest leading-none">Notas Internas</h4>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => setShowNotes(true)} className="h-6 px-2 text-[10px] font-black uppercase text-amber-600 hover:bg-amber-100">
+                      Editar
+                    </Button>
+                  </div>
+                  {showNotes ? (
+                    <div className="space-y-2">
+                      <Textarea 
+                        value={editNotes} 
+                        onChange={(e) => setEditNotes(e.target.value)} 
+                        className="min-h-[80px] text-xs bg-white border-amber-200"
+                        rows={3} 
+                      />
+                      <div className="flex gap-2 justify-end">
+                        <Button size="xs" variant="outline" onClick={() => setShowNotes(false)}>Sair</Button>
+                        <Button size="xs" onClick={handleSaveNotes} disabled={actionLoading}>Salvar</Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-amber-900/70 italic leading-relaxed">
+                      {selected.notes || "Sem observações registradas."}
+                    </p>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="grid grid-cols-1 gap-2 pt-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button variant="outline" className="h-10 rounded-xl font-bold text-[10px] uppercase tracking-widest" onClick={() => openEdit(selected)}>
+                      <Pencil size={14} className="mr-2" /> Editar
+                    </Button>
+                    <PrintReceiptButton
+                      data={selected as any}
+                      className="h-10"
+                      label="Recibo"
+                    />
+                  </div>
+                  {selected.customerPhone && (
+                    <Button 
+                      className="h-10 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-[10px] uppercase tracking-widest"
+                      asChild
+                    >
+                      <a 
+                        href={`https://wa.me/${selected.customerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}!`)}`}
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                      >
+                        <Smartphone size={14} className="mr-2" /> WhatsApp
+                      </a>
+                    </Button>
+                  )}
+                  {selected.status === "pendente" && (
+                    <Button onClick={() => handleAction(() => confirmPayment(selected.id), "Pago!")} className="h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold text-[10px] uppercase tracking-widest text-white shadow-lg shadow-emerald-200">
+                      Confirmar Pagamento
+                    </Button>
+                  )}
+                  <Button variant="ghost" onClick={() => setSelected(null)} className="h-10 text-[10px] font-black uppercase text-muted-foreground hover:bg-muted mt-2">
+                    Fechar Detalhes
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="glass-card rounded-[2.5rem] p-12 text-center sticky top-24 border border-dashed border-border/50">
+              <div className="w-20 h-20 rounded-[2rem] bg-muted/20 flex items-center justify-center text-muted-foreground/30 mx-auto mb-6">
+                <LayoutGrid size={32} />
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 mb-2">Painel de Detalhes</p>
+              <p className="text-xs font-bold text-muted-foreground/30 leading-relaxed">
+                Selecione uma reserva na lista ao lado para visualizar informações completas e ações rápidas.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
         <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
           {selected && (
