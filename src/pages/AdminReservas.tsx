@@ -941,179 +941,184 @@ const AdminReservas = () => {
                   </div>
                 </div>
 
-              {/* Notes */}
-              <div className="bg-muted rounded-xl p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-semibold text-sm text-foreground flex items-center gap-1">
-                    <MessageSquare size={14} /> Observações
-                  </h4>
-                  {!showNotes && (
-                    <Button variant="ghost" size="sm" onClick={() => setShowNotes(true)} className="text-xs h-7">
-                      Editar
-                    </Button>
-                  )}
-                </div>
-                {showNotes ? (
-                  <div className="space-y-2">
-                    <Textarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)} placeholder="Adicionar observações..." rows={3} />
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={handleSaveNotes} disabled={actionLoading}>
-                        {actionLoading ? <Loader2 className="animate-spin mr-1" size={14} /> : null} Salvar
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => setShowNotes(false)}>Cancelar</Button>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">{selected.notes || "Nenhuma observação."}</p>
-                )}
-                {/* Links e Termo de Risco */}
-                <div className="flex flex-col gap-3 mt-4">
-                  <div className="flex gap-2 w-full">
-                    {selected.invoiceUrl && (
-                      <Button variant="outline" size="sm" className="flex-1" asChild>
-                        <a href={selected.invoiceUrl} target="_blank" rel="noopener noreferrer">
-                          <FileText size={14} className="mr-1" /> Nota Fiscal
-                        </a>
-                      </Button>
-                    )}
-                    {selected.voucherUrl && (
-                      <Button variant="outline" size="sm" className="flex-1" asChild>
-                        <a href={selected.voucherUrl} target="_blank" rel="noopener noreferrer">
-                          <FileText size={14} className="mr-1" /> Voucher
-                        </a>
-                      </Button>
-                    )}
-                  </div>
-                  
-                  <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-amber-700">
-                        <Shield size={16} />
-                        <span className="text-sm font-bold uppercase tracking-tight">Termo de Risco</span>
+                  {/* Notes & Tools */}
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <MessageSquare size={16} className="text-primary" />
+                        <h4 className="font-black text-[10px] md:text-xs text-slate-400 uppercase tracking-widest leading-none">Observações Internas</h4>
                       </div>
-                      <Badge 
-                        variant="outline" 
-                        className={cn(
-                          "text-[10px]",
-                          selected.termStatus === "assinado" 
-                            ? "bg-green-100 text-green-700 border-green-200" 
-                            : "bg-white/50 text-amber-600 border-amber-200"
-                        )}
-                      >
-                        {selected.termStatus === "assinado" ? "ASSINADO" : "PENDENTE"}
-                      </Badge>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="bg-white border-amber-200 text-amber-700 hover:bg-amber-50 h-9"
-                        onClick={() => {
-                          const link = `${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`;
-                          navigator.clipboard.writeText(link);
-                          toast.success("Link do termo copiado!");
-                        }}
-                      >
-                        <Copy size={14} className="mr-2" /> Copiar Link
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="bg-white border-green-200 text-green-700 hover:bg-green-50 h-9"
-                        asChild
-                      >
-                        <a 
-                          href={`https://wa.me/${selected.customerPhone?.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}! Por favor, assine o Termo de Ciência de Risco para o passeio ${selected.itemName}: ${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`)}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                        >
-                          <Smartphone size={14} className="mr-2" /> WhatsApp
-                        </a>
-                      </Button>
-                      {selected.termStatus === "assinado" ? (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="bg-green-600 text-white border-transparent hover:bg-green-700 h-9"
-                          asChild
-                        >
-                          <a 
-                            href={supabase.storage.from("customer-documents").getPublicUrl(selected.termPdfUrl!).data.publicUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                          >
-                            <FileText size={14} className="mr-2" /> Ver Termo
-                          </a>
-                        </Button>
-                      ) : (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="bg-amber-600 text-white border-transparent hover:bg-amber-700 h-9"
-                          asChild
-                        >
-                          <a href={`/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink size={14} className="mr-2" /> Abrir Termo
-                          </a>
+                      {!showNotes && (
+                        <Button variant="ghost" size="sm" onClick={() => setShowNotes(true)} className="text-[10px] h-7 font-black uppercase tracking-widest text-primary hover:bg-primary/5">
+                          Editar
                         </Button>
                       )}
                     </div>
+                    {showNotes ? (
+                      <div className="space-y-2">
+                        <Textarea 
+                          value={editNotes} 
+                          onChange={(e) => setEditNotes(e.target.value)} 
+                          placeholder="Adicionar observações importantes sobre esta reserva..." 
+                          className="min-h-[100px] rounded-xl bg-amber-50/30 border-amber-200/50"
+                          rows={3} 
+                        />
+                        <div className="flex gap-2 justify-end">
+                          <Button size="sm" variant="outline" onClick={() => setShowNotes(false)} className="rounded-lg h-9 text-[10px] font-black uppercase tracking-widest">Cancelar</Button>
+                          <Button size="sm" onClick={handleSaveNotes} disabled={actionLoading} className="rounded-lg h-9 text-[10px] font-black uppercase tracking-widest">
+                            {actionLoading ? <Loader2 className="animate-spin mr-1" size={12} /> : null} Salvar
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+                        <p className="text-sm text-slate-600 dark:text-slate-400 italic">
+                          {selected.notes || "Nenhuma observação interna registrada para esta reserva."}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Document Tools */}
+                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                      <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Documentos e Links</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {selected.invoiceUrl && (
+                          <Button variant="outline" size="sm" className="h-10 rounded-xl border-slate-200 font-bold text-xs" asChild>
+                            <a href={selected.invoiceUrl} target="_blank" rel="noopener noreferrer">
+                              <FileText size={14} className="mr-2 text-primary" /> Nota Fiscal
+                            </a>
+                          </Button>
+                        )}
+                        {selected.voucherUrl && (
+                          <Button variant="outline" size="sm" className="h-10 rounded-xl border-slate-200 font-bold text-xs" asChild>
+                            <a href={selected.voucherUrl} target="_blank" rel="noopener noreferrer">
+                              <FileText size={14} className="mr-2 text-emerald-500" /> Voucher
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Term of Risk */}
+                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2 text-amber-600">
+                          <Shield size={16} />
+                          <span className="text-[10px] font-black uppercase tracking-widest">Termo de Ciência de Risco</span>
+                        </div>
+                        <Badge 
+                          variant="outline" 
+                          className={cn(
+                            "text-[8px] font-black tracking-widest px-2 py-0.5",
+                            selected.termStatus === "assinado" 
+                              ? "bg-green-100 text-green-700 border-green-200" 
+                              : "bg-amber-100 text-amber-700 border-amber-200"
+                          )}
+                        >
+                          {selected.termStatus === "assinado" ? "ASSINADO" : "PENDENTE"}
+                        </Badge>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 h-9 rounded-xl text-[10px] font-bold"
+                          onClick={() => {
+                            const link = `${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`;
+                            navigator.clipboard.writeText(link);
+                            toast.success("Link do termo copiado!");
+                          }}
+                        >
+                          <Copy size={14} className="mr-2 text-primary" /> Copiar Link
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-white border-slate-200 text-slate-700 hover:bg-slate-50 h-9 rounded-xl text-[10px] font-bold"
+                          asChild
+                        >
+                          <a 
+                            href={`https://wa.me/${selected.customerPhone?.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selected.customerName}! Por favor, assine o Termo de Ciência de Risco para o passeio ${selected.itemName}: ${window.location.origin}/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`)}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
+                            <Smartphone size={14} className="mr-2 text-green-500" /> WhatsApp
+                          </a>
+                        </Button>
+                        {selected.termStatus === "assinado" ? (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="bg-green-600 text-white border-transparent hover:bg-green-700 h-9 rounded-xl text-[10px] font-bold shadow-lg shadow-green-200"
+                            asChild
+                          >
+                            <a 
+                              href={supabase.storage.from("customer-documents").getPublicUrl(selected.termPdfUrl!).data.publicUrl} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                            >
+                              <Eye size={14} className="mr-2" /> Ver Termo
+                            </a>
+                          </Button>
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="bg-amber-500 text-white border-transparent hover:bg-amber-600 h-9 rounded-xl text-[10px] font-bold shadow-lg shadow-amber-200"
+                            asChild
+                          >
+                            <a href={`/assinatura-termo?booking=${encodeURIComponent(selected.bookingCode.trim())}`} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink size={14} className="mr-2" /> Abrir Termo
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                   </div>
+
                 </div>
-              </div>
 
-              {/* Status badges */}
-              <div className="flex gap-2">
-                <Badge className={statusConfig[selected.status]?.className}>
-                  {statusConfig[selected.status]?.label || selected.status}
-                </Badge>
-                <Badge className={paymentConfig[selected.paymentStatus]?.className}>
-                  {paymentConfig[selected.paymentStatus]?.label || selected.paymentStatus}
-                </Badge>
-              </div>
+                <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex flex-wrap gap-3 sticky bottom-0 z-10">
+                  <Button variant="outline" onClick={() => { setSelected(null); openEdit(selected); }} disabled={actionLoading} className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl font-bold text-xs border-slate-200">
+                    <Pencil size={16} className="mr-2 text-amber-500" /> Editar
+                  </Button>
+                  
+                  {selected.status === "pendente" && selected.paymentStatus === "pendente" && (
+                    <Button onClick={() => handleAction(() => confirmPayment(selected.id), "Pagamento confirmado!")} disabled={actionLoading} className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg shadow-emerald-200">
+                      {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle size={16} className="mr-2" />}
+                      Confirmar Pago
+                    </Button>
+                  )}
+                  
+                  {selected.status === "confirmada" && (
+                    <Button variant="secondary" onClick={() => handleAction(() => completeBooking(selected.id), "Reserva concluída!")} disabled={actionLoading} className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl font-bold text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 border-none">
+                      {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
+                      Concluir
+                    </Button>
+                  )}
+                  
+                  {selected.status !== "cancelada" && (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleAction(() => deleteBooking(selected.id), "Reserva removida.", true)} 
+                      disabled={actionLoading} 
+                      className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl border-rose-200 text-rose-600 hover:bg-rose-50 font-bold text-xs"
+                    >
+                      {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
+                      Cancelar
+                    </Button>
+                  )}
 
-              {/* Actions */}
-              <div className="flex gap-3 pt-4 flex-wrap border-t border-slate-200 mt-6">
-                <Button variant="outline" onClick={() => { setSelected(null); openEdit(selected); }} disabled={actionLoading} className="flex-1 min-w-[140px] border-slate-300">
-                  <Pencil size={16} className="mr-2 text-amber-500" /> Editar Reserva
-                </Button>
-                
-                {selected.status === "pendente" && selected.paymentStatus === "pendente" && (
-                  <Button onClick={() => handleAction(() => confirmPayment(selected.id), "Pagamento confirmado!")} disabled={actionLoading} className="flex-1 min-w-[140px] bg-emerald-600 hover:bg-emerald-700">
-                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle size={16} className="mr-2" />}
-                    Confirmar Pagamento
-                  </Button>
-                )}
-                
-                {selected.status === "confirmada" && (
-                  <Button variant="secondary" onClick={() => handleAction(() => completeBooking(selected.id), "Reserva concluída!")} disabled={actionLoading} className="flex-1 min-w-[140px]">
-                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <CheckCircle2 size={16} className="mr-2" />}
-                    Concluir Serviço
-                  </Button>
-                )}
-                
-                {selected.status !== "cancelada" && (
                   <Button 
-                    variant="outline" 
-                    onClick={() => handleAction(() => deleteBooking(selected.id), "Reserva removida.", true)} 
+                    variant="destructive" 
+                    onClick={() => handleDelete(selected.id)} 
                     disabled={actionLoading} 
-                    className="flex-1 min-w-[140px] border-rose-200 text-rose-600 hover:bg-rose-50"
+                    className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl bg-rose-600 hover:bg-rose-700 font-bold text-xs shadow-lg shadow-rose-200"
                   >
-                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Ban size={16} className="mr-2" />}
-                    Cancelar e Excluir
+                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Trash2 size={16} className="mr-2" />}
+                    Excluir
                   </Button>
-                )}
-
-                <Button 
-                  variant="destructive" 
-                  onClick={() => handleDelete(selected.id)} 
-                  disabled={actionLoading} 
-                  className="flex-1 min-w-[140px] bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-200"
-                >
-                  {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Trash2 size={16} className="mr-2" />}
-                  Excluir Permanente
-                </Button>
-              </div>
+                </div>
               
               {/* Other Actions Group */}
               <div className="flex flex-col sm:flex-row gap-3 mt-4 pt-4 border-t border-slate-100">
