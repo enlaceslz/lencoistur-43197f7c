@@ -617,7 +617,11 @@ const AdminReservas = () => {
           {filtered.map((booking, index) => (
             <div 
               key={booking.id}
-              className="glass-card admin-card-hover rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden border border-white/20 group animate-in-slide-up bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-xl shadow-black/5"
+              onClick={() => setSelected(booking)}
+              className={cn(
+                "glass-card admin-card-hover rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden border border-white/20 group animate-in-slide-up bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-xl shadow-black/5 cursor-pointer transition-all",
+                selected?.id === booking.id && "ring-4 ring-primary/20 bg-white dark:bg-black/40 scale-[1.02]"
+              )}
               style={{ animationDelay: `${0.05 * (index % 10)}s` }}
             >
               <div className="p-6 md:p-8">
