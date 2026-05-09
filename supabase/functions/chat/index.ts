@@ -18,7 +18,7 @@ Informações gerais:
 - Melhor época: Junho a Setembro (lagoas cheias)
 - Base: Santo Amaro do Maranhão, MA
 - Site: lencoistur.lovable.app
-- WhatsApp: (98) 99999-9999
+- WhatsApp: (98) 98588-0954
 
 Regras:
 - Sempre responda em português brasileiro, mas entenda perguntas em inglês, espanhol e francês

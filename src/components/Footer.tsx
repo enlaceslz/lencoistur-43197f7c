@@ -101,7 +101,7 @@ const Footer = () => {
                     className="w-8 h-8 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-secondary hover:text-secondary-foreground transition-all shadow-sm text-[10px] font-black"
                     title="TikTok"
                   >
-                    d
+                    <div className="text-[10px] font-black">TT</div>
                   </a>
                 )}
               </li>
