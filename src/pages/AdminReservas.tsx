@@ -553,7 +553,14 @@ const AdminReservas = () => {
             </TableHeader>
             <TableBody>
               {filtered.map((booking) => (
-                <TableRow key={booking.id} className="border-b border-border/40 hover:bg-primary/5 transition-colors group">
+                <TableRow 
+                  key={booking.id} 
+                  onClick={() => setSelected(booking)}
+                  className={cn(
+                    "border-b border-border/40 hover:bg-primary/5 transition-all cursor-pointer group",
+                    selected?.id === booking.id && "bg-primary/5"
+                  )}
+                >
                   <TableCell className="py-4">
                     <span className="text-[10px] font-black text-primary bg-primary/5 px-2 py-1 rounded-md">#{booking.bookingCode}</span>
                   </TableCell>
