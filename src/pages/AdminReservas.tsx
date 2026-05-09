@@ -777,6 +777,7 @@ const AdminReservas = () => {
               </div>
             </div>
           )}
+          </div>
         </div>
       </div>
 
