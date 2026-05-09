@@ -598,8 +598,8 @@ const AdminReservas = () => {
               key={booking.id}
               onClick={() => setSelected(booking)}
               className={cn(
-                "glass-card admin-card-hover rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden border border-white/20 group animate-in-slide-up bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-xl shadow-black/5 cursor-pointer transition-all",
-                selected?.id === booking.id && "ring-4 ring-primary/20 bg-white dark:bg-black/40 scale-[1.02]"
+                "glass-card rounded-[1.5rem] md:rounded-3xl overflow-hidden border border-border group animate-in-slide-up bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-sm cursor-pointer transition-all",
+                selected?.id === booking.id && "ring-2 ring-primary bg-white dark:bg-black/40 shadow-lg shadow-primary/5"
               )}
               style={{ animationDelay: `${0.05 * (index % 10)}s` }}
             >
@@ -779,9 +779,10 @@ const AdminReservas = () => {
           )}
         </div>
       </div>
+
       <div className={cn("hidden lg:block w-[380px] space-y-6 animate-in-fade shrink-0", !selected && "opacity-50 pointer-events-none")}>
-          {selected ? (
-            <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover sticky top-24 overflow-hidden flex flex-col max-h-[calc(100vh-120px)]">
+        {selected ? (
+            <div className="glass-card rounded-[2.5rem] p-8 sticky top-24 overflow-hidden flex flex-col max-h-[calc(100vh-120px)] border border-border">
               <div className="text-center bg-primary/[0.02] p-8 rounded-[2rem] border border-primary/5 mb-8">
                 <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-primary to-ocean flex items-center justify-center text-white text-3xl font-black mx-auto mb-6 shadow-2xl shadow-primary/20 transition-transform duration-500 hover:rotate-6">
                   {selected.customerName.trim() ? selected.customerName.trim().split(" ").filter(Boolean).map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
@@ -1256,7 +1257,7 @@ const AdminReservas = () => {
           </form>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
     </AdminLayout>
   );
 };
