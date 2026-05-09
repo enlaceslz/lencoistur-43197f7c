@@ -858,13 +858,6 @@ const AdminReservas = () => {
                       </span>
                     </div>
                   </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
-                </div>
 
                 {/* Booking details */}
                 <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
