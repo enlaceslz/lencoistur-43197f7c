@@ -3,8 +3,9 @@ import {
   DollarSign, TrendingUp, Users, Calendar,
   ArrowUpRight, ArrowDownRight, Loader2, ShieldAlert,
   PieChart as PieChartIcon, LayoutDashboard, Briefcase, Star, MapPin,
-  CheckCircle2, Clock, XCircle, Search, Filter, ChevronRight, User
+  CheckCircle2, Clock, XCircle, Search, Filter, ChevronRight, User, ArrowRight
 } from "lucide-react";
+
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell
