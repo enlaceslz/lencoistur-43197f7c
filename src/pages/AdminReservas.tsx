@@ -598,8 +598,8 @@ const AdminReservas = () => {
               key={booking.id}
               onClick={() => setSelected(booking)}
               className={cn(
-                "glass-card admin-card-hover rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden border border-white/20 group animate-in-slide-up bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-xl shadow-black/5 cursor-pointer transition-all",
-                selected?.id === booking.id && "ring-4 ring-primary/20 bg-white dark:bg-black/40 scale-[1.02]"
+                "glass-card rounded-[1.5rem] md:rounded-3xl overflow-hidden border border-border group animate-in-slide-up bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-sm cursor-pointer transition-all",
+                selected?.id === booking.id && "ring-2 ring-primary bg-white dark:bg-black/40 shadow-lg shadow-primary/5"
               )}
               style={{ animationDelay: `${0.05 * (index % 10)}s` }}
             >
