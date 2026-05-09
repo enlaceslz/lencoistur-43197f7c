@@ -1114,6 +1114,15 @@ const AdminReservas = () => {
                     </Button>
                   )}
 
+                  <Button 
+                    variant="destructive" 
+                    onClick={() => handleDelete(selected.id)} 
+                    disabled={actionLoading} 
+                    className="flex-1 min-w-[140px] h-11 md:h-12 rounded-xl bg-rose-600 hover:bg-rose-700 font-bold text-xs shadow-lg shadow-rose-200"
+                  >
+                    {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Trash2 size={16} className="mr-2" />}
+                    Excluir
+                  </Button>
                 </div>
               
                 <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex flex-col gap-4">
