@@ -398,133 +398,105 @@ const AdminReservas = () => {
 
   return (
     <AdminLayout title="Gestão de Reservas">
-      {/* Stats - Responsive Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
-        {[
-          { label: "Total Reservas", value: bookings.length, icon: ShoppingCart, color: "from-blue-500 to-indigo-600", desc: "Histórico geral" },
-          { label: "Confirmadas", value: bookings.filter((b) => b.status === "confirmada").length, icon: CheckCircle, color: "from-emerald-500 to-teal-600", desc: "Vendas firmes" },
-          { label: "Pendentes", value: bookings.filter((b) => b.status === "pendente").length, icon: Clock, color: "from-amber-500 to-orange-600", desc: "Aguardando" },
-          { label: "Receita Paga", value: fmt(totalPago), icon: DollarSign, color: "from-purple-500 to-pink-600", desc: "LTV Financeiro" },
-        ].map((stat, i) => (
-          <div key={i} className="glass-card admin-card-hover rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-6 relative overflow-hidden group">
-            <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
-            <div className="flex items-center justify-between mb-2 md:mb-4">
-              <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-primary/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
-                <stat.icon size={20} className="md:w-[22px]" strokeWidth={2.5} />
+      <div className="flex flex-col lg:flex-row gap-6 h-full items-stretch">
+        <div className="flex-1 min-w-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+            {[
+              { label: "Total Reservas", value: bookings.length, icon: ShoppingCart, color: "from-blue-500 to-indigo-600", desc: "Histórico" },
+              { label: "Confirmadas", value: bookings.filter((b) => b.status === "confirmada").length, icon: CheckCircle, color: "from-emerald-500 to-teal-600", desc: "Vendas" },
+              { label: "Pendentes", value: bookings.filter((b) => b.status === "pendente").length, icon: Clock, color: "from-amber-500 to-orange-600", desc: "Aguardando" },
+              { label: "Receita Paga", value: fmt(totalPago), icon: DollarSign, color: "from-purple-500 to-pink-600", desc: "Financeiro" },
+            ].map((stat, i) => (
+              <div key={i} className="glass-card rounded-3xl p-4 relative overflow-hidden group">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg`}>
+                    <stat.icon size={18} strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <p className="text-xl font-black text-foreground tracking-tighter">{stat.value}</p>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{stat.label}</p>
+                  </div>
+                </div>
               </div>
-              <div className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{stat.desc}</div>
-            </div>
-            <p className="text-xl md:text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
-            <p className="text-[9px] md:text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* View Switcher & Filters - More Responsive */}
-      <Card className="mb-6 md:mb-8 border-none shadow-2xl shadow-primary/5 overflow-hidden glass-card rounded-[1.5rem] md:rounded-[2.5rem] animate-in-fade border border-white/20" style={{ animationDelay: '0.2s' }}>
-        <CardContent className="p-4 md:p-8 space-y-6 md:space-y-8">
-          <div className="flex flex-col lg:flex-row gap-4 md:gap-8 items-stretch lg:items-center justify-between">
-            <div className="flex bg-white/40 dark:bg-black/20 backdrop-blur-xl p-1.5 rounded-[1.2rem] md:rounded-[1.5rem] border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 w-full lg:w-auto">
-
-              <Button 
-                variant={viewMode === "list" ? "default" : "ghost"} 
-                onClick={() => setViewMode("list")}
-                className={cn(
-                  "flex-1 lg:flex-none h-11 md:h-12 px-4 md:px-8 rounded-xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] transition-all",
-                  viewMode === "list" ? "shadow-lg shadow-primary/25 scale-[1.02]" : "text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5"
-                )}
-              >
-                <LayoutGrid size={16} className="mr-2 md:w-[18px]" /> Cards
-              </Button>
-              <Button 
-                variant={viewMode === "table" ? "default" : "ghost"} 
-                onClick={() => setViewMode("table")}
-                className={cn(
-                  "flex-1 lg:flex-none h-11 md:h-12 px-4 md:px-8 rounded-xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] transition-all",
-                  viewMode === "table" ? "shadow-lg shadow-primary/25 scale-[1.02]" : "text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5"
-                )}
-              >
-                <List size={16} className="mr-2 md:w-[18px]" /> Tabela
-              </Button>
-              <Button 
-                variant={viewMode === "calendar" ? "default" : "ghost"} 
-                onClick={() => setViewMode("calendar")}
-                className={cn(
-                  "flex-1 lg:flex-none h-11 md:h-12 px-4 md:px-8 rounded-xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] transition-all",
-                  viewMode === "calendar" ? "shadow-lg shadow-primary/25 scale-[1.02]" : "text-muted-foreground hover:bg-white/50 dark:hover:bg-white/5"
-                )}
-              >
-                <CalendarDays size={16} className="mr-2 md:w-[18px]" /> Agenda
-              </Button>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
-              <div className="relative flex-1 lg:w-[350px] group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
-                <Input
-                  placeholder="Nome, passeio ou código..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-12 h-12 md:h-14 rounded-[1.2rem] md:rounded-[1.5rem] border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/20 backdrop-blur-xl focus:bg-white/80 dark:focus:bg-black/40 focus:ring-4 focus:ring-primary/10 transition-all font-semibold text-sm"
-                />
-              </div>
-
-              <div className="flex gap-2">
-                <Button 
-                  onClick={() => { resetNewForm(); setShowNewForm(true); }} 
-                  className="flex-1 sm:flex-none h-12 md:h-14 px-4 md:px-8 rounded-[1.2rem] md:rounded-[1.5rem] bg-gradient-to-r from-primary to-indigo-600 hover:shadow-2xl hover:shadow-primary/30 transition-all font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em]"
-                >
-                  <Plus size={18} className="mr-1 md:mr-2" /> Reserva
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={exportCSV} 
-                  className="flex-1 sm:flex-none h-12 md:h-14 px-4 md:px-8 rounded-[1.2rem] md:rounded-[1.5rem] border-white/40 dark:border-white/10 backdrop-blur-xl hover:bg-white/50 transition-all font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em]"
-                >
-                  <Download size={18} className="mr-1 md:mr-2" /> CSV
-                </Button>
-              </div>
-            </div>
+            ))}
           </div>
 
-          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 md:gap-6 pt-6 border-t border-border/40">
-            <div className="flex overflow-x-auto pb-2 md:pb-0 gap-2 no-scrollbar">
+          <Card className="mb-6 border-none shadow-sm glass-card rounded-3xl overflow-hidden border border-white/20">
+            <CardContent className="p-4 md:p-6 space-y-4">
+              <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
+                <div className="flex bg-muted/30 p-1 rounded-2xl border border-border/40 w-full md:w-auto">
+                  <Button 
+                    variant={viewMode === "list" ? "default" : "ghost"} 
+                    onClick={() => setViewMode("list")}
+                    className={cn("flex-1 md:flex-none h-10 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest", viewMode === "list" ? "shadow-md" : "text-muted-foreground")}
+                  >
+                    <LayoutGrid size={14} className="mr-2" /> Cards
+                  </Button>
+                  <Button 
+                    variant={viewMode === "table" ? "default" : "ghost"} 
+                    onClick={() => setViewMode("table")}
+                    className={cn("flex-1 md:flex-none h-10 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest", viewMode === "table" ? "shadow-md" : "text-muted-foreground")}
+                  >
+                    <List size={14} className="mr-2" /> Tabela
+                  </Button>
+                  <Button 
+                    variant={viewMode === "calendar" ? "default" : "ghost"} 
+                    onClick={() => setViewMode("calendar")}
+                    className={cn("flex-1 md:flex-none h-10 px-6 rounded-xl font-black text-[10px] uppercase tracking-widest", viewMode === "calendar" ? "shadow-md" : "text-muted-foreground")}
+                  >
+                    <CalendarDays size={14} className="mr-2" /> Agenda
+                  </Button>
+                </div>
 
-              {["todos", "confirmada", "pendente", "cancelada", "concluida"].map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setStatusFilter(s)}
-                  className={`text-[9px] md:text-[10px] font-black uppercase tracking-widest px-4 md:px-5 py-2 md:py-3 rounded-xl transition-all whitespace-nowrap shadow-sm border border-border/20 ${
-                    statusFilter === s
-                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
-                      : "bg-white/40 dark:bg-black/20 backdrop-blur-sm text-muted-foreground hover:bg-primary/5 hover:text-primary hover:border-primary/20"
-                  }`}
-                >
-                  {s === "todos" ? `Status: Todos` : statusConfig[s]?.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-3 md:gap-4 bg-white/40 dark:bg-black/20 backdrop-blur-xl px-4 md:px-5 py-2 md:py-3 rounded-xl border border-white/40 dark:border-white/10 shadow-sm md:ml-auto w-full md:w-auto justify-center md:justify-start">
-              <Calendar size={14} className="text-primary" />
-              <div className="flex items-center gap-2 md:gap-3">
-                <input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="bg-transparent text-[10px] md:text-[11px] font-black uppercase tracking-widest outline-none w-24 md:w-28 text-foreground" />
-                <span className="text-muted-foreground text-[9px] md:text-[10px] font-black opacity-40">ATÉ</span>
-                <input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="bg-transparent text-[10px] md:text-[11px] font-black uppercase tracking-widest outline-none w-24 md:w-28 text-foreground" />
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
+                  <div className="relative flex-1 md:w-[280px]">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40" size={16} />
+                    <Input
+                      placeholder="Busca..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="pl-10 h-11 rounded-xl border-border/40 bg-muted/20 focus:bg-white transition-all font-semibold text-xs"
+                    />
+                  </div>
+                  <Button onClick={openNew} className="h-11 px-6 rounded-xl bg-primary hover:bg-primary/90 font-black text-[10px] uppercase tracking-widest">
+                    <Plus size={16} className="mr-2" /> Reserva
+                  </Button>
+                  <Button variant="outline" onClick={exportCSV} className="h-11 px-6 rounded-xl border-border/40 hover:bg-muted font-black text-[10px] uppercase tracking-widest">
+                    <Download size={16} className="mr-2" /> CSV
+                  </Button>
+                </div>
               </div>
-              {(dateStart || dateEnd) && (
-                <button onClick={() => { setDateStart(""); setDateEnd(""); }} className="ml-1 text-[9px] font-black text-rose-500 uppercase tracking-widest hover:underline px-2 py-1 rounded-md bg-rose-500/5">
-                  X
-                </button>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        {/* Main Content Area */}
-        <div className={cn("space-y-6", selected ? "lg:col-span-2" : "lg:col-span-3")}>
+              <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 pt-4 border-t border-border/40">
+                <div className="flex overflow-x-auto pb-2 md:pb-0 gap-2 no-scrollbar">
+                  {["todos", "confirmada", "pendente", "cancelada", "concluida"].map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setStatusFilter(s)}
+                      className={`text-[9px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all whitespace-nowrap border ${
+                        statusFilter === s
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-muted/30 text-muted-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {s === "todos" ? `Status: Todos` : statusConfig[s]?.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-3 bg-muted/20 px-4 py-2 rounded-xl border border-border/40 ml-auto">
+                  <Calendar size={12} className="text-primary" />
+                  <div className="flex items-center gap-2">
+                    <input type="date" value={dateStart} onChange={(e) => setDateStart(e.target.value)} className="bg-transparent text-[9px] font-black uppercase tracking-widest outline-none w-24" />
+                    <span className="text-muted-foreground text-[8px] font-black opacity-40">→</span>
+                    <input type="date" value={dateEnd} onChange={(e) => setDateEnd(e.target.value)} className="bg-transparent text-[9px] font-black uppercase tracking-widest outline-none w-24" />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="min-h-0">
           {viewMode === "calendar" ? (
             <div className="animate-in-fade" style={{ animationDelay: '0.3s' }}>
               <BookingCalendar 
