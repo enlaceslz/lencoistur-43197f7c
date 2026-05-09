@@ -1161,7 +1161,6 @@ const AdminReservas = () => {
                   </a>
                 )}
                 </div>
-                </div>
               </div>
             )}
           </DialogContent>
