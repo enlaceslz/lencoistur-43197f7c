@@ -1111,6 +1111,7 @@ const AdminReservas = () => {
                     {actionLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : <Trash2 size={16} className="mr-2" />}
                     Excluir
                   </Button>
+                  </Button>
                 </div>
               
                 <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex flex-col gap-4">
@@ -1162,9 +1163,10 @@ const AdminReservas = () => {
                 )}
               </div>
             </div>
-          )}
-        </DialogContent>
-      </Dialog>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
 
       {/* New Booking Dialog */}
       <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
