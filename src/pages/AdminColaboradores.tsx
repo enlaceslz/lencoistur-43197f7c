@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Users, Search, Plus, Edit, Trash2, Loader2, Phone, Mail, User, Wallet, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileText, History, LayoutGrid, List, Settings2, Trash, Camera, Upload, ExternalLink, Download, FileDown
+  Users, Search, Plus, Edit, Trash2, Loader2, Phone, Mail, User, Wallet, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileText, History, LayoutGrid, List, Settings2, Trash, Camera, Upload, ExternalLink, Download, FileDown, ChevronRight, MoreHorizontal, ArrowRight, Shield, Award, MapPin, Tag as TagIcon
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -24,11 +24,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { maskCPF, maskPhone, maskCEP, maskCurrency, parseCurrencyToNumber } from "@/lib/masks";
-import { formatCurrency, validateCPF } from "@/lib/utils";
+import { formatCurrency, validateCPF, cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+
 
 interface Collaborator {
   id: string;
@@ -419,247 +420,90 @@ const AdminColaboradores = () => {
 
   return (
     <AdminLayout title="Colaboradores">
-      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 mb-10 glass-card p-8 rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.1s' }}>
-        <div className="space-y-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Equipe Interna e Operacional</p>
-          <h1 className="text-4xl font-black text-foreground tracking-tight leading-none">Colaboradores</h1>
-          <div className="flex items-center gap-3 mt-4">
-            <div className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-              <Users size={12} /> {collaborators.length} Especialistas
+      <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-120px)] items-stretch">
+        <div className="flex-1 min-w-0 flex flex-col">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div className="space-y-1">
+              <h1 className="text-2xl font-black text-slate-900 tracking-tight">Equipe</h1>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <Users size={14} className="text-primary" /> {collaborators.length} Especialistas Ativos
+              </p>
             </div>
-            <div className="flex items-center gap-2 bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-              <CheckCircle2 size={12} /> {collaborators.filter(c => c.status === 'active').length} Ativos
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 min-w-[320px] group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
-            <input 
-              placeholder="Pesquisar colaborador por nome ou cargo..." 
-              value={search} 
-              onChange={(e) => setSearch(e.target.value)} 
-              className="w-full pl-14 h-14 rounded-2xl border border-border/40 focus:ring-4 focus:ring-primary/10 bg-muted/20 transition-all font-medium text-sm outline-none placeholder:text-muted-foreground/40" 
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="rounded-xl h-12 w-12 border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-sm" 
-                    onClick={generatePDF}
-                  >
-                    <FileDown size={20} className="text-rose-500" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Relatório PDF</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-            <Button variant="outline" size="sm" className="rounded-2xl h-12 px-5 border-slate-200 bg-white hover:bg-slate-50 transition-all font-bold text-slate-600 shadow-sm hidden sm:flex" onClick={() => setTypesDialogOpen(true)}>
-              <Settings2 size={18} className="mr-2" /> Categorias
-            </Button>
-            
-            <Button onClick={openNew} size="lg" className="rounded-2xl h-12 px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white active:scale-95">
-              <Plus size={20} className="mr-2" strokeWidth={3} /> Novo
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap gap-3 mb-10 overflow-x-auto pb-4 no-scrollbar scroll-smooth animate-in-fade" style={{ animationDelay: '0.15s' }}>
-        <button
-          onClick={() => setSearch("")} 
-          className={`text-[10px] font-black uppercase tracking-widest px-8 h-12 rounded-2xl transition-all whitespace-nowrap shadow-lg shadow-primary/5 ${
-            !search
-              ? "bg-primary text-primary-foreground shadow-primary/20 scale-105"
-              : "glass-card text-muted-foreground hover:bg-muted/80"
-          }`}
-        >
-          Todos Especialistas
-        </button>
-        {collabTypes.map((t) => {
-          const isActive = search === t.name;
-          const count = collaborators.filter(c => c.type === t.name).length;
-          return (
-            <button 
-              key={t.id} 
-              onClick={() => setSearch(t.name)}
-              className={`flex items-center gap-3 px-8 h-12 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap shadow-lg shadow-primary/5 ${
-                isActive 
-                  ? "bg-primary text-primary-foreground shadow-primary/20 scale-105" 
-                  : "glass-card text-muted-foreground hover:bg-muted/80"
-              }`}
-            >
-              <Users size={16} strokeWidth={2.5} className={isActive ? "text-white" : "text-primary/40"} />
-              {t.name}
-              <span className={`ml-2 px-2.5 py-0.5 rounded-lg text-[9px] ${isActive ? "bg-white/20 text-white" : "bg-primary/10 text-primary"}`}>
-                {count}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="mb-10 glass-card rounded-[2.5rem] p-8 shadow-sm animate-in-fade" style={{ animationDelay: '0.2s' }}>
-        <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
-          <div className="relative flex-1 w-full group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
-            <input 
-              placeholder="Pesquisar por nome, e-mail ou documento..." 
-              value={search} 
-              onChange={(e) => setSearch(e.target.value)} 
-              className="w-full pl-14 h-14 rounded-2xl border border-border/40 focus:ring-4 focus:ring-primary/10 bg-muted/20 transition-all font-medium text-sm outline-none placeholder:text-muted-foreground/40" 
-            />
-          </div>
-          
-          <div className="flex items-center gap-4 w-full md:w-auto">
-            <div className="h-10 w-px bg-slate-200 hidden md:block" />
-            
-            <div className="flex items-center gap-1 bg-slate-100/80 p-1.5 rounded-2xl shadow-inner w-full md:w-auto justify-center">
+            <div className="flex items-center gap-2">
               <Button 
-                variant={viewMode === 'cards' ? 'secondary' : 'ghost'} 
-                size="sm" 
-                onClick={() => setViewMode('cards')}
-                className={`h-9 px-4 rounded-xl transition-all duration-300 ${viewMode === 'cards' ? 'bg-white text-primary shadow-sm font-bold' : 'text-slate-500'}`}
+                variant="outline" 
+                size="icon" 
+                className="rounded-xl h-10 w-10 border-slate-200" 
+                onClick={generatePDF}
               >
-                <LayoutGrid size={16} className="mr-2" />
-                Cards
+                <FileDown size={18} className="text-rose-500" />
               </Button>
               <Button 
-                variant={viewMode === 'table' ? 'secondary' : 'ghost'} 
+                variant="outline" 
                 size="sm" 
-                onClick={() => setViewMode('table')}
-                className={`h-9 px-4 rounded-xl transition-all duration-300 ${viewMode === 'table' ? 'bg-white text-primary shadow-sm font-bold' : 'text-slate-500'}`}
+                className="rounded-xl h-10 px-4 border-slate-200 font-bold text-slate-600 hidden sm:flex" 
+                onClick={() => setTypesDialogOpen(true)}
               >
-                <List size={16} className="mr-2" />
-                Lista
+                <Settings2 size={16} className="mr-2" /> Categorias
+              </Button>
+              <Button 
+                onClick={openNew} 
+                size="sm" 
+                className="rounded-xl h-10 px-6 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 font-black text-white"
+              >
+                <Plus size={18} className="mr-2" strokeWidth={3} /> Novo
               </Button>
             </div>
           </div>
-        </div>
-      </div>
 
-      {viewMode === 'cards' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filtered.map(c => (
-            <div key={c.id} className="overflow-hidden border-none glass-card admin-card-hover group relative flex flex-col h-full rounded-[2.5rem] animate-in-fade">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-primary/5 group-hover:bg-primary/20 transition-colors" />
-              
-              <div className="p-6 flex-1">
-                <div className="flex justify-between items-start mb-6">
-                  <div className="relative">
-                    <div className="w-20 h-20 rounded-3xl overflow-hidden bg-slate-50 border-2 border-slate-100 flex items-center justify-center font-bold text-2xl shadow-inner group-hover:scale-105 transition-transform duration-500 group-hover:border-primary/20">
-                      {c.avatar_url ? (
-                        <img src={c.avatar_url} alt={c.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-primary/40 group-hover:text-primary transition-colors">{c.name.substring(0, 2).toUpperCase()}</span>
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col flex-1 overflow-hidden">
+            <div className="p-4 border-b border-slate-100 flex flex-col md:flex-row gap-4 items-center bg-slate-50/50">
+              <div className="relative flex-1 w-full">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input 
+                  placeholder="Pesquisar por nome ou cargo..." 
+                  value={search} 
+                  onChange={(e) => setSearch(e.target.value)} 
+                  className="w-full pl-11 h-11 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary/20 bg-white transition-all text-sm outline-none font-medium" 
+                />
+              </div>
+              <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setViewMode('cards')}
+                  className={cn("h-9 px-3 rounded-lg transition-all", viewMode === 'cards' ? "bg-primary/10 text-primary font-bold" : "text-slate-400")}
+                >
+                  <LayoutGrid size={16} />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setViewMode('table')}
+                  className={cn("h-9 px-3 rounded-lg transition-all", viewMode === 'table' ? "bg-primary/10 text-primary font-bold" : "text-slate-400")}
+                >
+                  <List size={16} />
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+              {viewMode === 'cards' ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {filtered.map(c => (
+                    <div 
+                      key={c.id} 
+                      onClick={() => openDetails(c)}
+                      className={cn(
+                        "group p-5 rounded-2xl border transition-all cursor-pointer relative overflow-hidden",
+                        selectedCollab?.id === c.id 
+                          ? "bg-primary/5 border-primary shadow-md ring-1 ring-primary/20" 
+                          : "bg-white border-slate-100 hover:border-primary/30 hover:shadow-sm"
                       )}
-                    </div>
-                    <div className="absolute -bottom-2 -right-2">
-                      <Badge variant={c.status === 'active' ? 'default' : 'secondary'} className={`rounded-full w-6 h-6 p-0 flex items-center justify-center border-2 border-white shadow-sm ${c.status === 'active' ? 'bg-green-500' : 'bg-slate-300'}`}>
-                        {c.status === 'active' ? <CheckCircle2 size={12} className="text-white" /> : <XCircle size={12} className="text-white" />}
-                      </Badge>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col items-end gap-2">
-                    <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 bg-slate-100 text-slate-600 border-none rounded-full group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                      {c.type || "Outro"}
-                    </Badge>
-                    <span className="text-[10px] text-muted-foreground font-mono bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">{c.document}</span>
-                  </div>
-                </div>
-
-                <h3 className="font-black text-xl text-slate-800 truncate cursor-pointer hover:text-primary transition-colors mb-4 group-hover:translate-x-1 duration-300" onClick={() => openDetails(c)}>
-                  {c.name}
-                </h3>
-
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-center gap-3 text-slate-600 group/item">
-                    <div className="p-2 rounded-xl bg-slate-50 text-slate-400 group-hover/item:bg-primary/10 group-hover/item:text-primary transition-colors">
-                      <Phone size={14} />
-                    </div>
-                    <span className="text-sm font-semibold">{c.phone || "—"}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-slate-600 group/item">
-                    <div className="p-2 rounded-xl bg-slate-50 text-slate-400 group-hover/item:bg-primary/10 group-hover/item:text-primary transition-colors">
-                      <Mail size={14} />
-                    </div>
-                    <span className="text-sm font-semibold truncate max-w-[180px]">{c.email || "—"}</span>
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 p-4 rounded-2xl border border-slate-100 group-hover:border-primary/10 transition-colors">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] text-slate-400 uppercase font-black tracking-wider">{getPaymentTypeLabel(c.payment_type)}</span>
-                    <Wallet size={12} className="text-slate-300 group-hover:text-primary/40" />
-                  </div>
-                  <p className="text-lg font-black text-slate-700 group-hover:text-primary transition-colors leading-none">
-                    {c.payment_type === 'commission' ? `${c.payment_value}%` : formatCurrency(c.payment_value)}
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-4 bg-slate-50/50 flex items-center justify-between border-t border-slate-100 rounded-b-3xl">
-                <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-emerald-50 hover:text-emerald-600 transition-all text-slate-400" onClick={() => openNewPayment(c)} title="Lançar Pagamento">
-                    <Banknote size={18} />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-blue-50 hover:text-blue-600 transition-all text-slate-400" onClick={() => openHistory(c)} title="Histórico">
-                    <History size={18} />
-                  </Button>
-                </div>
-                <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-slate-200 transition-all text-slate-400 hover:text-slate-900" onClick={() => openEdit(c)} title="Editar">
-                    <Edit size={18} />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-red-50 hover:text-red-600 transition-all text-slate-400" onClick={() => setDeleteId(c.id)} title="Excluir">
-                    <Trash2 size={18} />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ))}
-          {filtered.length === 0 && (
-            <div className="col-span-full py-32 text-center bg-white rounded-3xl border-2 border-dashed border-slate-200 shadow-sm">
-              <div className="inline-flex p-6 rounded-full bg-slate-50 mb-4">
-                <Users size={48} className="text-slate-200" />
-              </div>
-              <p className="text-lg font-bold text-slate-400">Nenhum colaborador encontrado.</p>
-              <Button variant="link" onClick={() => setSearch("")} className="mt-2 text-primary">Limpar filtros</Button>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="glass-card rounded-[2.5rem] overflow-hidden border-none shadow-sm animate-in-fade" style={{ animationDelay: '0.3s' }}>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent border-border/20">
-                  <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6 pl-8">Especialista</TableHead>
-                  <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6">Contato</TableHead>
-                  <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6">Remuneração</TableHead>
-                  <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6">Status</TableHead>
-                  <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[10px] py-6 pr-8 text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="text-center py-20 text-slate-400 font-medium">
-                      Nenhum colaborador encontrado.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filtered.map((c) => (
-                    <TableRow key={c.id} className="group hover:bg-slate-50/50 transition-colors border-slate-100">
-                      <TableCell className="py-4 pl-8">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-2xl overflow-hidden bg-slate-100 text-slate-400 flex items-center justify-center font-bold text-sm shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center font-bold text-lg text-primary overflow-hidden shadow-inner">
                             {c.avatar_url ? (
                               <img src={c.avatar_url} alt={c.name} className="w-full h-full object-cover" />
                             ) : (
@@ -667,70 +511,259 @@ const AdminColaboradores = () => {
                             )}
                           </div>
                           <div>
-                            <p className="font-black text-slate-700 group-hover:text-primary transition-colors cursor-pointer" onClick={() => openDetails(c)}>
+                            <h3 className="font-black text-slate-900 group-hover:text-primary transition-colors truncate max-w-[150px]">
                               {c.name}
-                            </p>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <Badge variant="secondary" className="text-[9px] h-4 px-1.5 font-bold uppercase tracking-tighter bg-slate-100 text-slate-500 border-none group-hover:bg-primary group-hover:text-white transition-colors">
-                                {c.type || "Outro"}
-                              </Badge>
-                              <p className="text-[10px] font-mono text-slate-400">{c.document || "S/ Documento"}</p>
-                            </div>
+                            </h3>
+                            <Badge variant="secondary" className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 bg-slate-100 text-slate-500 border-none rounded-md">
+                              {c.type || "Outro"}
+                            </Badge>
                           </div>
                         </div>
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
-                            <Phone size={12} className="text-slate-300" /> {c.phone || "—"}
-                          </div>
-                          <div className="flex items-center gap-2 text-[10px] font-medium text-slate-400">
-                            <Mail size={12} className="text-slate-300" /> {c.email || "—"}
-                          </div>
+                        <Badge variant={c.status === 'active' ? 'default' : 'secondary'} className={cn("rounded-full px-2 py-0 bg-transparent border-none", c.status === 'active' ? "text-green-500" : "text-slate-300")}>
+                          <CheckCircle2 size={16} fill="currentColor" className="text-white" />
+                        </Badge>
+                      </div>
+
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center gap-2 text-[11px] font-bold text-slate-500">
+                          <Phone size={12} className="text-slate-300" /> {c.phone || "—"}
                         </div>
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <div className="bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100 inline-block group-hover:border-primary/20 transition-colors">
-                          <p className="text-[9px] font-black text-slate-400 uppercase leading-none mb-1">{getPaymentTypeLabel(c.payment_type)}</p>
-                          <p className="text-sm font-black text-slate-700 leading-none">
+                        <div className="flex items-center gap-2 text-[11px] font-medium text-slate-400">
+                          <Mail size={12} className="text-slate-300" /> {c.email || "—"}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-3 border-t border-slate-50">
+                        <div>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">{getPaymentTypeLabel(c.payment_type)}</p>
+                          <p className="text-sm font-black text-primary leading-none">
                             {c.payment_type === 'commission' ? `${c.payment_value}%` : formatCurrency(c.payment_value)}
                           </p>
                         </div>
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <Badge variant={c.status === 'active' ? 'default' : 'secondary'} className={`rounded-full px-3 py-0.5 text-[10px] font-black uppercase tracking-widest ${c.status === 'active' ? 'bg-green-500 text-white shadow-sm' : 'bg-slate-200 text-slate-500'}`}>
-                          {c.status === 'active' ? 'Ativo' : 'Inativo'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="py-4 pr-8 text-right">
-                        <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-emerald-50 hover:text-emerald-600 transition-all text-slate-400" title="Lançar Pagamento" onClick={() => openNewPayment(c)}>
-                            <Banknote size={16} />
+                        <div className="flex gap-1">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/10 transition-all" onClick={(e) => { e.stopPropagation(); openEdit(c); }}>
+                            <Edit size={14} />
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all text-slate-400" title="Histórico" onClick={() => openHistory(c)}>
-                            <History size={16} />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-slate-200 transition-all text-slate-400 hover:text-slate-900" title="Editar" onClick={() => openEdit(c)}>
-                            <Edit size={16} />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all text-slate-400" title="Excluir" onClick={() => setDeleteId(c.id)}>
-                            <Trash2 size={16} />
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all" onClick={(e) => { e.stopPropagation(); setDeleteId(c.id); }}>
+                            <Trash2 size={14} />
                           </Button>
                         </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-xl border border-slate-100 overflow-hidden bg-white">
+                  <Table>
+                    <TableHeader className="bg-slate-50/80">
+                      <TableRow className="hover:bg-transparent">
+                        <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[9px] h-10">Especialista</TableHead>
+                        <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[9px] h-10">Remuneração</TableHead>
+                        <TableHead className="font-black text-slate-400 uppercase tracking-widest text-[9px] h-10 text-right">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filtered.map((c) => (
+                        <TableRow 
+                          key={c.id} 
+                          onClick={() => openDetails(c)}
+                          className={cn("group cursor-pointer transition-colors border-slate-50", selectedCollab?.id === c.id ? "bg-primary/5" : "hover:bg-slate-50/50")}
+                        >
+                          <TableCell className="py-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-400 shadow-inner group-hover:scale-110 transition-transform">
+                                {c.avatar_url ? <img src={c.avatar_url} className="w-full h-full object-cover rounded-lg" /> : c.name.substring(0, 2).toUpperCase()}
+                              </div>
+                              <div>
+                                <p className="font-bold text-slate-800 text-xs leading-none mb-1 group-hover:text-primary transition-colors">{c.name}</p>
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="secondary" className="text-[8px] h-4 px-1 font-bold uppercase tracking-tighter bg-slate-100 text-slate-500 border-none">
+                                    {c.type || "Outro"}
+                                  </Badge>
+                                  <p className="text-[9px] font-mono text-slate-400">{c.document}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-3 text-xs font-black text-slate-700">
+                            {c.payment_type === 'commission' ? `${c.payment_value}%` : formatCurrency(c.payment_value)}
+                          </TableCell>
+                          <TableCell className="py-3 text-right">
+                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-slate-300 hover:text-primary transition-all">
+                              <ChevronRight size={14} />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+
+              {filtered.length === 0 && (
+                <div className="py-20 text-center flex flex-col items-center justify-center">
+                  <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-4">
+                    <Users size={32} className="text-slate-200" />
+                  </div>
+                  <p className="text-sm font-bold text-slate-400">Nenhum colaborador encontrado.</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      )}
+
+        {/* Details Panel - CRM Style */}
+        <div className="w-full lg:w-[420px] shrink-0">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm h-full flex flex-col overflow-hidden animate-in-slide-from-right">
+            {selectedCollab ? (
+              <div className="flex flex-col h-full overflow-hidden">
+                <div className="p-8 border-b border-slate-100 bg-gradient-to-br from-slate-50 to-white relative">
+                  <div className="absolute top-4 right-4 flex gap-1">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-slate-400 hover:text-primary hover:bg-white transition-all shadow-sm" onClick={() => openEdit(selectedCollab)}>
+                      <Edit size={14} />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-slate-400 hover:text-primary hover:bg-white transition-all shadow-sm" onClick={() => setSelectedCollab(null)}>
+                      <XCircle size={14} />
+                    </Button>
+                  </div>
+                  
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-24 h-24 rounded-3xl bg-white border-2 border-slate-100 flex items-center justify-center shadow-xl mb-4 p-1 relative group">
+                      <div className="w-full h-full rounded-2xl overflow-hidden bg-slate-50 flex items-center justify-center text-primary font-black text-3xl">
+                        {selectedCollab.avatar_url ? (
+                          <img src={selectedCollab.avatar_url} alt={selectedCollab.name} className="w-full h-full object-cover" />
+                        ) : (
+                          selectedCollab.name.substring(0, 2).toUpperCase()
+                        )}
+                      </div>
+                      <Badge className={cn("absolute -bottom-2 -right-2 w-8 h-8 rounded-full border-4 border-white flex items-center justify-center shadow-lg", selectedCollab.status === 'active' ? "bg-green-500" : "bg-slate-300")}>
+                        <CheckCircle2 size={14} className="text-white" />
+                      </Badge>
+                    </div>
+                    
+                    <h2 className="text-2xl font-black text-slate-900 leading-tight mb-1">{selectedCollab.name}</h2>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Badge variant="secondary" className="bg-primary/10 text-primary border-none font-black text-[10px] uppercase tracking-widest px-3 py-1">
+                        {selectedCollab.type || "Outro"}
+                      </Badge>
+                      <Badge variant="outline" className="text-slate-400 border-slate-200 font-mono text-[10px] uppercase">
+                        {selectedCollab.document}
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 w-full mt-4">
+                      <Button onClick={() => openNewPayment(selectedCollab)} className="h-11 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs shadow-md shadow-emerald-500/20">
+                        <Banknote size={14} className="mr-2" /> PAGAMENTO
+                      </Button>
+                      <Button variant="outline" onClick={() => openHistory(selectedCollab)} className="h-11 rounded-xl border-slate-200 font-black text-xs text-slate-600 hover:bg-slate-50">
+                        <History size={14} className="mr-2 text-primary" /> HISTÓRICO
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+                  <div className="space-y-8">
+                    {/* Information Cards */}
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="p-5 rounded-2xl border border-slate-100 bg-white hover:border-primary/20 transition-all shadow-sm">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center shadow-sm">
+                            <Phone size={14} />
+                          </div>
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Contatos</span>
+                        </div>
+                        <div className="space-y-3">
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">WhatsApp / Telefone</span>
+                            <span className="text-sm font-black text-slate-700">{selectedCollab.phone || "Não informado"}</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">E-mail Profissional</span>
+                            <span className="text-sm font-black text-slate-700 truncate">{selectedCollab.email || "Não informado"}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-5 rounded-2xl border border-slate-100 bg-white hover:border-primary/20 transition-all shadow-sm">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-500 flex items-center justify-center shadow-sm">
+                            <Wallet size={14} />
+                          </div>
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Financeiro</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">Contrato</span>
+                            <p className="text-xs font-black text-primary uppercase">{getPaymentTypeLabel(selectedCollab.payment_type)}</p>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">Valor/Taxa</span>
+                            <p className="text-sm font-black text-slate-900">
+                              {selectedCollab.payment_type === 'commission' ? `${selectedCollab.payment_value}%` : formatCurrency(selectedCollab.payment_value)}
+                            </p>
+                          </div>
+                          <div className="col-span-2 pt-2 border-t border-slate-50 mt-1">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">Chave PIX ({selectedCollab.pix_type})</span>
+                            <p className="text-xs font-black text-slate-700 break-all bg-slate-50 p-2 rounded-lg mt-1 border border-slate-100">
+                              {selectedCollab.pix_key || "Não cadastrada"}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-5 rounded-2xl border border-slate-100 bg-white hover:border-primary/20 transition-all shadow-sm">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center shadow-sm">
+                            <Shield size={14} />
+                          </div>
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Credenciais</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">CNH</span>
+                            <p className="text-xs font-black text-slate-700">{selectedCollab.cnh || "—"}</p>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">CADASTUR</span>
+                            <p className="text-xs font-black text-slate-700">{selectedCollab.cadastur || "—"}</p>
+                          </div>
+                          <div className="col-span-2 pt-2 border-t border-slate-50 mt-1">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1">Endereço Residencial</span>
+                            <p className="text-xs font-medium text-slate-600 leading-relaxed">
+                              {selectedCollab.address || "—"} {selectedCollab.zip_code ? `(CEP: ${selectedCollab.zip_code})` : ""}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {selectedCollab.observation && (
+                      <div className="p-5 rounded-2xl border-l-4 border-l-primary bg-primary/5">
+                        <span className="text-[10px] font-black text-primary uppercase tracking-widest mb-2 block">Observações Internas</span>
+                        <p className="text-xs font-medium text-slate-600 italic">"{selectedCollab.observation}"</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center p-12 text-center opacity-40 grayscale pointer-events-none">
+                <div className="w-32 h-32 rounded-[2.5rem] bg-slate-50 flex items-center justify-center mb-6 border-2 border-dashed border-slate-200">
+                  <User size={64} className="text-slate-300" />
+                </div>
+                <h3 className="text-xl font-black text-slate-400 leading-tight">Selecione um especialista<br />para ver os detalhes</h3>
+                <p className="mt-2 text-xs font-bold text-slate-300 uppercase tracking-widest">Gestão de Equipe & Performance</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Collaborator Form Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-3xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
-          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+        <DialogContent className="sm:max-w-3xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden glass-card">
+          <div className="bg-slate-50 border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-3 md:gap-4">
               <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                 <Users size={20} className="md:w-6 md:h-6" />
@@ -746,7 +779,6 @@ const AdminColaboradores = () => {
               <XCircle size={20} className="text-slate-400" />
             </Button>
           </div>
-
 
           <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col h-[calc(90vh-80px)]">
             <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
@@ -1176,7 +1208,7 @@ const AdminColaboradores = () => {
                   </div>
                 )}
                 
-                <div className="md:col-span-2 pt-6 border-t border-slate-100">
+                <div className="md:col-span-2 pt-6 border-t border-slate-100/50">
                   <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest ml-1 mb-4">Últimos Lançamentos</p>
                   <div className="max-h-[250px] overflow-y-auto rounded-2xl border border-slate-100 bg-white shadow-sm overflow-hidden">
                     <Table>
@@ -1204,7 +1236,7 @@ const AdminColaboradores = () => {
                 </div>
               </div>
               
-              <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0">
+              <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0 z-20">
                 <Button variant="outline" onClick={() => setDetailsDialogOpen(false)} className="flex-1 h-12 rounded-xl font-bold">Fechar</Button>
                 <Button onClick={() => { setDetailsDialogOpen(false); openEdit(selectedCollab!); }} className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white">Editar Perfil</Button>
               </div>
