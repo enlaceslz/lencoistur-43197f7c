@@ -762,8 +762,8 @@ const AdminColaboradores = () => {
 
       {/* Collaborator Form Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-3xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
-          <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
+        <DialogContent className="sm:max-w-3xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden glass-card">
+          <div className="bg-slate-50 border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-3 md:gap-4">
               <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                 <Users size={20} className="md:w-6 md:h-6" />
@@ -779,7 +779,6 @@ const AdminColaboradores = () => {
               <XCircle size={20} className="text-slate-400" />
             </Button>
           </div>
-
 
           <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col h-[calc(90vh-80px)]">
             <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
@@ -1209,7 +1208,7 @@ const AdminColaboradores = () => {
                   </div>
                 )}
                 
-                <div className="md:col-span-2 pt-6 border-t border-slate-100">
+                <div className="md:col-span-2 pt-6 border-t border-slate-100/50">
                   <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest ml-1 mb-4">Últimos Lançamentos</p>
                   <div className="max-h-[250px] overflow-y-auto rounded-2xl border border-slate-100 bg-white shadow-sm overflow-hidden">
                     <Table>
@@ -1237,7 +1236,7 @@ const AdminColaboradores = () => {
                 </div>
               </div>
               
-              <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0">
+              <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0 z-20">
                 <Button variant="outline" onClick={() => setDetailsDialogOpen(false)} className="flex-1 h-12 rounded-xl font-bold">Fechar</Button>
                 <Button onClick={() => { setDetailsDialogOpen(false); openEdit(selectedCollab!); }} className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all font-black text-white">Editar Perfil</Button>
               </div>
