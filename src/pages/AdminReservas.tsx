@@ -398,7 +398,7 @@ const AdminReservas = () => {
 
   return (
     <AdminLayout title="Gestão de Reservas">
-      <div className={cn("flex flex-col lg:flex-row gap-6 h-full items-stretch")}>
+      <div className="flex flex-col lg:flex-row gap-6 h-full items-stretch">
         <div className="flex-1 min-w-0">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
             {[
