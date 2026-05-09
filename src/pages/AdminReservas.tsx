@@ -777,12 +777,11 @@ const AdminReservas = () => {
               </div>
             </div>
           )}
+          </div>
         </div>
-      )}
-    </div>
 
-        {/* Detail View (Right Column on Desktop, Modal on Mobile) */}
-        <div className={cn("hidden lg:block space-y-6 animate-in-fade", !selected && "opacity-50 pointer-events-none")}>
+        {/* Detail View (Right Column) */}
+        <div className={cn("hidden lg:block w-[380px] space-y-6 animate-in-fade shrink-0", !selected && "opacity-50 pointer-events-none")}>
           {selected ? (
             <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover sticky top-24 overflow-hidden flex flex-col max-h-[calc(100vh-120px)]">
               <div className="text-center bg-primary/[0.02] p-8 rounded-[2rem] border border-primary/5 mb-8">
