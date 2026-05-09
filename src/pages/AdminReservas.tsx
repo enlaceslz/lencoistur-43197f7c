@@ -397,7 +397,7 @@ const AdminReservas = () => {
   }
 
   return (
-    <AdminLayout title="Reservas">
+    <AdminLayout title="Gestão de Reservas">
       {/* Stats - Responsive Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
         {[
