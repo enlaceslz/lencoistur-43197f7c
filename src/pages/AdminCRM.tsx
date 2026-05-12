@@ -1014,9 +1014,9 @@ const AdminCRMContent = () => {
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="w-full">
           {/* Client List */}
-          <div className="lg:col-span-2 glass-card rounded-[2.5rem] p-8 animate-in-fade" style={{ animationDelay: '0.2s' }}>
+          <div className="glass-card rounded-[2.5rem] p-8 animate-in-fade" style={{ animationDelay: '0.2s' }}>
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <div className="flex items-center gap-3 flex-1 bg-muted/40 border border-border/20 rounded-2xl px-5 py-3 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                 <Search size={18} className="text-primary/50" />
