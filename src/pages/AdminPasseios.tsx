@@ -451,16 +451,16 @@ const AdminPasseios = () => {
   return (
     <AdminLayout title="Passeios">
       <div className="flex flex-col gap-6 h-[calc(100vh-140px)]">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Catálogo</h1>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Catálogo</h1>
           <p className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
             <Compass size={14} className="text-primary" /> {tours.length} Passeios Registrados
           </p>
         </div>
         <button 
           onClick={openNew}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-8 rounded-xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-6 rounded-xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all active:scale-95"
         >
           <Plus size={18} strokeWidth={3} /> Novo Passeio
         </button>
@@ -488,7 +488,7 @@ const AdminPasseios = () => {
         ))}
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-6 bg-white rounded-[2.5rem] border border-white/40 shadow-xl shadow-primary/5 glass-card animate-in-fade" style={{ animationDelay: '0.2s' }}>
+      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between p-6 bg-white rounded-[2.5rem] border border-white/40 shadow-xl shadow-primary/5 glass-card animate-in-fade" style={{ animationDelay: '0.2s' }}>
         <div className="relative flex-1 w-full group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
           <Input 
@@ -832,7 +832,7 @@ const AdminPasseios = () => {
 
             </div>
             
-            <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0 z-10">
+            <div className="bg-white border-t border-slate-100 p-6 flex gap-3 sticky bottom-0 z-10">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all">
