@@ -109,11 +109,16 @@ const AdminReservas = () => {
         </div>
 
         <div className="flex-1 flex gap-6 overflow-hidden">
-          <div className="flex-1 bg-white rounded-[2.5rem] border border-slate-200 flex flex-col overflow-hidden shadow-sm">
-            <div className="p-4 border-b border-slate-100 flex gap-4 items-center bg-slate-50/50">
+          <div className="flex-1 bg-white rounded-[2.5rem] border border-white/40 flex flex-col overflow-hidden shadow-xl shadow-primary/5 glass-card">
+            <div className="p-6 border-b border-border/40 flex gap-4 items-center bg-slate-50/30">
               <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input placeholder="Buscar por código, cliente ou serviço..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-11 pr-4 h-11 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 text-sm font-medium bg-white" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                <input 
+                  placeholder="Buscar por código, cliente ou serviço..." 
+                  value={search} 
+                  onChange={(e) => setSearch(e.target.value)} 
+                  className="w-full pl-11 pr-4 h-12 rounded-2xl border border-border/60 outline-none focus:ring-4 focus:ring-primary/5 text-sm font-semibold bg-white transition-all" 
+                />
               </div>
             </div>
             <div className="overflow-auto flex-1">
