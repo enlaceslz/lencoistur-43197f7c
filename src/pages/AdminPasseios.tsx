@@ -488,7 +488,7 @@ const AdminPasseios = () => {
         ))}
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-4 sm:p-6 glass-card rounded-[2.5rem] shadow-sm animate-in-fade" style={{ animationDelay: '0.2s' }}>
+      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-6 bg-white rounded-[2.5rem] border border-white/40 shadow-xl shadow-primary/5 glass-card animate-in-fade" style={{ animationDelay: '0.2s' }}>
         <div className="relative flex-1 w-full group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
           <Input 
