@@ -451,6 +451,7 @@ const AdminPasseios = () => {
 
   return (
     <AdminLayout title="Passeios">
+      <div className="flex flex-col gap-6 h-[calc(100vh-120px)]">
       <div className="flex items-center justify-between mb-6">
         <div className="space-y-1">
           <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Catálogo</h1>
