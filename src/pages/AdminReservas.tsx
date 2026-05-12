@@ -30,6 +30,7 @@ const AdminReservas = () => {
   const [showNewForm, setShowNewForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [showWideView, setShowWideView] = useState(false);
   const [collaborators, setCollaborators] = useState<any[]>([]);
   const [partners, setPartners] = useState<any[]>([]);
   const [tours, setTours] = useState<any[]>([]);
