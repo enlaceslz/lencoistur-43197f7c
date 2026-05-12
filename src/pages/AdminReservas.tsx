@@ -621,7 +621,7 @@ const AdminReservas = () => {
                       placeholder="Detalhes sobre restrições, preferências ou logísticas especiais..." 
                       value={form.notes} 
                       onChange={e => setForm({...form, notes: e.target.value})}
-                      className="rounded-xl min-h-[100px] font-semibold border-slate-200"
+                      className="rounded-xl min-h-[100px] font-semibold border-slate-200 shadow-inner bg-slate-50/50"
                     />
                   </div>
                 </div>
@@ -629,18 +629,32 @@ const AdminReservas = () => {
             </div>
           </div>
 
-          <div className="p-8 bg-slate-50 border-t border-border/40 flex justify-end gap-4 rounded-b-[2.5rem]">
-            <Button variant="ghost" onClick={() => setShowNewForm(false)} className="rounded-xl h-14 px-8 font-bold text-slate-500 hover:bg-slate-200 transition-all">
-              Descartar
-            </Button>
-            <Button 
-              onClick={handleSave} 
-              disabled={saving}
-              className="rounded-2xl h-14 px-12 bg-primary font-black text-white shadow-xl shadow-primary/20 hover:scale-105 transition-all active:scale-95 disabled:opacity-50"
-            >
-              {saving ? <Loader2 className="animate-spin mr-2" /> : <Plus className="mr-2" strokeWidth={3} />}
-              Efetivar Reserva no Sistema
-            </Button>
+          <div className="p-8 bg-slate-50 border-t border-border/40 flex flex-col md:flex-row justify-between items-center gap-6 rounded-b-[2.5rem]">
+            <div className="flex flex-col gap-1">
+               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Estimado</p>
+               <div className="flex items-baseline gap-2">
+                 <span className="text-3xl font-black text-primary tracking-tighter">
+                   {formatCurrency((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount))}
+                 </span>
+                 <span className="text-xs font-bold text-slate-400 line-through">
+                   {parseCurrencyToNumber(form.discount) > 0 && formatCurrency(parseCurrencyToNumber(form.unitPrice) * form.guests)}
+                 </span>
+               </div>
+            </div>
+
+            <div className="flex gap-4 w-full md:w-auto">
+              <Button variant="ghost" onClick={() => setShowNewForm(false)} className="flex-1 md:flex-none rounded-xl h-14 px-8 font-bold text-slate-500 hover:bg-slate-200 transition-all">
+                Descartar
+              </Button>
+              <Button 
+                onClick={handleSave} 
+                disabled={saving}
+                className="flex-1 md:flex-none rounded-2xl h-14 px-12 bg-primary font-black text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all active:scale-95 disabled:opacity-50"
+              >
+                {saving ? <Loader2 className="animate-spin mr-2" /> : <Plus className="mr-2" strokeWidth={3} />}
+                Efetivar Reserva no Sistema
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
