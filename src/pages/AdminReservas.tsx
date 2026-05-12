@@ -161,8 +161,8 @@ const AdminReservas = () => {
       setForm(prev => ({
         ...prev,
         itemName: tour.name,
-        unitPrice: (tour.price / 100).toString(), // tour.price is in cents
-        publicUnitPrice: (tour.private_price / 100).toString(),
+        unitPrice: tour.price.toString(),
+        publicUnitPrice: tour.private_price.toString(),
       }));
     }
   };
