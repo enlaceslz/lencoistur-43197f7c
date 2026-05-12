@@ -451,24 +451,40 @@ const AdminPasseios = () => {
 
   return (
     <AdminLayout title="Passeios">
+      <div className="flex items-center justify-between mb-6">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Catálogo</h1>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+            <Compass size={14} className="text-primary" /> {tours.length} Passeios Registrados
+          </p>
+        </div>
+        <button 
+          onClick={openNew}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-8 rounded-xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+        >
+          <Plus size={18} strokeWidth={3} /> Novo Passeio
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
         {[
-          { label: "Catálogo", value: tours.length, icon: Compass, color: "from-blue-500 to-indigo-600", desc: "Total cadastrado" },
-          { label: "Visíveis", value: activeCount, icon: Eye, color: "from-emerald-500 to-teal-600", desc: "No site" },
-          { label: "Rating Médio", value: avgRating, icon: Star, color: "from-amber-500 to-orange-600", desc: "Avaliação clientes" },
-          { label: "Feedback", value: tours.reduce((a, t) => a + (t.reviews_count || 0), 0), icon: Users, color: "from-purple-500 to-pink-600", desc: "Reviews totais" },
+          { label: "Catálogo", value: tours.length, icon: Compass, color: "text-blue-600", bg: "bg-blue-500/10", desc: "Total cadastrado" },
+          { label: "Visíveis", value: activeCount, icon: Eye, color: "text-emerald-600", bg: "bg-emerald-500/10", desc: "No site" },
+          { label: "Rating Médio", value: avgRating, icon: Star, color: "text-amber-600", bg: "bg-amber-500/10", desc: "Avaliação clientes" },
+          { label: "Feedback", value: tours.reduce((a, t) => a + (t.reviews_count || 0), 0), icon: Users, color: "text-purple-600", bg: "bg-purple-500/10", desc: "Reviews totais" },
         ].map((stat, i) => (
-          <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group">
-            <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
-            <div className="flex items-center justify-between mb-4">
-              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-primary/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
-                <stat.icon size={22} strokeWidth={2.5} />
+          <Card key={i} className="rounded-[2rem] border-white/40 shadow-xl shadow-primary/5 glass-card overflow-hidden group">
+            <CardContent className="p-7 relative">
+              <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
+              <div className="flex items-center gap-4 mb-4">
+                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center border shadow-sm", stat.bg, stat.color, "border-white/20")}>
+                  <stat.icon size={22} strokeWidth={2.5} />
+                </div>
               </div>
-              <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{stat.desc}</div>
-            </div>
-            <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
-            <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
-          </div>
+              <p className="text-3xl font-black text-foreground tracking-tighter">{stat.value}</p>
+              <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
