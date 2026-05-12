@@ -831,8 +831,9 @@ const AdminPasseios = () => {
             </div>
 
             </div>
+            </div>
             
-            <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0 z-10">
+            <div className="bg-white border-t border-slate-100 p-6 flex gap-3 sticky bottom-0 z-10">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all">
