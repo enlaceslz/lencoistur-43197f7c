@@ -32,6 +32,7 @@ const AdminReservas = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [showWideView, setShowWideView] = useState(false);
+  const [isWideViewNewWindow, setIsWideViewNewWindow] = useState(false);
   const [collaborators, setCollaborators] = useState<any[]>([]);
   const [partners, setPartners] = useState<any[]>([]);
   const [tours, setTours] = useState<any[]>([]);
@@ -59,6 +60,13 @@ const AdminReservas = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      // Check for booking_id in URL for wide view new window
+      const urlParams = new URLSearchParams(window.location.search);
+      const wideViewId = urlParams.get('wide_view_id');
+      if (wideViewId) {
+        setIsWideViewNewWindow(true);
+      }
+
       const [collabsRes, partnersRes, toursRes, customersRes] = await Promise.all([
         supabase.from("collaborators").select("id, name").eq("status", "active"),
         supabase.from("partners").select("id, name").eq("active", true),
@@ -252,6 +260,140 @@ const AdminReservas = () => {
     </AdminLayout>
   );
 
+  if (isWideViewNewWindow) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const wideViewId = urlParams.get('wide_view_id');
+    const wideBooking = bookings.find(b => b.id === wideViewId);
+
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between rounded-t-3xl">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+                <Calendar size={24} strokeWidth={2.5} />
+              </div>
+              <div>
+                <h1 className="text-xl font-black text-slate-900 leading-none mb-1">
+                  {wideBooking?.itemName || "Detalhes da Reserva"}
+                </h1>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-[10px] font-black uppercase bg-primary/5 text-primary border-primary/10">
+                    {wideBooking?.bookingCode || "Reserva"}
+                  </Badge>
+                  <p className="text-xs text-slate-500 font-medium">Ficha Técnica Operacional</p>
+                </div>
+              </div>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="rounded-xl font-bold h-10"
+              onClick={() => window.close()}
+            >
+              Fechar Janela
+            </Button>
+          </div>
+
+          <div className="bg-white p-6 md:p-8 rounded-b-3xl shadow-sm">
+            {wideBooking ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="md:col-span-1 space-y-8">
+                  <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <User size={14} className="text-primary" /> Identificação do Cliente
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center font-black text-xl">
+                          {wideBooking.customerName[0]}
+                        </div>
+                        <div>
+                          <p className="text-sm font-black text-slate-700">{wideBooking.customerName}</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">{wideBooking.customerEmail}</p>
+                        </div>
+                      </div>
+                      <div className="pt-4 border-t border-slate-200/60">
+                        <Label className="text-[10px] uppercase font-bold text-slate-400">Telefone / WhatsApp</Label>
+                        <p className="text-sm font-black text-slate-700">{wideBooking.customerPhone}</p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <DollarSign size={14} className="text-emerald-500" /> Financeiro
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase">
+                        <span>Preço Unitário</span>
+                        <span className="text-slate-700">{formatCurrency(wideBooking.unitPrice)}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase">
+                        <span>Total Pax ({wideBooking.guests})</span>
+                        <span className="text-slate-700">{formatCurrency(wideBooking.total)}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-[10px] font-black text-rose-500 uppercase">
+                        <span>Descontos</span>
+                        <span>- {formatCurrency(wideBooking.discount)}</span>
+                      </div>
+                      <div className="flex justify-between items-end pt-4 border-t border-dashed border-slate-200">
+                        <div>
+                          <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Valor Final</p>
+                          <p className="text-2xl font-black text-emerald-600 tracking-tighter">{formatCurrency(wideBooking.finalTotal)}</p>
+                        </div>
+                        <div className="text-right">
+                          <Badge variant="outline" className="text-[9px] font-black uppercase px-3 py-1 bg-white">{wideBooking.payMethod}</Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+
+                <div className="md:col-span-2 space-y-8">
+                  <section className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden">
+                    <div className="absolute right-0 top-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                    <div className="relative z-10">
+                      <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-2">Serviço Agendado</p>
+                      <h2 className="text-2xl font-black text-slate-800 leading-tight mb-6">{wideBooking.itemName}</h2>
+                      
+                      <div className="grid grid-cols-2 gap-8 pt-6 border-t border-slate-200/60">
+                        <div>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Data da Atividade</p>
+                          <p className="text-sm font-black flex items-center gap-2 text-slate-700 uppercase"><Calendar size={16} className="text-primary" /> {wideBooking.date}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Total de Passageiros</p>
+                          <p className="text-sm font-black flex items-center gap-2 text-slate-700 uppercase"><Users size={16} className="text-primary" /> {wideBooking.guests} PAX</p>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  {wideBooking.notes && (
+                    <section className="bg-amber-50/30 p-8 rounded-[2rem] border border-amber-100 shadow-sm">
+                      <h3 className="text-xs font-black uppercase tracking-widest text-amber-600 mb-4 flex items-center gap-2">
+                        <Tag size={14} /> Notas Operacionais
+                      </h3>
+                      <p className="text-sm font-medium text-amber-800 leading-relaxed italic">
+                        "{wideBooking.notes}"
+                      </p>
+                    </section>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+                <Loader2 size={40} className="animate-spin mb-4 opacity-20" />
+                <p className="text-sm font-bold uppercase tracking-widest">Carregando reserva...</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <AdminLayout title="Gestão de Reservas">
       <div className="flex flex-col gap-6 h-[calc(100vh-120px)]">
@@ -382,9 +524,21 @@ const AdminReservas = () => {
                       variant="ghost" 
                       size="icon" 
                       className="rounded-xl hover:bg-primary/5 hover:text-primary transition-all"
-                      onClick={() => setShowWideView(true)}
+                      onClick={() => {
+                        const baseUrl = window.location.origin;
+                        const wideUrl = `${baseUrl}/admin-reservas?wide_view_id=${selected.id}`;
+                        window.open(wideUrl, '_blank');
+                      }}
                     >
                       <Eye size={18} />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="rounded-xl hover:bg-primary/5 hover:text-primary transition-all"
+                      onClick={() => setShowWideView(true)}
+                    >
+                      <LayoutDashboard size={18} />
                     </Button>
                   </div>
                   <Badge 
