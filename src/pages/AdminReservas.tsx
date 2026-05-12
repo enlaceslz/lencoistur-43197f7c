@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Plus, Calendar, DollarSign, Clock, CheckCircle, XCircle, ChevronRight, FileDown, LayoutGrid, List, Loader2, User, Phone, Mail, MapPin, CreditCard, Trash2, Printer, Download, Eye, MoreHorizontal, Users } from "lucide-react";
+import { Search, Plus, Calendar, DollarSign, Clock, CheckCircle, XCircle, ChevronRight, FileDown, LayoutGrid, List, Loader2, User, Phone, Mail, MapPin, CreditCard, Trash2, Printer, Download, Eye, MoreHorizontal, Users, Tag, Briefcase } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { formatCurrency, cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { maskPhone } from "@/lib/masks";
+import { maskPhone, maskCurrency, parseCurrencyToNumber } from "@/lib/masks";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   confirmada: { label: "Confirmada", className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
@@ -29,6 +29,43 @@ const AdminReservas = () => {
   const [selected, setSelected] = useState<BookingItem | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [collaborators, setCollaborators] = useState<any[]>([]);
+  const [partners, setPartners] = useState<any[]>([]);
+  const [tours, setTours] = useState<any[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  const [form, setForm] = useState({
+    customerName: "",
+    customerEmail: "",
+    customerPhone: "",
+    type: "tour" as "tour" | "transfer" | "package",
+    itemName: "",
+    date: "",
+    guests: 1,
+    payMethod: "pix" as "pix" | "card" | "info",
+    unitPrice: "0",
+    discount: "0",
+    publicUnitPrice: "0",
+    notes: "",
+    collaboratorId: "",
+    partnerId: "",
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const [collabsRes, partnersRes, toursRes] = await Promise.all([
+        supabase.from("collaborators").select("id, name").eq("status", "active"),
+        supabase.from("partners").select("id, name").eq("active", true),
+        supabase.from("tours").select("id, name, price, private_price").eq("active", true)
+      ]);
+
+      if (collabsRes.data) setCollaborators(collabsRes.data);
+      if (partnersRes.data) setPartners(partnersRes.data);
+      if (toursRes.data) setTours(toursRes.data);
+    };
+
+    fetchData();
+  }, []);
 
   const filtered = bookings.filter((b) => {
     const q = search.toLowerCase();
