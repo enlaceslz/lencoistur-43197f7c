@@ -139,7 +139,18 @@ const AdminParceiros = () => {
 
   const fetchTypes = async () => {
     const { data } = await supabase.from("partner_types").select("*").order("label", { ascending: true });
-    if (data) setPartnerTypes(data as PartnerType[]);
+    if (data && data.length > 0) {
+      setPartnerTypes(data as PartnerType[]);
+    } else {
+      // Fallback types if database is empty
+      setPartnerTypes([
+        { id: '1', name: 'hotel', label: 'Hotel/Pousada', icon: 'Building2', color: 'blue' },
+        { id: '2', name: 'guia', label: 'Guia de Turismo', icon: 'Compass', color: 'green' },
+        { id: '3', name: 'motorista', label: 'Motorista', icon: 'Car', color: 'amber' },
+        { id: '4', name: 'agencia', label: 'Agência', icon: 'Users', color: 'purple' },
+        { id: '5', name: 'restaurante', label: 'Restaurante', icon: 'Utensils', color: 'rose' }
+      ]);
+    }
   };
 
   const openNew = () => {
@@ -319,10 +330,12 @@ const AdminParceiros = () => {
     if (!selectedPartner) return;
     setSaving(true);
     try {
-      const valorNumerico = Math.round(Number(receivableForm.valor.replace(/\D/g, "")) / 100 * 100); // Já em centavos
+      const cleanValor = String(receivableForm.valor).replace(/\D/g, "");
+      const valorNumerico = Number(cleanValor);
+      
       const { error } = await supabase.from("contas_receber").insert({
         descricao: `Parceiro: ${selectedPartner.name} - ${receivableForm.descricao}`,
-        valor: Number(receivableForm.valor.replace(/\D/g, "")),
+        valor: valorNumerico,
         vencimento: receivableForm.vencimento,
         categoria: receivableForm.categoria,
         status: "pendente",
@@ -861,28 +874,32 @@ const AdminParceiros = () => {
               </div>
             </div>
 
-            {form.type === "motorista" && (
+            {(form.type === "motorista" || form.type === "fretista" || form.type === "guia") && (
               <div className="space-y-4 p-4 border border-amber-200 dark:border-amber-800 rounded-xl bg-amber-50/50 dark:bg-amber-900/10">
-                <p className="text-sm font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1"><Car size={14} /> Dados do Motorista</p>
-                <div className="grid grid-cols-2 gap-4">
+                <p className="text-sm font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1">
+                  {form.type === "guia" ? <Compass size={14} /> : <Car size={14} />} 
+                  Dados de Habilitação / Profissional
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label className="mb-1.5 block">Nº da CNH</Label>
-                    <Input value={form.cnh} onChange={(e) => setForm({ ...form, cnh: e.target.value })} placeholder="00000000000" maxLength={20} />
+                    <Label className="mb-1.5 block text-xs font-bold uppercase text-amber-600">
+                      {form.type === "guia" ? "Nº Cadastur / Registro" : "Nº da CNH"}
+                    </Label>
+                    <Input 
+                      value={form.type === "guia" ? form.cadastur : form.cnh} 
+                      onChange={(e) => setForm({ ...form, [form.type === "guia" ? "cadastur" : "cnh"]: e.target.value })} 
+                      placeholder={form.type === "guia" ? "Registro profissional" : "00000000000"} 
+                      maxLength={30} 
+                    />
                   </div>
                   <div>
-                    <Label className="mb-1.5 block">Validade da CNH</Label>
-                    <Input type="date" value={form.cnh_validade} onChange={(e) => setForm({ ...form, cnh_validade: e.target.value })} />
+                    <Label className="mb-1.5 block text-xs font-bold uppercase text-amber-600">Validade</Label>
+                    <Input 
+                      type="date" 
+                      value={form.cnh_validade} 
+                      onChange={(e) => setForm({ ...form, cnh_validade: e.target.value })} 
+                    />
                   </div>
-                </div>
-              </div>
-            )}
-
-            {form.type === "guia" && (
-              <div className="space-y-4 p-4 border border-green-200 dark:border-green-800 rounded-xl bg-green-50/50 dark:bg-green-900/10">
-                <p className="text-sm font-semibold text-green-700 dark:text-green-400 flex items-center gap-1"><Compass size={14} /> Dados do Guia</p>
-                <div>
-                  <Label className="mb-1.5 block">Nº Cadastur (Autorização)</Label>
-                  <Input value={form.cadastur} onChange={(e) => setForm({ ...form, cadastur: e.target.value })} placeholder="Número de registro no Cadastur" maxLength={30} />
                 </div>
               </div>
             )}
@@ -1212,9 +1229,23 @@ const AdminParceiros = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-muted-foreground">CADASTUR</span>
-                        <span className="text-sm font-bold">{viewPartner.cadastur || "Não cadastrado"}</span>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-muted-foreground">CADASTUR</span>
+                          <span className="text-sm font-bold">{viewPartner.cadastur || "Não cadastrado"}</span>
+                        </div>
+                        {viewPartner.cnh_validade && (
+                          <>
+                            <Separator />
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs text-muted-foreground">Validade</span>
+                              <span className="text-sm font-bold flex items-center gap-2 text-amber-600">
+                                <Calendar size={14} />
+                                {formatDate(new Date(viewPartner.cnh_validade + "T12:00:00"), "dd/MM/yyyy")}
+                              </span>
+                            </div>
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
