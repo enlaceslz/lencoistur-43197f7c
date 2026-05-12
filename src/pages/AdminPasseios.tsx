@@ -501,11 +501,28 @@ const AdminPasseios = () => {
         </div>
         
         <div className="flex gap-2 flex-wrap justify-center overflow-x-auto no-scrollbar pb-1">
-          <Button variant={!search ? "default" : "outline"} size="sm" onClick={() => setSearch("")} className="h-10 rounded-xl px-4 font-bold">
+          <Button 
+            variant={!search ? "default" : "outline"} 
+            size="sm" 
+            onClick={() => setSearch("")} 
+            className={cn(
+              "h-10 rounded-xl px-4 font-bold transition-all",
+              !search ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+            )}
+          >
             Todos
           </Button>
           {CATEGORIES.map((cat) => (
-            <Button key={cat} variant={search === cat ? "default" : "outline"} size="sm" onClick={() => setSearch(cat)} className="h-10 rounded-xl px-4 font-bold whitespace-nowrap">
+            <Button 
+              key={cat} 
+              variant={search === cat ? "default" : "outline"} 
+              size="sm" 
+              onClick={() => setSearch(cat)} 
+              className={cn(
+                "h-10 rounded-xl px-4 font-bold whitespace-nowrap transition-all",
+                search === cat ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+              )}
+            >
               {cat}
             </Button>
           ))}
