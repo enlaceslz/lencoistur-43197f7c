@@ -793,6 +793,244 @@ const AdminReservas = () => {
                  </span>
                </div>
             </div>
+      </Dialog>
+      
+      {/* Reserva Full Details (Wide View) */}
+      <Dialog open={showWideView} onOpenChange={setShowWideView}>
+        <DialogContent className="sm:max-w-5xl w-[95vw] max-h-[95vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between sticky top-0 z-20">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+                <LayoutDashboard size={24} strokeWidth={2.5} />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-black text-slate-900 leading-none mb-1">
+                  Ficha Operacional Completa
+                </DialogTitle>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-[10px] font-black uppercase bg-primary/5 text-primary border-primary/10">
+                    Reserva #{selected?.bookingCode}
+                  </Badge>
+                  <p className="text-xs text-slate-500 font-medium">{selected?.itemName}</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="rounded-xl font-bold h-10 border-slate-200"
+                onClick={() => window.print()}
+              >
+                <Printer size={16} className="mr-2" /> Imprimir
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => setShowWideView(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+                <XCircle size={24} className="text-slate-400" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="p-8">
+            {selected ? (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Coluna 1: Status e Operação */}
+                <div className="lg:col-span-1 space-y-8">
+                  <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden">
+                    <div className={cn("absolute top-0 right-0 w-2 h-full", statusConfig[selected.status]?.className.split(' ')[1])} />
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <Activity size={14} className="text-primary" /> Status da Operação
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-[10px] uppercase font-black text-slate-400">Situação</Label>
+                        <Badge className={cn("rounded-xl px-4 py-1.5 font-black text-[10px] uppercase border", statusConfig[selected.status]?.className)}>
+                          {statusConfig[selected.status]?.label}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Label className="text-[10px] uppercase font-black text-slate-400">Pagamento</Label>
+                        <Badge variant="outline" className={cn("rounded-xl px-4 py-1.5 font-black text-[10px] uppercase border", selected.paymentStatus === 'pago' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-amber-50 text-amber-600 border-amber-100")}>
+                          {selected.paymentStatus === 'pago' ? 'Liquidado' : 'Pendente'}
+                        </Badge>
+                      </div>
+                      <div className="pt-4 border-t border-slate-50 space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+                            <Clock size={14} />
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black uppercase text-slate-400">Criada em</p>
+                            <p className="text-xs font-bold text-slate-700">{new Date(selected.createdAt).toLocaleString('pt-BR')}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <Briefcase size={14} className="text-primary" /> Alocação de Recursos
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                          <User size={20} />
+                        </div>
+                        <div className="min-w-0">
+                          <Label className="text-[9px] uppercase font-black text-slate-400">Colaborador / Guia</Label>
+                          <p className="text-sm font-black text-slate-700 truncate">{selected.collaboratorName || "Não alocado"}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                          <Building2 size={20} />
+                        </div>
+                        <div className="min-w-0">
+                          <Label className="text-[9px] uppercase font-black text-slate-400">Parceiro / Canal</Label>
+                          <p className="text-sm font-black text-slate-700 truncate">
+                            {selected.partnerId ? "Origem Parceiro" : "Venda Direta"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+
+                {/* Coluna 2: Dados do Cliente e PAX */}
+                <div className="lg:col-span-1 space-y-8">
+                  <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <Users size={14} className="text-primary" /> Dados do Cliente (Titular)
+                    </h3>
+                    <div className="space-y-5">
+                      <div className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50/50">
+                        <div className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center font-black text-lg shadow-lg">
+                          {selected.customerName[0]}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-black text-slate-900 truncate leading-tight mb-1">{selected.customerName}</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight truncate">{selected.customerEmail}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3 px-1">
+                        <div className="flex items-center gap-3 text-slate-500">
+                          <Smartphone size={14} className="text-primary/60" />
+                          <span className="text-xs font-bold">{selected.customerPhone}</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-slate-500">
+                          <FileText size={14} className="text-primary/60" />
+                          <span className="text-xs font-bold font-mono">{selected.cpf || selected.passport || "Documento não informado"}</span>
+                        </div>
+                        {selected.birthDate && (
+                          <div className="flex items-center gap-3 text-slate-500">
+                            <Calendar size={14} className="text-primary/60" />
+                            <span className="text-xs font-bold">Nascimento: {new Date(selected.birthDate + "T12:00:00").toLocaleDateString('pt-BR')}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <Shield size={14} className="text-indigo-600" /> Segurança & Termos
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 rounded-2xl bg-indigo-50/30 border border-indigo-100/50">
+                        <div className="flex items-center gap-3">
+                          <Shield size={18} className="text-indigo-600" />
+                          <span className="text-[10px] font-black uppercase text-indigo-900">Termo de Risco</span>
+                        </div>
+                        <Badge className={cn("text-[8px] font-black uppercase", selected.termStatus === 'assinado' ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700")}>
+                          {selected.termStatus === 'assinado' ? "Assinado" : "Pendente"}
+                        </Badge>
+                      </div>
+                      {selected.termPdfUrl && (
+                        <Button variant="outline" className="w-full rounded-xl h-10 text-[10px] font-black uppercase tracking-widest border-indigo-200 text-indigo-600 hover:bg-indigo-50" onClick={() => window.open(selected.termPdfUrl, '_blank')}>
+                          <Download size={14} className="mr-2" /> Visualizar Documento Assinado
+                        </Button>
+                      )}
+                    </div>
+                  </section>
+                </div>
+
+                {/* Coluna 3: Itens e Financeiro */}
+                <div className="lg:col-span-1 space-y-8">
+                   <section className="bg-slate-900 text-white p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+                     <div className="absolute right-0 top-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                     <div className="relative z-10">
+                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-4">Itinerário & Serviço</p>
+                        <h4 className="text-2xl font-black tracking-tighter leading-tight mb-8">{selected.itemName}</h4>
+                        <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/10">
+                          <div className="space-y-1">
+                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Data</p>
+                            <p className="text-xs font-black uppercase tracking-tighter">{selected.date}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Ocupação</p>
+                            <p className="text-xs font-black uppercase tracking-tighter">{selected.guests} Pessoas</p>
+                          </div>
+                        </div>
+                     </div>
+                   </section>
+
+                   <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <DollarSign size={14} className="text-emerald-500" /> Demonstrativo Financeiro
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase">
+                        <span>Preço Unitário</span>
+                        <span className="text-slate-700">{formatCurrency(selected.unitPrice)}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase">
+                        <span>Total Pax ({selected.guests})</span>
+                        <span className="text-slate-700">{formatCurrency(selected.total)}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-[10px] font-black text-rose-500 uppercase">
+                        <span>Descontos / Promos</span>
+                        <span>- {formatCurrency(selected.discount)}</span>
+                      </div>
+                      <Separator className="my-2 border-dashed" />
+                      <div className="flex justify-between items-end">
+                        <div>
+                          <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Valor Final Liquidado</p>
+                          <p className="text-3xl font-black text-emerald-600 tracking-tighter">{formatCurrency(selected.finalTotal)}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Método</p>
+                          <Badge variant="outline" className="text-[9px] font-black uppercase px-3 py-1 bg-slate-50">{selected.payMethod}</Badge>
+                        </div>
+                      </div>
+                    </div>
+                   </section>
+
+                   {selected.notes && (
+                     <section className="bg-amber-50/50 p-6 rounded-[2rem] border border-amber-100">
+                       <h3 className="text-xs font-black uppercase tracking-widest text-amber-600 mb-2 flex items-center gap-2">
+                         <Tag size={14} /> Notas Operacionais
+                       </h3>
+                       <p className="text-[11px] font-bold text-amber-800 leading-relaxed italic">
+                         "{selected.notes}"
+                       </p>
+                     </section>
+                   )}
+                </div>
+              </div>
+            ) : (
+              <div className="py-20 flex justify-center items-center">
+                <Loader2 className="animate-spin text-primary" size={40} />
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white border-t border-slate-100 p-6 flex justify-end">
+            <Button variant="secondary" onClick={() => setShowWideView(false)} className="rounded-xl h-12 px-8 font-black uppercase text-[10px] tracking-widest">
+              Fechar Ficha Técnica
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
             <div className="flex gap-4 w-full md:w-auto">
               <Button variant="ghost" onClick={() => setShowNewForm(false)} className="flex-1 md:flex-none rounded-xl h-14 px-8 font-bold text-slate-500 hover:bg-slate-200 transition-all">
