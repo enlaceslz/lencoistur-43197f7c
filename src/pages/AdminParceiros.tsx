@@ -645,7 +645,7 @@ const AdminParceiros = () => {
                 <div 
                   key={p.id} 
                   className={`group relative flex flex-col overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${!p.active ? "opacity-60 grayscale" : ""}`}
-                  onClick={() => { setViewPartner(p); fetchPartnerBookings(p.id); }}
+                  onClick={() => { setViewPartner(p); fetchPartnerBookings(p.id); fetchPartnerReceivables(p.id); }}
                 >
                   {/* Banner Colorido */}
                   <div className={`h-24 w-full bg-gradient-to-br ${colorClass} relative overflow-hidden`}>
