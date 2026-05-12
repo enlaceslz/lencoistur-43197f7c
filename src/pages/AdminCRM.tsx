@@ -1651,6 +1651,12 @@ const AdminCRMContent = () => {
                           )}
                         </div>
                       </TabsContent>
+
+                      <TabsContent value="interacoes">
+                        <div className="bg-white border border-slate-100 rounded-[2rem] p-6">
+                           <CustomerInteractionHistory customerId={selectedCustomer.id} />
+                        </div>
+                      </TabsContent>
                     </div>
                   </Tabs>
 
