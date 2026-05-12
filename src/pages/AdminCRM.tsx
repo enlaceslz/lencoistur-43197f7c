@@ -1208,7 +1208,11 @@ const AdminCRMContent = () => {
                             <div className="flex gap-1 justify-end">
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:bg-primary/10" onClick={(e) => { e.stopPropagation(); setViewDetailsOpen(true); selectCustomer(c); }}>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:bg-primary/10" onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    const url = `${window.location.origin}${window.location.pathname}?wide_view_id=${c.id}`;
+                                    window.open(url, '_blank');
+                                  }}>
                                     <Eye size={14} />
                                   </Button>
                                 </TooltipTrigger>
