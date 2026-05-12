@@ -126,8 +126,8 @@ const AdminReservas = () => {
         finalTotal,
         publicUnitPrice: publicUnitPriceNum,
         publicTotal,
-        collaboratorId: form.collaboratorId || undefined,
-        partnerId: form.partnerId || undefined,
+        collaboratorId: form.collaboratorId === "none" ? undefined : form.collaboratorId || undefined,
+        partnerId: form.partnerId === "none" ? undefined : form.partnerId || undefined,
       });
 
       toast.success("Reserva criada com sucesso!");
