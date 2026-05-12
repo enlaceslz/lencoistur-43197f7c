@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Plus, Calendar, DollarSign, Clock, CheckCircle, XCircle, ChevronRight, FileDown, LayoutGrid, List, Loader2, User, Phone, Mail, MapPin, CreditCard, Trash2, Printer, Download, Eye, MoreHorizontal, Users } from "lucide-react";
+import { Search, Plus, Calendar, DollarSign, Clock, CheckCircle, XCircle, ChevronRight, FileDown, LayoutGrid, List, Loader2, User, Phone, Mail, MapPin, CreditCard, Trash2, Printer, Download, Eye, MoreHorizontal, Users, Tag, Briefcase } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { formatCurrency, cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { maskPhone } from "@/lib/masks";
+import { maskPhone, maskCurrency, parseCurrencyToNumber } from "@/lib/masks";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   confirmada: { label: "Confirmada", className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
@@ -29,6 +29,43 @@ const AdminReservas = () => {
   const [selected, setSelected] = useState<BookingItem | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [collaborators, setCollaborators] = useState<any[]>([]);
+  const [partners, setPartners] = useState<any[]>([]);
+  const [tours, setTours] = useState<any[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  const [form, setForm] = useState({
+    customerName: "",
+    customerEmail: "",
+    customerPhone: "",
+    type: "tour" as "tour" | "transfer" | "package",
+    itemName: "",
+    date: "",
+    guests: 1,
+    payMethod: "pix" as "pix" | "card" | "info",
+    unitPrice: "0",
+    discount: "0",
+    publicUnitPrice: "0",
+    notes: "",
+    collaboratorId: "",
+    partnerId: "",
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const [collabsRes, partnersRes, toursRes] = await Promise.all([
+        supabase.from("collaborators").select("id, name").eq("status", "active"),
+        supabase.from("partners").select("id, name").eq("active", true),
+        supabase.from("tours").select("id, name, price, private_price").eq("active", true)
+      ]);
+
+      if (collabsRes.data) setCollaborators(collabsRes.data);
+      if (partnersRes.data) setPartners(partnersRes.data);
+      if (toursRes.data) setTours(toursRes.data);
+    };
+
+    fetchData();
+  }, []);
 
   const filtered = bookings.filter((b) => {
     const q = search.toLowerCase();
@@ -62,6 +99,71 @@ const AdminReservas = () => {
       toast.error(err?.message || "Erro ao excluir reserva.");
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!form.customerName || !form.itemName || !form.date) {
+      toast.error("Preencha os campos obrigatórios");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const unitPriceNum = parseCurrencyToNumber(form.unitPrice);
+      const discountNum = parseCurrencyToNumber(form.discount);
+      const publicUnitPriceNum = parseCurrencyToNumber(form.publicUnitPrice);
+      
+      const total = (unitPriceNum * form.guests);
+      const publicTotal = (publicUnitPriceNum * form.guests);
+      const finalTotal = total - discountNum;
+
+      await addBooking({
+        ...form,
+        unitPrice: unitPriceNum,
+        total,
+        discount: discountNum,
+        finalTotal,
+        publicUnitPrice: publicUnitPriceNum,
+        publicTotal,
+        collaboratorId: form.collaboratorId === "none" ? undefined : form.collaboratorId || undefined,
+        partnerId: form.partnerId === "none" ? undefined : form.partnerId || undefined,
+      });
+
+      toast.success("Reserva criada com sucesso!");
+      setShowNewForm(false);
+      setForm({
+        customerName: "",
+        customerEmail: "",
+        customerPhone: "",
+        type: "tour",
+        itemName: "",
+        date: "",
+        guests: 1,
+        payMethod: "pix",
+        unitPrice: "0",
+        discount: "0",
+        publicUnitPrice: "0",
+        notes: "",
+        collaboratorId: "",
+        partnerId: "",
+      });
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao criar reserva");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleTourChange = (tourId: string) => {
+    const tour = tours.find(t => t.id === tourId);
+    if (tour) {
+      setForm(prev => ({
+        ...prev,
+        itemName: tour.name,
+        unitPrice: tour.price.toString(),
+        publicUnitPrice: tour.private_price.toString(),
+      }));
     }
   };
 
@@ -310,16 +412,235 @@ const AdminReservas = () => {
       </div>
 
       <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
-        <DialogContent className="max-w-2xl rounded-[2.5rem] p-8">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-black text-slate-900 tracking-tight">Nova Reserva</DialogTitle>
-          </DialogHeader>
-          <div className="py-6 space-y-6">
-            <p className="text-sm font-medium text-slate-500">O formulário completo de reserva está sendo otimizado. Por favor, utilize o fluxo de venda direta no site ou entre em contato com o suporte para reservas manuais avançadas.</p>
-            <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" onClick={() => setShowNewForm(false)} className="rounded-xl h-11 font-bold">Cancelar</Button>
-              <Button className="rounded-xl h-11 font-black" onClick={() => toast.info("Funcionalidade em desenvolvimento")}>Criar via Site</Button>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto rounded-[2.5rem] p-0 border-none shadow-2xl">
+          <div className="bg-slate-50/50 p-8 border-b border-border/40">
+            <DialogHeader>
+              <DialogTitle className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                  <Plus size={24} strokeWidth={3} />
+                </div>
+                Nova Reserva Operacional
+              </DialogTitle>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mt-2">Preencha os detalhes estratégicos para o registro da nova expedição</p>
+            </DialogHeader>
+          </div>
+
+          <div className="p-8 space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              {/* Seção: Cliente */}
+              <div className="space-y-6">
+                <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
+                  <User size={14} /> Dados do Cliente
+                </h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nome Completo</Label>
+                    <Input 
+                      placeholder="Ex: João Silva" 
+                      value={form.customerName} 
+                      onChange={e => setForm({...form, customerName: e.target.value})}
+                      className="rounded-xl h-12 font-semibold border-slate-200 focus:ring-primary/10"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">WhatsApp</Label>
+                      <Input 
+                        placeholder="(00) 00000-0000" 
+                        value={form.customerPhone} 
+                        onChange={e => setForm({...form, customerPhone: maskPhone(e.target.value)})}
+                        className="rounded-xl h-12 font-semibold border-slate-200"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">E-mail</Label>
+                      <Input 
+                        type="email" 
+                        placeholder="email@exemplo.com" 
+                        value={form.customerEmail} 
+                        onChange={e => setForm({...form, customerEmail: e.target.value})}
+                        className="rounded-xl h-12 font-semibold border-slate-200"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Seção: Reserva */}
+              <div className="space-y-6">
+                <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Calendar size={14} /> Detalhes da Reserva
+                </h3>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tipo de Serviço</Label>
+                      <Select value={form.type} onValueChange={(v: any) => setForm({...form, type: v})}>
+                        <SelectTrigger className="rounded-xl h-12 font-semibold border-slate-200">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl border-slate-200">
+                          <SelectItem value="tour">Expedição (Tour)</SelectItem>
+                          <SelectItem value="transfer">Translado</SelectItem>
+                          <SelectItem value="package">Pacote</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data da Operação</Label>
+                      <Input 
+                        type="date" 
+                        value={form.date} 
+                        onChange={e => setForm({...form, date: e.target.value})}
+                        className="rounded-xl h-12 font-semibold border-slate-200"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Serviço / Item</Label>
+                    <Select onValueChange={handleTourChange}>
+                      <SelectTrigger className="rounded-xl h-12 font-semibold border-slate-200">
+                        <SelectValue placeholder="Selecione um serviço cadastrado..." />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-slate-200">
+                        {tours.map(t => (
+                          <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input 
+                      placeholder="Ou digite o nome manualmente..." 
+                      value={form.itemName} 
+                      onChange={e => setForm({...form, itemName: e.target.value})}
+                      className="rounded-xl h-10 text-xs font-semibold border-slate-200 mt-2"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-8 border-t border-slate-100">
+              {/* Seção: Financeiro */}
+              <div className="space-y-6">
+                <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
+                  <DollarSign size={14} /> Financeiro
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Qtd. PAX</Label>
+                    <Input 
+                      type="number" 
+                      min="1" 
+                      value={form.guests} 
+                      onChange={e => setForm({...form, guests: parseInt(e.target.value) || 1})}
+                      className="rounded-xl h-12 font-semibold border-slate-200"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Método de Pagto</Label>
+                    <Select value={form.payMethod} onValueChange={(v: any) => setForm({...form, payMethod: v})}>
+                      <SelectTrigger className="rounded-xl h-12 font-semibold border-slate-200">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-slate-200">
+                        <SelectItem value="pix">PIX</SelectItem>
+                        <SelectItem value="card">Cartão de Crédito</SelectItem>
+                        <SelectItem value="info">Informar depois</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Valor Unit.</Label>
+                    <Input 
+                      value={form.unitPrice} 
+                      onChange={e => setForm({...form, unitPrice: maskCurrency(e.target.value)})}
+                      className="rounded-xl h-12 font-semibold border-slate-200"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Desconto</Label>
+                    <Input 
+                      value={form.discount} 
+                      onChange={e => setForm({...form, discount: maskCurrency(e.target.value)})}
+                      className="rounded-xl h-12 font-semibold border-slate-200 text-rose-500"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Valor Público</Label>
+                    <Input 
+                      value={form.publicUnitPrice} 
+                      onChange={e => setForm({...form, publicUnitPrice: maskCurrency(e.target.value)})}
+                      className="rounded-xl h-12 font-semibold border-slate-200"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Seção: Alocação */}
+              <div className="space-y-6">
+                <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
+                  <Briefcase size={14} /> Alocação & Notas
+                </h3>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Colaborador / Guia</Label>
+                      <Select value={form.collaboratorId} onValueChange={v => setForm({...form, collaboratorId: v})}>
+                        <SelectTrigger className="rounded-xl h-12 font-semibold border-slate-200 text-left">
+                          <SelectValue placeholder="Selecione..." />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl border-slate-200">
+                          <SelectItem value="none">Nenhum</SelectItem>
+                          {collaborators.map(c => (
+                            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Parceiro / Origem</Label>
+                      <Select value={form.partnerId} onValueChange={v => setForm({...form, partnerId: v})}>
+                        <SelectTrigger className="rounded-xl h-12 font-semibold border-slate-200">
+                          <SelectValue placeholder="Selecione..." />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl border-slate-200">
+                          <SelectItem value="none">Venda Direta</SelectItem>
+                          {partners.map(p => (
+                            <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Observações Operacionais</Label>
+                    <Textarea 
+                      placeholder="Detalhes sobre restrições, preferências ou logísticas especiais..." 
+                      value={form.notes} 
+                      onChange={e => setForm({...form, notes: e.target.value})}
+                      className="rounded-xl min-h-[100px] font-semibold border-slate-200"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-8 bg-slate-50 border-t border-border/40 flex justify-end gap-4 rounded-b-[2.5rem]">
+            <Button variant="ghost" onClick={() => setShowNewForm(false)} className="rounded-xl h-14 px-8 font-bold text-slate-500 hover:bg-slate-200 transition-all">
+              Descartar
+            </Button>
+            <Button 
+              onClick={handleSave} 
+              disabled={saving}
+              className="rounded-2xl h-14 px-12 bg-primary font-black text-white shadow-xl shadow-primary/20 hover:scale-105 transition-all active:scale-95 disabled:opacity-50"
+            >
+              {saving ? <Loader2 className="animate-spin mr-2" /> : <Plus className="mr-2" strokeWidth={3} />}
+              Efetivar Reserva no Sistema
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
