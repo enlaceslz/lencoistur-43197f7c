@@ -901,7 +901,7 @@ const AdminPasseios = () => {
                       <div className="flex items-center gap-4">
                         <div className="relative shrink-0">
                           {t.images?.[0] ? (
-                            <img src={t.images[0]} className="w-14 h-14 rounded-2xl object-cover shadow-sm group-hover:scale-105 transition-transform" />
+                            <img src={t.images[0]} className="w-14 h-14 rounded-2xl object-cover shadow-md group-hover:scale-110 transition-transform duration-500" />
                           ) : (
                             <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground">
                               <Compass size={24} />
