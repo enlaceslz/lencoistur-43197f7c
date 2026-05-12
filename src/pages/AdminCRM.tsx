@@ -375,6 +375,37 @@ const AdminCRMContent = () => {
         lastBooking: bookingsByCustomer[c.id]?.lastDate || null,
         ltvCategory: (bookingsByCustomer[c.id]?.total || 0) > 500000 ? "VIP" : (bookingsByCustomer[c.id]?.count || 0) >= 3 ? "Fiel" : "Novo"
       })));
+
+      if (wideViewId) {
+        const target = customersData.find((c: any) => c.id === wideViewId);
+        if (target) {
+          const mapped = {
+            id: target.id,
+            name: target.name,
+            email: target.email,
+            phone: target.phone,
+            cpf: target.cpf,
+            passport: target.passport,
+            birth_date: target.birth_date,
+            notes: target.notes,
+            status: target.status || "regular",
+            created_at: target.created_at,
+            country: target.country || "Brasil",
+            cep: target.cep,
+            address: target.address,
+            number: target.number,
+            neighborhood: target.neighborhood,
+            city: target.city,
+            state: target.state,
+            tags: target.tags || [],
+            totalBookings: bookingsByCustomer[target.id]?.count || 0,
+            totalSpent: bookingsByCustomer[target.id]?.total || 0,
+            lastBooking: bookingsByCustomer[target.id]?.lastDate || null,
+            ltvCategory: (bookingsByCustomer[target.id]?.total || 0) > 500000 ? "VIP" : (bookingsByCustomer[target.id]?.count || 0) >= 3 ? "Fiel" : "Novo" as any
+          };
+          selectCustomer(mapped);
+        }
+      }
     }
     setLoading(false);
     fetchAllDependents();
