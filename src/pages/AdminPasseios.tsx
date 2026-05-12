@@ -857,7 +857,11 @@ const AdminPasseios = () => {
               filtered.map((t) => {
                 const isTopSeller = t.reviews_count >= topSellingThreshold && t.active;
                 return (
-                  <TableRow key={t.id} className={`group hover:bg-primary/5 transition-all border-b border-border/50 ${!t.active ? "opacity-60 grayscale" : ""}`}>
+                  <TableRow 
+                    key={t.id} 
+                    className={`group hover:bg-primary/5 transition-all border-b border-border/50 cursor-pointer ${!t.active ? "opacity-60 grayscale" : ""}`}
+                    onClick={() => setDetailTour(t)}
+                  >
                     <TableCell className="pl-6 py-4">
                       <div className="flex items-center gap-4">
                         <div className="relative shrink-0">
