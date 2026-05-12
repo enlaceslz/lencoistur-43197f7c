@@ -463,7 +463,10 @@ const AdminReservas = () => {
                         "cursor-pointer border-b border-border/20 transition-all group", 
                         selected?.id === b.id ? "bg-primary/[0.03]" : "hover:bg-primary/[0.01]"
                       )} 
-                      onClick={() => setSelected(b)}
+                      onClick={() => {
+                        setSelected(b);
+                        setShowWideView(true);
+                      }}
                     >
                       <TableCell className="px-6 py-5">
                         <div>
