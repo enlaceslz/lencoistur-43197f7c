@@ -247,6 +247,7 @@ const AdminCRMContent = () => {
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+  const [isWideViewNewWindow, setIsWideViewNewWindow] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [form, setForm] = useState<CustomerForm>(emptyForm);
   const [saving, setSaving] = useState(false);
