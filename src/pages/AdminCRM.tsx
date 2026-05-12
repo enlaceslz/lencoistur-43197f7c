@@ -1340,11 +1340,16 @@ const AdminCRMContent = () => {
                             </div>
                           </div>
                           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <a href={doc.file_url} target="_blank" rel="noopener noreferrer">
+                            <button 
+                              onClick={() => {
+                                // Ensure we use the latest public URL logic if needed
+                                window.open(doc.file_url, '_blank');
+                              }}
+                            >
                               <Button variant="ghost" size="icon" className="h-7 w-7">
-                                <Download size={12} />
+                                <Eye size={12} />
                               </Button>
-                            </a>
+                            </button>
                             <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-destructive/10" onClick={() => setDeleteDocConfirm(doc.id)}>
                               <Trash2 size={12} className="text-destructive" />
                             </Button>
