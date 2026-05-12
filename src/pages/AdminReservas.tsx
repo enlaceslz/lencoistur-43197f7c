@@ -377,6 +377,14 @@ const AdminReservas = () => {
                     >
                       <Pencil size={18} />
                     </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="rounded-xl hover:bg-primary/5 hover:text-primary transition-all"
+                      onClick={() => setShowWideView(true)}
+                    >
+                      <Eye size={18} />
+                    </Button>
                   </div>
                   <Badge 
                     className={cn("rounded-2xl px-5 py-2 font-black text-[10px] uppercase border shadow-sm", statusConfig[selected.status]?.className)} 
