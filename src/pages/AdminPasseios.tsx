@@ -532,7 +532,7 @@ const AdminPasseios = () => {
             <TooltipTrigger asChild>
               <button 
                 onClick={openNew}
-                className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+                className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
               >
                 <Plus size={20} strokeWidth={3} /> Novo Passeio
               </button>
