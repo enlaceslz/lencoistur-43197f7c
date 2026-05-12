@@ -238,6 +238,21 @@ const AdminReservas = () => {
           </div>
         </div>
       </div>
+
+      <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
+        <DialogContent className="max-w-2xl rounded-[2.5rem] p-8">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black text-slate-900 tracking-tight">Nova Reserva</DialogTitle>
+          </DialogHeader>
+          <div className="py-6 space-y-6">
+            <p className="text-sm font-medium text-slate-500">O formulário completo de reserva está sendo otimizado. Por favor, utilize o fluxo de venda direta no site ou entre em contato com o suporte para reservas manuais avançadas.</p>
+            <div className="grid grid-cols-2 gap-4">
+              <Button variant="outline" onClick={() => setShowNewForm(false)} className="rounded-xl h-11 font-bold">Cancelar</Button>
+              <Button className="rounded-xl h-11 font-black" onClick={() => toast.info("Funcionalidade em desenvolvimento")}>Criar via Site</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
