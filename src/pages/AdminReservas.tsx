@@ -463,14 +463,40 @@ const AdminReservas = () => {
                   <User size={14} /> Dados do Cliente
                 </h3>
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nome Completo</Label>
-                    <Input 
-                      placeholder="Ex: João Silva" 
-                      value={form.customerName} 
-                      onChange={e => setForm({...form, customerName: e.target.value})}
-                      className="rounded-xl h-12 font-semibold border-slate-200 focus:ring-primary/10"
-                    />
+                  <div className="space-y-2 relative">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Buscar no CRM ou Nome Completo</Label>
+                    <div className="relative">
+                      <Input 
+                        placeholder="Ex: João Silva..." 
+                        value={form.customerName || customerSearch} 
+                        onChange={e => {
+                          const val = e.target.value;
+                          setForm({...form, customerName: val, customerId: ""});
+                          searchCustomers(val);
+                        }}
+                        className="rounded-xl h-12 font-semibold border-slate-200 focus:ring-primary/10 pl-10"
+                      />
+                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    </div>
+
+                    {customerSearch && customers.length > 0 && (
+                      <div className="absolute z-[100] left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        {customers.map((c) => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onClick={() => handleSelectCustomer(c)}
+                            className="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0 flex items-center justify-between group"
+                          >
+                            <div>
+                              <p className="text-xs font-black text-slate-900 group-hover:text-primary transition-colors">{c.name}</p>
+                              <p className="text-[10px] text-slate-500 font-bold tracking-tight">{c.email || "Sem e-mail"} • {c.phone || "Sem telefone"}</p>
+                            </div>
+                            <UserCheck size={14} className="text-slate-300 group-hover:text-primary opacity-0 group-hover:opacity-100 transition-all" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
