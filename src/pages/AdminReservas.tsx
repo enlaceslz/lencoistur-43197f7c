@@ -431,7 +431,7 @@ const AdminReservas = () => {
           ))}
         </div>
 
-        <div className="flex-1 flex gap-6 overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 bg-white rounded-[2.5rem] border border-white/40 flex flex-col overflow-hidden shadow-xl shadow-primary/5 glass-card">
             <div className="p-6 border-b border-border/40 flex gap-4 items-center bg-slate-50/30">
               <div className="relative flex-1">
