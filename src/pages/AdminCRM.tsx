@@ -246,7 +246,7 @@ const AdminCRMContent = () => {
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
-  const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+  
   const [isWideViewNewWindow, setIsWideViewNewWindow] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [form, setForm] = useState<CustomerForm>(emptyForm);
@@ -317,7 +317,7 @@ const AdminCRMContent = () => {
     const wideViewId = urlParams.get('wide_view_id');
     if (wideViewId) {
       setIsWideViewNewWindow(true);
-      setViewDetailsOpen(true);
+      
     }
 
     setLoading(true);
@@ -1014,9 +1014,9 @@ const AdminCRMContent = () => {
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="w-full">
           {/* Client List */}
-          <div className="lg:col-span-2 glass-card rounded-[2.5rem] p-8 animate-in-fade" style={{ animationDelay: '0.2s' }}>
+          <div className="glass-card rounded-[2.5rem] p-8 animate-in-fade" style={{ animationDelay: '0.2s' }}>
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <div className="flex items-center gap-3 flex-1 bg-muted/40 border border-border/20 rounded-2xl px-5 py-3 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                 <Search size={18} className="text-primary/50" />
@@ -1125,8 +1125,8 @@ const AdminCRMContent = () => {
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
-                                      const parent = customers.find(c => c.id === d.customer_id);
-                                      if (parent) selectCustomer(parent);
+                                      const url = `${window.location.origin}${window.location.pathname}?wide_view_id=${d.customer_id}`;
+                                      window.open(url, '_blank');
                                     }}>
                                       <Eye size={14} className="text-primary" />
                                     </Button>
@@ -1149,7 +1149,10 @@ const AdminCRMContent = () => {
                           <tr
                             key={c.id}
                             className={`border-b border-border last:border-0 hover:bg-primary/5 transition-all cursor-pointer group ${selectedCustomer?.id === c.id ? "bg-primary/5" : ""}`}
-                            onClick={() => selectCustomer(c)}
+                            onClick={() => {
+                              const url = `${window.location.origin}${window.location.pathname}?wide_view_id=${c.id}`;
+                              window.open(url, '_blank');
+                            }}
                           >
                             <td className="py-4 px-4">
                               <div className="flex items-center gap-3">
@@ -1208,7 +1211,11 @@ const AdminCRMContent = () => {
                             <div className="flex gap-1 justify-end">
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:bg-primary/10" onClick={(e) => { e.stopPropagation(); setViewDetailsOpen(true); selectCustomer(c); }}>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:bg-primary/10" onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    const url = `${window.location.origin}${window.location.pathname}?wide_view_id=${c.id}`;
+                                    window.open(url, '_blank');
+                                  }}>
                                     <Eye size={14} />
                                   </Button>
                                 </TooltipTrigger>
@@ -1276,327 +1283,6 @@ const AdminCRMContent = () => {
             )}
           </div>
         </div>
-
-          <div className="lg:col-span-1 space-y-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
-            {selectedCustomer ? (
-                <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover sticky top-24">
-                  <div className="text-center bg-primary/[0.02] p-8 rounded-[2rem] border border-primary/5 mb-8">
-                    <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-primary to-ocean flex items-center justify-center text-white text-3xl font-black mx-auto mb-6 shadow-2xl shadow-primary/20 transition-transform duration-500 hover:rotate-6">
-                      {selectedCustomer.name.trim() ? selectedCustomer.name.trim().split(" ").filter(Boolean).map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
-                    </div>
-                    <h3 className="font-display text-xl font-black text-foreground">{selectedCustomer.name}</h3>
-                    <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
-                      <Badge variant="outline" className={`uppercase text-[10px] font-black tracking-widest px-3 py-1 ${customerStatusConfig[selectedCustomer.status]?.className || ""}`}>
-                        {customerStatusConfig[selectedCustomer.status]?.label || selectedCustomer.status}
-                      </Badge>
-                      {selectedCustomer.ltvCategory && (
-                        <Badge variant="secondary" className="uppercase text-[10px] font-black tracking-widest px-3 py-1 bg-primary text-white">
-                          {selectedCustomer.ltvCategory}
-                        </Badge>
-                      )}
-                      {selectedCustomer.tags?.map(tag => (
-                        <Badge key={tag} variant="secondary" className="text-[8px] uppercase tracking-tighter px-1.5 py-0 bg-muted text-muted-foreground border-border">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                    <p className="text-[10px] font-bold text-muted-foreground mt-4 uppercase tracking-widest">
-                      Parceiro Lençóis Tour desde {new Date(selectedCustomer.created_at).toLocaleDateString("pt-BR")}
-                    </p>
-                  </div>
-
-                  <Tabs defaultValue="info" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 mb-4">
-                      <TabsTrigger value="info" className="text-[10px] font-black uppercase tracking-widest">Informações</TabsTrigger>
-                      <TabsTrigger value="timeline" className="text-[10px] font-black uppercase tracking-widest">Histórico</TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="info" className="space-y-6">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 text-center">
-                          <p className="text-2xl font-black text-primary leading-none">{selectedCustomer.totalBookings}</p>
-                          <p className="text-[10px] uppercase font-bold text-muted-foreground mt-2 tracking-widest">Viagens</p>
-                        </div>
-                        <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 text-center">
-                          <p className="text-2xl font-black text-foreground leading-none">{fmt(selectedCustomer.totalSpent)}</p>
-                          <p className="text-[10px] uppercase font-bold text-muted-foreground mt-2 tracking-widest">LTV Acumulado</p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-muted/30 border border-border/50 rounded-2xl p-4 text-center">
-                          <p className="text-xl font-black text-foreground leading-none">{selectedCustomer.cpf ? maskCPF(selectedCustomer.cpf) : (selectedCustomer.passport || "—")}</p>
-                          <p className="text-[10px] uppercase font-bold text-muted-foreground mt-2 tracking-widest">Documento</p>
-                        </div>
-                        <div className="bg-muted/30 border border-border/50 rounded-2xl p-4 text-center">
-                          <p className="text-xl font-black text-foreground leading-none">{selectedCustomer.birth_date ? new Date(selectedCustomer.birth_date + "T00:00:00").toLocaleDateString("pt-BR") : "—"}</p>
-                          <p className="text-[10px] uppercase font-bold text-muted-foreground mt-2 tracking-widest">Nascimento</p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4 bg-muted/10 p-5 rounded-2xl border border-border/50 shadow-inner">
-                        <div className="flex items-center gap-4 text-sm font-semibold">
-                          <div className="p-2 rounded-lg bg-background border border-border cursor-pointer hover:bg-muted" onClick={() => { navigator.clipboard.writeText(selectedCustomer.email || ""); toast.success("E-mail copiado!"); }}><Mail size={16} className="text-primary" /></div>
-                          <span className="text-foreground truncate">{selectedCustomer.email || "Sem e-mail cadastrado"}</span>
-                        </div>
-                        {selectedCustomer.phone && (
-                          <div className="flex items-center gap-4 text-sm font-semibold">
-                            <div className="p-2 rounded-lg bg-background border border-border cursor-pointer hover:bg-muted" onClick={() => { navigator.clipboard.writeText(selectedCustomer.phone || ""); toast.success("Telefone copiado!"); }}><Smartphone size={16} className="text-primary" /></div>
-                            <span className="text-foreground">{maskPhone(selectedCustomer.phone)}</span>
-                          </div>
-                        )}
-                        {selectedCustomer.address && (
-                          <div className="flex items-start gap-4 text-sm font-semibold">
-                            <div className="p-2 rounded-lg bg-background border border-border shrink-0"><MapPin size={16} className="text-primary" /></div>
-                            <div className="flex flex-col">
-                              <span className="text-foreground text-xs leading-tight">
-                                {selectedCustomer.address}{selectedCustomer.number ? `, ${selectedCustomer.number}` : ""}
-                              </span>
-                              <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter mt-1">
-                                {selectedCustomer.neighborhood ? `${selectedCustomer.neighborhood}, ` : ""}{selectedCustomer.city} - {selectedCustomer.state}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                        {selectedCustomer.lastBooking && (
-                          <div className="flex items-center gap-4 text-sm border-t border-border pt-4 mt-2">
-                            <div className="p-2 rounded-lg bg-primary/10"><Calendar size={16} className="text-primary" /></div>
-                            <div className="flex flex-col">
-                              <span className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Última Viagem</span>
-                              <span className="text-xs font-bold">{new Date(selectedCustomer.lastBooking).toLocaleDateString("pt-BR", { dateStyle: 'long' })}</span>
-                            </div>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-4 text-sm font-semibold">
-                          <div className="p-2 rounded-lg bg-background border border-border"><Globe size={16} className="text-primary" /></div>
-                          <span className="text-foreground">{selectedCustomer.country || "Brasil"}</span>
-                        </div>
-                      </div>
-
-                      {selectedCustomer.notes && (
-                        <div className="bg-amber-50 dark:bg-amber-900/10 p-4 rounded-2xl border border-amber-100 dark:border-amber-900/20 shadow-sm">
-                          <p className="text-[10px] font-black text-amber-800 dark:text-amber-400 uppercase tracking-widest mb-1">Observações Internas</p>
-                          <p className="text-xs text-amber-900 dark:text-amber-200 leading-relaxed font-medium">{selectedCustomer.notes}</p>
-                        </div>
-                      )}
-
-                      <div className="flex flex-col gap-2">
-                        {selectedCustomer.phone && (
-                          <div className="flex gap-2">
-                            <a
-                              href={`https://wa.me/${selectedCustomer.country === "Brasil" ? "55" : ""}${selectedCustomer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Olá ${selectedCustomer.name.split(" ")[0]}! Tudo bem?`)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1"
-                            >
-                              <Button className="w-full rounded-xl bg-green-600 hover:bg-green-700 text-white shadow-sm h-11">
-                                <Smartphone size={16} /> WhatsApp
-                              </Button>
-                            </a>
-                            <a
-                              href={`tel:${selectedCustomer.phone.replace(/\D/g, "")}`}
-                              className="shrink-0"
-                            >
-                              <Button variant="outline" className="rounded-xl h-11 w-11 p-0">
-                                <Phone size={16} />
-                              </Button>
-                            </a>
-                          </div>
-                        )}
-                        <div className="grid grid-cols-2 gap-2">
-                          <Button variant="outline" className="w-full rounded-xl h-11" onClick={() => openEditModal(selectedCustomer)}>
-                            <Pencil size={14} /> Editar
-                          </Button>
-                          <Button variant="outline" className="w-full rounded-xl border-primary/20 text-primary hover:bg-primary/5 h-11" onClick={() => exportClientPDF(selectedCustomer)}>
-                            <Printer size={14} /> Ficha PDF
-                          </Button>
-                        </div>
-                      </div>
-                    </TabsContent>
-
-                    <TabsContent value="timeline">
-                      <CustomerInteractionHistory customerId={selectedCustomer.id} />
-                    </TabsContent>
-                  </Tabs>
-                <div className="border-t border-border pt-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-                    <h4 className="font-display font-bold text-foreground">Dependentes / Acompanhantes</h4>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-7 text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 rounded-lg"
-                        onClick={() => {
-                          if (!selectedCustomer?.phone) {
-                            toast.error("Cliente sem telefone cadastrado.");
-                            return;
-                          }
-                          const message = `Olá ${selectedCustomer.name}! Por favor, complete os seus dados e assine o Termo de Ciência de Risco para a sua próxima aventura: ${window.location.origin}/assinatura-termo?customer_id=${selectedCustomer.id}`;
-                          const cleanPhone = selectedCustomer.phone.replace(/\D/g, "");
-                          const whatsappUrl = `https://wa.me/${cleanPhone.startsWith('55') ? cleanPhone : '55' + cleanPhone}?text=${encodeURIComponent(message)}`;
-                          window.open(whatsappUrl, '_blank');
-                        }}
-                      >
-                        <Smartphone size={12} className="mr-1" /> Termo via WhatsApp
-                      </Button>
-                      <Button variant="ghost" size="sm" className="h-7 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary/20 rounded-lg" onClick={openCreateDependentModal}>
-                        <Plus size={12} className="mr-1" /> Adicionar
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  {dependents.length === 0 ? (
-                    <p className="text-[10px] text-muted-foreground italic bg-muted/20 p-3 rounded-xl border border-dashed border-border text-center mb-6">
-                      Nenhum dependente cadastrado.
-                    </p>
-                  ) : (
-                    <div className="space-y-2 mb-6">
-                      {dependents.map(d => {
-                        const age = calculateAge(d.birth_date);
-                        return (
-                          <div key={d.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-xl border border-border/50 group hover:bg-muted/50 transition-colors">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center text-muted-foreground">
-                                <Baby size={16} />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="text-xs font-bold text-foreground truncate">{d.name}</p>
-                                <p className="text-[9px] text-muted-foreground uppercase font-black tracking-tighter">
-                                  {d.relationship} • {age !== null ? `${age} anos` : "—"} • {d.cpf ? maskCPF(d.cpf) : "SEM CPF"}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditDependentModal(d)}>
-                                <Pencil size={12} className="text-muted-foreground" />
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-destructive/10" onClick={() => setDeleteDepConfirm(d.id)}>
-                                <Trash2 size={12} className="text-destructive" />
-                              </Button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between mb-3 border-t border-border pt-4">
-                    <h4 className="font-display font-bold text-foreground">Documentos e Anexos</h4>
-                    <div className="flex gap-2">
-                      <select 
-                        className="text-[10px] bg-background border border-border rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-primary/50 font-bold uppercase tracking-tight"
-                        value={docCategory}
-                        onChange={(e) => setDocCategory(e.target.value)}
-                      >
-                        <option value="outros">Outros</option>
-                        <option value="recibo">Recibo</option>
-                        <option value="termo">Termo</option>
-                        <option value="documento">Documento</option>
-                      </select>
-                      <Label htmlFor="doc-upload" className="cursor-pointer">
-                        <div className="flex items-center gap-1 bg-primary/10 text-primary hover:bg-primary/20 px-2 py-1 rounded text-[10px] font-bold transition-colors">
-                          {uploadingDoc ? <Loader2 size={12} className="animate-spin" /> : <Paperclip size={12} />}
-                          Anexar
-                        </div>
-                        <Input 
-                          id="doc-upload" 
-                          type="file" 
-                          className="hidden" 
-                          onChange={handleFileUpload} 
-                          disabled={uploadingDoc}
-                        />
-                      </Label>
-                    </div>
-                  </div>
-                  
-                  {customerDocuments.length === 0 ? (
-                    <p className="text-[10px] text-muted-foreground italic bg-muted/20 p-3 rounded-xl border border-dashed border-border text-center">
-                      Nenhum documento anexado.
-                    </p>
-                  ) : (
-                    <div className="space-y-2">
-                      {customerDocuments.map((doc) => (
-                        <div key={doc.id} className="bg-muted/50 rounded-xl p-3 flex items-center justify-between group">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-8 h-8 rounded-lg bg-background flex items-center justify-center shrink-0 border border-border">
-                              <FileText size={16} className="text-primary" />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-sm font-semibold text-foreground truncate">{doc.name}</p>
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline" className="text-[8px] px-1 py-0 uppercase bg-background">
-                                  {doc.category}
-                                </Badge>
-                                <span className="text-[10px] text-muted-foreground">
-                                  {new Date(doc.created_at).toLocaleDateString("pt-BR")}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button 
-                              onClick={() => {
-                                // Ensure we use the latest public URL logic if needed
-                                window.open(doc.file_url, '_blank');
-                              }}
-                            >
-                              <Button variant="ghost" size="icon" className="h-7 w-7">
-                                <Eye size={12} />
-                              </Button>
-                            </button>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-destructive/10" onClick={() => setDeleteDocConfirm(doc.id)}>
-                              <Trash2 size={12} className="text-destructive" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="border-t border-border pt-6 mt-6">
-                  <h4 className="font-display font-bold text-foreground mb-3">Histórico de Reservas</h4>
-                  {customerBookings.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">Nenhuma reserva encontrada.</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {customerBookings.map((b) => (
-                        <div key={b.id} className="bg-muted/40 hover:bg-muted/60 transition-colors border border-border/50 rounded-2xl px-4 py-3 group">
-                          <div className="flex items-center justify-between mb-1.5">
-                            <div className="flex items-center gap-2 flex-1 min-w-0">
-                              <span className="text-[10px] font-black font-mono text-muted-foreground bg-background px-1.5 py-0.5 rounded border border-border">{b.booking_code}</span>
-                              <Badge variant="secondary" className="text-[8px] font-black uppercase tracking-tighter px-1.5 py-0">{b.type === "passeio" ? "Passeio" : "Translado"}</Badge>
-                            </div>
-                            <p className="text-sm font-black text-primary ml-2">{fmt(b.final_total)}</p>
-                          </div>
-                          <p className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">{b.item_name}</p>
-                          <div className="flex items-center justify-between mt-2">
-                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
-                              {b.date || new Date(b.created_at).toLocaleDateString("pt-BR")} · {b.guests} {b.guests === 1 ? 'pessoa' : 'pessoas'}
-                            </p>
-                            <div className="flex gap-1">
-                              <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-tighter ${statusConfig[b.status]?.className || ""}`}>
-                                {statusConfig[b.status]?.label || b.status}
-                              </Badge>
-                              <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-tighter ${payStatusConfig[b.payment_status]?.className || ""}`}>
-                                {payStatusConfig[b.payment_status]?.label || b.payment_status}
-                              </Badge>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-64 text-muted-foreground text-sm">
-                <Users className="mb-3 opacity-30" size={40} />
-                Selecione um cliente para ver detalhes
-              </div>
-            )}
-          </div>
-        </div>
       </div>
       {/* Delete Document Confirmation */}
       <Dialog open={!!deleteDocConfirm} onOpenChange={() => setDeleteDocConfirm(null)}>
@@ -1615,259 +1301,6 @@ const AdminCRMContent = () => {
               <Trash2 size={14} className="mr-1" /> Excluir
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      {/* View Details Wide Modal */}
-      <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
-        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
-          <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between sticky top-0 z-20">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
-                <Users size={24} strokeWidth={2.5} />
-              </div>
-              <div>
-                <DialogTitle className="text-xl font-black text-slate-900 leading-none mb-1">
-                  {selectedCustomer?.name || "Detalhes do Cliente"}
-                </DialogTitle>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-[10px] font-black uppercase bg-primary/5 text-primary border-primary/10">
-                    {selectedCustomer?.ltvCategory || "Cliente"}
-                  </Badge>
-                  <p className="text-xs text-slate-500 font-medium">Ficha Cadastral Ampla</p>
-                </div>
-              </div>
-            </div>
-            <Button variant="ghost" size="icon" onClick={() => setViewDetailsOpen(false)} className="rounded-full hover:bg-slate-100 transition-colors">
-              <X size={20} className="text-slate-400" />
-            </Button>
-          </div>
-
-          <div className="p-6 md:p-8">
-            {selectedCustomer ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Lateral Esquerda: Info Básica */}
-                <div className="md:col-span-1 space-y-8">
-                  <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
-                      <User size={14} className="text-primary" /> Identificação
-                    </h3>
-                    <div className="space-y-4">
-                      <div>
-                        <Label className="text-[10px] uppercase font-bold text-slate-400">CPF / Passaporte</Label>
-                        <p className="text-sm font-black text-slate-700">{selectedCustomer.cpf ? maskCPF(selectedCustomer.cpf) : selectedCustomer.passport || "—"}</p>
-                      </div>
-                      <div>
-                        <Label className="text-[10px] uppercase font-bold text-slate-400">Data de Nascimento</Label>
-                        <p className="text-sm font-black text-slate-700">{selectedCustomer.birth_date ? new Date(selectedCustomer.birth_date + "T12:00:00").toLocaleDateString("pt-BR") : "—"}</p>
-                        {selectedCustomer.birth_date && (
-                          <p className="text-[9px] text-primary font-bold uppercase mt-0.5">{calculateAge(selectedCustomer.birth_date)} anos</p>
-                        )}
-                      </div>
-                      <div>
-                        <Label className="text-[10px] uppercase font-bold text-slate-400">Nacionalidade</Label>
-                        <p className="text-sm font-black text-slate-700">{selectedCustomer.country}</p>
-                      </div>
-                    </div>
-                  </section>
-
-                  <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
-                      <Smartphone size={14} className="text-emerald-500" /> Contato & Endereço
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                          <Phone size={14} />
-                        </div>
-                        <div className="min-w-0">
-                          <Label className="text-[9px] uppercase font-bold text-slate-400">Telefone</Label>
-                          <p className="text-xs font-black text-slate-700 truncate">{selectedCustomer.phone ? maskPhone(selectedCustomer.phone) : "—"}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                          <Mail size={14} />
-                        </div>
-                        <div className="min-w-0">
-                          <Label className="text-[9px] uppercase font-bold text-slate-400">E-mail</Label>
-                          <p className="text-xs font-black text-slate-700 truncate">{selectedCustomer.email || "—"}</p>
-                        </div>
-                      </div>
-                      <div className="pt-2">
-                        <Label className="text-[10px] uppercase font-bold text-slate-400">Localização</Label>
-                        <p className="text-xs font-bold text-slate-600 leading-relaxed mt-1">
-                          {selectedCustomer.address}, {selectedCustomer.number}<br />
-                          {selectedCustomer.neighborhood}<br />
-                          {selectedCustomer.city} - {selectedCustomer.state}<br />
-                          CEP: {selectedCustomer.cep}
-                        </p>
-                      </div>
-                    </div>
-                  </section>
-                </div>
-
-                {/* Centro/Direita: Financeiro e Documentos */}
-                <div className="md:col-span-2 space-y-8">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-gradient-to-br from-primary to-blue-600 p-6 rounded-[2rem] text-white shadow-lg shadow-primary/20">
-                      <div className="flex items-center justify-between mb-2">
-                        <DollarSign size={20} className="opacity-60" />
-                        <span className="text-[10px] font-black uppercase tracking-widest opacity-60">LTV Acumulado</span>
-                      </div>
-                      <p className="text-2xl font-black tracking-tighter">{fmt(selectedCustomer.totalSpent)}</p>
-                      <p className="text-[10px] font-bold opacity-80 mt-1 uppercase">{selectedCustomer.totalBookings} Reservas Totais</p>
-                    </div>
-                    <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col justify-center">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Última Interação</p>
-                      <p className="text-sm font-black text-slate-700">
-                        {selectedCustomer.lastBooking ? new Date(selectedCustomer.lastBooking).toLocaleDateString("pt-BR") : "Nenhuma reserva"}
-                      </p>
-                      <Badge className="w-fit mt-2 text-[8px] uppercase" variant={selectedCustomer.status === "regular" ? "secondary" : "destructive"}>
-                        Status: {selectedCustomer.status}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <Tabs defaultValue="reservas" className="w-full">
-                    <TabsList className="bg-slate-100/50 p-1 rounded-2xl w-full justify-start h-12">
-                      <TabsTrigger value="reservas" className="rounded-xl font-bold text-xs px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                        <History size={14} className="mr-2" /> Reservas
-                      </TabsTrigger>
-                      <TabsTrigger value="documentos" className="rounded-xl font-bold text-xs px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                        <FileText size={14} className="mr-2" /> Documentos
-                      </TabsTrigger>
-                      <TabsTrigger value="dependentes" className="rounded-xl font-bold text-xs px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                        <Users size={14} className="mr-2" /> Dependentes
-                      </TabsTrigger>
-                      <TabsTrigger value="interacoes" className="rounded-xl font-bold text-xs px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                        <History size={14} className="mr-2" /> Linha do Tempo
-                      </TabsTrigger>
-                    </TabsList>
-
-                    <div className="mt-6">
-                      <TabsContent value="reservas">
-                        {customerBookings.length === 0 ? (
-                          <div className="bg-slate-50 rounded-3xl p-12 text-center border border-dashed border-slate-200">
-                            <History className="mx-auto mb-3 text-slate-300" size={32} />
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Nenhuma reserva histórica</p>
-                          </div>
-                        ) : (
-                          <div className="grid grid-cols-1 gap-3">
-                            {customerBookings.map((b) => (
-                              <div key={b.id} className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center justify-between hover:border-primary/20 hover:shadow-md transition-all group">
-                                <div className="flex items-center gap-4">
-                                  <div className="w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                    <ShoppingBag size={18} />
-                                  </div>
-                                  <div>
-                                    <p className="text-[10px] font-black font-mono text-slate-400 mb-1">{b.booking_code}</p>
-                                    <p className="text-sm font-black text-slate-700 leading-tight">{b.item_name}</p>
-                                    <p className="text-[10px] font-bold text-slate-400 mt-0.5 uppercase">
-                                      {b.date || new Date(b.created_at).toLocaleDateString("pt-BR")} · {b.guests} {b.guests === 1 ? 'PAX' : 'PAX'}
-                                    </p>
-                                  </div>
-                                </div>
-                                <div className="text-right">
-                                  <p className="text-sm font-black text-primary mb-1">{fmt(b.final_total)}</p>
-                                  <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-tighter ${statusConfig[b.status]?.className || ""}`}>
-                                    {statusConfig[b.status]?.label || b.status}
-                                  </Badge>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </TabsContent>
-
-                      <TabsContent value="documentos">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {customerDocuments.length === 0 ? (
-                            <div className="sm:col-span-2 bg-slate-50 rounded-3xl p-12 text-center border border-dashed border-slate-200">
-                              <FileText className="mx-auto mb-3 text-slate-300" size={32} />
-                              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Nenhum documento anexado</p>
-                            </div>
-                          ) : (
-                            customerDocuments.map((doc) => (
-                              <div key={doc.id} className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center justify-between group">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0">
-                                    <FileText size={20} className="text-primary/60" />
-                                  </div>
-                                  <div className="min-w-0">
-                                    <p className="text-xs font-black text-slate-700 truncate mb-0.5">{doc.name}</p>
-                                    <Badge variant="secondary" className="text-[8px] font-bold uppercase">{doc.category}</Badge>
-                                  </div>
-                                </div>
-                                <Button variant="ghost" size="icon" className="rounded-xl h-8 w-8 text-primary" onClick={() => window.open(doc.file_url, '_blank')}>
-                                  <Eye size={14} />
-                                </Button>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </TabsContent>
-
-                      <TabsContent value="dependentes">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {dependents.length === 0 ? (
-                            <div className="sm:col-span-2 bg-slate-50 rounded-3xl p-12 text-center border border-dashed border-slate-200">
-                              <Users className="mx-auto mb-3 text-slate-300" size={32} />
-                              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Nenhum dependente vinculado</p>
-                            </div>
-                          ) : (
-                            dependents.map((d) => (
-                              <div key={d.id} className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                                    <Baby size={18} className="text-muted-foreground" />
-                                  </div>
-                                  <div>
-                                    <p className="text-xs font-black text-slate-700 mb-0.5">{d.name}</p>
-                                    <p className="text-[10px] font-bold text-primary uppercase">{d.relationship}</p>
-                                  </div>
-                                </div>
-                                <Badge variant="outline" className="text-[9px] font-bold">
-                                  {d.birth_date ? `${calculateAge(d.birth_date)} anos` : "—"}
-                                </Badge>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </TabsContent>
-
-                      <TabsContent value="interacoes">
-                        <div className="bg-white border border-slate-100 rounded-[2rem] p-6">
-                           <CustomerInteractionHistory customerId={selectedCustomer.id} />
-                        </div>
-                      </TabsContent>
-                    </div>
-                  </Tabs>
-
-                  {selectedCustomer.notes && (
-                    <section className="bg-amber-50/50 p-6 rounded-[2rem] border border-amber-100">
-                      <h3 className="text-xs font-black uppercase tracking-widest text-amber-600 mb-3 flex items-center gap-2">
-                        <FileText size={14} /> Observações Importantes
-                      </h3>
-                      <p className="text-xs font-medium text-amber-800 leading-relaxed whitespace-pre-wrap">
-                        {selectedCustomer.notes}
-                      </p>
-                    </section>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-                <Loader2 size={40} className="animate-spin mb-4 opacity-20" />
-                <p className="text-sm font-bold uppercase tracking-widest">Carregando ficha técnica...</p>
-              </div>
-            )}
-          </div>
-          
-          <div className="bg-white border-t border-slate-100 p-6 flex justify-end">
-            <Button variant="secondary" onClick={() => setViewDetailsOpen(false)} className="rounded-xl h-12 px-8 font-black uppercase text-[10px] tracking-widest">
-              Fechar Visualização
-            </Button>
-          </div>
         </DialogContent>
       </Dialog>
 
@@ -2262,7 +1695,8 @@ const AdminCRMContent = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </AdminLayout>
+    </div>
+  </AdminLayout>
   );
 };
 
