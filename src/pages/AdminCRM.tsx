@@ -1149,7 +1149,10 @@ const AdminCRMContent = () => {
                           <tr
                             key={c.id}
                             className={`border-b border-border last:border-0 hover:bg-primary/5 transition-all cursor-pointer group ${selectedCustomer?.id === c.id ? "bg-primary/5" : ""}`}
-                            onClick={() => selectCustomer(c)}
+                            onClick={() => {
+                              const url = `${window.location.origin}${window.location.pathname}?wide_view_id=${c.id}`;
+                              window.open(url, '_blank');
+                            }}
                           >
                             <td className="py-4 px-4">
                               <div className="flex items-center gap-3">
