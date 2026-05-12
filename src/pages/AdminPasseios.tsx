@@ -831,7 +831,6 @@ const AdminPasseios = () => {
             </div>
 
             </div>
-            </div>
             
             <div className="bg-white border-t border-slate-100 p-6 flex gap-3 sticky bottom-0 z-10">
               <Tooltip>
