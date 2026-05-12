@@ -402,9 +402,25 @@ const AdminReservas = () => {
                         <p className="text-[11px] font-bold text-muted-foreground flex items-center gap-2 tracking-tight">
                           <Phone size={13} className="text-primary/60" /> {selected.customerPhone}
                         </p>
+                        {(selected.cpf || selected.passport) && (
+                          <p className="text-[11px] font-bold text-muted-foreground flex items-center gap-2 tracking-tight">
+                            <Tag size={13} className="text-primary/60" /> {selected.cpf || selected.passport}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </section>
+
+                  {selected.notes && (
+                    <section className="space-y-3">
+                      <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Observações Internas
+                      </h3>
+                      <div className="p-4 bg-amber-50/50 rounded-2xl border border-amber-200/50 text-[11px] font-medium text-amber-900/80 italic leading-relaxed">
+                        {selected.notes}
+                      </div>
+                    </section>
+                  )}
 
                   <section className="space-y-5">
                     <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2.5">
