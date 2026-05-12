@@ -1241,7 +1241,6 @@ const AdminPasseios = () => {
           )}
         </DialogContent>
       </Dialog>
-    </div>
   </AdminLayout>
   );
 };
