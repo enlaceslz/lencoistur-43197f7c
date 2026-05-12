@@ -245,6 +245,7 @@ const AdminCRMContent = () => {
   const [filter, setFilter] = useState<"all" | "with_bookings" | "no_bookings" | "dependents">("all");
 
   // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
   const [isWideViewOpen, setIsWideViewOpen] = useState(false);
   const [isWideViewNewWindow, setIsWideViewNewWindow] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
