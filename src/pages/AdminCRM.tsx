@@ -317,7 +317,7 @@ const AdminCRMContent = () => {
     const wideViewId = urlParams.get('wide_view_id');
     if (wideViewId) {
       setIsWideViewNewWindow(true);
-      setViewDetailsOpen(true);
+      
     }
 
     setLoading(true);
