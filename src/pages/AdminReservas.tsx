@@ -360,7 +360,7 @@ const AdminReservas = () => {
             </div>
           </div>
 
-          <div className="w-[450px] flex flex-col gap-6 h-full">
+          <div className="w-[450px] flex flex-col gap-6 h-full relative">
             {selected ? (
               <div className="bg-white rounded-[2.5rem] border border-white/40 p-8 shadow-xl shadow-primary/5 overflow-auto flex-1 flex flex-col animate-in slide-in-from-right-8 duration-500 glass-card">
                 <div className="flex items-center justify-between mb-10">
