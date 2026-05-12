@@ -54,7 +54,10 @@ Deno.serve(async (req) => {
     const { 
       type, itemName, date, guests, payMethod, customerName, 
       customerEmail, customerPhone, cpf, passport, country, 
-      birthDate, notes, companions, collaboratorId, partner_id
+      birthDate, notes, companions, collaboratorId, partner_id,
+      unitPrice: overrideUnitPrice,
+      discount: overrideDiscount,
+      publicUnitPrice: overridePublicUnitPrice
     } = body;
 
     const trimmedEmail = typeof customerEmail === "string" ? customerEmail.trim().toLowerCase() : "";
