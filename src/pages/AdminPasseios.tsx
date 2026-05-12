@@ -303,8 +303,7 @@ const AdminPasseios = () => {
     : "0";
 
   if (isWideViewNewWindow) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const wideViewId = urlParams.get('wide_view_id');
+    const wideViewId = new URLSearchParams(window.location.search).get('wide_view_id');
     const wideTour = tours.find(t => t.id === wideViewId);
 
     return (
