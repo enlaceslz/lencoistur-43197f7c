@@ -451,16 +451,16 @@ const AdminPasseios = () => {
   return (
     <AdminLayout title="Passeios">
       <div className="flex flex-col gap-6 h-[calc(100vh-140px)]">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Catálogo</h1>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Catálogo</h1>
           <p className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
             <Compass size={14} className="text-primary" /> {tours.length} Passeios Registrados
           </p>
         </div>
         <button 
           onClick={openNew}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-8 rounded-xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-6 rounded-xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all active:scale-95"
         >
           <Plus size={18} strokeWidth={3} /> Novo Passeio
         </button>
