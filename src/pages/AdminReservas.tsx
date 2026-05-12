@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Plus, Calendar, DollarSign, Clock, CheckCircle, XCircle, ChevronRight, FileDown, LayoutGrid, List, Loader2, User, Phone, Mail, MapPin, CreditCard, Trash2, Printer, Download, Eye, MoreHorizontal, Users, Tag, Briefcase, UserCheck } from "lucide-react";
+import { Search, Plus, Calendar, DollarSign, Clock, CheckCircle, XCircle, ChevronRight, FileDown, LayoutGrid, List, Loader2, User, Phone, Mail, MapPin, CreditCard, Trash2, Printer, Download, Eye, MoreHorizontal, Users, Tag, Briefcase, UserCheck, Pencil, Shield } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { formatCurrency, cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -28,6 +28,7 @@ const AdminReservas = () => {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<BookingItem | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [collaborators, setCollaborators] = useState<any[]>([]);
   const [partners, setPartners] = useState<any[]>([]);
@@ -147,7 +148,7 @@ const AdminReservas = () => {
       const publicTotal = (publicUnitPriceNum * form.guests);
       const finalTotal = total - discountNum;
 
-      await addBooking({
+      const payload = {
         ...form,
         unitPrice: unitPriceNum,
         total,
@@ -157,10 +158,18 @@ const AdminReservas = () => {
         publicTotal,
         collaboratorId: form.collaboratorId === "none" ? undefined : form.collaboratorId || undefined,
         partnerId: form.partnerId === "none" ? undefined : form.partnerId || undefined,
-      });
+      };
 
-      toast.success("Reserva criada com sucesso!");
+      if (isEditing && selected) {
+        await updateBooking(selected.id, selected.customerId || "", payload);
+        toast.success("Reserva atualizada com sucesso!");
+      } else {
+        await addBooking(payload);
+        toast.success("Reserva criada com sucesso!");
+      }
+
       setShowNewForm(false);
+      setIsEditing(false);
       setForm({
         customerId: "",
         customerName: "",
@@ -179,10 +188,48 @@ const AdminReservas = () => {
         partnerId: "",
       });
     } catch (error: any) {
-      toast.error(error.message || "Erro ao criar reserva");
+      toast.error(error.message || "Erro ao salvar reserva");
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleEdit = () => {
+    if (!selected) return;
+    
+    setForm({
+      customerId: selected.customerId || "",
+      customerName: selected.customerName,
+      customerEmail: selected.customerEmail,
+      customerPhone: selected.customerPhone,
+      type: selected.type,
+      itemName: selected.itemName,
+      date: selected.date,
+      guests: selected.guests,
+      payMethod: selected.payMethod,
+      unitPrice: selected.unitPrice.toString(),
+      discount: selected.discount.toString(),
+      publicUnitPrice: (selected.publicUnitPrice || 0).toString(),
+      notes: selected.notes || "",
+      collaboratorId: selected.collaboratorId || "",
+      partnerId: selected.partnerId || "",
+    });
+    
+    setIsEditing(true);
+    setShowNewForm(true);
+  };
+
+  const handleSendRiskTerm = () => {
+    if (!selected) return;
+    const baseUrl = window.location.origin;
+    const link = `${baseUrl}/assinatura-termo?booking_id=${selected.id}`;
+    
+    navigator.clipboard.writeText(link);
+    toast.success("Link do termo copiado!");
+    
+    const message = encodeURIComponent(`Olá ${selected.customerName}, aqui está o link para assinatura do Termo de Responsabilidade da sua reserva ${selected.bookingCode}: ${link}`);
+    const whatsappUrl = `https://wa.me/${selected.customerPhone.replace(/\D/g, '')}?text=${message}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   const handleTourChange = (tourId: string) => {
@@ -316,9 +363,19 @@ const AdminReservas = () => {
             {selected ? (
               <div className="bg-white rounded-[2.5rem] border border-white/40 p-8 shadow-xl shadow-primary/5 overflow-auto flex-1 flex flex-col animate-in slide-in-from-right-8 duration-500 glass-card">
                 <div className="flex items-center justify-between mb-10">
-                  <div className="space-y-1.5">
-                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Gestão Operacional</p>
-                    <h2 className="text-3xl font-black text-foreground tracking-tighter leading-none">{selected.bookingCode}</h2>
+                  <div className="flex items-center gap-4">
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Gestão Operacional</p>
+                      <h2 className="text-3xl font-black text-foreground tracking-tighter leading-none">{selected.bookingCode}</h2>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="rounded-xl hover:bg-primary/5 hover:text-primary transition-all"
+                      onClick={handleEdit}
+                    >
+                      <Pencil size={18} />
+                    </Button>
                   </div>
                   <Badge 
                     className={cn("rounded-2xl px-5 py-2 font-black text-[10px] uppercase border shadow-sm", statusConfig[selected.status]?.className)} 
@@ -394,6 +451,17 @@ const AdminReservas = () => {
                 </div>
 
                 <div className="mt-10 pt-8 border-t border-border/40 space-y-3">
+                  <Button 
+                    onClick={handleSendRiskTerm} 
+                    className={cn(
+                      "w-full rounded-2xl h-14 font-black text-[10px] uppercase tracking-widest text-white shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2",
+                      selected.termStatus === "assinado" ? "bg-slate-400" : "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/10"
+                    )}
+                  >
+                    <Shield size={18} />
+                    {selected.termStatus === "assinado" ? "Termo Assinado" : "Enviar Termo de Risco"}
+                  </Button>
+                  
                   <div className="grid grid-cols-2 gap-3">
                     {selected.status === 'pendente' && (
                       <Button 
@@ -441,15 +509,18 @@ const AdminReservas = () => {
         </div>
       </div>
 
-      <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
+      <Dialog open={showNewForm} onOpenChange={(open) => {
+        setShowNewForm(open);
+        if (!open) setIsEditing(false);
+      }}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto rounded-[2.5rem] p-0 border-none shadow-2xl">
           <div className="bg-slate-50/50 p-8 border-b border-border/40">
             <DialogHeader>
               <DialogTitle className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
-                  <Plus size={24} strokeWidth={3} />
+                  {isEditing ? <Pencil size={24} strokeWidth={3} /> : <Plus size={24} strokeWidth={3} />}
                 </div>
-                Nova Reserva Operacional
+                {isEditing ? "Editar Reserva Operacional" : "Nova Reserva Operacional"}
               </DialogTitle>
               <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mt-2">Preencha os detalhes estratégicos para o registro da nova expedição</p>
             </DialogHeader>
