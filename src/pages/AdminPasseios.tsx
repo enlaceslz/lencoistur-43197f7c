@@ -355,14 +355,14 @@ const AdminPasseios = () => {
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">{wideTour.category}</p>
                         </div>
                       </div>
-                      <div className="pt-4 border-t border-slate-200/60">
-                        <Label className="text-[10px] uppercase font-bold text-slate-400">Localização</Label>
-                        <p className="text-sm font-black text-slate-700 flex items-center gap-2"><MapPin size={14} className="text-primary" /> {wideTour.location}</p>
-                      </div>
-                      <div className="pt-4 border-t border-slate-200/60">
-                        <Label className="text-[10px] uppercase font-bold text-slate-400">Duração</Label>
-                        <p className="text-sm font-black text-slate-700 flex items-center gap-2"><Clock size={14} className="text-primary" /> {wideTour.duration}</p>
-                      </div>
+                        <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                          <Label className="text-[10px] uppercase font-bold text-slate-400">Localização</Label>
+                          <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1"><MapPin size={14} className="text-primary" /> {wideTour.location}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                          <Label className="text-[10px] uppercase font-bold text-slate-400">Duração Estimada</Label>
+                          <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1"><Clock size={14} className="text-primary" /> {wideTour.duration}</p>
+                        </div>
                     </div>
                   </section>
 
@@ -451,6 +451,7 @@ const AdminPasseios = () => {
 
   return (
     <AdminLayout title="Passeios">
+      <div className="flex flex-col gap-6 h-[calc(100vh-120px)]">
       <div className="flex items-center justify-between mb-6">
         <div className="space-y-1">
           <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Catálogo</h1>
@@ -488,7 +489,7 @@ const AdminPasseios = () => {
         ))}
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-4 sm:p-6 glass-card rounded-[2.5rem] shadow-sm animate-in-fade" style={{ animationDelay: '0.2s' }}>
+      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-6 bg-white rounded-[2.5rem] border border-white/40 shadow-xl shadow-primary/5 glass-card animate-in-fade" style={{ animationDelay: '0.2s' }}>
         <div className="relative flex-1 w-full group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
           <Input 
@@ -500,11 +501,28 @@ const AdminPasseios = () => {
         </div>
         
         <div className="flex gap-2 flex-wrap justify-center overflow-x-auto no-scrollbar pb-1">
-          <Button variant={!search ? "default" : "outline"} size="sm" onClick={() => setSearch("")} className="h-10 rounded-xl px-4 font-bold">
+          <Button 
+            variant={!search ? "default" : "outline"} 
+            size="sm" 
+            onClick={() => setSearch("")} 
+            className={cn(
+              "h-10 rounded-xl px-4 font-bold transition-all",
+              !search ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+            )}
+          >
             Todos
           </Button>
           {CATEGORIES.map((cat) => (
-            <Button key={cat} variant={search === cat ? "default" : "outline"} size="sm" onClick={() => setSearch(cat)} className="h-10 rounded-xl px-4 font-bold whitespace-nowrap">
+            <Button 
+              key={cat} 
+              variant={search === cat ? "default" : "outline"} 
+              size="sm" 
+              onClick={() => setSearch(cat)} 
+              className={cn(
+                "h-10 rounded-xl px-4 font-bold whitespace-nowrap transition-all",
+                search === cat ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+              )}
+            >
               {cat}
             </Button>
           ))}
@@ -514,7 +532,7 @@ const AdminPasseios = () => {
             <TooltipTrigger asChild>
               <button 
                 onClick={openNew}
-                className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+                className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
               >
                 <Plus size={20} strokeWidth={3} /> Novo Passeio
               </button>
@@ -843,8 +861,9 @@ const AdminPasseios = () => {
       </Dialog>
 
 
-      <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
-        <div className="overflow-x-auto">
+      <div className="flex-1 flex flex-col overflow-hidden animate-in-fade" style={{ animationDelay: '0.3s' }}>
+        <div className="flex-1 bg-white rounded-[2.5rem] border border-white/40 flex flex-col overflow-hidden shadow-xl shadow-primary/5 glass-card">
+          <div className="overflow-auto flex-1">
           <Table>
           <TableHeader className="bg-slate-50/50">
             <TableRow className="hover:bg-transparent border-b border-border/40">
@@ -882,7 +901,7 @@ const AdminPasseios = () => {
                       <div className="flex items-center gap-4">
                         <div className="relative shrink-0">
                           {t.images?.[0] ? (
-                            <img src={t.images[0]} className="w-14 h-14 rounded-2xl object-cover shadow-sm group-hover:scale-105 transition-transform" />
+                            <img src={t.images[0]} className="w-14 h-14 rounded-2xl object-cover shadow-md group-hover:scale-110 transition-transform duration-500" />
                           ) : (
                             <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground">
                               <Compass size={24} />
@@ -1024,10 +1043,11 @@ const AdminPasseios = () => {
                 );
               })
             )}
-          </TableBody>
+            </TableBody>
           </Table>
         </div>
-      </Card>
+      </div>
+    </div>
 
       {/* Tour Detail Dialog */}
       <Dialog open={!!detailTour} onOpenChange={(open) => !open && setDetailTour(null)}>
@@ -1222,7 +1242,8 @@ const AdminPasseios = () => {
           )}
         </DialogContent>
       </Dialog>
-    </AdminLayout>
+    </div>
+  </AdminLayout>
   );
 };
 
