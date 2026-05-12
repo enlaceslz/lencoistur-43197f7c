@@ -793,6 +793,21 @@ const AdminReservas = () => {
                  </span>
                </div>
             </div>
+            <div className="flex gap-4 w-full md:w-auto">
+              <Button variant="ghost" onClick={() => setShowNewForm(false)} className="flex-1 md:flex-none rounded-xl h-14 px-8 font-bold text-slate-500 hover:bg-slate-200 transition-all">
+                Descartar
+              </Button>
+              <Button 
+                onClick={handleSave} 
+                disabled={saving}
+                className="flex-1 md:flex-none rounded-2xl h-14 px-12 bg-primary font-black text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all active:scale-95 disabled:opacity-50"
+              >
+                {saving ? <Loader2 className="animate-spin mr-2" /> : <Plus className="mr-2" strokeWidth={3} />}
+                Efetivar Reserva no Sistema
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
       </Dialog>
       
       {/* Reserva Full Details (Wide View) */}
@@ -991,8 +1006,7 @@ const AdminReservas = () => {
                         <span>Descontos / Promos</span>
                         <span>- {formatCurrency(selected.discount)}</span>
                       </div>
-                      <Separator className="my-2 border-dashed" />
-                      <div className="flex justify-between items-end">
+                      <div className="flex justify-between items-end pt-4 border-t border-dashed border-slate-100">
                         <div>
                           <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Valor Final Liquidado</p>
                           <p className="text-3xl font-black text-emerald-600 tracking-tighter">{formatCurrency(selected.finalTotal)}</p>
@@ -1028,23 +1042,6 @@ const AdminReservas = () => {
             <Button variant="secondary" onClick={() => setShowWideView(false)} className="rounded-xl h-12 px-8 font-black uppercase text-[10px] tracking-widest">
               Fechar Ficha Técnica
             </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-            <div className="flex gap-4 w-full md:w-auto">
-              <Button variant="ghost" onClick={() => setShowNewForm(false)} className="flex-1 md:flex-none rounded-xl h-14 px-8 font-bold text-slate-500 hover:bg-slate-200 transition-all">
-                Descartar
-              </Button>
-              <Button 
-                onClick={handleSave} 
-                disabled={saving}
-                className="flex-1 md:flex-none rounded-2xl h-14 px-12 bg-primary font-black text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all active:scale-95 disabled:opacity-50"
-              >
-                {saving ? <Loader2 className="animate-spin mr-2" /> : <Plus className="mr-2" strokeWidth={3} />}
-                Efetivar Reserva no Sistema
-              </Button>
-            </div>
           </div>
         </DialogContent>
       </Dialog>
