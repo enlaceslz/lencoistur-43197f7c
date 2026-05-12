@@ -477,8 +477,16 @@ const AdminReservas = () => {
                   >
                     <Shield size={18} />
                     {selected.termStatus === "assinado" ? "Termo Assinado" : "Enviar Termo de Risco"}
-                  </Button>
-                  
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="rounded-xl hover:bg-primary/5 hover:text-primary transition-all"
+                      onClick={() => setShowWideView(true)}
+                    >
+                      <Eye size={18} />
+                    </Button>
+
                   <div className="grid grid-cols-2 gap-3">
                     {selected.status === 'pendente' && (
                       <Button 
