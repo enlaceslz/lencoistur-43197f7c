@@ -32,9 +32,12 @@ const AdminReservas = () => {
   const [collaborators, setCollaborators] = useState<any[]>([]);
   const [partners, setPartners] = useState<any[]>([]);
   const [tours, setTours] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [customerSearch, setCustomerSearch] = useState("");
   const [saving, setSaving] = useState(false);
 
   const [form, setForm] = useState({
+    customerId: "",
     customerName: "",
     customerEmail: "",
     customerPhone: "",
@@ -53,19 +56,45 @@ const AdminReservas = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [collabsRes, partnersRes, toursRes] = await Promise.all([
+      const [collabsRes, partnersRes, toursRes, customersRes] = await Promise.all([
         supabase.from("collaborators").select("id, name").eq("status", "active"),
         supabase.from("partners").select("id, name").eq("active", true),
-        supabase.from("tours").select("id, name, price, private_price").eq("active", true)
+        supabase.from("tours").select("id, name, price, private_price").eq("active", true),
+        supabase.from("customers").select("id, name, email, phone").order("name").limit(10)
       ]);
 
       if (collabsRes.data) setCollaborators(collabsRes.data);
       if (partnersRes.data) setPartners(partnersRes.data);
       if (toursRes.data) setTours(toursRes.data);
+      if (customersRes.data) setCustomers(customersRes.data);
     };
 
     fetchData();
   }, []);
+
+  const searchCustomers = async (query: string) => {
+    setCustomerSearch(query);
+    if (query.length < 2) return;
+
+    const { data } = await supabase
+      .from("customers")
+      .select("id, name, email, phone")
+      .ilike("name", `%${query}%`)
+      .limit(5);
+
+    if (data) setCustomers(data);
+  };
+
+  const handleSelectCustomer = (customer: any) => {
+    setForm(prev => ({
+      ...prev,
+      customerId: customer.id,
+      customerName: customer.name,
+      customerEmail: customer.email || "",
+      customerPhone: customer.phone || "",
+    }));
+    setCustomerSearch("");
+  };
 
   const filtered = bookings.filter((b) => {
     const q = search.toLowerCase();
@@ -133,6 +162,7 @@ const AdminReservas = () => {
       toast.success("Reserva criada com sucesso!");
       setShowNewForm(false);
       setForm({
+        customerId: "",
         customerName: "",
         customerEmail: "",
         customerPhone: "",
