@@ -1941,7 +1941,8 @@ const AdminCRMContent = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </AdminLayout>
+    </div>
+  </AdminLayout>
   );
 };
 
