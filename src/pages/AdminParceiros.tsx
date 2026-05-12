@@ -101,7 +101,9 @@ const AdminParceiros = () => {
   const [receivableDialogOpen, setReceivableDialogOpen] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   const [partnerBookings, setPartnerBookings] = useState<any[]>([]);
+  const [partnerReceivables, setPartnerReceivables] = useState<any[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
+  const [loadingReceivables, setLoadingReceivables] = useState(false);
 
   const [form, setForm] = useState({
     name: "", type: "hotel", contact_name: "", phone: "", email: "",
@@ -142,6 +144,21 @@ const AdminParceiros = () => {
       setPartnerBookings(data);
     }
     setLoadingBookings(false);
+  };
+
+  const fetchPartnerReceivables = async (partnerId: string) => {
+    setLoadingReceivables(true);
+    const { data, error } = await supabase
+      .from("contas_receber")
+      .select("*")
+      .eq("partner_id", partnerId)
+      .order("vencimento", { ascending: false })
+      .limit(10);
+    
+    if (!error && data) {
+      setPartnerReceivables(data);
+    }
+    setLoadingReceivables(false);
   };
 
   const fetchCompany = async () => {
@@ -319,11 +336,14 @@ const AdminParceiros = () => {
           observacoes: `Sincronizado automaticamente do módulo Parceiros (${form.type})`
         };
 
-        // Verifica se já existe um condutor com esse nome ou CPF
+        const filter = form.cpf_cnpj 
+          ? `nome.eq.${form.name.trim()},cpf.eq.${form.cpf_cnpj.trim()}`
+          : `nome.eq.${form.name.trim()}`;
+
         const { data: existing } = await supabase
           .from("sgs_condutores")
           .select("id")
-          .or(`nome.eq."${form.name.trim()}"${form.cpf_cnpj ? `,cpf.eq."${form.cpf_cnpj.trim()}"` : ""}`)
+          .or(filter)
           .maybeSingle();
 
         if (existing) {
@@ -732,7 +752,7 @@ const AdminParceiros = () => {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-primary hover:text-white transition-all duration-300 shadow-sm" onClick={() => { setViewPartner(p); fetchPartnerBookings(p.id); }}>
+                              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-primary hover:text-white transition-all duration-300 shadow-sm" onClick={() => { setViewPartner(p); fetchPartnerBookings(p.id); fetchPartnerReceivables(p.id); }}>
                                 <Eye size={18} />
                               </Button>
                             </TooltipTrigger>
@@ -1313,6 +1333,52 @@ const AdminParceiros = () => {
                         }`}>
                           {booking.status === 'confirmed' ? 'Confirmada' : 
                            booking.status === 'pending' ? 'Pendente' : booking.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            <section className="mt-8 pt-8 border-t border-slate-100">
+              <div className="flex items-center justify-between mb-6">
+                <h4 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                  <DollarSign size={18} className="text-emerald-600" /> Histórico Financeiro
+                </h4>
+                <Badge variant="outline" className="text-[10px] font-bold text-emerald-600 bg-emerald-50 border-emerald-100">Últimos Lançamentos</Badge>
+              </div>
+              
+              {loadingReceivables ? (
+                <div className="flex justify-center py-10">
+                  <Loader2 className="animate-spin text-emerald-400" size={24} />
+                </div>
+              ) : partnerReceivables.length === 0 ? (
+                <div className="bg-emerald-50/30 rounded-2xl p-8 text-center border border-dashed border-emerald-100">
+                  <DollarSign className="mx-auto mb-3 text-emerald-200" size={32} />
+                  <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Nenhum lançamento encontrado</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {partnerReceivables.map((receivable) => (
+                    <div key={receivable.id} className="flex items-center justify-between p-4 rounded-2xl bg-white border border-slate-100">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${receivable.status === 'pago' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
+                          <DollarSign size={18} />
+                        </div>
+                        <div>
+                          <p className="text-xs font-black text-slate-900 uppercase leading-none mb-1 line-clamp-1">{receivable.descricao}</p>
+                          <p className="text-[10px] font-bold text-slate-400">
+                            Venc: {formatDate(new Date(receivable.vencimento + "T12:00:00"), "dd/MM/yyyy")}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-black text-emerald-600">R$ {(receivable.valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <Badge variant="outline" className={`text-[8px] font-black uppercase px-2 py-0 border-none ${
+                          receivable.status === 'pago' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
+                        }`}>
+                          {receivable.status === 'pago' ? 'Recebido' : 'Pendente'}
                         </Badge>
                       </div>
                     </div>
