@@ -355,14 +355,14 @@ const AdminPasseios = () => {
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">{wideTour.category}</p>
                         </div>
                       </div>
-                      <div className="pt-4 border-t border-slate-200/60">
-                        <Label className="text-[10px] uppercase font-bold text-slate-400">Localização</Label>
-                        <p className="text-sm font-black text-slate-700 flex items-center gap-2"><MapPin size={14} className="text-primary" /> {wideTour.location}</p>
-                      </div>
-                      <div className="pt-4 border-t border-slate-200/60">
-                        <Label className="text-[10px] uppercase font-bold text-slate-400">Duração</Label>
-                        <p className="text-sm font-black text-slate-700 flex items-center gap-2"><Clock size={14} className="text-primary" /> {wideTour.duration}</p>
-                      </div>
+                        <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                          <Label className="text-[10px] uppercase font-bold text-slate-400">Localização</Label>
+                          <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1"><MapPin size={14} className="text-primary" /> {wideTour.location}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                          <Label className="text-[10px] uppercase font-bold text-slate-400">Duração Estimada</Label>
+                          <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1"><Clock size={14} className="text-primary" /> {wideTour.duration}</p>
+                        </div>
                     </div>
                   </section>
 
