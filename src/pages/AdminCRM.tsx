@@ -390,7 +390,7 @@ const AdminCRMContent = () => {
     setCustomerDocuments(data || []);
   };
 
-  const selectCustomer = async (c: Customer) => {
+  const selectCustomer = useCallback(async (c: Customer) => {
     setSelectedCustomer(c);
     
     // Fetch bookings
@@ -406,7 +406,7 @@ const AdminCRMContent = () => {
 
     // Fetch documents
     fetchDocuments(c.id);
-  };
+  }, []);
 
   const openCreateModal = () => {
     setEditingCustomer(null);
