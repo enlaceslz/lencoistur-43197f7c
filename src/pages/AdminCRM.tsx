@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { 
-  Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, 
+  Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, ShoppingBag, 
   DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, 
   Pencil, Trash2, X, Save, UserPlus, Baby, FileText, Printer, 
   Paperclip, Upload, History, Tag as TagIcon, Target, CheckCircle2,
@@ -246,6 +246,7 @@ const AdminCRMContent = () => {
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
+  const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [form, setForm] = useState<CustomerForm>(emptyForm);
   const [saving, setSaving] = useState(false);
@@ -1022,6 +1023,16 @@ const AdminCRMContent = () => {
                             </td>
                             <td className="py-4 px-4 text-right">
                             <div className="flex gap-1 justify-end">
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:bg-primary/10" onClick={(e) => { e.stopPropagation(); setViewDetailsOpen(true); selectCustomer(c); }}>
+                                    <Eye size={14} />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Visualização Ampla</p>
+                                </TooltipContent>
+                              </Tooltip>
                               {c.phone && (
                                 <Tooltip>
                                   <TooltipTrigger asChild>
@@ -1423,6 +1434,251 @@ const AdminCRMContent = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {/* View Details Wide Modal */}
+      <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
+        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+          <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between sticky top-0 z-20">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+                <Users size={24} strokeWidth={2.5} />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-black text-slate-900 leading-none mb-1">
+                  {selectedCustomer?.name || "Detalhes do Cliente"}
+                </DialogTitle>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-[10px] font-black uppercase bg-primary/5 text-primary border-primary/10">
+                    {selectedCustomer?.ltvCategory || "Cliente"}
+                  </Badge>
+                  <p className="text-xs text-slate-500 font-medium">Ficha Cadastral Ampla</p>
+                </div>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setViewDetailsOpen(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+              <X size={20} className="text-slate-400" />
+            </Button>
+          </div>
+
+          <div className="p-6 md:p-8">
+            {selectedCustomer ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Lateral Esquerda: Info Básica */}
+                <div className="md:col-span-1 space-y-8">
+                  <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <User size={14} className="text-primary" /> Identificação
+                    </h3>
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="text-[10px] uppercase font-bold text-slate-400">CPF / Passaporte</Label>
+                        <p className="text-sm font-black text-slate-700">{selectedCustomer.cpf ? maskCPF(selectedCustomer.cpf) : selectedCustomer.passport || "—"}</p>
+                      </div>
+                      <div>
+                        <Label className="text-[10px] uppercase font-bold text-slate-400">Data de Nascimento</Label>
+                        <p className="text-sm font-black text-slate-700">{selectedCustomer.birth_date ? new Date(selectedCustomer.birth_date + "T12:00:00").toLocaleDateString("pt-BR") : "—"}</p>
+                        {selectedCustomer.birth_date && (
+                          <p className="text-[9px] text-primary font-bold uppercase mt-0.5">{calculateAge(selectedCustomer.birth_date)} anos</p>
+                        )}
+                      </div>
+                      <div>
+                        <Label className="text-[10px] uppercase font-bold text-slate-400">Nacionalidade</Label>
+                        <p className="text-sm font-black text-slate-700">{selectedCustomer.country}</p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <Smartphone size={14} className="text-emerald-500" /> Contato & Endereço
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                          <Phone size={14} />
+                        </div>
+                        <div className="min-w-0">
+                          <Label className="text-[9px] uppercase font-bold text-slate-400">Telefone</Label>
+                          <p className="text-xs font-black text-slate-700 truncate">{selectedCustomer.phone ? maskPhone(selectedCustomer.phone) : "—"}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                          <Mail size={14} />
+                        </div>
+                        <div className="min-w-0">
+                          <Label className="text-[9px] uppercase font-bold text-slate-400">E-mail</Label>
+                          <p className="text-xs font-black text-slate-700 truncate">{selectedCustomer.email || "—"}</p>
+                        </div>
+                      </div>
+                      <div className="pt-2">
+                        <Label className="text-[10px] uppercase font-bold text-slate-400">Localização</Label>
+                        <p className="text-xs font-bold text-slate-600 leading-relaxed mt-1">
+                          {selectedCustomer.address}, {selectedCustomer.number}<br />
+                          {selectedCustomer.neighborhood}<br />
+                          {selectedCustomer.city} - {selectedCustomer.state}<br />
+                          CEP: {selectedCustomer.cep}
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+
+                {/* Centro/Direita: Financeiro e Documentos */}
+                <div className="md:col-span-2 space-y-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-gradient-to-br from-primary to-blue-600 p-6 rounded-[2rem] text-white shadow-lg shadow-primary/20">
+                      <div className="flex items-center justify-between mb-2">
+                        <DollarSign size={20} className="opacity-60" />
+                        <span className="text-[10px] font-black uppercase tracking-widest opacity-60">LTV Acumulado</span>
+                      </div>
+                      <p className="text-2xl font-black tracking-tighter">{fmt(selectedCustomer.totalSpent)}</p>
+                      <p className="text-[10px] font-bold opacity-80 mt-1 uppercase">{selectedCustomer.totalBookings} Reservas Totais</p>
+                    </div>
+                    <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col justify-center">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Última Interação</p>
+                      <p className="text-sm font-black text-slate-700">
+                        {selectedCustomer.lastBooking ? new Date(selectedCustomer.lastBooking).toLocaleDateString("pt-BR") : "Nenhuma reserva"}
+                      </p>
+                      <Badge className="w-fit mt-2 text-[8px] uppercase" variant={selectedCustomer.status === "regular" ? "secondary" : "destructive"}>
+                        Status: {selectedCustomer.status}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <Tabs defaultValue="reservas" className="w-full">
+                    <TabsList className="bg-slate-100/50 p-1 rounded-2xl w-full justify-start h-12">
+                      <TabsTrigger value="reservas" className="rounded-xl font-bold text-xs px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                        <History size={14} className="mr-2" /> Reservas
+                      </TabsTrigger>
+                      <TabsTrigger value="documentos" className="rounded-xl font-bold text-xs px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                        <FileText size={14} className="mr-2" /> Documentos
+                      </TabsTrigger>
+                      <TabsTrigger value="dependentes" className="rounded-xl font-bold text-xs px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                        <Users size={14} className="mr-2" /> Dependentes
+                      </TabsTrigger>
+                    </TabsList>
+                    
+                    <div className="mt-6">
+                      <TabsContent value="reservas">
+                        {customerBookings.length === 0 ? (
+                          <div className="bg-slate-50 rounded-3xl p-12 text-center border border-dashed border-slate-200">
+                            <History className="mx-auto mb-3 text-slate-300" size={32} />
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Nenhuma reserva histórica</p>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 gap-3">
+                            {customerBookings.map((b) => (
+                              <div key={b.id} className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center justify-between hover:border-primary/20 hover:shadow-md transition-all group">
+                                <div className="flex items-center gap-4">
+                                  <div className="w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                    <ShoppingBag size={18} />
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] font-black font-mono text-slate-400 mb-1">{b.booking_code}</p>
+                                    <p className="text-sm font-black text-slate-700 leading-tight">{b.item_name}</p>
+                                    <p className="text-[10px] font-bold text-slate-400 mt-0.5 uppercase">
+                                      {b.date || new Date(b.created_at).toLocaleDateString("pt-BR")} · {b.guests} {b.guests === 1 ? 'PAX' : 'PAX'}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-sm font-black text-primary mb-1">{fmt(b.final_total)}</p>
+                                  <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-tighter ${statusConfig[b.status]?.className || ""}`}>
+                                    {statusConfig[b.status]?.label || b.status}
+                                  </Badge>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </TabsContent>
+
+                      <TabsContent value="documentos">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {customerDocuments.length === 0 ? (
+                            <div className="sm:col-span-2 bg-slate-50 rounded-3xl p-12 text-center border border-dashed border-slate-200">
+                              <FileText className="mx-auto mb-3 text-slate-300" size={32} />
+                              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Nenhum documento anexado</p>
+                            </div>
+                          ) : (
+                            customerDocuments.map((doc) => (
+                              <div key={doc.id} className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center justify-between group">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0">
+                                    <FileText size={20} className="text-primary/60" />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <p className="text-xs font-black text-slate-700 truncate mb-0.5">{doc.name}</p>
+                                    <Badge variant="secondary" className="text-[8px] font-bold uppercase">{doc.category}</Badge>
+                                  </div>
+                                </div>
+                                <Button variant="ghost" size="icon" className="rounded-xl h-8 w-8 text-primary" onClick={() => window.open(doc.file_url, '_blank')}>
+                                  <Eye size={14} />
+                                </Button>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="dependentes">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {dependents.length === 0 ? (
+                            <div className="sm:col-span-2 bg-slate-50 rounded-3xl p-12 text-center border border-dashed border-slate-200">
+                              <Users className="mx-auto mb-3 text-slate-300" size={32} />
+                              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Nenhum dependente vinculado</p>
+                            </div>
+                          ) : (
+                            dependents.map((d) => (
+                              <div key={d.id} className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
+                                    <Baby size={18} className="text-muted-foreground" />
+                                  </div>
+                                  <div>
+                                    <p className="text-xs font-black text-slate-700 mb-0.5">{d.name}</p>
+                                    <p className="text-[10px] font-bold text-primary uppercase">{d.relationship}</p>
+                                  </div>
+                                </div>
+                                <Badge variant="outline" className="text-[9px] font-bold">
+                                  {d.birth_date ? `${calculateAge(d.birth_date)} anos` : "—"}
+                                </Badge>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </TabsContent>
+                    </div>
+                  </Tabs>
+
+                  {selectedCustomer.notes && (
+                    <section className="bg-amber-50/50 p-6 rounded-[2rem] border border-amber-100">
+                      <h3 className="text-xs font-black uppercase tracking-widest text-amber-600 mb-3 flex items-center gap-2">
+                        <FileText size={14} /> Observações Importantes
+                      </h3>
+                      <p className="text-xs font-medium text-amber-800 leading-relaxed whitespace-pre-wrap">
+                        {selectedCustomer.notes}
+                      </p>
+                    </section>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+                <Loader2 size={40} className="animate-spin mb-4 opacity-20" />
+                <p className="text-sm font-bold uppercase tracking-widest">Carregando ficha técnica...</p>
+              </div>
+            )}
+          </div>
+          
+          <div className="bg-white border-t border-slate-100 p-6 flex justify-end">
+            <Button variant="secondary" onClick={() => setViewDetailsOpen(false)} className="rounded-xl h-12 px-8 font-black uppercase text-[10px] tracking-widest">
+              Fechar Visualização
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="sm:max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
