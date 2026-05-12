@@ -14,7 +14,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Loader2, MapPin, Settings2, Eye, Phone, Mail, User, Percent, FileText, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileDown, Copy, DollarSign
+  Building2, Compass, Car, Users, Search, Plus, Edit, Trash2, Loader2, MapPin, Settings2, Eye, Phone, Mail, User, Percent, FileText, Calendar, CheckCircle2, XCircle, Banknote, Landmark, Clock, FileDown, Copy, DollarSign, ShoppingBag
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -100,7 +100,9 @@ const AdminParceiros = () => {
   const [company, setCompany] = useState<any>(null);
   const [receivableDialogOpen, setReceivableDialogOpen] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
-  
+  const [partnerBookings, setPartnerBookings] = useState<any[]>([]);
+  const [loadingBookings, setLoadingBookings] = useState(false);
+
   const [form, setForm] = useState({
     name: "", type: "hotel", contact_name: "", phone: "", email: "",
     commission_rate: "10", cpf_cnpj: "", address: "", cnh: "", cnh_validade: "", cadastur: "",
@@ -125,6 +127,21 @@ const AdminParceiros = () => {
     setLoading(true);
     await Promise.all([fetchPartners(), fetchTypes(), fetchCompany()]);
     setLoading(false);
+  };
+
+  const fetchPartnerBookings = async (partnerId: string) => {
+    setLoadingBookings(true);
+    const { data, error } = await supabase
+      .from("bookings")
+      .select("*, customers(name)")
+      .eq("partner_id", partnerId)
+      .order("created_at", { ascending: false })
+      .limit(10);
+    
+    if (!error && data) {
+      setPartnerBookings(data);
+    }
+    setLoadingBookings(false);
   };
 
   const fetchCompany = async () => {
@@ -296,7 +313,7 @@ const AdminParceiros = () => {
           cpf: form.cpf_cnpj.trim() || null,
           telefone: form.phone.trim() || null,
           email: form.email.trim() || null,
-          cnh_numero: form.cnh.trim() || null,
+          cnh_numero: (form.type === "guia" ? form.cadastur?.trim() : form.cnh?.trim()) || null,
           cnh_validade: form.cnh_validade || null,
           status: "ativo",
           observacoes: `Sincronizado automaticamente do módulo Parceiros (${form.type})`
@@ -715,7 +732,7 @@ const AdminParceiros = () => {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-primary hover:text-white transition-all duration-300 shadow-sm" onClick={() => setViewPartner(p)}>
+                              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-primary hover:text-white transition-all duration-300 shadow-sm" onClick={() => { setViewPartner(p); fetchPartnerBookings(p.id); }}>
                                 <Eye size={18} />
                               </Button>
                             </TooltipTrigger>
@@ -1252,7 +1269,57 @@ const AdminParceiros = () => {
                 </section>
               )}
             </div>
+            </div>
           </div>
+          
+          <div className="px-4 md:px-8 pb-8">
+            <section className="mt-8 pt-8 border-t border-slate-100">
+              <div className="flex items-center justify-between mb-6">
+                <h4 className="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                  <ShoppingBag size={18} className="text-primary" /> Últimas Reservas Relacionadas
+                </h4>
+                <Badge variant="outline" className="text-[10px] font-bold">Mostrando as últimas 10</Badge>
+              </div>
+              
+              {loadingBookings ? (
+                <div className="flex justify-center py-10">
+                  <Loader2 className="animate-spin text-primary/40" size={24} />
+                </div>
+              ) : partnerBookings.length === 0 ? (
+                <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-8 text-center border border-dashed border-slate-200">
+                  <ShoppingBag className="mx-auto mb-3 text-slate-300" size={32} />
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Nenhuma reserva encontrada</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {partnerBookings.map((booking) => (
+                    <div key={booking.id} className="group flex items-center justify-between p-4 rounded-2xl bg-white border border-slate-100 hover:border-primary/20 hover:shadow-md transition-all">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                          <ShoppingBag size={18} />
+                        </div>
+                        <div>
+                          <p className="text-xs font-black text-slate-900 uppercase leading-none mb-1">{booking.item_name}</p>
+                          <p className="text-[10px] font-bold text-slate-400">
+                            {booking.customers?.name || "Cliente Final"} • {formatDate(new Date(booking.date), "dd/MM/yyyy")}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-black text-primary">R$ {(booking.final_total / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <Badge variant="outline" className={`text-[8px] font-black uppercase px-2 py-0 border-none ${
+                          booking.status === 'confirmed' ? 'bg-emerald-50 text-emerald-600' : 
+                          booking.status === 'pending' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-600'
+                        }`}>
+                          {booking.status === 'confirmed' ? 'Confirmada' : 
+                           booking.status === 'pending' ? 'Pendente' : booking.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
 
           <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0">
