@@ -86,23 +86,26 @@ const AdminReservas = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="rounded-[2rem] border-slate-100 shadow-sm"><CardContent className="p-6">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Reservas</p>
-            <p className="text-2xl font-black text-slate-900">{bookings.length}</p>
-          </CardContent></Card>
-          <Card className="rounded-[2rem] border-slate-100 shadow-sm"><CardContent className="p-6">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Confirmadas</p>
-            <p className="text-2xl font-black text-emerald-600">{bookings.filter(b => b.status === "confirmada").length}</p>
-          </CardContent></Card>
-          <Card className="rounded-[2rem] border-slate-100 shadow-sm"><CardContent className="p-6">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Pendentes</p>
-            <p className="text-2xl font-black text-amber-600">{bookings.filter(b => b.status === "pendente").length}</p>
-          </CardContent></Card>
-          <Card className="rounded-[2rem] border-slate-100 shadow-sm"><CardContent className="p-6">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Faturamento Pago</p>
-            <p className="text-2xl font-black text-blue-600">{formatCurrency(totalPago)}</p>
-          </CardContent></Card>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[
+            { label: "Total Reservas", value: bookings.length, icon: Calendar, color: "text-indigo-600", bg: "bg-indigo-500/10" },
+            { label: "Confirmadas", value: bookings.filter(b => b.status === "confirmada").length, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-500/10" },
+            { label: "Pendentes", value: bookings.filter(b => b.status === "pendente").length, icon: Clock, color: "text-amber-600", bg: "bg-amber-500/10" },
+            { label: "Faturamento Pago", value: formatCurrency(totalPago), icon: DollarSign, color: "text-blue-600", bg: "bg-blue-500/10" },
+          ].map((stat, i) => (
+            <Card key={i} className="rounded-[2rem] border-white/40 shadow-xl shadow-primary/5 glass-card overflow-hidden group">
+              <CardContent className="p-7 relative">
+                <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center border shadow-sm", stat.bg, stat.color, "border-white/20")}>
+                    <stat.icon size={22} strokeWidth={2.5} />
+                  </div>
+                </div>
+                <p className="text-3xl font-black text-foreground tracking-tighter">{stat.value}</p>
+                <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         <div className="flex-1 flex gap-6 overflow-hidden">
