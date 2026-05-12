@@ -50,6 +50,21 @@ const AdminReservas = () => {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("🚨 EXCLUIR RESERVA PERMANENTEMENTE?\n\nEsta ação não pode ser desfeita e removerá todos os registros financeiros associados.")) return;
+    
+    setActionLoading(true);
+    try {
+      await deleteBooking(id);
+      toast.success("Reserva excluída permanentemente.");
+      setSelected(null);
+    } catch (err: any) {
+      toast.error(err?.message || "Erro ao excluir reserva.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   if (loading) return (
     <AdminLayout title="Gestão de Reservas">
       <div className="flex items-center justify-center py-32"><Loader2 className="animate-spin text-primary" size={40} /></div>
