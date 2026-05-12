@@ -102,6 +102,71 @@ const AdminReservas = () => {
     }
   };
 
+  const handleSave = async () => {
+    if (!form.customerName || !form.itemName || !form.date) {
+      toast.error("Preencha os campos obrigatórios");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const unitPriceNum = parseCurrencyToNumber(form.unitPrice);
+      const discountNum = parseCurrencyToNumber(form.discount);
+      const publicUnitPriceNum = parseCurrencyToNumber(form.publicUnitPrice);
+      
+      const total = (unitPriceNum * form.guests);
+      const publicTotal = (publicUnitPriceNum * form.guests);
+      const finalTotal = total - discountNum;
+
+      await addBooking({
+        ...form,
+        unitPrice: unitPriceNum,
+        total,
+        discount: discountNum,
+        finalTotal,
+        publicUnitPrice: publicUnitPriceNum,
+        publicTotal,
+        collaboratorId: form.collaboratorId || undefined,
+        partnerId: form.partnerId || undefined,
+      });
+
+      toast.success("Reserva criada com sucesso!");
+      setShowNewForm(false);
+      setForm({
+        customerName: "",
+        customerEmail: "",
+        customerPhone: "",
+        type: "tour",
+        itemName: "",
+        date: "",
+        guests: 1,
+        payMethod: "pix",
+        unitPrice: "0",
+        discount: "0",
+        publicUnitPrice: "0",
+        notes: "",
+        collaboratorId: "",
+        partnerId: "",
+      });
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao criar reserva");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleTourChange = (tourId: string) => {
+    const tour = tours.find(t => t.id === tourId);
+    if (tour) {
+      setForm(prev => ({
+        ...prev,
+        itemName: tour.name,
+        unitPrice: (tour.price / 100).toString(), // tour.price is in cents
+        publicUnitPrice: (tour.private_price / 100).toString(),
+      }));
+    }
+  };
+
   if (loading) return (
     <AdminLayout title="Gestão de Reservas">
       <div className="flex items-center justify-center py-32"><Loader2 className="animate-spin text-primary" size={40} /></div>
