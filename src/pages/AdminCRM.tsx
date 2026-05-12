@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { 
   Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, ShoppingBag, 
@@ -247,6 +247,7 @@ const AdminCRMContent = () => {
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+  const [isWideViewNewWindow, setIsWideViewNewWindow] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [form, setForm] = useState<CustomerForm>(emptyForm);
   const [saving, setSaving] = useState(false);
@@ -311,6 +312,14 @@ const AdminCRMContent = () => {
   };
 
   const fetchCustomers = async () => {
+    // Check for customer_id in URL for wide view new window
+    const urlParams = new URLSearchParams(window.location.search);
+    const wideViewId = urlParams.get('wide_view_id');
+    if (wideViewId) {
+      setIsWideViewNewWindow(true);
+      setViewDetailsOpen(true);
+    }
+
     setLoading(true);
     const { data: customersData, error } = await supabase
       .from("customers")
@@ -342,7 +351,7 @@ const AdminCRMContent = () => {
         }
       });
 
-      setCustomers(customersData.map((c: any) => ({
+      const mappedCustomers = customersData.map((c: any) => ({
         id: c.id,
         name: c.name,
         email: c.email,
@@ -364,8 +373,17 @@ const AdminCRMContent = () => {
         totalBookings: bookingsByCustomer[c.id]?.count || 0,
         totalSpent: bookingsByCustomer[c.id]?.total || 0,
         lastBooking: bookingsByCustomer[c.id]?.lastDate || null,
-        ltvCategory: (bookingsByCustomer[c.id]?.total || 0) > 500000 ? "VIP" : (bookingsByCustomer[c.id]?.count || 0) >= 3 ? "Fiel" : "Novo"
-      })));
+        ltvCategory: (bookingsByCustomer[c.id]?.total || 0) > 500000 ? "VIP" : (bookingsByCustomer[c.id]?.count || 0) >= 3 ? "Fiel" : "Novo" as any
+      }));
+
+      setCustomers(mappedCustomers);
+
+      if (wideViewId) {
+        const target = mappedCustomers.find((c: any) => c.id === wideViewId);
+        if (target) {
+          selectCustomer(target);
+        }
+      }
     }
     setLoading(false);
     fetchAllDependents();
@@ -389,7 +407,7 @@ const AdminCRMContent = () => {
     setCustomerDocuments(data || []);
   };
 
-  const selectCustomer = async (c: Customer) => {
+  const selectCustomer = useCallback(async (c: Customer) => {
     setSelectedCustomer(c);
     
     // Fetch bookings
@@ -405,7 +423,7 @@ const AdminCRMContent = () => {
 
     // Fetch documents
     fetchDocuments(c.id);
-  };
+  }, []);
 
   const openCreateModal = () => {
     setEditingCustomer(null);
@@ -804,7 +822,172 @@ const AdminCRMContent = () => {
     );
   }
 
-  return (
+  return isWideViewNewWindow ? (
+    <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-8">
+      {/* Visualização Ampla Simplificada para nova janela */}
+      <div className="max-w-6xl mx-auto">
+        <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between rounded-t-3xl">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+              <Users size={24} strokeWidth={2.5} />
+            </div>
+            <div>
+              <h1 className="text-xl font-black text-slate-900 leading-none mb-1">
+                {selectedCustomer?.name || "Detalhes do Cliente"}
+              </h1>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-[10px] font-black uppercase bg-primary/5 text-primary border-primary/10">
+                  {selectedCustomer?.ltvCategory || "Cliente"}
+                </Badge>
+                <p className="text-xs text-slate-500 font-medium">Ficha Cadastral Ampla</p>
+              </div>
+            </div>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="rounded-xl font-bold h-10"
+            onClick={() => window.close()}
+          >
+            Fechar Janela
+          </Button>
+        </div>
+
+        <div className="bg-white p-6 md:p-8 rounded-b-3xl shadow-sm">
+          {selectedCustomer ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="md:col-span-1 space-y-8">
+                <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                    <User size={14} className="text-primary" /> Identificação
+                  </h3>
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-[10px] uppercase font-bold text-slate-400">CPF / Passaporte</Label>
+                      <p className="text-sm font-black text-slate-700">{selectedCustomer.cpf ? maskCPF(selectedCustomer.cpf) : selectedCustomer.passport || "—"}</p>
+                    </div>
+                    <div>
+                      <Label className="text-[10px] uppercase font-bold text-slate-400">Data de Nascimento</Label>
+                      <p className="text-sm font-black text-slate-700">{selectedCustomer.birth_date ? new Date(selectedCustomer.birth_date + "T12:00:00").toLocaleDateString("pt-BR") : "—"}</p>
+                    </div>
+                    <div>
+                      <Label className="text-[10px] uppercase font-bold text-slate-400">Nacionalidade</Label>
+                      <p className="text-sm font-black text-slate-700">{selectedCustomer.country}</p>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                    <Smartphone size={14} className="text-emerald-500" /> Contato
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                        <Phone size={14} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-black text-slate-700 truncate">{selectedCustomer.phone ? maskPhone(selectedCustomer.phone) : "—"}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                        <Mail size={14} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-black text-slate-700 truncate">{selectedCustomer.email || "—"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+
+              <div className="md:col-span-2 space-y-8">
+                <Tabs defaultValue="reservas" className="w-full">
+                  <TabsList className="bg-slate-100/50 p-1 rounded-2xl w-full justify-start h-12">
+                    <TabsTrigger value="reservas" className="rounded-xl font-bold text-xs px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                      <History size={14} className="mr-2" /> Reservas
+                    </TabsTrigger>
+                    <TabsTrigger value="documentos" className="rounded-xl font-bold text-xs px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                      <FileText size={14} className="mr-2" /> Documentos
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <div className="mt-6">
+                    <TabsContent value="reservas">
+                      {customerBookings.length === 0 ? (
+                        <div className="bg-slate-50 rounded-3xl p-12 text-center border border-dashed border-slate-200">
+                          <History className="mx-auto mb-3 text-slate-300" size={32} />
+                          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Nenhuma reserva histórica</p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 gap-3">
+                          {customerBookings.map((b) => (
+                            <div key={b.id} className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center justify-between hover:border-primary/20 hover:shadow-md transition-all group">
+                              <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center shrink-0">
+                                  <ShoppingBag size={18} />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-black text-slate-700 leading-tight">{b.item_name}</p>
+                                  <p className="text-[10px] font-bold text-slate-400 mt-0.5 uppercase">
+                                    {b.date || new Date(b.created_at).toLocaleDateString("pt-BR")} · {b.guests} PAX
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-black text-primary mb-1">{fmt(b.final_total)}</p>
+                                <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-tighter ${statusConfig[b.status]?.className || ""}`}>
+                                  {statusConfig[b.status]?.label || b.status}
+                                </Badge>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="documentos">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {customerDocuments.length === 0 ? (
+                          <div className="sm:col-span-2 bg-slate-50 rounded-3xl p-12 text-center border border-dashed border-slate-200">
+                            <FileText className="mx-auto mb-3 text-slate-300" size={32} />
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Nenhum documento anexado</p>
+                          </div>
+                        ) : (
+                          customerDocuments.map((doc) => (
+                            <div key={doc.id} className="bg-white border border-slate-100 rounded-2xl p-4 flex items-center justify-between group">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0">
+                                  <FileText size={20} className="text-primary/60" />
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="text-xs font-black text-slate-700 truncate mb-0.5">{doc.name}</p>
+                                  <Badge variant="secondary" className="text-[8px] font-bold uppercase">{doc.category}</Badge>
+                                </div>
+                              </div>
+                              <Button variant="ghost" size="icon" className="rounded-xl h-8 w-8 text-primary" onClick={() => window.open(doc.file_url, '_blank')}>
+                                <Eye size={14} />
+                              </Button>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </TabsContent>
+                  </div>
+                </Tabs>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+              <Loader2 size={40} className="animate-spin mb-4 opacity-20" />
+              <p className="text-sm font-bold uppercase tracking-widest">Carregando...</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  ) : (
     <AdminLayout title="Gestão de Clientes & CRM">
       <div className="space-y-8 pb-10">
         {/* Advanced Stats Section */}
