@@ -182,96 +182,127 @@ const AdminReservas = () => {
 
           <div className="w-[450px] flex flex-col gap-6 h-full">
             {selected ? (
-              <div className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-sm overflow-auto flex-1 flex flex-col animate-in slide-in-from-right-4 duration-300">
-                <div className="flex items-center justify-between mb-8">
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Detalhes da Reserva</p>
-                    <h2 className="text-3xl font-black text-slate-900 tracking-tight">{selected.bookingCode}</h2>
+              <div className="bg-white rounded-[2.5rem] border border-white/40 p-8 shadow-xl shadow-primary/5 overflow-auto flex-1 flex flex-col animate-in slide-in-from-right-8 duration-500 glass-card">
+                <div className="flex items-center justify-between mb-10">
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Gestão Operacional</p>
+                    <h2 className="text-3xl font-black text-foreground tracking-tighter leading-none">{selected.bookingCode}</h2>
                   </div>
-                  <Badge className={cn("rounded-xl px-4 py-1.5 font-black text-[11px] uppercase border-2", statusConfig[selected.status]?.className)} variant="outline">{statusConfig[selected.status]?.label}</Badge>
+                  <Badge 
+                    className={cn("rounded-2xl px-5 py-2 font-black text-[10px] uppercase border shadow-sm", statusConfig[selected.status]?.className)} 
+                    variant="outline"
+                  >
+                    {statusConfig[selected.status]?.label}
+                  </Badge>
                 </div>
 
-                <div className="space-y-8 flex-1">
-                  <section className="space-y-4">
-                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                      <User size={14} className="text-slate-300" /> Informações do Cliente
+                <div className="space-y-10 flex-1">
+                  <section className="space-y-5">
+                    <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary" /> Informações do Cliente
                     </h3>
-                    <div className="grid grid-cols-1 gap-4">
-                      <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-primary shadow-sm font-black text-xl">
-                          {selected.customerName[0]}
-                        </div>
-                        <div className="space-y-1">
-                          <p className="font-black text-slate-900 leading-none">{selected.customerName}</p>
-                          <p className="text-xs font-bold text-slate-500 flex items-center gap-1"><Mail size={12} /> {selected.customerEmail}</p>
-                          <p className="text-xs font-bold text-slate-500 flex items-center gap-1"><Phone size={12} /> {selected.customerPhone}</p>
-                        </div>
+                    <div className="p-6 bg-slate-50/50 rounded-[2rem] border border-border/40 flex items-start gap-5 group hover:bg-white hover:shadow-lg hover:shadow-primary/5 transition-all">
+                      <div className="w-14 h-14 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 font-black text-xl border-2 border-white/20">
+                        {selected.customerName[0]}
+                      </div>
+                      <div className="space-y-1.5">
+                        <p className="font-black text-lg text-foreground tracking-tight leading-none">{selected.customerName}</p>
+                        <p className="text-[11px] font-bold text-muted-foreground flex items-center gap-2 tracking-tight">
+                          <Mail size={13} className="text-primary/60" /> {selected.customerEmail}
+                        </p>
+                        <p className="text-[11px] font-bold text-muted-foreground flex items-center gap-2 tracking-tight">
+                          <Phone size={13} className="text-primary/60" /> {selected.customerPhone}
+                        </p>
                       </div>
                     </div>
                   </section>
 
-                  <section className="space-y-4">
-                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                      <List size={14} className="text-slate-300" /> Dados do Serviço
+                  <section className="space-y-5">
+                    <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary" /> Resumo do Serviço
                     </h3>
-                    <div className="p-6 bg-slate-900 rounded-3xl text-white space-y-4 shadow-xl shadow-slate-200 relative overflow-hidden">
+                    <div className="p-8 bg-foreground rounded-[2.5rem] text-white space-y-6 shadow-2xl shadow-foreground/20 relative overflow-hidden group">
+                      <div className="absolute right-0 top-0 w-48 h-48 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-primary/20 transition-all" />
                       <div className="relative z-10">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{selected.type === 'tour' ? 'Passeio' : selected.type === 'transfer' ? 'Translado' : 'Pacote'}</p>
-                        <p className="text-xl font-black leading-tight mb-4">{selected.itemName}</p>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-1">
-                            <p className="text-[9px] font-black text-slate-500 uppercase">Data</p>
-                            <p className="text-sm font-bold flex items-center gap-2"><Calendar size={14} /> {selected.date}</p>
+                        <p className="text-[9px] font-black text-primary uppercase tracking-[0.3em] mb-2">{selected.type === 'tour' ? 'Expedição' : selected.type === 'transfer' ? 'Translado Premium' : 'Pacote Exclusivo'}</p>
+                        <p className="text-2xl font-black leading-tight tracking-tight mb-6 pr-8">{selected.itemName}</p>
+                        <div className="grid grid-cols-2 gap-6 pt-6 border-t border-white/10">
+                          <div className="space-y-1.5">
+                            <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Data agendada</p>
+                            <p className="text-xs font-black flex items-center gap-2.5 uppercase tracking-tighter"><Calendar size={14} className="text-primary" /> {selected.date}</p>
                           </div>
-                          <div className="space-y-1">
-                            <p className="text-[9px] font-black text-slate-500 uppercase">Hóspedes</p>
-                            <p className="text-sm font-bold flex items-center gap-2"><Plus size={14} /> {selected.guests} PAX</p>
+                          <div className="space-y-1.5">
+                            <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Ocupação</p>
+                            <p className="text-xs font-black flex items-center gap-2.5 uppercase tracking-tighter"><Users size={14} className="text-primary" /> {selected.guests} PAX</p>
                           </div>
                         </div>
                       </div>
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl rounded-full -mr-16 -mt-16" />
                     </div>
                   </section>
 
-                  <section className="space-y-4">
-                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                      <DollarSign size={14} className="text-slate-300" /> Resumo Financeiro
+                  <section className="space-y-5">
+                    <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2.5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary" /> Demonstrativo Financeiro
                     </h3>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center text-sm font-bold text-slate-500">
-                        <span>Subtotal</span>
-                        <span>{formatCurrency(selected.total)}</span>
+                    <div className="p-6 rounded-[2rem] border border-border/40 bg-slate-50/30 space-y-4">
+                      <div className="flex justify-between items-center text-[11px] font-black text-muted-foreground uppercase tracking-widest">
+                        <span>Valor Base</span>
+                        <span className="text-foreground">{formatCurrency(selected.total)}</span>
                       </div>
-                      <div className="flex justify-between items-center text-sm font-bold text-rose-500">
-                        <span>Desconto</span>
+                      <div className="flex justify-between items-center text-[11px] font-black text-rose-500 uppercase tracking-widest">
+                        <span>Descontos / Isenções</span>
                         <span>- {formatCurrency(selected.discount)}</span>
                       </div>
-                      <div className="pt-2 border-t border-dashed border-slate-200 flex justify-between items-center">
-                        <span className="text-sm font-black text-slate-900">Total Final</span>
-                        <span className="text-xl font-black text-primary">{formatCurrency(selected.finalTotal)}</span>
+                      <div className="pt-4 border-t border-dashed border-border flex justify-between items-center">
+                        <span className="text-xs font-black text-foreground uppercase tracking-[0.2em]">Total Líquido</span>
+                        <span className="text-2xl font-black text-primary tracking-tighter">{formatCurrency(selected.finalTotal)}</span>
                       </div>
                     </div>
                   </section>
                 </div>
 
-                <div className="mt-8 pt-8 border-t border-slate-100 grid grid-cols-2 gap-3">
-                  {selected.status === 'pendente' && (
-                    <Button onClick={() => handleAction(() => confirmPayment(selected.id), "Pagamento confirmado!")} className="rounded-xl h-11 bg-emerald-600 font-black text-white hover:bg-emerald-700 shadow-lg shadow-emerald-100">Confirmar Pagamento</Button>
-                  )}
-                  {selected.status === 'confirmada' && (
-                    <Button onClick={() => handleAction(() => completeBooking(selected.id), "Reserva concluída!")} className="rounded-xl h-11 bg-blue-600 font-black text-white hover:bg-blue-700 shadow-lg shadow-blue-100">Concluir Serviço</Button>
-                  )}
-                  <Button onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada!")} variant="outline" className="rounded-xl h-11 border-rose-100 text-rose-600 font-black hover:bg-rose-50">Cancelar Reserva</Button>
-                  <Button onClick={() => handleDelete(selected.id)} variant="ghost" className="rounded-xl h-11 text-slate-400 font-bold hover:text-rose-600 hover:bg-rose-50 col-span-2"><Trash2 size={16} className="mr-2" /> Excluir Registro</Button>
+                <div className="mt-10 pt-8 border-t border-border/40 space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    {selected.status === 'pendente' && (
+                      <Button 
+                        onClick={() => handleAction(() => confirmPayment(selected.id), "Pagamento processado com sucesso!")} 
+                        className="rounded-2xl h-14 bg-emerald-600 font-black text-[10px] uppercase tracking-widest text-white hover:bg-emerald-700 shadow-xl shadow-emerald-500/10 transition-all active:scale-95"
+                      >
+                        Validar Pagamento
+                      </Button>
+                    )}
+                    {selected.status === 'confirmada' && (
+                      <Button 
+                        onClick={() => handleAction(() => completeBooking(selected.id), "Operação finalizada!")} 
+                        className="rounded-2xl h-14 bg-primary font-black text-[10px] uppercase tracking-widest text-white hover:bg-primary/90 shadow-xl shadow-primary/10 transition-all active:scale-95"
+                      >
+                        Concluir Checklist
+                      </Button>
+                    )}
+                    <Button 
+                      onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva estornada e cancelada.")} 
+                      variant="outline" 
+                      className="rounded-2xl h-14 border-rose-500/20 text-rose-600 font-black text-[10px] uppercase tracking-widest hover:bg-rose-500/5 transition-all active:scale-95"
+                    >
+                      Solicitar Cancelamento
+                    </Button>
+                  </div>
+                  <Button 
+                    onClick={() => handleDelete(selected.id)} 
+                    variant="ghost" 
+                    className="w-full rounded-2xl h-12 text-muted-foreground hover:text-rose-600 font-black text-[9px] uppercase tracking-[0.2em] hover:bg-rose-500/5 transition-all"
+                  >
+                    <Trash2 size={14} className="mr-2" /> Eliminar Registro do Sistema
+                  </Button>
                 </div>
               </div>
             ) : (
-              <div className="h-full bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 p-12 text-center">
-                <div className="w-20 h-20 rounded-[2rem] bg-white border border-slate-100 flex items-center justify-center mb-6 shadow-sm">
-                  <Calendar size={32} className="text-slate-200" />
+              <div className="h-full bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground p-12 text-center shadow-inner glass-card">
+                <div className="w-24 h-24 rounded-[2.5rem] bg-white border border-border flex items-center justify-center mb-8 shadow-xl shadow-primary/5">
+                  <Calendar size={40} className="text-primary/20" />
                 </div>
-                <h3 className="text-xl font-black text-slate-900 uppercase tracking-widest leading-tight">Selecione uma<br />reserva</h3>
-                <p className="text-xs font-bold mt-2 text-slate-500">Para visualizar os detalhes operacionais e financeiros completos</p>
+                <h3 className="text-xl font-black text-foreground uppercase tracking-widest leading-tight">Análise<br />Estratégica</h3>
+                <p className="text-[10px] font-bold mt-3 text-muted-foreground max-w-[200px] leading-relaxed uppercase tracking-widest">Selecione uma operação para detalhamento operacional completo</p>
               </div>
             )}
           </div>
