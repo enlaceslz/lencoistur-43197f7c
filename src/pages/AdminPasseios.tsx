@@ -450,7 +450,7 @@ const AdminPasseios = () => {
 
   return (
     <AdminLayout title="Passeios">
-      <div className="flex flex-col gap-6 h-[calc(100vh-120px)]">
+      <div className="flex flex-col gap-6 h-[calc(100vh-140px)]">
       <div className="flex items-center justify-between mb-6">
         <div className="space-y-1">
           <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Catálogo</h1>
@@ -862,7 +862,7 @@ const AdminPasseios = () => {
 
       <div className="flex-1 flex flex-col overflow-hidden animate-in-fade" style={{ animationDelay: '0.3s' }}>
         <div className="flex-1 bg-white rounded-[2.5rem] border border-white/40 flex flex-col overflow-hidden shadow-xl shadow-primary/5 glass-card">
-          <div className="overflow-auto flex-1">
+          <div className="overflow-auto flex-1 no-scrollbar">
           <Table>
           <TableHeader className="bg-slate-50/50">
             <TableRow className="hover:bg-transparent border-b border-border/40">
