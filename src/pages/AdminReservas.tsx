@@ -496,9 +496,34 @@ const AdminReservas = () => {
                           {statusConfig[b.status]?.label || b.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="px-6 py-5 text-right">
-                        <ChevronRight size={18} className={cn("inline transition-all", selected?.id === b.id ? "translate-x-1 text-primary opacity-100" : "text-slate-300 opacity-0 group-hover:opacity-100")} />
-                      </TableCell>
+                    <TableCell className="px-6 py-5 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-primary hover:bg-primary/10"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelected(b);
+                            setShowWideView(true);
+                          }}
+                        >
+                          <Eye size={16} />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-slate-400 hover:text-primary hover:bg-primary/5"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelected(b);
+                            handleEdit();
+                          }}
+                        >
+                          <Pencil size={14} />
+                        </Button>
+                      </div>
+                    </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
