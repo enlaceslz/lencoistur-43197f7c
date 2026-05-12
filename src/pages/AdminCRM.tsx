@@ -2264,7 +2264,6 @@ const AdminCRMContent = () => {
         </DialogContent>
       </Dialog>
     </AdminLayout>
-    )}
   );
 };
 
