@@ -1046,6 +1046,7 @@ const AdminPasseios = () => {
           </Table>
         </div>
       </div>
+    </div>
 
       {/* Tour Detail Dialog */}
       <Dialog open={!!detailTour} onOpenChange={(open) => !open && setDetailTour(null)}>
