@@ -63,9 +63,18 @@ const AdminPasseios = () => {
   const [newUrlInput, setNewUrlInput] = useState("");
   const [uploading, setUploading] = useState(false);
   const [detailTour, setDetailTour] = useState<any | null>(null);
+  const [isWideViewNewWindow, setIsWideViewNewWindow] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { 
+    // Check for tour_id in URL for wide view new window
+    const urlParams = new URLSearchParams(window.location.search);
+    const wideViewId = urlParams.get('wide_view_id');
+    if (wideViewId) {
+      setIsWideViewNewWindow(true);
+    }
+    load(); 
+  }, []);
 
   const load = async () => {
     setLoading(true);
