@@ -124,24 +124,55 @@ const AdminReservas = () => {
             <div className="overflow-auto flex-1">
               <Table>
                 <TableHeader className="bg-slate-50/50">
-                  <TableRow className="hover:bg-transparent border-none">
-                    <TableHead className="font-bold text-slate-400 uppercase text-[10px] tracking-widest pl-6">Código</TableHead>
-                    <TableHead className="font-bold text-slate-400 uppercase text-[10px] tracking-widest">Cliente</TableHead>
-                    <TableHead className="font-bold text-slate-400 uppercase text-[10px] tracking-widest">Serviço</TableHead>
-                    <TableHead className="font-bold text-slate-400 uppercase text-[10px] tracking-widest">Valor</TableHead>
-                    <TableHead className="font-bold text-slate-400 uppercase text-[10px] tracking-widest">Status</TableHead>
-                    <TableHead></TableHead>
+                  <TableRow className="hover:bg-transparent border-b border-border/40">
+                    <th className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-6 py-5 text-left">Reserva / ID</th>
+                    <th className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-6 py-5 text-left">Cliente</th>
+                    <th className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-6 py-5 text-left">Valor Total</th>
+                    <th className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-6 py-5 text-center">Status</th>
+                    <th className="px-6"></th>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filtered.map((b) => (
-                    <TableRow key={b.id} className={cn("cursor-pointer border-slate-50 transition-all", selected?.id === b.id ? "bg-primary/5 shadow-inner" : "hover:bg-slate-50")} onClick={() => setSelected(b)}>
-                      <TableCell className="font-black text-slate-900 pl-6">{b.bookingCode}</TableCell>
-                      <TableCell className="font-bold text-slate-700">{b.customerName}</TableCell>
-                      <TableCell className="text-slate-500 font-medium">{b.itemName}</TableCell>
-                      <TableCell className="font-black text-slate-900">{formatCurrency(b.finalTotal)}</TableCell>
-                      <TableCell><Badge className={cn("rounded-lg font-black text-[10px] uppercase border px-2 py-0.5", statusConfig[b.status]?.className)} variant="outline">{statusConfig[b.status]?.label || b.status}</Badge></TableCell>
-                      <TableCell className="pr-6"><ChevronRight size={16} className={cn("transition-transform", selected?.id === b.id ? "translate-x-1 text-primary" : "text-slate-300")} /></TableCell>
+                    <TableRow 
+                      key={b.id} 
+                      className={cn(
+                        "cursor-pointer border-b border-border/20 transition-all group", 
+                        selected?.id === b.id ? "bg-primary/[0.03]" : "hover:bg-primary/[0.01]"
+                      )} 
+                      onClick={() => setSelected(b)}
+                    >
+                      <TableCell className="px-6 py-5">
+                        <div>
+                          <p className="text-xs font-black text-foreground leading-tight">{b.itemName}</p>
+                          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-tighter mt-1">#{b.bookingCode}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-6 py-5">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-primary/5 flex items-center justify-center text-primary font-black text-[10px] border border-primary/10 group-hover:bg-primary/10 transition-colors">
+                            {b.customerName.charAt(0)}
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-foreground leading-tight">{b.customerName}</p>
+                            <p className="text-[9px] font-medium text-muted-foreground mt-0.5">{b.date}</p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-6 py-5">
+                        <p className="text-sm font-black text-foreground">{formatCurrency(b.finalTotal)}</p>
+                      </TableCell>
+                      <TableCell className="px-6 py-5 text-center">
+                        <Badge 
+                          className={cn("rounded-xl px-3 py-1 font-black text-[9px] uppercase border shadow-sm", statusConfig[b.status]?.className)} 
+                          variant="outline"
+                        >
+                          {statusConfig[b.status]?.label || b.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="px-6 py-5 text-right">
+                        <ChevronRight size={18} className={cn("inline transition-all", selected?.id === b.id ? "translate-x-1 text-primary opacity-100" : "text-slate-300 opacity-0 group-hover:opacity-100")} />
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
