@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { maskPhone, maskCurrency, parseCurrencyToNumber } from "@/lib/masks";
+import { Separator } from "@/components/ui/separator";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   confirmada: { label: "Confirmada", className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
