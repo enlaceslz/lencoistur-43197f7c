@@ -1023,6 +1023,16 @@ const AdminCRMContent = () => {
                             </td>
                             <td className="py-4 px-4 text-right">
                             <div className="flex gap-1 justify-end">
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:bg-primary/10" onClick={(e) => { e.stopPropagation(); setViewDetailsOpen(true); selectCustomer(c); }}>
+                                    <Eye size={14} />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Visualização Ampla</p>
+                                </TooltipContent>
+                              </Tooltip>
                               {c.phone && (
                                 <Tooltip>
                                   <TooltipTrigger asChild>
