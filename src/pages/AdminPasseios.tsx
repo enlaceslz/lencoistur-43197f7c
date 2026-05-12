@@ -302,6 +302,153 @@ const AdminPasseios = () => {
     ? (tours.reduce((a, t) => a + (Number(t.rating) || 0), 0) / tours.length).toFixed(1)
     : "0";
 
+  if (isWideViewNewWindow) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const wideViewId = urlParams.get('wide_view_id');
+    const wideTour = tours.find(t => t.id === wideViewId);
+
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between rounded-t-3xl">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+                <Compass size={24} strokeWidth={2.5} />
+              </div>
+              <div>
+                <h1 className="text-xl font-black text-slate-900 leading-none mb-1">
+                  {wideTour?.name || "Detalhes do Passeio"}
+                </h1>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-[10px] font-black uppercase bg-primary/5 text-primary border-primary/10">
+                    {wideTour?.category || "Passeio"}
+                  </Badge>
+                  <p className="text-xs text-slate-500 font-medium">Ficha Técnica Operacional</p>
+                </div>
+              </div>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="rounded-xl font-bold h-10"
+              onClick={() => window.close()}
+            >
+              Fechar Janela
+            </Button>
+          </div>
+
+          <div className="bg-white p-6 md:p-8 rounded-b-3xl shadow-sm">
+            {wideTour ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="md:col-span-1 space-y-8">
+                  <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <Compass size={14} className="text-primary" /> Informações Básicas
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center font-black text-xl overflow-hidden">
+                          {wideTour.images?.[0] ? <img src={wideTour.images[0]} className="w-full h-full object-cover" /> : wideTour.name[0]}
+                        </div>
+                        <div>
+                          <p className="text-sm font-black text-slate-700">{wideTour.name}</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">{wideTour.category}</p>
+                        </div>
+                      </div>
+                      <div className="pt-4 border-t border-slate-200/60">
+                        <Label className="text-[10px] uppercase font-bold text-slate-400">Localização</Label>
+                        <p className="text-sm font-black text-slate-700 flex items-center gap-2"><MapPin size={14} className="text-primary" /> {wideTour.location}</p>
+                      </div>
+                      <div className="pt-4 border-t border-slate-200/60">
+                        <Label className="text-[10px] uppercase font-bold text-slate-400">Duração</Label>
+                        <p className="text-sm font-black text-slate-700 flex items-center gap-2"><Clock size={14} className="text-primary" /> {wideTour.duration}</p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <DollarSign size={14} className="text-emerald-500" /> Tarifário
+                    </h3>
+                    <div className="space-y-4">
+                      {wideTour.mode_collective_enabled && (
+                        <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase">
+                          <span>Coletivo (pax)</span>
+                          <span className="text-slate-700">{fmt(wideTour.price)}</span>
+                        </div>
+                      )}
+                      {wideTour.mode_private_enabled && (
+                        <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase">
+                          <span>Privativo (veíc)</span>
+                          <span className="text-slate-700">{fmt(wideTour.private_price)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between items-end pt-4 border-t border-dashed border-slate-200">
+                        <div>
+                          <p className="text-[9px] font-black text-primary uppercase tracking-widest">Avaliação</p>
+                          <p className="text-2xl font-black text-amber-500 tracking-tighter flex items-center gap-1">
+                            <Star size={20} fill="currentColor" /> {Number(wideTour.rating).toFixed(1)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <Badge variant="outline" className="text-[9px] font-black uppercase px-3 py-1 bg-white">{wideTour.reviews_count} reviews</Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+
+                <div className="md:col-span-2 space-y-8">
+                  <section className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden">
+                    <div className="absolute right-0 top-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                    <div className="relative z-10">
+                      <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-2">Descrição do Produto</p>
+                      <h2 className="text-2xl font-black text-slate-800 leading-tight mb-6">{wideTour.name}</h2>
+                      <p className="text-sm font-medium text-slate-600 leading-relaxed">
+                        {wideTour.description}
+                      </p>
+                      
+                      <div className="grid grid-cols-2 gap-8 pt-8 mt-8 border-t border-slate-200/60">
+                        <div>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Capacidade Veículo</p>
+                          <p className="text-sm font-black flex items-center gap-2 text-slate-700 uppercase"><Users size={16} className="text-primary" /> {wideTour.vehicle_capacity} PAX</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Dificuldade</p>
+                          <p className="text-sm font-black flex items-center gap-2 text-slate-700 uppercase"><Activity size={16} className="text-primary" /> {wideTour.difficulty}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  {wideTour.highlights?.length > 0 && (
+                    <section className="bg-blue-50/30 p-8 rounded-[2rem] border border-blue-100 shadow-sm">
+                      <h3 className="text-xs font-black uppercase tracking-widest text-blue-600 mb-4 flex items-center gap-2">
+                        <Sparkles size={14} /> Destaques
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {wideTour.highlights.map((h: string, i: number) => (
+                          <div key={i} className="flex items-center gap-2 text-sm font-bold text-blue-800">
+                            <CheckCircle size={14} className="text-blue-500" /> {h}
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+                <Loader2 size={40} className="animate-spin mb-4 opacity-20" />
+                <p className="text-sm font-bold uppercase tracking-widest">Carregando passeio...</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <AdminLayout title="Passeios">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
