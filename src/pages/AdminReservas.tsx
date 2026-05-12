@@ -17,10 +17,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { maskPhone } from "@/lib/masks";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
-  confirmada: { label: "Confirmada", className: "bg-emerald-100 text-emerald-700 border-emerald-200" },
-  pendente: { label: "Pendente", className: "bg-amber-100 text-amber-700 border-amber-200" },
-  cancelada: { label: "Cancelada", className: "bg-rose-100 text-rose-700 border-rose-200" },
-  concluida: { label: "Concluída", className: "bg-blue-100 text-blue-700 border-blue-200" },
+  confirmada: { label: "Confirmada", className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
+  pendente: { label: "Pendente", className: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
+  cancelada: { label: "Cancelada", className: "bg-rose-500/10 text-rose-600 border-rose-500/20" },
+  concluida: { label: "Concluída", className: "bg-primary/10 text-primary border-primary/20" },
 };
 
 const AdminReservas = () => {
