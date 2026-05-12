@@ -12,7 +12,7 @@ import {
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import {
   Search, Plus, Pencil, Trash2, Eye, EyeOff, Compass, Users, Clock, Star, X, Upload, Link as LinkIcon, Image as ImageIcon, GripVertical, Percent, MapPin, CheckCircle, Sparkles, Copy, Shield, Loader2,
-  Save, XCircle, Building2
+  Save, XCircle, Building2, DollarSign, Activity, ExternalLink
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -63,9 +63,18 @@ const AdminPasseios = () => {
   const [newUrlInput, setNewUrlInput] = useState("");
   const [uploading, setUploading] = useState(false);
   const [detailTour, setDetailTour] = useState<any | null>(null);
+  const [isWideViewNewWindow, setIsWideViewNewWindow] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { 
+    // Check for tour_id in URL for wide view new window
+    const urlParams = new URLSearchParams(window.location.search);
+    const wideViewId = urlParams.get('wide_view_id');
+    if (wideViewId) {
+      setIsWideViewNewWindow(true);
+    }
+    load(); 
+  }, []);
 
   const load = async () => {
     setLoading(true);
@@ -293,26 +302,189 @@ const AdminPasseios = () => {
     ? (tours.reduce((a, t) => a + (Number(t.rating) || 0), 0) / tours.length).toFixed(1)
     : "0";
 
+  if (isWideViewNewWindow) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const wideViewId = urlParams.get('wide_view_id');
+    const wideTour = tours.find(t => t.id === wideViewId);
+
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between rounded-t-3xl">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+                <Compass size={24} strokeWidth={2.5} />
+              </div>
+              <div>
+                <h1 className="text-xl font-black text-slate-900 leading-none mb-1">
+                  {wideTour?.name || "Detalhes do Passeio"}
+                </h1>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-[10px] font-black uppercase bg-primary/5 text-primary border-primary/10">
+                    {wideTour?.category || "Passeio"}
+                  </Badge>
+                  <p className="text-xs text-slate-500 font-medium">Ficha Técnica Operacional</p>
+                </div>
+              </div>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="rounded-xl font-bold h-10"
+              onClick={() => window.close()}
+            >
+              Fechar Janela
+            </Button>
+          </div>
+
+          <div className="bg-white p-6 md:p-8 rounded-b-3xl shadow-sm">
+            {wideTour ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="md:col-span-1 space-y-8">
+                  <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <Compass size={14} className="text-primary" /> Informações Básicas
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center font-black text-xl overflow-hidden">
+                          {wideTour.images?.[0] ? <img src={wideTour.images[0]} className="w-full h-full object-cover" /> : wideTour.name[0]}
+                        </div>
+                        <div>
+                          <p className="text-sm font-black text-slate-700">{wideTour.name}</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">{wideTour.category}</p>
+                        </div>
+                      </div>
+                      <div className="pt-4 border-t border-slate-200/60">
+                        <Label className="text-[10px] uppercase font-bold text-slate-400">Localização</Label>
+                        <p className="text-sm font-black text-slate-700 flex items-center gap-2"><MapPin size={14} className="text-primary" /> {wideTour.location}</p>
+                      </div>
+                      <div className="pt-4 border-t border-slate-200/60">
+                        <Label className="text-[10px] uppercase font-bold text-slate-400">Duração</Label>
+                        <p className="text-sm font-black text-slate-700 flex items-center gap-2"><Clock size={14} className="text-primary" /> {wideTour.duration}</p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <DollarSign size={14} className="text-emerald-500" /> Tarifário
+                    </h3>
+                    <div className="space-y-4">
+                      {wideTour.mode_collective_enabled && (
+                        <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase">
+                          <span>Coletivo (pax)</span>
+                          <span className="text-slate-700">{fmt(wideTour.price)}</span>
+                        </div>
+                      )}
+                      {wideTour.mode_private_enabled && (
+                        <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase">
+                          <span>Privativo (veíc)</span>
+                          <span className="text-slate-700">{fmt(wideTour.private_price)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between items-end pt-4 border-t border-dashed border-slate-200">
+                        <div>
+                          <p className="text-[9px] font-black text-primary uppercase tracking-widest">Avaliação</p>
+                          <p className="text-2xl font-black text-amber-500 tracking-tighter flex items-center gap-1">
+                            <Star size={20} fill="currentColor" /> {Number(wideTour.rating).toFixed(1)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <Badge variant="outline" className="text-[9px] font-black uppercase px-3 py-1 bg-white">{wideTour.reviews_count} reviews</Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+
+                <div className="md:col-span-2 space-y-8">
+                  <section className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden">
+                    <div className="absolute right-0 top-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                    <div className="relative z-10">
+                      <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-2">Descrição do Produto</p>
+                      <h2 className="text-2xl font-black text-slate-800 leading-tight mb-6">{wideTour.name}</h2>
+                      <p className="text-sm font-medium text-slate-600 leading-relaxed">
+                        {wideTour.description}
+                      </p>
+                      
+                      <div className="grid grid-cols-2 gap-8 pt-8 mt-8 border-t border-slate-200/60">
+                        <div>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Capacidade Veículo</p>
+                          <p className="text-sm font-black flex items-center gap-2 text-slate-700 uppercase"><Users size={16} className="text-primary" /> {wideTour.vehicle_capacity} PAX</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Dificuldade</p>
+                          <p className="text-sm font-black flex items-center gap-2 text-slate-700 uppercase"><Activity size={16} className="text-primary" /> {wideTour.difficulty}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  {wideTour.highlights?.length > 0 && (
+                    <section className="bg-blue-50/30 p-8 rounded-[2rem] border border-blue-100 shadow-sm">
+                      <h3 className="text-xs font-black uppercase tracking-widest text-blue-600 mb-4 flex items-center gap-2">
+                        <Sparkles size={14} /> Destaques
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {wideTour.highlights.map((h: string, i: number) => (
+                          <div key={i} className="flex items-center gap-2 text-sm font-bold text-blue-800">
+                            <CheckCircle size={14} className="text-blue-500" /> {h}
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+                <Loader2 size={40} className="animate-spin mb-4 opacity-20" />
+                <p className="text-sm font-bold uppercase tracking-widest">Carregando passeio...</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <AdminLayout title="Passeios">
+      <div className="flex items-center justify-between mb-6">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">Catálogo</h1>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+            <Compass size={14} className="text-primary" /> {tours.length} Passeios Registrados
+          </p>
+        </div>
+        <button 
+          onClick={openNew}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-8 rounded-xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+        >
+          <Plus size={18} strokeWidth={3} /> Novo Passeio
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
         {[
-          { label: "Catálogo", value: tours.length, icon: Compass, color: "from-blue-500 to-indigo-600", desc: "Total cadastrado" },
-          { label: "Visíveis", value: activeCount, icon: Eye, color: "from-emerald-500 to-teal-600", desc: "No site" },
-          { label: "Rating Médio", value: avgRating, icon: Star, color: "from-amber-500 to-orange-600", desc: "Avaliação clientes" },
-          { label: "Feedback", value: tours.reduce((a, t) => a + (t.reviews_count || 0), 0), icon: Users, color: "from-purple-500 to-pink-600", desc: "Reviews totais" },
+          { label: "Catálogo", value: tours.length, icon: Compass, color: "text-blue-600", bg: "bg-blue-500/10", desc: "Total cadastrado" },
+          { label: "Visíveis", value: activeCount, icon: Eye, color: "text-emerald-600", bg: "bg-emerald-500/10", desc: "No site" },
+          { label: "Rating Médio", value: avgRating, icon: Star, color: "text-amber-600", bg: "bg-amber-500/10", desc: "Avaliação clientes" },
+          { label: "Feedback", value: tours.reduce((a, t) => a + (t.reviews_count || 0), 0), icon: Users, color: "text-purple-600", bg: "bg-purple-500/10", desc: "Reviews totais" },
         ].map((stat, i) => (
-          <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group">
-            <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
-            <div className="flex items-center justify-between mb-4">
-              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-primary/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
-                <stat.icon size={22} strokeWidth={2.5} />
+          <Card key={i} className="rounded-[2rem] border-white/40 shadow-xl shadow-primary/5 glass-card overflow-hidden group">
+            <CardContent className="p-7 relative">
+              <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
+              <div className="flex items-center gap-4 mb-4">
+                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center border shadow-sm", stat.bg, stat.color, "border-white/20")}>
+                  <stat.icon size={22} strokeWidth={2.5} />
+                </div>
               </div>
-              <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{stat.desc}</div>
-            </div>
-            <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
-            <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
-          </div>
+              <p className="text-3xl font-black text-foreground tracking-tighter">{stat.value}</p>
+              <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
@@ -674,8 +846,8 @@ const AdminPasseios = () => {
       <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
         <div className="overflow-x-auto">
           <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
+          <TableHeader className="bg-slate-50/50">
+            <TableRow className="hover:bg-transparent border-b border-border/40">
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest pl-6">Passeio / Localização</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Categoria</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Preço Site</TableHead>
@@ -701,7 +873,11 @@ const AdminPasseios = () => {
               filtered.map((t) => {
                 const isTopSeller = t.reviews_count >= topSellingThreshold && t.active;
                 return (
-                  <TableRow key={t.id} className={`group hover:bg-primary/5 transition-all border-b border-border/50 ${!t.active ? "opacity-60 grayscale" : ""}`}>
+                  <TableRow 
+                    key={t.id} 
+                    className={`group hover:bg-primary/5 transition-all border-b border-border/50 cursor-pointer ${!t.active ? "opacity-60 grayscale" : ""}`}
+                    onClick={() => setDetailTour(t)}
+                  >
                     <TableCell className="pl-6 py-4">
                       <div className="flex items-center gap-4">
                         <div className="relative shrink-0">
@@ -855,142 +1031,194 @@ const AdminPasseios = () => {
 
       {/* Tour Detail Dialog */}
       <Dialog open={!!detailTour} onOpenChange={(open) => !open && setDetailTour(null)}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-4xl w-[95vw] p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
           {detailTour && (
-            <>
-              <DialogHeader>
-                <div className="flex items-center justify-between gap-4">
-                  <DialogTitle className="font-display text-xl">{detailTour.name}</DialogTitle>
-                  <button onClick={() => { openEdit(detailTour); setDetailTour(null); }} 
-                    className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-bold hover:bg-primary/20 transition-colors">
-                    <Pencil size={14} /> Editar Passeio
-                  </button>
-                </div>
-              </DialogHeader>
-
-              {/* Images */}
-              {detailTour.images?.length > 0 && (
-                <div className="grid grid-cols-3 gap-2 mt-2">
-                  {detailTour.images.slice(0, 6).map((img: string, i: number) => (
-                    <img key={i} src={img} alt={`${detailTour.name} ${i + 1}`}
-                      className={`rounded-xl object-cover w-full ${i === 0 ? "col-span-2 row-span-2 h-48" : "h-24"}`}
-                      onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
-                  ))}
-                </div>
-              )}
-
-              {/* Info Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
-                <div className="bg-muted rounded-xl p-3">
-                  <p className="text-xs text-muted-foreground flex items-center gap-1"><MapPin size={12} /> Localização</p>
-                  <p className="text-sm font-semibold text-foreground mt-1">{detailTour.location || "—"}</p>
-                </div>
-                <div className="bg-muted rounded-xl p-3">
-                  <p className="text-xs text-muted-foreground flex items-center gap-1"><Clock size={12} /> Duração</p>
-                  <p className="text-sm font-semibold text-foreground mt-1">{detailTour.duration || "—"}</p>
-                </div>
-                <div className="bg-muted rounded-xl p-3">
-                  <p className="text-xs text-muted-foreground flex items-center gap-1"><Users size={12} /> Grupo</p>
-                  <p className="text-sm font-semibold text-foreground mt-1">{detailTour.group_size || "—"}</p>
-                </div>
-                <div className="bg-muted rounded-xl p-3 flex flex-col justify-center">
-                  <p className="text-xs text-muted-foreground flex items-center gap-1"><Users size={12} className="text-primary" /> Coletivo</p>
-                  <p className="text-sm font-bold text-primary mt-1">{fmt(detailTour.price)}</p>
-                </div>
-                <div className="bg-muted rounded-xl p-3 flex flex-col justify-center">
-                  <p className="text-xs text-muted-foreground flex items-center gap-1"><Shield size={12} className="text-secondary" /> Privativo</p>
-                  <p className="text-sm font-bold text-secondary mt-1">{fmt(detailTour.private_price || 130000)}</p>
-                </div>
-                {detailTour.partner_price && (
-                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex flex-col justify-center">
-                    <p className="text-xs text-primary/60 flex items-center gap-1"><Building2 size={12} /> Parceiro Col.</p>
-                    <p className="text-sm font-bold text-primary mt-1">{fmt(detailTour.partner_price)}</p>
+            <div className="flex flex-col max-h-[90vh]">
+              <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between sticky top-0 z-10">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+                    <Compass size={24} strokeWidth={2.5} />
                   </div>
-                )}
-                {detailTour.partner_private_price && (
-                  <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex flex-col justify-center">
-                    <p className="text-xs text-primary/60 flex items-center gap-1"><Building2 size={12} /> Parceiro Priv.</p>
-                    <p className="text-sm font-bold text-primary mt-1">{fmt(detailTour.partner_private_price)}</p>
+                  <div>
+                    <h2 className="text-xl font-black text-slate-900 leading-none mb-1">
+                      {detailTour.name}
+                    </h2>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-[10px] font-black uppercase bg-primary/5 text-primary border-primary/10">
+                        {detailTour.category}
+                      </Badge>
+                      <p className="text-xs text-slate-500 font-medium">Visualização do Catálogo</p>
+                    </div>
                   </div>
-                )}
-                <div className="bg-muted rounded-xl p-3">
-                  <p className="text-xs text-muted-foreground flex items-center gap-1"><Star size={12} /> Avaliação</p>
-                  <p className="text-sm font-semibold text-foreground mt-1">{Number(detailTour.rating || 0).toFixed(1)} ({detailTour.reviews_count || 0})</p>
                 </div>
-                <div className="bg-muted rounded-xl p-3 flex flex-col justify-center">
-                  <p className="text-xs text-muted-foreground">Status</p>
-                  <Badge variant={detailTour.active ? "default" : "secondary"} className="mt-1 w-fit">
-                    {detailTour.active ? "Ativo" : "Inativo"}
-                  </Badge>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="rounded-xl font-bold h-10 hidden md:flex items-center gap-2"
+                    onClick={() => {
+                      const url = `${window.location.origin}${window.location.pathname}?wide_view_id=${detailTour.id}`;
+                      window.open(url, '_blank', 'width=1200,height=800');
+                    }}
+                  >
+                    <ExternalLink size={16} /> Abrir em Nova Janela
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => setDetailTour(null)} className="rounded-full hover:bg-slate-100 transition-colors">
+                    <X size={20} className="text-slate-400" />
+                  </Button>
                 </div>
               </div>
 
-              {detailTour.pix_discount > 0 && (
-                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-3 mt-2">
-                  <p className="text-sm font-semibold text-green-700 dark:text-green-400">
-                    💰 Desconto PIX: {detailTour.pix_discount}% → {fmt(Math.round(detailTour.price * (1 - detailTour.pix_discount / 100)))} por pessoa
-                  </p>
-                </div>
-              )}
+              <div className="overflow-y-auto p-6 md:p-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="md:col-span-1 space-y-6">
+                    <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                      <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                        <Compass size={14} className="text-primary" /> Atributos Principais
+                      </h3>
+                      <div className="space-y-4">
+                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                          <Label className="text-[10px] uppercase font-bold text-slate-400">Localização</Label>
+                          <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1">
+                            <MapPin size={14} className="text-primary" /> {detailTour.location || "Não informada"}
+                          </p>
+                        </div>
+                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                          <Label className="text-[10px] uppercase font-bold text-slate-400">Duração Estimada</Label>
+                          <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1">
+                            <Clock size={14} className="text-primary" /> {detailTour.duration || "Não informada"}
+                          </p>
+                        </div>
+                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                          <Label className="text-[10px] uppercase font-bold text-slate-400">Tamanho do Grupo</Label>
+                          <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1">
+                            <Users size={14} className="text-primary" /> {detailTour.group_size || "Não informado"}
+                          </p>
+                        </div>
+                      </div>
+                    </section>
 
-              {/* Description */}
-              {detailTour.description && (
-                <div className="mt-3">
-                  <h4 className="text-sm font-semibold text-foreground mb-1">Descrição</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{detailTour.description}</p>
-                </div>
-              )}
+                    <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                      <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                        <DollarSign size={14} className="text-emerald-500" /> Precificação
+                      </h3>
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase">
+                          <span>Preço Coletivo</span>
+                          <span className="text-slate-700 font-bold">{fmt(detailTour.price)}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase">
+                          <span>Preço Privativo</span>
+                          <span className="text-slate-700 font-bold">{fmt(detailTour.private_price || 130000)}</span>
+                        </div>
+                        <div className="pt-4 border-t border-dashed border-slate-200">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">Avaliação Média</span>
+                            <Badge variant="outline" className="text-[9px] font-black uppercase px-2 py-0.5 bg-amber-50 text-amber-600 border-amber-100">
+                              {detailTour.reviews_count} reviews
+                            </Badge>
+                          </div>
+                          <p className="text-2xl font-black text-amber-500 tracking-tighter flex items-center gap-1">
+                            <Star size={20} fill="currentColor" /> {Number(detailTour.rating || 0).toFixed(1)}
+                          </p>
+                        </div>
+                      </div>
+                    </section>
+                  </div>
 
-              {/* Includes */}
-              {detailTour.includes?.length > 0 && (
-                <div className="mt-3">
-                  <h4 className="text-sm font-semibold text-foreground mb-2">O que inclui</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {detailTour.includes.map((item: string, i: number) => (
-                      <span key={i} className="flex items-center gap-1 text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full">
-                        <CheckCircle size={12} /> {item}
-                      </span>
-                    ))}
+                  <div className="md:col-span-2 space-y-6">
+                    {detailTour.images?.length > 0 && (
+                      <div className="grid grid-cols-4 gap-3 mb-6">
+                        <div className="col-span-4 lg:col-span-3 aspect-video relative rounded-3xl overflow-hidden border border-slate-200 shadow-sm">
+                          <img src={detailTour.images[0]} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="hidden lg:flex flex-col gap-3">
+                          {detailTour.images.slice(1, 4).map((img: string, i: number) => (
+                            <div key={i} className="flex-1 aspect-square rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
+                              <img src={img} className="w-full h-full object-cover" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <section className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden">
+                      <div className="absolute right-0 top-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                      <div className="relative z-10">
+                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-2">Descrição Detalhada</p>
+                        <h2 className="text-2xl font-black text-slate-800 leading-tight mb-6">{detailTour.name}</h2>
+                        <p className="text-sm font-medium text-slate-600 leading-relaxed italic">
+                          "{detailTour.description}"
+                        </p>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-8 mt-8 border-t border-slate-200/60">
+                          <div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Capacidade Máxima</p>
+                            <p className="text-sm font-black flex items-center gap-2 text-slate-700 uppercase">
+                              <Users size={16} className="text-primary" /> {detailTour.vehicle_capacity || 9} PAX POR VEÍCULO
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Nível de Dificuldade</p>
+                            <p className="text-sm font-black flex items-center gap-2 text-slate-700 uppercase">
+                              <Activity size={16} className="text-primary" /> {detailTour.difficulty}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {detailTour.includes?.length > 0 && (
+                        <section className="bg-emerald-50/30 p-6 rounded-[2rem] border border-emerald-100 shadow-sm">
+                          <h3 className="text-xs font-black uppercase tracking-widest text-emerald-600 mb-4 flex items-center gap-2">
+                            <CheckCircle size={14} /> Itens Inclusos
+                          </h3>
+                          <div className="space-y-2">
+                            {detailTour.includes.map((h: string, i: number) => (
+                              <div key={i} className="flex items-center gap-2 text-xs font-bold text-emerald-800">
+                                <CheckCircle size={12} className="text-emerald-500 shrink-0" /> {h}
+                              </div>
+                            ))}
+                          </div>
+                        </section>
+                      )}
+
+                      {detailTour.highlights?.length > 0 && (
+                        <section className="bg-blue-50/30 p-6 rounded-[2rem] border border-blue-100 shadow-sm">
+                          <h3 className="text-xs font-black uppercase tracking-widest text-blue-600 mb-4 flex items-center gap-2">
+                            <Sparkles size={14} /> Destaques do Roteiro
+                          </h3>
+                          <div className="space-y-2">
+                            {detailTour.highlights.map((h: string, i: number) => (
+                              <div key={i} className="flex items-center gap-2 text-xs font-bold text-blue-800">
+                                <CheckCircle size={12} className="text-blue-500 shrink-0" /> {h}
+                              </div>
+                            ))}
+                          </div>
+                        </section>
+                      )}
+                    </div>
                   </div>
                 </div>
-              )}
-
-              {/* Highlights */}
-              {detailTour.highlights?.length > 0 && (
-                <div className="mt-3">
-                  <h4 className="text-sm font-semibold text-foreground mb-2">Destaques</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {detailTour.highlights.map((item: string, i: number) => (
-                      <span key={i} className="flex items-center gap-1 text-xs bg-secondary/20 text-secondary-foreground px-2.5 py-1 rounded-full">
-                        <Sparkles size={12} /> {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Meta */}
-              <div className="grid grid-cols-2 gap-3 mt-4 text-xs text-muted-foreground">
-                <div><span className="font-medium">Categoria:</span> {detailTour.category || "—"}</div>
-                <div><span className="font-medium">Dificuldade:</span> {detailTour.difficulty || "—"}</div>
-                <div><span className="font-medium">Saída:</span> {detailTour.departure || "—"}</div>
-                <div><span className="font-medium">Operador:</span> {detailTour.operator || "—"}</div>
-                <div><span className="font-medium">Slug:</span> {detailTour.slug}</div>
-                <div><span className="font-medium">Tag:</span> {detailTour.tag || "—"}</div>
               </div>
 
-              {/* Actions */}
-              <div className="flex gap-3 mt-4 pt-4 border-t border-border">
-                <button onClick={() => { setDetailTour(null); openEdit(detailTour); }}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-xl text-sm font-semibold flex items-center gap-2">
-                  <Pencil size={14} /> Editar
-                </button>
-                <button onClick={() => setDetailTour(null)}
-                  className="bg-muted text-muted-foreground px-5 py-2 rounded-xl text-sm font-semibold">
+              <div className="bg-white border-t border-slate-100 p-6 flex gap-3 sticky bottom-0 z-10">
+                <Button 
+                  className="flex-1 rounded-xl h-12 bg-primary font-black text-white shadow-lg shadow-primary/20 uppercase tracking-widest text-xs"
+                  onClick={() => { openEdit(detailTour); setDetailTour(null); }}
+                >
+                  <Pencil size={16} className="mr-2" /> Editar Passeio
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="rounded-xl h-12 font-bold px-8"
+                  onClick={() => setDetailTour(null)}
+                >
                   Fechar
-                </button>
+                </Button>
               </div>
-            </>
+            </div>
           )}
         </DialogContent>
       </Dialog>
