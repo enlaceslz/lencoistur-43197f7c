@@ -846,8 +846,8 @@ const AdminPasseios = () => {
       <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
         <div className="overflow-x-auto">
           <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
+          <TableHeader className="bg-slate-50/50">
+            <TableRow className="hover:bg-transparent border-b border-border/40">
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest pl-6">Passeio / Localização</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Categoria</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Preço Site</TableHead>
