@@ -1048,7 +1048,7 @@ const AdminPasseios = () => {
       </div>
     </div>
 
-      {/* Tour Detail Dialog */}
+    {/* Tour Detail Dialog */}
       <Dialog open={!!detailTour} onOpenChange={(open) => !open && setDetailTour(null)}>
         <DialogContent className="sm:max-w-4xl w-[95vw] p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
           {detailTour && (
