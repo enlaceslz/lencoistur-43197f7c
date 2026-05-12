@@ -156,7 +156,6 @@ export function useBookings() {
           companions: data.companions,
           partner_id: data.partnerId,
           collaboratorId: data.collaboratorId,
-          partner_id: data.partnerId,
           unitPrice: data.unitPrice,
           discount: data.discount,
           publicUnitPrice: data.publicUnitPrice,
