@@ -1125,8 +1125,8 @@ const AdminCRMContent = () => {
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
-                                      const parent = customers.find(c => c.id === d.customer_id);
-                                      if (parent) selectCustomer(parent);
+                                      const url = `${window.location.origin}${window.location.pathname}?wide_view_id=${d.customer_id}`;
+                                      window.open(url, '_blank');
                                     }}>
                                       <Eye size={14} className="text-primary" />
                                     </Button>
