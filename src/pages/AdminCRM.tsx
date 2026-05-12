@@ -312,6 +312,14 @@ const AdminCRMContent = () => {
   };
 
   const fetchCustomers = async () => {
+    // Check for customer_id in URL for wide view new window
+    const urlParams = new URLSearchParams(window.location.search);
+    const wideViewId = urlParams.get('wide_view_id');
+    if (wideViewId) {
+      setIsWideViewNewWindow(true);
+      setViewDetailsOpen(true);
+    }
+
     setLoading(true);
     const { data: customersData, error } = await supabase
       .from("customers")
