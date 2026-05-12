@@ -211,12 +211,19 @@ Deno.serve(async (req) => {
     }
     
     const isPrivate = itemName.includes("(Privativo)");
+    
+    // Apply overrides if provided (useful for CRM/Admin)
+    if (overrideUnitPrice !== undefined) unitPrice = Number(overrideUnitPrice);
+    if (overridePublicUnitPrice !== undefined) publicUnitPrice = Number(overridePublicUnitPrice);
+
     const total = isPrivate ? unitPrice : unitPrice * guestsNum;
     const publicTotal = isPrivate ? publicUnitPrice : publicUnitPrice * guestsNum;
     
-    const discount = payMethod === "pix" && pixDiscountPercent > 0 && !partner_id
+    const calculatedDiscount = payMethod === "pix" && pixDiscountPercent > 0 && !partner_id
       ? Math.round(total * pixDiscountPercent / 100)
       : 0;
+      
+    const discount = overrideDiscount !== undefined ? Number(overrideDiscount) : calculatedDiscount;
     const finalTotal = total - discount;
     const pixCode = payMethod === "pix" ? generatePixCode() : null;
 
