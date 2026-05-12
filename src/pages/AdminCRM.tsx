@@ -1556,8 +1556,11 @@ const AdminCRMContent = () => {
                       <TabsTrigger value="dependentes" className="rounded-xl font-bold text-xs px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">
                         <Users size={14} className="mr-2" /> Dependentes
                       </TabsTrigger>
+                      <TabsTrigger value="interacoes" className="rounded-xl font-bold text-xs px-6 data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                        <History size={14} className="mr-2" /> Linha do Tempo
+                      </TabsTrigger>
                     </TabsList>
-                    
+
                     <div className="mt-6">
                       <TabsContent value="reservas">
                         {customerBookings.length === 0 ? (
@@ -1646,6 +1649,12 @@ const AdminCRMContent = () => {
                               </div>
                             ))
                           )}
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="interacoes">
+                        <div className="bg-white border border-slate-100 rounded-[2rem] p-6">
+                           <CustomerInteractionHistory customerId={selectedCustomer.id} />
                         </div>
                       </TabsContent>
                     </div>
