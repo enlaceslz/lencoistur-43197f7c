@@ -843,8 +843,9 @@ const AdminPasseios = () => {
       </Dialog>
 
 
-      <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.3s' }}>
-        <div className="overflow-x-auto">
+      <div className="flex-1 flex flex-col overflow-hidden animate-in-fade" style={{ animationDelay: '0.3s' }}>
+        <div className="flex-1 bg-white rounded-[2.5rem] border border-white/40 flex flex-col overflow-hidden shadow-xl shadow-primary/5 glass-card">
+          <div className="overflow-auto flex-1">
           <Table>
           <TableHeader className="bg-slate-50/50">
             <TableRow className="hover:bg-transparent border-b border-border/40">
