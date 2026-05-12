@@ -820,17 +820,28 @@ const AdminReservas = () => {
               </div>
               <div>
                 <DialogTitle className="text-xl font-black text-slate-900 leading-none mb-1">
-                  Ficha Operacional Completa
+                  {selected?.itemName || "Ficha Operacional"}
                 </DialogTitle>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="text-[10px] font-black uppercase bg-primary/5 text-primary border-primary/10">
                     Reserva #{selected?.bookingCode}
                   </Badge>
-                  <p className="text-xs text-slate-500 font-medium">{selected?.itemName}</p>
+                  <p className="text-xs text-slate-500 font-medium">Ficha Técnica Detalhada</p>
                 </div>
               </div>
             </div>
             <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="rounded-xl font-bold h-10 border-primary/20 text-primary hover:bg-primary/5"
+                onClick={() => {
+                  const url = `${window.location.origin}${window.location.pathname}?wide_view_id=${selected?.id}`;
+                  window.open(url, '_blank');
+                }}
+              >
+                Abrir em Nova Aba
+              </Button>
               <Button 
                 variant="outline" 
                 size="sm" 
