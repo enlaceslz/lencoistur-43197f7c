@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Plus, Calendar, DollarSign, Clock, CheckCircle, XCircle, ChevronRight, FileDown, LayoutGrid, List, Loader2, User, Phone, Mail, MapPin, CreditCard, Trash2, Printer, Download, Eye, MoreHorizontal, Users, Tag, Briefcase } from "lucide-react";
+import { Search, Plus, Calendar, DollarSign, Clock, CheckCircle, XCircle, ChevronRight, FileDown, LayoutGrid, List, Loader2, User, Phone, Mail, MapPin, CreditCard, Trash2, Printer, Download, Eye, MoreHorizontal, Users, Tag, Briefcase, UserCheck } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { formatCurrency, cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -32,9 +32,12 @@ const AdminReservas = () => {
   const [collaborators, setCollaborators] = useState<any[]>([]);
   const [partners, setPartners] = useState<any[]>([]);
   const [tours, setTours] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [customerSearch, setCustomerSearch] = useState("");
   const [saving, setSaving] = useState(false);
 
   const [form, setForm] = useState({
+    customerId: "",
     customerName: "",
     customerEmail: "",
     customerPhone: "",
@@ -53,19 +56,45 @@ const AdminReservas = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [collabsRes, partnersRes, toursRes] = await Promise.all([
+      const [collabsRes, partnersRes, toursRes, customersRes] = await Promise.all([
         supabase.from("collaborators").select("id, name").eq("status", "active"),
         supabase.from("partners").select("id, name").eq("active", true),
-        supabase.from("tours").select("id, name, price, private_price").eq("active", true)
+        supabase.from("tours").select("id, name, price, private_price").eq("active", true),
+        supabase.from("customers").select("id, name, email, phone").order("name").limit(10)
       ]);
 
       if (collabsRes.data) setCollaborators(collabsRes.data);
       if (partnersRes.data) setPartners(partnersRes.data);
       if (toursRes.data) setTours(toursRes.data);
+      if (customersRes.data) setCustomers(customersRes.data);
     };
 
     fetchData();
   }, []);
+
+  const searchCustomers = async (query: string) => {
+    setCustomerSearch(query);
+    if (query.length < 2) return;
+
+    const { data } = await supabase
+      .from("customers")
+      .select("id, name, email, phone")
+      .ilike("name", `%${query}%`)
+      .limit(5);
+
+    if (data) setCustomers(data);
+  };
+
+  const handleSelectCustomer = (customer: any) => {
+    setForm(prev => ({
+      ...prev,
+      customerId: customer.id,
+      customerName: customer.name,
+      customerEmail: customer.email || "",
+      customerPhone: customer.phone || "",
+    }));
+    setCustomerSearch("");
+  };
 
   const filtered = bookings.filter((b) => {
     const q = search.toLowerCase();
@@ -133,6 +162,7 @@ const AdminReservas = () => {
       toast.success("Reserva criada com sucesso!");
       setShowNewForm(false);
       setForm({
+        customerId: "",
         customerName: "",
         customerEmail: "",
         customerPhone: "",
@@ -433,14 +463,40 @@ const AdminReservas = () => {
                   <User size={14} /> Dados do Cliente
                 </h3>
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nome Completo</Label>
-                    <Input 
-                      placeholder="Ex: João Silva" 
-                      value={form.customerName} 
-                      onChange={e => setForm({...form, customerName: e.target.value})}
-                      className="rounded-xl h-12 font-semibold border-slate-200 focus:ring-primary/10"
-                    />
+                  <div className="space-y-2 relative">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Buscar no CRM ou Nome Completo</Label>
+                    <div className="relative">
+                      <Input 
+                        placeholder="Ex: João Silva..." 
+                        value={form.customerName || customerSearch} 
+                        onChange={e => {
+                          const val = e.target.value;
+                          setForm({...form, customerName: val, customerId: ""});
+                          searchCustomers(val);
+                        }}
+                        className="rounded-xl h-12 font-semibold border-slate-200 focus:ring-primary/10 pl-10"
+                      />
+                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                    </div>
+
+                    {customerSearch && customers.length > 0 && (
+                      <div className="absolute z-[100] left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        {customers.map((c) => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onClick={() => handleSelectCustomer(c)}
+                            className="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0 flex items-center justify-between group"
+                          >
+                            <div>
+                              <p className="text-xs font-black text-slate-900 group-hover:text-primary transition-colors">{c.name}</p>
+                              <p className="text-[10px] text-slate-500 font-bold tracking-tight">{c.email || "Sem e-mail"} • {c.phone || "Sem telefone"}</p>
+                            </div>
+                            <UserCheck size={14} className="text-slate-300 group-hover:text-primary opacity-0 group-hover:opacity-100 transition-all" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
