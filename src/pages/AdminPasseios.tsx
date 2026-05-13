@@ -991,7 +991,7 @@ const AdminPasseios = () => {
                     <TableCell className="text-center">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button onClick={() => toggleActive(t.id, t.active)}
+                          <button onClick={(e) => { e.stopPropagation(); toggleActive(t.id, t.active); }}
                             className={`font-black text-[9px] uppercase px-3 py-1 rounded-xl border transition-all active:scale-95 ${t.active ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200"}`}>
                             {t.active ? "Publicado" : "Pausado"}
                           </button>
