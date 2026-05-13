@@ -102,7 +102,15 @@ const ToursPage = () => {
     .filter((t) => {
       const matchSearch = t.name.toLowerCase().includes(search.toLowerCase()) ||
         (t.location || "").toLowerCase().includes(search.toLowerCase());
-      const effectivePrice = (t.mode_collective_enabled !== false ? t.price : (t.private_price || 0)) / 100;
+      
+      const isPrivate = t.mode_collective_enabled === false;
+      const basePrice = isPrivate ? (t.private_price || 130000) : t.price;
+      const partnerPricing = pricingByTourId[t.id];
+      const priceToFormat = partnerPricing
+        ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePrice) : partnerPricing.effectivePrice)
+        : basePrice;
+      
+      const effectivePrice = priceToFormat / 100;
       const matchPrice = effectivePrice <= maxPrice;
       return matchSearch && matchPrice;
     })
