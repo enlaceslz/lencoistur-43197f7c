@@ -932,7 +932,7 @@ const AdminPasseios = () => {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-black text-foreground group-hover:text-primary transition-colors flex items-center gap-2">
+                          <p className="font-black text-foreground group-hover:text-primary transition-colors flex items-center gap-2 truncate">
                             {t.name}
                             {isTopSeller && <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[8px] font-black uppercase py-0 px-1.5">Best Seller</Badge>}
                           </p>
