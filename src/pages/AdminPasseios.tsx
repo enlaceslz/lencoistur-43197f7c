@@ -960,7 +960,7 @@ const AdminPasseios = () => {
                         )}
                         {t.mode_private_enabled && (
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-primary">{fmt(t.private_price || 130000)}</span>
+                            <span className="text-xs font-bold text-primary">{fmt(t.private_price)}</span>
                             <span className="text-[9px] font-bold text-primary/60 uppercase bg-primary/5 px-1.5 rounded">Privativo</span>
                           </div>
                         )}
