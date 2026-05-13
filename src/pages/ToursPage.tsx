@@ -115,12 +115,20 @@ const ToursPage = () => {
       return matchSearch && matchPrice;
     })
     .sort((a, b) => {
-      const priceA = (a.mode_collective_enabled !== false ? a.price : (a.private_price || 0)) / 100;
-      const priceB = (b.mode_collective_enabled !== false ? b.price : (b.private_price || 0)) / 100;
+      const getPrice = (t: any) => {
+        const isPrivate = t.mode_collective_enabled === false;
+        const basePrice = isPrivate ? (t.private_price || 130000) : t.price;
+        const partnerPricing = pricingByTourId[t.id];
+        return partnerPricing
+          ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePrice) : partnerPricing.effectivePrice)
+          : basePrice;
+      };
+      const priceA = getPrice(a) / 100;
+      const priceB = getPrice(b) / 100;
       if (sort === "price-asc") return priceA - priceB;
       if (sort === "price-desc") return priceB - priceA;
-      if (sort === "rating") return (b.rating || 0) - (a.rating || 0);
-      return (b.reviews_count || 0) - (a.reviews_count || 0);
+      if (sort === "rating") return (Number(b.rating) || 0) - (Number(a.rating) || 0);
+      return (Number(b.reviews_count) || 0) - (Number(a.reviews_count) || 0);
     });
 
   return (
