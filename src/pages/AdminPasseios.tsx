@@ -78,7 +78,11 @@ const AdminPasseios = () => {
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("tours").select("*").order("name");
+    const { data, error } = await supabase.from("tours").select("*").order("name");
+    if (error) {
+      console.error("Erro ao carregar passeios:", error);
+      toast.error("Erro ao carregar catálogo: " + error.message);
+    }
     setTours(data || []);
     setLoading(false);
   };
@@ -291,11 +295,14 @@ const AdminPasseios = () => {
   const sortedTours = [...tours].sort((a, b) => (b.reviews_count || 0) - (a.reviews_count || 0));
   const topSellingThreshold = sortedTours.length > 3 ? sortedTours[2].reviews_count : 10;
 
-  const filtered = tours.filter(t =>
-    t.name.toLowerCase().includes(search.toLowerCase()) ||
-    t.category.toLowerCase().includes(search.toLowerCase()) ||
-    (t.location && t.location.toLowerCase().includes(search.toLowerCase()))
-  );
+  const filtered = tours.filter(t => {
+    const s = search.toLowerCase();
+    return (
+      t.name?.toLowerCase().includes(s) ||
+      t.category?.toLowerCase().includes(s) ||
+      (t.location && t.location.toLowerCase().includes(s))
+    );
+  });
 
   const activeCount = tours.filter(t => t.active).length;
   const avgRating = tours.length
@@ -450,7 +457,7 @@ const AdminPasseios = () => {
 
   return (
     <AdminLayout title="Passeios">
-      <div className="flex flex-col gap-6 h-[calc(100vh-140px)]">
+      <div className="flex flex-col gap-6 h-[calc(100vh-100px)]">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Catálogo</h1>
@@ -860,10 +867,10 @@ const AdminPasseios = () => {
       </Dialog>
 
 
-      <div className="flex-1 flex flex-col overflow-hidden animate-in-fade" style={{ animationDelay: '0.3s' }}>
-        <div className="flex-1 bg-white rounded-[2.5rem] border border-white/40 flex flex-col overflow-hidden shadow-xl shadow-primary/5 glass-card">
+      <div className="flex-1 overflow-hidden animate-in-fade" style={{ animationDelay: '0.3s' }}>
+        <div className="h-full bg-white rounded-[2.5rem] border border-white/40 flex flex-col overflow-hidden shadow-xl shadow-primary/5 glass-card">
           <div className="overflow-auto flex-1 no-scrollbar">
-          <Table>
+          <Table className="min-w-[1000px]">
           <TableHeader className="bg-slate-50/50">
             <TableRow className="hover:bg-transparent border-b border-border/40">
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest pl-6">Passeio / Localização</TableHead>
