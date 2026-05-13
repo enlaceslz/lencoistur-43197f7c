@@ -27,7 +27,10 @@ const TourDetail = () => {
     if (!slug) return;
     const partnerId = params.get("partner_id") || params.get("partner");
     const load = async () => {
-      const { data: t } = await supabase.from("public_tours" as "tours").select("*").eq("slug", slug).single();
+      const { data: t, error } = await supabase.from("public_tours" as "tours").select("*").eq("slug", slug).single();
+      if (error) {
+        console.error("Erro ao carregar detalhes do passeio:", error);
+      }
       setTour(t);
       if (t) {
         if (partnerId) {

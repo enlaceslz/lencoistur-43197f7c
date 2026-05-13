@@ -46,7 +46,12 @@ const ToursSection = () => {
 
   useEffect(() => {
     supabase.from("public_tours" as "tours").select("*").order("reviews_count", { ascending: false }).limit(8)
-      .then(({ data }) => setTours(data || []));
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Erro ao carregar passeios na Home:", error);
+        }
+        setTours(data || []);
+      });
   }, []);
 
   const getTourImage = (tour: any): string | null => {

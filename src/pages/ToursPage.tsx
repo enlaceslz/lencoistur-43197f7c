@@ -58,7 +58,10 @@ const ToursPage = () => {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const { data } = await supabase.from("public_tours" as "tours").select("*").order("name");
+      const { data, error } = await supabase.from("public_tours" as "tours").select("*").order("name");
+      if (error) {
+        console.error("Erro ao carregar passeios:", error);
+      }
       const safeTours = data || [];
       setTours(safeTours);
 
