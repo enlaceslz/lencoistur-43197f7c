@@ -960,7 +960,7 @@ const AdminPasseios = () => {
                         )}
                         {t.mode_private_enabled && (
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-primary">{fmt(t.private_price || 130000)}</span>
+                            <span className="text-xs font-bold text-primary">{fmt(t.private_price)}</span>
                             <span className="text-[9px] font-bold text-primary/60 uppercase bg-primary/5 px-1.5 rounded">Privativo</span>
                           </div>
                         )}
@@ -998,23 +998,26 @@ const AdminPasseios = () => {
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button onClick={(e) => { e.stopPropagation(); toggleActive(t.id, t.active); }}
-                            className={`font-black text-[9px] uppercase px-3 py-1 rounded-xl border transition-all active:scale-95 ${t.active ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200"}`}>
-                            {t.active ? "Publicado" : "Pausado"}
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>{t.active ? "Clique para ocultar este passeio do site" : "Clique para tornar este passeio visível no site"}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell className="text-right pr-6">
-                      <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                      <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary" onClick={(e) => { e.stopPropagation(); setDetailTour(t); }}>
+                            <button onClick={() => toggleActive(t.id, t.active)}
+                              className={`font-black text-[9px] uppercase px-3 py-1.5 rounded-xl border transition-all active:scale-95 flex items-center gap-1.5 ${t.active ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200"}`}>
+                              {t.active ? <CheckCircle size={12} /> : <XCircle size={12} />}
+                              {t.active ? "Publicado" : "Pausado"}
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{t.active ? "Clique para ocultar este passeio do site" : "Clique para tornar este passeio visível no site"}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right pr-6">
+                      <div className="flex justify-end gap-1 group-hover:opacity-100 opacity-80 transition-all translate-x-2 group-hover:translate-x-0" onClick={(e) => e.stopPropagation()}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary" onClick={() => setDetailTour(t)}>
                               <Eye size={16} />
                             </Button>
                           </TooltipTrigger>
@@ -1022,10 +1025,26 @@ const AdminPasseios = () => {
                             <p>Visualizar Detalhes</p>
                           </TooltipContent>
                         </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-9 w-9 rounded-xl hover:bg-emerald-100 hover:text-emerald-600" 
+                              onClick={() => window.open(`${window.location.origin}/passeios/${t.slug}`, '_blank')}
+                            >
+                              <ExternalLink size={16} />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Ver no Site</p>
+                          </TooltipContent>
+                        </Tooltip>
                         
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-blue-100 hover:text-blue-600" onClick={(e) => { e.stopPropagation(); handleDuplicate(t); }}>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-blue-100 hover:text-blue-600" onClick={() => handleDuplicate(t)}>
                               <Copy size={16} />
                             </Button>
                           </TooltipTrigger>
@@ -1036,7 +1055,7 @@ const AdminPasseios = () => {
 
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary" onClick={(e) => { e.stopPropagation(); openEdit(t); }}>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary" onClick={() => openEdit(t)}>
                               <Pencil size={16} />
                             </Button>
                           </TooltipTrigger>
@@ -1047,7 +1066,7 @@ const AdminPasseios = () => {
 
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-destructive hover:bg-destructive/10" onClick={(e) => { e.stopPropagation(); handleDelete(t.id); }}>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-destructive hover:bg-destructive/10" onClick={() => handleDelete(t.id)}>
                               <Trash2 size={16} />
                             </Button>
                           </TooltipTrigger>
