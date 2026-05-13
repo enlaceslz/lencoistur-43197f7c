@@ -298,9 +298,9 @@ const AdminPasseios = () => {
   const filtered = tours.filter(t => {
     const s = search.toLowerCase();
     return (
-      t.name?.toLowerCase().includes(s) ||
-      t.category?.toLowerCase().includes(s) ||
-      (t.location && t.location.toLowerCase().includes(s))
+      (t.name || "").toLowerCase().includes(s) ||
+      (t.category || "").toLowerCase().includes(s) ||
+      (t.location || "").toLowerCase().includes(s)
     );
   });
 
