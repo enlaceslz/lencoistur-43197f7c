@@ -457,7 +457,7 @@ const AdminPasseios = () => {
 
   return (
     <AdminLayout title="Passeios">
-      <div className="flex flex-col gap-6 h-[calc(100vh-100px)]">
+      <div className="flex flex-col gap-6 h-[calc(100vh-120px)]">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Catálogo</h1>
@@ -868,9 +868,18 @@ const AdminPasseios = () => {
 
 
       <div className="flex-1 overflow-hidden animate-in-fade" style={{ animationDelay: '0.3s' }}>
-        <div className="h-full bg-white rounded-[2.5rem] border border-white/40 flex flex-col overflow-hidden shadow-xl shadow-primary/5 glass-card">
+        <div className="flex-1 bg-white rounded-[2.5rem] border border-white/40 flex flex-col overflow-hidden shadow-xl shadow-primary/5 glass-card">
           <div className="overflow-auto flex-1 no-scrollbar">
-          <Table className="min-w-[1000px]">
+          <Table className="min-w-[1000px] table-fixed">
+            <colgroup>
+              <col className="w-[30%]" />
+              <col className="w-[12%]" />
+              <col className="w-[15%]" />
+              <col className="w-[15%]" />
+              <col className="w-[15%]" />
+              <col className="w-[8%]" />
+              <col className="w-[5%]" />
+            </colgroup>
           <TableHeader className="bg-slate-50/50">
             <TableRow className="hover:bg-transparent border-b border-border/40">
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest pl-6">Passeio / Localização</TableHead>
@@ -896,12 +905,15 @@ const AdminPasseios = () => {
               </TableRow>
             ) : (
               filtered.map((t) => {
-                const isTopSeller = t.reviews_count >= topSellingThreshold && t.active;
+                const isTopSeller = (t.reviews_count || 0) >= topSellingThreshold && t.active;
                 return (
                   <TableRow 
                     key={t.id} 
                     className={`group hover:bg-primary/5 transition-all border-b border-border/50 cursor-pointer ${!t.active ? "opacity-60 grayscale" : ""}`}
-                    onClick={() => setDetailTour(t)}
+                    onClick={(e) => {
+                      if (e.defaultPrevented) return;
+                      setDetailTour(t);
+                    }}
                   >
                     <TableCell className="pl-6 py-4">
                       <div className="flex items-center gap-4">
@@ -920,7 +932,7 @@ const AdminPasseios = () => {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-black text-foreground group-hover:text-primary transition-colors flex items-center gap-2">
+                          <p className="font-black text-foreground group-hover:text-primary transition-colors flex items-center gap-2 truncate">
                             {t.name}
                             {isTopSeller && <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[8px] font-black uppercase py-0 px-1.5">Best Seller</Badge>}
                           </p>
@@ -988,7 +1000,7 @@ const AdminPasseios = () => {
                     <TableCell className="text-center">
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <button onClick={() => toggleActive(t.id, t.active)}
+                          <button onClick={(e) => { e.stopPropagation(); toggleActive(t.id, t.active); }}
                             className={`font-black text-[9px] uppercase px-3 py-1 rounded-xl border transition-all active:scale-95 ${t.active ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200"}`}>
                             {t.active ? "Publicado" : "Pausado"}
                           </button>
