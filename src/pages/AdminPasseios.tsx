@@ -291,11 +291,14 @@ const AdminPasseios = () => {
   const sortedTours = [...tours].sort((a, b) => (b.reviews_count || 0) - (a.reviews_count || 0));
   const topSellingThreshold = sortedTours.length > 3 ? sortedTours[2].reviews_count : 10;
 
-  const filtered = tours.filter(t =>
-    t.name.toLowerCase().includes(search.toLowerCase()) ||
-    t.category.toLowerCase().includes(search.toLowerCase()) ||
-    (t.location && t.location.toLowerCase().includes(search.toLowerCase()))
-  );
+  const filtered = tours.filter(t => {
+    const s = search.toLowerCase();
+    return (
+      t.name?.toLowerCase().includes(s) ||
+      t.category?.toLowerCase().includes(s) ||
+      (t.location && t.location.toLowerCase().includes(s))
+    );
+  });
 
   const activeCount = tours.filter(t => t.active).length;
   const avgRating = tours.length
