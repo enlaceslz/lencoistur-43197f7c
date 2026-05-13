@@ -870,7 +870,16 @@ const AdminPasseios = () => {
       <div className="flex-1 overflow-hidden animate-in-fade" style={{ animationDelay: '0.3s' }}>
         <div className="h-full bg-white rounded-[2.5rem] border border-white/40 flex flex-col overflow-hidden shadow-xl shadow-primary/5 glass-card">
           <div className="overflow-auto flex-1 no-scrollbar">
-          <Table className="min-w-[1000px]">
+          <Table className="min-w-[1000px] table-fixed">
+            <colgroup>
+              <col className="w-[30%]" />
+              <col className="w-[12%]" />
+              <col className="w-[15%]" />
+              <col className="w-[15%]" />
+              <col className="w-[15%]" />
+              <col className="w-[8%]" />
+              <col className="w-[5%]" />
+            </colgroup>
           <TableHeader className="bg-slate-50/50">
             <TableRow className="hover:bg-transparent border-b border-border/40">
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest pl-6">Passeio / Localização</TableHead>
