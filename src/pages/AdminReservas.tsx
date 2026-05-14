@@ -204,6 +204,26 @@ const AdminReservas = () => {
 
     setSaving(true);
     try {
+      // Validar Duplicidade (apenas para novas reservas)
+      if (!isEditing) {
+        const isDuplicate = bookings.some(b => 
+          (b.customerId === form.customerId || b.customerName.toLowerCase() === form.customerName.toLowerCase()) && 
+          b.date === form.date && 
+          b.itemName.toLowerCase() === form.itemName.toLowerCase() &&
+          b.status !== 'cancelada'
+        );
+
+        if (isDuplicate) {
+          toast({ 
+            title: "Reserva Duplicada", 
+            description: "Atenção: Este cliente já possui uma reserva para este passeio nesta data.", 
+            variant: "destructive" 
+          });
+          setSaving(false);
+          return;
+        }
+      }
+
       const unitPriceNum = parseCurrencyToNumber(form.unitPrice);
       const discountNum = parseCurrencyToNumber(form.discount);
       const publicUnitPriceNum = parseCurrencyToNumber(form.publicUnitPrice);
@@ -587,51 +607,86 @@ const AdminReservas = () => {
                         <p className="text-sm font-black text-foreground">{formatCurrency(b.finalTotal)}</p>
                       </TableCell>
                       <TableCell className="px-6 py-5 text-center">
-                        <Badge 
-                          className={cn("rounded-xl px-3 py-1 font-black text-[9px] uppercase border shadow-sm", statusConfig[b.status]?.className)} 
-                          variant="outline"
-                        >
-                          {statusConfig[b.status]?.label || b.status}
-                        </Badge>
+                        <div className="flex flex-col items-center gap-1">
+                          <Badge 
+                            className={cn("rounded-xl px-3 py-1 font-black text-[9px] uppercase border shadow-sm", statusConfig[b.status]?.className)} 
+                            variant="outline"
+                          >
+                            {statusConfig[b.status]?.label || b.status}
+                          </Badge>
+                          {b.termStatus === 'assinado' ? (
+                            <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[8px] font-black uppercase py-0 px-2 h-4">Assinado</Badge>
+                          ) : (
+                            <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-[8px] font-black uppercase py-0 px-2 h-4">Termo Pendente</Badge>
+                          )}
+                        </div>
                       </TableCell>
+
                     <TableCell className="px-6 py-5 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 text-primary hover:bg-primary/10"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelected(b);
-                            setShowWideView(true);
-                          }}
-                        >
-                          <Eye size={16} />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 text-slate-400 hover:text-primary hover:bg-primary/5"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelected(b);
-                            handleEdit();
-                          }}
-                        >
-                          <Pencil size={14} />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 text-rose-400 hover:text-rose-600 hover:bg-rose-50"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(b.id);
-                          }}
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </div>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            title="Ver Detalhes / Ficha"
+                            className="h-9 w-9 text-primary hover:bg-primary/10 rounded-xl"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelected(b);
+                              setShowWideView(true);
+                            }}
+                          >
+                            <Eye size={18} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            title="Enviar Termo (WhatsApp)"
+                            className={cn(
+                              "h-9 w-9 rounded-xl transition-all",
+                              b.termStatus === 'assinado' ? "text-emerald-500 hover:bg-emerald-50" : "text-amber-500 hover:bg-amber-50 animate-pulse-subtle"
+                            )}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelected(b);
+                              // Trigger send term logic - needs a slight refactor to use b instead of selected
+                              const baseUrl = window.location.origin;
+                              const link = `${baseUrl}/assinatura-termo?booking_id=${b.id}`;
+                              navigator.clipboard.writeText(link);
+                              toast({ title: "Copiado", description: "Link do termo copiado!" });
+                              const message = encodeURIComponent(`Olá ${b.customerName}, aqui está o link para assinatura do Termo de Responsabilidade da sua reserva ${b.bookingCode}: ${link}`);
+                              const whatsappUrl = `https://wa.me/${b.customerPhone.replace(/\D/g, '')}?text=${message}`;
+                              window.open(whatsappUrl, '_blank');
+                            }}
+                          >
+                            <Smartphone size={16} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            title="Editar"
+                            className="h-9 w-9 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelected(b);
+                              handleEdit();
+                            }}
+                          >
+                            <Pencil size={16} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            title="EXCLUIR DEFINITIVAMENTE"
+                            className="h-9 w-9 text-rose-400 hover:text-white hover:bg-rose-500 transition-all rounded-xl"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(b.id);
+                            }}
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </div>
+
                     </TableCell>
                     </TableRow>
                   ))}
