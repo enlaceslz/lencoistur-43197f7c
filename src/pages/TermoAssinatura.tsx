@@ -894,39 +894,6 @@ const TermoAssinatura = () => {
                 </div>
               </div>
             )}
-                            <button 
-                              type="button"
-                              onClick={(e) => {
-                                const canvas = document.getElementById(`canvas-${companion.id}`) as HTMLCanvasElement;
-                                if (canvas) {
-                                  const ctx = canvas.getContext('2d');
-                                  ctx?.clearRect(0, 0, canvas.width, canvas.height);
-                                  setSignatures(prev => {
-                                    const next = { ...prev };
-                                    delete next[companion.id];
-                                    return next;
-                                  });
-                                }
-                              }}
-                              className="absolute bottom-2 right-2 p-1.5 bg-muted/80 rounded-lg text-muted-foreground hover:text-destructive transition-colors"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {companion.signature_data && (
-                        <div className="mt-2 flex flex-col items-center border-t border-dashed pt-2">
-                           <img src={companion.signature_data} alt="Assinatura" className="h-12 object-contain" />
-                           <p className="text-[8px] text-muted-foreground">Assinado em {new Date(companion.signed_at).toLocaleString('pt-BR')}</p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Signature Area */}
             <div className="space-y-4 border-t border-border pt-6">
