@@ -277,6 +277,7 @@ const AdminReservas = () => {
       unitPrice: selected.unitPrice.toString(),
       discount: selected.discount.toString(),
       publicUnitPrice: (selected.publicUnitPrice || 0).toString(),
+      partnerNetPrice: (selected.partnerNetPrice || 0).toString(),
       notes: selected.notes || "",
       collaboratorId: selected.collaboratorId || "",
       partnerId: selected.partnerId || "",
