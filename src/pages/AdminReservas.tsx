@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +24,49 @@ const statusConfig: Record<string, { label: string; className: string }> = {
   pendente: { label: "Pendente", className: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
   cancelada: { label: "Cancelada", className: "bg-rose-500/10 text-rose-600 border-rose-500/20" },
   concluida: { label: "Concluída", className: "bg-primary/10 text-primary border-primary/20" },
+};
+
+const DependentList = ({ customerId }: { customerId: string }) => {
+  const [dependents, setDependents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDeps = async () => {
+      if (!customerId) return;
+      const { data } = await supabase
+        .from("dependents")
+        .select("*")
+        .eq("customer_id", customerId);
+      if (data) setDependents(data);
+      setLoading(false);
+    };
+    fetchDeps();
+  }, [customerId]);
+
+  if (loading) return <div className="text-[10px] text-slate-400">Carregando dependentes...</div>;
+  if (dependents.length === 0) return <div className="text-[10px] text-slate-400 italic">Nenhum dependente vinculado a este cliente.</div>;
+
+  return (
+    <div className="space-y-2">
+      {dependents.map((dep) => (
+        <div key={dep.id} className="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+          <p className="text-[11px] font-black text-slate-700 uppercase">{dep.name}</p>
+          <div className="flex gap-2 mt-1">
+            {dep.cpf && (
+              <Badge variant="outline" className="text-[8px] font-bold py-0 h-4 bg-white">
+                CPF: {dep.cpf}
+              </Badge>
+            )}
+            {dep.birth_date && (
+              <Badge variant="outline" className="text-[8px] font-bold py-0 h-4 bg-white">
+                Nasc: {format(new Date(dep.birth_date), "dd/MM/yyyy")}
+              </Badge>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 };
 
 const AdminReservas = () => {
@@ -56,6 +101,14 @@ const AdminReservas = () => {
     notes: "",
     collaboratorId: "",
     partnerId: "",
+    companions: [] as { name: string; cpf?: string; birthDate?: string; relationship?: string }[],
+  });
+
+  const [companionForm, setCompanionForm] = useState({
+    name: "",
+    cpf: "",
+    birthDate: "",
+    relationship: "Acompanhante",
   });
 
   useEffect(() => {
@@ -160,6 +213,7 @@ const AdminReservas = () => {
 
       const payload = {
         ...form,
+        companions: form.companions,
         unitPrice: unitPriceNum,
         total,
         discount: discountNum,
@@ -196,6 +250,7 @@ const AdminReservas = () => {
         notes: "",
         collaboratorId: "",
         partnerId: "",
+        companions: [],
       });
     } catch (error: any) {
       toast({ title: "Erro", description: error.message || "Erro ao salvar reserva", variant: "destructive" });
@@ -223,10 +278,35 @@ const AdminReservas = () => {
       notes: selected.notes || "",
       collaboratorId: selected.collaboratorId || "",
       partnerId: selected.partnerId || "",
+      companions: [],
     });
     
     setIsEditing(true);
     setShowNewForm(true);
+  };
+
+  const addCompanion = () => {
+    if (!companionForm.name) {
+      toast({ title: "Erro", description: "Nome do dependente é obrigatório", variant: "destructive" });
+      return;
+    }
+    setForm(prev => ({
+      ...prev,
+      companions: [...prev.companions, { ...companionForm }]
+    }));
+    setCompanionForm({
+      name: "",
+      cpf: "",
+      birthDate: "",
+      relationship: "Acompanhante",
+    });
+  };
+
+  const removeCompanion = (index: number) => {
+    setForm(prev => ({
+      ...prev,
+      companions: prev.companions.filter((_, i) => i !== index)
+    }));
   };
 
   const handleSendRiskTerm = () => {
@@ -778,6 +858,81 @@ const AdminReservas = () => {
                       </Select>
                     </div>
                   </div>
+                  <div className="space-y-4 pt-4 border-t border-slate-100">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                      <Users size={14} /> Dependentes / Acompanhantes
+                    </h4>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                      <div className="space-y-1">
+                        <Label className="text-[9px] font-black uppercase text-slate-400">Nome</Label>
+                        <Input 
+                          placeholder="Nome"
+                          value={companionForm.name}
+                          onChange={(e) => setCompanionForm({ ...companionForm, name: e.target.value })}
+                          className="h-9 text-xs rounded-lg font-semibold"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[9px] font-black uppercase text-slate-400">CPF</Label>
+                        <Input 
+                          placeholder="000.000.000-00"
+                          value={companionForm.cpf}
+                          onChange={(e) => setCompanionForm({ ...companionForm, cpf: e.target.value })}
+                          className="h-9 text-xs rounded-lg font-semibold"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[9px] font-black uppercase text-slate-400">Nascimento</Label>
+                        <Input 
+                          type="date"
+                          value={companionForm.birthDate}
+                          onChange={(e) => setCompanionForm({ ...companionForm, birthDate: e.target.value })}
+                          className="h-9 text-xs rounded-lg font-semibold"
+                        />
+                      </div>
+                      <div className="flex items-end">
+                        <Button 
+                          type="button"
+                          variant="outline"
+                          className="w-full h-9 text-[10px] font-black uppercase gap-2 rounded-lg border-primary/20 text-primary hover:bg-primary/5"
+                          onClick={addCompanion}
+                        >
+                          <Plus size={14} strokeWidth={3} /> Adicionar
+                        </Button>
+                      </div>
+                    </div>
+
+                    {form.companions.length > 0 && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {form.companions.map((comp, idx) => (
+                          <div key={idx} className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl">
+                            <div className="flex items-center gap-3">
+                              <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center font-black text-[10px] text-primary">
+                                {idx + 1}
+                              </div>
+                              <div className="leading-none">
+                                <p className="text-[11px] font-black text-slate-700 uppercase tracking-tight">{comp.name}</p>
+                                <p className="text-[9px] text-slate-400 font-bold uppercase mt-0.5">
+                                  {comp.cpf ? comp.cpf : 'S/ CPF'} • {comp.birthDate ? comp.birthDate : 'S/ DATA'}
+                                </p>
+                              </div>
+                            </div>
+                            <Button 
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 w-7 p-0 text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg"
+                              onClick={() => removeCompanion(idx)}
+                            >
+                              <Trash2 size={12} />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Observações Operacionais</Label>
                     <Textarea 
@@ -1011,7 +1166,13 @@ const AdminReservas = () => {
                       )}
                     </div>
                   </section>
-                </div>
+                    <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                      <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                        <Users size={14} className="text-primary" /> Dependentes (CRM Externo)
+                      </h3>
+                      <DependentList customerId={selected.customerId || ""} />
+                    </section>
+                  </div>
 
                 {/* Coluna 3: Itens e Financeiro */}
                 <div className="lg:col-span-1 space-y-8">
