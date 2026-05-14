@@ -101,6 +101,7 @@ const AdminReservas = () => {
     notes: "",
     collaboratorId: "",
     partnerId: "",
+    partnerNetPrice: "0",
     companions: [] as { name: string; cpf?: string; birthDate?: string; relationship?: string }[],
   });
 
@@ -123,7 +124,7 @@ const AdminReservas = () => {
       const [collabsRes, partnersRes, toursRes, customersRes] = await Promise.all([
         supabase.from("collaborators").select("id, name").eq("status", "active"),
         supabase.from("partners").select("id, name").eq("active", true),
-        supabase.from("tours").select("id, name, price, private_price").eq("active", true),
+        supabase.from("tours").select("id, name, price, private_price, partner_price").eq("active", true),
         supabase.from("customers").select("id, name, email, phone").order("name").limit(10)
       ]);
 
@@ -250,6 +251,7 @@ const AdminReservas = () => {
         notes: "",
         collaboratorId: "",
         partnerId: "",
+        partnerNetPrice: "0",
         companions: [],
       });
     } catch (error: any) {
@@ -330,6 +332,7 @@ const AdminReservas = () => {
         itemName: tour.name,
         unitPrice: tour.price.toString(),
         publicUnitPrice: tour.private_price.toString(),
+        partnerNetPrice: tour.partner_price ? tour.partner_price.toString() : "0",
       }));
     }
   };
