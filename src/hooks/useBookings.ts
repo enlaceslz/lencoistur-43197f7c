@@ -164,7 +164,9 @@ export function useBookings() {
       });
 
       if (error || !result) {
-        throw new Error(result?.error || "Erro ao criar reserva");
+        const errorMsg = result?.error || error?.message || "Erro ao criar reserva";
+        toast.error(errorMsg);
+        throw new Error(errorMsg);
       }
 
       const mapped = mapDbToBooking(result, result.customers);
