@@ -101,6 +101,7 @@ const AdminReservas = () => {
     notes: "",
     collaboratorId: "",
     partnerId: "",
+    partnerNetPrice: "0",
     companions: [] as { name: string; cpf?: string; birthDate?: string; relationship?: string }[],
   });
 
@@ -123,7 +124,7 @@ const AdminReservas = () => {
       const [collabsRes, partnersRes, toursRes, customersRes] = await Promise.all([
         supabase.from("collaborators").select("id, name").eq("status", "active"),
         supabase.from("partners").select("id, name").eq("active", true),
-        supabase.from("tours").select("id, name, price, private_price").eq("active", true),
+        supabase.from("tours").select("id, name, price, private_price, partner_price").eq("active", true),
         supabase.from("customers").select("id, name, email, phone").order("name").limit(10)
       ]);
 
@@ -206,6 +207,7 @@ const AdminReservas = () => {
       const unitPriceNum = parseCurrencyToNumber(form.unitPrice);
       const discountNum = parseCurrencyToNumber(form.discount);
       const publicUnitPriceNum = parseCurrencyToNumber(form.publicUnitPrice);
+      const partnerNetPriceNum = parseCurrencyToNumber(form.partnerNetPrice);
       
       const total = (unitPriceNum * form.guests);
       const publicTotal = (publicUnitPriceNum * form.guests);
@@ -220,6 +222,7 @@ const AdminReservas = () => {
         finalTotal,
         publicUnitPrice: publicUnitPriceNum,
         publicTotal,
+        partnerNetPrice: partnerNetPriceNum,
         collaboratorId: form.collaboratorId === "none" ? undefined : form.collaboratorId || undefined,
         partnerId: form.partnerId === "none" ? undefined : form.partnerId || undefined,
       };
@@ -250,6 +253,7 @@ const AdminReservas = () => {
         notes: "",
         collaboratorId: "",
         partnerId: "",
+        partnerNetPrice: "0",
         companions: [],
       });
     } catch (error: any) {
@@ -275,6 +279,7 @@ const AdminReservas = () => {
       unitPrice: selected.unitPrice.toString(),
       discount: selected.discount.toString(),
       publicUnitPrice: (selected.publicUnitPrice || 0).toString(),
+      partnerNetPrice: (selected.partnerNetPrice || 0).toString(),
       notes: selected.notes || "",
       collaboratorId: selected.collaboratorId || "",
       partnerId: selected.partnerId || "",
@@ -330,6 +335,7 @@ const AdminReservas = () => {
         itemName: tour.name,
         unitPrice: tour.price.toString(),
         publicUnitPrice: tour.private_price.toString(),
+        partnerNetPrice: tour.partner_price ? tour.partner_price.toString() : "0",
       }));
     }
   };
@@ -800,7 +806,7 @@ const AdminReservas = () => {
                     </Select>
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Valor Unit.</Label>
                     <Input 
@@ -809,6 +815,18 @@ const AdminReservas = () => {
                       className="rounded-xl h-12 font-semibold border-slate-200"
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-600 flex items-center gap-1">
+                      <Briefcase size={12} /> Valor NET Parceiro
+                    </Label>
+                    <Input 
+                      value={form.partnerNetPrice} 
+                      onChange={e => setForm({...form, partnerNetPrice: maskCurrency(e.target.value)})}
+                      className="rounded-xl h-12 font-bold border-emerald-100 bg-emerald-50/30 text-emerald-700"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Desconto</Label>
                     <Input 
