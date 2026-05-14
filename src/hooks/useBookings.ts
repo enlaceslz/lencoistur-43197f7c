@@ -389,6 +389,20 @@ export function useBookings() {
       .eq("id", id);
       
     if (bookingError) throw bookingError;
+
+    // Se houver novos acompanhantes para adicionar durante o edit
+    if (data.companions && data.companions.length > 0) {
+      const deps = data.companions.map((c: any) => ({
+        customer_id: customerId,
+        name: c.name,
+        cpf: c.cpf || null,
+        birth_date: c.birthDate || null,
+        relationship: c.relationship || 'Acompanhante'
+      }));
+      const { error: depError } = await supabase.from("dependents").insert(deps);
+      if (depError) console.error("Erro ao adicionar dependentes no update:", depError);
+    }
+
   }, []);
 
   return { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, deleteBooking, completeBooking, updateBookingNotes, refresh: fetchBookings };

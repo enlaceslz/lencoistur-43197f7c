@@ -81,7 +81,10 @@ const AdminReservas = () => {
   const [collaborators, setCollaborators] = useState<any[]>([]);
   const [partners, setPartners] = useState<any[]>([]);
   const [tours, setTours] = useState<any[]>([]);
+  const [packages, setPackages] = useState<any[]>([]);
+  const [transfers, setTransfers] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
+
   const [customerSearch, setCustomerSearch] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -121,17 +124,22 @@ const AdminReservas = () => {
         setIsWideViewNewWindow(true);
       }
 
-      const [collabsRes, partnersRes, toursRes, customersRes] = await Promise.all([
+      const [collabsRes, partnersRes, toursRes, pkgsRes, transfersRes, customersRes] = await Promise.all([
         supabase.from("collaborators").select("id, name").eq("status", "active"),
         supabase.from("partners").select("id, name").eq("active", true),
         supabase.from("tours").select("id, name, price, private_price, partner_price").eq("active", true),
+        supabase.from("packages").select("id, name, discount_price, original_price, partner_price").eq("active", true),
+        supabase.from("transfer_routes").select("id, origin, destination, price, partner_price").eq("active", true),
         supabase.from("customers").select("id, name, email, phone").order("name").limit(10)
       ]);
 
       if (collabsRes.data) setCollaborators(collabsRes.data);
       if (partnersRes.data) setPartners(partnersRes.data);
       if (toursRes.data) setTours(toursRes.data);
+      if (pkgsRes.data) setPackages(pkgsRes.data);
+      if (transfersRes.data) setTransfers(transfersRes.data);
       if (customersRes.data) setCustomers(customersRes.data);
+
     };
 
     fetchData();
@@ -347,18 +355,44 @@ const AdminReservas = () => {
     window.open(whatsappUrl, '_blank');
   };
 
-  const handleTourChange = (tourId: string) => {
-    const tour = tours.find(t => t.id === tourId);
-    if (tour) {
-      setForm(prev => ({
-        ...prev,
-        itemName: tour.name,
-        unitPrice: tour.price.toString(),
-        publicUnitPrice: tour.private_price.toString(),
-        partnerNetPrice: tour.partner_price ? tour.partner_price.toString() : "0",
-      }));
+  const handleItemChange = (itemId: string) => {
+    let item: any;
+    if (form.type === "tour") {
+      item = tours.find(t => t.id === itemId);
+      if (item) {
+        setForm(prev => ({
+          ...prev,
+          itemName: item.name,
+          unitPrice: item.price.toString(),
+          publicUnitPrice: item.private_price?.toString() || item.price.toString(),
+          partnerNetPrice: item.partner_price ? item.partner_price.toString() : "0",
+        }));
+      }
+    } else if (form.type === "package") {
+      item = packages.find(p => p.id === itemId);
+      if (item) {
+        setForm(prev => ({
+          ...prev,
+          itemName: item.name,
+          unitPrice: (item.discount_price || item.original_price).toString(),
+          publicUnitPrice: (item.original_price).toString(),
+          partnerNetPrice: item.partner_price ? item.partner_price.toString() : "0",
+        }));
+      }
+    } else if (form.type === "transfer") {
+      item = transfers.find(t => t.id === itemId);
+      if (item) {
+        setForm(prev => ({
+          ...prev,
+          itemName: `${item.origin} → ${item.destination}`,
+          unitPrice: item.price.toString(),
+          publicUnitPrice: item.price.toString(),
+          partnerNetPrice: item.partner_price ? item.partner_price.toString() : "0",
+        }));
+      }
     }
   };
+
 
   if (loading) return (
     <AdminLayout title="Gestão de Reservas">
@@ -605,6 +639,11 @@ const AdminReservas = () => {
                       </TableCell>
                       <TableCell className="px-6 py-5">
                         <p className="text-sm font-black text-foreground">{formatCurrency(b.finalTotal)}</p>
+                        {b.partnerNetPrice !== undefined && b.partnerNetPrice > 0 && (
+                          <div className="flex items-center gap-1 text-[8px] font-black text-emerald-600 uppercase mt-1">
+                            <Briefcase size={8} /> NET: {formatCurrency(b.partnerNetPrice)}
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell className="px-6 py-5 text-center">
                         <div className="flex flex-col items-center gap-1">
@@ -621,13 +660,12 @@ const AdminReservas = () => {
                           )}
                         </div>
                       </TableCell>
-
-                    <TableCell className="px-6 py-5 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      <TableCell className="px-6 py-5 text-right">
+                        <div className="flex items-center justify-end gap-2">
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            title="Ver Detalhes / Ficha"
+                            title="Ficha Operacional"
                             className="h-9 w-9 text-primary hover:bg-primary/10 rounded-xl"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -640,22 +678,42 @@ const AdminReservas = () => {
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            title="Enviar Termo (WhatsApp)"
+                            title="Voucher / Recibo"
+                            className="h-9 w-9 text-indigo-500 hover:bg-indigo-50 rounded-xl"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(`${window.location.origin}/voucher?id=${b.id}`, '_blank');
+                            }}
+                          >
+                            <FileText size={18} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            title="Enviar Voucher (WhatsApp)"
+                            className="h-9 w-9 text-emerald-600 hover:bg-emerald-50 rounded-xl"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const url = `${window.location.origin}/voucher?id=${b.id}`;
+                              const message = encodeURIComponent(`Olá ${b.customerName}, segue o voucher da sua reserva: ${url}`);
+                              window.open(`https://wa.me/${b.customerPhone.replace(/\D/g, '')}?text=${message}`, '_blank');
+                            }}
+                          >
+                            <Building2 size={16} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            title="Enviar Termo de Risco (WhatsApp)"
                             className={cn(
                               "h-9 w-9 rounded-xl transition-all",
                               b.termStatus === 'assinado' ? "text-emerald-500 hover:bg-emerald-50" : "text-amber-500 hover:bg-amber-50 animate-pulse-subtle"
                             )}
                             onClick={(e) => {
                               e.stopPropagation();
-                              setSelected(b);
-                              // Trigger send term logic - needs a slight refactor to use b instead of selected
-                              const baseUrl = window.location.origin;
-                              const link = `${baseUrl}/assinatura-termo?booking_id=${b.id}`;
-                              navigator.clipboard.writeText(link);
-                              toast({ title: "Copiado", description: "Link do termo copiado!" });
-                              const message = encodeURIComponent(`Olá ${b.customerName}, aqui está o link para assinatura do Termo de Responsabilidade da sua reserva ${b.bookingCode}: ${link}`);
-                              const whatsappUrl = `https://wa.me/${b.customerPhone.replace(/\D/g, '')}?text=${message}`;
-                              window.open(whatsappUrl, '_blank');
+                              const link = `${window.location.origin}/assinatura-termo?booking_id=${b.id}`;
+                              const message = encodeURIComponent(`Olá ${b.customerName}, por favor assine o termo de risco: ${link}`);
+                              window.open(`https://wa.me/${b.customerPhone.replace(/\D/g, '')}?text=${message}`, '_blank');
                             }}
                           >
                             <Smartphone size={16} />
@@ -676,7 +734,7 @@ const AdminReservas = () => {
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            title="EXCLUIR DEFINITIVAMENTE"
+                            title="EXCLUIR"
                             className="h-9 w-9 text-rose-400 hover:text-white hover:bg-rose-500 transition-all rounded-xl"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -686,8 +744,8 @@ const AdminReservas = () => {
                             <Trash2 size={16} />
                           </Button>
                         </div>
+                      </TableCell>
 
-                    </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -815,16 +873,23 @@ const AdminReservas = () => {
                   
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Serviço / Item</Label>
-                    <Select onValueChange={handleTourChange}>
+                    <Select onValueChange={handleItemChange}>
                       <SelectTrigger className="rounded-xl h-12 font-semibold border-slate-200">
                         <SelectValue placeholder="Selecione um serviço cadastrado..." />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border-slate-200">
-                        {tours.map(t => (
+                        {form.type === "tour" && tours.map(t => (
                           <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                        ))}
+                        {form.type === "package" && packages.map(p => (
+                          <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                        ))}
+                        {form.type === "transfer" && transfers.map(t => (
+                          <SelectItem key={t.id} value={t.id}>{`${t.origin} → ${t.destination}`}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+
                     <Input 
                       placeholder="Ou digite o nome manualmente..." 
                       value={form.itemName} 
@@ -1328,19 +1393,52 @@ const AdminReservas = () => {
             )}
           </div>
 
-          <div className="bg-white border-t border-slate-100 p-6 flex justify-between items-center">
-            <Button 
-              variant="ghost" 
-              className="rounded-xl h-12 px-6 font-black uppercase text-[10px] tracking-widest text-rose-500 hover:text-rose-600 hover:bg-rose-50"
-              onClick={() => {
-                if (selected) handleDelete(selected.id);
-              }}
-            >
-              <Trash2 size={16} className="mr-2" /> Excluir Reserva
-            </Button>
-            <Button variant="secondary" onClick={() => setShowWideView(false)} className="rounded-xl h-12 px-8 font-black uppercase text-[10px] tracking-widest">
-              Fechar Ficha Técnica
-            </Button>
+          <div className="bg-white border-t border-slate-100 p-6 flex flex-wrap justify-between items-center gap-4">
+            <div className="flex gap-2">
+              <Button 
+                variant="ghost" 
+                className="rounded-xl h-12 px-6 font-black uppercase text-[10px] tracking-widest text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+                onClick={() => {
+                  if (selected) handleDelete(selected.id);
+                }}
+              >
+                <Trash2 size={16} className="mr-2" /> Excluir Reserva
+              </Button>
+
+              {selected?.status === 'pendente' && (
+                <Button 
+                  variant="outline"
+                  className="rounded-xl h-12 px-6 font-black uppercase text-[10px] tracking-widest border-rose-200 text-rose-600 hover:bg-rose-50"
+                  onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada")}
+                >
+                  <XCircle size={16} className="mr-2" /> Cancelar Reserva
+                </Button>
+              )}
+            </div>
+
+            <div className="flex gap-3">
+              {selected?.paymentStatus === 'pendente' && (
+                <Button 
+                  className="rounded-xl h-12 px-6 font-black uppercase text-[10px] tracking-widest bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-200"
+                  onClick={() => handleAction(() => confirmPayment(selected.id), "Pagamento confirmado e reserva ativada")}
+                >
+                  <CheckCircle size={16} className="mr-2" /> Confirmar Pagamento
+                </Button>
+              )}
+
+              {selected?.status === 'confirmada' && (
+                <Button 
+                  className="rounded-xl h-12 px-6 font-black uppercase text-[10px] tracking-widest bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20"
+                  onClick={() => handleAction(() => completeBooking(selected.id), "Reserva marcada como concluída")}
+                >
+                  <CheckCircle size={16} className="mr-2" /> Concluir Operação
+                </Button>
+              )}
+
+              <Button variant="secondary" onClick={() => setShowWideView(false)} className="rounded-xl h-12 px-8 font-black uppercase text-[10px] tracking-widest">
+                Fechar Ficha Técnica
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

@@ -48,7 +48,9 @@ import AdminRelatorios from "./pages/AdminRelatorios.tsx";
 import AdminAjuda from "./pages/AdminAjuda.tsx";
 import TermoAssinatura from "./pages/TermoAssinatura.tsx";
 import PackageDetail from "./pages/PackageDetail.tsx";
+import VoucherPage from "./pages/VoucherPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
+
 
 const queryClient = new QueryClient();
 
@@ -68,7 +70,9 @@ const App = () => (
           <Route path="/minhas-reservas" element={<MinhasReservas />} />
           <Route path="/pacotes/:slug" element={<PackageDetail />} />
           <Route path="/assinatura-termo" element={<TermoAssinatura />} />
+          <Route path="/voucher" element={<VoucherPage />} />
           <Route path="/admin/login" element={<AdminLogin />} />
+
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/crm" element={<AdminRoute><AdminCRM /></AdminRoute>} />
           <Route path="/admin/financeiro" element={<AdminRoute><AdminFinanceiro /></AdminRoute>} />
