@@ -1328,19 +1328,52 @@ const AdminReservas = () => {
             )}
           </div>
 
-          <div className="bg-white border-t border-slate-100 p-6 flex justify-between items-center">
-            <Button 
-              variant="ghost" 
-              className="rounded-xl h-12 px-6 font-black uppercase text-[10px] tracking-widest text-rose-500 hover:text-rose-600 hover:bg-rose-50"
-              onClick={() => {
-                if (selected) handleDelete(selected.id);
-              }}
-            >
-              <Trash2 size={16} className="mr-2" /> Excluir Reserva
-            </Button>
-            <Button variant="secondary" onClick={() => setShowWideView(false)} className="rounded-xl h-12 px-8 font-black uppercase text-[10px] tracking-widest">
-              Fechar Ficha Técnica
-            </Button>
+          <div className="bg-white border-t border-slate-100 p-6 flex flex-wrap justify-between items-center gap-4">
+            <div className="flex gap-2">
+              <Button 
+                variant="ghost" 
+                className="rounded-xl h-12 px-6 font-black uppercase text-[10px] tracking-widest text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+                onClick={() => {
+                  if (selected) handleDelete(selected.id);
+                }}
+              >
+                <Trash2 size={16} className="mr-2" /> Excluir Reserva
+              </Button>
+
+              {selected?.status === 'pendente' && (
+                <Button 
+                  variant="outline"
+                  className="rounded-xl h-12 px-6 font-black uppercase text-[10px] tracking-widest border-rose-200 text-rose-600 hover:bg-rose-50"
+                  onClick={() => handleAction(() => cancelBooking(selected.id), "Reserva cancelada")}
+                >
+                  <XCircle size={16} className="mr-2" /> Cancelar Reserva
+                </Button>
+              )}
+            </div>
+
+            <div className="flex gap-3">
+              {selected?.paymentStatus === 'pendente' && (
+                <Button 
+                  className="rounded-xl h-12 px-6 font-black uppercase text-[10px] tracking-widest bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-200"
+                  onClick={() => handleAction(() => confirmPayment(selected.id), "Pagamento confirmado e reserva ativada")}
+                >
+                  <CheckCircle size={16} className="mr-2" /> Confirmar Pagamento
+                </Button>
+              )}
+
+              {selected?.status === 'confirmada' && (
+                <Button 
+                  className="rounded-xl h-12 px-6 font-black uppercase text-[10px] tracking-widest bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20"
+                  onClick={() => handleAction(() => completeBooking(selected.id), "Reserva marcada como concluída")}
+                >
+                  <CheckCircle size={16} className="mr-2" /> Concluir Operação
+                </Button>
+              )}
+
+              <Button variant="secondary" onClick={() => setShowWideView(false)} className="rounded-xl h-12 px-8 font-black uppercase text-[10px] tracking-widest">
+                Fechar Ficha Técnica
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
