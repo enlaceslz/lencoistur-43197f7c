@@ -207,6 +207,7 @@ const AdminReservas = () => {
       const unitPriceNum = parseCurrencyToNumber(form.unitPrice);
       const discountNum = parseCurrencyToNumber(form.discount);
       const publicUnitPriceNum = parseCurrencyToNumber(form.publicUnitPrice);
+      const partnerNetPriceNum = parseCurrencyToNumber(form.partnerNetPrice);
       
       const total = (unitPriceNum * form.guests);
       const publicTotal = (publicUnitPriceNum * form.guests);
@@ -221,6 +222,7 @@ const AdminReservas = () => {
         finalTotal,
         publicUnitPrice: publicUnitPriceNum,
         publicTotal,
+        partnerNetPrice: partnerNetPriceNum,
         collaboratorId: form.collaboratorId === "none" ? undefined : form.collaboratorId || undefined,
         partnerId: form.partnerId === "none" ? undefined : form.partnerId || undefined,
       };
@@ -804,7 +806,7 @@ const AdminReservas = () => {
                     </Select>
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Valor Unit.</Label>
                     <Input 
@@ -813,6 +815,18 @@ const AdminReservas = () => {
                       className="rounded-xl h-12 font-semibold border-slate-200"
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-600 flex items-center gap-1">
+                      <Briefcase size={12} /> Valor NET Parceiro
+                    </Label>
+                    <Input 
+                      value={form.partnerNetPrice} 
+                      onChange={e => setForm({...form, partnerNetPrice: maskCurrency(e.target.value)})}
+                      className="rounded-xl h-12 font-bold border-emerald-100 bg-emerald-50/30 text-emerald-700"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Desconto</Label>
                     <Input 
