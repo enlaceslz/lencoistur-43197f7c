@@ -205,7 +205,7 @@ const TermoAssinatura = () => {
           
           if (companionsData) setCompanions(companionsData);
 
-          const allAdultsSigned = !companionsData || companionsData.filter(c => c.is_adult && !c.signature_data).length === 0;
+          const allAdultsSigned = true; // Removida necessidade de assinatura individual para dependentes
           if (termData.signature_data && allAdultsSigned) {
             setSigned(true);
           }
@@ -325,14 +325,7 @@ const TermoAssinatura = () => {
       return;
     }
 
-    // Check companion signatures if any adult
-    const adultCompanions = companions.filter(c => c.is_adult);
-    for (const companion of adultCompanions) {
-      if (!signatures[companion.id] && !companion.signature_data) {
-        toast({ title: "Assinatura pendente", description: `O dependente ${companion.full_name} deve assinar.`, variant: "destructive" });
-        return;
-      }
-    }
+    // Removida validação de assinaturas de dependentes - titular assina por todos
 
     setSigning(true);
     const signatureData = canvas.toDataURL();
@@ -562,33 +555,23 @@ const TermoAssinatura = () => {
       doc.text(booking.customers?.name || "Cliente", 14, currentY + 19);
       doc.text(`${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}, ${new Date().toLocaleString("pt-BR")}`, 14, currentY + 22);
 
-      // Companions Signatures
-      const adultCompanions = companions.filter(c => c.is_adult && (signatures[c.id] || c.signature_data));
-      if (adultCompanions.length > 0) {
-        let compX = 14 + sigBoxWidth + 12;
-        let compY = currentY;
+      // Companions List (covered by main signature)
+      if (companions.length > 0) {
+        currentY += 10;
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "bold");
+        doc.text("Dependentes cobertos por este termo:", 14, currentY);
+        currentY += 4;
         
-        adultCompanions.forEach((comp, idx) => {
-          const sig = signatures[comp.id] || comp.signature_data;
-          if (sig) {
-            // Check if we need a new row for signatures
-            if (idx > 0 && idx % 2 === 0) {
-              compX = 14;
-              compY += 30;
-              currentY = compY;
-            } else if (idx > 0) {
-              compX = 14 + sigBoxWidth + 12;
-            }
-
-            doc.setFontSize(8);
-            doc.setFont("helvetica", "bold");
-            doc.text(`Assinatura: ${comp.full_name}`, compX, compY);
-            doc.addImage(sig, 'PNG', compX, compY + 2, 40, 12);
-            doc.line(compX, compY + 15, compX + sigBoxWidth, compY + 15);
-            doc.setFontSize(7);
-            doc.text(`Dependente Adulto`, compX, compY + 19);
-            doc.text(`Assinado em: ${new Date().toLocaleString("pt-BR")}`, compX, compY + 22);
+        companions.forEach((comp, idx) => {
+          if (currentY > pageHeight - 20) {
+            doc.addPage();
+            currentY = 20;
           }
+          doc.setFontSize(7);
+          doc.setFont("helvetica", "normal");
+          doc.text(`${idx + 1}. ${comp.full_name} (${comp.is_adult ? 'Adulto' : 'Menor'})`, 14, currentY);
+          currentY += 4;
         });
       }
 
@@ -895,91 +878,22 @@ const TermoAssinatura = () => {
                 <div className="space-y-3">
                   {companions.map(companion => (
                     <div key={companion.id} className="bg-muted/30 border border-border/50 rounded-2xl p-4">
-                      <div className="flex justify-between items-start mb-2">
+                      <div className="flex justify-between items-start">
                         <div>
                           <p className="text-sm font-bold">{companion.full_name}</p>
                           <p className="text-[10px] text-muted-foreground uppercase font-semibold">
-                            {companion.is_adult ? "Maior de Idade" : `Menor de Idade • Responsável: ${companion.responsible_name || 'Não informado'}`}
+                            {companion.is_adult ? "Dependente Adulto" : `Menor de Idade • Responsável: ${companion.responsible_name || 'Não informado'}`}
                           </p>
                         </div>
-                        {companion.is_adult && (
-                          <div className="flex flex-col items-end">
-                            {companion.signature_data ? (
-                              <span className="text-[10px] bg-green-500/10 text-green-600 px-2 py-0.5 rounded-full font-bold">ASSINADO</span>
-                            ) : (
-                              <span className="text-[10px] bg-amber-500/10 text-amber-600 px-2 py-0.5 rounded-full font-bold">ASSINATURA PENDENTE</span>
-                            )}
-                          </div>
-                        )}
+                        <div className="flex flex-col items-end">
+                          <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">COBERTO PELO TITULAR</span>
+                        </div>
                       </div>
-
-                      {companion.is_adult && !companion.signature_data && (
-                        <div className="mt-3 space-y-2">
-                          <p className="text-[10px] font-bold text-muted-foreground uppercase">Assinatura do Dependente:</p>
-                          <div className="bg-white rounded-xl border border-border overflow-hidden h-32 relative">
-                            <canvas 
-                              id={`canvas-${companion.id}`}
-                              className="w-full h-full cursor-crosshair touch-none"
-                              onMouseDown={(e) => {
-                                const canvas = e.currentTarget;
-                                const ctx = canvas.getContext('2d');
-                                if (!ctx) return;
-                                ctx.lineWidth = 2;
-                                ctx.lineCap = 'round';
-                                ctx.strokeStyle = '#000';
-                                const rect = canvas.getBoundingClientRect();
-                                let lastX = e.clientX - rect.left;
-                                let lastY = e.clientY - rect.top;
-                                ctx.beginPath();
-                                ctx.moveTo(lastX, lastY);
-
-                                const handleMouseMove = (moveEvent: MouseEvent) => {
-                                  const x = moveEvent.clientX - rect.left;
-                                  const y = moveEvent.clientY - rect.top;
-                                  ctx.lineTo(x, y);
-                                  ctx.stroke();
-                                };
-
-                                const handleMouseUp = () => {
-                                  window.removeEventListener('mousemove', handleMouseMove);
-                                  window.removeEventListener('mouseup', handleMouseUp);
-                                  setSignatures(prev => ({ ...prev, [companion.id]: canvas.toDataURL() }));
-                                };
-
-                                window.addEventListener('mousemove', handleMouseMove);
-                                window.addEventListener('mouseup', handleMouseUp);
-                              }}
-                              onTouchStart={(e) => {
-                                const canvas = e.currentTarget;
-                                const ctx = canvas.getContext('2d');
-                                if (!ctx) return;
-                                ctx.lineWidth = 2;
-                                ctx.lineCap = 'round';
-                                ctx.strokeStyle = '#000';
-                                const rect = canvas.getBoundingClientRect();
-                                let lastX = e.touches[0].clientX - rect.left;
-                                let lastY = e.touches[0].clientY - rect.top;
-                                ctx.beginPath();
-                                ctx.moveTo(lastX, lastY);
-
-                                const handleTouchMove = (moveEvent: TouchEvent) => {
-                                  moveEvent.preventDefault();
-                                  const x = moveEvent.touches[0].clientX - rect.left;
-                                  const y = moveEvent.touches[0].clientY - rect.top;
-                                  ctx.lineTo(x, y);
-                                  ctx.stroke();
-                                };
-
-                                const handleTouchEnd = () => {
-                                  window.removeEventListener('touchmove', handleTouchMove);
-                                  window.removeEventListener('touchend', handleTouchEnd);
-                                  setSignatures(prev => ({ ...prev, [companion.id]: canvas.toDataURL() }));
-                                };
-
-                                window.addEventListener('touchmove', handleTouchMove, { passive: false });
-                                window.addEventListener('touchend', handleTouchEnd);
-                              }}
-                            />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
                             <button 
                               type="button"
                               onClick={(e) => {
