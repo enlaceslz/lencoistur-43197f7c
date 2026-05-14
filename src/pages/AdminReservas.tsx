@@ -55,7 +55,6 @@ const AdminReservas = () => {
     publicUnitPrice: "0",
     notes: "",
     collaboratorId: "",
-    collaboratorId: "",
     partnerId: "",
     companions: [] as { name: string; cpf?: string; birthDate?: string; relationship?: string }[],
   });
