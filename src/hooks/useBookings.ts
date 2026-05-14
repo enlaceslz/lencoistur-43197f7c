@@ -15,6 +15,7 @@ export interface BookingItem {
   finalTotal: number;
   publicUnitPrice?: number;
   publicTotal?: number;
+  partnerNetPrice?: number;
   payMethod: "pix" | "card" | "info";
   status: "confirmada" | "pendente" | "cancelada" | "concluida";
   paymentStatus: "pago" | "pendente";
@@ -68,6 +69,7 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
     finalTotal: row.final_total,
     publicUnitPrice: row.public_unit_price,
     publicTotal: row.public_total,
+    partnerNetPrice: row.partner_net_price,
     payMethod: row.pay_method,
     status: row.status,
     paymentStatus: row.payment_status,
@@ -161,6 +163,7 @@ export function useBookings() {
           discount: data.discount,
           publicUnitPrice: data.publicUnitPrice,
           publicTotal: data.publicTotal,
+          partner_net_price: data.partnerNetPrice,
         },
       });
 
@@ -378,6 +381,7 @@ export function useBookings() {
         final_total: data.finalTotal,
         public_unit_price: data.publicUnitPrice || null,
         public_total: data.publicTotal || null,
+        partner_net_price: data.partnerNetPrice || null,
         notes: data.notes,
         collaborator_id: data.collaboratorId || null,
         partner_id: data.partnerId || null,

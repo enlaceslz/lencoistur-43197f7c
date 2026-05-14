@@ -65,6 +65,7 @@ export type Database = {
           marketing_campaign_id: string | null
           notes: string | null
           partner_id: string | null
+          partner_net_price: number | null
           pay_method: string
           payment_status: string
           pix_code: string | null
@@ -96,6 +97,7 @@ export type Database = {
           marketing_campaign_id?: string | null
           notes?: string | null
           partner_id?: string | null
+          partner_net_price?: number | null
           pay_method: string
           payment_status?: string
           pix_code?: string | null
@@ -127,6 +129,7 @@ export type Database = {
           marketing_campaign_id?: string | null
           notes?: string | null
           partner_id?: string | null
+          partner_net_price?: number | null
           pay_method?: string
           payment_status?: string
           pix_code?: string | null
