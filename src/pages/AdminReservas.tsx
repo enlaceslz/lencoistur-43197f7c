@@ -1082,7 +1082,16 @@ const AdminReservas = () => {
             )}
           </div>
 
-          <div className="bg-white border-t border-slate-100 p-6 flex justify-end">
+          <div className="bg-white border-t border-slate-100 p-6 flex justify-between items-center">
+            <Button 
+              variant="ghost" 
+              className="rounded-xl h-12 px-6 font-black uppercase text-[10px] tracking-widest text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+              onClick={() => {
+                if (selected) handleDelete(selected.id);
+              }}
+            >
+              <Trash2 size={16} className="mr-2" /> Excluir Reserva
+            </Button>
             <Button variant="secondary" onClick={() => setShowWideView(false)} className="rounded-xl h-12 px-8 font-black uppercase text-[10px] tracking-widest">
               Fechar Ficha Técnica
             </Button>
