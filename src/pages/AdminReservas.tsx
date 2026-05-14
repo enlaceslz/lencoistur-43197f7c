@@ -429,6 +429,12 @@ const AdminReservas = () => {
                         <span>Descontos</span>
                         <span>- {formatCurrency(wideBooking.discount)}</span>
                       </div>
+                      {wideBooking.partnerNetPrice !== undefined && wideBooking.partnerNetPrice > 0 && (
+                        <div className="flex justify-between items-center text-[10px] font-black text-emerald-600 uppercase bg-emerald-50/50 p-2 rounded-lg border border-emerald-100/50">
+                          <span className="flex items-center gap-1"><Briefcase size={10} /> Custo NET</span>
+                          <span>{formatCurrency(wideBooking.partnerNetPrice)}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between items-end pt-4 border-t border-dashed border-slate-200">
                         <div>
                           <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Valor Final</p>
