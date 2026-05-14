@@ -231,7 +231,7 @@ const AdminReservas = () => {
 
   const addCompanion = () => {
     if (!companionForm.name) {
-      toast({ title: \"Erro\", description: \"Nome do dependente é obrigatório\", variant: \"destructive\" });
+      toast({ title: "Erro", description: "Nome do dependente é obrigatório", variant: "destructive" });
       return;
     }
     setForm(prev => ({
@@ -239,10 +239,10 @@ const AdminReservas = () => {
       companions: [...prev.companions, { ...companionForm }]
     }));
     setCompanionForm({
-      name: \"\",
-      cpf: \"\",
-      birthDate: \"\",
-      relationship: \"Acompanhante\",
+      name: "",
+      cpf: "",
+      birthDate: "",
+      relationship: "Acompanhante",
     });
   };
 
