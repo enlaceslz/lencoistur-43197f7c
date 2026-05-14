@@ -166,7 +166,7 @@ export function useBookings() {
 
       if (error || !result) {
         const errorMsg = result?.error || error?.message || "Erro ao criar reserva";
-        toast.error(errorMsg);
+        toast({ title: "Erro", description: errorMsg, variant: "destructive" });
         throw new Error(errorMsg);
       }
 

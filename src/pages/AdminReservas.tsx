@@ -118,10 +118,10 @@ const AdminReservas = () => {
     setActionLoading(true);
     try {
       await action();
-      toast("Sucesso", { description: msg });
+      toast({ title: "Sucesso", description: msg });
       setSelected(null);
     } catch (err) {
-      toast("Erro", { description: "Erro ao processar ação" });
+      toast({ title: "Erro", description: "Erro ao processar ação", variant: "destructive" });
     } finally {
       setActionLoading(false);
     }
@@ -133,10 +133,10 @@ const AdminReservas = () => {
     setActionLoading(true);
     try {
       await deleteBooking(id);
-      toast("Sucesso", { description: "Reserva excluída permanentemente." });
+      toast({ title: "Reserva excluída", description: "Reserva excluída permanentemente." });
       setSelected(null);
     } catch (err: any) {
-      toast("Erro", { description: err?.message || "Erro ao excluir reserva." });
+      toast({ title: "Erro", description: err?.message || "Erro ao excluir reserva.", variant: "destructive" });
     } finally {
       setActionLoading(false);
     }
@@ -144,7 +144,7 @@ const AdminReservas = () => {
 
   const handleSave = async () => {
     if (!form.customerName || !form.itemName || !form.date) {
-      toast("Atenção", { description: "Preencha os campos obrigatórios" });
+      toast({ title: "Atenção", description: "Preencha os campos obrigatórios", variant: "destructive" });
       return;
     }
 
@@ -172,10 +172,10 @@ const AdminReservas = () => {
 
       if (isEditing && selected) {
         await updateBooking(selected.id, selected.customerId || "", payload);
-        toast("Sucesso", { description: "Reserva atualizada com sucesso!" });
+        toast({ title: "Sucesso", description: "Reserva atualizada com sucesso!" });
       } else {
         await addBooking(payload);
-        toast("Sucesso", { description: "Reserva criada com sucesso!" });
+        toast({ title: "Sucesso", description: "Reserva criada com sucesso!" });
       }
 
       setShowNewForm(false);
@@ -198,7 +198,7 @@ const AdminReservas = () => {
         partnerId: "",
       });
     } catch (error: any) {
-      toast("Erro", { description: error.message || "Erro ao salvar reserva" });
+      toast({ title: "Erro", description: error.message || "Erro ao salvar reserva", variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -235,7 +235,7 @@ const AdminReservas = () => {
     const link = `${baseUrl}/assinatura-termo?booking_id=${selected.id}`;
     
     navigator.clipboard.writeText(link);
-    toast("Copiado", { description: "Link do termo copiado!" });
+    toast({ title: "Copiado", description: "Link do termo copiado!" });
     
     const message = encodeURIComponent(`Olá ${selected.customerName}, aqui está o link para assinatura do Termo de Responsabilidade da sua reserva ${selected.bookingCode}: ${link}`);
     const whatsappUrl = `https://wa.me/${selected.customerPhone.replace(/\D/g, '')}?text=${message}`;
