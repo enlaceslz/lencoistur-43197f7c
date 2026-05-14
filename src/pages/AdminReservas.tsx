@@ -168,6 +168,7 @@ const AdminReservas = () => {
 
       const payload = {
         ...form,
+        companions: form.companions,
         unitPrice: unitPriceNum,
         total,
         discount: discountNum,
