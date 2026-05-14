@@ -812,6 +812,81 @@ const AdminReservas = () => {
                       </Select>
                     </div>
                   </div>
+                  <div className="space-y-4 pt-4 border-t border-slate-100">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                      <Users size={14} /> Dependentes / Acompanhantes
+                    </h4>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                      <div className="space-y-1">
+                        <Label className="text-[9px] font-black uppercase text-slate-400">Nome</Label>
+                        <Input 
+                          placeholder="Nome"
+                          value={companionForm.name}
+                          onChange={(e) => setCompanionForm({ ...companionForm, name: e.target.value })}
+                          className="h-9 text-xs rounded-lg font-semibold"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[9px] font-black uppercase text-slate-400">CPF</Label>
+                        <Input 
+                          placeholder="000.000.000-00"
+                          value={companionForm.cpf}
+                          onChange={(e) => setCompanionForm({ ...companionForm, cpf: e.target.value })}
+                          className="h-9 text-xs rounded-lg font-semibold"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-[9px] font-black uppercase text-slate-400">Nascimento</Label>
+                        <Input 
+                          type="date"
+                          value={companionForm.birthDate}
+                          onChange={(e) => setCompanionForm({ ...companionForm, birthDate: e.target.value })}
+                          className="h-9 text-xs rounded-lg font-semibold"
+                        />
+                      </div>
+                      <div className="flex items-end">
+                        <Button 
+                          type="button"
+                          variant="outline"
+                          className="w-full h-9 text-[10px] font-black uppercase gap-2 rounded-lg border-primary/20 text-primary hover:bg-primary/5"
+                          onClick={addCompanion}
+                        >
+                          <Plus size={14} strokeWidth={3} /> Adicionar
+                        </Button>
+                      </div>
+                    </div>
+
+                    {form.companions.length > 0 && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {form.companions.map((comp, idx) => (
+                          <div key={idx} className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl">
+                            <div className="flex items-center gap-3">
+                              <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center font-black text-[10px] text-primary">
+                                {idx + 1}
+                              </div>
+                              <div className="leading-none">
+                                <p className="text-[11px] font-black text-slate-700 uppercase tracking-tight">{comp.name}</p>
+                                <p className="text-[9px] text-slate-400 font-bold uppercase mt-0.5">
+                                  {comp.cpf ? comp.cpf : 'S/ CPF'} • {comp.birthDate ? comp.birthDate : 'S/ DATA'}
+                                </p>
+                              </div>
+                            </div>
+                            <Button 
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 w-7 p-0 text-rose-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg"
+                              onClick={() => removeCompanion(idx)}
+                            >
+                              <Trash2 size={12} />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Observações Operacionais</Label>
                     <Textarea 
