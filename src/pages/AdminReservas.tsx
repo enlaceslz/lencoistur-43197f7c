@@ -522,6 +522,17 @@ const AdminReservas = () => {
                         >
                           <Pencil size={14} />
                         </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-rose-400 hover:text-rose-600 hover:bg-rose-50"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(b.id);
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </Button>
                       </div>
                     </TableCell>
                     </TableRow>
