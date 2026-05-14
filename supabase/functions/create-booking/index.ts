@@ -369,6 +369,24 @@ Deno.serve(async (req) => {
       customerId = newCustomer.id;
     }
 
+    // Check for duplicate booking
+    const { data: duplicate } = await supabaseAdmin
+      .from("bookings")
+      .select("id")
+      .eq("customer_id", customerId)
+      .eq("item_name", itemName)
+      .eq("date", date || null)
+      .neq("status", "cancelada")
+      .maybeSingle();
+
+    if (duplicate) {
+      console.log("Duplicate booking detected", { customerId, itemName, date });
+      return new Response(
+        JSON.stringify({ error: "Você já possui uma reserva ativa para este passeio nesta data." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const booking = await createBookingRecord(customerId);
     console.log("Booking created successfully", {
       bookingId: booking.id,
