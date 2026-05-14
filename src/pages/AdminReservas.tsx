@@ -611,21 +611,6 @@ const AdminReservas = () => {
                           </div>
                         )}
                       </TableCell>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            title="Ver Voucher"
-                            className="h-9 w-9 text-indigo-500 hover:bg-indigo-50 rounded-xl"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              // Open voucher in new tab
-                              const url = `${window.location.origin}/voucher?id=${b.id}`;
-                              window.open(url, '_blank');
-                            }}
-                          >
-                            <FileText size={18} />
-                          </Button>
-
                       <TableCell className="px-6 py-5 text-center">
                         <div className="flex flex-col items-center gap-1">
                           <Badge 
@@ -641,13 +626,12 @@ const AdminReservas = () => {
                           )}
                         </div>
                       </TableCell>
-
-                    <TableCell className="px-6 py-5 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      <TableCell className="px-6 py-5 text-right">
+                        <div className="flex items-center justify-end gap-2">
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            title="Ver Detalhes / Ficha"
+                            title="Ficha Operacional"
                             className="h-9 w-9 text-primary hover:bg-primary/10 rounded-xl"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -660,22 +644,42 @@ const AdminReservas = () => {
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            title="Enviar Termo (WhatsApp)"
+                            title="Voucher / Recibo"
+                            className="h-9 w-9 text-indigo-500 hover:bg-indigo-50 rounded-xl"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(`${window.location.origin}/voucher?id=${b.id}`, '_blank');
+                            }}
+                          >
+                            <FileText size={18} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            title="Enviar Voucher (WhatsApp)"
+                            className="h-9 w-9 text-emerald-600 hover:bg-emerald-50 rounded-xl"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const url = `${window.location.origin}/voucher?id=${b.id}`;
+                              const message = encodeURIComponent(`Olá ${b.customerName}, segue o voucher da sua reserva: ${url}`);
+                              window.open(`https://wa.me/${b.customerPhone.replace(/\D/g, '')}?text=${message}`, '_blank');
+                            }}
+                          >
+                            <Building2 size={16} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            title="Enviar Termo de Risco (WhatsApp)"
                             className={cn(
                               "h-9 w-9 rounded-xl transition-all",
                               b.termStatus === 'assinado' ? "text-emerald-500 hover:bg-emerald-50" : "text-amber-500 hover:bg-amber-50 animate-pulse-subtle"
                             )}
                             onClick={(e) => {
                               e.stopPropagation();
-                              setSelected(b);
-                              // Trigger send term logic - needs a slight refactor to use b instead of selected
-                              const baseUrl = window.location.origin;
-                              const link = `${baseUrl}/assinatura-termo?booking_id=${b.id}`;
-                              navigator.clipboard.writeText(link);
-                              toast({ title: "Copiado", description: "Link do termo copiado!" });
-                              const message = encodeURIComponent(`Olá ${b.customerName}, aqui está o link para assinatura do Termo de Responsabilidade da sua reserva ${b.bookingCode}: ${link}`);
-                              const whatsappUrl = `https://wa.me/${b.customerPhone.replace(/\D/g, '')}?text=${message}`;
-                              window.open(whatsappUrl, '_blank');
+                              const link = `${window.location.origin}/assinatura-termo?booking_id=${b.id}`;
+                              const message = encodeURIComponent(`Olá ${b.customerName}, por favor assine o termo de risco: ${link}`);
+                              window.open(`https://wa.me/${b.customerPhone.replace(/\D/g, '')}?text=${message}`, '_blank');
                             }}
                           >
                             <Smartphone size={16} />
@@ -696,7 +700,7 @@ const AdminReservas = () => {
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            title="EXCLUIR DEFINITIVAMENTE"
+                            title="EXCLUIR"
                             className="h-9 w-9 text-rose-400 hover:text-white hover:bg-rose-500 transition-all rounded-xl"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -706,8 +710,8 @@ const AdminReservas = () => {
                             <Trash2 size={16} />
                           </Button>
                         </div>
+                      </TableCell>
 
-                    </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
