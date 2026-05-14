@@ -229,6 +229,30 @@ const AdminReservas = () => {
     setShowNewForm(true);
   };
 
+  const addCompanion = () => {
+    if (!companionForm.name) {
+      toast({ title: \"Erro\", description: \"Nome do dependente é obrigatório\", variant: \"destructive\" });
+      return;
+    }
+    setForm(prev => ({
+      ...prev,
+      companions: [...prev.companions, { ...companionForm }]
+    }));
+    setCompanionForm({
+      name: \"\",
+      cpf: \"\",
+      birthDate: \"\",
+      relationship: \"Acompanhante\",
+    });
+  };
+
+  const removeCompanion = (index: number) => {
+    setForm(prev => ({
+      ...prev,
+      companions: prev.companions.filter((_, i) => i !== index)
+    }));
+  };
+
   const handleSendRiskTerm = () => {
     if (!selected) return;
     const baseUrl = window.location.origin;
