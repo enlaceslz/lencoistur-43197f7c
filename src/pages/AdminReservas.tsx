@@ -522,6 +522,17 @@ const AdminReservas = () => {
                         >
                           <Pencil size={14} />
                         </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-rose-400 hover:text-rose-600 hover:bg-rose-50"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(b.id);
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </Button>
                       </div>
                     </TableCell>
                     </TableRow>
@@ -976,6 +987,28 @@ const AdminReservas = () => {
                           <Download size={14} className="mr-2" /> Visualizar Documento Assinado
                         </Button>
                       )}
+                      
+                      {selected.termStatus !== 'assinado' && (
+                        <div className="flex flex-col gap-2">
+                          <Button 
+                            className="w-full rounded-xl h-10 text-[10px] font-black uppercase tracking-widest bg-emerald-500 hover:bg-emerald-600 text-white"
+                            onClick={handleSendRiskTerm}
+                          >
+                            <Smartphone size={14} className="mr-2" /> Enviar Link (WhatsApp)
+                          </Button>
+                          <Button 
+                            variant="outline"
+                            className="w-full rounded-xl h-10 text-[10px] font-black uppercase tracking-widest border-primary/20 text-primary hover:bg-primary/5"
+                            onClick={() => {
+                              const baseUrl = window.location.origin;
+                              const link = `${baseUrl}/assinatura-termo?booking_id=${selected.id}`;
+                              window.open(link, '_blank');
+                            }}
+                          >
+                            <Pencil size={14} className="mr-2" /> Assinar Agora
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </section>
                 </div>
@@ -1049,7 +1082,16 @@ const AdminReservas = () => {
             )}
           </div>
 
-          <div className="bg-white border-t border-slate-100 p-6 flex justify-end">
+          <div className="bg-white border-t border-slate-100 p-6 flex justify-between items-center">
+            <Button 
+              variant="ghost" 
+              className="rounded-xl h-12 px-6 font-black uppercase text-[10px] tracking-widest text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+              onClick={() => {
+                if (selected) handleDelete(selected.id);
+              }}
+            >
+              <Trash2 size={16} className="mr-2" /> Excluir Reserva
+            </Button>
             <Button variant="secondary" onClick={() => setShowWideView(false)} className="rounded-xl h-12 px-8 font-black uppercase text-[10px] tracking-widest">
               Fechar Ficha Técnica
             </Button>
