@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface BookingItem {
@@ -164,7 +165,9 @@ export function useBookings() {
       });
 
       if (error || !result) {
-        throw new Error(result?.error || "Erro ao criar reserva");
+        const errorMsg = result?.error || error?.message || "Erro ao criar reserva";
+        toast({ title: "Erro", description: errorMsg, variant: "destructive" });
+        throw new Error(errorMsg);
       }
 
       const mapped = mapDbToBooking(result, result.customers);

@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Search, Plus, Calendar, DollarSign, Clock, CheckCircle, XCircle, ChevronRight, FileDown, LayoutGrid, List, Loader2, User, Phone, Mail, MapPin, CreditCard, Trash2, Printer, Download, Eye, MoreHorizontal, Users, Tag, Briefcase, UserCheck, Pencil, Shield, Smartphone, FileText, Activity, Building2, LayoutDashboard } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { formatCurrency, cn } from "@/lib/utils";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -118,10 +118,10 @@ const AdminReservas = () => {
     setActionLoading(true);
     try {
       await action();
-      toast.success(msg);
+      toast({ title: "Sucesso", description: msg });
       setSelected(null);
     } catch (err) {
-      toast.error("Erro ao processar ação");
+      toast({ title: "Erro", description: "Erro ao processar ação", variant: "destructive" });
     } finally {
       setActionLoading(false);
     }
@@ -133,10 +133,10 @@ const AdminReservas = () => {
     setActionLoading(true);
     try {
       await deleteBooking(id);
-      toast.success("Reserva excluída permanentemente.");
+      toast({ title: "Reserva excluída", description: "Reserva excluída permanentemente." });
       setSelected(null);
     } catch (err: any) {
-      toast.error(err?.message || "Erro ao excluir reserva.");
+      toast({ title: "Erro", description: err?.message || "Erro ao excluir reserva.", variant: "destructive" });
     } finally {
       setActionLoading(false);
     }
@@ -144,7 +144,7 @@ const AdminReservas = () => {
 
   const handleSave = async () => {
     if (!form.customerName || !form.itemName || !form.date) {
-      toast.error("Preencha os campos obrigatórios");
+      toast({ title: "Atenção", description: "Preencha os campos obrigatórios", variant: "destructive" });
       return;
     }
 
@@ -172,10 +172,10 @@ const AdminReservas = () => {
 
       if (isEditing && selected) {
         await updateBooking(selected.id, selected.customerId || "", payload);
-        toast.success("Reserva atualizada com sucesso!");
+        toast({ title: "Sucesso", description: "Reserva atualizada com sucesso!" });
       } else {
         await addBooking(payload);
-        toast.success("Reserva criada com sucesso!");
+        toast({ title: "Sucesso", description: "Reserva criada com sucesso!" });
       }
 
       setShowNewForm(false);
@@ -198,7 +198,7 @@ const AdminReservas = () => {
         partnerId: "",
       });
     } catch (error: any) {
-      toast.error(error.message || "Erro ao salvar reserva");
+      toast({ title: "Erro", description: error.message || "Erro ao salvar reserva", variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -235,7 +235,7 @@ const AdminReservas = () => {
     const link = `${baseUrl}/assinatura-termo?booking_id=${selected.id}`;
     
     navigator.clipboard.writeText(link);
-    toast.success("Link do termo copiado!");
+    toast({ title: "Copiado", description: "Link do termo copiado!" });
     
     const message = encodeURIComponent(`Olá ${selected.customerName}, aqui está o link para assinatura do Termo de Responsabilidade da sua reserva ${selected.bookingCode}: ${link}`);
     const whatsappUrl = `https://wa.me/${selected.customerPhone.replace(/\D/g, '')}?text=${message}`;
