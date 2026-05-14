@@ -55,7 +55,16 @@ const AdminReservas = () => {
     publicUnitPrice: "0",
     notes: "",
     collaboratorId: "",
+    collaboratorId: "",
     partnerId: "",
+    companions: [] as { name: string; cpf?: string; birthDate?: string; relationship?: string }[],
+  });
+
+  const [companionForm, setCompanionForm] = useState({
+    name: "",
+    cpf: "",
+    birthDate: "",
+    relationship: "Acompanhante",
   });
 
   useEffect(() => {
@@ -196,6 +205,7 @@ const AdminReservas = () => {
         notes: "",
         collaboratorId: "",
         partnerId: "",
+        companions: [],
       });
     } catch (error: any) {
       toast({ title: "Erro", description: error.message || "Erro ao salvar reserva", variant: "destructive" });
@@ -223,6 +233,7 @@ const AdminReservas = () => {
       notes: selected.notes || "",
       collaboratorId: selected.collaboratorId || "",
       partnerId: selected.partnerId || "",
+      companions: [],
     });
     
     setIsEditing(true);
