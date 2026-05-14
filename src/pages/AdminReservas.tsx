@@ -987,6 +987,28 @@ const AdminReservas = () => {
                           <Download size={14} className="mr-2" /> Visualizar Documento Assinado
                         </Button>
                       )}
+                      
+                      {selected.termStatus !== 'assinado' && (
+                        <div className="flex flex-col gap-2">
+                          <Button 
+                            className="w-full rounded-xl h-10 text-[10px] font-black uppercase tracking-widest bg-emerald-500 hover:bg-emerald-600 text-white"
+                            onClick={handleSendRiskTerm}
+                          >
+                            <Smartphone size={14} className="mr-2" /> Enviar Link (WhatsApp)
+                          </Button>
+                          <Button 
+                            variant="outline"
+                            className="w-full rounded-xl h-10 text-[10px] font-black uppercase tracking-widest border-primary/20 text-primary hover:bg-primary/5"
+                            onClick={() => {
+                              const baseUrl = window.location.origin;
+                              const link = `${baseUrl}/assinatura-termo?booking_id=${selected.id}`;
+                              window.open(link, '_blank');
+                            }}
+                          >
+                            <Pencil size={14} className="mr-2" /> Assinar Agora
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </section>
                 </div>
