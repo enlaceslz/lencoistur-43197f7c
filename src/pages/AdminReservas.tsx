@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +24,49 @@ const statusConfig: Record<string, { label: string; className: string }> = {
   pendente: { label: "Pendente", className: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
   cancelada: { label: "Cancelada", className: "bg-rose-500/10 text-rose-600 border-rose-500/20" },
   concluida: { label: "Concluída", className: "bg-primary/10 text-primary border-primary/20" },
+};
+
+const DependentList = ({ customerId }: { customerId: string }) => {
+  const [dependents, setDependents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDeps = async () => {
+      if (!customerId) return;
+      const { data } = await supabase
+        .from("dependents")
+        .select("*")
+        .eq("customer_id", customerId);
+      if (data) setDependents(data);
+      setLoading(false);
+    };
+    fetchDeps();
+  }, [customerId]);
+
+  if (loading) return <div className="text-[10px] text-slate-400">Carregando dependentes...</div>;
+  if (dependents.length === 0) return <div className="text-[10px] text-slate-400 italic">Nenhum dependente vinculado a este cliente.</div>;
+
+  return (
+    <div className="space-y-2">
+      {dependents.map((dep) => (
+        <div key={dep.id} className="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+          <p className="text-[11px] font-black text-slate-700 uppercase">{dep.name}</p>
+          <div className="flex gap-2 mt-1">
+            {dep.cpf && (
+              <Badge variant="outline" className="text-[8px] font-bold py-0 h-4 bg-white">
+                CPF: {dep.cpf}
+              </Badge>
+            )}
+            {dep.birth_date && (
+              <Badge variant="outline" className="text-[8px] font-bold py-0 h-4 bg-white">
+                Nasc: {format(new Date(dep.birth_date), "dd/MM/yyyy")}
+              </Badge>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 };
 
 const AdminReservas = () => {
@@ -1121,7 +1166,13 @@ const AdminReservas = () => {
                       )}
                     </div>
                   </section>
-                </div>
+                    <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                      <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                        <Users size={14} className="text-primary" /> Dependentes (CRM Externo)
+                      </h3>
+                      <DependentList customerId={selected.customerId || ""} />
+                    </section>
+                  </div>
 
                 {/* Coluna 3: Itens e Financeiro */}
                 <div className="lg:col-span-1 space-y-8">
