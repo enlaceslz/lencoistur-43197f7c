@@ -605,7 +605,27 @@ const AdminReservas = () => {
                       </TableCell>
                       <TableCell className="px-6 py-5">
                         <p className="text-sm font-black text-foreground">{formatCurrency(b.finalTotal)}</p>
+                        {b.partnerNetPrice !== undefined && b.partnerNetPrice > 0 && (
+                          <div className="flex items-center gap-1 text-[8px] font-black text-emerald-600 uppercase mt-1">
+                            <Briefcase size={8} /> NET: {formatCurrency(b.partnerNetPrice)}
+                          </div>
+                        )}
                       </TableCell>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            title="Ver Voucher"
+                            className="h-9 w-9 text-indigo-500 hover:bg-indigo-50 rounded-xl"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Open voucher in new tab
+                              const url = `${window.location.origin}/voucher?id=${b.id}`;
+                              window.open(url, '_blank');
+                            }}
+                          >
+                            <FileText size={18} />
+                          </Button>
+
                       <TableCell className="px-6 py-5 text-center">
                         <div className="flex flex-col items-center gap-1">
                           <Badge 
