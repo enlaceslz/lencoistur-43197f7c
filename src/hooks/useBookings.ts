@@ -129,6 +129,43 @@ export function useBookings() {
     };
   }, [fetchBookings]);
 
+  const confirmPayment = useCallback(async (id: string) => {
+    const { data: booking, error: fetchError } = await supabase
+      .from("bookings")
+      .select("*, customers!customer_id(name)")
+      .eq("id", id)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    const { error: updateError } = await supabase
+      .from("bookings")
+      .update({ status: "confirmada", payment_status: "pago" })
+      .eq("id", id);
+    
+    if (updateError) throw updateError;
+
+    // Integrar com Financeiro: Gerar Conta a Receber automaticamente
+    const { error: financeError } = await supabase
+      .from("contas_receber")
+      .insert({
+        descricao: `Reserva ${booking.booking_code} - ${booking.item_name}`,
+        valor: booking.final_total,
+        vencimento: booking.date || new Date().toISOString().slice(0, 10),
+        status: "recebido",
+        categoria: booking.partner_id ? "parceiro" : "reserva",
+        cliente: booking.customers?.name || "Cliente",
+        booking_id: booking.id,
+        partner_id: booking.partner_id || null,
+        recebido_em: new Date().toISOString().slice(0, 10),
+        observacoes: `Gerado automaticamente via CRM (Reserva ${booking.booking_code})${booking.partner_id ? ' - Venda via Parceiro' : ''}`
+      });
+
+    if (financeError) {
+      console.error("Erro ao gerar conta a receber:", financeError);
+    }
+  }, []);
+
   const addBooking = useCallback(
     async (
       data: Omit<BookingItem, "id" | "bookingCode" | "createdAt" | "pixCode" | "status" | "paymentStatus" | "customerId"> & {
@@ -192,44 +229,6 @@ export function useBookings() {
     [confirmPayment]
   );
 
-  const confirmPayment = useCallback(async (id: string) => {
-    const { data: booking, error: fetchError } = await supabase
-      .from("bookings")
-      .select("*, customers!customer_id(name)")
-      .eq("id", id)
-      .single();
-
-    if (fetchError) throw fetchError;
-
-    const { error: updateError } = await supabase
-      .from("bookings")
-      .update({ status: "confirmada", payment_status: "pago" })
-      .eq("id", id);
-    
-    if (updateError) throw updateError;
-
-    // Integrar com Financeiro: Gerar Conta a Receber automaticamente
-    const { error: financeError } = await supabase
-      .from("contas_receber")
-      .insert({
-        descricao: `Reserva ${booking.booking_code} - ${booking.item_name}`,
-        valor: booking.final_total,
-        vencimento: booking.date || new Date().toISOString().slice(0, 10),
-        status: "recebido",
-        categoria: booking.partner_id ? "parceiro" : "reserva",
-        cliente: booking.customers?.name || "Cliente",
-        booking_id: booking.id,
-        partner_id: booking.partner_id || null,
-        recebido_em: new Date().toISOString().slice(0, 10),
-        observacoes: `Gerado automaticamente via CRM (Reserva ${booking.booking_code})${booking.partner_id ? ' - Venda via Parceiro' : ''}`
-      });
-
-    if (financeError) {
-      console.error("Erro ao gerar conta a receber:", financeError);
-      // Não barramos a confirmação da reserva se o financeiro falhar, mas logamos.
-    }
-  }, []);
-
   const cancelBooking = useCallback(async (id: string) => {
     const { error } = await supabase
       .from("bookings")
@@ -237,7 +236,6 @@ export function useBookings() {
       .eq("id", id);
     if (error) throw error;
 
-    // Também atualizar o status no financeiro (Contas a Receber)
     await supabase
       .from("contas_receber")
       .update({ status: "cancelado", observacoes: "Reserva cancelada via CRM" })
@@ -260,7 +258,6 @@ export function useBookings() {
     
     if (updateError) throw updateError;
 
-    // Se houver um colaborador vinculado, gerar a comissão/pagamento
     if (booking.collaborator_id) {
       const { data: collab } = await supabase
         .from("collaborators")
@@ -273,13 +270,12 @@ export function useBookings() {
         if (collab.payment_type === "commission") {
           commissionAmount = Math.round((booking.final_total * collab.payment_value) / 100);
         } else if (collab.payment_type === "per_tour" || collab.payment_type === "daily") {
-          commissionAmount = collab.payment_value * 100; // converter para centavos
+          commissionAmount = collab.payment_value * 100;
         }
 
         if (commissionAmount > 0) {
           const description = `Comissão/Pagamento: ${booking.item_name} (Reserva ${booking.booking_code})`;
           
-          // Registrar no histórico de pagamentos do colaborador
           await supabase.from("collaborator_payments").insert({
             collaborator_id: collab.id,
             booking_id: booking.id,
@@ -289,7 +285,6 @@ export function useBookings() {
             status: "pending"
           });
 
-          // Registrar no financeiro (Contas a Pagar)
           await supabase.from("contas_pagar").insert({
             descricao: `Colaborador: ${collab.name} - ${description}`,
             valor: commissionAmount / 100,
@@ -305,17 +300,12 @@ export function useBookings() {
       }
     }
 
-    // Se houver um parceiro vinculado, não geramos contas a pagar automaticamente aqui,
-    // pois parceiros fazem parte do Contas a Receber conforme regra de negócio.
-    // A conta a receber já foi gerada no confirmPayment com o valor líquido (final_total).
-
-    // Registrar o custo operacional base se não houver colaborador (ou adicionalmente)
     if (!booking.collaborator_id) {
       const { error: costError } = await supabase
         .from("contas_pagar")
         .insert({
           descricao: `Custo Operacional: ${booking.item_name} (Reserva ${booking.booking_code})`,
-          valor: Math.round(booking.final_total * 0.4) / 100, // Estimativa de 40% de custo operacional
+          valor: Math.round(booking.final_total * 0.4) / 100,
           vencimento: new Date().toISOString().slice(0, 10),
           status: "pendente",
           categoria: "operacional",
@@ -344,19 +334,16 @@ export function useBookings() {
     
     if (bookingError) throw bookingError;
 
-    // Também remover do financeiro (Contas a Receber)
     await supabase
       .from("contas_receber")
       .delete()
       .eq("booking_id", id);
     
-    // Remover do financeiro (Contas a Pagar)
     await supabase
       .from("contas_pagar")
       .delete()
       .eq("booking_id", id);
       
-    // Remover do histórico de colaboradores
     await supabase
       .from("collaborator_payments")
       .delete()
@@ -402,7 +389,6 @@ export function useBookings() {
       
     if (bookingError) throw bookingError;
 
-    // Se houver novos acompanhantes para adicionar durante o edit
     if (data.companions && data.companions.length > 0) {
       const deps = data.companions.map((c: any) => ({
         customer_id: customerId,
