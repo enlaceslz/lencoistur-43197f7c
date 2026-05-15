@@ -679,6 +679,20 @@ const AdminReservas = () => {
                           >
                             <Eye size={18} />
                           </Button>
+                          {b.paymentStatus === 'pendente' && (
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              title="Confirmar Pagamento"
+                              className="h-9 w-9 text-emerald-500 hover:text-white hover:bg-emerald-500 transition-all rounded-xl"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAction(() => confirmPayment(b.id), "Pagamento confirmado");
+                              }}
+                            >
+                              <DollarSign size={16} />
+                            </Button>
+                          )}
                           <Button 
                             variant="ghost" 
                             size="icon" 
