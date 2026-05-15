@@ -105,6 +105,7 @@ const AdminReservas = () => {
     collaboratorId: "",
     partnerId: "",
     partnerNetPrice: "0",
+    paid: false,
     companions: [] as { name: string; cpf?: string; birthDate?: string; relationship?: string }[],
   });
 
@@ -243,6 +244,7 @@ const AdminReservas = () => {
 
       const payload = {
         ...form,
+        isPaid: form.paid,
         companions: form.companions,
         unitPrice: unitPriceNum,
         total,
@@ -282,6 +284,7 @@ const AdminReservas = () => {
         collaboratorId: "",
         partnerId: "",
         partnerNetPrice: "0",
+        paid: false,
         companions: [],
       });
     } catch (error: any) {
@@ -311,6 +314,7 @@ const AdminReservas = () => {
       notes: selected.notes || "",
       collaboratorId: selected.collaboratorId || "",
       partnerId: selected.partnerId || "",
+      paid: selected.paymentStatus === 'pago',
       companions: [],
     });
     
@@ -1098,16 +1102,41 @@ const AdminReservas = () => {
           </div>
 
           <div className="p-8 bg-slate-50 border-t border-border/40 flex flex-col md:flex-row justify-between items-center gap-6 rounded-b-[2.5rem]">
-            <div className="flex flex-col gap-1">
-               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Estimado</p>
-               <div className="flex items-baseline gap-2">
-                 <span className="text-3xl font-black text-primary tracking-tighter">
-                   {formatCurrency((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount))}
-                 </span>
-                 <span className="text-xs font-bold text-slate-400 line-through">
-                   {parseCurrencyToNumber(form.discount) > 0 && formatCurrency(parseCurrencyToNumber(form.unitPrice) * form.guests)}
-                 </span>
-               </div>
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              <div className="flex flex-col gap-1">
+                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Estimado</p>
+                 <div className="flex items-baseline gap-2">
+                   <span className="text-3xl font-black text-primary tracking-tighter">
+                     {formatCurrency((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount))}
+                   </span>
+                   <span className="text-xs font-bold text-slate-400 line-through">
+                     {parseCurrencyToNumber(form.discount) > 0 && formatCurrency(parseCurrencyToNumber(form.unitPrice) * form.guests)}
+                   </span>
+                 </div>
+              </div>
+              
+              {!isEditing && (
+                <div 
+                  className={cn(
+                    "flex items-center gap-3 p-4 rounded-2xl border-2 transition-all cursor-pointer select-none",
+                    form.paid 
+                      ? "bg-emerald-50 border-emerald-500 text-emerald-700 shadow-lg shadow-emerald-100" 
+                      : "bg-white border-slate-100 text-slate-400 hover:border-emerald-200"
+                  )}
+                  onClick={() => setForm(prev => ({ ...prev, paid: !prev.paid }))}
+                >
+                  <div className={cn(
+                    "w-6 h-6 rounded-lg flex items-center justify-center transition-colors",
+                    form.paid ? "bg-emerald-500 text-white" : "bg-slate-100 text-slate-300"
+                  )}>
+                    <CheckCircle size={14} strokeWidth={3} />
+                  </div>
+                  <div className="leading-tight">
+                    <p className="text-[10px] font-black uppercase tracking-tight">Confirmar Pagamento</p>
+                    <p className="text-[9px] font-bold opacity-70">Liquidado no ato do cadastro</p>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex gap-4 w-full md:w-auto">
               <Button variant="ghost" onClick={() => setShowNewForm(false)} className="flex-1 md:flex-none rounded-xl h-14 px-8 font-bold text-slate-500 hover:bg-slate-200 transition-all">
