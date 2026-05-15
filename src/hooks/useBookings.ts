@@ -139,6 +139,7 @@ export function useBookings() {
         notes?: string;
         companions?: { name: string; cpf?: string; birthDate?: string; relationship?: string }[];
         partnerId?: string;
+        isPaid?: boolean;
       }
     ): Promise<BookingItem> => {
       const { data: result, error } = await supabase.functions.invoke("create-booking", {
@@ -174,10 +175,21 @@ export function useBookings() {
       }
 
       const mapped = mapDbToBooking(result, result.customers);
+      
+      if (data.isPaid) {
+        try {
+          await confirmPayment(mapped.id);
+          mapped.paymentStatus = "pago";
+          mapped.status = "confirmada";
+        } catch (confirmErr) {
+          console.error("Erro ao confirmar pagamento inicial:", confirmErr);
+        }
+      }
+
       setBookings((prev) => [mapped, ...prev]);
       return mapped;
     },
-    []
+    [confirmPayment]
   );
 
   const confirmPayment = useCallback(async (id: string) => {
