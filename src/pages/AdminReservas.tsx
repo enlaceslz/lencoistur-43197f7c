@@ -411,22 +411,22 @@ const AdminReservas = () => {
     const wideBooking = bookings.find(b => b.id === wideViewId);
 
     return (
-      <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-8">
+      <div className="min-h-screen bg-slate-50 p-4 md:p-6">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between rounded-t-3xl">
+          <div className="bg-white border-b border-slate-200 p-6 flex items-center justify-between rounded-t-lg">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
-                <Calendar size={24} strokeWidth={2.5} />
+              <div className="w-10 h-10 rounded bg-slate-100 flex items-center justify-center text-slate-700 border border-slate-200">
+                <Calendar size={20} />
               </div>
               <div>
-                <h1 className="text-xl font-black text-slate-900 leading-none mb-1">
+                <h1 className="text-lg font-bold text-slate-900 leading-none mb-1">
                   {wideBooking?.itemName || "Detalhes da Reserva"}
                 </h1>
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-[10px] font-black uppercase bg-primary/5 text-primary border-primary/10">
+                  <Badge variant="outline" className="text-[10px] font-bold uppercase bg-slate-50 text-slate-600 border-slate-200">
                     {wideBooking?.bookingCode || "Reserva"}
                   </Badge>
-                  <p className="text-xs text-slate-500 font-medium">Ficha Técnica Operacional</p>
+                  <p className="text-xs text-slate-500 font-medium">Relatório Técnico</p>
                 </div>
               </div>
             </div>
@@ -443,14 +443,14 @@ const AdminReservas = () => {
           <div className="bg-white p-6 md:p-8 rounded-b-3xl shadow-sm">
             {wideBooking ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="md:col-span-1 space-y-8">
-                  <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
-                      <Users size={14} className="text-primary" /> Dependentes
+                <div className="md:col-span-1 space-y-6">
+                  <section className="bg-white p-6 rounded-lg border border-slate-200">
+                    <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+                      <Users size={14} className="text-slate-500" /> Dependentes
                     </h3>
                     <DependentList customerId={wideBooking.customerId || ""} />
                   </section>
-                  <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                  <section className="bg-white p-6 rounded-lg border border-slate-200">
                     <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                       <User size={14} className="text-primary" /> Identificação do Cliente
                     </h3>
