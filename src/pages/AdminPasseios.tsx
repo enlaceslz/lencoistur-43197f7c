@@ -458,7 +458,7 @@ const AdminPasseios = () => {
   return (
     <AdminLayout title="Passeios">
       <div className="flex flex-col gap-6 h-[calc(100vh-120px)]">
-        <div className="glass-card rounded-[2.5rem] p-10 relative overflow-hidden group shadow-2xl shadow-primary/5">
+        <div className="bg-white rounded-lg p-10 relative overflow-hidden group border border-border shadow-sm">
           <div className="absolute right-0 top-0 w-96 h-96 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-primary/10 transition-all duration-700" />
           
           <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
@@ -477,25 +477,25 @@ const AdminPasseios = () => {
             
             <button 
               onClick={openNew}
-              className="bg-primary hover:bg-primary/90 text-white px-10 h-16 rounded-2xl text-xs font-black uppercase tracking-widest shadow-2xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-3"
+              className="bg-primary hover:bg-primary/90 text-white px-10 h-16 rounded-lg text-xs font-black uppercase tracking-widest shadow-sm transition-none flex items-center gap-3"
             >
               <Plus size={20} /> Novo Passeio
             </button>
           </div>
         </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {[
           { label: "Catálogo", value: tours.length, icon: Compass, color: "text-primary", bg: "bg-primary/5", desc: "Total cadastrado" },
           { label: "Visíveis", value: activeCount, icon: Eye, color: "text-primary", bg: "bg-primary/5", desc: "No site" },
           { label: "Rating Médio", value: avgRating, icon: Star, color: "text-primary", bg: "bg-primary/5", desc: "Avaliação clientes" },
           { label: "Feedback", value: tours.reduce((a, t) => a + (t.reviews_count || 0), 0), icon: Users, color: "text-primary", bg: "bg-primary/5", desc: "Reviews totais" },
         ].map((stat, i) => (
-          <Card key={i} className="rounded-[2rem] border-white/40 shadow-xl shadow-primary/5 glass-card overflow-hidden group">
+          <Card key={i} className="rounded-lg border-border shadow-sm bg-white overflow-hidden group">
             <CardContent className="p-7 relative">
               <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
               <div className="flex items-center gap-4 mb-4">
-                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center border shadow-sm", stat.bg, stat.color, "border-white/20")}>
+                <div className={cn("w-12 h-12 rounded-lg flex items-center justify-center border shadow-sm", stat.bg, stat.color, "border-border")}>
                   <stat.icon size={22} strokeWidth={2.5} />
                 </div>
               </div>
@@ -506,14 +506,14 @@ const AdminPasseios = () => {
         ))}
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-6 items-center justify-between p-10 bg-white rounded-[2.5rem] border border-white/40 shadow-2xl shadow-primary/5 glass-card animate-in-fade" style={{ animationDelay: '0.2s' }}>
+      <div className="flex flex-col xl:flex-row gap-6 items-center justify-between p-10 bg-white rounded-lg border border-border shadow-sm">
         <div className="relative flex-1 w-full group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary" size={18} />
           <Input 
             placeholder="Buscar passeio pelo nome ou categoria..." 
             value={search} 
             onChange={(e) => setSearch(e.target.value)} 
-            className="pl-12 h-12 rounded-2xl border-border/40 focus:ring-primary/20 bg-muted/20 transition-all text-sm font-medium" 
+            className="pl-12 h-12 rounded-lg border-border focus:ring-0 focus:border-primary bg-slate-50 transition-none text-sm font-medium" 
           />
         </div>
         
@@ -523,7 +523,7 @@ const AdminPasseios = () => {
             size="sm" 
             onClick={() => setSearch("")} 
             className={cn(
-              "h-10 rounded-xl px-4 font-bold transition-all",
+              "h-10 rounded-lg px-4 font-bold transition-none",
               !search ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
             )}
           >
@@ -536,7 +536,7 @@ const AdminPasseios = () => {
               size="sm" 
               onClick={() => setSearch(cat)} 
               className={cn(
-                "h-10 rounded-xl px-4 font-bold whitespace-nowrap transition-all",
+                "h-10 rounded-lg px-4 font-bold whitespace-nowrap transition-none",
                 search === cat ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
               )}
             >
@@ -549,7 +549,7 @@ const AdminPasseios = () => {
             <TooltipTrigger asChild>
               <button 
                 onClick={openNew}
-                className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+                className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-lg text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-sm transition-none"
               >
                 <Plus size={20} strokeWidth={3} /> Novo Passeio
               </button>
@@ -562,10 +562,10 @@ const AdminPasseios = () => {
       </div>
 
       <Dialog open={showForm} onOpenChange={(open) => !open && setShowForm(false)}>
-        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-lg overflow-hidden bg-[#F8FAFC]">
           <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-3 md:gap-4">
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                 <Compass size={20} className="md:w-6 md:h-6" />
               </div>
               <div>
@@ -575,7 +575,7 @@ const AdminPasseios = () => {
                 <p className="text-[11px] md:text-sm text-slate-500 font-medium">Configure os detalhes do passeio no catálogo</p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => setShowForm(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+            <Button variant="ghost" size="icon" onClick={() => setShowForm(false)} className="rounded-full hover:bg-slate-100">
               <X size={20} className="text-slate-400" />
             </Button>
           </div>
@@ -586,12 +586,12 @@ const AdminPasseios = () => {
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Nome *</label>
                 <input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: generateSlug(e.target.value) })}
-                  className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" maxLength={200} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-4 py-3 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none font-medium" maxLength={200} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Slug (URL amigável)</label>
                 <input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })}
-                  className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" maxLength={200} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-4 py-3 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none font-medium" maxLength={200} />
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Coletivo (R$/pessoa)</Label>
