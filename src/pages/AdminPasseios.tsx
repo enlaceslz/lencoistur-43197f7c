@@ -318,7 +318,7 @@ const AdminPasseios = () => {
         <div className="max-w-6xl mx-auto">
           <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between rounded-t-3xl">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary shadow-sm">
                 <Compass size={24} strokeWidth={2.5} />
               </div>
               <div>
@@ -336,14 +336,14 @@ const AdminPasseios = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="rounded-xl font-bold h-10"
+              className="rounded-lg font-bold h-10 transition-none"
               onClick={() => window.close()}
             >
               Fechar Janela
             </Button>
           </div>
 
-          <div className="bg-white p-6 md:p-8 rounded-b-3xl shadow-sm">
+          <div className="bg-white p-6 md:p-8 rounded-b-lg shadow-sm">
             {wideTour ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-1 space-y-8">
@@ -353,7 +353,7 @@ const AdminPasseios = () => {
                     </h3>
                     <div className="space-y-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center font-black text-xl overflow-hidden">
+                        <div className="w-12 h-12 rounded-lg bg-primary text-white flex items-center justify-center font-black text-xl overflow-hidden">
                           {wideTour.images?.[0] ? <img src={wideTour.images[0]} className="w-full h-full object-cover" /> : wideTour.name[0]}
                         </div>
                         <div>
@@ -361,18 +361,18 @@ const AdminPasseios = () => {
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">{wideTour.category}</p>
                         </div>
                       </div>
-                        <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                        <div className="bg-white p-4 rounded-lg border border-slate-100 shadow-sm">
                           <Label className="text-[10px] uppercase font-bold text-slate-400">Localização</Label>
                           <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1"><MapPin size={14} className="text-primary" /> {wideTour.location}</p>
                         </div>
-                        <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                        <div className="bg-white p-4 rounded-lg border border-slate-100 shadow-sm">
                           <Label className="text-[10px] uppercase font-bold text-slate-400">Duração Estimada</Label>
                           <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1"><Clock size={14} className="text-primary" /> {wideTour.duration}</p>
                         </div>
                     </div>
                   </section>
 
-                  <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                  <section className="bg-slate-50 p-6 rounded-lg border border-slate-100 shadow-sm">
                     <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                       <DollarSign size={14} className="text-emerald-500" /> Tarifário
                     </h3>
@@ -405,7 +405,7 @@ const AdminPasseios = () => {
                 </div>
 
                 <div className="md:col-span-2 space-y-8">
-                  <section className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden">
+                  <section className="bg-slate-50 p-8 rounded-lg border border-slate-100 shadow-sm relative overflow-hidden">
                     <div className="absolute right-0 top-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                     <div className="relative z-10">
                       <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-2">Descrição do Produto</p>
@@ -458,7 +458,7 @@ const AdminPasseios = () => {
   return (
     <AdminLayout title="Passeios">
       <div className="flex flex-col gap-6 h-[calc(100vh-120px)]">
-        <div className="glass-card rounded-[2.5rem] p-10 relative overflow-hidden group shadow-2xl shadow-primary/5">
+        <div className="bg-white rounded-lg p-10 relative overflow-hidden group border border-border shadow-sm">
           <div className="absolute right-0 top-0 w-96 h-96 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-primary/10 transition-all duration-700" />
           
           <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
@@ -477,25 +477,25 @@ const AdminPasseios = () => {
             
             <button 
               onClick={openNew}
-              className="bg-primary hover:bg-primary/90 text-white px-10 h-16 rounded-2xl text-xs font-black uppercase tracking-widest shadow-2xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-3"
+              className="bg-primary hover:bg-primary/90 text-white px-10 h-16 rounded-lg text-xs font-black uppercase tracking-widest shadow-sm transition-none flex items-center gap-3"
             >
               <Plus size={20} /> Novo Passeio
             </button>
           </div>
         </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {[
           { label: "Catálogo", value: tours.length, icon: Compass, color: "text-primary", bg: "bg-primary/5", desc: "Total cadastrado" },
           { label: "Visíveis", value: activeCount, icon: Eye, color: "text-primary", bg: "bg-primary/5", desc: "No site" },
           { label: "Rating Médio", value: avgRating, icon: Star, color: "text-primary", bg: "bg-primary/5", desc: "Avaliação clientes" },
           { label: "Feedback", value: tours.reduce((a, t) => a + (t.reviews_count || 0), 0), icon: Users, color: "text-primary", bg: "bg-primary/5", desc: "Reviews totais" },
         ].map((stat, i) => (
-          <Card key={i} className="rounded-[2rem] border-white/40 shadow-xl shadow-primary/5 glass-card overflow-hidden group">
+          <Card key={i} className="rounded-lg border-border shadow-sm bg-white overflow-hidden group">
             <CardContent className="p-7 relative">
               <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
               <div className="flex items-center gap-4 mb-4">
-                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center border shadow-sm", stat.bg, stat.color, "border-white/20")}>
+                <div className={cn("w-12 h-12 rounded-lg flex items-center justify-center border shadow-sm", stat.bg, stat.color, "border-border")}>
                   <stat.icon size={22} strokeWidth={2.5} />
                 </div>
               </div>
@@ -506,14 +506,14 @@ const AdminPasseios = () => {
         ))}
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-6 items-center justify-between p-10 bg-white rounded-[2.5rem] border border-white/40 shadow-2xl shadow-primary/5 glass-card animate-in-fade" style={{ animationDelay: '0.2s' }}>
+      <div className="flex flex-col xl:flex-row gap-6 items-center justify-between p-10 bg-white rounded-lg border border-border shadow-sm">
         <div className="relative flex-1 w-full group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary" size={18} />
           <Input 
             placeholder="Buscar passeio pelo nome ou categoria..." 
             value={search} 
             onChange={(e) => setSearch(e.target.value)} 
-            className="pl-12 h-12 rounded-2xl border-border/40 focus:ring-primary/20 bg-muted/20 transition-all text-sm font-medium" 
+            className="pl-12 h-12 rounded-lg border-border focus:ring-0 focus:border-primary bg-slate-50 transition-none text-sm font-medium" 
           />
         </div>
         
@@ -523,7 +523,7 @@ const AdminPasseios = () => {
             size="sm" 
             onClick={() => setSearch("")} 
             className={cn(
-              "h-10 rounded-xl px-4 font-bold transition-all",
+              "h-10 rounded-lg px-4 font-bold transition-none",
               !search ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
             )}
           >
@@ -536,7 +536,7 @@ const AdminPasseios = () => {
               size="sm" 
               onClick={() => setSearch(cat)} 
               className={cn(
-                "h-10 rounded-xl px-4 font-bold whitespace-nowrap transition-all",
+                "h-10 rounded-lg px-4 font-bold whitespace-nowrap transition-none",
                 search === cat ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
               )}
             >
@@ -549,7 +549,7 @@ const AdminPasseios = () => {
             <TooltipTrigger asChild>
               <button 
                 onClick={openNew}
-                className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+                className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-lg text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-sm transition-none"
               >
                 <Plus size={20} strokeWidth={3} /> Novo Passeio
               </button>
@@ -562,10 +562,10 @@ const AdminPasseios = () => {
       </div>
 
       <Dialog open={showForm} onOpenChange={(open) => !open && setShowForm(false)}>
-        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-lg overflow-hidden bg-[#F8FAFC]">
           <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-3 md:gap-4">
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                 <Compass size={20} className="md:w-6 md:h-6" />
               </div>
               <div>
@@ -575,7 +575,7 @@ const AdminPasseios = () => {
                 <p className="text-[11px] md:text-sm text-slate-500 font-medium">Configure os detalhes do passeio no catálogo</p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => setShowForm(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+            <Button variant="ghost" size="icon" onClick={() => setShowForm(false)} className="rounded-full hover:bg-slate-100">
               <X size={20} className="text-slate-400" />
             </Button>
           </div>
@@ -586,12 +586,12 @@ const AdminPasseios = () => {
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Nome *</label>
                 <input required value={form.name} onChange={e => setForm({ ...form, name: e.target.value, slug: generateSlug(e.target.value) })}
-                  className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" maxLength={200} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-4 py-3 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none font-medium" maxLength={200} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Slug (URL amigável)</label>
                 <input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })}
-                  className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" maxLength={200} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-4 py-3 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none font-medium" maxLength={200} />
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Coletivo (R$/pessoa)</Label>
@@ -648,7 +648,7 @@ const AdminPasseios = () => {
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Lotação Máxima</label>
                 <input type="number" min={1} max={50} value={form.vehicle_capacity} onChange={e => setForm({ ...form, vehicle_capacity: Number(e.target.value) })}
-                  className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold" />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-4 py-3 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none font-bold" />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block flex items-center gap-1.5">
@@ -661,7 +661,7 @@ const AdminPasseios = () => {
                     max={50}
                     value={form.pix_discount}
                     onChange={e => setForm({ ...form, pix_discount: Number(e.target.value) })}
-                    className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none pr-8 focus:ring-2 focus:ring-primary/20"
+                    className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none pr-8 focus:ring-0 focus:border-primary transition-none"
                     placeholder="0"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
@@ -670,70 +670,70 @@ const AdminPasseios = () => {
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Localização</label>
                 <input value={form.location} onChange={e => setForm({ ...form, location: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={200} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none" maxLength={200} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Duração</label>
                 <input value={form.duration} onChange={e => setForm({ ...form, duration: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" placeholder="Meio dia" maxLength={100} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none" placeholder="Meio dia" maxLength={100} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Categoria</label>
                 <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20">
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none">
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Dificuldade</label>
                 <select value={form.difficulty} onChange={e => setForm({ ...form, difficulty: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20">
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none">
                   {DIFFICULTIES.map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Tag</label>
                 <input value={form.tag} onChange={e => setForm({ ...form, tag: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" placeholder="Mais Vendido" maxLength={50} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none" placeholder="Mais Vendido" maxLength={50} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Grupo</label>
                 <input value={form.group_size} onChange={e => setForm({ ...form, group_size: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" placeholder="Até 10 pessoas" maxLength={50} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none" placeholder="Até 10 pessoas" maxLength={50} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Saída</label>
                 <input value={form.departure} onChange={e => setForm({ ...form, departure: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={200} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none" maxLength={200} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Operador</label>
                 <input value={form.operator} onChange={e => setForm({ ...form, operator: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={100} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none" maxLength={100} />
               </div>
             </div>
 
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Descrição</label>
               <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-24 focus:ring-2 focus:ring-primary/20" maxLength={2000} />
+                className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none h-24 focus:ring-0 focus:border-primary transition-none" maxLength={2000} />
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Itens Inclusos (separados por vírgula)</label>
                 <input value={form.includes} onChange={e => setForm({ ...form, includes: e.target.value })}
-                  className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" maxLength={500} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-4 py-3 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none font-medium" maxLength={500} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Destaques (separados por vírgula)</label>
                 <input value={form.highlights} onChange={e => setForm({ ...form, highlights: e.target.value })}
-                  className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" maxLength={500} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-4 py-3 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none font-medium" maxLength={500} />
               </div>
             </div>
 
             {/* Image Management Section */}
-            <div className="space-y-3 bg-muted/20 border border-border rounded-2xl p-4">
+            <div className="space-y-3 bg-slate-50 border border-border rounded-lg p-4">
               <label className="text-sm font-bold text-foreground block flex items-center gap-2">
                 <ImageIcon size={16} /> Imagens do Passeio
               </label>
@@ -741,23 +741,23 @@ const AdminPasseios = () => {
               {imageUrls.length > 0 && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
                   {imageUrls.map((url, index) => (
-                    <div key={index} className="relative group rounded-xl overflow-hidden border border-border bg-muted aspect-square">
+                    <div key={index} className="relative group rounded-lg overflow-hidden border border-border bg-slate-100 aspect-square">
                       <img src={url} alt={`Imagem ${index + 1}`} className="w-full h-full object-cover" 
                         onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
                         {index > 0 && (
                           <button type="button" onClick={() => moveImage(index, index - 1)}
-                            className="p-1.5 bg-white/20 rounded-lg hover:bg-white/40 text-white text-xs" title="Mover para esquerda">
+                            className="p-1.5 bg-white/20 rounded-md hover:bg-white/40 text-white text-xs" title="Mover para esquerda">
                             ←
                           </button>
                         )}
                         <button type="button" onClick={() => removeImage(index)}
-                          className="p-1.5 bg-destructive/80 rounded-lg hover:bg-destructive text-white" title="Remover">
+                          className="p-1.5 bg-destructive/80 rounded-md hover:bg-destructive text-white" title="Remover">
                           <X size={14} />
                         </button>
                         {index < imageUrls.length - 1 && (
                           <button type="button" onClick={() => moveImage(index, index + 1)}
-                            className="p-1.5 bg-white/20 rounded-lg hover:bg-white/40 text-white text-xs" title="Mover para direita">
+                            className="p-1.5 bg-white/20 rounded-md hover:bg-white/40 text-white text-xs" title="Mover para direita">
                             →
                           </button>
                         )}
@@ -780,14 +780,14 @@ const AdminPasseios = () => {
                     onChange={e => setNewUrlInput(e.target.value)}
                     onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addUrlImage(); } }}
                     placeholder="Cole a URL da imagem aqui..."
-                    className="w-full bg-muted border border-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20"
+                    className="w-full bg-white border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none"
                   />
                 </div>
                 <div className="flex gap-2">
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button type="button" onClick={addUrlImage}
-                        className="bg-muted hover:bg-accent text-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border border-border whitespace-nowrap transition-colors">
+                        className="bg-white hover:bg-slate-100 text-foreground px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 border border-border whitespace-nowrap transition-none">
                         Adicionar URL
                       </button>
                     </TooltipTrigger>
@@ -799,7 +799,7 @@ const AdminPasseios = () => {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
-                        className="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border border-primary/20 disabled:opacity-50 transition-colors">
+                        className="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 border border-primary/20 disabled:opacity-50 transition-none">
                         <Upload size={14} /> {uploading ? "..." : "Upload"}
                       </button>
                     </TooltipTrigger>
@@ -812,19 +812,19 @@ const AdminPasseios = () => {
               <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileUpload} className="hidden" />
             </div>
 
-            <div className="border border-border rounded-2xl p-4 bg-muted/30 space-y-4">
+            <div className="border border-border rounded-lg p-4 bg-slate-50 space-y-4">
               <div>
                 <h4 className="text-sm font-bold text-foreground">Modalidades e Disponibilidade</h4>
                 <p className="text-xs text-muted-foreground">Configure como este passeio pode ser vendido.</p>
               </div>
               <div className="grid sm:grid-cols-2 gap-3">
-                <label className="flex items-center gap-2 cursor-pointer bg-card border border-border rounded-xl px-4 py-3 hover:border-primary/40 transition-colors">
+                <label className="flex items-center gap-2 cursor-pointer bg-white border border-border rounded-lg px-4 py-3 hover:border-primary transition-none">
                   <input type="checkbox" checked={form.mode_collective_enabled}
                     onChange={e => setForm({ ...form, mode_collective_enabled: e.target.checked })}
                     className="rounded w-5 h-5 accent-primary" />
                   <span className="text-sm font-medium text-foreground flex-1">Coletivo (por pessoa)</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer bg-card border border-border rounded-xl px-4 py-3 hover:border-secondary/40 transition-colors">
+                <label className="flex items-center gap-2 cursor-pointer bg-white border border-border rounded-lg px-4 py-3 hover:border-secondary transition-none">
                   <input type="checkbox" checked={form.mode_private_enabled}
                     onChange={e => setForm({ ...form, mode_private_enabled: e.target.checked })}
                     className="rounded w-5 h-5 accent-secondary" />
@@ -835,7 +835,7 @@ const AdminPasseios = () => {
                 <label className="text-sm font-black uppercase tracking-widest text-muted-foreground mb-2 block ml-1 opacity-80">Modalidade Padrão no Site</label>
                 <select value={form.default_mode}
                   onChange={e => setForm({ ...form, default_mode: e.target.value as "privativo" | "coletivo" })}
-                  className="w-full bg-card border border-border/50 rounded-2xl px-4 py-3 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm">
+                  className="w-full bg-white border border-border rounded-lg px-4 py-3 text-sm font-bold text-foreground outline-none focus:ring-0 focus:border-primary transition-none shadow-sm">
                   <option value="privativo" disabled={!form.mode_private_enabled}>Privativo (Venda por Veículo)</option>
                   <option value="coletivo" disabled={!form.mode_collective_enabled}>Coletivo (Venda por Pessoa)</option>
                 </select>
@@ -853,7 +853,7 @@ const AdminPasseios = () => {
             <div className="bg-white border-t border-slate-100 p-6 flex gap-3 sticky bottom-0 z-10">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all">
+                  <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-sm font-bold shadow-sm transition-none">
                     {editingId ? "Salvar Alterações" : "Criar Passeio"}
                   </button>
                 </TooltipTrigger>
@@ -864,7 +864,7 @@ const AdminPasseios = () => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button type="button" onClick={() => setShowForm(false)} className="px-6 py-3 rounded-xl text-sm font-semibold text-muted-foreground hover:bg-muted transition-colors">
+                  <button type="button" onClick={() => setShowForm(false)} className="px-6 py-3 rounded-lg text-sm font-semibold text-muted-foreground hover:bg-slate-100 transition-none">
                     Cancelar
                   </button>
                 </TooltipTrigger>
@@ -878,8 +878,8 @@ const AdminPasseios = () => {
       </Dialog>
 
 
-      <div className="flex-1 overflow-hidden animate-in-fade" style={{ animationDelay: '0.3s' }}>
-        <div className="flex-1 bg-white rounded-[2.5rem] border border-white/40 flex flex-col overflow-hidden shadow-xl shadow-primary/5 glass-card">
+      <div className="flex-1 overflow-hidden">
+        <div className="flex-1 bg-white rounded-lg border border-border flex flex-col overflow-hidden shadow-sm">
           <div className="overflow-auto flex-1 no-scrollbar">
           <Table className="min-w-[1000px] table-fixed">
             <colgroup>
@@ -891,7 +891,7 @@ const AdminPasseios = () => {
               <col className="w-[8%]" />
               <col className="w-[5%]" />
             </colgroup>
-          <TableHeader className="bg-slate-50/50">
+          <TableHeader className="bg-slate-50">
             <TableRow className="hover:bg-transparent border-b border-border/40">
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest pl-6">Passeio / Localização</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Categoria</TableHead>
@@ -920,7 +920,7 @@ const AdminPasseios = () => {
                 return (
                   <TableRow 
                     key={t.id} 
-                    className={`group hover:bg-primary/5 transition-all border-b border-border/50 cursor-pointer ${!t.active ? "opacity-60 grayscale" : ""}`}
+                    className={`group hover:bg-slate-50 border-b border-border cursor-pointer transition-none ${!t.active ? "opacity-60 grayscale" : ""}`}
                     onClick={(e) => {
                       if (e.defaultPrevented) return;
                       setDetailTour(t);
@@ -930,20 +930,20 @@ const AdminPasseios = () => {
                       <div className="flex items-center gap-4">
                         <div className="relative shrink-0">
                           {t.images?.[0] ? (
-                            <img src={t.images[0]} className="w-14 h-14 rounded-2xl object-cover shadow-md group-hover:scale-110 transition-transform duration-500" />
+                            <img src={t.images[0]} className="w-14 h-14 rounded-lg object-cover shadow-sm" />
                           ) : (
-                            <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground">
+                            <div className="w-14 h-14 rounded-lg bg-slate-100 flex items-center justify-center text-muted-foreground">
                               <Compass size={24} />
                             </div>
                           )}
                           {isTopSeller && (
-                            <div className="absolute -top-2 -right-2 bg-amber-500 text-white p-1 rounded-full shadow-lg border-2 border-background animate-bounce">
+                            <div className="absolute -top-2 -right-2 bg-amber-500 text-white p-1 rounded-full shadow-sm border-2 border-white">
                               <Sparkles size={10} />
                             </div>
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-black text-foreground group-hover:text-primary transition-colors flex items-center gap-2 truncate">
+                          <p className="font-black text-foreground group-hover:text-primary flex items-center gap-2 truncate">
                             {t.name}
                             {isTopSeller && <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[8px] font-black uppercase py-0 px-1.5">Best Seller</Badge>}
                           </p>
@@ -1013,7 +1013,7 @@ const AdminPasseios = () => {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button onClick={() => toggleActive(t.id, t.active)}
-                              className={`font-black text-[9px] uppercase px-3 py-1.5 rounded-xl border transition-all active:scale-95 flex items-center gap-1.5 ${t.active ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200"}`}>
+                              className={`font-black text-[9px] uppercase px-3 py-1.5 rounded-lg border transition-none flex items-center gap-1.5 ${t.active ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200"}`}>
                               {t.active ? <CheckCircle size={12} /> : <XCircle size={12} />}
                               {t.active ? "Publicado" : "Pausado"}
                             </button>
@@ -1025,10 +1025,10 @@ const AdminPasseios = () => {
                       </div>
                     </TableCell>
                     <TableCell className="text-right pr-6">
-                      <div className="flex justify-end gap-1 group-hover:opacity-100 opacity-80 transition-all translate-x-2 group-hover:translate-x-0" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary" onClick={() => setDetailTour(t)}>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-primary/10 hover:text-primary transition-none" onClick={() => setDetailTour(t)}>
                               <Eye size={16} />
                             </Button>
                           </TooltipTrigger>
@@ -1042,7 +1042,7 @@ const AdminPasseios = () => {
                             <Button 
                               variant="ghost" 
                               size="icon" 
-                              className="h-9 w-9 rounded-xl hover:bg-emerald-100 hover:text-emerald-600" 
+                              className="h-9 w-9 rounded-lg hover:bg-emerald-100 hover:text-emerald-600 transition-none" 
                               onClick={() => window.open(`${window.location.origin}/passeios/${t.slug}`, '_blank')}
                             >
                               <ExternalLink size={16} />
@@ -1055,7 +1055,7 @@ const AdminPasseios = () => {
                         
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-blue-100 hover:text-blue-600" onClick={() => handleDuplicate(t)}>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-blue-100 hover:text-blue-600 transition-none" onClick={() => handleDuplicate(t)}>
                               <Copy size={16} />
                             </Button>
                           </TooltipTrigger>
@@ -1066,7 +1066,7 @@ const AdminPasseios = () => {
 
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary" onClick={() => openEdit(t)}>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-primary/10 hover:text-primary transition-none" onClick={() => openEdit(t)}>
                               <Pencil size={16} />
                             </Button>
                           </TooltipTrigger>
@@ -1077,7 +1077,7 @@ const AdminPasseios = () => {
 
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-destructive hover:bg-destructive/10" onClick={() => handleDelete(t.id)}>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg text-destructive hover:bg-destructive/10 transition-none" onClick={() => handleDelete(t.id)}>
                               <Trash2 size={16} />
                             </Button>
                           </TooltipTrigger>
@@ -1099,12 +1099,12 @@ const AdminPasseios = () => {
 
     {/* Tour Detail Dialog */}
       <Dialog open={!!detailTour} onOpenChange={(open) => !open && setDetailTour(null)}>
-        <DialogContent className="sm:max-w-4xl w-[95vw] p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+        <DialogContent className="sm:max-w-4xl w-[95vw] p-0 border-none shadow-2xl rounded-lg overflow-hidden bg-[#F8FAFC]">
           {detailTour && (
             <div className="flex flex-col max-h-[90vh]">
               <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between sticky top-0 z-10">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary shadow-sm">
                     <Compass size={24} strokeWidth={2.5} />
                   </div>
                   <div>
@@ -1123,7 +1123,7 @@ const AdminPasseios = () => {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="rounded-xl font-bold h-10 hidden md:flex items-center gap-2"
+                    className="rounded-lg font-bold h-10 hidden md:flex items-center gap-2 transition-none"
                     onClick={() => {
                       const url = `${window.location.origin}${window.location.pathname}?wide_view_id=${detailTour.id}`;
                       window.open(url, '_blank', 'width=1200,height=800');
@@ -1131,7 +1131,7 @@ const AdminPasseios = () => {
                   >
                     <ExternalLink size={16} /> Abrir em Nova Janela
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => setDetailTour(null)} className="rounded-full hover:bg-slate-100 transition-colors">
+                  <Button variant="ghost" size="icon" onClick={() => setDetailTour(null)} className="rounded-full hover:bg-slate-100">
                     <X size={20} className="text-slate-400" />
                   </Button>
                 </div>
@@ -1140,24 +1140,24 @@ const AdminPasseios = () => {
               <div className="overflow-y-auto p-6 md:p-8">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div className="md:col-span-1 space-y-6">
-                    <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <section className="bg-white p-6 rounded-lg border border-slate-100 shadow-sm">
                       <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                         <Compass size={14} className="text-primary" /> Atributos Principais
                       </h3>
                       <div className="space-y-4">
-                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
                           <Label className="text-[10px] uppercase font-bold text-slate-400">Localização</Label>
                           <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1">
                             <MapPin size={14} className="text-primary" /> {detailTour.location || "Não informada"}
                           </p>
                         </div>
-                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
                           <Label className="text-[10px] uppercase font-bold text-slate-400">Duração Estimada</Label>
                           <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1">
                             <Clock size={14} className="text-primary" /> {detailTour.duration || "Não informada"}
                           </p>
                         </div>
-                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
                           <Label className="text-[10px] uppercase font-bold text-slate-400">Tamanho do Grupo</Label>
                           <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1">
                             <Users size={14} className="text-primary" /> {detailTour.group_size || "Não informado"}
@@ -1166,7 +1166,7 @@ const AdminPasseios = () => {
                       </div>
                     </section>
 
-                    <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <section className="bg-white p-6 rounded-lg border border-slate-100 shadow-sm">
                       <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                         <DollarSign size={14} className="text-emerald-500" /> Precificação
                       </h3>

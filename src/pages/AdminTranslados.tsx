@@ -135,43 +135,43 @@ const AdminTranslados = () => {
 
   return (
     <AdminLayout title="Translados">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {[
           { label: "Total de Rotas", value: routes.length, icon: Car, color: "from-blue-500 to-indigo-600", desc: "Rede de logística" },
           { label: "Rotas Ativas", value: activeRoutes.length, icon: MapPin, color: "from-emerald-500 to-teal-600", desc: "Em operação" },
           { label: "Destinos", value: new Set(routes.flatMap(t => [t.origin, t.destination])).size, icon: MapPin, color: "from-amber-500 to-orange-600", desc: "Cidades atendidas" },
           { label: "Tipos Veículo", value: new Set(routes.map(t => t.vehicle_type)).size, icon: Users, color: "from-purple-500 to-pink-600", desc: "Diversidade frota" },
         ].map((stat, i) => (
-          <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group">
+          <div key={i} className="bg-white border border-border shadow-sm rounded-lg p-6 relative overflow-hidden group">
             <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
             <div className="flex items-center justify-between mb-4">
-              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg shadow-primary/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+              <div className={cn("w-12 h-12 rounded-lg flex items-center justify-center text-white shadow-sm transition-none", stat.color.replace('from-', 'bg-').split(' ')[0])}>
                 <stat.icon size={22} strokeWidth={2.5} />
               </div>
               <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{stat.desc}</div>
             </div>
-            <p className="text-2xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{stat.value}</p>
+            <p className="text-2xl font-black text-foreground tracking-tighter">{stat.value}</p>
             <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
           </div>
         ))}
       </div>
 
-      <Card className="mb-8 border-none shadow-2xl shadow-primary/5 overflow-hidden glass-card rounded-[2.5rem] animate-in-fade border border-white/20" style={{ animationDelay: '0.2s' }}>
+      <Card className="mb-8 border border-border shadow-sm overflow-hidden rounded-lg">
         <CardContent className="p-8">
           <div className="flex flex-col xl:flex-row gap-8 items-center justify-between">
             <div className="relative flex-1 w-full group">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={20} />
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary" size={20} />
               <Input 
                 placeholder="Buscar por origem, destino ou veículo..." 
                 value={search} 
                 onChange={e => setSearch(e.target.value)} 
-                className="pl-14 h-14 rounded-[1.5rem] border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/20 backdrop-blur-xl focus:bg-white/80 dark:focus:bg-black/40 focus:ring-4 focus:ring-primary/10 transition-all font-semibold" 
+                className="pl-14 h-14 rounded-lg border-border bg-slate-50 focus:bg-white focus:ring-0 focus:border-primary transition-none font-semibold" 
               />
             </div>
             
             <Button 
               onClick={openNew}
-              className="w-full xl:w-auto h-14 px-8 rounded-[1.5rem] bg-gradient-to-r from-primary to-indigo-600 hover:shadow-2xl hover:shadow-primary/30 transition-all font-black text-[11px] uppercase tracking-[0.2em]"
+              className="w-full xl:w-auto h-14 px-8 rounded-lg bg-primary hover:bg-primary/90 transition-none font-black text-[11px] uppercase tracking-[0.2em]"
             >
               <Plus size={20} className="mr-2" strokeWidth={3} /> Nova Rota
             </Button>
@@ -186,17 +186,16 @@ const AdminTranslados = () => {
           <p className="text-muted-foreground animate-pulse font-bold uppercase tracking-widest text-xs">Carregando rotas...</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((route, index) => (
             <div 
               key={route.id}
-              className="glass-card admin-card-hover rounded-[2.5rem] overflow-hidden border border-white/20 group animate-in-slide-up bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-2xl shadow-black/5"
-              style={{ animationDelay: `${0.05 * (index % 10)}s` }}
+              className="bg-white border border-border shadow-sm rounded-lg overflow-hidden group transition-none"
             >
               <div className="p-8">
                 {/* Card Header - Route */}
                 <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center gap-4 bg-primary/5 p-3 rounded-2xl flex-1 group-hover:bg-primary/10 transition-colors duration-500">
+                  <div className="flex items-center gap-4 bg-primary/5 p-3 rounded-lg flex-1 group-hover:bg-primary/10 transition-none">
                     <div className="flex flex-col items-center">
                       <p className="text-xs font-black text-primary/40 uppercase tracking-tighter leading-none mb-1">DE</p>
                       <p className="font-black text-base text-foreground tracking-tight">{route.origin}</p>
@@ -209,7 +208,7 @@ const AdminTranslados = () => {
                   </div>
                   <Badge 
                     className={cn(
-                      "ml-4 rounded-xl px-3 py-1.5 font-black text-[9px] uppercase tracking-widest border-none shadow-sm",
+                      "ml-4 rounded-lg px-3 py-1.5 font-black text-[9px] uppercase tracking-widest border-none shadow-sm",
                       route.active 
                         ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" 
                         : "bg-muted text-muted-foreground"
@@ -221,8 +220,8 @@ const AdminTranslados = () => {
 
                 {/* Route Details */}
                 <div className="grid grid-cols-2 gap-4 mb-8">
-                  <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/40 dark:bg-black/20 border border-white/40 dark:border-white/10 group/item">
-                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover/item:scale-110 transition-transform">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-border group/item">
+                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
                       <Car size={14} />
                     </div>
                     <div>
@@ -231,8 +230,8 @@ const AdminTranslados = () => {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/40 dark:bg-black/20 border border-white/40 dark:border-white/10 group/item">
-                    <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover/item:scale-110 transition-transform">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-border group/item">
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500">
                       <Clock size={14} />
                     </div>
                     <div>
@@ -266,12 +265,12 @@ const AdminTranslados = () => {
                             variant="ghost" 
                             size="icon" 
                             onClick={() => setDetailRoute(route)}
-                            className="h-11 w-11 rounded-2xl bg-white/50 dark:bg-white/5 hover:bg-primary hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10 shadow-lg active:scale-95"
+                            className="h-11 w-11 rounded-lg bg-slate-50 hover:bg-primary hover:text-white transition-none border border-border shadow-sm active:scale-95"
                           >
                             <Eye size={18} />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent className="bg-primary text-white font-black text-[10px] px-4 py-2 rounded-xl shadow-2xl">Detalhes</TooltipContent>
+                        <TooltipContent className="bg-primary text-white font-black text-[10px] px-4 py-2 rounded-lg shadow-md">Detalhes</TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                     
@@ -282,12 +281,12 @@ const AdminTranslados = () => {
                             variant="ghost" 
                             size="icon" 
                             onClick={() => openEdit(route)}
-                            className="h-11 w-11 rounded-2xl bg-white/50 dark:bg-white/5 hover:bg-amber-500 hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10 shadow-lg active:scale-95"
+                            className="h-11 w-11 rounded-lg bg-slate-50 hover:bg-amber-500 hover:text-white transition-none border border-border shadow-sm active:scale-95"
                           >
                             <Pencil size={18} />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent className="bg-amber-500 text-white font-black text-[10px] px-4 py-2 rounded-xl shadow-2xl">Editar</TooltipContent>
+                        <TooltipContent className="bg-amber-500 text-white font-black text-[10px] px-4 py-2 rounded-lg shadow-md">Editar</TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
 
@@ -298,12 +297,12 @@ const AdminTranslados = () => {
                             variant="ghost" 
                             size="icon" 
                             onClick={() => setDeleteId(route.id)}
-                            className="h-11 w-11 rounded-2xl bg-white/50 dark:bg-white/5 hover:bg-rose-500 hover:text-white transition-all duration-500 border border-white/40 dark:border-white/10 shadow-lg active:scale-95 text-rose-500/60"
+                            className="h-11 w-11 rounded-lg bg-slate-50 hover:bg-rose-500 hover:text-white transition-none border border-border shadow-sm active:scale-95 text-rose-500/60"
                           >
                             <Trash2 size={18} />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent className="bg-rose-500 text-white font-black text-[10px] px-4 py-2 rounded-xl shadow-2xl">Excluir</TooltipContent>
+                        <TooltipContent className="bg-rose-500 text-white font-black text-[10px] px-4 py-2 rounded-lg shadow-md">Excluir</TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   </div>
@@ -313,8 +312,8 @@ const AdminTranslados = () => {
           ))}
 
           {filtered.length === 0 && (
-            <div className="col-span-full h-80 flex flex-col items-center justify-center space-y-6 bg-white/40 dark:bg-black/20 backdrop-blur-xl rounded-[3rem] border-2 border-dashed border-white/40 dark:border-white/10 animate-pulse">
-              <div className="w-20 h-20 rounded-[2rem] bg-muted/20 flex items-center justify-center text-muted-foreground/40 shadow-inner">
+            <div className="col-span-full h-80 flex flex-col items-center justify-center space-y-6 bg-slate-50 rounded-lg border-2 border-dashed border-border">
+              <div className="w-20 h-20 rounded-lg bg-muted/20 flex items-center justify-center text-muted-foreground/40 shadow-inner">
                 <Car size={40} />
               </div>
               <div className="text-center">
@@ -328,10 +327,10 @@ const AdminTranslados = () => {
 
       {/* Form Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-lg overflow-hidden bg-[#F8FAFC]">
           <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-3 md:gap-4">
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                 <Car size={20} className="md:w-6 md:h-6" />
               </div>
               <div>
@@ -341,7 +340,7 @@ const AdminTranslados = () => {
                 <p className="text-[11px] md:text-sm text-slate-500 font-medium line-clamp-1">Configure os detalhes da logística e valores</p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => setShowForm(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+            <Button variant="ghost" size="icon" onClick={() => setShowForm(false)} className="rounded-full hover:bg-slate-100">
               <X size={20} className="text-slate-400" />
             </Button>
           </div>
