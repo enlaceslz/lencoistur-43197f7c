@@ -773,7 +773,7 @@ const AdminReservas = () => {
                             title="Enviar Termo de Risco (WhatsApp)"
                             className={cn(
                               "h-9 w-9 rounded-xl transition-all",
-                              b.termStatus === 'assinado' ? "text-emerald-500 hover:bg-emerald-50" : "text-amber-500 hover:bg-amber-50 animate-pulse-subtle"
+                              (b.termStatus === 'assinado' || b.termStatus === 'balcao') ? "text-emerald-500 hover:bg-emerald-50" : "text-amber-500 hover:bg-amber-50 animate-pulse-subtle"
                             )}
                             onClick={(e) => {
                               e.stopPropagation();
