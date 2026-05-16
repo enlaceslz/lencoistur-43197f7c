@@ -1,9 +1,8 @@
 import { useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart as PieChartIcon, TrendingUp, Wallet, ArrowRight, Zap, Target, ArrowUpRight } from "lucide-react";
+import { PieChart as PieChartIcon, TrendingUp, Wallet, Zap, ArrowUpRight } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line, Legend, PieChart, Pie, Cell, AreaChart, Area
+  Legend, PieChart, Pie, Cell, AreaChart, Area
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
 
@@ -167,6 +166,7 @@ export default function FluxoCaixaTab({
                   <Bar dataKey="despesas" name="Saídas" fill="url(#colorDespesas)" radius={[8, 8, 0, 0]} barSize={28} />
                 </BarChart>
               </ResponsiveContainer>
+            </div>
           </div>
         </div>
 
