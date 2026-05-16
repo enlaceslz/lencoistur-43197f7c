@@ -644,8 +644,13 @@ const AdminReservas = () => {
                       <TableCell className="px-6 py-5">
                         <p className="text-sm font-black text-foreground">{formatCurrency(b.finalTotal)}</p>
                         {b.partnerNetPrice !== undefined && b.partnerNetPrice > 0 && (
-                          <div className="flex items-center gap-1 text-[8px] font-black text-emerald-600 uppercase mt-1">
-                            <Briefcase size={8} /> NET: {formatCurrency(b.partnerNetPrice)}
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-1 text-[8px] font-black text-slate-400 uppercase">
+                              <Briefcase size={8} /> NET: {formatCurrency(b.partnerNetPrice * b.guests)}
+                            </div>
+                            <div className="flex items-center gap-1 text-[8px] font-black text-emerald-600 uppercase">
+                              <DollarSign size={8} /> Lucro: {formatCurrency(b.finalTotal - (b.partnerNetPrice * b.guests))}
+                            </div>
                           </div>
                         )}
                       </TableCell>
@@ -986,6 +991,72 @@ const AdminReservas = () => {
                       onChange={e => setForm({...form, publicUnitPrice: maskCurrency(e.target.value)})}
                       className="rounded-xl h-12 font-semibold border-slate-200"
                     />
+                  </div>
+                </div>
+                
+                {/* Visualização de Cálculos em Tempo Real */}
+                <div className="mt-6 p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-3">
+                  <div className="flex justify-between items-center text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    <span>Resumo Financeiro</span>
+                    <Badge variant="outline" className="bg-white text-[9px]">Cálculo Automático</Badge>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-slate-600 font-medium">Subtotal ({form.guests} PAX × {form.unitPrice})</span>
+                      <span className="text-xs font-bold text-slate-900">
+                        {formatCurrency(parseCurrencyToNumber(form.unitPrice) * form.guests)}
+                      </span>
+                    </div>
+                    
+                    {parseCurrencyToNumber(form.discount) > 0 && (
+                      <div className="flex justify-between items-center text-rose-500">
+                        <span className="text-xs font-medium">Desconto Aplicado</span>
+                        <span className="text-xs font-bold">
+                          - {formatCurrency(parseCurrencyToNumber(form.discount))}
+                        </span>
+                      </div>
+                    )}
+
+                    {parseCurrencyToNumber(form.publicUnitPrice) > parseCurrencyToNumber(form.unitPrice) && (
+                      <div className="flex justify-between items-center text-emerald-600">
+                        <span className="text-[10px] font-bold uppercase">Abaixo do Valor Público</span>
+                        <span className="text-xs font-bold">
+                          {formatCurrency((parseCurrencyToNumber(form.publicUnitPrice) - parseCurrencyToNumber(form.unitPrice)) * form.guests)} economia
+                        </span>
+                      </div>
+                    )}
+                    
+                    <Separator className="bg-slate-200" />
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-black text-slate-900 uppercase tracking-tight">Total Final</span>
+                      <span className="text-lg font-black text-primary">
+                        {formatCurrency((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount))}
+                      </span>
+                    </div>
+
+                    {parseCurrencyToNumber(form.partnerNetPrice) > 0 && (
+                      <div className="pt-2 mt-2 border-t border-dashed border-slate-200 space-y-1">
+                        <div className="flex justify-between items-center text-emerald-600">
+                          <span className="text-[10px] font-black uppercase tracking-wider">Margem de Lucro (Bruto)</span>
+                          <span className="text-xs font-extrabold">
+                            {formatCurrency(((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount)) - (parseCurrencyToNumber(form.partnerNetPrice) * form.guests))}
+                          </span>
+                        </div>
+                        {((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount)) > 0 && (
+                          <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold uppercase">
+                            <span>Markup Sugerido</span>
+                            <span>
+                              {Math.round(((((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount)) - (parseCurrencyToNumber(form.partnerNetPrice) * form.guests)) / (parseCurrencyToNumber(form.partnerNetPrice) * form.guests)) * 100) || 0}%
+                            </span>
+                          </div>
+                        )}
+                        <p className="text-[9px] text-slate-400 font-medium italic mt-1">
+                          * Cálculo baseado no Valor Unitário - Valor NET Parceiro × Qtd. PAX
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
