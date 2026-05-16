@@ -1195,16 +1195,18 @@ const AdminReservas = () => {
           <div className="p-8 bg-slate-50 border-t border-border/40 flex flex-col md:flex-row justify-between items-center gap-6 rounded-b-[2.5rem]">
             <div className="flex flex-col md:flex-row items-center gap-8">
               <div className="flex flex-col gap-1">
-                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Estimado</p>
+                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Líquido Estimado</p>
                  <div className="flex items-baseline gap-2">
                    <span className="text-3xl font-black text-primary tracking-tighter">
                      {formatCurrency((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount))}
                    </span>
-                   <span className="text-xs font-bold text-slate-400 line-through">
-                     {parseCurrencyToNumber(form.discount) > 0 && formatCurrency(parseCurrencyToNumber(form.unitPrice) * form.guests)}
-                   </span>
+                   {parseCurrencyToNumber(form.partnerNetPrice) > 0 && (
+                     <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[10px] font-black uppercase py-0.5 px-2">
+                       Lucro: {formatCurrency(((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount)) - (parseCurrencyToNumber(form.partnerNetPrice) * form.guests))}
+                     </Badge>
+                   )}
                  </div>
-              </div>
+            </div>
               
               {!isEditing && (
                 <div 
