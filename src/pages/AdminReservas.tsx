@@ -988,6 +988,55 @@ const AdminReservas = () => {
                     />
                   </div>
                 </div>
+                
+                {/* Visualização de Cálculos em Tempo Real */}
+                <div className="mt-6 p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-3">
+                  <div className="flex justify-between items-center text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    <span>Resumo Financeiro</span>
+                    <Badge variant="outline" className="bg-white text-[9px]">Cálculo Automático</Badge>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-slate-600 font-medium">Subtotal ({form.guests} PAX × {form.unitPrice})</span>
+                      <span className="text-xs font-bold text-slate-900">
+                        {formatCurrency(parseCurrencyToNumber(form.unitPrice) * form.guests)}
+                      </span>
+                    </div>
+                    
+                    {parseCurrencyToNumber(form.discount) > 0 && (
+                      <div className="flex justify-between items-center text-rose-500">
+                        <span className="text-xs font-medium">Desconto Aplicado</span>
+                        <span className="text-xs font-bold">
+                          - {formatCurrency(parseCurrencyToNumber(form.discount))}
+                        </span>
+                      </div>
+                    )}
+                    
+                    <Separator className="bg-slate-200" />
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-black text-slate-900 uppercase tracking-tight">Total Final</span>
+                      <span className="text-lg font-black text-primary">
+                        {formatCurrency((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount))}
+                      </span>
+                    </div>
+
+                    {parseCurrencyToNumber(form.partnerNetPrice) > 0 && (
+                      <div className="pt-2 mt-2 border-t border-dashed border-slate-200">
+                        <div className="flex justify-between items-center text-emerald-600">
+                          <span className="text-[10px] font-black uppercase tracking-wider">Margem de Lucro (Bruto)</span>
+                          <span className="text-xs font-extrabold">
+                            {formatCurrency(((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount)) - (parseCurrencyToNumber(form.partnerNetPrice) * form.guests))}
+                          </span>
+                        </div>
+                        <p className="text-[9px] text-slate-400 font-medium italic mt-1">
+                          * Cálculo baseado no Valor Unitário - Valor NET Parceiro × Qtd. PAX
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* Seção: Alocação */}
