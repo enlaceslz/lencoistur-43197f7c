@@ -179,16 +179,16 @@ const AdminDashboard = () => {
     <AdminLayout title="Centro de Operações">
       <div className="space-y-8 pb-10 animate-in-fade">
         {/* Executive Header */}
-        <div className="xl:col-span-4 glass-card rounded-[2.5rem] p-8 relative overflow-hidden group border border-white/40 shadow-xl shadow-primary/5">
-          <div className="absolute right-0 top-0 w-96 h-96 bg-gradient-to-br from-primary/10 to-ocean/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:from-primary/20 transition-all duration-700" />
+        <div className="xl:col-span-4 glass-card rounded-[2.5rem] p-10 relative overflow-hidden group shadow-2xl shadow-primary/5">
+          <div className="absolute right-0 top-0 w-[500px] h-[500px] bg-gradient-to-br from-primary/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:from-primary/20 transition-all duration-700" />
           <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Sistema Ativo</span>
+                <div className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Sistema Ativo</span>
                 </div>
-                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Painel Executivo</span>
+                <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">Painel Executivo</span>
               </div>
               <div>
                 <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tighter leading-tight">
@@ -226,8 +226,8 @@ const AdminDashboard = () => {
                   <stat.icon size={26} strokeWidth={2.5} />
                 </div>
               </div>
-              <p className="text-3xl font-black text-foreground tracking-tighter">{stat.value}</p>
-              <p className="text-[10px] font-black text-muted-foreground mt-1.5 uppercase tracking-[0.2em]">{stat.label}</p>
+              <p className="text-4xl font-black text-foreground tracking-tight">{stat.value}</p>
+              <p className="text-[11px] font-bold text-muted-foreground mt-2 uppercase tracking-widest">{stat.label}</p>
             </div>
           ))}
         </div>
