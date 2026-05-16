@@ -26,10 +26,10 @@ const SortableItem = ({ item, type, index, onRemove }: { item: any, type: 'tour'
   
   return (
     <div ref={setNodeRef} style={style} className={cn(
-      "flex items-center gap-3 bg-white p-3 rounded-xl border border-border shadow-sm group transition-all",
-      isDragging && "shadow-lg border-primary ring-2 ring-primary/10"
+      "flex items-center gap-3 bg-white p-3 rounded-lg border border-border shadow-sm group transition-none",
+      isDragging && "shadow-md border-primary"
     )}>
-      <div {...attributes} {...listeners} className="cursor-grab p-1 text-muted-foreground/30 hover:text-primary transition-colors"><GripVertical size={16} /></div>
+      <div {...attributes} {...listeners} className="cursor-grab p-1 text-muted-foreground/30 hover:text-primary"><GripVertical size={16} /></div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
           <Badge variant="secondary" className={cn("text-[8px] uppercase font-black px-1.5 h-4", type === 'tour' ? "text-amber-600 bg-amber-50" : "text-blue-600 bg-blue-50")}>
@@ -41,7 +41,7 @@ const SortableItem = ({ item, type, index, onRemove }: { item: any, type: 'tour'
           {type === 'tour' ? item.name : `${item.origin} → ${item.destination}`}
         </p>
       </div>
-      <Button type="button" variant="ghost" size="icon" onClick={onRemove} className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all"><X size={16} /></Button>
+      <Button type="button" variant="ghost" size="icon" onClick={onRemove} className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-none"><X size={16} /></Button>
     </div>
   );
 };
@@ -205,16 +205,16 @@ const AdminPacotes = () => {
 
   return (
     <AdminLayout title="Pacotes & Campanhas">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {[
           { label: "Pacotes Ativos", value: packages.filter(p => p.active).length, icon: PackageIcon, color: "text-blue-500", bg: "bg-blue-500/10", desc: "Total em catálogo" },
           { label: "Passeios Cadastrados", value: tours.length, icon: Compass, color: "text-emerald-500", bg: "bg-emerald-500/10", desc: "Opções de roteiro" },
           { label: "Rotas de Transfer", value: transfers.length, icon: Car, color: "text-amber-500", bg: "bg-amber-500/10", desc: "Logística ativa" },
           { label: "Preço Médio", value: fmt(packages.reduce((a, b) => a + (b.discount_price || 0), 0) / (packages.length || 1)), icon: Target, color: "text-purple-500", bg: "bg-purple-500/10", desc: "Valor promocional" }
         ].map((stat, i) => (
-          <div key={i} className="bg-white border border-border shadow-sm rounded-2xl p-6 relative overflow-hidden group hover:border-primary/50 transition-all">
+          <div key={i} className="bg-white border border-border shadow-sm rounded-lg p-6 relative overflow-hidden group hover:border-primary/50">
             <div className="flex items-center justify-between mb-4">
-              <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shadow-sm", stat.bg, stat.color)}>
+              <div className={cn("w-12 h-12 rounded-lg flex items-center justify-center shadow-sm", stat.bg, stat.color)}>
                 <stat.icon size={22} />
               </div>
               <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">{stat.desc}</div>
@@ -230,20 +230,20 @@ const AdminPacotes = () => {
       <div className="flex flex-col md:flex-row gap-4 mb-8 items-center">
         <div className="relative flex-1 w-full group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary transition-colors" size={18} />
-          <Input placeholder="Pesquisar pacotes pelo nome..." value={search} onChange={e => setSearch(e.target.value)} className="pl-11 h-12 rounded-xl bg-white shadow-sm border-border focus:ring-2 focus:ring-primary/20" />
+          <Input placeholder="Pesquisar pacotes pelo nome..." value={search} onChange={e => setSearch(e.target.value)} className="pl-11 h-12 rounded-lg bg-white shadow-sm border-border focus:ring-0 focus:border-primary transition-none" />
         </div>
-        <Button onClick={() => openForm()} className="h-12 px-6 rounded-xl bg-primary hover:bg-primary/90 font-bold text-sm shadow-sm transition-all">
+        <Button onClick={() => openForm()} className="h-12 px-6 rounded-lg bg-primary hover:bg-primary/90 font-bold text-sm shadow-sm transition-none">
           <Plus size={18} className="mr-2" /> Novo Pacote
         </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {packages.filter(p => p.name.toLowerCase().includes(search.toLowerCase())).map((pkg, idx) => (
-          <Card key={pkg.id} className="overflow-hidden border border-border shadow-sm rounded-2xl group hover:shadow-md transition-all duration-300">
+          <Card key={pkg.id} className="overflow-hidden border border-border shadow-sm rounded-lg group">
             <div className="relative h-44 overflow-hidden">
               <img 
                 src={pkg.banner_url || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80"} 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                className="w-full h-full object-cover" 
                 alt={pkg.name} 
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -282,7 +282,7 @@ const AdminPacotes = () => {
                   variant="outline" 
                   size="sm"
                   onClick={() => sharePackage(pkg)} 
-                  className="flex-1 min-w-[120px] rounded-xl h-10 text-[10px] font-black uppercase tracking-widest"
+                  className="flex-1 min-w-[120px] rounded-lg h-10 text-[10px] font-black uppercase tracking-widest transition-none"
                 >
                   <Share2 size={14} className="mr-2 text-primary" /> Campanha
                 </Button>
@@ -307,7 +307,7 @@ const AdminPacotes = () => {
                     variant="ghost"
                     size="icon"
                     onClick={() => handleDelete(pkg.id)} 
-                    className="h-10 w-10 rounded-xl text-destructive hover:bg-destructive/10"
+                    className="h-10 w-10 rounded-lg text-destructive hover:bg-destructive/10 transition-none"
                   >
                     <Trash2 size={16} />
                   </Button>
@@ -319,10 +319,10 @@ const AdminPacotes = () => {
       </div>
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-lg overflow-hidden bg-[#F8FAFC]">
           <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-3 md:gap-4">
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                 <PackageIcon size={20} className="md:w-6 md:h-6" />
               </div>
               <div>
@@ -332,7 +332,7 @@ const AdminPacotes = () => {
                 <p className="text-[11px] md:text-sm text-slate-500 font-medium line-clamp-1">Configure os detalhes e o itinerário da campanha</p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => setShowForm(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+            <Button variant="ghost" size="icon" onClick={() => setShowForm(false)} className="rounded-full hover:bg-slate-100">
               <XCircle size={20} className="text-slate-400" />
             </Button>
           </div>
@@ -341,7 +341,7 @@ const AdminPacotes = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
               {/* Coluna Principal: Informações Básicas */}
               <div className="lg:col-span-7 space-y-6">
-                <div className="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm space-y-4">
+                <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm space-y-4">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-1.5 h-6 bg-primary rounded-full" />
                     <h3 className="font-black text-slate-800 uppercase tracking-wider text-xs">Informações Gerais</h3>
@@ -354,7 +354,7 @@ const AdminPacotes = () => {
                       value={form.name} 
                       onChange={e => setForm({...form, name: e.target.value})} 
                       placeholder="Ex: Bonito Master Experience" 
-                      className="h-12 px-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-bold" 
+                      className="h-12 px-4 rounded-lg border-slate-200 bg-slate-50 focus:bg-white transition-none font-bold" 
                       required 
                     />
                   </div>
@@ -366,7 +366,7 @@ const AdminPacotes = () => {
                       value={form.description} 
                       onChange={e => setForm({...form, description: e.target.value})} 
                       placeholder="Descreva o que torna este pacote único..."
-                      className="min-h-[120px] p-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-medium leading-relaxed" 
+                      className="min-h-[120px] p-4 rounded-lg border-slate-200 bg-slate-50 focus:bg-white transition-none font-medium leading-relaxed" 
                     />
                   </div>
 
@@ -386,7 +386,7 @@ const AdminPacotes = () => {
                             prefix="R$ "
                             decimalScale={2}
                             fixedDecimalScale
-                            className="flex h-12 w-full px-4 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-black text-primary outline-none focus:ring-2 focus:ring-primary/20"
+                            className="flex h-12 w-full px-4 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white transition-none font-black text-primary outline-none focus:ring-0 focus:border-primary"
                           />
                         </div>
                       </div>
@@ -405,7 +405,7 @@ const AdminPacotes = () => {
                             prefix="R$ "
                             decimalScale={2}
                             fixedDecimalScale
-                            className="flex h-12 w-full px-4 rounded-xl border border-primary/20 bg-primary/5 focus:bg-white transition-all font-black text-primary outline-none focus:ring-2 focus:ring-primary/20"
+                            className="flex h-12 w-full px-4 rounded-lg border border-primary/20 bg-primary/5 focus:bg-white transition-none font-black text-primary outline-none focus:ring-0 focus:border-primary"
                           />
                         </div>
                       </div>
@@ -443,7 +443,7 @@ const AdminPacotes = () => {
                       <Label htmlFor="pkg-banner" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Banner do Pacote (Upload ou URL)</Label>
                     <div className="flex gap-2">
                       <div className="relative group flex-1">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary">
                           <Eye size={16} />
                         </div>
                         <Input 
@@ -451,7 +451,7 @@ const AdminPacotes = () => {
                           value={form.banner_url} 
                           onChange={e => setForm({...form, banner_url: e.target.value})} 
                           placeholder="Cole o link ou use o botão de upload"
-                          className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all" 
+                          className="h-12 pl-10 pr-4 rounded-lg border-slate-200 bg-slate-50 focus:bg-white transition-none" 
                         />
                       </div>
                       <div className="relative">
@@ -466,7 +466,7 @@ const AdminPacotes = () => {
                         <Button 
                           type="button" 
                           variant="outline" 
-                          className="h-12 w-12 rounded-xl p-0 border-slate-200"
+                          className="h-12 w-12 rounded-lg p-0 border-slate-200 transition-none"
                           onClick={() => document.getElementById('banner-upload')?.click()}
                           disabled={uploading}
                         >
@@ -475,7 +475,7 @@ const AdminPacotes = () => {
                       </div>
                     </div>
                     {form.banner_url && (
-                      <div className="mt-3 rounded-2xl overflow-hidden border border-slate-100 shadow-sm aspect-[21/9]">
+                      <div className="mt-3 rounded-lg overflow-hidden border border-slate-100 shadow-sm aspect-[21/9]">
                         <img src={form.banner_url} alt="Preview" className="w-full h-full object-cover" />
                       </div>
                     )}
@@ -485,7 +485,7 @@ const AdminPacotes = () => {
 
               {/* Coluna Lateral: Itinerário e Configurações */}
               <div className="lg:col-span-5 space-y-6">
-                <div className="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm space-y-5">
+                <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm space-y-5">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-6 bg-amber-500 rounded-full" />
@@ -527,7 +527,7 @@ const AdminPacotes = () => {
 
                     <div className="min-h-[250px] max-h-[400px] overflow-y-auto pr-2 space-y-3 custom-scrollbar">
                       {selectedItems.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-48 border-2 border-dashed border-slate-100 rounded-2xl p-6 text-center">
+                        <div className="flex flex-col items-center justify-center h-48 border-2 border-dashed border-slate-100 rounded-lg p-6 text-center">
                           <PackageIcon className="text-slate-200 mb-3" size={32} />
                           <p className="text-xs font-bold text-slate-400">O itinerário está vazio.<br/>Selecione passeios ou translados acima.</p>
                         </div>
@@ -550,7 +550,7 @@ const AdminPacotes = () => {
                   </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm">
+                <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
                       <p className="font-black text-slate-800 text-sm">Status do Pacote</p>
@@ -571,14 +571,14 @@ const AdminPacotes = () => {
                   type="button" 
                   variant="ghost" 
                   onClick={() => setShowForm(false)} 
-                  className="flex-1 sm:flex-none h-12 px-6 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition-all"
+                  className="flex-1 sm:flex-none h-12 px-6 rounded-lg font-bold text-slate-500 hover:bg-slate-100 transition-none"
                 >
                   Cancelar
                 </Button>
                 <Button 
                   type="submit" 
                   disabled={saving} 
-                  className="flex-1 sm:flex-none h-12 px-10 rounded-xl bg-primary hover:bg-primary/90 text-white font-black shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
+                  className="flex-1 sm:flex-none h-12 px-10 rounded-lg bg-primary hover:bg-primary/90 text-white font-black shadow-sm transition-none"
                 >
                   {saving ? (
                     <Loader2 className="animate-spin mr-2" size={18} />
@@ -593,12 +593,12 @@ const AdminPacotes = () => {
         </DialogContent>
       </Dialog>
       <Dialog open={showView} onOpenChange={setShowView}>
-        <DialogContent className="sm:max-w-3xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+        <DialogContent className="sm:max-w-3xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-lg overflow-hidden bg-[#F8FAFC]">
           {viewingPackage && (
             <>
               <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                     <Eye size={24} />
                   </div>
                   <div>
@@ -608,13 +608,13 @@ const AdminPacotes = () => {
                     <p className="text-sm text-slate-500 font-medium">Preview e compartilhamento do pacote</p>
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => setShowView(false)} className="rounded-full hover:bg-slate-100 transition-colors">
+                <Button variant="ghost" size="icon" onClick={() => setShowView(false)} className="rounded-full hover:bg-slate-100">
                   <XCircle size={20} className="text-slate-400" />
                 </Button>
               </div>
 
               <div className="p-6 md:p-8 space-y-8">
-                <div className="relative aspect-[21/9] rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white">
+                <div className="relative aspect-[21/9] rounded-lg overflow-hidden shadow-md border-2 border-white">
                   <img 
                     src={viewingPackage.banner_url || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80"} 
                     className="w-full h-full object-cover" 
@@ -643,7 +643,7 @@ const AdminPacotes = () => {
 
                 <div className="grid md:grid-cols-2 gap-8">
                   <div className="space-y-6">
-                    <div className="bg-white p-6 rounded-[2rem] border border-slate-200/60 shadow-sm">
+                    <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
                       <h3 className="font-black text-slate-800 uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
                         <FileText size={16} className="text-primary" /> Descrição da Campanha
                       </h3>
@@ -655,7 +655,7 @@ const AdminPacotes = () => {
                     <div className="flex gap-4">
                       <Button 
                         onClick={() => sharePackage(viewingPackage)} 
-                        className="flex-1 h-16 rounded-2xl bg-[#25D366] hover:bg-[#20ba5a] text-white font-black uppercase tracking-widest shadow-lg shadow-green-500/20 transition-all active:scale-95"
+                        className="flex-1 h-16 rounded-lg bg-[#25D366] hover:bg-[#20ba5a] text-white font-black uppercase tracking-widest shadow-sm transition-none"
                       >
                         <Share2 size={20} className="mr-3" /> WhatsApp
                       </Button>
@@ -666,26 +666,26 @@ const AdminPacotes = () => {
                           navigator.clipboard.writeText(url);
                           toast.success("Link copiado!");
                         }}
-                        className="h-16 px-6 rounded-2xl border-slate-200 font-bold text-slate-500 hover:bg-slate-50 transition-all active:scale-95"
+                        className="h-16 px-6 rounded-lg border-slate-200 font-bold text-slate-500 hover:bg-slate-50 transition-none"
                       >
                         <Copy size={20} />
                       </Button>
                     </div>
                   </div>
 
-                  <div className="bg-white p-6 rounded-[2rem] border border-slate-200/60 shadow-sm">
+                  <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
                     <h3 className="font-black text-slate-800 uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
                       <Target size={16} className="text-amber-500" /> Gerenciar Banner
                     </h3>
                     <div className="space-y-4">
                       <p className="text-[11px] text-slate-500 font-medium">Troque a imagem desta campanha para atrair mais clientes.</p>
                       <div className="relative group cursor-pointer" onClick={() => document.getElementById('view-banner-upload')?.click()}>
-                        <div className="aspect-[16/9] rounded-2xl overflow-hidden bg-slate-100 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center transition-all group-hover:border-primary/40 group-hover:bg-primary/5">
+                        <div className="aspect-[16/9] rounded-lg overflow-hidden bg-slate-100 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center transition-none group-hover:border-primary group-hover:bg-primary/5">
                           {uploading ? (
                             <Loader2 size={32} className="animate-spin text-primary" />
                           ) : (
                             <>
-                              <Upload size={32} className="text-slate-300 mb-2 group-hover:text-primary transition-colors" />
+                              <Upload size={32} className="text-slate-300 mb-2 group-hover:text-primary" />
                               <p className="text-[10px] font-black uppercase text-slate-400 group-hover:text-primary tracking-widest">Subir Novo Banner</p>
                             </>
                           )}
