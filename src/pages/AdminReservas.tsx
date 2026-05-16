@@ -644,8 +644,13 @@ const AdminReservas = () => {
                       <TableCell className="px-6 py-5">
                         <p className="text-sm font-black text-foreground">{formatCurrency(b.finalTotal)}</p>
                         {b.partnerNetPrice !== undefined && b.partnerNetPrice > 0 && (
-                          <div className="flex items-center gap-1 text-[8px] font-black text-emerald-600 uppercase mt-1">
-                            <Briefcase size={8} /> NET: {formatCurrency(b.partnerNetPrice)}
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-1 text-[8px] font-black text-slate-400 uppercase">
+                              <Briefcase size={8} /> NET: {formatCurrency(b.partnerNetPrice * b.guests)}
+                            </div>
+                            <div className="flex items-center gap-1 text-[8px] font-black text-emerald-600 uppercase">
+                              <DollarSign size={8} /> Lucro: {formatCurrency(b.finalTotal - (b.partnerNetPrice * b.guests))}
+                            </div>
                           </div>
                         )}
                       </TableCell>
