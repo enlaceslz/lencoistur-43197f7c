@@ -593,17 +593,40 @@ const AdminReservas = () => {
 
   return (
     <AdminLayout title="Gestão de Reservas">
-      <div className="flex flex-col gap-6 h-[calc(100vh-120px)]">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Operações</h1>
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-              <Calendar size={14} className="text-primary" /> {bookings.length} Reservas Registradas
-            </p>
+      <div className="flex flex-col gap-8 pb-10 animate-in-fade">
+        {/* Superior Control Panel */}
+        <div className="glass-card rounded-[2.5rem] p-8 shadow-2xl shadow-primary/5">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-1.5">
+              <h1 className="text-3xl font-black text-slate-900 tracking-tight">Painel de Operações</h1>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/5 border border-primary/10">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  <span className="text-[10px] font-black text-primary uppercase tracking-widest">{bookings.length} Registros Encontrados</span>
+                </div>
+              </div>
+            </div>
+            
+            <button 
+              onClick={() => setShowNewForm(true)} 
+              className="bg-primary hover:bg-primary/90 text-white px-8 h-14 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-3"
+            >
+              <Plus size={18} /> Nova Reserva
+            </button>
           </div>
-          <Button onClick={() => setShowNewForm(true)} className="rounded-xl h-10 px-6 bg-primary font-black text-white shadow-lg shadow-primary/20">
-            <Plus size={18} className="mr-2" strokeWidth={3} /> Nova Reserva
-          </Button>
+
+          <div className="mt-8 flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1 group">
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" size={20} />
+              <input 
+                type="text" 
+                placeholder="Pesquisar por cliente, passeio, ID ou data..." 
+                className="w-full bg-muted/30 border-border/50 rounded-2xl pl-14 pr-6 h-14 text-sm font-medium focus:ring-4 focus:ring-primary/10 focus:bg-white focus:border-primary/20 transition-all outline-none"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

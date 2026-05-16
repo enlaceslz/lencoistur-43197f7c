@@ -993,10 +993,10 @@ const AdminCRMContent = () => {
         {/* Advanced Stats Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-in-fade" style={{ animationDelay: '0.05s' }}>
           {[
-            { label: "Base de Clientes", value: customers.length, icon: Users, color: "text-blue-500", bg: "bg-blue-500/10", desc: "Total de titulares" },
-            { label: "Novos Parceiros", value: newThisMonth, icon: UserPlus, color: "text-purple-500", bg: "bg-purple-500/10", desc: "Registrados este mês" },
-            { label: "LTV Consolidado", value: fmt(totalRevenue), icon: DollarSign, color: "text-emerald-500", bg: "bg-emerald-500/10", desc: "Receita histórica" },
-            { label: "Ticket Médio", value: withBookings > 0 ? fmt(Math.round(totalRevenue / withBookings)) : "R$ 0", icon: Target, color: "text-amber-500", bg: "bg-amber-500/10", desc: "Valor por cliente" },
+            { label: "Base de Clientes", value: customers.length, icon: Users, color: "text-primary", bg: "bg-primary/5", desc: "Total de titulares" },
+            { label: "Novos Parceiros", value: newThisMonth, icon: UserPlus, color: "text-primary", bg: "bg-primary/5", desc: "Registrados este mês" },
+            { label: "LTV Consolidado", value: fmt(totalRevenue), icon: DollarSign, color: "text-primary", bg: "bg-primary/5", desc: "Receita histórica" },
+            { label: "Ticket Médio", value: withBookings > 0 ? fmt(Math.round(totalRevenue / withBookings)) : "R$ 0", icon: Target, color: "text-primary", bg: "bg-primary/5", desc: "Valor por cliente" },
           ].map((stat, i) => (
             <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group border border-white/20 shadow-xl shadow-black/5 bg-white">
               <div className="absolute right-0 top-0 w-24 h-24 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-primary/10 transition-colors" />
@@ -1016,10 +1016,10 @@ const AdminCRMContent = () => {
 
         <div className="w-full">
           {/* Client List */}
-          <div className="glass-card rounded-[2.5rem] p-8 animate-in-fade" style={{ animationDelay: '0.2s' }}>
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <div className="flex items-center gap-3 flex-1 bg-muted/40 border border-border/20 rounded-2xl px-5 py-3 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                <Search size={18} className="text-primary/50" />
+          <div className="glass-card rounded-[2.5rem] p-10 animate-in-fade shadow-2xl shadow-primary/5" style={{ animationDelay: '0.2s' }}>
+            <div className="flex flex-col sm:flex-row gap-6 mb-10">
+              <div className="flex items-center gap-4 flex-1 bg-muted/40 border border-border/40 rounded-2xl px-6 py-4 focus-within:ring-4 focus-within:ring-primary/10 focus-within:bg-white transition-all group">
+                <Search size={20} className="text-primary group-focus-within:scale-110 transition-transform" />
                 <input
                   type="text"
                   placeholder="Pesquisar clientes..."

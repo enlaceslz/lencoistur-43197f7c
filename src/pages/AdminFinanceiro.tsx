@@ -368,7 +368,7 @@ const AdminFinanceiro = () => {
         
         {/* Superior "Health Pulse" Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in-fade" style={{ animationDelay: '0.05s' }}>
-          <div className="md:col-span-2 relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-indigo-600 via-blue-600 to-blue-700 p-8 text-white shadow-2xl shadow-blue-500/20 group">
+          <div className="md:col-span-2 relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-primary via-primary/90 to-blue-700 p-10 text-white shadow-2xl shadow-primary/20 group">
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
             <div className="absolute right-0 top-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
             
@@ -402,7 +402,7 @@ const AdminFinanceiro = () => {
           <div className="glass-card rounded-[2.5rem] p-8 flex flex-col justify-between group border border-white/20 shadow-xl shadow-black/5 bg-white">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:rotate-6 transition-transform">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner border border-primary/10 group-hover:rotate-6 transition-transform">
                   <LayoutDashboard size={22} strokeWidth={2.5} />
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Análise Executiva</span>
