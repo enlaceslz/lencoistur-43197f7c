@@ -70,7 +70,7 @@ const DependentList = ({ customerId }: { customerId: string }) => {
 };
 
 const AdminReservas = () => {
-  const { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, deleteBooking, completeBooking } = useBookings();
+  const { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, deleteBooking, completeBooking, markTermAsSignedAtCounter } = useBookings();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<BookingItem | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
@@ -1405,8 +1405,14 @@ const AdminReservas = () => {
                           <Shield size={18} className="text-indigo-600" />
                           <span className="text-[10px] font-black uppercase text-indigo-900">Termo de Risco</span>
                         </div>
-                        <Badge className={cn("text-[8px] font-black uppercase", selected.termStatus === 'assinado' ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700")}>
-                          {selected.termStatus === 'assinado' ? "Assinado" : "Pendente"}
+                        <Badge className={cn("text-[8px] font-black uppercase", 
+                          selected.termStatus === 'assinado' ? "bg-emerald-100 text-emerald-700" : 
+                          selected.termStatus === 'balcao' ? "bg-blue-100 text-blue-700" : 
+                          "bg-amber-100 text-amber-700"
+                        )}>
+                          {selected.termStatus === 'assinado' ? "Assinado" : 
+                           selected.termStatus === 'balcao' ? "Assinado Balcão" : 
+                           "Pendente"}
                         </Badge>
                       </div>
                       {selected.termPdfUrl && (
@@ -1415,7 +1421,7 @@ const AdminReservas = () => {
                         </Button>
                       )}
                       
-                      {selected.termStatus !== 'assinado' && (
+                      {selected.termStatus === 'pendente' && (
                         <div className="flex flex-col gap-2">
                           <Button 
                             className="w-full rounded-xl h-10 text-[10px] font-black uppercase tracking-widest bg-emerald-500 hover:bg-emerald-600 text-white"
@@ -1433,6 +1439,13 @@ const AdminReservas = () => {
                             }}
                           >
                             <Pencil size={14} className="mr-2" /> Assinar Agora
+                          </Button>
+                          <Button 
+                            variant="outline"
+                            className="w-full rounded-xl h-10 text-[10px] font-black uppercase tracking-widest border-blue-200 text-blue-600 hover:bg-blue-50"
+                            onClick={() => handleAction(() => markTermAsSignedAtCounter(selected.id), "Termo marcado como assinado no balcão!")}
+                          >
+                            <UserCheck size={14} className="mr-2" /> Assinado no Balcão
                           </Button>
                         </div>
                       )}
