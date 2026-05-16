@@ -318,7 +318,7 @@ const AdminPasseios = () => {
         <div className="max-w-6xl mx-auto">
           <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between rounded-t-3xl">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary shadow-sm">
                 <Compass size={24} strokeWidth={2.5} />
               </div>
               <div>
@@ -336,14 +336,14 @@ const AdminPasseios = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="rounded-xl font-bold h-10"
+              className="rounded-lg font-bold h-10 transition-none"
               onClick={() => window.close()}
             >
               Fechar Janela
             </Button>
           </div>
 
-          <div className="bg-white p-6 md:p-8 rounded-b-3xl shadow-sm">
+          <div className="bg-white p-6 md:p-8 rounded-b-lg shadow-sm">
             {wideTour ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-1 space-y-8">
@@ -353,7 +353,7 @@ const AdminPasseios = () => {
                     </h3>
                     <div className="space-y-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center font-black text-xl overflow-hidden">
+                        <div className="w-12 h-12 rounded-lg bg-primary text-white flex items-center justify-center font-black text-xl overflow-hidden">
                           {wideTour.images?.[0] ? <img src={wideTour.images[0]} className="w-full h-full object-cover" /> : wideTour.name[0]}
                         </div>
                         <div>
@@ -361,18 +361,18 @@ const AdminPasseios = () => {
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">{wideTour.category}</p>
                         </div>
                       </div>
-                        <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                        <div className="bg-white p-4 rounded-lg border border-slate-100 shadow-sm">
                           <Label className="text-[10px] uppercase font-bold text-slate-400">Localização</Label>
                           <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1"><MapPin size={14} className="text-primary" /> {wideTour.location}</p>
                         </div>
-                        <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                        <div className="bg-white p-4 rounded-lg border border-slate-100 shadow-sm">
                           <Label className="text-[10px] uppercase font-bold text-slate-400">Duração Estimada</Label>
                           <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1"><Clock size={14} className="text-primary" /> {wideTour.duration}</p>
                         </div>
                     </div>
                   </section>
 
-                  <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                  <section className="bg-slate-50 p-6 rounded-lg border border-slate-100 shadow-sm">
                     <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                       <DollarSign size={14} className="text-emerald-500" /> Tarifário
                     </h3>
@@ -405,7 +405,7 @@ const AdminPasseios = () => {
                 </div>
 
                 <div className="md:col-span-2 space-y-8">
-                  <section className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden">
+                  <section className="bg-slate-50 p-8 rounded-lg border border-slate-100 shadow-sm relative overflow-hidden">
                     <div className="absolute right-0 top-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                     <div className="relative z-10">
                       <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-2">Descrição do Produto</p>
