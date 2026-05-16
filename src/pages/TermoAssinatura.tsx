@@ -7,6 +7,7 @@ import { Shield, CheckCircle, AlertTriangle, FileText, Pencil, Trash2, Users } f
 import { toast } from "@/hooks/use-toast";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import { Button } from "@/components/ui/button";
 
 // Riscos inerentes conforme P6 VATTI
 const RISKS_OPTIONS = [
@@ -721,7 +722,7 @@ const TermoAssinatura = () => {
 
           <div className="p-6 space-y-6">
             {/* Booking Summary */}
-            {booking && (
+            {booking ? (
               <div className="bg-muted/50 rounded-2xl p-4 grid sm:grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Passeio / Atividade</p>
@@ -729,7 +730,7 @@ const TermoAssinatura = () => {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Data</p>
-                  <p className="text-sm font-bold">{new Date(booking.date + "T12:00").toLocaleDateString("pt-BR")}</p>
+                  <p className="text-sm font-bold">{booking.date ? new Date(booking.date + "T12:00").toLocaleDateString("pt-BR") : "A definir"}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Participante</p>
@@ -740,9 +741,7 @@ const TermoAssinatura = () => {
                   <p className="text-sm font-bold font-mono text-primary">{booking.booking_code}</p>
                 </div>
               </div>
-            )}
-
-            {term && !booking && (
+            ) : term ? (
               <div className="bg-muted/50 rounded-2xl p-4 grid sm:grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Atividade</p>
@@ -752,6 +751,13 @@ const TermoAssinatura = () => {
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Participante</p>
                   <p className="text-sm font-bold">{term.customers?.name || term.customer_name}</p>
                 </div>
+              </div>
+            ) : !loading && (
+              <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-6 text-center space-y-3">
+                <AlertTriangle className="mx-auto text-destructive" size={32} />
+                <h3 className="font-bold text-destructive">Reserva não localizada</h3>
+                <p className="text-sm text-muted-foreground">Não conseguimos encontrar os detalhes da sua reserva. Por favor, verifique o link ou entre em contato com a agência.</p>
+                <Button variant="outline" size="sm" onClick={() => window.location.reload()}>Tentar novamente</Button>
               </div>
             )}
 
