@@ -1028,13 +1028,21 @@ const AdminReservas = () => {
                     </div>
 
                     {parseCurrencyToNumber(form.partnerNetPrice) > 0 && (
-                      <div className="pt-2 mt-2 border-t border-dashed border-slate-200">
+                      <div className="pt-2 mt-2 border-t border-dashed border-slate-200 space-y-1">
                         <div className="flex justify-between items-center text-emerald-600">
                           <span className="text-[10px] font-black uppercase tracking-wider">Margem de Lucro (Bruto)</span>
                           <span className="text-xs font-extrabold">
                             {formatCurrency(((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount)) - (parseCurrencyToNumber(form.partnerNetPrice) * form.guests))}
                           </span>
                         </div>
+                        {((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount)) > 0 && (
+                          <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold uppercase">
+                            <span>Markup Sugerido</span>
+                            <span>
+                              {Math.round(((((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount)) - (parseCurrencyToNumber(form.partnerNetPrice) * form.guests)) / (parseCurrencyToNumber(form.partnerNetPrice) * form.guests)) * 100) || 0}%
+                            </span>
+                          </div>
+                        )}
                         <p className="text-[9px] text-slate-400 font-medium italic mt-1">
                           * Cálculo baseado no Valor Unitário - Valor NET Parceiro × Qtd. PAX
                         </p>
