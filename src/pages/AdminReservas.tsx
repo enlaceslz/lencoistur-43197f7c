@@ -1017,6 +1017,15 @@ const AdminReservas = () => {
                         </span>
                       </div>
                     )}
+
+                    {parseCurrencyToNumber(form.publicUnitPrice) > parseCurrencyToNumber(form.unitPrice) && (
+                      <div className="flex justify-between items-center text-emerald-600">
+                        <span className="text-[10px] font-bold uppercase">Abaixo do Valor Público</span>
+                        <span className="text-xs font-bold">
+                          {formatCurrency((parseCurrencyToNumber(form.publicUnitPrice) - parseCurrencyToNumber(form.unitPrice)) * form.guests)} economia
+                        </span>
+                      </div>
+                    )}
                     
                     <Separator className="bg-slate-200" />
                     
