@@ -291,7 +291,7 @@ const AdminPacotes = () => {
                     variant="outline"
                     size="icon"
                     onClick={() => openForm(pkg)} 
-                    className="h-10 w-10 rounded-xl"
+                    className="h-10 w-10 rounded-lg transition-none"
                   >
                     <Eye size={16} />
                   </Button>
@@ -299,7 +299,7 @@ const AdminPacotes = () => {
                     variant="secondary"
                     size="icon"
                     onClick={() => openForm(pkg)} 
-                    className="h-10 w-10 rounded-xl"
+                    className="h-10 w-10 rounded-lg transition-none"
                   >
                     <Pencil size={16} />
                   </Button>
@@ -501,7 +501,7 @@ const AdminPacotes = () => {
                       <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1.5 block">Adicionar Itens</Label>
                       <div className="grid grid-cols-2 gap-2">
                         <select 
-                          className="h-11 rounded-xl bg-slate-50 border border-slate-200 px-3 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer" 
+                          className="h-11 rounded-lg bg-slate-50 border border-slate-200 px-3 text-xs font-bold text-slate-700 outline-none focus:ring-0 focus:border-primary transition-none cursor-pointer" 
                           onChange={e => { 
                             const t = tours.find(x => x.id === e.target.value); 
                             if(t) setSelectedItems([...selectedItems, {id:t.id, type:'tour', data:t}]); 
@@ -512,7 +512,7 @@ const AdminPacotes = () => {
                           {tours.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                         </select>
                         <select 
-                          className="h-11 rounded-xl bg-slate-50 border border-slate-200 px-3 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer" 
+                          className="h-11 rounded-lg bg-slate-50 border border-slate-200 px-3 text-xs font-bold text-slate-700 outline-none focus:ring-0 focus:border-primary transition-none cursor-pointer" 
                           onChange={e => { 
                             const t = transfers.find(x => x.id === e.target.value); 
                             if(t) setSelectedItems([...selectedItems, {id:t.id, type:'transfer', data:t}]); 
