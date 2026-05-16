@@ -35,7 +35,7 @@ export interface BookingItem {
   collaboratorId?: string;
   collaboratorName?: string;
   partnerId?: string;
-  termStatus?: "pendente" | "assinado";
+  termStatus?: "pendente" | "assinado" | "balcao";
   termPdfUrl?: string;
 }
 
@@ -55,6 +55,11 @@ function generatePixCode(): string {
 
 function mapDbToBooking(row: any, customer?: any): BookingItem {
   const term = row.sgs_risk_terms && row.sgs_risk_terms[0];
+  
+  let termStatus: "pendente" | "assinado" | "balcao" = "pendente";
+  if (term?.pdf_url || term?.accepted) {
+    termStatus = term?.signed_at_counter ? "balcao" : "assinado";
+  }
   
   return {
     id: row.id,
@@ -89,7 +94,7 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
     collaboratorId: row.collaborator_id || undefined,
     collaboratorName: row.collaborators?.name || undefined,
     partnerId: row.partner_id || undefined,
-    termStatus: term?.pdf_url ? "assinado" : "pendente",
+    termStatus,
     termPdfUrl: term?.pdf_url || undefined,
   };
 }
@@ -102,7 +107,7 @@ export function useBookings() {
     setLoading(true);
     const { data: bookingsData } = await supabase
       .from("bookings")
-      .select("*, customers!customer_id(*), collaborators(name), sgs_risk_terms(pdf_url)")
+      .select("*, customers!customer_id(*), collaborators(name), sgs_risk_terms(pdf_url, accepted, signed_at_counter)")
       .order("created_at", { ascending: false });
 
     if (bookingsData) {
@@ -403,5 +408,54 @@ export function useBookings() {
 
   }, []);
 
-  return { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, deleteBooking, completeBooking, updateBookingNotes, refresh: fetchBookings };
+  const markTermAsSignedAtCounter = useCallback(async (bookingId: string) => {
+    // Buscar dados da reserva para criar o registro no termo
+    const { data: booking, error: fetchError } = await supabase
+      .from("bookings")
+      .select("*, customers!customer_id(*)")
+      .eq("id", bookingId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Verificar se já existe um termo
+    const { data: existingTerm } = await supabase
+      .from("sgs_risk_terms")
+      .select("id")
+      .eq("booking_id", bookingId)
+      .maybeSingle();
+
+    if (existingTerm) {
+      const { error: updateError } = await supabase
+        .from("sgs_risk_terms")
+        .update({ 
+          accepted: true, 
+          signed_at_counter: true,
+          signed_at: new Date().toISOString()
+        })
+        .eq("id", existingTerm.id);
+      
+      if (updateError) throw updateError;
+    } else {
+      const { error: insertError } = await supabase
+        .from("sgs_risk_terms")
+        .insert({
+          booking_id: bookingId,
+          customer_id: booking.customer_id,
+          customer_name: booking.customers?.name,
+          phone: booking.customers?.phone,
+          tour_name: booking.item_name,
+          accepted: true,
+          signed_at_counter: true,
+          signed_at: new Date().toISOString(),
+          term_date: new Date().toISOString().slice(0, 10)
+        });
+      
+      if (insertError) throw insertError;
+    }
+    
+    await fetchBookings();
+  }, [fetchBookings]);
+
+  return { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, deleteBooking, completeBooking, updateBookingNotes, markTermAsSignedAtCounter, refresh: fetchBookings };
 }

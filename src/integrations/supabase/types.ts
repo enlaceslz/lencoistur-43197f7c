@@ -2080,6 +2080,7 @@ export type Database = {
           sign_access_token: string | null
           signature_data: string | null
           signed_at: string | null
+          signed_at_counter: boolean | null
           takes_medication: boolean | null
           term_date: string | null
           tour_id: string | null
@@ -2126,6 +2127,7 @@ export type Database = {
           sign_access_token?: string | null
           signature_data?: string | null
           signed_at?: string | null
+          signed_at_counter?: boolean | null
           takes_medication?: boolean | null
           term_date?: string | null
           tour_id?: string | null
@@ -2172,6 +2174,7 @@ export type Database = {
           sign_access_token?: string | null
           signature_data?: string | null
           signed_at?: string | null
+          signed_at_counter?: boolean | null
           takes_medication?: boolean | null
           term_date?: string | null
           tour_id?: string | null

@@ -70,7 +70,7 @@ const DependentList = ({ customerId }: { customerId: string }) => {
 };
 
 const AdminReservas = () => {
-  const { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, deleteBooking, completeBooking } = useBookings();
+  const { bookings, loading, addBooking, updateBooking, confirmPayment, cancelBooking, deleteBooking, completeBooking, markTermAsSignedAtCounter } = useBookings();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<BookingItem | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
@@ -473,6 +473,46 @@ const AdminReservas = () => {
 
                   <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
                     <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <Shield size={14} className="text-indigo-600" /> Segurança & Termos
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 rounded-2xl bg-indigo-50/30 border border-indigo-100/50">
+                        <div className="flex items-center gap-3">
+                          <Shield size={18} className="text-indigo-600" />
+                          <span className="text-[10px] font-black uppercase text-indigo-900">Termo de Risco</span>
+                        </div>
+                        <Badge className={cn("text-[8px] font-black uppercase", 
+                          wideBooking.termStatus === 'assinado' ? "bg-emerald-100 text-emerald-700" : 
+                          wideBooking.termStatus === 'balcao' ? "bg-blue-100 text-blue-700" : 
+                          "bg-amber-100 text-amber-700"
+                        )}>
+                          {wideBooking.termStatus === 'assinado' ? "Assinado" : 
+                           wideBooking.termStatus === 'balcao' ? "Assinado Balcão" : 
+                           "Pendente"}
+                        </Badge>
+                      </div>
+                      
+                      {wideBooking.termStatus === 'pendente' && (
+                        <div className="flex flex-col gap-2">
+                          <Button 
+                            variant="outline"
+                            className="w-full rounded-xl h-10 text-[10px] font-black uppercase tracking-widest border-blue-200 text-blue-600 hover:bg-blue-50"
+                            onClick={() => handleAction(() => markTermAsSignedAtCounter(wideBooking.id), "Termo marcado como assinado no balcão!")}
+                          >
+                            <UserCheck size={14} className="mr-2" /> Assinado no Balcão
+                          </Button>
+                        </div>
+                      )}
+                      
+                      {wideBooking.termPdfUrl && (
+                        <Button variant="outline" className="w-full rounded-xl h-10 text-[10px] font-black uppercase tracking-widest border-indigo-200 text-indigo-600 hover:bg-indigo-50" onClick={() => window.open(wideBooking.termPdfUrl, '_blank')}>
+                          <Download size={14} className="mr-2" /> Ver Termo Assinado
+                        </Button>
+                      )}
+                    </div>
+                  </section>
+                  <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                       <DollarSign size={14} className="text-emerald-500" /> Financeiro
                     </h3>
                     <div className="space-y-4">
@@ -665,6 +705,8 @@ const AdminReservas = () => {
                           </Badge>
                           {b.termStatus === 'assinado' ? (
                             <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[8px] font-black uppercase py-0 px-2 h-4">Assinado</Badge>
+                          ) : b.termStatus === 'balcao' ? (
+                            <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-[8px] font-black uppercase py-0 px-2 h-4">Assinado Balcão</Badge>
                           ) : (
                             <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-[8px] font-black uppercase py-0 px-2 h-4">Termo Pendente</Badge>
                           )}
@@ -731,7 +773,7 @@ const AdminReservas = () => {
                             title="Enviar Termo de Risco (WhatsApp)"
                             className={cn(
                               "h-9 w-9 rounded-xl transition-all",
-                              b.termStatus === 'assinado' ? "text-emerald-500 hover:bg-emerald-50" : "text-amber-500 hover:bg-amber-50 animate-pulse-subtle"
+                              (b.termStatus === 'assinado' || b.termStatus === 'balcao') ? "text-emerald-500 hover:bg-emerald-50" : "text-amber-500 hover:bg-amber-50 animate-pulse-subtle"
                             )}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -1405,8 +1447,14 @@ const AdminReservas = () => {
                           <Shield size={18} className="text-indigo-600" />
                           <span className="text-[10px] font-black uppercase text-indigo-900">Termo de Risco</span>
                         </div>
-                        <Badge className={cn("text-[8px] font-black uppercase", selected.termStatus === 'assinado' ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700")}>
-                          {selected.termStatus === 'assinado' ? "Assinado" : "Pendente"}
+                        <Badge className={cn("text-[8px] font-black uppercase", 
+                          selected.termStatus === 'assinado' ? "bg-emerald-100 text-emerald-700" : 
+                          selected.termStatus === 'balcao' ? "bg-blue-100 text-blue-700" : 
+                          "bg-amber-100 text-amber-700"
+                        )}>
+                          {selected.termStatus === 'assinado' ? "Assinado" : 
+                           selected.termStatus === 'balcao' ? "Assinado Balcão" : 
+                           "Pendente"}
                         </Badge>
                       </div>
                       {selected.termPdfUrl && (
@@ -1415,7 +1463,7 @@ const AdminReservas = () => {
                         </Button>
                       )}
                       
-                      {selected.termStatus !== 'assinado' && (
+                      {selected.termStatus === 'pendente' && (
                         <div className="flex flex-col gap-2">
                           <Button 
                             className="w-full rounded-xl h-10 text-[10px] font-black uppercase tracking-widest bg-emerald-500 hover:bg-emerald-600 text-white"
@@ -1433,6 +1481,13 @@ const AdminReservas = () => {
                             }}
                           >
                             <Pencil size={14} className="mr-2" /> Assinar Agora
+                          </Button>
+                          <Button 
+                            variant="outline"
+                            className="w-full rounded-xl h-10 text-[10px] font-black uppercase tracking-widest border-blue-200 text-blue-600 hover:bg-blue-50"
+                            onClick={() => handleAction(() => markTermAsSignedAtCounter(selected.id), "Termo marcado como assinado no balcão!")}
+                          >
+                            <UserCheck size={14} className="mr-2" /> Assinado no Balcão
                           </Button>
                         </div>
                       )}
