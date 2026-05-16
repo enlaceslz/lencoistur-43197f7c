@@ -75,8 +75,8 @@ const AdminPacotes = () => {
     setLoading(true);
     const [pkgRes, tourRes, transRes] = await Promise.all([
       supabase.from("packages").select("*, package_tours(tour_id), package_transfers(transfer_route_id)").order("created_at", { ascending: false }),
-      supabase.from("tours").select("id, name").eq("active", true).order("name"),
-      supabase.from("transfer_routes").select("id, origin, destination").eq("active", true).order("origin")
+      supabase.from("tours").select("id, name, price, partner_price").eq("active", true).order("name"),
+      supabase.from("transfer_routes").select("id, origin, destination, price, partner_price").eq("active", true).order("origin")
     ]);
 
     if (pkgRes.data) setPackages(pkgRes.data);
@@ -137,6 +137,21 @@ const AdminPacotes = () => {
     }
     setShowForm(true);
   };
+  useEffect(() => {
+    if (showForm) {
+      const totalSite = selectedItems.reduce((acc, item) => acc + (item.data?.price || 0), 0);
+      const totalPartner = selectedItems.reduce((acc, item) => acc + (item.data?.partner_price || 0), 0);
+      
+      setForm(prev => ({ 
+        ...prev, 
+        discount_price: totalSite,
+        // We initialize partner_price with the sum if it's a new package,
+        // but the user can still edit it as requested.
+        partner_price: prev.partner_price || totalPartner 
+      }));
+    }
+  }, [selectedItems, showForm]);
+
 
   const openView = (pkg: any) => {
     setViewingPackage(pkg);
