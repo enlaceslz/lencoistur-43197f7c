@@ -1486,7 +1486,36 @@ const AdminReservas = () => {
                         </div>
                       </div>
                     </div>
-                   </section>
+                    </section>
+
+                    {selected.partnerNetPrice !== undefined && selected.partnerNetPrice > 0 && (
+                      <section className="bg-emerald-50/30 p-6 rounded-[2rem] border border-emerald-100/50">
+                        <h3 className="text-xs font-black uppercase tracking-widest text-emerald-700 mb-4 flex items-center gap-2">
+                          <Activity size={14} /> Análise de Rentabilidade
+                        </h3>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase">
+                            <span>Custo NET ({selected.guests} PAX)</span>
+                            <span className="text-slate-700">{formatCurrency(selected.partnerNetPrice * selected.guests)}</span>
+                          </div>
+                          <Separator className="bg-emerald-100/50" />
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Lucro Bruto (Markup)</p>
+                              <p className="text-2xl font-black text-emerald-700 tracking-tighter">
+                                {formatCurrency(selected.finalTotal - (selected.partnerNetPrice * selected.guests))}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-[9px] font-black text-slate-400 uppercase mb-1">Margem</p>
+                              <p className="text-lg font-black text-emerald-600">
+                                {Math.round(((selected.finalTotal - (selected.partnerNetPrice * selected.guests)) / (selected.partnerNetPrice * selected.guests)) * 100) || 0}%
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </section>
+                    )}
 
                    {selected.notes && (
                      <section className="bg-amber-50/50 p-6 rounded-[2rem] border border-amber-100">
