@@ -163,12 +163,24 @@ const AdminPacotes = () => {
     e.preventDefault();
     setSaving(true);
     const slug = form.slug || generateSlug(form.name);
-    const payload = { ...form, slug };
+    // Destructuring para garantir que enviamos apenas campos que existem na tabela
+    const { 
+      name, slug: _, description, days, nights, 
+      original_price, discount_price, partner_price, banner_url, tag, active,
+      highlights 
+    } = form;
+
+    const payload = { 
+      name, slug, description, days, nights, 
+      original_price, discount_price, partner_price, banner_url, tag, active,
+      highlights 
+    };
     
     try {
       let packageId = editingId;
       if (editingId) {
-        await supabase.from("packages").update(payload).eq("id", editingId);
+        const { error } = await supabase.from("packages").update(payload).eq("id", editingId);
+        if (error) throw error;
       } else {
         const { data, error } = await supabase.from("packages").insert([payload]).select().single();
         if (error) throw error;
@@ -190,7 +202,8 @@ const AdminPacotes = () => {
 
       toast.success("Salvo!"); setShowForm(false); loadData();
     } catch (err: any) {
-      toast.error("Erro!");
+      console.error("Erro ao salvar pacote:", err);
+      toast.error("Erro ao salvar: " + (err.message || "Erro desconhecido"));
     } finally {
       setSaving(false);
     }
