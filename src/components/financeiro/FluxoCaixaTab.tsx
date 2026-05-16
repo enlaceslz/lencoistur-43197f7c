@@ -167,9 +167,8 @@ export default function FluxoCaixaTab({
                   <Bar dataKey="despesas" name="Saídas" fill="url(#colorDespesas)" radius={[8, 8, 0, 0]} barSize={28} />
                 </BarChart>
               </ResponsiveContainer>
-            </div>
           </div>
-        </motion.div>
+        </div>
 
         <div>
           <div className="bg-white rounded-lg p-8 border border-slate-200 h-full">
@@ -209,7 +208,7 @@ export default function FluxoCaixaTab({
                         ))}
                       </Pie>
                       <Tooltip 
-                        contentStyle={{ borderRadius: '1.5rem', border: 'none', boxShadow: '0 20px 50px rgba(0,0,0,0.1)', fontSize: '12px' }}
+                        contentStyle={{ borderRadius: '4px', border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', fontSize: '12px', backgroundColor: '#ffffff' }}
                         formatter={(value: number) => [fmt(value), "Volume"]} 
                       />
                     </PieChart>
@@ -236,7 +235,7 @@ export default function FluxoCaixaTab({
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
 
       <div>
@@ -289,11 +288,11 @@ export default function FluxoCaixaTab({
               />
               <Tooltip 
                  contentStyle={{ 
-                  borderRadius: '1.5rem', 
-                  border: 'none', 
-                  boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
-                  backdropFilter: 'blur(10px)',
-                  backgroundColor: 'rgba(255,255,255,0.9)'
+                  borderRadius: '4px', 
+                  border: '1px solid #e2e8f0', 
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                  backgroundColor: '#ffffff',
+                  padding: '12px'
                 }}
                  formatter={(value: number) => [fmt(value), "Resultado Líquido"]} 
               />
@@ -311,7 +310,7 @@ export default function FluxoCaixaTab({
             </AreaChart>
           </ResponsiveContainer>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
