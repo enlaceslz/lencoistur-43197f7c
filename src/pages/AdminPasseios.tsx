@@ -648,7 +648,7 @@ const AdminPasseios = () => {
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Lotação Máxima</label>
                 <input type="number" min={1} max={50} value={form.vehicle_capacity} onChange={e => setForm({ ...form, vehicle_capacity: Number(e.target.value) })}
-                  className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-bold" />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-4 py-3 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none font-bold" />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block flex items-center gap-1.5">
@@ -661,7 +661,7 @@ const AdminPasseios = () => {
                     max={50}
                     value={form.pix_discount}
                     onChange={e => setForm({ ...form, pix_discount: Number(e.target.value) })}
-                    className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none pr-8 focus:ring-2 focus:ring-primary/20"
+                    className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none pr-8 focus:ring-0 focus:border-primary transition-none"
                     placeholder="0"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
@@ -670,70 +670,70 @@ const AdminPasseios = () => {
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Localização</label>
                 <input value={form.location} onChange={e => setForm({ ...form, location: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={200} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none" maxLength={200} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Duração</label>
                 <input value={form.duration} onChange={e => setForm({ ...form, duration: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" placeholder="Meio dia" maxLength={100} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none" placeholder="Meio dia" maxLength={100} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Categoria</label>
                 <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20">
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none">
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Dificuldade</label>
                 <select value={form.difficulty} onChange={e => setForm({ ...form, difficulty: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20">
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none">
                   {DIFFICULTIES.map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Tag</label>
                 <input value={form.tag} onChange={e => setForm({ ...form, tag: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" placeholder="Mais Vendido" maxLength={50} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none" placeholder="Mais Vendido" maxLength={50} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Grupo</label>
                 <input value={form.group_size} onChange={e => setForm({ ...form, group_size: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" placeholder="Até 10 pessoas" maxLength={50} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none" placeholder="Até 10 pessoas" maxLength={50} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Saída</label>
                 <input value={form.departure} onChange={e => setForm({ ...form, departure: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={200} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none" maxLength={200} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Operador</label>
                 <input value={form.operator} onChange={e => setForm({ ...form, operator: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" maxLength={100} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none" maxLength={100} />
               </div>
             </div>
 
             <div>
               <label className="text-sm font-semibold text-foreground mb-1 block">Descrição</label>
               <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-                className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none h-24 focus:ring-2 focus:ring-primary/20" maxLength={2000} />
+                className="w-full bg-slate-50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground outline-none h-24 focus:ring-0 focus:border-primary transition-none" maxLength={2000} />
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Itens Inclusos (separados por vírgula)</label>
                 <input value={form.includes} onChange={e => setForm({ ...form, includes: e.target.value })}
-                  className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" maxLength={500} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-4 py-3 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none font-medium" maxLength={500} />
               </div>
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Destaques (separados por vírgula)</label>
                 <input value={form.highlights} onChange={e => setForm({ ...form, highlights: e.target.value })}
-                  className="w-full bg-muted/50 border border-border/50 rounded-2xl px-4 py-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium" maxLength={500} />
+                  className="w-full bg-slate-50 border border-border rounded-lg px-4 py-3 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none font-medium" maxLength={500} />
               </div>
             </div>
 
             {/* Image Management Section */}
-            <div className="space-y-3 bg-muted/20 border border-border rounded-2xl p-4">
+            <div className="space-y-3 bg-slate-50 border border-border rounded-lg p-4">
               <label className="text-sm font-bold text-foreground block flex items-center gap-2">
                 <ImageIcon size={16} /> Imagens do Passeio
               </label>
@@ -741,23 +741,23 @@ const AdminPasseios = () => {
               {imageUrls.length > 0 && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
                   {imageUrls.map((url, index) => (
-                    <div key={index} className="relative group rounded-xl overflow-hidden border border-border bg-muted aspect-square">
+                    <div key={index} className="relative group rounded-lg overflow-hidden border border-border bg-slate-100 aspect-square">
                       <img src={url} alt={`Imagem ${index + 1}`} className="w-full h-full object-cover" 
                         onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }} />
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
                         {index > 0 && (
                           <button type="button" onClick={() => moveImage(index, index - 1)}
-                            className="p-1.5 bg-white/20 rounded-lg hover:bg-white/40 text-white text-xs" title="Mover para esquerda">
+                            className="p-1.5 bg-white/20 rounded-md hover:bg-white/40 text-white text-xs" title="Mover para esquerda">
                             ←
                           </button>
                         )}
                         <button type="button" onClick={() => removeImage(index)}
-                          className="p-1.5 bg-destructive/80 rounded-lg hover:bg-destructive text-white" title="Remover">
+                          className="p-1.5 bg-destructive/80 rounded-md hover:bg-destructive text-white" title="Remover">
                           <X size={14} />
                         </button>
                         {index < imageUrls.length - 1 && (
                           <button type="button" onClick={() => moveImage(index, index + 1)}
-                            className="p-1.5 bg-white/20 rounded-lg hover:bg-white/40 text-white text-xs" title="Mover para direita">
+                            className="p-1.5 bg-white/20 rounded-md hover:bg-white/40 text-white text-xs" title="Mover para direita">
                             →
                           </button>
                         )}
@@ -780,14 +780,14 @@ const AdminPasseios = () => {
                     onChange={e => setNewUrlInput(e.target.value)}
                     onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addUrlImage(); } }}
                     placeholder="Cole a URL da imagem aqui..."
-                    className="w-full bg-muted border border-border rounded-xl pl-9 pr-3 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20"
+                    className="w-full bg-white border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground outline-none focus:ring-0 focus:border-primary transition-none"
                   />
                 </div>
                 <div className="flex gap-2">
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button type="button" onClick={addUrlImage}
-                        className="bg-muted hover:bg-accent text-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border border-border whitespace-nowrap transition-colors">
+                        className="bg-white hover:bg-slate-100 text-foreground px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 border border-border whitespace-nowrap transition-none">
                         Adicionar URL
                       </button>
                     </TooltipTrigger>
@@ -799,7 +799,7 @@ const AdminPasseios = () => {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
-                        className="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 border border-primary/20 disabled:opacity-50 transition-colors">
+                        className="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 border border-primary/20 disabled:opacity-50 transition-none">
                         <Upload size={14} /> {uploading ? "..." : "Upload"}
                       </button>
                     </TooltipTrigger>
@@ -812,19 +812,19 @@ const AdminPasseios = () => {
               <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileUpload} className="hidden" />
             </div>
 
-            <div className="border border-border rounded-2xl p-4 bg-muted/30 space-y-4">
+            <div className="border border-border rounded-lg p-4 bg-slate-50 space-y-4">
               <div>
                 <h4 className="text-sm font-bold text-foreground">Modalidades e Disponibilidade</h4>
                 <p className="text-xs text-muted-foreground">Configure como este passeio pode ser vendido.</p>
               </div>
               <div className="grid sm:grid-cols-2 gap-3">
-                <label className="flex items-center gap-2 cursor-pointer bg-card border border-border rounded-xl px-4 py-3 hover:border-primary/40 transition-colors">
+                <label className="flex items-center gap-2 cursor-pointer bg-white border border-border rounded-lg px-4 py-3 hover:border-primary transition-none">
                   <input type="checkbox" checked={form.mode_collective_enabled}
                     onChange={e => setForm({ ...form, mode_collective_enabled: e.target.checked })}
                     className="rounded w-5 h-5 accent-primary" />
                   <span className="text-sm font-medium text-foreground flex-1">Coletivo (por pessoa)</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer bg-card border border-border rounded-xl px-4 py-3 hover:border-secondary/40 transition-colors">
+                <label className="flex items-center gap-2 cursor-pointer bg-white border border-border rounded-lg px-4 py-3 hover:border-secondary transition-none">
                   <input type="checkbox" checked={form.mode_private_enabled}
                     onChange={e => setForm({ ...form, mode_private_enabled: e.target.checked })}
                     className="rounded w-5 h-5 accent-secondary" />
@@ -835,7 +835,7 @@ const AdminPasseios = () => {
                 <label className="text-sm font-black uppercase tracking-widest text-muted-foreground mb-2 block ml-1 opacity-80">Modalidade Padrão no Site</label>
                 <select value={form.default_mode}
                   onChange={e => setForm({ ...form, default_mode: e.target.value as "privativo" | "coletivo" })}
-                  className="w-full bg-card border border-border/50 rounded-2xl px-4 py-3 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm">
+                  className="w-full bg-white border border-border rounded-lg px-4 py-3 text-sm font-bold text-foreground outline-none focus:ring-0 focus:border-primary transition-none shadow-sm">
                   <option value="privativo" disabled={!form.mode_private_enabled}>Privativo (Venda por Veículo)</option>
                   <option value="coletivo" disabled={!form.mode_collective_enabled}>Coletivo (Venda por Pessoa)</option>
                 </select>
@@ -853,7 +853,7 @@ const AdminPasseios = () => {
             <div className="bg-white border-t border-slate-100 p-6 flex gap-3 sticky bottom-0 z-10">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all">
+                  <button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-sm font-bold shadow-sm transition-none">
                     {editingId ? "Salvar Alterações" : "Criar Passeio"}
                   </button>
                 </TooltipTrigger>
@@ -864,7 +864,7 @@ const AdminPasseios = () => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button type="button" onClick={() => setShowForm(false)} className="px-6 py-3 rounded-xl text-sm font-semibold text-muted-foreground hover:bg-muted transition-colors">
+                  <button type="button" onClick={() => setShowForm(false)} className="px-6 py-3 rounded-lg text-sm font-semibold text-muted-foreground hover:bg-slate-100 transition-none">
                     Cancelar
                   </button>
                 </TooltipTrigger>
