@@ -240,6 +240,7 @@ const AdminReservas = () => {
       
       const total = (unitPriceNum * form.guests);
       const publicTotal = (publicUnitPriceNum * form.guests);
+      const partnerTotal = (partnerNetPriceNum * form.guests);
       const finalTotal = total - discountNum;
 
       const payload = {
