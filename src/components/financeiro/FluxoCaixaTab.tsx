@@ -6,7 +6,6 @@ import {
   LineChart, Line, Legend, PieChart, Pie, Cell, AreaChart, Area
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
-import { motion } from "framer-motion";
 
 const MONTH_LABELS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 const fmt = (v: number) => formatCurrency(v);
@@ -99,27 +98,23 @@ export default function FluxoCaixaTab({
   return (
     <div className="space-y-6">
       <div className="grid lg:grid-cols-3 gap-6">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="lg:col-span-2"
-        >
-          <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover overflow-hidden h-full border border-white/20">
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-lg p-8 border border-slate-200 overflow-hidden h-full">
             <div className="flex flex-row items-center justify-between mb-8">
               <div className="space-y-1">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Fluxo Operacional</p>
+                  <p className="text-[10px] font-bold text-primary uppercase tracking-wider">Fluxo Operacional</p>
                 </div>
-                <h3 className="text-2xl font-black text-foreground tracking-tight flex items-center gap-3">
-                  <TrendingUp className="text-primary" size={24} strokeWidth={2.5} />
+                <h3 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
+                  <TrendingUp className="text-primary" size={20} />
                   Performance Comparativa
                 </h3>
               </div>
               <div className="flex gap-4">
                 <div className="text-right">
-                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Receita Total</p>
-                  <p className="text-lg font-black text-foreground">{fmt(monthlyFiltered.reduce((acc, m) => acc + m.entradas, 0))}</p>
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Receita Total</p>
+                  <p className="text-lg font-bold text-slate-900">{fmt(monthlyFiltered.reduce((acc, m) => acc + m.entradas, 0))}</p>
                 </div>
               </div>
             </div>
@@ -152,14 +147,13 @@ export default function FluxoCaixaTab({
                     dx={-10}
                   />
                   <Tooltip 
-                    cursor={{ fill: 'hsl(var(--muted)/0.2)', radius: 8 }}
+                    cursor={{ fill: 'rgba(0,0,0,0.02)' }}
                     contentStyle={{ 
-                      borderRadius: '1.5rem', 
-                      border: 'none', 
-                      boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
-                      padding: '16px',
-                      backdropFilter: 'blur(10px)',
-                      backgroundColor: 'rgba(255,255,255,0.9)'
+                      borderRadius: '4px', 
+                      border: '1px solid #e2e8f0', 
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                      padding: '12px',
+                      backgroundColor: '#ffffff'
                     }}
                     formatter={(value: number) => [fmt(value), ""]} 
                   />
@@ -177,19 +171,15 @@ export default function FluxoCaixaTab({
           </div>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover h-full border border-white/20">
+        <div>
+          <div className="bg-white rounded-lg p-8 border border-slate-200 h-full">
             <div className="space-y-1 mb-8">
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em]">Mix de Conversão</p>
+                <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Mix de Conversão</p>
               </div>
-              <h3 className="text-2xl font-black text-foreground tracking-tight flex items-center gap-3">
-                <PieChartIcon className="text-primary" size={24} strokeWidth={2.5} />
+              <h3 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
+                <PieChartIcon className="text-primary" size={20} />
                 Canais Pagos
               </h3>
             </div>
@@ -232,7 +222,7 @@ export default function FluxoCaixaTab({
                 
                 <div className="grid gap-2">
                   {revenueByMethod.map((m, i) => (
-                    <div key={m.name} className="group flex items-center justify-between p-3.5 rounded-2xl hover:bg-muted/40 transition-all border border-transparent hover:border-border/30">
+                    <div key={m.name} className="group flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
                       <div className="flex items-center gap-3">
                         <div className="w-3 h-3 rounded-full shadow-lg" style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }} />
                         <span className="text-xs font-black text-muted-foreground uppercase tracking-tight">{m.name}</span>
@@ -249,29 +239,25 @@ export default function FluxoCaixaTab({
         </motion.div>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
-        <div className="glass-card rounded-[2.5rem] p-8 admin-card-hover overflow-hidden border border-white/20">
+      <div>
+        <div className="bg-white rounded-lg p-8 border border-slate-200 overflow-hidden">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div className="space-y-1">
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                <p className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em]">Visão Prospectiva</p>
+                <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Visão Prospectiva</p>
               </div>
-              <h3 className="text-2xl font-black text-foreground tracking-tight flex items-center gap-3">
-                <Zap className="text-primary" size={24} strokeWidth={2.5} />
+              <h3 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
+                <Zap className="text-primary" size={20} />
                 Trajetória de Liquidez
               </h3>
             </div>
             <div className="flex gap-6">
-              <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10">
-                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Melhor Mês</p>
+              <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Melhor Mês</p>
                 <div className="flex items-center gap-2">
-                  <ArrowUpRight className="text-emerald-500" size={16} />
-                  <span className="text-sm font-black text-foreground">
+                  <ArrowUpRight className="text-emerald-500" size={14} />
+                  <span className="text-xs font-bold text-slate-900">
                     {monthlyFiltered.sort((a,b) => b.receitaLiquida - a.receitaLiquida)[0]?.month || '-'}
                   </span>
                 </div>
