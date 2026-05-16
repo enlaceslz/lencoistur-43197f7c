@@ -665,6 +665,8 @@ const AdminReservas = () => {
                           </Badge>
                           {b.termStatus === 'assinado' ? (
                             <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[8px] font-black uppercase py-0 px-2 h-4">Assinado</Badge>
+                          ) : b.termStatus === 'balcao' ? (
+                            <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-[8px] font-black uppercase py-0 px-2 h-4">Assinado Balcão</Badge>
                           ) : (
                             <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-[8px] font-black uppercase py-0 px-2 h-4">Termo Pendente</Badge>
                           )}
