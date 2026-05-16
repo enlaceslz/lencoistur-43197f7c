@@ -1206,14 +1206,7 @@ const AdminReservas = () => {
                      </Badge>
                    )}
                  </div>
-              </div>
-                     {formatCurrency((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount))}
-                   </span>
-                   <span className="text-xs font-bold text-slate-400 line-through">
-                     {parseCurrencyToNumber(form.discount) > 0 && formatCurrency(parseCurrencyToNumber(form.unitPrice) * form.guests)}
-                   </span>
-                 </div>
-              </div>
+            </div>
               
               {!isEditing && (
                 <div 
