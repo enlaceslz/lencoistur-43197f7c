@@ -473,6 +473,46 @@ const AdminReservas = () => {
 
                   <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
                     <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                      <Shield size={14} className="text-indigo-600" /> Segurança & Termos
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 rounded-2xl bg-indigo-50/30 border border-indigo-100/50">
+                        <div className="flex items-center gap-3">
+                          <Shield size={18} className="text-indigo-600" />
+                          <span className="text-[10px] font-black uppercase text-indigo-900">Termo de Risco</span>
+                        </div>
+                        <Badge className={cn("text-[8px] font-black uppercase", 
+                          wideBooking.termStatus === 'assinado' ? "bg-emerald-100 text-emerald-700" : 
+                          wideBooking.termStatus === 'balcao' ? "bg-blue-100 text-blue-700" : 
+                          "bg-amber-100 text-amber-700"
+                        )}>
+                          {wideBooking.termStatus === 'assinado' ? "Assinado" : 
+                           wideBooking.termStatus === 'balcao' ? "Assinado Balcão" : 
+                           "Pendente"}
+                        </Badge>
+                      </div>
+                      
+                      {wideBooking.termStatus === 'pendente' && (
+                        <div className="flex flex-col gap-2">
+                          <Button 
+                            variant="outline"
+                            className="w-full rounded-xl h-10 text-[10px] font-black uppercase tracking-widest border-blue-200 text-blue-600 hover:bg-blue-50"
+                            onClick={() => handleAction(() => markTermAsSignedAtCounter(wideBooking.id), "Termo marcado como assinado no balcão!")}
+                          >
+                            <UserCheck size={14} className="mr-2" /> Assinado no Balcão
+                          </Button>
+                        </div>
+                      )}
+                      
+                      {wideBooking.termPdfUrl && (
+                        <Button variant="outline" className="w-full rounded-xl h-10 text-[10px] font-black uppercase tracking-widest border-indigo-200 text-indigo-600 hover:bg-indigo-50" onClick={() => window.open(wideBooking.termPdfUrl, '_blank')}>
+                          <Download size={14} className="mr-2" /> Ver Termo Assinado
+                        </Button>
+                      )}
+                    </div>
+                  </section>
+
+                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                       <DollarSign size={14} className="text-emerald-500" /> Financeiro
                     </h3>
                     <div className="space-y-4">
