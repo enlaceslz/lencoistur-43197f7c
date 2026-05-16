@@ -99,7 +99,7 @@ const PackageDetail = () => {
           </div>
           <h1 className="font-display text-2xl font-bold mb-2">Ops! Experiência não encontrada</h1>
           <p className="text-muted-foreground mb-8">O pacote que você está procurando pode ter sido removido ou o link está incorreto.</p>
-          <Link to="/" className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground rounded-xl font-bold transition-all hover:bg-primary/90">
+          <Link to="/" className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground rounded-lg font-bold transition-none hover:bg-primary/90">
             Voltar para Início
           </Link>
         </div>
@@ -138,8 +138,8 @@ const PackageDetail = () => {
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
-              <div className="bg-card border border-border rounded-2xl p-5 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <div className="bg-card border border-border rounded-lg p-5 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                   <Clock size={24} />
                 </div>
                 <div>
@@ -147,8 +147,8 @@ const PackageDetail = () => {
                   <p className="text-lg font-bold text-foreground">{pkg.days} dias</p>
                 </div>
               </div>
-              <div className="bg-card border border-border rounded-2xl p-5 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <div className="bg-card border border-border rounded-lg p-5 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                   <Sparkles size={24} />
                 </div>
                 <div>
@@ -162,8 +162,8 @@ const PackageDetail = () => {
               <h2 className="font-display text-2xl font-bold text-foreground mb-6">O que está incluso neste pacote</h2>
               <div className="space-y-4">
                 {pkgTours.map((tour, index) => (
-                  <div key={tour.id} className="bg-card border border-border rounded-2xl overflow-hidden flex flex-col md:flex-row gap-6 p-4">
-                    <div className="w-full md:w-48 h-32 rounded-xl overflow-hidden shrink-0">
+                  <div key={tour.id} className="bg-card border border-border rounded-lg overflow-hidden flex flex-col md:flex-row gap-6 p-4">
+                    <div className="w-full md:w-48 h-32 rounded-lg overflow-hidden shrink-0">
                       {tour.images?.[0] ? (
                         <img src={tour.images[0]} alt={tour.name} className="w-full h-full object-cover" />
                       ) : (
@@ -187,7 +187,7 @@ const PackageDetail = () => {
               </div>
             </div>
 
-            <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6">
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
               <h3 className="font-display font-bold text-primary mb-4 flex items-center gap-2">
                 <Shield size={20} /> Segurança e Garantia Lençóis Tour
               </h3>
@@ -210,7 +210,7 @@ const PackageDetail = () => {
 
           {/* Sidebar / Booking */}
           <div className="space-y-6">
-            <div className="bg-card border border-border rounded-2xl p-6 shadow-sm sticky top-28">
+            <div className="bg-card border border-border rounded-lg p-6 shadow-sm sticky top-28">
               <div className="mb-6">
                 {!partner && pkg.original_price > 0 && (
                   <p className="text-sm text-muted-foreground line-through">De {formatCurrency(pkg.original_price)}</p>
@@ -250,7 +250,7 @@ const PackageDetail = () => {
               <div className="space-y-3">
                 <Link
                   to={`/checkout?type=package&id=${pkg.id}${partnerId ? `&partner_id=${partnerId}` : ''}`}
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-lg font-bold text-lg transition-none flex items-center justify-center gap-2"
                 >
                   Reservar Pacote
                 </Link>
@@ -258,7 +258,7 @@ const PackageDetail = () => {
                   href={`https://wa.me/5598985880954?text=${encodeURIComponent(`Olá! Gostaria de reservar o ${pkg.name}.`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full border border-border hover:bg-muted text-foreground py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+                  className="w-full border border-border hover:bg-muted text-foreground py-4 rounded-lg font-bold transition-none flex items-center justify-center gap-2"
                 >
                   Falar com Especialista
                 </a>

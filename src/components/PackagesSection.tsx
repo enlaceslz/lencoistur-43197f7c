@@ -100,12 +100,12 @@ const PackagesSection = () => {
             const pkgTours = (pkg.package_tours || []).map((pt: any) => pt.tour).filter(Boolean);
 
             return (
-              <div key={pkg.id} className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl transition-shadow group">
+              <div key={pkg.id} className="bg-card border border-border rounded-lg overflow-hidden group">
                 <div className="relative h-48 flex">
                   {pkgTours.length > 0 ? pkgTours.slice(0, 3).map((tour: any, idx: number) => (
                     <div key={`${pkg.id}-${tour.id}-${idx}`} className="flex-1 overflow-hidden">
                       {tour.images?.[0] ? (
-                        <img src={tour.images[0]} alt={tour.name} className="w-full h-full object-cover aspect-[4/3] group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                        <img src={tour.images[0]} alt={tour.name} className="w-full h-full object-cover aspect-[4/3]" loading="lazy" />
                       ) : (
                         <div className="w-full h-full bg-muted" />
                       )}
@@ -155,7 +155,7 @@ const PackagesSection = () => {
                         <span className="text-xs text-muted-foreground">{t("packages.perPerson")}</span>
                       </div>
                     </div>
-                    <Link to={`/pacotes/${pkg.slug}${partnerId ? `?partner_id=${partnerId}` : ''}`} className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2">
+                    <Link to={`/pacotes/${pkg.slug}${partnerId ? `?partner_id=${partnerId}` : ''}`} className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-semibold transition-none flex items-center gap-2">
                       {t("packages.view")} <ArrowRight size={14} />
                     </Link>
                   </div>
@@ -168,7 +168,7 @@ const PackagesSection = () => {
         <div className="mt-12 text-center">
           <a href="https://wa.me/5598985880954?text=Olá! Gostaria de saber mais sobre os pacotes de passeios."
             target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 bg-[hsl(var(--whatsapp))] hover:bg-[hsl(var(--whatsapp-hover))] text-primary-foreground px-8 py-4 rounded-xl font-semibold text-lg transition-colors">
+            className="inline-flex items-center gap-3 bg-[hsl(var(--whatsapp))] hover:bg-[hsl(var(--whatsapp-hover))] text-primary-foreground px-8 py-4 rounded-lg font-semibold text-lg transition-none">
             {t("packages.whatsappCta")}
           </a>
         </div>
