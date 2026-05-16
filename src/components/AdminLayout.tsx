@@ -179,11 +179,13 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
       <Link
         to={path}
         onClick={() => setSidebarOpen(false)}
-        className={`flex items-center gap-3 px-4 py-3 rounded-xl text-[13px] font-bold transition-all duration-300 ${
-          active ? "bg-white/[0.08] text-white shadow-xl shadow-black/20 translate-x-1" : "text-white/40 hover:text-white hover:bg-white/[0.05]"
-        } ${sidebarCollapsed ? "justify-center px-0" : ""}`}
+        className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[14px] font-semibold transition-all duration-300 ${
+          active 
+            ? "bg-primary text-white shadow-lg shadow-primary/30 translate-x-1" 
+            : "text-white/60 hover:text-white hover:bg-white/[0.08]"
+        } ${sidebarCollapsed ? "justify-center px-0 mx-2" : "mx-2"}`}
       >
-        <Icon size={indent ? 16 : 18} className={active ? "text-primary" : ""} />
+        <Icon size={indent ? 16 : 20} className={active ? "text-white" : ""} />
         {!sidebarCollapsed && <span className="truncate">{label}</span>}
       </Link>
     );
@@ -193,17 +195,17 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-[hsl(220,30%,98%)] flex font-body">
-        <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[80px]" : "w-[280px]"} admin-sidebar transition-all duration-500 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col border-r border-white/5`}>
-          <div className={`px-6 py-10 border-b border-white/[0.05] ${sidebarCollapsed ? "flex justify-center" : ""}`}>
+      <div className="min-h-screen bg-slate-50 flex font-body">
+        <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[90px]" : "w-[280px]"} admin-sidebar transition-all duration-500 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col border-r border-white/5`}>
+          <div className={`px-6 py-10 ${sidebarCollapsed ? "flex justify-center" : ""}`}>
             <Link to="/" className="flex items-center gap-4 group">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-ocean flex items-center justify-center shrink-0 shadow-2xl shadow-primary/20 group-hover:rotate-6 transition-all duration-500">
+              <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shrink-0 shadow-2xl shadow-primary/40 group-hover:scale-105 transition-all duration-500">
                 <span className="text-white font-black text-xl">LT</span>
               </div>
               {!sidebarCollapsed && (
                 <div className="flex flex-col">
-                  <span className="font-display text-2xl font-black text-white tracking-tighter">Lençóis<span className="text-primary">Tour</span></span>
-                  <p className="text-[9px] text-white/30 uppercase font-black tracking-[0.3em]">Management Suite</p>
+                  <span className="font-display text-2xl font-black text-white tracking-tight">Lençóis<span className="text-primary">Tour</span></span>
+                  <p className="text-[10px] text-primary font-bold uppercase tracking-[0.2em]">Gestão Operacional</p>
                 </div>
               )}
             </Link>
@@ -212,7 +214,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1.5 scrollbar-none">
             {mainGroups.map((group, idx) => (
               <div key={idx} className={idx > 0 ? "pt-6" : ""}>
-                {!sidebarCollapsed && <p className="px-4 pb-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/20">{group.title}</p>}
+                {!sidebarCollapsed && <p className="px-6 pb-2 text-[11px] font-bold uppercase tracking-[0.15em] text-white/30">{group.title}</p>}
                 {group.items.map(item => <SidebarLink key={item.path} {...item} />)}
               </div>
             ))}
