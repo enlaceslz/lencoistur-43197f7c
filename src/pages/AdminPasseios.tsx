@@ -458,27 +458,38 @@ const AdminPasseios = () => {
   return (
     <AdminLayout title="Passeios">
       <div className="flex flex-col gap-6 h-[calc(100vh-120px)]">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Catálogo</h1>
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-            <Compass size={14} className="text-primary" /> {tours.length} Passeios Registrados
-          </p>
+        <div className="glass-card rounded-[2.5rem] p-10 relative overflow-hidden group shadow-2xl shadow-primary/5">
+          <div className="absolute right-0 top-0 w-96 h-96 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-primary/10 transition-all duration-700" />
+          
+          <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/5 border border-primary/10">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  <span className="text-[10px] font-black text-primary uppercase tracking-widest">{tours.length} Serviços Ativos</span>
+                </div>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Gestão de Inventário</span>
+              </div>
+              <h2 className="text-4xl font-black text-foreground tracking-tight leading-tight">
+                Catálogo de <span className="text-primary">Passeios</span>
+              </h2>
+            </div>
+            
+            <button 
+              onClick={openNew}
+              className="bg-primary hover:bg-primary/90 text-white px-10 h-16 rounded-2xl text-xs font-black uppercase tracking-widest shadow-2xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-3"
+            >
+              <Plus size={20} /> Novo Passeio
+            </button>
+          </div>
         </div>
-        <button 
-          onClick={openNew}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground h-11 px-6 rounded-xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-primary/20 transition-all active:scale-95"
-        >
-          <Plus size={18} strokeWidth={3} /> Novo Passeio
-        </button>
-      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
         {[
-          { label: "Catálogo", value: tours.length, icon: Compass, color: "text-blue-600", bg: "bg-blue-500/10", desc: "Total cadastrado" },
-          { label: "Visíveis", value: activeCount, icon: Eye, color: "text-emerald-600", bg: "bg-emerald-500/10", desc: "No site" },
-          { label: "Rating Médio", value: avgRating, icon: Star, color: "text-amber-600", bg: "bg-amber-500/10", desc: "Avaliação clientes" },
-          { label: "Feedback", value: tours.reduce((a, t) => a + (t.reviews_count || 0), 0), icon: Users, color: "text-purple-600", bg: "bg-purple-500/10", desc: "Reviews totais" },
+          { label: "Catálogo", value: tours.length, icon: Compass, color: "text-primary", bg: "bg-primary/5", desc: "Total cadastrado" },
+          { label: "Visíveis", value: activeCount, icon: Eye, color: "text-primary", bg: "bg-primary/5", desc: "No site" },
+          { label: "Rating Médio", value: avgRating, icon: Star, color: "text-primary", bg: "bg-primary/5", desc: "Avaliação clientes" },
+          { label: "Feedback", value: tours.reduce((a, t) => a + (t.reviews_count || 0), 0), icon: Users, color: "text-primary", bg: "bg-primary/5", desc: "Reviews totais" },
         ].map((stat, i) => (
           <Card key={i} className="rounded-[2rem] border-white/40 shadow-xl shadow-primary/5 glass-card overflow-hidden group">
             <CardContent className="p-7 relative">
