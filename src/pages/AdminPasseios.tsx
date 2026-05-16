@@ -878,8 +878,8 @@ const AdminPasseios = () => {
       </Dialog>
 
 
-      <div className="flex-1 overflow-hidden animate-in-fade" style={{ animationDelay: '0.3s' }}>
-        <div className="flex-1 bg-white rounded-[2.5rem] border border-white/40 flex flex-col overflow-hidden shadow-xl shadow-primary/5 glass-card">
+      <div className="flex-1 overflow-hidden">
+        <div className="flex-1 bg-white rounded-lg border border-border flex flex-col overflow-hidden shadow-sm">
           <div className="overflow-auto flex-1 no-scrollbar">
           <Table className="min-w-[1000px] table-fixed">
             <colgroup>
@@ -891,7 +891,7 @@ const AdminPasseios = () => {
               <col className="w-[8%]" />
               <col className="w-[5%]" />
             </colgroup>
-          <TableHeader className="bg-slate-50/50">
+          <TableHeader className="bg-slate-50">
             <TableRow className="hover:bg-transparent border-b border-border/40">
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest pl-6">Passeio / Localização</TableHead>
               <TableHead className="font-bold text-muted-foreground uppercase text-[10px] tracking-widest">Categoria</TableHead>
@@ -920,7 +920,7 @@ const AdminPasseios = () => {
                 return (
                   <TableRow 
                     key={t.id} 
-                    className={`group hover:bg-primary/5 transition-all border-b border-border/50 cursor-pointer ${!t.active ? "opacity-60 grayscale" : ""}`}
+                    className={`group hover:bg-slate-50 border-b border-border cursor-pointer transition-none ${!t.active ? "opacity-60 grayscale" : ""}`}
                     onClick={(e) => {
                       if (e.defaultPrevented) return;
                       setDetailTour(t);
@@ -930,20 +930,20 @@ const AdminPasseios = () => {
                       <div className="flex items-center gap-4">
                         <div className="relative shrink-0">
                           {t.images?.[0] ? (
-                            <img src={t.images[0]} className="w-14 h-14 rounded-2xl object-cover shadow-md group-hover:scale-110 transition-transform duration-500" />
+                            <img src={t.images[0]} className="w-14 h-14 rounded-lg object-cover shadow-sm" />
                           ) : (
-                            <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground">
+                            <div className="w-14 h-14 rounded-lg bg-slate-100 flex items-center justify-center text-muted-foreground">
                               <Compass size={24} />
                             </div>
                           )}
                           {isTopSeller && (
-                            <div className="absolute -top-2 -right-2 bg-amber-500 text-white p-1 rounded-full shadow-lg border-2 border-background animate-bounce">
+                            <div className="absolute -top-2 -right-2 bg-amber-500 text-white p-1 rounded-full shadow-sm border-2 border-white">
                               <Sparkles size={10} />
                             </div>
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-black text-foreground group-hover:text-primary transition-colors flex items-center gap-2 truncate">
+                          <p className="font-black text-foreground group-hover:text-primary flex items-center gap-2 truncate">
                             {t.name}
                             {isTopSeller && <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-[8px] font-black uppercase py-0 px-1.5">Best Seller</Badge>}
                           </p>
@@ -1013,7 +1013,7 @@ const AdminPasseios = () => {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button onClick={() => toggleActive(t.id, t.active)}
-                              className={`font-black text-[9px] uppercase px-3 py-1.5 rounded-xl border transition-all active:scale-95 flex items-center gap-1.5 ${t.active ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200"}`}>
+                              className={`font-black text-[9px] uppercase px-3 py-1.5 rounded-lg border transition-none flex items-center gap-1.5 ${t.active ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200"}`}>
                               {t.active ? <CheckCircle size={12} /> : <XCircle size={12} />}
                               {t.active ? "Publicado" : "Pausado"}
                             </button>
@@ -1025,10 +1025,10 @@ const AdminPasseios = () => {
                       </div>
                     </TableCell>
                     <TableCell className="text-right pr-6">
-                      <div className="flex justify-end gap-1 group-hover:opacity-100 opacity-80 transition-all translate-x-2 group-hover:translate-x-0" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary" onClick={() => setDetailTour(t)}>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-primary/10 hover:text-primary transition-none" onClick={() => setDetailTour(t)}>
                               <Eye size={16} />
                             </Button>
                           </TooltipTrigger>
@@ -1042,7 +1042,7 @@ const AdminPasseios = () => {
                             <Button 
                               variant="ghost" 
                               size="icon" 
-                              className="h-9 w-9 rounded-xl hover:bg-emerald-100 hover:text-emerald-600" 
+                              className="h-9 w-9 rounded-lg hover:bg-emerald-100 hover:text-emerald-600 transition-none" 
                               onClick={() => window.open(`${window.location.origin}/passeios/${t.slug}`, '_blank')}
                             >
                               <ExternalLink size={16} />
@@ -1055,7 +1055,7 @@ const AdminPasseios = () => {
                         
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-blue-100 hover:text-blue-600" onClick={() => handleDuplicate(t)}>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-blue-100 hover:text-blue-600 transition-none" onClick={() => handleDuplicate(t)}>
                               <Copy size={16} />
                             </Button>
                           </TooltipTrigger>
@@ -1066,7 +1066,7 @@ const AdminPasseios = () => {
 
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10 hover:text-primary" onClick={() => openEdit(t)}>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-primary/10 hover:text-primary transition-none" onClick={() => openEdit(t)}>
                               <Pencil size={16} />
                             </Button>
                           </TooltipTrigger>
@@ -1077,7 +1077,7 @@ const AdminPasseios = () => {
 
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-destructive hover:bg-destructive/10" onClick={() => handleDelete(t.id)}>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg text-destructive hover:bg-destructive/10 transition-none" onClick={() => handleDelete(t.id)}>
                               <Trash2 size={16} />
                             </Button>
                           </TooltipTrigger>
@@ -1099,12 +1099,12 @@ const AdminPasseios = () => {
 
     {/* Tour Detail Dialog */}
       <Dialog open={!!detailTour} onOpenChange={(open) => !open && setDetailTour(null)}>
-        <DialogContent className="sm:max-w-4xl w-[95vw] p-0 border-none shadow-2xl rounded-3xl overflow-hidden bg-[#F8FAFC]">
+        <DialogContent className="sm:max-w-4xl w-[95vw] p-0 border-none shadow-2xl rounded-lg overflow-hidden bg-[#F8FAFC]">
           {detailTour && (
             <div className="flex flex-col max-h-[90vh]">
               <div className="bg-white border-b border-slate-100 p-6 flex items-center justify-between sticky top-0 z-10">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary shadow-sm">
                     <Compass size={24} strokeWidth={2.5} />
                   </div>
                   <div>
@@ -1123,7 +1123,7 @@ const AdminPasseios = () => {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="rounded-xl font-bold h-10 hidden md:flex items-center gap-2"
+                    className="rounded-lg font-bold h-10 hidden md:flex items-center gap-2 transition-none"
                     onClick={() => {
                       const url = `${window.location.origin}${window.location.pathname}?wide_view_id=${detailTour.id}`;
                       window.open(url, '_blank', 'width=1200,height=800');
@@ -1131,7 +1131,7 @@ const AdminPasseios = () => {
                   >
                     <ExternalLink size={16} /> Abrir em Nova Janela
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => setDetailTour(null)} className="rounded-full hover:bg-slate-100 transition-colors">
+                  <Button variant="ghost" size="icon" onClick={() => setDetailTour(null)} className="rounded-full hover:bg-slate-100">
                     <X size={20} className="text-slate-400" />
                   </Button>
                 </div>
@@ -1140,24 +1140,24 @@ const AdminPasseios = () => {
               <div className="overflow-y-auto p-6 md:p-8">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div className="md:col-span-1 space-y-6">
-                    <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <section className="bg-white p-6 rounded-lg border border-slate-100 shadow-sm">
                       <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                         <Compass size={14} className="text-primary" /> Atributos Principais
                       </h3>
                       <div className="space-y-4">
-                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
                           <Label className="text-[10px] uppercase font-bold text-slate-400">Localização</Label>
                           <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1">
                             <MapPin size={14} className="text-primary" /> {detailTour.location || "Não informada"}
                           </p>
                         </div>
-                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
                           <Label className="text-[10px] uppercase font-bold text-slate-400">Duração Estimada</Label>
                           <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1">
                             <Clock size={14} className="text-primary" /> {detailTour.duration || "Não informada"}
                           </p>
                         </div>
-                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
                           <Label className="text-[10px] uppercase font-bold text-slate-400">Tamanho do Grupo</Label>
                           <p className="text-sm font-black text-slate-700 flex items-center gap-2 mt-1">
                             <Users size={14} className="text-primary" /> {detailTour.group_size || "Não informado"}
@@ -1166,7 +1166,7 @@ const AdminPasseios = () => {
                       </div>
                     </section>
 
-                    <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <section className="bg-white p-6 rounded-lg border border-slate-100 shadow-sm">
                       <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                         <DollarSign size={14} className="text-emerald-500" /> Precificação
                       </h3>
