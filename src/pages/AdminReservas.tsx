@@ -511,7 +511,7 @@ const AdminReservas = () => {
                       )}
                     </div>
                   </section>
-
+                  <section className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
                     <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                       <DollarSign size={14} className="text-emerald-500" /> Financeiro
                     </h3>
