@@ -928,9 +928,14 @@ const AdminReservas = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-8 border-t border-slate-100">
               {/* Seção: Financeiro */}
               <div className="space-y-6">
-                <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
-                  <DollarSign size={14} /> Financeiro
-                </h3>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] flex items-center gap-2">
+                    <DollarSign size={14} /> Financeiro
+                  </h3>
+                  <Badge variant="outline" className="text-[9px] font-bold bg-primary/5 text-primary border-primary/10">
+                    Cálculo Automático Ativo
+                  </Badge>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Qtd. PAX</Label>
