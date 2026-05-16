@@ -179,10 +179,10 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
       <Link
         to={path}
         onClick={() => setSidebarOpen(false)}
-        className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[14px] font-semibold transition-all duration-300 ${
+        className={`flex items-center gap-3 px-4 py-2.5 rounded text-[14px] font-medium transition-colors ${
           active 
-            ? "bg-primary text-white shadow-lg shadow-primary/30 translate-x-1" 
-            : "text-white/60 hover:text-white hover:bg-white/[0.08]"
+            ? "bg-primary text-white" 
+            : "text-white/70 hover:text-white hover:bg-white/10"
         } ${sidebarCollapsed ? "justify-center px-0 mx-2" : "mx-2"}`}
       >
         <Icon size={indent ? 16 : 20} className={active ? "text-white" : ""} />
@@ -196,25 +196,25 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-slate-50 flex font-body">
-        <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[90px]" : "w-[280px]"} admin-sidebar transition-all duration-500 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col border-r border-white/5`}>
-          <div className={`px-6 py-10 ${sidebarCollapsed ? "flex justify-center" : ""}`}>
-            <Link to="/" className="flex items-center gap-4 group">
-              <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shrink-0 shadow-2xl shadow-primary/40 group-hover:scale-105 transition-all duration-500">
-                <span className="text-white font-black text-xl">LT</span>
+        <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[70px]" : "w-[260px]"} bg-slate-900 transition-all duration-200 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col border-r border-slate-800`}>
+          <div className={`px-4 py-6 ${sidebarCollapsed ? "flex justify-center" : ""}`}>
+            <Link to="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded bg-primary flex items-center justify-center shrink-0">
+                <span className="text-white font-bold text-lg">LT</span>
               </div>
               {!sidebarCollapsed && (
                 <div className="flex flex-col">
-                  <span className="font-display text-2xl font-black text-white tracking-tight">Lençóis<span className="text-primary">Tour</span></span>
-                  <p className="text-[10px] text-primary font-bold uppercase tracking-[0.2em]">Gestão Operacional</p>
+                  <span className="font-sans text-xl font-bold text-white tracking-tight">Lençóis Tour</span>
+                  <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Administrativo</p>
                 </div>
               )}
             </Link>
           </div>
 
-          <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1.5 scrollbar-none">
+          <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1 scrollbar-none">
             {mainGroups.map((group, idx) => (
-              <div key={idx} className={idx > 0 ? "pt-6" : ""}>
-                {!sidebarCollapsed && <p className="px-6 pb-2 text-[11px] font-bold uppercase tracking-[0.15em] text-white/30">{group.title}</p>}
+              <div key={idx} className={idx > 0 ? "pt-4" : ""}>
+                {!sidebarCollapsed && <p className="px-4 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">{group.title}</p>}
                 {group.items.map(item => <SidebarLink key={item.path} {...item} />)}
               </div>
             ))}
@@ -240,13 +240,13 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           </div>
         </aside>
 
-        <main className={`flex-1 flex flex-col min-w-0 transition-all duration-500 ${sidebarCollapsed ? "lg:ml-[80px]" : "lg:ml-[280px]"}`}>
-          <header className="h-20 bg-white/70 backdrop-blur-xl border-b border-border/40 px-8 flex items-center justify-between sticky top-0 z-40 shadow-sm">
-            <div className="flex items-center gap-6">
-              <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2.5 rounded-xl hover:bg-muted"><Menu size={22} /></button>
+        <main className={`flex-1 flex flex-col min-w-0 transition-all duration-200 ${sidebarCollapsed ? "lg:ml-[70px]" : "lg:ml-[260px]"}`}>
+          <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-40">
+            <div className="flex items-center gap-4">
+              <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded hover:bg-slate-100"><Menu size={20} /></button>
               <div className="hidden lg:flex items-center gap-4">
-                <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="p-2.5 rounded-xl hover:bg-muted transition-all group">
-                  {sidebarCollapsed ? <ChevronRight size={20} className="group-hover:translate-x-0.5" /> : <Menu size={20} />}
+                <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="p-2 rounded hover:bg-slate-100 transition-colors">
+                  {sidebarCollapsed ? <ChevronRight size={18} /> : <Menu size={18} />}
                 </button>
                 <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
                   {breadcrumbs.map((c, i) => (
