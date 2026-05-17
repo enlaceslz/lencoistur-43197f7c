@@ -3156,6 +3156,18 @@ export type Database = {
           unit_price: number
         }[]
       }
+      get_public_company_info: {
+        Args: never
+        Returns: {
+          cidade: string
+          estado: string
+          logo_url: string
+          nome_fantasia: string
+          razao_social: string
+          term_recommendations: string
+          term_safety_risks: string
+        }[]
+      }
       get_public_term_v2: {
         Args: { p_term_id: string }
         Returns: {
