@@ -74,7 +74,7 @@ const TermoAssinatura = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const companyRes = await supabase.from("sgs_empresa").select("*").limit(1).maybeSingle();
+      const companyRes = await supabase.from("sgs_empresa").select("razao_social, logo_url, endereco, telefone, email, cidade, estado, term_recommendations, term_safety_risks, icmbio_autorizacao, cnpj").limit(1).maybeSingle();
       setCompany(companyRes.data);
 
       let bookingData = null;
@@ -82,114 +82,85 @@ const TermoAssinatura = () => {
 
       if (termId) {
         console.log("Searching by termId:", termId);
-        const termRes = await supabase.from("sgs_risk_terms").select("*, customers!customer_id(*)").eq("id", termId).maybeSingle();
-        if (termRes.data) {
-          termData = termRes.data;
-          console.log("Term found:", termData.id);
-          if (termData.booking_id) {
-            const bookingRes = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", termData.booking_id).maybeSingle();
-            bookingData = bookingRes.data;
+        const { data: tData, error: tError } = await supabase.rpc("get_public_term_v2", { p_term_id: termId });
+        if (tData && tData.length > 0) {
+          const row = tData[0];
+          termData = {
+            id: row.id,
+            customer_id: row.customer_id,
+            customer_name: row.customer_name,
+            tour_name: row.tour_name,
+            term_date: row.term_date,
+            accepted: row.accepted,
+            booking_id: row.booking_id,
+            signature_data: row.signature_data,
+            risks_informed: row.risks_informed,
+            health_questions: row.health_questions,
+            pdf_url: row.pdf_url,
+            customers: {
+              id: row.customer_id,
+              name: row.customer_name,
+              email: row.customer_email,
+              phone: row.customer_phone,
+              cpf: row.customer_cpf,
+              passport: row.customer_passport,
+              country: row.customer_country,
+              birth_date: row.customer_birth_date
+            }
+          };
+          if (row.booking_id) {
+            bookingData = {
+              id: row.booking_id,
+              booking_code: row.booking_code,
+              item_name: row.booking_item_name,
+              date: row.booking_date,
+              customers: termData.customers
+            };
           }
         }
       }
 
-      if (!bookingData && bookingIdParam) {
-        console.log("Searching by bookingIdParam:", bookingIdParam);
-        const { data: bById, error: bIdError } = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", bookingIdParam).maybeSingle();
-        if (bIdError) console.error("Booking search error:", bIdError);
-        bookingData = bById;
-      }
-
-      if (!bookingData && bookingCode) {
-        console.log("Searching by bookingCode:", bookingCode);
-        const cleanBookingCode = bookingCode.trim();
+      if (!bookingData && (bookingIdParam || bookingCode || customerIdParam)) {
+        const query = bookingIdParam || bookingCode || customerIdParam;
+        console.log("Searching booking by query:", query);
+        const { data: searchResults } = await supabase.rpc("search_public_booking", { p_query: query });
         
-        // Try searching by booking_code first
-        const { data: bData, error: bError } = await supabase
-          .from("bookings")
-          .select("*, customers!customer_id(*)")
-          .ilike("booking_code", cleanBookingCode)
-          .maybeSingle();
-        
-        if (bError) console.error("Search error:", bError);
-        bookingData = bData;
-
-        // Try searching without prefix if cleanBookingCode doesn't have it but DB does, or vice versa
-        if (!bookingData) {
-          const alternativeCode = cleanBookingCode.startsWith("RES-") 
-            ? cleanBookingCode 
-            : `RES-${new Date().getFullYear()}-${cleanBookingCode.padStart(4, "0")}`;
-          
-          console.log("Trying alternative bookingCode:", alternativeCode);
-          const { data: bDataAlt } = await supabase
-            .from("bookings")
-            .select("*, customers!customer_id(*)")
-            .ilike("booking_code", alternativeCode)
-            .maybeSingle();
-          bookingData = bDataAlt;
-        }
-
-        // Fallback: try searching by ID if bookingCode looks like a UUID
-        if (!bookingData && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanBookingCode)) {
-          console.log("Trying bookingCode as UUID fallback");
-          const { data: bByIdFallback } = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", cleanBookingCode).maybeSingle();
-          bookingData = bByIdFallback;
-        }
-        
-        // Final fallback for booking_code: exact match with variations
-        if (!bookingData) {
-          const { data: bDataExact } = await supabase
-            .from("bookings")
-            .select("*, customers!customer_id(*)")
-            .or(`booking_code.eq.${cleanBookingCode},booking_code.ilike.%${cleanBookingCode}%`)
-            .limit(1)
-            .maybeSingle();
-          bookingData = bDataExact;
-        }
-
-        if (bookingData && !termData) {
-          const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
-          termData = tData;
-        }
-      }
-
-      if (!bookingData && customerIdParam) {
-        console.log("Searching by customerIdParam:", customerIdParam);
-        // Fallback: try to find the most recent booking for this customer
-        const { data: bByCust, error: bCustError } = await supabase
-          .from("bookings")
-          .select("*, customers!customer_id(*)")
-          .eq("customer_id", customerIdParam)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        
-        if (bCustError) console.error("Customer search error:", bCustError);
-        bookingData = bByCust;
-
-        if (bookingData && !termData) {
-          const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
-          termData = tData;
-        }
-      }
-
-      if (!bookingData && !termData && customerIdParam) {
-        console.log("Searching directly for customer:", customerIdParam);
-        const { data: customerData } = await supabase.from("customers").select("*").eq("id", customerIdParam).maybeSingle();
-        if (customerData) {
+        if (searchResults && searchResults.length > 0) {
+          const row = searchResults[0];
           bookingData = {
-            id: null,
-            customer_id: customerData.id,
-            customers: customerData,
-            item_name: "Passeio (A definir)",
-            date: new Date().toISOString().split('T')[0],
-            booking_code: "AVULSO"
+            id: row.id,
+            booking_code: row.booking_code,
+            item_name: row.item_name,
+            date: row.date,
+            customer_id: row.customer_id,
+            customers: {
+              id: row.customer_id,
+              name: row.customer_name,
+              email: row.customer_email,
+              phone: row.customer_phone,
+              cpf: row.customer_cpf,
+              passport: row.customer_passport,
+              country: row.customer_country,
+              birth_date: row.customer_birth_date
+            }
           };
-          
-          const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("customer_id", customerData.id).is("booking_id", null).maybeSingle();
-          termData = tData;
+
+          // Try to find existing term for this booking
+          const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
+          if (tData) {
+             // We use RPC to get full term data including customers if needed, but for now term exists
+             const { data: fullTData } = await supabase.rpc("get_public_term_v2", { p_term_id: tData.id });
+             if (fullTData && fullTData.length > 0) {
+                const tRow = fullTData[0];
+                termData = {
+                  ...tRow,
+                  customers: bookingData.customers
+                };
+             }
+          }
         }
       }
+
 
       if (bookingData || termData) {
         setBooking(bookingData);
@@ -332,103 +303,18 @@ const TermoAssinatura = () => {
     const signatureData = canvas.toDataURL();
 
     try {
-      let currentTermId = term?.id;
+      const currentTermId = term?.id;
+      const fileName = `termo_${booking?.booking_code || 'SGS'}_${Date.now()}.pdf`;
 
-      if (!currentTermId) {
-        // 1. Save term record if it doesn't exist
-        const { data: termData, error: termError } = await supabase.from("sgs_risk_terms").insert([{
-          booking_id: booking.id,
-          customer_id: booking.customer_id,
-          customer_name: booking.customers?.name || "Cliente",
-          nationality: booking.customers?.country || "Brasil",
-          phone: booking.customers?.phone || booking.customer_phone || "",
-          email: booking.customers?.email || booking.customer_email || "",
-          cpf: booking.customers?.cpf || "",
-          birth_date: booking.customers?.birth_date || null,
-          tour_name: booking.item_name || "Passeio",
-          risks_informed: acceptedRisks,
-          health_questions: healthInfo,
-          safety_controls_informed: true,
-          accepted: true,
-          signature_data: signatureData,
-          signed_at: new Date().toISOString(),
-          term_date: new Date().toISOString().split('T')[0],
-          cancellation_policy: "Conforme política da agência aceita no momento da reserva."
-        }]).select();
-        
-        if (termError) {
-          console.error("Error inserting term:", termError);
-          throw termError;
-        }
-        
-        if (!termData || termData.length === 0) throw new Error("Erro ao criar o termo no banco de dados.");
-        currentTermId = termData[0].id;
-      } else {
-        // Update existing term
-        const { error: termError } = await supabase.from("sgs_risk_terms").update({
-          risks_informed: acceptedRisks,
-          health_questions: healthInfo,
-          signature_data: signatureData,
-          signed_at: new Date().toISOString(),
-          term_date: new Date().toISOString().split('T')[0], // Atualiza a data do termo para o dia da assinatura
-          accepted: true
-        }).eq("id", currentTermId);
-
-        if (termError) throw termError;
-      }
-
-      // 2. Save/Update companion signatures
-      const minorsToInsert = [];
-      const minorsToUpdate = [];
-
-      for (const companion of companions) {
-        const signature = signatures[companion.id] || companion.signature_data;
-        
-        // Check if this specific companion already exists in sgs_risk_term_minors for this term
-        const { data: existingMinor } = await supabase
-          .from("sgs_risk_term_minors")
-          .select("id")
-          .eq("risk_term_id", currentTermId)
-          .eq("full_name", companion.full_name)
-          .maybeSingle();
-        
-        const minorPayload = {
-          risk_term_id: currentTermId,
-          full_name: companion.full_name,
-          is_adult: companion.is_adult,
-          responsible_name: companion.responsible_name,
-          signature_data: signature,
-          signed_at: signature ? new Date().toISOString() : null
-        };
-
-        if (!existingMinor) {
-          minorsToInsert.push(minorPayload);
-        } else {
-          minorsToUpdate.push({ id: existingMinor.id, ...minorPayload });
-        }
-      }
-
-      if (minorsToInsert.length > 0) {
-        const { error: insertError } = await supabase.from("sgs_risk_term_minors").insert(minorsToInsert);
-        if (insertError) console.error("Error inserting companions:", insertError);
-      }
-
-      for (const minor of minorsToUpdate) {
-        const { error: updateError } = await supabase.from("sgs_risk_term_minors").update(minor).eq("id", minor.id);
-        if (updateError) console.error("Error updating companion:", updateError);
-      }
-
-      // 2. Generate PDF
+      // 1. Generate PDF locally
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
       
-      // Fine Border
       doc.setDrawColor(200, 200, 200);
       doc.setLineWidth(0.2);
       doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
       
-      // Load Logo
       if (company?.logo_url) {
         try {
           doc.addImage(company.logo_url, 'PNG', 14, 10, 30, 12);
@@ -437,7 +323,6 @@ const TermoAssinatura = () => {
         }
       }
       
-      // Header Info - Right Aligned
       doc.setFontSize(7);
       doc.setTextColor(100, 100, 100);
       const companyName = company?.razao_social || company?.nome_fantasia || "LENÇÓIS TOUR";
@@ -451,7 +336,6 @@ const TermoAssinatura = () => {
       doc.setDrawColor(230, 230, 230);
       doc.line(14, 25, pageWidth - 14, 25);
       
-      // Title
       doc.setFontSize(13);
       doc.setTextColor(0, 0, 0);
       doc.setFont("helvetica", "bold");
@@ -462,7 +346,6 @@ const TermoAssinatura = () => {
       
       let currentY = 44;
       
-      // Booking Info (Table)
       autoTable(doc, {
         startY: currentY,
         body: [
@@ -482,10 +365,8 @@ const TermoAssinatura = () => {
       
       currentY = (doc as any).lastAutoTable.finalY + 8;
       
-      // Content Sections - Compacted
       const addSection = (title: string, content: string, fontSize = 7) => {
         if (currentY > pageHeight - 60) doc.addPage();
-        
         doc.setFontSize(9);
         doc.setFont("helvetica", "bold");
         doc.text(title, 14, currentY);
@@ -504,7 +385,6 @@ const TermoAssinatura = () => {
         addSection("Riscos e Segurança:", company.term_safety_risks);
       }
 
-      // Risks Checklist (Two Columns Compact)
       doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
       doc.text("Declaração de Ciência de Riscos:", 14, currentY);
@@ -527,7 +407,6 @@ const TermoAssinatura = () => {
       
       currentY = (doc as any).lastAutoTable.finalY + 6;
 
-      // Health Info
       if (healthInfo.length > 0) {
         doc.setFontSize(8);
         doc.setFont("helvetica", "bold");
@@ -542,10 +421,7 @@ const TermoAssinatura = () => {
       doc.text(declLines, 14, currentY);
       currentY += (declLines.length * 4) + 12;
 
-      // Signatures Area
       const sigBoxWidth = (pageWidth - 40) / 2;
-      
-      // Participant Signature
       doc.setFontSize(8);
       doc.setFont("helvetica", "bold");
       doc.text("Assinatura do Participante:", 14, currentY);
@@ -556,14 +432,12 @@ const TermoAssinatura = () => {
       doc.text(booking.customers?.name || "Cliente", 14, currentY + 19);
       doc.text(`${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}, ${new Date().toLocaleString("pt-BR")}`, 14, currentY + 22);
 
-      // Companions List (covered by main signature)
       if (companions.length > 0) {
         currentY += 10;
         doc.setFontSize(8);
         doc.setFont("helvetica", "bold");
         doc.text("Dependentes cobertos por este termo:", 14, currentY);
         currentY += 4;
-        
         companions.forEach((comp, idx) => {
           if (currentY > pageHeight - 20) {
             doc.addPage();
@@ -576,74 +450,51 @@ const TermoAssinatura = () => {
         });
       }
 
-      // Final Footer
       doc.setFontSize(6);
       doc.setTextColor(150, 150, 150);
       doc.text(`Documento gerado digitalmente por Lençóis Tour - SGS - ${new Date().toLocaleDateString("pt-BR")}`, pageWidth / 2, pageHeight - 8, { align: "center" });
 
-      const pdfBlob = doc.output('blob');
-      const fileName = `termo_${booking?.booking_code || 'SGS'}_${Date.now()}.pdf`;
-      const filePath = `termos_assinados/${fileName}`;
+      const pdfBase64 = btoa(doc.output());
 
-      // 3. Upload to Storage
-      const { error: uploadError } = await supabase.storage
-        .from("customer-documents")
-        .upload(filePath, pdfBlob, {
-          contentType: 'application/pdf',
-          cacheControl: '3600'
-        });
+      // 2. Pre-calculate minor signatures
+      const minorsData = companions.map(c => ({
+        full_name: c.full_name,
+        is_adult: c.is_adult,
+        responsible_name: c.responsible_name,
+        signature_data: signatures[c.id] || c.signature_data,
+        cpf: c.cpf,
+        birth_date: c.birthDate
+      }));
 
-      if (uploadError) console.error("Storage upload error:", uploadError);
-
-      // 4. Save to CRM Customer Documents
-      const customerId = booking?.customer_id || term?.customer_id;
-      if (customerId) {
-        const publicUrl = supabase.storage.from("customer-documents").getPublicUrl(filePath).data.publicUrl;
-        
-        await supabase.from("customer_documents").insert([{
-          customer_id: customerId,
-          name: `Termo Assinado - ${booking?.item_name || term?.tour_name}`,
-          file_url: publicUrl,
-          file_type: "application/pdf",
-          file_size: pdfBlob.size,
-          category: "termo"
-        }]);
-      }
-
-      // Also update sgs_risk_terms record with the PDF path
-      await supabase.from("sgs_risk_terms").update({ pdf_url: filePath }).eq("id", currentTermId);
-
-      // 5. Update booking status if applicable
-      if (booking?.id) {
-        try {
-          // If booking is pending, mark as confirmed now that it's signed
-          if (booking.status === 'pendente') {
-            const { error: bookingUpdateError } = await supabase.from("bookings").update({ 
-              status: "confirmada",
-              updated_at: new Date().toISOString()
-            }).eq("id", booking.id);
-            
-            if (bookingUpdateError) {
-              console.error("Error updating booking status:", bookingUpdateError);
-              // We don't throw here to not block the user if the status update fails but the term was saved
-            } else {
-              console.log("Booking status updated to confirmed after signing.");
-            }
+      // 3. Invoke Edge Function to save everything securely
+      const { data: edgeResult, error: edgeError } = await supabase.functions.invoke("handle-public-term", {
+        body: {
+          action: "save_term",
+          payload: {
+            termId: currentTermId,
+            bookingId: booking?.id,
+            bookingCode: booking?.booking_code,
+            customerId: booking?.customer_id || term?.customer_id,
+            customerName: booking?.customers?.name || term?.customer_name || "Cliente",
+            nationality: booking?.customers?.country || term?.nationality || "Brasil",
+            phone: booking?.customers?.phone || term?.phone || "",
+            email: booking?.customers?.email || term?.email || "",
+            cpf: booking?.customers?.cpf || term?.cpf || "",
+            birthDate: booking?.customers?.birth_date || term?.birth_date || null,
+            tourName: booking?.item_name || term?.tour_name || "Passeio",
+            risksInformed: acceptedRisks,
+            healthQuestions: healthInfo,
+            signatureData: signatureData,
+            minors: minorsData,
+            pdfBase64: pdfBase64,
+            pdfFileName: fileName
           }
-        } catch (statusErr) {
-          console.error("Error in booking status update flow:", statusErr);
         }
-      }
+      });
 
-      // Also save to generic Documents Module
-      await supabase.from("documents").insert([{
-        name: `Termo Assinado - ${booking?.item_name || term?.tour_name} - ${booking?.booking_code || 'SGS'}`,
-        type: "termo_assinado",
-        description: `Termo assinado por ${booking?.customers?.name || booking?.customer_name || term?.customer_name} em ${new Date().toLocaleDateString("pt-BR")}`,
-        file_url: filePath,
-        file_name: fileName,
-        status: "vigente"
-      }]);
+      if (edgeError || !edgeResult?.success) {
+        throw new Error(edgeResult?.error || edgeError?.message || "Erro ao salvar o termo");
+      }
 
       toast({ title: "Termo Assinado!", description: "Documento salvo e anexado ao cadastro." });
       setSigned(true);
@@ -654,6 +505,7 @@ const TermoAssinatura = () => {
     } finally {
       setSigning(false);
     }
+
   };
 
   if (loading) {

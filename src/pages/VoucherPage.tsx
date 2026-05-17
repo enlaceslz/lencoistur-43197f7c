@@ -17,42 +17,44 @@ const VoucherPage = () => {
         return;
       }
 
-      const { data, error } = await supabase
-        .from("bookings")
-        .select("*, customers!customer_id(*)")
-        .eq("id", id)
-        .single();
+      const { data, error } = await supabase.rpc("get_public_booking_v2", {
+        p_booking_id: id
+      });
 
-      if (error || !data) {
+      if (error || !data || (data as any).length === 0) {
         console.error("Error fetching booking for voucher:", error);
         navigate("/");
         return;
       }
 
+      const bookingData = (data as any)[0];
+
+
       const { data: company } = await supabase.from("sgs_empresa").select("*").limit(1).maybeSingle();
 
       const receiptData: ReceiptData = {
-        bookingCode: data.booking_code,
-        customerName: data.customers?.name || "Cliente",
-        customerEmail: data.customers?.email || "",
-        customerPhone: data.customers?.phone || "",
-        itemName: data.item_name,
-        type: data.type,
-        date: data.date,
-        guests: data.guests,
-        unitPrice: data.unit_price,
-        total: data.total,
-        discount: data.discount,
-        finalTotal: data.final_total,
-        payMethod: data.pay_method,
-        paymentStatus: data.payment_status,
-        status: data.status,
-        pixCode: data.pix_code,
-        createdAt: data.created_at,
-        notes: data.notes,
-        cpf: data.customers?.cpf,
-        passport: data.customers?.passport
+        bookingCode: bookingData.booking_code,
+        customerName: bookingData.customer_name || "Cliente",
+        customerEmail: bookingData.customer_email || "",
+        customerPhone: bookingData.customer_phone || "",
+        itemName: bookingData.item_name,
+        type: bookingData.type as any,
+        date: bookingData.date,
+        guests: bookingData.guests,
+        unitPrice: bookingData.unit_price,
+        total: bookingData.total,
+        discount: bookingData.discount,
+        finalTotal: bookingData.final_total,
+        payMethod: bookingData.pay_method as any,
+        paymentStatus: bookingData.payment_status as any,
+        status: bookingData.status as any,
+        pixCode: bookingData.pix_code,
+        createdAt: bookingData.created_at,
+        notes: bookingData.notes,
+        cpf: bookingData.customer_cpf,
+        passport: bookingData.customer_passport
       };
+
 
       // Since this page's purpose is to show the receipt, we trigger the print logic
       // and then we can also show a "Download" view if the print is cancelled.

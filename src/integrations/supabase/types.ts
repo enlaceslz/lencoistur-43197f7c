@@ -3130,12 +3130,80 @@ export type Database = {
       }
     }
     Functions: {
+      get_public_booking_v2: {
+        Args: { p_booking_id: string }
+        Returns: {
+          booking_code: string
+          created_at: string
+          customer_cpf: string
+          customer_email: string
+          customer_name: string
+          customer_passport: string
+          customer_phone: string
+          date: string
+          discount: number
+          final_total: number
+          guests: number
+          id: string
+          item_name: string
+          notes: string
+          pay_method: string
+          payment_status: string
+          pix_code: string
+          status: string
+          total: number
+          type: string
+          unit_price: number
+        }[]
+      }
+      get_public_term_v2: {
+        Args: { p_term_id: string }
+        Returns: {
+          accepted: boolean
+          booking_code: string
+          booking_date: string
+          booking_id: string
+          booking_item_name: string
+          customer_birth_date: string
+          customer_country: string
+          customer_cpf: string
+          customer_email: string
+          customer_id: string
+          customer_name: string
+          customer_passport: string
+          customer_phone: string
+          health_questions: string[]
+          id: string
+          pdf_url: string
+          risks_informed: string[]
+          signature_data: string
+          term_date: string
+          tour_name: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      search_public_booking: {
+        Args: { p_query: string }
+        Returns: {
+          booking_code: string
+          customer_birth_date: string
+          customer_country: string
+          customer_cpf: string
+          customer_email: string
+          customer_id: string
+          customer_name: string
+          customer_passport: string
+          customer_phone: string
+          date: string
+          id: string
+          item_name: string
+        }[]
       }
     }
     Enums: {

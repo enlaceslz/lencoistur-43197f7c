@@ -223,14 +223,16 @@ const MinhasReservas = () => {
                           />
                         )}
                         {b.termStatus === "assinado" ? (
-                          <a
-                            href={supabase.storage.from("customer-documents").getPublicUrl(b.termPdfUrl!).data.publicUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <button
+                            onClick={async () => {
+                              const { data } = await supabase.storage.from("customer-documents").createSignedUrl(b.termPdfUrl!, 300);
+                              if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+                              else toast({ title: "Erro", description: "Não foi possível gerar o link do documento.", variant: "destructive" });
+                            }}
                             className="bg-green-500/10 text-green-600 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-500/20 transition-colors flex items-center gap-1"
                           >
                             <Shield size={14} /> Termo Assinado
-                          </a>
+                          </button>
                         ) : (
                           <Link
                             to={`/assinatura-termo?booking=${encodeURIComponent(b.bookingCode)}`}
@@ -239,6 +241,7 @@ const MinhasReservas = () => {
                             <Shield size={14} /> Assinar Termo de Risco
                           </Link>
                         )}
+
                       </div>
                     </div>
                   )}
@@ -283,14 +286,16 @@ const MinhasReservas = () => {
                         </TooltipContent>
                       </Tooltip>
                       {b.termStatus === "assinado" ? (
-                        <a
-                          href={supabase.storage.from("customer-documents").getPublicUrl(b.termPdfUrl!).data.publicUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          onClick={async () => {
+                            const { data } = await supabase.storage.from("customer-documents").createSignedUrl(b.termPdfUrl!, 300);
+                            if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+                            else toast({ title: "Erro", description: "Não foi possível gerar o link do documento.", variant: "destructive" });
+                          }}
                           className="bg-green-500/10 text-green-600 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-500/20 transition-colors flex items-center gap-1"
                         >
                           <Shield size={14} /> Termo Assinado
-                        </a>
+                        </button>
                       ) : (
                         <Link
                           to={`/assinatura-termo?booking=${encodeURIComponent(b.bookingCode)}`}
@@ -299,6 +304,7 @@ const MinhasReservas = () => {
                           <Shield size={14} /> Assinar Termo de Risco
                         </Link>
                       )}
+
                     </div>
                   )}
 

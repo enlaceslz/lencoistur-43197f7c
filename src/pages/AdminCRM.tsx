@@ -611,20 +611,17 @@ const AdminCRMContent = () => {
         
       if (error) throw error;
       
-      const { data: { publicUrl } } = supabase.storage
-        .from('customer-documents')
-        .getPublicUrl(fileName);
-        
       const { error: dbError } = await supabase
         .from('customer_documents')
         .insert({
           customer_id: selectedCustomer.id,
           name: file.name,
-          file_url: publicUrl,
+          file_url: data.path, // Store the path
           file_type: file.type,
           file_size: file.size,
           category: docCategory
         });
+
         
       if (dbError) throw dbError;
       
@@ -637,7 +634,26 @@ const AdminCRMContent = () => {
     }
   };
 
+  const handleViewDocument = async (fileUrl: string) => {
+    let path = fileUrl;
+    if (fileUrl.startsWith('http')) {
+      // Try to extract path from old public URL
+      const parts = fileUrl.split('customer-documents/');
+      if (parts.length > 1) {
+        path = parts[1];
+      }
+    }
+    
+    const { data, error } = await supabase.storage.from('customer-documents').createSignedUrl(path, 300);
+    if (data?.signedUrl) {
+      window.open(data.signedUrl, '_blank');
+    } else {
+      toast.error("Erro ao gerar link do documento");
+    }
+  };
+
   const handleDeleteDocument = async (id: string) => {
+
     const doc = customerDocuments.find(d => d.id === id);
     if (!doc) return;
     
@@ -966,7 +982,8 @@ const AdminCRMContent = () => {
                                   <Badge variant="secondary" className="text-[8px] font-bold uppercase">{doc.category}</Badge>
                                 </div>
                               </div>
-                              <Button variant="ghost" size="icon" className="rounded-xl h-8 w-8 text-primary" onClick={() => window.open(doc.file_url, '_blank')}>
+                              <Button variant="ghost" size="icon" className="rounded-xl h-8 w-8 text-primary" onClick={() => handleViewDocument(doc.file_url)}>
+
                                 <Eye size={14} />
                               </Button>
                             </div>
@@ -1762,7 +1779,7 @@ const AdminCRMContent = () => {
                                       <Badge variant="secondary" className="text-[8px] font-bold uppercase">{doc.category}</Badge>
                                     </div>
                                   </div>
-                                  <Button variant="ghost" size="icon" className="rounded-xl h-8 w-8 text-primary" onClick={() => window.open(doc.file_url, '_blank')}>
+                                  <Button variant="ghost" size="icon" className="rounded-xl h-8 w-8 text-primary" onClick={() => handleViewDocument(doc.file_url)}>
                                     <Eye size={14} />
                                   </Button>
                                 </div>
