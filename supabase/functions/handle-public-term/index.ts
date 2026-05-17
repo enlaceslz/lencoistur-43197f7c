@@ -37,7 +37,7 @@ serve(async (req) => {
       // Validate token and existence
       const { data: existingTerm, error: termError } = await supabaseAdmin
         .from('sgs_risk_terms')
-        .select('id, sign_access_token, sign_access_expires_at')
+        .select('id, sign_access_token, sign_access_expires_at, booking_id, customer_id, accepted')
         .eq('id', termId)
         .maybeSingle()
 
