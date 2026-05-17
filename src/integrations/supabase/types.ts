@@ -3134,14 +3134,26 @@ export type Database = {
         Args: { p_booking_id: string }
         Returns: {
           booking_code: string
+          created_at: string
+          customer_cpf: string
+          customer_email: string
           customer_name: string
+          customer_passport: string
+          customer_phone: string
           date: string
+          discount: number
+          final_total: number
           guests: number
           id: string
           item_name: string
+          notes: string
+          pay_method: string
           payment_status: string
+          pix_code: string
           status: string
+          total: number
           type: string
+          unit_price: number
         }[]
       }
       get_public_term_v2: {
