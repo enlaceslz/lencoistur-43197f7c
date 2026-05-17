@@ -303,72 +303,62 @@ const TermoAssinatura = () => {
     const signatureData = canvas.toDataURL();
 
     try {
-      let currentTermId = term?.id;
+      const currentTermId = term?.id;
+      const fileName = `termo_${booking?.booking_code || 'SGS'}_${Date.now()}.pdf`;
 
-      if (!currentTermId) {
-        // 1. Save term record if it doesn't exist
-        const { data: termData, error: termError } = await supabase.from("sgs_risk_terms").insert([{
-          booking_id: booking.id,
-          customer_id: booking.customer_id,
-          customer_name: booking.customers?.name || "Cliente",
-          nationality: booking.customers?.country || "Brasil",
-          phone: booking.customers?.phone || booking.customer_phone || "",
-          email: booking.customers?.email || booking.customer_email || "",
-          cpf: booking.customers?.cpf || "",
-          birth_date: booking.customers?.birth_date || null,
-          tour_name: booking.item_name || "Passeio",
-          risks_informed: acceptedRisks,
-          health_questions: healthInfo,
-          safety_controls_informed: true,
-          accepted: true,
-          signature_data: signatureData,
-          signed_at: new Date().toISOString(),
-          term_date: new Date().toISOString().split('T')[0],
-          cancellation_policy: "Conforme política da agência aceita no momento da reserva."
-        }]).select();
-        
-        if (termError) {
-          console.error("Error inserting term:", termError);
-          throw termError;
+      // Pre-calculate minor signatures
+      const minorsData = companions.map(c => ({
+        full_name: c.full_name,
+        is_adult: c.is_adult,
+        responsible_name: c.responsible_name,
+        signature_data: signatures[c.id] || c.signature_data,
+        cpf: c.cpf,
+        birth_date: c.birthDate
+      }));
+
+      // Generate PDF in background or just before sending
+      // For now, we will handle the PDF generation and upload in the Edge Function
+      // We need to convert the doc to base64 if we want the Edge Function to handle it.
+      // But we can also generate it in the Edge Function.
+      // Let's stick to generating it here and sending base64 to ensure it matches the UI.
+      
+      const doc = generatePDF(); // Extract PDF generation to a function
+      const pdfBase64 = btoa(doc.output());
+
+      const { data: edgeResult, error: edgeError } = await supabase.functions.invoke("handle-public-term", {
+        body: {
+          action: "save_term",
+          payload: {
+            termId: currentTermId,
+            bookingId: booking?.id,
+            customerId: booking?.customer_id || term?.customer_id,
+            customerName: booking?.customers?.name || term?.customer_name || "Cliente",
+            nationality: booking?.customers?.country || term?.nationality || "Brasil",
+            phone: booking?.customers?.phone || term?.phone || "",
+            email: booking?.customers?.email || term?.email || "",
+            cpf: booking?.customers?.cpf || term?.cpf || "",
+            birthDate: booking?.customers?.birth_date || term?.birth_date || null,
+            tourName: booking?.item_name || term?.tour_name || "Passeio",
+            risksInformed: acceptedRisks,
+            healthQuestions: healthInfo,
+            signatureData: signatureData,
+            minors: minorsData,
+            pdfBase64: pdfBase64,
+            pdfFileName: fileName
+          }
         }
-        
-        if (!termData || termData.length === 0) throw new Error("Erro ao criar o termo no banco de dados.");
-        currentTermId = termData[0].id;
-      } else {
-        // Update existing term
-        const { error: termError } = await supabase.from("sgs_risk_terms").update({
-          risks_informed: acceptedRisks,
-          health_questions: healthInfo,
-          signature_data: signatureData,
-          signed_at: new Date().toISOString(),
-          term_date: new Date().toISOString().split('T')[0], // Atualiza a data do termo para o dia da assinatura
-          accepted: true
-        }).eq("id", currentTermId);
+      });
 
-        if (termError) throw termError;
+      if (edgeError || !edgeResult?.success) {
+        throw new Error(edgeResult?.error || edgeError?.message || "Erro ao salvar o termo");
       }
 
-      // 2. Save/Update companion signatures
-      const minorsToInsert = [];
-      const minorsToUpdate = [];
+      setSigned(true);
+      toast({
+        title: "Sucesso!",
+        description: "Termo de risco assinado com sucesso.",
+      });
 
-      for (const companion of companions) {
-        const signature = signatures[companion.id] || companion.signature_data;
-        
-        // Check if this specific companion already exists in sgs_risk_term_minors for this term
-        const { data: existingMinor } = await supabase
-          .from("sgs_risk_term_minors")
-          .select("id")
-          .eq("risk_term_id", currentTermId)
-          .eq("full_name", companion.full_name)
-          .maybeSingle();
-        
-        const minorPayload = {
-          risk_term_id: currentTermId,
-          full_name: companion.full_name,
-          is_adult: companion.is_adult,
-          responsible_name: companion.responsible_name,
-          signature_data: signature,
           signed_at: signature ? new Date().toISOString() : null
         };
 
