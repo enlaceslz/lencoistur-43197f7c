@@ -634,7 +634,26 @@ const AdminCRMContent = () => {
     }
   };
 
+  const handleViewDocument = async (fileUrl: string) => {
+    let path = fileUrl;
+    if (fileUrl.startsWith('http')) {
+      // Try to extract path from old public URL
+      const parts = fileUrl.split('customer-documents/');
+      if (parts.length > 1) {
+        path = parts[1];
+      }
+    }
+    
+    const { data, error } = await supabase.storage.from('customer-documents').createSignedUrl(path, 300);
+    if (data?.signedUrl) {
+      window.open(data.signedUrl, '_blank');
+    } else {
+      toast.error("Erro ao gerar link do documento");
+    }
+  };
+
   const handleDeleteDocument = async (id: string) => {
+
     const doc = customerDocuments.find(d => d.id === id);
     if (!doc) return;
     
