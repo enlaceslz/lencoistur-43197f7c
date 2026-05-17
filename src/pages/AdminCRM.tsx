@@ -1779,7 +1779,7 @@ const AdminCRMContent = () => {
                                       <Badge variant="secondary" className="text-[8px] font-bold uppercase">{doc.category}</Badge>
                                     </div>
                                   </div>
-                                  <Button variant="ghost" size="icon" className="rounded-xl h-8 w-8 text-primary" onClick={() => window.open(doc.file_url, '_blank')}>
+                                  <Button variant="ghost" size="icon" className="rounded-xl h-8 w-8 text-primary" onClick={() => handleViewDocument(doc.file_url)}>
                                     <Eye size={14} />
                                   </Button>
                                 </div>
