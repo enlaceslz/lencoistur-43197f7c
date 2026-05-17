@@ -348,7 +348,7 @@ const AdminPacotes = () => {
       </div>
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="sm:max-w-4xl w-full sm:w-[95vw] h-full sm:h-auto sm:max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl sm:rounded-lg overflow-hidden bg-[#F8FAFC]">
+        <DialogContent className="sm:max-w-4xl w-full sm:w-[95vw] h-[100dvh] sm:h-auto sm:max-h-[90vh] flex flex-col p-0 border-none shadow-2xl sm:rounded-lg overflow-hidden bg-[#F8FAFC]">
           <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-3 md:gap-4">
               <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
@@ -366,7 +366,7 @@ const AdminPacotes = () => {
             </Button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8">
+          <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8 custom-scrollbar">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
               {/* Coluna Principal: Informações Básicas */}
               <div className="lg:col-span-7 space-y-6">
@@ -513,7 +513,7 @@ const AdminPacotes = () => {
               </div>
 
               {/* Coluna Lateral: Itinerário e Configurações */}
-              <div className="lg:col-span-5 space-y-6">
+              <div className="lg:col-span-5 space-y-6 pb-20 sm:pb-0">
                 <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm space-y-5">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -591,7 +591,7 @@ const AdminPacotes = () => {
               </div>
             </div>
 
-            <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100">
+            <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100 mt-auto bg-white sm:bg-transparent pb-4 sm:pb-0">
               <p className="text-[11px] font-bold text-slate-400 max-w-xs text-center sm:text-left">
                 * Campos obrigatórios. O pacote será salvo e poderá ser compartilhado imediatamente como campanha.
               </p>
@@ -622,7 +622,7 @@ const AdminPacotes = () => {
         </DialogContent>
       </Dialog>
       <Dialog open={showView} onOpenChange={setShowView}>
-        <DialogContent className="sm:max-w-3xl w-full sm:w-[95vw] h-full sm:h-auto sm:max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl sm:rounded-lg overflow-hidden bg-[#F8FAFC]">
+        <DialogContent className="sm:max-w-3xl w-full sm:w-[95vw] h-[100dvh] sm:h-auto sm:max-h-[90vh] flex flex-col p-0 border-none shadow-2xl sm:rounded-lg overflow-hidden bg-[#F8FAFC]">
           {viewingPackage && (
             <>
               <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
@@ -642,7 +642,7 @@ const AdminPacotes = () => {
                 </Button>
               </div>
 
-              <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 custom-scrollbar">
                 <div className="relative aspect-[21/9] rounded-lg overflow-hidden shadow-md border-2 border-white">
                   <img 
                     src={viewingPackage.banner_url || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80"} 
