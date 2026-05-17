@@ -111,8 +111,8 @@ const AdminSGSDashboard = () => {
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="grid lg:grid-cols-4 gap-6 animate-in-fade" style={{ animationDelay: '0.1s' }}>
-            <div className="lg:col-span-3 glass-card rounded-[2.5rem] p-6 relative overflow-hidden group border-primary/10">
+          <div className="grid lg:grid-cols-4 gap-6">
+            <div className="lg:col-span-3 bg-white rounded-lg p-6 relative overflow-hidden group border border-border shadow-sm">
               <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity"><Waves size={120} className="text-primary" /></div>
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center"><Activity size={16} className="text-primary" /></div>
@@ -140,7 +140,7 @@ const AdminSGSDashboard = () => {
                 ))}
               </div>
             </div>
-            <div className="glass-card rounded-[2.5rem] p-6 border-primary/20 bg-gradient-to-br from-primary/[0.05] to-transparent relative overflow-hidden shadow-lg shadow-primary/5 flex flex-col justify-center">
+            <div className="bg-white rounded-lg p-6 border border-border relative overflow-hidden shadow-sm flex flex-col justify-center">
               <div className="absolute -right-4 -top-4 opacity-10 rotate-12"><Shield size={100} className="text-primary" /></div>
               <div className="text-center space-y-2">
                 <p className="text-[9px] font-black text-primary uppercase tracking-[0.3em]">SGS Health Score</p>
@@ -153,7 +153,7 @@ const AdminSGSDashboard = () => {
             </div>
           </div>
           {/* Quick Actions Bar */}
-          <div className="glass-card rounded-[2.5rem] p-8 shadow-sm animate-in-fade border-primary/5 bg-gradient-to-r from-primary/[0.03] to-transparent" style={{ animationDelay: '0.2s' }}>
+          <div className="bg-white rounded-lg p-8 shadow-sm border border-border" >
             <div className="flex items-center justify-between mb-6">
               <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] ml-1">Central de Gestão e Resposta SGS (ABNT ISO 21101)</p>
               <div className="flex gap-2">
@@ -172,7 +172,7 @@ const AdminSGSDashboard = () => {
                 <button
                   key={a.label}
                   onClick={() => navigate(a.path)}
-                  className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-[11px] font-black uppercase tracking-tight transition-all active:scale-95 shadow-md ${a.color}`}
+                  className={`flex items-center gap-3 px-6 py-3 rounded-lg text-[11px] font-black uppercase tracking-tight transition-none active:scale-95 shadow-sm ${a.color}`}
                 >
                   <a.icon size={18} strokeWidth={2.5} />
                   {a.label}
@@ -181,11 +181,11 @@ const AdminSGSDashboard = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-in-fade" style={{ animationDelay: '0.3s' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {statCards.map((s, idx) => (
-              <button key={s.label} onClick={() => navigate(s.path)} className="glass-card rounded-[2rem] p-6 text-left relative overflow-hidden group">
+              <button key={s.label} onClick={() => navigate(s.path)} className="bg-white rounded-lg border border-border p-6 text-left relative overflow-hidden group shadow-sm transition-none">
                 <div className="flex items-center justify-between mb-6">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-primary/10 ${s.color}`}><s.icon size={22} strokeWidth={2.5} /></div>
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center bg-primary/10 ${s.color}`}><s.icon size={22} strokeWidth={2.5} /></div>
                   {s.urgent && <div className="w-2 h-2 rounded-full bg-destructive animate-pulse" />}
                 </div>
                 <p className="text-2xl font-black text-foreground tracking-tighter">{s.value}</p>
@@ -194,9 +194,9 @@ const AdminSGSDashboard = () => {
             ))}
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-6 animate-in-fade" style={{ animationDelay: '0.4s' }}>
+          <div className="grid lg:grid-cols-2 gap-6">
             {/* Risk Distribution Chart */}
-            <div className="glass-card rounded-[2.5rem] p-6">
+            <div className="bg-white border border-border rounded-lg p-6 shadow-sm">
               <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-6">Distribuição de Riscos</h3>
               <div className="h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -211,11 +211,11 @@ const AdminSGSDashboard = () => {
             </div>
 
             {/* Recent Activity */}
-            <div className="glass-card rounded-[2.5rem] p-6">
+            <div className="bg-white border border-border rounded-lg p-6 shadow-sm">
               <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-6">Atividade Recente</h3>
               <div className="space-y-4">
                 {recentActivity.map((a, i) => (
-                  <div key={i} className="flex items-start gap-4 p-3 rounded-2xl hover:bg-primary/5 transition-colors border border-transparent hover:border-primary/10">
+                  <div key={i} className="flex items-start gap-4 p-3 rounded-lg hover:bg-primary/5 transition-none border border-transparent hover:border-primary/10">
                     <div className={`w-2 h-2 rounded-full mt-2 ${a.severity === 'alta' ? 'bg-destructive' : 'bg-primary'}`} />
                     <div className="flex-1">
                       <p className="text-xs font-black text-foreground uppercase tracking-tight">{a.title}</p>

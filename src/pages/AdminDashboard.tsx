@@ -177,10 +177,10 @@ const AdminDashboard = () => {
 
   return (
     <AdminLayout title="Centro de Operações">
-      <div className="space-y-8 pb-10 animate-in-fade">
+      <div className="space-y-8 pb-10">
         {/* Executive Header */}
-        <div className="xl:col-span-4 glass-card rounded-[2.5rem] p-10 relative overflow-hidden group shadow-2xl shadow-primary/5">
-          <div className="absolute right-0 top-0 w-[500px] h-[500px] bg-gradient-to-br from-primary/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:from-primary/20 transition-all duration-700" />
+        <div className="xl:col-span-4 bg-white rounded-lg p-10 relative overflow-hidden group border border-border shadow-sm">
+          <div className="absolute right-0 top-0 w-[500px] h-[500px] bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl transition-none" />
           <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -201,10 +201,10 @@ const AdminDashboard = () => {
               </div>
             </div>
             <div className="flex flex-wrap gap-3">
-              <button onClick={() => navigate("/admin/reservas")} className="bg-primary hover:bg-primary/90 text-white px-8 h-14 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-3">
+              <button onClick={() => navigate("/admin/reservas")} className="bg-primary hover:bg-primary/90 text-white px-8 h-14 rounded-lg text-xs font-black uppercase tracking-widest shadow-sm transition-none flex items-center gap-3">
                 <Calendar size={18} /> Nova Reserva
               </button>
-              <button onClick={() => window.open('/', '_blank')} className="bg-white hover:bg-slate-50 text-foreground border border-slate-200 px-8 h-14 rounded-2xl text-xs font-black uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-3">
+              <button onClick={() => window.open('/', '_blank')} className="bg-white hover:bg-slate-50 text-foreground border border-slate-200 px-8 h-14 rounded-lg text-xs font-black uppercase tracking-widest transition-none flex items-center gap-3">
                 <LayoutDashboard size={18} /> Ver Site Público
               </button>
             </div>
@@ -217,12 +217,12 @@ const AdminDashboard = () => {
             <div 
               key={stat.label} 
               onClick={() => stat.path && navigate(stat.path)}
-              className="glass-card rounded-[2rem] p-7 cursor-pointer hover:shadow-xl hover:shadow-primary/5 hover:border-primary/20 transition-all duration-300 relative overflow-hidden group border border-white/40"
+              className="bg-white rounded-lg p-7 cursor-pointer hover:border-primary/50 transition-none relative overflow-hidden group border border-border shadow-sm"
               style={{ animationDelay: `${idx * 0.1}s` }}
             >
               <div className="absolute -right-4 -top-4 w-28 h-28 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
               <div className="flex items-center justify-between mb-8">
-                <div className="w-14 h-14 rounded-2xl bg-primary/5 text-primary flex items-center justify-center border border-primary/10 shadow-sm">
+                <div className="w-14 h-14 rounded-lg bg-primary/5 text-primary flex items-center justify-center border border-primary/10 shadow-sm">
                   <stat.icon size={26} strokeWidth={2.5} />
                 </div>
               </div>
@@ -236,7 +236,7 @@ const AdminDashboard = () => {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Chart Section */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="glass-card rounded-[2.5rem] p-8 border border-white/40 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-lg p-8 border border-border shadow-sm overflow-hidden">
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h3 className="text-xl font-black text-foreground tracking-tight">Performance Financeira</h3>
@@ -273,7 +273,7 @@ const AdminDashboard = () => {
                     />
                     <Tooltip 
                       contentStyle={{
-                        borderRadius: '1.25rem', 
+                        borderRadius: '0.5rem', 
                         border: '1px solid hsl(var(--border))', 
                         boxShadow: '0 10px 30px -10px rgba(0,0,0,0.1)',
                         fontSize: '11px',
@@ -295,7 +295,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* Recent Bookings Table Style (Split Layout inspired by CRM) */}
-            <div className="glass-card rounded-[2.5rem] p-8 border border-white/40 shadow-sm">
+            <div className="bg-white rounded-lg p-8 border border-border shadow-sm">
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h3 className="text-xl font-black text-foreground tracking-tight">Reservas Recentes</h3>
@@ -303,7 +303,7 @@ const AdminDashboard = () => {
                 </div>
                 <button 
                   onClick={() => navigate("/admin/reservas")}
-                  className="p-2.5 rounded-xl bg-primary/5 text-primary hover:bg-primary/10 transition-colors"
+                  className="p-2.5 rounded-lg bg-primary/5 text-primary hover:bg-primary/10 transition-none"
                 >
                   <ArrowRight size={20} />
                 </button>
@@ -328,7 +328,7 @@ const AdminDashboard = () => {
                       >
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center text-primary font-black text-xs border border-primary/10">
+                            <div className="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center text-primary font-black text-xs border border-primary/10">
                               {b.client.charAt(0)}
                             </div>
                             <div>

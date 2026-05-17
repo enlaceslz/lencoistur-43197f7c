@@ -526,19 +526,19 @@ const AdminParceiros = () => {
 
   return (
     <AdminLayout title="Parceiros">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {[
           { label: "Parceiros", value: partners.length, icon: Building2, color: "from-blue-500 to-indigo-600", desc: "Total cadastrado" },
           { label: "Ativos", value: activeCount, icon: CheckCircle2, color: "from-emerald-500 to-teal-600", desc: "Operando" },
           { label: "Tipos", value: partnerTypes.length, icon: Settings2, color: "from-amber-500 to-orange-600", desc: "Categorias" },
           { label: "Crédito Total", value: `R$ ${partners.reduce((a, b) => a + (b.credit_limit || 0), 0).toLocaleString("pt-BR")}`, icon: Banknote, color: "from-purple-500 to-pink-600", desc: "Limite global" },
         ].map((stat, i) => (
-          <div key={i} className="group relative overflow-hidden rounded-[2.5rem] p-6 transition-all duration-500 hover:-translate-y-1">
+          <div key={i} className="group relative overflow-hidden rounded-lg p-6 border border-border bg-white shadow-sm">
             <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} transition-transform duration-500 group-hover:scale-105`} />
             <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white shadow-xl">
+                <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary shadow-sm">
                   <stat.icon size={22} strokeWidth={2.5} />
                 </div>
                 <div className="text-[10px] font-black uppercase tracking-widest text-white/60">{stat.desc}</div>
@@ -550,14 +550,14 @@ const AdminParceiros = () => {
         ))}
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-4 sm:p-6 glass-card rounded-[2.5rem] shadow-sm animate-in-fade" style={{ animationDelay: '0.2s' }}>
+      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between mb-8 p-4 sm:p-6 bg-white border border-border rounded-lg shadow-sm">
         <div className="relative flex-1 w-full group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" size={18} />
           <Input 
             placeholder="Pesquisar parceiro por nome, contato ou documento..." 
             value={search} 
             onChange={(e) => setSearch(e.target.value)} 
-            className="pl-12 h-12 rounded-2xl border-border/40 focus:ring-primary/20 bg-muted/20 transition-all text-sm font-medium" 
+            className="pl-12 h-12 rounded-lg border-border focus:ring-0 focus:border-primary bg-slate-50 text-sm font-medium" 
           />
         </div>
         
@@ -584,14 +584,14 @@ const AdminParceiros = () => {
 
           <button 
             onClick={openNew}
-            className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-2xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95"
+            className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-primary-foreground h-12 px-8 rounded-lg text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-sm active:scale-95"
           >
             <Plus size={20} strokeWidth={3} /> Novo Parceiro
           </button>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-3 mb-10 overflow-x-auto pb-4 no-scrollbar scroll-smooth animate-in-fade" style={{ animationDelay: '0.15s' }}>
+      <div className="flex flex-wrap gap-3 mb-10 overflow-x-auto pb-4 no-scrollbar scroll-smooth">
         <button
           onClick={() => setTypeFilter("todos")} 
           className={`text-[10px] font-black uppercase tracking-widest px-8 h-12 rounded-2xl transition-all whitespace-nowrap shadow-lg ${

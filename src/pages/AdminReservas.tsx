@@ -593,9 +593,9 @@ const AdminReservas = () => {
 
   return (
     <AdminLayout title="Gestão de Reservas">
-      <div className="flex flex-col gap-8 pb-10 animate-in-fade">
+      <div className="flex flex-col gap-8 pb-10">
         {/* Superior Control Panel */}
-        <div className="glass-card rounded-[2.5rem] p-8 shadow-2xl shadow-primary/5">
+        <div className="bg-white rounded-lg p-8 border border-border shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-1.5">
               <h1 className="text-3xl font-black text-slate-900 tracking-tight">Painel de Operações</h1>
@@ -609,7 +609,7 @@ const AdminReservas = () => {
             
             <button 
               onClick={() => setShowNewForm(true)} 
-              className="bg-primary hover:bg-primary/90 text-white px-8 h-14 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-3"
+              className="bg-primary hover:bg-primary/90 text-white px-8 h-14 rounded-lg text-[11px] font-black uppercase tracking-widest shadow-sm transition-none flex items-center gap-3"
             >
               <Plus size={18} /> Nova Reserva
             </button>
@@ -621,7 +621,7 @@ const AdminReservas = () => {
               <input 
                 type="text" 
                 placeholder="Pesquisar por cliente, passeio, ID ou data..." 
-                className="w-full bg-muted/30 border-border/50 rounded-2xl pl-14 pr-6 h-14 text-sm font-medium focus:ring-4 focus:ring-primary/10 focus:bg-white focus:border-primary/20 transition-all outline-none"
+                className="w-full bg-slate-50 border border-border rounded-lg pl-14 pr-6 h-14 text-sm font-medium focus:ring-0 focus:border-primary transition-none outline-none"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
@@ -636,11 +636,11 @@ const AdminReservas = () => {
             { label: "Pendentes", value: bookings.filter(b => b.status === "pendente").length, icon: Clock, color: "text-amber-600", bg: "bg-amber-500/10" },
             { label: "Faturamento Pago", value: formatCurrency(totalPago), icon: DollarSign, color: "text-blue-600", bg: "bg-blue-500/10" },
           ].map((stat, i) => (
-            <Card key={i} className="rounded-[2rem] border-white/40 shadow-xl shadow-primary/5 glass-card overflow-hidden group">
+            <Card key={i} className="rounded-lg border-border shadow-sm bg-white overflow-hidden group">
               <CardContent className="p-7 relative">
                 <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
                 <div className="flex items-center gap-4 mb-4">
-                  <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center border shadow-sm", stat.bg, stat.color, "border-white/20")}>
+                  <div className={cn("w-12 h-12 rounded-lg flex items-center justify-center border shadow-sm", stat.bg, stat.color, "border-border")}>
                     <stat.icon size={22} strokeWidth={2.5} />
                   </div>
                 </div>
@@ -652,7 +652,7 @@ const AdminReservas = () => {
         </div>
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 bg-white rounded-[2.5rem] border border-white/40 flex flex-col overflow-hidden shadow-xl shadow-primary/5 glass-card">
+          <div className="flex-1 bg-white rounded-lg border border-border flex flex-col overflow-hidden shadow-sm">
             <div className="p-6 border-b border-border/40 flex gap-4 items-center bg-slate-50/30">
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
@@ -660,7 +660,7 @@ const AdminReservas = () => {
                   placeholder="Buscar por código, cliente ou serviço..." 
                   value={search} 
                   onChange={(e) => setSearch(e.target.value)} 
-                  className="w-full pl-11 pr-4 h-12 rounded-2xl border border-border/60 outline-none focus:ring-4 focus:ring-primary/5 text-sm font-semibold bg-white transition-all" 
+                  className="w-full pl-11 pr-4 h-12 rounded-lg border border-border outline-none focus:ring-0 focus:border-primary text-sm font-semibold bg-white transition-none" 
                 />
               </div>
             </div>
@@ -780,7 +780,7 @@ const AdminReservas = () => {
                             variant="ghost" 
                             size="icon" 
                             title="Enviar Voucher (WhatsApp)"
-                            className="h-9 w-9 text-emerald-600 hover:bg-emerald-50 rounded-xl"
+                            className="h-9 w-9 text-emerald-600 hover:bg-emerald-50 rounded-lg"
                             onClick={(e) => {
                               e.stopPropagation();
                               const url = `${window.location.origin}/voucher?id=${b.id}`;
@@ -795,7 +795,7 @@ const AdminReservas = () => {
                             size="icon" 
                             title="Enviar Termo de Risco (WhatsApp)"
                             className={cn(
-                              "h-9 w-9 rounded-xl transition-all",
+                              "h-9 w-9 rounded-lg",
                               (b.termStatus === 'assinado' || b.termStatus === 'balcao') ? "text-emerald-500 hover:bg-emerald-50" : "text-amber-500 hover:bg-amber-50 animate-pulse-subtle"
                             )}
                             onClick={(e) => {
@@ -849,11 +849,11 @@ const AdminReservas = () => {
         setShowNewForm(open);
         if (!open) setIsEditing(false);
       }}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto rounded-[2.5rem] p-0 border-none shadow-2xl">
-          <div className="bg-slate-50/50 p-8 border-b border-border/40">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto rounded-lg p-0 border-none shadow-2xl">
+          <div className="bg-slate-50 p-8 border-b border-border">
             <DialogHeader>
               <DialogTitle className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center text-white shadow-sm">
                   {isEditing ? <Pencil size={24} strokeWidth={3} /> : <Plus size={24} strokeWidth={3} />}
                 </div>
                 {isEditing ? "Editar Reserva Operacional" : "Nova Reserva Operacional"}
@@ -1009,16 +1009,16 @@ const AdminReservas = () => {
                       min="1" 
                       value={form.guests} 
                       onChange={e => setForm({...form, guests: parseInt(e.target.value) || 1})}
-                      className="rounded-xl h-12 font-semibold border-slate-200"
+                      className="rounded-lg h-12 font-semibold border-slate-200"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Método de Pagto</Label>
                     <Select value={form.payMethod} onValueChange={(v: any) => setForm({...form, payMethod: v})}>
-                      <SelectTrigger className="rounded-xl h-12 font-semibold border-slate-200">
+                      <SelectTrigger className="rounded-lg h-12 font-semibold border-slate-200">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="rounded-xl border-slate-200">
+                      <SelectContent className="rounded-lg border-slate-200">
                         <SelectItem value="pix">PIX</SelectItem>
                         <SelectItem value="card">Cartão de Crédito</SelectItem>
                         <SelectItem value="info">Informar depois</SelectItem>
@@ -1032,7 +1032,7 @@ const AdminReservas = () => {
                     <Input 
                       value={form.unitPrice} 
                       onChange={e => setForm({...form, unitPrice: maskCurrency(e.target.value)})}
-                      className="rounded-xl h-12 font-semibold border-slate-200"
+                      className="rounded-lg h-12 font-semibold border-slate-200"
                     />
                   </div>
                   <div className="space-y-2">
@@ -1042,7 +1042,7 @@ const AdminReservas = () => {
                     <Input 
                       value={form.partnerNetPrice} 
                       onChange={e => setForm({...form, partnerNetPrice: maskCurrency(e.target.value)})}
-                      className="rounded-xl h-12 font-bold border-emerald-100 bg-emerald-50/30 text-emerald-700"
+                      className="rounded-lg h-12 font-bold border-emerald-100 bg-emerald-50/30 text-emerald-700"
                     />
                   </div>
                 </div>
@@ -1052,7 +1052,7 @@ const AdminReservas = () => {
                     <Input 
                       value={form.discount} 
                       onChange={e => setForm({...form, discount: maskCurrency(e.target.value)})}
-                      className="rounded-xl h-12 font-semibold border-slate-200 text-rose-500"
+                      className="rounded-lg h-12 font-semibold border-slate-200 text-rose-500"
                     />
                   </div>
                   <div className="space-y-2">
@@ -1060,13 +1060,13 @@ const AdminReservas = () => {
                     <Input 
                       value={form.publicUnitPrice} 
                       onChange={e => setForm({...form, publicUnitPrice: maskCurrency(e.target.value)})}
-                      className="rounded-xl h-12 font-semibold border-slate-200"
+                      className="rounded-lg h-12 font-semibold border-slate-200"
                     />
                   </div>
                 </div>
                 
                 {/* Visualização de Cálculos em Tempo Real */}
-                <div className="mt-6 p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-3">
+                <div className="mt-6 p-4 bg-slate-50 border border-slate-100 rounded-lg space-y-3">
                   <div className="flex justify-between items-center text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                     <span>Resumo Financeiro</span>
                     <Badge variant="outline" className="bg-white text-[9px]">Cálculo Automático</Badge>
@@ -1249,7 +1249,7 @@ const AdminReservas = () => {
                       placeholder="Detalhes sobre restrições, preferências ou logísticas especiais..." 
                       value={form.notes} 
                       onChange={e => setForm({...form, notes: e.target.value})}
-                      className="rounded-xl min-h-[100px] font-semibold border-slate-200 shadow-inner bg-slate-50/50"
+                      className="rounded-lg min-h-[100px] font-semibold border-slate-200 shadow-inner bg-slate-50"
                     />
                   </div>
                 </div>
@@ -1257,7 +1257,7 @@ const AdminReservas = () => {
             </div>
           </div>
 
-          <div className="p-8 bg-slate-50 border-t border-border/40 flex flex-col md:flex-row justify-between items-center gap-6 rounded-b-[2.5rem]">
+          <div className="p-8 bg-slate-50 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6 rounded-b-lg">
             <div className="flex flex-col md:flex-row items-center gap-8">
               <div className="flex flex-col gap-1">
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Líquido Estimado</p>
@@ -1544,7 +1544,7 @@ const AdminReservas = () => {
                      </div>
                    </section>
 
-                   <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                   <section className="bg-white p-6 rounded-lg border border-slate-100 shadow-sm">
                     <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                       <DollarSign size={14} className="text-emerald-500" /> Demonstrativo Financeiro
                     </h3>
