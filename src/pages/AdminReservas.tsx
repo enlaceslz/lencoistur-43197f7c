@@ -593,9 +593,9 @@ const AdminReservas = () => {
 
   return (
     <AdminLayout title="Gestão de Reservas">
-      <div className="flex flex-col gap-8 pb-10 animate-in-fade">
+      <div className="flex flex-col gap-8 pb-10">
         {/* Superior Control Panel */}
-        <div className="glass-card rounded-[2.5rem] p-8 shadow-2xl shadow-primary/5">
+        <div className="bg-white rounded-lg p-8 border border-border shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-1.5">
               <h1 className="text-3xl font-black text-slate-900 tracking-tight">Painel de Operações</h1>
@@ -609,7 +609,7 @@ const AdminReservas = () => {
             
             <button 
               onClick={() => setShowNewForm(true)} 
-              className="bg-primary hover:bg-primary/90 text-white px-8 h-14 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-3"
+              className="bg-primary hover:bg-primary/90 text-white px-8 h-14 rounded-lg text-[11px] font-black uppercase tracking-widest shadow-sm transition-none flex items-center gap-3"
             >
               <Plus size={18} /> Nova Reserva
             </button>
@@ -780,7 +780,7 @@ const AdminReservas = () => {
                             variant="ghost" 
                             size="icon" 
                             title="Enviar Voucher (WhatsApp)"
-                            className="h-9 w-9 text-emerald-600 hover:bg-emerald-50 rounded-xl"
+                            className="h-9 w-9 text-emerald-600 hover:bg-emerald-50 rounded-lg"
                             onClick={(e) => {
                               e.stopPropagation();
                               const url = `${window.location.origin}/voucher?id=${b.id}`;
@@ -795,7 +795,7 @@ const AdminReservas = () => {
                             size="icon" 
                             title="Enviar Termo de Risco (WhatsApp)"
                             className={cn(
-                              "h-9 w-9 rounded-xl transition-all",
+                              "h-9 w-9 rounded-lg",
                               (b.termStatus === 'assinado' || b.termStatus === 'balcao') ? "text-emerald-500 hover:bg-emerald-50" : "text-amber-500 hover:bg-amber-50 animate-pulse-subtle"
                             )}
                             onClick={(e) => {
