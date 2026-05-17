@@ -611,20 +611,17 @@ const AdminCRMContent = () => {
         
       if (error) throw error;
       
-      const { data: { publicUrl } } = supabase.storage
-        .from('customer-documents')
-        .getPublicUrl(fileName);
-        
       const { error: dbError } = await supabase
         .from('customer_documents')
         .insert({
           customer_id: selectedCustomer.id,
           name: file.name,
-          file_url: publicUrl,
+          file_url: data.path, // Store the path
           file_type: file.type,
           file_size: file.size,
           category: docCategory
         });
+
         
       if (dbError) throw dbError;
       
