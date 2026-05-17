@@ -306,90 +306,15 @@ const TermoAssinatura = () => {
       const currentTermId = term?.id;
       const fileName = `termo_${booking?.booking_code || 'SGS'}_${Date.now()}.pdf`;
 
-      // Pre-calculate minor signatures
-      const minorsData = companions.map(c => ({
-        full_name: c.full_name,
-        is_adult: c.is_adult,
-        responsible_name: c.responsible_name,
-        signature_data: signatures[c.id] || c.signature_data,
-        cpf: c.cpf,
-        birth_date: c.birthDate
-      }));
-
-      // Generate PDF in background or just before sending
-      // For now, we will handle the PDF generation and upload in the Edge Function
-      // We need to convert the doc to base64 if we want the Edge Function to handle it.
-      // But we can also generate it in the Edge Function.
-      // Let's stick to generating it here and sending base64 to ensure it matches the UI.
-      
-      const doc = generatePDF(); // Extract PDF generation to a function
-      const pdfBase64 = btoa(doc.output());
-
-      const { data: edgeResult, error: edgeError } = await supabase.functions.invoke("handle-public-term", {
-        body: {
-          action: "save_term",
-          payload: {
-            termId: currentTermId,
-            bookingId: booking?.id,
-            customerId: booking?.customer_id || term?.customer_id,
-            customerName: booking?.customers?.name || term?.customer_name || "Cliente",
-            nationality: booking?.customers?.country || term?.nationality || "Brasil",
-            phone: booking?.customers?.phone || term?.phone || "",
-            email: booking?.customers?.email || term?.email || "",
-            cpf: booking?.customers?.cpf || term?.cpf || "",
-            birthDate: booking?.customers?.birth_date || term?.birth_date || null,
-            tourName: booking?.item_name || term?.tour_name || "Passeio",
-            risksInformed: acceptedRisks,
-            healthQuestions: healthInfo,
-            signatureData: signatureData,
-            minors: minorsData,
-            pdfBase64: pdfBase64,
-            pdfFileName: fileName
-          }
-        }
-      });
-
-      if (edgeError || !edgeResult?.success) {
-        throw new Error(edgeResult?.error || edgeError?.message || "Erro ao salvar o termo");
-      }
-
-      setSigned(true);
-      toast({
-        title: "Sucesso!",
-        description: "Termo de risco assinado com sucesso.",
-      });
-
-          signed_at: signature ? new Date().toISOString() : null
-        };
-
-        if (!existingMinor) {
-          minorsToInsert.push(minorPayload);
-        } else {
-          minorsToUpdate.push({ id: existingMinor.id, ...minorPayload });
-        }
-      }
-
-      if (minorsToInsert.length > 0) {
-        const { error: insertError } = await supabase.from("sgs_risk_term_minors").insert(minorsToInsert);
-        if (insertError) console.error("Error inserting companions:", insertError);
-      }
-
-      for (const minor of minorsToUpdate) {
-        const { error: updateError } = await supabase.from("sgs_risk_term_minors").update(minor).eq("id", minor.id);
-        if (updateError) console.error("Error updating companion:", updateError);
-      }
-
-      // 2. Generate PDF
+      // 1. Generate PDF locally
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
       
-      // Fine Border
       doc.setDrawColor(200, 200, 200);
       doc.setLineWidth(0.2);
       doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
       
-      // Load Logo
       if (company?.logo_url) {
         try {
           doc.addImage(company.logo_url, 'PNG', 14, 10, 30, 12);
@@ -398,7 +323,6 @@ const TermoAssinatura = () => {
         }
       }
       
-      // Header Info - Right Aligned
       doc.setFontSize(7);
       doc.setTextColor(100, 100, 100);
       const companyName = company?.razao_social || company?.nome_fantasia || "LENÇÓIS TOUR";
@@ -412,7 +336,6 @@ const TermoAssinatura = () => {
       doc.setDrawColor(230, 230, 230);
       doc.line(14, 25, pageWidth - 14, 25);
       
-      // Title
       doc.setFontSize(13);
       doc.setTextColor(0, 0, 0);
       doc.setFont("helvetica", "bold");
@@ -423,7 +346,6 @@ const TermoAssinatura = () => {
       
       let currentY = 44;
       
-      // Booking Info (Table)
       autoTable(doc, {
         startY: currentY,
         body: [
@@ -443,10 +365,8 @@ const TermoAssinatura = () => {
       
       currentY = (doc as any).lastAutoTable.finalY + 8;
       
-      // Content Sections - Compacted
       const addSection = (title: string, content: string, fontSize = 7) => {
         if (currentY > pageHeight - 60) doc.addPage();
-        
         doc.setFontSize(9);
         doc.setFont("helvetica", "bold");
         doc.text(title, 14, currentY);
@@ -465,7 +385,6 @@ const TermoAssinatura = () => {
         addSection("Riscos e Segurança:", company.term_safety_risks);
       }
 
-      // Risks Checklist (Two Columns Compact)
       doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
       doc.text("Declaração de Ciência de Riscos:", 14, currentY);
@@ -488,7 +407,6 @@ const TermoAssinatura = () => {
       
       currentY = (doc as any).lastAutoTable.finalY + 6;
 
-      // Health Info
       if (healthInfo.length > 0) {
         doc.setFontSize(8);
         doc.setFont("helvetica", "bold");
@@ -503,10 +421,7 @@ const TermoAssinatura = () => {
       doc.text(declLines, 14, currentY);
       currentY += (declLines.length * 4) + 12;
 
-      // Signatures Area
       const sigBoxWidth = (pageWidth - 40) / 2;
-      
-      // Participant Signature
       doc.setFontSize(8);
       doc.setFont("helvetica", "bold");
       doc.text("Assinatura do Participante:", 14, currentY);
@@ -517,14 +432,12 @@ const TermoAssinatura = () => {
       doc.text(booking.customers?.name || "Cliente", 14, currentY + 19);
       doc.text(`${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}, ${new Date().toLocaleString("pt-BR")}`, 14, currentY + 22);
 
-      // Companions List (covered by main signature)
       if (companions.length > 0) {
         currentY += 10;
         doc.setFontSize(8);
         doc.setFont("helvetica", "bold");
         doc.text("Dependentes cobertos por este termo:", 14, currentY);
         currentY += 4;
-        
         companions.forEach((comp, idx) => {
           if (currentY > pageHeight - 20) {
             doc.addPage();
@@ -537,74 +450,51 @@ const TermoAssinatura = () => {
         });
       }
 
-      // Final Footer
       doc.setFontSize(6);
       doc.setTextColor(150, 150, 150);
       doc.text(`Documento gerado digitalmente por Lençóis Tour - SGS - ${new Date().toLocaleDateString("pt-BR")}`, pageWidth / 2, pageHeight - 8, { align: "center" });
 
-      const pdfBlob = doc.output('blob');
-      const fileName = `termo_${booking?.booking_code || 'SGS'}_${Date.now()}.pdf`;
-      const filePath = `termos_assinados/${fileName}`;
+      const pdfBase64 = btoa(doc.output());
 
-      // 3. Upload to Storage
-      const { error: uploadError } = await supabase.storage
-        .from("customer-documents")
-        .upload(filePath, pdfBlob, {
-          contentType: 'application/pdf',
-          cacheControl: '3600'
-        });
+      // 2. Pre-calculate minor signatures
+      const minorsData = companions.map(c => ({
+        full_name: c.full_name,
+        is_adult: c.is_adult,
+        responsible_name: c.responsible_name,
+        signature_data: signatures[c.id] || c.signature_data,
+        cpf: c.cpf,
+        birth_date: c.birthDate
+      }));
 
-      if (uploadError) console.error("Storage upload error:", uploadError);
-
-      // 4. Save to CRM Customer Documents
-      const customerId = booking?.customer_id || term?.customer_id;
-      if (customerId) {
-        const publicUrl = supabase.storage.from("customer-documents").getPublicUrl(filePath).data.publicUrl;
-        
-        await supabase.from("customer_documents").insert([{
-          customer_id: customerId,
-          name: `Termo Assinado - ${booking?.item_name || term?.tour_name}`,
-          file_url: publicUrl,
-          file_type: "application/pdf",
-          file_size: pdfBlob.size,
-          category: "termo"
-        }]);
-      }
-
-      // Also update sgs_risk_terms record with the PDF path
-      await supabase.from("sgs_risk_terms").update({ pdf_url: filePath }).eq("id", currentTermId);
-
-      // 5. Update booking status if applicable
-      if (booking?.id) {
-        try {
-          // If booking is pending, mark as confirmed now that it's signed
-          if (booking.status === 'pendente') {
-            const { error: bookingUpdateError } = await supabase.from("bookings").update({ 
-              status: "confirmada",
-              updated_at: new Date().toISOString()
-            }).eq("id", booking.id);
-            
-            if (bookingUpdateError) {
-              console.error("Error updating booking status:", bookingUpdateError);
-              // We don't throw here to not block the user if the status update fails but the term was saved
-            } else {
-              console.log("Booking status updated to confirmed after signing.");
-            }
+      // 3. Invoke Edge Function to save everything securely
+      const { data: edgeResult, error: edgeError } = await supabase.functions.invoke("handle-public-term", {
+        body: {
+          action: "save_term",
+          payload: {
+            termId: currentTermId,
+            bookingId: booking?.id,
+            bookingCode: booking?.booking_code,
+            customerId: booking?.customer_id || term?.customer_id,
+            customerName: booking?.customers?.name || term?.customer_name || "Cliente",
+            nationality: booking?.customers?.country || term?.nationality || "Brasil",
+            phone: booking?.customers?.phone || term?.phone || "",
+            email: booking?.customers?.email || term?.email || "",
+            cpf: booking?.customers?.cpf || term?.cpf || "",
+            birthDate: booking?.customers?.birth_date || term?.birth_date || null,
+            tourName: booking?.item_name || term?.tour_name || "Passeio",
+            risksInformed: acceptedRisks,
+            healthQuestions: healthInfo,
+            signatureData: signatureData,
+            minors: minorsData,
+            pdfBase64: pdfBase64,
+            pdfFileName: fileName
           }
-        } catch (statusErr) {
-          console.error("Error in booking status update flow:", statusErr);
         }
-      }
+      });
 
-      // Also save to generic Documents Module
-      await supabase.from("documents").insert([{
-        name: `Termo Assinado - ${booking?.item_name || term?.tour_name} - ${booking?.booking_code || 'SGS'}`,
-        type: "termo_assinado",
-        description: `Termo assinado por ${booking?.customers?.name || booking?.customer_name || term?.customer_name} em ${new Date().toLocaleDateString("pt-BR")}`,
-        file_url: filePath,
-        file_name: fileName,
-        status: "vigente"
-      }]);
+      if (edgeError || !edgeResult?.success) {
+        throw new Error(edgeResult?.error || edgeError?.message || "Erro ao salvar o termo");
+      }
 
       toast({ title: "Termo Assinado!", description: "Documento salvo e anexado ao cadastro." });
       setSigned(true);
@@ -615,6 +505,7 @@ const TermoAssinatura = () => {
     } finally {
       setSigning(false);
     }
+
   };
 
   if (loading) {
