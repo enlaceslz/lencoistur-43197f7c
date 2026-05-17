@@ -348,7 +348,7 @@ const AdminPacotes = () => {
       </div>
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-lg overflow-hidden bg-[#F8FAFC]">
+        <DialogContent className="sm:max-w-4xl w-full sm:w-[95vw] h-full sm:h-auto sm:max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl sm:rounded-lg overflow-hidden bg-[#F8FAFC]">
           <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-3 md:gap-4">
               <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
@@ -366,7 +366,7 @@ const AdminPacotes = () => {
             </Button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-6 md:space-y-8">
+          <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
               {/* Coluna Principal: Informações Básicas */}
               <div className="lg:col-span-7 space-y-6">
@@ -528,7 +528,7 @@ const AdminPacotes = () => {
                   <div className="flex flex-col gap-3">
                     <div className="relative">
                       <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1.5 block">Adicionar Itens</Label>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <select 
                           className="h-11 rounded-lg bg-slate-50 border border-slate-200 px-3 text-xs font-bold text-slate-700 outline-none focus:ring-0 focus:border-primary transition-none cursor-pointer" 
                           onChange={e => { 
