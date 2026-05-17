@@ -218,9 +218,13 @@ Deno.serve(async (req) => {
     
     const isPrivate = itemName.includes("(Privativo)");
     
-    // Apply overrides if provided (useful for CRM/Admin)
-    if (overrideUnitPrice !== undefined) unitPrice = Number(overrideUnitPrice);
-    if (overridePublicUnitPrice !== undefined) publicUnitPrice = Number(overridePublicUnitPrice);
+    // Apply overrides if provided (allowed ONLY for Admins)
+    if (isAdmin) {
+      if (overrideUnitPrice !== undefined) unitPrice = Number(overrideUnitPrice);
+      if (overridePublicUnitPrice !== undefined) publicUnitPrice = Number(overridePublicUnitPrice);
+    } else if (overrideUnitPrice !== undefined || overridePublicUnitPrice !== undefined) {
+      console.warn(`Attempted unauthorized price override by user ${userId || 'anonymous'}`);
+    }
 
     const total = isPrivate ? unitPrice : unitPrice * guestsNum;
     const publicTotal = isPrivate ? publicUnitPrice : publicUnitPrice * guestsNum;
