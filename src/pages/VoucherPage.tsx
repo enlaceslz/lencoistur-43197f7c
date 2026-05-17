@@ -17,17 +17,18 @@ const VoucherPage = () => {
         return;
       }
 
-      const { data, error } = await supabase
-        .from("bookings")
-        .select("*, customers!customer_id(*)")
-        .eq("id", id)
-        .single();
+      const { data, error } = await supabase.rpc("get_public_booking_v2", {
+        p_booking_id: id
+      });
 
-      if (error || !data) {
+      if (error || !data || (data as any).length === 0) {
         console.error("Error fetching booking for voucher:", error);
         navigate("/");
         return;
       }
+
+      const bookingData = (data as any)[0];
+
 
       const { data: company } = await supabase.from("sgs_empresa").select("*").limit(1).maybeSingle();
 
