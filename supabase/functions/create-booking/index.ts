@@ -103,16 +103,22 @@ Deno.serve(async (req) => {
 
     const authHeader = req.headers.get("Authorization");
     let userId = null;
+    let isAdmin = false;
+
     if (authHeader?.startsWith("Bearer ")) {
-      const supabaseClient = createClient(
-        Deno.env.get("SUPABASE_URL")!,
-        Deno.env.get("SUPABASE_ANON_KEY")!,
-        { global: { headers: { Authorization: authHeader } } }
-      );
       const token = authHeader.replace("Bearer ", "");
-      const { data, error } = await supabaseClient.auth.getClaims(token);
-      if (!error) {
-        userId = data?.claims?.sub ?? null;
+      const { data: authData, error: authError } = await supabaseAdmin.auth.getUser(token);
+      
+      if (!authError && authData?.user) {
+        userId = authData.user.id;
+        // Check if user is admin
+        const { data: roleData } = await supabaseAdmin
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", userId)
+          .eq("role", "admin")
+          .maybeSingle();
+        isAdmin = !!roleData;
       }
     }
 
