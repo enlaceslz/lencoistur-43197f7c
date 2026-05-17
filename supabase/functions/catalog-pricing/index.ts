@@ -43,6 +43,47 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    const authHeader = req.headers.get("Authorization");
+    let userId = null;
+    let isAdmin = false;
+    let isAuthorizedPartner = false;
+
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.replace("Bearer ", "");
+      const { data: authData, error: authError } = await supabaseAdmin.auth.getUser(token);
+      
+      if (!authError && authData?.user) {
+        userId = authData.user.id;
+        // Check if user is admin
+        const { data: roleData } = await supabaseAdmin
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", userId)
+          .eq("role", "admin")
+          .maybeSingle();
+        isAdmin = !!roleData;
+
+        // Check if it's the partner themselves
+        if (!isAdmin && partnerId) {
+          const { data: pData } = await supabaseAdmin
+            .from("partners")
+            .select("id")
+            .eq("user_id", userId)
+            .eq("id", partnerId)
+            .maybeSingle();
+          isAuthorizedPartner = !!pData;
+        }
+      }
+    }
+
+    if (!isAdmin && !isAuthorizedPartner) {
+      console.warn(`Unauthorized catalog-pricing access attempt for partner ${partnerId} by user ${userId || 'anonymous'}`);
+      return new Response(JSON.stringify({ error: "Unauthorized. Please sign in as admin or the respective partner." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { data: partner } = await supabaseAdmin
       .from("partners")
       .select("id, name, commission_rate, remuneration_type, remuneration_value")
