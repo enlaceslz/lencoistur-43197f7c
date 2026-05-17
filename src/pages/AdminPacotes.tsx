@@ -143,13 +143,15 @@ const AdminPacotes = () => {
       const totalSite = selectedItems.reduce((acc, item) => acc + (item.data?.price || 0), 0);
       const totalPartner = selectedItems.reduce((acc, item) => acc + (item.data?.partner_price || 0), 0);
       
-      setForm(prev => ({ 
-        ...prev, 
-        discount_price: totalSite,
-        // We initialize partner_price with the sum if it's a new package,
-        // but the user can still edit it as requested.
-        partner_price: prev.partner_price || totalPartner 
-      }));
+      setForm(prev => {
+        // Only auto-initialize partner_price if it's currently 0
+        const shouldUpdatePartner = prev.partner_price === 0 && totalPartner > 0;
+        return { 
+          ...prev, 
+          discount_price: totalSite,
+          partner_price: shouldUpdatePartner ? totalPartner : prev.partner_price
+        };
+      });
     }
   }, [selectedItems, showForm]);
 
