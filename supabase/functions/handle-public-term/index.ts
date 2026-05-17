@@ -99,23 +99,12 @@ serve(async (req) => {
         term_date: new Date().toISOString().split('T')[0],
       }
 
-      if (!currentTermId) {
-        const { data: newTerm, error: termError } = await supabaseAdmin
-          .from('sgs_risk_terms')
-          .insert([termRecord])
-          .select()
-          .single()
-        
-        if (termError) throw termError
-        currentTermId = newTerm.id
-      } else {
-        const { error: termError } = await supabaseAdmin
-          .from('sgs_risk_terms')
-          .update(termRecord)
-          .eq('id', currentTermId)
-        
-        if (termError) throw termError
-      }
+      const { error: updateError } = await supabaseAdmin
+        .from('sgs_risk_terms')
+        .update(termRecord)
+        .eq('id', currentTermId)
+      
+      if (updateError) throw updateError
 
       // 2. Manage Minors
       if (minors && Array.isArray(minors)) {
