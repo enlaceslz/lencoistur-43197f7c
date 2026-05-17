@@ -74,7 +74,7 @@ const TermoAssinatura = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const companyRes = await supabase.from("sgs_empresa").select("*").limit(1).maybeSingle();
+      const companyRes = await supabase.from("sgs_empresa").select("razao_social, logo_url, endereco, telefone, email, cidade, estado, term_recommendations, term_safety_risks, icmbio_autorizacao, cnpj").limit(1).maybeSingle();
       setCompany(companyRes.data);
 
       let bookingData = null;
@@ -82,114 +82,85 @@ const TermoAssinatura = () => {
 
       if (termId) {
         console.log("Searching by termId:", termId);
-        const termRes = await supabase.from("sgs_risk_terms").select("*, customers!customer_id(*)").eq("id", termId).maybeSingle();
-        if (termRes.data) {
-          termData = termRes.data;
-          console.log("Term found:", termData.id);
-          if (termData.booking_id) {
-            const bookingRes = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", termData.booking_id).maybeSingle();
-            bookingData = bookingRes.data;
+        const { data: tData, error: tError } = await supabase.rpc("get_public_term_v2", { p_term_id: termId });
+        if (tData && tData.length > 0) {
+          const row = tData[0];
+          termData = {
+            id: row.id,
+            customer_id: row.customer_id,
+            customer_name: row.customer_name,
+            tour_name: row.tour_name,
+            term_date: row.term_date,
+            accepted: row.accepted,
+            booking_id: row.booking_id,
+            signature_data: row.signature_data,
+            risks_informed: row.risks_informed,
+            health_questions: row.health_questions,
+            pdf_url: row.pdf_url,
+            customers: {
+              id: row.customer_id,
+              name: row.customer_name,
+              email: row.customer_email,
+              phone: row.customer_phone,
+              cpf: row.customer_cpf,
+              passport: row.customer_passport,
+              country: row.customer_country,
+              birth_date: row.customer_birth_date
+            }
+          };
+          if (row.booking_id) {
+            bookingData = {
+              id: row.booking_id,
+              booking_code: row.booking_code,
+              item_name: row.booking_item_name,
+              date: row.booking_date,
+              customers: termData.customers
+            };
           }
         }
       }
 
-      if (!bookingData && bookingIdParam) {
-        console.log("Searching by bookingIdParam:", bookingIdParam);
-        const { data: bById, error: bIdError } = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", bookingIdParam).maybeSingle();
-        if (bIdError) console.error("Booking search error:", bIdError);
-        bookingData = bById;
-      }
-
-      if (!bookingData && bookingCode) {
-        console.log("Searching by bookingCode:", bookingCode);
-        const cleanBookingCode = bookingCode.trim();
+      if (!bookingData && (bookingIdParam || bookingCode || customerIdParam)) {
+        const query = bookingIdParam || bookingCode || customerIdParam;
+        console.log("Searching booking by query:", query);
+        const { data: searchResults } = await supabase.rpc("search_public_booking", { p_query: query });
         
-        // Try searching by booking_code first
-        const { data: bData, error: bError } = await supabase
-          .from("bookings")
-          .select("*, customers!customer_id(*)")
-          .ilike("booking_code", cleanBookingCode)
-          .maybeSingle();
-        
-        if (bError) console.error("Search error:", bError);
-        bookingData = bData;
-
-        // Try searching without prefix if cleanBookingCode doesn't have it but DB does, or vice versa
-        if (!bookingData) {
-          const alternativeCode = cleanBookingCode.startsWith("RES-") 
-            ? cleanBookingCode 
-            : `RES-${new Date().getFullYear()}-${cleanBookingCode.padStart(4, "0")}`;
-          
-          console.log("Trying alternative bookingCode:", alternativeCode);
-          const { data: bDataAlt } = await supabase
-            .from("bookings")
-            .select("*, customers!customer_id(*)")
-            .ilike("booking_code", alternativeCode)
-            .maybeSingle();
-          bookingData = bDataAlt;
-        }
-
-        // Fallback: try searching by ID if bookingCode looks like a UUID
-        if (!bookingData && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cleanBookingCode)) {
-          console.log("Trying bookingCode as UUID fallback");
-          const { data: bByIdFallback } = await supabase.from("bookings").select("*, customers!customer_id(*)").eq("id", cleanBookingCode).maybeSingle();
-          bookingData = bByIdFallback;
-        }
-        
-        // Final fallback for booking_code: exact match with variations
-        if (!bookingData) {
-          const { data: bDataExact } = await supabase
-            .from("bookings")
-            .select("*, customers!customer_id(*)")
-            .or(`booking_code.eq.${cleanBookingCode},booking_code.ilike.%${cleanBookingCode}%`)
-            .limit(1)
-            .maybeSingle();
-          bookingData = bDataExact;
-        }
-
-        if (bookingData && !termData) {
-          const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
-          termData = tData;
-        }
-      }
-
-      if (!bookingData && customerIdParam) {
-        console.log("Searching by customerIdParam:", customerIdParam);
-        // Fallback: try to find the most recent booking for this customer
-        const { data: bByCust, error: bCustError } = await supabase
-          .from("bookings")
-          .select("*, customers!customer_id(*)")
-          .eq("customer_id", customerIdParam)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        
-        if (bCustError) console.error("Customer search error:", bCustError);
-        bookingData = bByCust;
-
-        if (bookingData && !termData) {
-          const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
-          termData = tData;
-        }
-      }
-
-      if (!bookingData && !termData && customerIdParam) {
-        console.log("Searching directly for customer:", customerIdParam);
-        const { data: customerData } = await supabase.from("customers").select("*").eq("id", customerIdParam).maybeSingle();
-        if (customerData) {
+        if (searchResults && searchResults.length > 0) {
+          const row = searchResults[0];
           bookingData = {
-            id: null,
-            customer_id: customerData.id,
-            customers: customerData,
-            item_name: "Passeio (A definir)",
-            date: new Date().toISOString().split('T')[0],
-            booking_code: "AVULSO"
+            id: row.id,
+            booking_code: row.booking_code,
+            item_name: row.item_name,
+            date: row.date,
+            customer_id: row.customer_id,
+            customers: {
+              id: row.customer_id,
+              name: row.customer_name,
+              email: row.customer_email,
+              phone: row.customer_phone,
+              cpf: row.customer_cpf,
+              passport: row.customer_passport,
+              country: row.customer_country,
+              birth_date: row.customer_birth_date
+            }
           };
-          
-          const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("customer_id", customerData.id).is("booking_id", null).maybeSingle();
-          termData = tData;
+
+          // Try to find existing term for this booking
+          const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
+          if (tData) {
+             // We use RPC to get full term data including customers if needed, but for now term exists
+             const { data: fullTData } = await supabase.rpc("get_public_term_v2", { p_term_id: tData.id });
+             if (fullTData && fullTData.length > 0) {
+                const tRow = fullTData[0];
+                termData = {
+                  ...tRow,
+                  customers: bookingData.customers
+                };
+             }
+          }
         }
       }
+
 
       if (bookingData || termData) {
         setBooking(bookingData);
