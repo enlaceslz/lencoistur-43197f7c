@@ -420,7 +420,7 @@ const AdminFinanceiro = () => {
         </div>
 
         {/* Header Section with Filters */}
-        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 glass-card rounded-[2.5rem] p-8 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+        <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 bg-white border border-border rounded-lg p-8">
           <div className="flex flex-col sm:flex-row gap-6">
             <div className="space-y-2">
               <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] ml-1">Período de Competência</p>
@@ -429,7 +429,7 @@ const AdminFinanceiro = () => {
                   <select 
                     value={selectedMonth} 
                     onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                    className="appearance-none bg-muted/40 border border-border/40 rounded-2xl px-6 pr-10 h-12 text-xs font-black uppercase tracking-tight focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer outline-none w-40"
+                    className="appearance-none bg-slate-50 border border-border rounded-lg px-6 pr-10 h-12 text-xs font-black uppercase tracking-tight focus:ring-0 focus:border-primary transition-none cursor-pointer outline-none w-40"
                   >
                     {["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"].map((m, i) => (
                       <option key={i} value={i}>{m}</option>
@@ -442,7 +442,7 @@ const AdminFinanceiro = () => {
                 <select 
                   value={selectedYear} 
                   onChange={(e) => setSelectedYear(Number(e.target.value))}
-                  className="bg-muted/40 border border-border/40 rounded-2xl px-5 h-12 text-xs font-black uppercase tracking-tight focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer outline-none"
+                  className="bg-slate-50 border border-border rounded-lg px-5 h-12 text-xs font-black uppercase tracking-tight focus:ring-0 focus:border-primary transition-none cursor-pointer outline-none"
                 >
                   {[2024, 2025, 2026].map(y => (
                     <option key={y} value={y}>{y}</option>
@@ -459,7 +459,7 @@ const AdminFinanceiro = () => {
                   placeholder="Descrição, meio de pagamento, status..." 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-11 h-12 bg-muted/30 border-border/50 rounded-2xl text-xs font-medium focus:ring-4 focus:ring-primary/10"
+                  className="pl-11 h-12 bg-slate-50 border border-border rounded-lg text-xs font-medium focus:ring-0 focus:border-primary transition-none"
                 />
               </div>
             </div>
@@ -472,7 +472,7 @@ const AdminFinanceiro = () => {
                 <select 
                   value={statusFilter} 
                   onChange={(e) => setStatusFilter(e.target.value as any)}
-                  className="bg-muted/40 border border-border/40 rounded-2xl px-4 h-12 text-xs font-bold focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer outline-none min-w-[140px]"
+                  className="bg-slate-50 border border-border rounded-lg px-4 h-12 text-xs font-bold focus:ring-0 focus:border-primary transition-none cursor-pointer outline-none min-w-[140px]"
                 >
                   <option value="todos">Status: Todos</option>
                   <option value="pago">Apenas Pagos</option>
@@ -481,7 +481,7 @@ const AdminFinanceiro = () => {
                 <select 
                   value={typeFilter} 
                   onChange={(e) => setTypeFilter(e.target.value as any)}
-                  className="bg-muted/40 border border-border/40 rounded-2xl px-4 h-12 text-xs font-bold focus:ring-4 focus:ring-primary/10 transition-all cursor-pointer outline-none min-w-[140px]"
+                  className="bg-slate-50 border border-border rounded-lg px-4 h-12 text-xs font-bold focus:ring-0 focus:border-primary transition-none cursor-pointer outline-none min-w-[140px]"
                 >
                   <option value="todos">Tipo: Todos</option>
                   <option value="entrada">Entradas (+)</option>
