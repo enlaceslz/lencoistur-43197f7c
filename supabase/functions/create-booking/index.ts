@@ -233,7 +233,7 @@ Deno.serve(async (req) => {
       ? Math.round(total * pixDiscountPercent / 100)
       : 0;
       
-    const discount = overrideDiscount !== undefined ? Number(overrideDiscount) : calculatedDiscount;
+    const discount = (isAdmin && overrideDiscount !== undefined) ? Number(overrideDiscount) : calculatedDiscount;
     const finalTotal = total - discount;
     const pixCode = payMethod === "pix" ? generatePixCode() : null;
 
