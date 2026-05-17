@@ -151,7 +151,7 @@ const TermoAssinatura = () => {
           const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
           if (tData) {
              // We use RPC to get full term data including customers if needed, but for now term exists
-             const { data: fullTData } = await supabase.rpc("get_public_term_v2", { p_term_id: tData.id });
+             const { data: fullTData } = await supabase.rpc("get_public_term_v2", { p_term_id: tData.id, p_token: accessToken });
              if (fullTData && fullTData.length > 0) {
                 const tRow = fullTData[0];
                 termData = {
