@@ -410,7 +410,7 @@ const AdminPacotes = () => {
                             value={form.discount_price / 100}
                             onValueChange={(values) => {
                               const { floatValue } = values;
-                              setForm({ ...form, discount_price: Math.round((floatValue || 0) * 100) });
+                              setForm(prev => ({ ...prev, discount_price: Math.round((floatValue || 0) * 100) }));
                             }}
                             thousandSeparator="."
                             decimalSeparator=","
@@ -429,7 +429,7 @@ const AdminPacotes = () => {
                             value={form.partner_price / 100}
                             onValueChange={(values) => {
                               const { floatValue } = values;
-                              setForm({ ...form, partner_price: Math.round((floatValue || 0) * 100) });
+                              setForm(prev => ({ ...prev, partner_price: Math.round((floatValue || 0) * 100) }));
                             }}
                             thousandSeparator="."
                             decimalSeparator=","
