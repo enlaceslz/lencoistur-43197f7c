@@ -161,9 +161,9 @@ serve(async (req) => {
           await supabaseAdmin.from('sgs_risk_terms').update({ pdf_url: filePath }).eq('id', currentTermId)
           
           // Add to customer_documents
-          if (customerId) {
+          if (trustedCustomerId) {
             await supabaseAdmin.from('customer_documents').insert([{
-              customer_id: customerId,
+              customer_id: trustedCustomerId,
               name: `Termo Assinado - ${tourName}`,
               file_url: filePath,
               file_type: 'application/pdf',
@@ -183,12 +183,12 @@ serve(async (req) => {
         }
       }
 
-      // 4. Update booking status
-      if (bookingId) {
+      // 4. Update booking status (use server-stored booking_id only)
+      if (trustedBookingId) {
         await supabaseAdmin.from('bookings').update({ 
           status: 'confirmada',
           updated_at: new Date().toISOString()
-        }).eq('id', bookingId).eq('status', 'pendente')
+        }).eq('id', trustedBookingId).eq('status', 'pendente')
       }
 
       return new Response(JSON.stringify({ success: true, termId: currentTermId }), {
