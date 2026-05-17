@@ -991,7 +991,7 @@ const AdminCRMContent = () => {
     <AdminLayout title="Gestão de Clientes & CRM">
       <div className="space-y-8 pb-10">
         {/* Advanced Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-in-fade" style={{ animationDelay: '0.05s' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { label: "Base de Clientes", value: customers.length, icon: Users, color: "text-primary", bg: "bg-primary/5", desc: "Total de titulares" },
             { label: "Novos Parceiros", value: newThisMonth, icon: UserPlus, color: "text-primary", bg: "bg-primary/5", desc: "Registrados este mês" },
@@ -1001,7 +1001,7 @@ const AdminCRMContent = () => {
             <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group border border-white/20 shadow-xl shadow-black/5 bg-white">
               <div className="absolute right-0 top-0 w-24 h-24 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-primary/10 transition-colors" />
               <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center shadow-sm transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+                <div className={`w-12 h-12 rounded-lg ${stat.bg} ${stat.color} flex items-center justify-center shadow-sm transition-none`}>
                   <stat.icon size={22} strokeWidth={2.5} />
                 </div>
                 <div className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">{stat.desc}</div>
@@ -1016,9 +1016,9 @@ const AdminCRMContent = () => {
 
         <div className="w-full">
           {/* Client List */}
-          <div className="glass-card rounded-[2.5rem] p-10 animate-in-fade shadow-2xl shadow-primary/5" style={{ animationDelay: '0.2s' }}>
+          <div className="bg-white border border-border rounded-lg p-10 shadow-sm">
             <div className="flex flex-col sm:flex-row gap-6 mb-10">
-              <div className="flex items-center gap-4 flex-1 bg-muted/40 border border-border/40 rounded-2xl px-6 py-4 focus-within:ring-4 focus-within:ring-primary/10 focus-within:bg-white transition-all group">
+              <div className="flex items-center gap-4 flex-1 bg-slate-50 border border-border rounded-lg px-6 py-4 focus-within:ring-0 focus-within:border-primary focus-within:bg-white transition-none group">
                 <Search size={20} className="text-primary group-focus-within:scale-110 transition-transform" />
                 <input
                   type="text"
@@ -1057,7 +1057,7 @@ const AdminCRMContent = () => {
                 <button
                   key={f.key}
                   onClick={() => setFilter(f.key)}
-                  className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all whitespace-nowrap ${
+                  className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-lg whitespace-nowrap ${
                     filter === f.key
                       ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105"
                       : "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -1156,7 +1156,7 @@ const AdminCRMContent = () => {
                           >
                             <td className="py-4 px-4">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-xs font-black shrink-0 shadow-sm group-hover:bg-primary group-hover:text-white transition-all">
+                                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-xs font-black shrink-0 shadow-sm group-hover:bg-primary group-hover:text-white transition-none">
                                   {c.name.trim() ? c.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
                                 </div>
                                 <div className="min-w-0">
