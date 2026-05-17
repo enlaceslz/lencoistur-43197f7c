@@ -36,23 +36,23 @@ const VoucherPage = () => {
         bookingCode: bookingData.booking_code,
         customerName: bookingData.customer_name || "Cliente",
         customerEmail: bookingData.customer_email || "",
-        customerPhone: bookingData.customer_phone || "",
+        customerPhone: "",
         itemName: bookingData.item_name,
         type: bookingData.type as any,
         date: bookingData.date,
         guests: bookingData.guests,
-        unitPrice: bookingData.unit_price,
-        total: bookingData.total,
-        discount: bookingData.discount,
+        unitPrice: 0,
+        total: bookingData.final_total,
+        discount: 0,
         finalTotal: bookingData.final_total,
         payMethod: bookingData.pay_method as any,
         paymentStatus: bookingData.payment_status as any,
         status: bookingData.status as any,
-        pixCode: bookingData.pix_code,
+        pixCode: null,
         createdAt: bookingData.created_at,
-        notes: bookingData.notes,
-        cpf: bookingData.customer_cpf,
-        passport: bookingData.customer_passport
+        notes: null,
+        cpf: "",
+        passport: ""
       };
 
 
