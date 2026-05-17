@@ -472,8 +472,9 @@ const TermoAssinatura = () => {
       const { data: edgeResult, error: edgeError } = await supabase.functions.invoke("handle-public-term", {
         body: {
           action: "save_term",
-          payload: {
+        payload: {
             termId: currentTermId,
+            accessToken,
             bookingId: booking?.id,
             bookingCode: booking?.booking_code,
             customerId: booking?.customer_id || term?.customer_id,
