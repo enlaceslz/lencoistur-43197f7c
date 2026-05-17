@@ -512,16 +512,16 @@ const AdminRelatorios = () => {
 };
 
 const KPICard = ({ label, value, icon: Icon, color }: any) => (
-  <div className="glass-card rounded-[2rem] p-7 border border-white/20 shadow-xl shadow-black/5 group hover:shadow-primary/5 transition-all relative overflow-hidden bg-white/40 backdrop-blur-xl">
+  <div className="bg-white rounded-lg p-7 border border-border shadow-sm relative overflow-hidden group">
     <div className={`absolute -right-4 -top-4 w-24 h-24 ${color.replace('text', 'bg')} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
     <div className="flex items-center justify-between mb-5">
-      <div className={`w-12 h-12 rounded-2xl ${color.replace('text', 'bg')} bg-opacity-10 flex items-center justify-center ${color} shadow-lg shadow-black/5 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
+      <div className={`w-12 h-12 rounded-lg ${color.replace('text', 'bg')} bg-opacity-10 flex items-center justify-center ${color} shadow-sm transition-none`}>
         <Icon size={22} strokeWidth={2.5} />
       </div>
       <div className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">Executivo</div>
     </div>
     <div className="space-y-1">
-      <p className="text-3xl font-black text-foreground tracking-tighter group-hover:translate-x-1 transition-transform">{value}</p>
+      <p className="text-3xl font-black text-foreground tracking-tighter">{value}</p>
       <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{label}</p>
     </div>
   </div>
@@ -529,10 +529,10 @@ const KPICard = ({ label, value, icon: Icon, color }: any) => (
 
 
 const ChartCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <Card className="border-none shadow-sm overflow-hidden glass-card rounded-[2.5rem] group hover:shadow-xl hover:shadow-primary/5 transition-all duration-500">
+  <Card className="border border-border shadow-sm overflow-hidden bg-white rounded-lg transition-none">
     <CardHeader className="bg-muted/10 border-b border-border/20 py-6 px-8">
-      <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-3 text-muted-foreground group-hover:text-primary transition-colors">
-        <Activity size={16} className="text-primary group-hover:scale-110 transition-transform" strokeWidth={3} /> {title}
+      <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-3 text-muted-foreground transition-none">
+        <Activity size={16} className="text-primary transition-none" strokeWidth={3} /> {title}
       </CardTitle>
     </CardHeader>
     <CardContent className="p-8 bg-transparent">{children}</CardContent>
