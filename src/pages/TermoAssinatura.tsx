@@ -84,7 +84,7 @@ const TermoAssinatura = () => {
 
       if (termId) {
         console.log("Searching by termId:", termId);
-        const { data: tData, error: tError } = await supabase.rpc("get_public_term_v2", { p_term_id: termId });
+        const { data: tData, error: tError } = await supabase.rpc("get_public_term_v2", { p_term_id: termId, p_token: accessToken });
         if (tData && tData.length > 0) {
           const row = tData[0];
           termData = {
