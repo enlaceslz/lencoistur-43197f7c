@@ -355,7 +355,7 @@ const AdminPacotes = () => {
                 <PackageIcon size={20} className="md:w-6 md:h-6" />
               </div>
               <div>
-                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                <DialogTitle className="text-base sm:text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
                   {editingId ? "Editar Pacote" : "Novo Pacote Turístico"}
                 </DialogTitle>
                 <p className="text-[11px] md:text-sm text-slate-500 font-medium line-clamp-1">Configure os detalhes e o itinerário da campanha</p>
@@ -631,7 +631,7 @@ const AdminPacotes = () => {
                     <Eye size={24} />
                   </div>
                   <div>
-                    <DialogTitle className="text-xl font-black text-slate-900 leading-none mb-1">
+                    <DialogTitle className="text-base sm:text-xl font-black text-slate-900 leading-none mb-1">
                       Visualizar Campanha
                     </DialogTitle>
                     <p className="text-sm text-slate-500 font-medium">Preview e compartilhamento do pacote</p>
@@ -653,7 +653,7 @@ const AdminPacotes = () => {
                     <Badge className="w-fit mb-3 bg-primary text-white font-black uppercase tracking-widest px-4 py-1.5 rounded-full text-xs border-none shadow-lg">
                       Oportunidade Única
                     </Badge>
-                    <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight uppercase">{viewingPackage.name}</h2>
+                    <h2 className="text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight uppercase">{viewingPackage.name}</h2>
                     <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-4">
                       <div className="flex items-center gap-2 text-white/90 font-bold text-sm">
                         <Clock size={18} className="text-primary" /> {viewingPackage.days} Dias
