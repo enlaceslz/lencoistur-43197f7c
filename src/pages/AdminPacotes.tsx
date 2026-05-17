@@ -108,9 +108,10 @@ const AdminPacotes = () => {
         .getPublicUrl(filePath);
 
       setForm(prev => ({ ...prev, banner_url: publicUrl }));
-      toast.success("Banner enviado com sucesso!");
+      toast.success("Imagem enviada com sucesso!");
     } catch (error: any) {
-      toast.error("Erro ao enviar imagem: " + error.message);
+      console.error("Erro no upload:", error);
+      toast.error("Erro ao enviar imagem: " + (error.message || "Verifique as permissões do bucket."));
     } finally {
       setUploading(false);
     }
@@ -438,7 +439,7 @@ const AdminPacotes = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="pkg-days" className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Dias</Label>
                         <div className="relative">
@@ -448,7 +449,7 @@ const AdminPacotes = () => {
                             type="number" 
                             value={form.days} 
                             onChange={e => setForm({...form, days: Number(e.target.value)})} 
-                            className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-bold text-xs" 
+                            className="h-12 pl-10 pr-4 rounded-lg border-slate-200 bg-slate-50 focus:bg-white transition-none font-bold text-xs" 
                           />
                         </div>
                       </div>
@@ -461,7 +462,7 @@ const AdminPacotes = () => {
                             type="number" 
                             value={form.nights} 
                             onChange={e => setForm({...form, nights: Number(e.target.value)})} 
-                            className="h-12 pl-10 pr-4 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-bold text-xs" 
+                            className="h-12 pl-10 pr-4 rounded-lg border-slate-200 bg-slate-50 focus:bg-white transition-none font-bold text-xs" 
                           />
                         </div>
                       </div>
