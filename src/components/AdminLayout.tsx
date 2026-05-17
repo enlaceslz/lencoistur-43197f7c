@@ -179,7 +179,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
       <Link
         to={path}
         onClick={() => setSidebarOpen(false)}
-        className={`flex items-center gap-3 px-4 py-2.5 rounded text-[14px] font-medium transition-colors ${
+        className={`flex items-center gap-3 px-4 py-2.5 rounded-md text-[14px] font-medium ${
           active 
             ? "bg-primary text-white" 
             : "text-white/70 hover:text-white hover:bg-white/10"
@@ -196,10 +196,10 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-slate-50 flex font-body">
-        <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[70px]" : "w-[260px]"} bg-slate-900 transition-all duration-200 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col border-r border-slate-800`}>
+        <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[70px]" : "w-[260px]"} bg-slate-900 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col border-r border-slate-800`}>
           <div className={`px-4 py-6 ${sidebarCollapsed ? "flex justify-center" : ""}`}>
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded bg-primary flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center shrink-0">
                 <span className="text-white font-bold text-lg">LT</span>
               </div>
               {!sidebarCollapsed && (
@@ -220,7 +220,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
             ))}
             
             <div className="pt-6 border-t border-white/5 mt-6">
-              <button onClick={() => setSgsOpen(!sgsOpen)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[13px] font-bold text-white/40 hover:text-white hover:bg-white/[0.05] transition-all ${sidebarCollapsed ? "justify-center px-0" : ""}`}>
+              <button onClick={() => setSgsOpen(!sgsOpen)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-[13px] font-bold text-white/40 hover:text-white hover:bg-white/[0.05] ${sidebarCollapsed ? "justify-center px-0" : ""}`}>
                 <Shield size={18} />
                 {!sidebarCollapsed && <span className="flex-1 text-left">SGS - Segurança</span>}
               </button>
@@ -233,26 +233,26 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           </nav>
 
           <div className="p-4 border-t border-white/5">
-            <button onClick={() => signOut()} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[13px] font-bold text-rose-400 hover:bg-rose-500/10 transition-all ${sidebarCollapsed ? "justify-center px-0" : ""}`}>
+            <button onClick={() => signOut()} className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-[13px] font-bold text-rose-400 hover:bg-rose-500/10 ${sidebarCollapsed ? "justify-center px-0" : ""}`}>
               <LogOut size={18} />
               {!sidebarCollapsed && <span>Sair do Sistema</span>}
             </button>
           </div>
         </aside>
 
-        <main className={`flex-1 flex flex-col min-w-0 transition-all duration-200 ${sidebarCollapsed ? "lg:ml-[70px]" : "lg:ml-[260px]"}`}>
+        <main className={`flex-1 flex flex-col min-w-0 ${sidebarCollapsed ? "lg:ml-[70px]" : "lg:ml-[260px]"}`}>
           <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-40">
             <div className="flex items-center gap-4">
               <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded hover:bg-slate-100"><Menu size={20} /></button>
               <div className="hidden lg:flex items-center gap-4">
-                <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="p-2 rounded hover:bg-slate-100 transition-colors">
+                <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="p-2 rounded hover:bg-slate-100">
                   {sidebarCollapsed ? <ChevronRight size={18} /> : <Menu size={18} />}
                 </button>
                 <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
                   {breadcrumbs.map((c, i) => (
                     <React.Fragment key={c.path}>
                       {i > 0 && <span className="opacity-20">/</span>}
-                      <Link to={c.path} className={`hover:text-primary transition-all ${i === breadcrumbs.length-1 ? "text-primary/80 opacity-100" : ""}`}>{c.label}</Link>
+                      <Link to={c.path} className={`hover:text-primary ${i === breadcrumbs.length-1 ? "text-primary/80 opacity-100" : ""}`}>{c.label}</Link>
                     </React.Fragment>
                   ))}
                 </div>
@@ -260,17 +260,17 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
             </div>
 
             <div className="flex items-center gap-5">
-              <div className="hidden xl:flex items-center gap-3 bg-muted/30 border border-border/40 rounded-2xl px-5 py-2.5 w-72 focus-within:w-80 focus-within:bg-white focus-within:shadow-xl focus-within:shadow-primary/5 transition-all">
+              <div className="hidden xl:flex items-center gap-3 bg-muted/30 border border-border/40 rounded-lg px-5 py-2.5 w-72 focus-within:w-80 focus-within:bg-white focus-within:shadow-md focus-within:shadow-primary/5">
                 <Compass size={17} className="text-muted-foreground" />
                 <input type="text" placeholder="Busca Inteligente..." className="bg-transparent border-none text-[11px] font-bold focus:ring-0 w-full placeholder:text-muted-foreground/30 uppercase tracking-widest" />
               </div>
               <div className="relative" ref={notifRef}>
-                <button onClick={() => setNotifOpen(!notifOpen)} className={`relative p-3 rounded-2xl transition-all ${notifOpen ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`}>
+                <button onClick={() => setNotifOpen(!notifOpen)} className={`relative p-3 rounded-lg ${notifOpen ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`}>
                   <Bell size={22} />
                   {activeNotifs.length > 0 && <span className={`absolute top-2 right-2 w-4 h-4 rounded-full text-[9px] text-white flex items-center justify-center font-black ${errorCount > 0 ? "bg-rose-500" : "bg-primary shadow-lg shadow-primary/40"}`}>{activeNotifs.length}</span>}
                 </button>
               </div>
-              <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-xs border border-primary/20 shadow-inner">
+              <div className="w-11 h-11 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-black text-xs border border-primary/20 shadow-inner">
                 {userInitials}
               </div>
             </div>
