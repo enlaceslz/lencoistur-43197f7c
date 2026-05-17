@@ -204,7 +204,7 @@ const AdminRelatorios = () => {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="glass-card p-4 rounded-2xl border-none shadow-xl">
+        <div className="bg-white p-4 rounded-lg border border-border shadow-md">
           <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
             {label ? formatDate(parseISO(label), "dd 'de' MMMM") : ''}
           </p>
@@ -261,13 +261,13 @@ const AdminRelatorios = () => {
           </div>
         </div>
 
-        <div className="no-print flex flex-col xl:flex-row xl:items-center justify-between gap-6 glass-card p-8 rounded-[2.5rem] animate-in-fade" style={{ animationDelay: '0.1s' }}>
+        <div className="no-print flex flex-col xl:flex-row xl:items-center justify-between gap-6 bg-white border border-border p-8 rounded-lg shadow-sm">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Análise de Performance</p>
             <h2 className="text-4xl font-black text-foreground tracking-tight leading-none">Relatórios Gerenciais</h2>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-muted/50 border border-border/50 rounded-2xl px-4 h-12 shadow-inner group">
+            <div className="flex items-center gap-2 bg-slate-50 border border-border rounded-lg px-4 h-12 shadow-sm group">
               <Calendar size={16} className="text-muted-foreground group-hover:text-primary transition-colors" />
               <select 
                 value={period} 
@@ -281,7 +281,7 @@ const AdminRelatorios = () => {
               </select>
             </div>
             
-            <div className="flex items-center gap-2 bg-muted/50 border border-border/50 rounded-2xl px-4 h-12 shadow-inner group">
+            <div className="flex items-center gap-2 bg-slate-50 border border-border rounded-lg px-4 h-12 shadow-sm group">
               <Filter size={16} className="text-muted-foreground group-hover:text-primary transition-colors" />
               <select 
                 value={statusFilter} 
@@ -295,7 +295,7 @@ const AdminRelatorios = () => {
               </select>
             </div>
 
-            <button onClick={printReport} className="flex items-center gap-2 bg-primary text-primary-foreground px-6 h-12 rounded-2xl font-black text-sm hover:brightness-110 transition-all shadow-lg shadow-primary/20 active:scale-95">
+            <button onClick={printReport} className="flex items-center gap-2 bg-primary text-primary-foreground px-6 h-12 rounded-lg font-black text-sm hover:brightness-110 transition-none shadow-sm active:scale-95">
               <Printer size={16} strokeWidth={3} />
               IMPRIMIR
             </button>
@@ -308,7 +308,7 @@ const AdminRelatorios = () => {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "flex items-center gap-3 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all whitespace-nowrap border-2",
+                "flex items-center gap-3 px-6 py-4 rounded-lg font-black text-xs uppercase tracking-[0.2em] transition-none whitespace-nowrap border-2",
                 activeTab === tab.id
                   ? "bg-primary text-primary-foreground border-primary shadow-xl shadow-primary/20 scale-105"
                   : "bg-muted/30 text-muted-foreground border-transparent hover:bg-muted/50 hover:border-border"
@@ -321,12 +321,12 @@ const AdminRelatorios = () => {
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-32 space-y-4 glass-card rounded-[3rem]">
+          <div className="flex flex-col items-center justify-center py-32 space-y-4 bg-white border border-border rounded-lg shadow-sm">
             <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
             <p className="text-sm font-black uppercase tracking-widest text-muted-foreground animate-pulse">Processando Inteligência de Dados...</p>
           </div>
         ) : (
-          <div className="space-y-8 animate-in-fade">
+          <div className="space-y-8">
             {/* KPI Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {activeTab === "reservas" && (
