@@ -348,14 +348,14 @@ const AdminPacotes = () => {
       </div>
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-lg overflow-hidden bg-[#F8FAFC]">
+        <DialogContent className="sm:max-w-4xl w-full sm:w-[95vw] h-full sm:h-auto sm:max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl sm:rounded-lg overflow-hidden bg-[#F8FAFC]">
           <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
             <div className="flex items-center gap-3 md:gap-4">
               <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                 <PackageIcon size={20} className="md:w-6 md:h-6" />
               </div>
               <div>
-                <DialogTitle className="text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
+                <DialogTitle className="text-base sm:text-lg md:text-xl font-black text-slate-900 leading-none mb-1">
                   {editingId ? "Editar Pacote" : "Novo Pacote Turístico"}
                 </DialogTitle>
                 <p className="text-[11px] md:text-sm text-slate-500 font-medium line-clamp-1">Configure os detalhes e o itinerário da campanha</p>
@@ -366,7 +366,7 @@ const AdminPacotes = () => {
             </Button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-6 md:space-y-8">
+          <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8 space-y-6 md:space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
               {/* Coluna Principal: Informações Básicas */}
               <div className="lg:col-span-7 space-y-6">
@@ -528,7 +528,7 @@ const AdminPacotes = () => {
                   <div className="flex flex-col gap-3">
                     <div className="relative">
                       <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1.5 block">Adicionar Itens</Label>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <select 
                           className="h-11 rounded-lg bg-slate-50 border border-slate-200 px-3 text-xs font-bold text-slate-700 outline-none focus:ring-0 focus:border-primary transition-none cursor-pointer" 
                           onChange={e => { 
@@ -595,7 +595,7 @@ const AdminPacotes = () => {
               <p className="text-[11px] font-bold text-slate-400 max-w-xs text-center sm:text-left">
                 * Campos obrigatórios. O pacote será salvo e poderá ser compartilhado imediatamente como campanha.
               </p>
-              <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                 <Button 
                   type="button" 
                   variant="ghost" 
@@ -622,7 +622,7 @@ const AdminPacotes = () => {
         </DialogContent>
       </Dialog>
       <Dialog open={showView} onOpenChange={setShowView}>
-        <DialogContent className="sm:max-w-3xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-lg overflow-hidden bg-[#F8FAFC]">
+        <DialogContent className="sm:max-w-3xl w-full sm:w-[95vw] h-full sm:h-auto sm:max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl sm:rounded-lg overflow-hidden bg-[#F8FAFC]">
           {viewingPackage && (
             <>
               <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
@@ -631,7 +631,7 @@ const AdminPacotes = () => {
                     <Eye size={24} />
                   </div>
                   <div>
-                    <DialogTitle className="text-xl font-black text-slate-900 leading-none mb-1">
+                    <DialogTitle className="text-base sm:text-xl font-black text-slate-900 leading-none mb-1">
                       Visualizar Campanha
                     </DialogTitle>
                     <p className="text-sm text-slate-500 font-medium">Preview e compartilhamento do pacote</p>
@@ -642,7 +642,7 @@ const AdminPacotes = () => {
                 </Button>
               </div>
 
-              <div className="p-6 md:p-8 space-y-8">
+              <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
                 <div className="relative aspect-[21/9] rounded-lg overflow-hidden shadow-md border-2 border-white">
                   <img 
                     src={viewingPackage.banner_url || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80"} 
@@ -653,8 +653,8 @@ const AdminPacotes = () => {
                     <Badge className="w-fit mb-3 bg-primary text-white font-black uppercase tracking-widest px-4 py-1.5 rounded-full text-xs border-none shadow-lg">
                       Oportunidade Única
                     </Badge>
-                    <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight uppercase">{viewingPackage.name}</h2>
-                    <div className="flex items-center gap-6 mt-4">
+                    <h2 className="text-xl sm:text-3xl md:text-4xl font-black text-white tracking-tight uppercase">{viewingPackage.name}</h2>
+                    <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-4">
                       <div className="flex items-center gap-2 text-white/90 font-bold text-sm">
                         <Clock size={18} className="text-primary" /> {viewingPackage.days} Dias
                       </div>
@@ -681,7 +681,7 @@ const AdminPacotes = () => {
                       </p>
                     </div>
 
-                    <div className="flex gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
                       <Button 
                         onClick={() => sharePackage(viewingPackage)} 
                         className="flex-1 h-16 rounded-lg bg-[#25D366] hover:bg-[#20ba5a] text-white font-black uppercase tracking-widest shadow-sm transition-none"
