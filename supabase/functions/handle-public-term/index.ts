@@ -77,12 +77,21 @@ serve(async (req) => {
         })
       }
 
+      // Prevent replay: reject if already accepted
+      if (existingTerm.accepted) {
+        return new Response(JSON.stringify({ error: 'This term has already been signed.' }), {
+          status: 409,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
       let currentTermId = termId
+      // Trust only the server-stored ids, never the client payload
+      const trustedBookingId = existingTerm.booking_id
+      const trustedCustomerId = existingTerm.customer_id
 
       // 1. Insert or Update sgs_risk_terms
       const termRecord = {
-        booking_id: bookingId,
-        customer_id: customerId,
         customer_name: customerName,
         nationality,
         phone,
