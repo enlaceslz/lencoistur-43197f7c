@@ -22,7 +22,7 @@ serve(async (req) => {
 
     if (action === 'save_term') {
       const { 
-        termId, accessToken, bookingId, bookingCode, customerId, customerName, nationality, phone, email, 
+        termId, accessToken, bookingCode, customerName, nationality, phone, email, 
         cpf, birthDate, tourName, risksInformed, healthQuestions, signatureData,
         minors, pdfBase64, pdfFileName
       } = payload
@@ -37,7 +37,7 @@ serve(async (req) => {
       // Validate token and existence
       const { data: existingTerm, error: termError } = await supabaseAdmin
         .from('sgs_risk_terms')
-        .select('id, sign_access_token, sign_access_expires_at')
+        .select('id, sign_access_token, sign_access_expires_at, booking_id, customer_id, accepted')
         .eq('id', termId)
         .maybeSingle()
 
@@ -77,12 +77,21 @@ serve(async (req) => {
         })
       }
 
+      // Prevent replay: reject if already accepted
+      if (existingTerm.accepted) {
+        return new Response(JSON.stringify({ error: 'This term has already been signed.' }), {
+          status: 409,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
       let currentTermId = termId
+      // Trust only the server-stored ids, never the client payload
+      const trustedBookingId = existingTerm.booking_id
+      const trustedCustomerId = existingTerm.customer_id
 
       // 1. Insert or Update sgs_risk_terms
       const termRecord = {
-        booking_id: bookingId,
-        customer_id: customerId,
         customer_name: customerName,
         nationality,
         phone,
@@ -152,9 +161,9 @@ serve(async (req) => {
           await supabaseAdmin.from('sgs_risk_terms').update({ pdf_url: filePath }).eq('id', currentTermId)
           
           // Add to customer_documents
-          if (customerId) {
+          if (trustedCustomerId) {
             await supabaseAdmin.from('customer_documents').insert([{
-              customer_id: customerId,
+              customer_id: trustedCustomerId,
               name: `Termo Assinado - ${tourName}`,
               file_url: filePath,
               file_type: 'application/pdf',
@@ -174,12 +183,12 @@ serve(async (req) => {
         }
       }
 
-      // 4. Update booking status
-      if (bookingId) {
+      // 4. Update booking status (use server-stored booking_id only)
+      if (trustedBookingId) {
         await supabaseAdmin.from('bookings').update({ 
           status: 'confirmada',
           updated_at: new Date().toISOString()
-        }).eq('id', bookingId).eq('status', 'pendente')
+        }).eq('id', trustedBookingId).eq('status', 'pendente')
       }
 
       return new Response(JSON.stringify({ success: true, termId: currentTermId }), {

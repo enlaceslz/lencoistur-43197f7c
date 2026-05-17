@@ -138,12 +138,12 @@ const TermoAssinatura = () => {
             customers: {
               id: row.customer_id,
               name: row.customer_name,
-              email: row.customer_email,
-              phone: row.customer_phone,
-              cpf: row.customer_cpf,
-              passport: row.customer_passport,
-              country: row.customer_country,
-              birth_date: row.customer_birth_date
+              email: "",
+              phone: "",
+              cpf: "",
+              passport: "",
+              country: "",
+              birth_date: null
             }
           };
 
