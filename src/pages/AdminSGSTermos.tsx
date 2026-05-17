@@ -934,7 +934,7 @@ const AdminSGSTermos = () => {
                         setSendingEmail(t.id);
                         try {
                           const baseUrl = window.location.origin;
-                          const signUrl = `${baseUrl}/assinatura-termo?id=${t.id}${t.booking_id ? `&booking_id=${t.booking_id}` : ''}`;
+                          const signUrl = `${baseUrl}/assinatura-termo?id=${t.id}${t.booking_id ? `&booking_id=${t.booking_id}` : ''}${t.sign_access_token ? `&token=${t.sign_access_token}` : ''}`;
                           const { error } = await supabase.functions.invoke("send-term-email", {
                             body: { customerEmail: customer.email, customerName: customer.name, signUrl: signUrl, tourName: t.tour_name }
                           });
@@ -960,7 +960,7 @@ const AdminSGSTermos = () => {
                           return;
                         }
                         const baseUrl = window.location.origin;
-                        const signUrl = `${baseUrl}/assinatura-termo?id=${t.id}${t.booking_id ? `&booking_id=${t.booking_id}` : ''}`;
+                        const signUrl = `${baseUrl}/assinatura-termo?id=${t.id}${t.booking_id ? `&booking_id=${t.booking_id}` : ''}${t.sign_access_token ? `&token=${t.sign_access_token}` : ''}`;
                         const message = `Olá ${customer.name}! Aqui está o seu link para assinatura do Termo de Ciência de Risco para o passeio ${t.tour_name}: ${signUrl}`;
                         const cleanPhone = customer.phone.replace(/\D/g, "");
                         const whatsappUrl = `https://wa.me/${cleanPhone.startsWith('55') ? cleanPhone : '55' + cleanPhone}?text=${encodeURIComponent(message)}`;

@@ -22,10 +22,60 @@ serve(async (req) => {
 
     if (action === 'save_term') {
       const { 
-        termId, bookingId, bookingCode, customerId, customerName, nationality, phone, email, 
+        termId, accessToken, bookingId, bookingCode, customerId, customerName, nationality, phone, email, 
         cpf, birthDate, tourName, risksInformed, healthQuestions, signatureData,
         minors, pdfBase64, pdfFileName
       } = payload
+
+      if (!termId || !accessToken) {
+        return new Response(JSON.stringify({ error: 'Term ID and Access Token are required for signing.' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Validate token and existence
+      const { data: existingTerm, error: termError } = await supabaseAdmin
+        .from('sgs_risk_terms')
+        .select('id, sign_access_token, sign_access_expires_at')
+        .eq('id', termId)
+        .maybeSingle()
+
+      if (termError || !existingTerm) {
+        return new Response(JSON.stringify({ error: 'Term record not found.' }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      if (existingTerm.sign_access_token !== accessToken) {
+        return new Response(JSON.stringify({ error: 'Unauthorized: Invalid access token.' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      if (existingTerm.sign_access_expires_at && new Date(existingTerm.sign_access_expires_at) < new Date()) {
+        return new Response(JSON.stringify({ error: 'Unauthorized: Access token has expired.' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      // Resource limits
+      if (pdfBase64 && pdfBase64.length > 7000000) { // Approx 5MB
+        return new Response(JSON.stringify({ error: 'PDF file too large (max 5MB).' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+
+      if (minors && Array.isArray(minors) && minors.length > 20) {
+        return new Response(JSON.stringify({ error: 'Too many companions (max 20).' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
 
       let currentTermId = termId
 
@@ -49,23 +99,12 @@ serve(async (req) => {
         term_date: new Date().toISOString().split('T')[0],
       }
 
-      if (!currentTermId) {
-        const { data: newTerm, error: termError } = await supabaseAdmin
-          .from('sgs_risk_terms')
-          .insert([termRecord])
-          .select()
-          .single()
-        
-        if (termError) throw termError
-        currentTermId = newTerm.id
-      } else {
-        const { error: termError } = await supabaseAdmin
-          .from('sgs_risk_terms')
-          .update(termRecord)
-          .eq('id', currentTermId)
-        
-        if (termError) throw termError
-      }
+      const { error: updateError } = await supabaseAdmin
+        .from('sgs_risk_terms')
+        .update(termRecord)
+        .eq('id', currentTermId)
+      
+      if (updateError) throw updateError
 
       // 2. Manage Minors
       if (minors && Array.isArray(minors)) {

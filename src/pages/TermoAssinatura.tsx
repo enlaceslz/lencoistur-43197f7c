@@ -48,6 +48,7 @@ const TermoAssinatura = () => {
   const bookingIdParam = params.get("booking_id") || "";
   const termId = params.get("id") || "";
   const customerIdParam = params.get("customer_id") || params.get("id") || ""; // Handle cases where 'id' might be a customer ID from CRM
+  const accessToken = params.get("token") || "";
   
   const [booking, setBooking] = useState<any>(null);
   const [term, setTerm] = useState<any>(null);
@@ -83,7 +84,7 @@ const TermoAssinatura = () => {
 
       if (termId) {
         console.log("Searching by termId:", termId);
-        const { data: tData, error: tError } = await supabase.rpc("get_public_term_v2", { p_term_id: termId });
+        const { data: tData, error: tError } = await supabase.rpc("get_public_term_v2", { p_term_id: termId, p_token: accessToken });
         if (tData && tData.length > 0) {
           const row = tData[0];
           termData = {
@@ -150,7 +151,7 @@ const TermoAssinatura = () => {
           const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
           if (tData) {
              // We use RPC to get full term data including customers if needed, but for now term exists
-             const { data: fullTData } = await supabase.rpc("get_public_term_v2", { p_term_id: tData.id });
+             const { data: fullTData } = await supabase.rpc("get_public_term_v2", { p_term_id: tData.id, p_token: accessToken });
              if (fullTData && fullTData.length > 0) {
                 const tRow = fullTData[0];
                 termData = {
@@ -471,8 +472,9 @@ const TermoAssinatura = () => {
       const { data: edgeResult, error: edgeError } = await supabase.functions.invoke("handle-public-term", {
         body: {
           action: "save_term",
-          payload: {
+        payload: {
             termId: currentTermId,
+            accessToken,
             bookingId: booking?.id,
             bookingCode: booking?.booking_code,
             customerId: booking?.customer_id || term?.customer_id,
