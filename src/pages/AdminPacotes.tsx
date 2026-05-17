@@ -622,7 +622,7 @@ const AdminPacotes = () => {
         </DialogContent>
       </Dialog>
       <Dialog open={showView} onOpenChange={setShowView}>
-        <DialogContent className="sm:max-w-3xl w-[95vw] max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl rounded-lg overflow-hidden bg-[#F8FAFC]">
+        <DialogContent className="sm:max-w-3xl w-full sm:w-[95vw] h-full sm:h-auto sm:max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl sm:rounded-lg overflow-hidden bg-[#F8FAFC]">
           {viewingPackage && (
             <>
               <div className="bg-white border-b border-slate-100 p-4 md:p-6 flex items-center justify-between sticky top-0 z-10">
@@ -642,7 +642,7 @@ const AdminPacotes = () => {
                 </Button>
               </div>
 
-              <div className="p-6 md:p-8 space-y-8">
+              <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
                 <div className="relative aspect-[21/9] rounded-lg overflow-hidden shadow-md border-2 border-white">
                   <img 
                     src={viewingPackage.banner_url || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80"} 
@@ -654,7 +654,7 @@ const AdminPacotes = () => {
                       Oportunidade Única
                     </Badge>
                     <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight uppercase">{viewingPackage.name}</h2>
-                    <div className="flex items-center gap-6 mt-4">
+                    <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-4">
                       <div className="flex items-center gap-2 text-white/90 font-bold text-sm">
                         <Clock size={18} className="text-primary" /> {viewingPackage.days} Dias
                       </div>
@@ -681,7 +681,7 @@ const AdminPacotes = () => {
                       </p>
                     </div>
 
-                    <div className="flex gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
                       <Button 
                         onClick={() => sharePackage(viewingPackage)} 
                         className="flex-1 h-16 rounded-lg bg-[#25D366] hover:bg-[#20ba5a] text-white font-black uppercase tracking-widest shadow-sm transition-none"
