@@ -164,20 +164,20 @@
   }
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Mais visível e profissional */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  @apply bg-slate-50;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
+  @apply bg-slate-300 rounded-full border-2 border-slate-50 hover:bg-slate-400 transition-colors;
 }
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-slate-800 hover:bg-slate-700;
+  @apply bg-slate-700 border-slate-900 hover:bg-slate-600;
 }
