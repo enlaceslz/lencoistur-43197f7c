@@ -976,10 +976,12 @@ const AdminSGSTermos = () => {
                 )}
                 {t.pdf_url ? (
                   <button 
-                    onClick={() => {
-                      const url = supabase.storage.from("customer-documents").getPublicUrl(t.pdf_url).data.publicUrl;
-                      window.open(url, '_blank');
+                    onClick={async () => {
+                      const { data } = await supabase.storage.from("customer-documents").createSignedUrl(t.pdf_url, 300);
+                      if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+                      else toast({ title: "Erro", description: "Não foi possível gerar o link do documento.", variant: "destructive" });
                     }}
+
                     className="h-11 px-5 bg-green-500/10 hover:bg-green-500 text-green-600 hover:text-white rounded-xl transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"
                   >
                     <FileText size={16} /> PDF Assinado
