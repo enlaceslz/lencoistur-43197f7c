@@ -849,11 +849,11 @@ const AdminReservas = () => {
         setShowNewForm(open);
         if (!open) setIsEditing(false);
       }}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto rounded-[2.5rem] p-0 border-none shadow-2xl">
-          <div className="bg-slate-50/50 p-8 border-b border-border/40">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto rounded-lg p-0 border-none shadow-2xl">
+          <div className="bg-slate-50 p-8 border-b border-border">
             <DialogHeader>
               <DialogTitle className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center text-white shadow-sm">
                   {isEditing ? <Pencil size={24} strokeWidth={3} /> : <Plus size={24} strokeWidth={3} />}
                 </div>
                 {isEditing ? "Editar Reserva Operacional" : "Nova Reserva Operacional"}
@@ -1249,7 +1249,7 @@ const AdminReservas = () => {
                       placeholder="Detalhes sobre restrições, preferências ou logísticas especiais..." 
                       value={form.notes} 
                       onChange={e => setForm({...form, notes: e.target.value})}
-                      className="rounded-xl min-h-[100px] font-semibold border-slate-200 shadow-inner bg-slate-50/50"
+                      className="rounded-lg min-h-[100px] font-semibold border-slate-200 shadow-inner bg-slate-50"
                     />
                   </div>
                 </div>
@@ -1257,7 +1257,7 @@ const AdminReservas = () => {
             </div>
           </div>
 
-          <div className="p-8 bg-slate-50 border-t border-border/40 flex flex-col md:flex-row justify-between items-center gap-6 rounded-b-[2.5rem]">
+          <div className="p-8 bg-slate-50 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6 rounded-b-lg">
             <div className="flex flex-col md:flex-row items-center gap-8">
               <div className="flex flex-col gap-1">
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Líquido Estimado</p>
@@ -1544,7 +1544,7 @@ const AdminReservas = () => {
                      </div>
                    </section>
 
-                   <section className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                   <section className="bg-white p-6 rounded-lg border border-slate-100 shadow-sm">
                     <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
                       <DollarSign size={14} className="text-emerald-500" /> Demonstrativo Financeiro
                     </h3>
