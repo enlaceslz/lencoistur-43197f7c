@@ -3130,6 +3130,32 @@ export type Database = {
       }
     }
     Functions: {
+      get_public_booking_v2: {
+        Args: { p_booking_id: string }
+        Returns: {
+          booking_code: string
+          customer_name: string
+          date: string
+          guests: number
+          id: string
+          item_name: string
+          payment_status: string
+          status: string
+          type: string
+        }[]
+      }
+      get_public_term_v2: {
+        Args: { p_term_id: string }
+        Returns: {
+          accepted: boolean
+          booking_id: string
+          customer_id: string
+          customer_name: string
+          id: string
+          term_date: string
+          tour_name: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
