@@ -22,7 +22,7 @@ serve(async (req) => {
 
     if (action === 'save_term') {
       const { 
-        termId, bookingId, customerId, customerName, nationality, phone, email, 
+        termId, bookingId, bookingCode, customerId, customerName, nationality, phone, email, 
         cpf, birthDate, tourName, risksInformed, healthQuestions, signatureData,
         minors, pdfBase64, pdfFileName
       } = payload
@@ -114,16 +114,24 @@ serve(async (req) => {
           
           // Add to customer_documents
           if (customerId) {
-            // Since it's a private bucket, we store the path, but the UI might need a URL.
-            // We'll store the path.
             await supabaseAdmin.from('customer_documents').insert([{
               customer_id: customerId,
               name: `Termo Assinado - ${tourName}`,
-              file_url: filePath, // Note: storing path instead of public URL
+              file_url: filePath,
               file_type: 'application/pdf',
               category: 'termo'
             }])
           }
+
+          // Add to generic Documents module
+          await supabaseAdmin.from('documents').insert([{
+            name: `Termo Assinado - ${tourName} - ${bookingCode || 'SGS'}`,
+            type: 'termo_assinado',
+            description: `Termo assinado por ${customerName} em ${new Date().toLocaleDateString('pt-BR')}`,
+            file_url: filePath,
+            file_name: pdfFileName,
+            status: 'vigente'
+          }])
         }
       }
 
