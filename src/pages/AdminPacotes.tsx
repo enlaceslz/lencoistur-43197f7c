@@ -595,7 +595,7 @@ const AdminPacotes = () => {
               <p className="text-[11px] font-bold text-slate-400 max-w-xs text-center sm:text-left">
                 * Campos obrigatórios. O pacote será salvo e poderá ser compartilhado imediatamente como campanha.
               </p>
-              <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
                 <Button 
                   type="button" 
                   variant="ghost" 
