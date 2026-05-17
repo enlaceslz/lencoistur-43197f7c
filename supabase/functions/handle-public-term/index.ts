@@ -22,7 +22,7 @@ serve(async (req) => {
 
     if (action === 'save_term') {
       const { 
-        termId, accessToken, bookingId, bookingCode, customerId, customerName, nationality, phone, email, 
+        termId, accessToken, bookingCode, customerName, nationality, phone, email, 
         cpf, birthDate, tourName, risksInformed, healthQuestions, signatureData,
         minors, pdfBase64, pdfFileName
       } = payload
