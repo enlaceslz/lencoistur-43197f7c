@@ -74,8 +74,9 @@ const TermoAssinatura = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const companyRes = await supabase.from("sgs_empresa").select("razao_social, logo_url, endereco, telefone, email, cidade, estado, term_recommendations, term_safety_risks, icmbio_autorizacao, cnpj").limit(1).maybeSingle();
-      setCompany(companyRes.data);
+      const companyRes = await supabase.rpc("get_public_company_info");
+      setCompany(companyRes.data?.[0] || null);
+
 
       let bookingData = null;
       let termData = null;
