@@ -342,14 +342,15 @@ const AdminCRMContent = () => {
         if (!bookingsByCustomer[b.customer_id]) {
           bookingsByCustomer[b.customer_id] = { count: 0, total: 0, lastDate: null };
         }
-        bookingsByCustomer[b.customer_id].count++;
         if (b.status !== "cancelada") {
+          bookingsByCustomer[b.customer_id].count++;
           bookingsByCustomer[b.customer_id].total += b.final_total;
         }
         if (!bookingsByCustomer[b.customer_id].lastDate || b.created_at > bookingsByCustomer[b.customer_id].lastDate!) {
           bookingsByCustomer[b.customer_id].lastDate = b.created_at;
         }
       });
+
 
       const mappedCustomers = customersData.map((c: any) => ({
         id: c.id,

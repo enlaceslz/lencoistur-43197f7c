@@ -175,7 +175,7 @@ const AdminReservas = () => {
     return b.customerName.toLowerCase().includes(q) || b.itemName.toLowerCase().includes(q) || b.bookingCode.toLowerCase().includes(q);
   });
 
-  const totalPago = bookings.filter((b) => b.paymentStatus === "pago").reduce((a, b) => a + b.finalTotal, 0);
+  const totalPago = bookings.filter((b) => b.paymentStatus === "pago" && b.status !== "cancelada").reduce((a, b) => a + b.finalTotal, 0);
 
   const handleAction = async (action: () => Promise<void>, msg: string) => {
     setActionLoading(true);
