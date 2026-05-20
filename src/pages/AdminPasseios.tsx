@@ -305,9 +305,12 @@ const AdminPasseios = () => {
   });
 
   const activeCount = tours.filter(t => t.active).length;
+  const inactiveCount = tours.length - activeCount;
   const avgRating = tours.length
     ? (tours.reduce((a, t) => a + (Number(t.rating) || 0), 0) / tours.length).toFixed(1)
     : "0";
+  const totalReviews = tours.reduce((a, t) => a + (t.reviews_count || 0), 0);
+
 
   if (isWideViewNewWindow) {
     const wideViewId = new URLSearchParams(window.location.search).get('wide_view_id');
