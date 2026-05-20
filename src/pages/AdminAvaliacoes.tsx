@@ -345,7 +345,7 @@ const AdminAvaliacoes = () => {
                           className={cn("h-10 w-10 rounded-xl transition-all", r.status === 'approved' ? "text-emerald-500 bg-emerald-500/10" : "text-slate-300")}
                           onClick={async () => {
                             const newStatus = r.status === 'approved' ? 'hidden' : 'approved';
-                            const { error } = await supabase.from("reviews").update({ status: newStatus }).eq("id", r.id);
+                            const { error } = await supabase.from("reviews").update({ status: newStatus } as any).eq("id", r.id);
                             if (!error) {
                               toast.success(newStatus === 'approved' ? "Avaliação aprovada!" : "Avaliação oculta.");
                               fetchReviews();
