@@ -369,7 +369,7 @@ const AdminAvaliacoes = () => {
                           size="icon" 
                           className={cn("h-10 w-10 rounded-xl transition-all", r.is_featured ? "text-amber-500 bg-amber-500/10" : "text-slate-300")}
                           onClick={async () => {
-                            const { error } = await supabase.from("reviews").update({ is_featured: !r.is_featured }).eq("id", r.id);
+                            const { error } = await supabase.from("reviews").update({ is_featured: !r.is_featured } as any).eq("id", r.id);
                             if (!error) {
                               toast.success(r.is_featured ? "Destaque removido." : "Definida como destaque!");
                               fetchReviews();
