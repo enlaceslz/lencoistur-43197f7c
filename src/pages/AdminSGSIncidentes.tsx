@@ -265,23 +265,29 @@ const AdminSGSIncidentes = () => {
                   className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all" placeholder="Primeiros socorros, resgate..." />
               </div>
 
-              <div className="flex items-center gap-2 pt-6">
+              <div className="flex items-center gap-3 pt-6 bg-destructive/5 p-4 rounded-xl border border-destructive/10">
                 <input type="checkbox" id="pre_activated" checked={form.pre_activated} onChange={(e) => setForm({ ...form, pre_activated: e.target.checked })}
-                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary/30" />
-                <label htmlFor="pre_activated" className="text-sm font-bold text-destructive uppercase tracking-tighter">🚨 PRE Ativado</label>
+                  className="w-5 h-5 rounded border-border text-destructive focus:ring-destructive/30" />
+                <label htmlFor="pre_activated" className="text-sm font-black text-destructive uppercase tracking-widest cursor-pointer select-none flex items-center gap-2">
+                  🚨 PRE Ativado (Protocolo de Resposta a Emergência)
+                </label>
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Descrição (Fatos e Circunstâncias) *</label>
-                <textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none resize-none" placeholder="Relato detalhado..." />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Descrição (Fatos e Circunstâncias) *</label>
+                <textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={4}
+                  className="w-full bg-muted/30 border border-border/40 rounded-xl px-4 py-3 text-sm font-bold text-foreground outline-none resize-none focus:ring-4 focus:ring-primary/10 transition-all" 
+                  placeholder="Relato detalhado do que aconteceu..." />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Lições Aprendidas (Prevenção)</label>
-                <textarea value={form.lessons_learned} onChange={(e) => setForm({ ...form, lessons_learned: e.target.value })} rows={3}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none resize-none" placeholder="O que aprendemos para evitar reincidência?" />
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Lições Aprendidas (Prevenção)</label>
+                <textarea value={form.lessons_learned} onChange={(e) => setForm({ ...form, lessons_learned: e.target.value })} rows={4}
+                  className="w-full bg-muted/30 border border-border/40 rounded-xl px-4 py-3 text-sm font-bold text-foreground outline-none resize-none focus:ring-4 focus:ring-primary/10 transition-all" 
+                  placeholder="O que aprendemos para evitar reincidência?" />
               </div>
+            </div>
+
             </div>
             <div className="flex gap-4 pt-6 border-t border-border/50">
               <button type="submit" className="flex-1 h-14 bg-destructive hover:bg-destructive/90 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-destructive/20 transition-all active:scale-95">
