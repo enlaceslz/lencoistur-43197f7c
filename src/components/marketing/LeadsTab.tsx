@@ -131,17 +131,22 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 mb-8">
         <h2 className="font-display font-black text-xl text-foreground tracking-tight">Gestão de Leads</h2>
         <div className="flex gap-2 w-full md:w-auto">
-          <div className="relative flex-1 md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <Input placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+          <div className="relative flex-1 md:w-80 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
+            <Input 
+              placeholder="Buscar por nome, email ou fone..." 
+              value={search} 
+              onChange={(e) => setSearch(e.target.value)} 
+              className="pl-11 h-11 rounded-2xl bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary/30 transition-all text-sm font-medium" 
+            />
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <DialogTrigger asChild><Button><Plus size={16} className="mr-1" /> Lead</Button></DialogTrigger>
+                  <DialogTrigger asChild><Button className="rounded-2xl h-11 px-6 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-primary/20"><Plus size={16} className="mr-2" /> Novo Lead</Button></DialogTrigger>
                 </TooltipTrigger>
-                <TooltipContent>
+                <TooltipContent className="rounded-xl font-bold text-[10px] uppercase tracking-widest">
                   <p>Adicionar lead manualmente</p>
                 </TooltipContent>
               </Tooltip>
