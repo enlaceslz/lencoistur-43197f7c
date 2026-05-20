@@ -7,7 +7,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Smartphone, Trash2, Search, UserPlus, Loader2, ExternalLink } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, Smartphone, Trash2, Search, UserPlus, Loader2, ExternalLink, StickyNote } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { statusColors } from "./statusColors";
 import { useState } from "react";
