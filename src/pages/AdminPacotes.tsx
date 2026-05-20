@@ -250,11 +250,12 @@ const AdminPacotes = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {[
           { label: "Pacotes Ativos", value: packages.filter(p => p.active).length, icon: PackageIcon, color: "text-blue-500", bg: "bg-blue-500/10", desc: "Total em catálogo" },
-          { label: "Passeios Cadastrados", value: tours.length, icon: Compass, color: "text-emerald-500", bg: "bg-emerald-500/10", desc: "Opções de roteiro" },
-          { label: "Rotas de Transfer", value: transfers.length, icon: Car, color: "text-amber-500", bg: "bg-amber-500/10", desc: "Logística ativa" },
-          { label: "Preço Médio", value: fmt(packages.reduce((a, b) => a + (b.discount_price || 0), 0) / (packages.length || 1)), icon: Target, color: "text-purple-500", bg: "bg-purple-500/10", desc: "Valor promocional" }
+          { label: "Valor em Catálogo", value: fmt(packages.reduce((a, b) => a + (b.discount_price || 0), 0)), icon: DollarSign, color: "text-emerald-500", bg: "bg-emerald-500/10", desc: "Soma dos pacotes" },
+          { label: "Opções de Roteiro", value: tours.length + transfers.length, icon: Compass, color: "text-amber-500", bg: "bg-amber-500/10", desc: "Itens disponíveis" },
+          { label: "Ticket Médio", value: fmt(packages.reduce((a, b) => a + (b.discount_price || 0), 0) / (packages.length || 1)), icon: Target, color: "text-purple-500", bg: "bg-purple-500/10", desc: "Valor promocional" }
         ].map((stat, i) => (
           <div key={i} className="bg-white border border-border shadow-sm rounded-lg p-6 relative overflow-hidden group hover:border-primary/50">
+
             <div className="flex items-center justify-between mb-4">
               <div className={cn("w-12 h-12 rounded-lg flex items-center justify-center shadow-sm", stat.bg, stat.color)}>
                 <stat.icon size={22} />
