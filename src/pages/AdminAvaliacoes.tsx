@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Star, ThumbsUp, MessageSquare, TrendingUp, Loader2, Trash2, Plus, Search, Filter, Save, MapPin, Calendar, Quote, CheckCircle2, Compass } from "lucide-react";
+import { Star, ThumbsUp, MessageSquare, TrendingUp, Loader2, Trash2, Plus, Search, Filter, Save, MapPin, Calendar, Quote, CheckCircle2, Compass, Eye, EyeOff, Award } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -21,6 +21,8 @@ interface Review {
   comment: string | null;
   country: string | null;
   tour_id: string | null;
+  status: 'pending' | 'approved' | 'hidden';
+  is_featured: boolean;
   created_at: string;
   tour_name?: string;
 }
@@ -332,7 +334,58 @@ const AdminAvaliacoes = () => {
                 </div>
               </div>
 
-              <div className="p-4 bg-white/20 dark:bg-black/20 border-t border-white/40 dark:border-white/10 flex justify-end">
+              <div className="p-4 bg-white/20 dark:bg-black/20 border-t border-white/40 dark:border-white/10 flex justify-between items-center">
+                <div className="flex gap-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className={cn("h-10 w-10 rounded-xl transition-all", r.status === 'approved' ? "text-emerald-500 bg-emerald-500/10" : "text-slate-300")}
+                          onClick={async () => {
+                            const newStatus = r.status === 'approved' ? 'hidden' : 'approved';
+                            const { error } = await supabase.from("reviews").update({ status: newStatus } as any).eq("id", r.id);
+                            if (!error) {
+                              toast.success(newStatus === 'approved' ? "Avaliação aprovada!" : "Avaliação oculta.");
+                              fetchReviews();
+                            }
+                          }}
+                        >
+                          {r.status === 'approved' ? <Eye size={18} /> : <EyeOff size={18} />}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="font-black text-[10px] uppercase">
+                        {r.status === 'approved' ? "Ocultar do Site" : "Exibir no Site"}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className={cn("h-10 w-10 rounded-xl transition-all", r.is_featured ? "text-amber-500 bg-amber-500/10" : "text-slate-300")}
+                          onClick={async () => {
+                            const { error } = await supabase.from("reviews").update({ is_featured: !r.is_featured } as any).eq("id", r.id);
+                            if (!error) {
+                              toast.success(r.is_featured ? "Destaque removido." : "Definida como destaque!");
+                              fetchReviews();
+                            }
+                          }}
+                        >
+                          <Award size={18} />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="font-black text-[10px] uppercase">
+                        {r.is_featured ? "Remover Destaque" : "Destacar na Home"}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+
                 <AlertDialog>
                   <TooltipProvider>
                     <Tooltip>

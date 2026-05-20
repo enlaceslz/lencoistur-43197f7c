@@ -1174,7 +1174,9 @@ export type Database = {
           created_at: string
           customer_id: string | null
           id: string
+          is_featured: boolean | null
           rating: number
+          status: string | null
           tour_id: string | null
         }
         Insert: {
@@ -1186,7 +1188,9 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           id?: string
+          is_featured?: boolean | null
           rating: number
+          status?: string | null
           tour_id?: string | null
         }
         Update: {
@@ -1198,7 +1202,9 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           id?: string
+          is_featured?: boolean | null
           rating?: number
+          status?: string | null
           tour_id?: string | null
         }
         Relationships: [
