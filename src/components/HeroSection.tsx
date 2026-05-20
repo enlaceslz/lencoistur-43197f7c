@@ -1,16 +1,9 @@
 import { Search, MapPin, Calendar, ShieldCheck } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-const HERO_IMG_DEFAULT = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/banners/banner-1777596368007.png";
-
-const categoryKeys = ["boat", "eco", "gastro", "cultural", "kayak", "trekking"] as const;
-
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
   const { t } = useTranslation();
