@@ -305,9 +305,12 @@ const AdminPasseios = () => {
   });
 
   const activeCount = tours.filter(t => t.active).length;
+  const inactiveCount = tours.length - activeCount;
   const avgRating = tours.length
     ? (tours.reduce((a, t) => a + (Number(t.rating) || 0), 0) / tours.length).toFixed(1)
     : "0";
+  const totalReviews = tours.reduce((a, t) => a + (t.reviews_count || 0), 0);
+
 
   if (isWideViewNewWindow) {
     const wideViewId = new URLSearchParams(window.location.search).get('wide_view_id');
@@ -457,40 +460,45 @@ const AdminPasseios = () => {
 
   return (
     <AdminLayout title="Passeios">
-      <div className="flex flex-col gap-6 h-[calc(100vh-120px)]">
+      <div className="flex flex-col gap-8 pb-20">
         <div className="bg-white rounded-lg p-10 relative overflow-hidden group border border-border shadow-sm">
           <div className="absolute right-0 top-0 w-96 h-96 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-primary/10 transition-all duration-700" />
           
           <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
-            <div className="space-y-2">
+            <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/5 border border-primary/10">
+                <div className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                  <span className="text-[10px] font-black text-primary uppercase tracking-widest">{tours.length} Serviços Ativos</span>
+                  <span className="text-[10px] font-black text-primary uppercase tracking-widest">{tours.length} Serviços no Catálogo</span>
                 </div>
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Gestão de Inventário</span>
               </div>
-              <h2 className="text-4xl font-black text-foreground tracking-tight leading-tight">
-                Catálogo de <span className="text-primary">Passeios</span>
+              <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tighter leading-tight">
+                Catálogo de <span className="text-gradient-primary">Passeios</span>
               </h2>
+              <p className="text-sm text-muted-foreground max-w-xl leading-relaxed font-medium">
+                Gerencie todas as experiências oferecidas pela agência. Você pode controlar preços, disponibilidades, modalidades e conteúdos visuais aqui.
+              </p>
             </div>
             
             <button 
               onClick={openNew}
-              className="bg-primary hover:bg-primary/90 text-white px-10 h-16 rounded-lg text-xs font-black uppercase tracking-widest shadow-sm transition-none flex items-center gap-3"
+              className="bg-primary hover:bg-primary/90 text-white px-10 h-16 rounded-lg text-xs font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95 flex items-center gap-3"
             >
-              <Plus size={20} /> Novo Passeio
+              <Plus size={20} /> Adicionar Novo Passeio
             </button>
           </div>
         </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {[
-          { label: "Catálogo", value: tours.length, icon: Compass, color: "text-primary", bg: "bg-primary/5", desc: "Total cadastrado" },
-          { label: "Visíveis", value: activeCount, icon: Eye, color: "text-primary", bg: "bg-primary/5", desc: "No site" },
-          { label: "Rating Médio", value: avgRating, icon: Star, color: "text-primary", bg: "bg-primary/5", desc: "Avaliação clientes" },
-          { label: "Feedback", value: tours.reduce((a, t) => a + (t.reviews_count || 0), 0), icon: Users, color: "text-primary", bg: "bg-primary/5", desc: "Reviews totais" },
-        ].map((stat, i) => (
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[
+            { label: "Catálogo Total", value: tours.length, icon: Compass, color: "text-primary", bg: "bg-primary/5", desc: "Total cadastrado" },
+            { label: "Visíveis no Site", value: activeCount, icon: Eye, color: "text-emerald-500", bg: "bg-emerald-500/5", desc: "Listados agora" },
+            { label: "Avaliação Média", value: avgRating, icon: Star, color: "text-amber-500", bg: "bg-amber-500/5", desc: "Feedback médio" },
+            { label: "Engajamento", value: totalReviews, icon: Users, color: "text-blue-500", bg: "bg-blue-500/5", desc: "Reviews totais" },
+          ].map((stat, i) => (
+
           <Card key={i} className="rounded-lg border-border shadow-sm bg-white overflow-hidden group">
             <CardContent className="p-7 relative">
               <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />

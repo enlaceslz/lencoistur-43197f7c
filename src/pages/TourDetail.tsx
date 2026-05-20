@@ -1,6 +1,7 @@
 import { useParams, Link, useSearchParams } from "react-router-dom";
-import { Star, MapPin, Clock, Users, ArrowLeft, Shield, CheckCircle, ChevronLeft, ChevronRight, Building2 } from "lucide-react";
+import { Star, MapPin, Clock, Users, ArrowLeft, Shield, CheckCircle, ChevronLeft, ChevronRight, Building2, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
@@ -94,7 +95,7 @@ const TourDetail = () => {
   const privateOn = tour.mode_private_enabled ?? true;
   const showModeToggle = collectiveOn && privateOn;
   const isPrivate = tourMode === "privativo";
-  const basePublicPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
+  const basePublicPrice = isPrivate ? (tour.private_price || 0) : tour.price;
   const unitPrice = partnerPricing
     ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePublicPrice) : partnerPricing.effectivePrice)
     : basePublicPrice;
@@ -156,7 +157,15 @@ const TourDetail = () => {
             )}
 
             <div>
-              <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">{tour.name}</h1>
+              <div className="flex items-center gap-3 mb-3">
+                <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">{tour.name}</h1>
+                {(tour.reviews_count || 0) >= 15 && (
+                  <Badge className="bg-amber-500 text-white font-black uppercase text-[10px] tracking-widest px-2 py-0.5 rounded-md animate-pulse">
+                    <Sparkles size={12} className="mr-1" /> Mais Vendido
+                  </Badge>
+                )}
+              </div>
+
               <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
                 <span className="flex items-center gap-1"><MapPin size={16} className="text-primary" />{tour.location}</span>
                 <span className="flex items-center gap-1"><Clock size={16} className="text-primary" />{tour.duration}</span>

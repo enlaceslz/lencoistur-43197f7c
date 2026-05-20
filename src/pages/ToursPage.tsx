@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Star, MapPin, Clock, Search, SlidersHorizontal } from "lucide-react";
+import { Star, MapPin, Clock, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { formatCurrency } from "@/lib/utils";
 import { fetchPartnerCatalogPricing } from "@/lib/catalogPricing";
+import { Badge } from "@/components/ui/badge";
+
 
 import tourLagoasAzuis from "@/assets/tour-lagoas-azuis-hero.jpg";
 import tourRioPreguicas from "@/assets/tour-rio-preguicas.jpg";
@@ -105,11 +107,12 @@ const ToursPage = () => {
         (t.location || "").toLowerCase().includes(search.toLowerCase());
       
       const isPrivate = t.mode_collective_enabled === false;
-      const basePrice = isPrivate ? (t.private_price || 130000) : t.price;
+      const basePrice = isPrivate ? (t.private_price || 0) : t.price;
       const partnerPricing = pricingByTourId[t.id];
       const priceToFormat = partnerPricing
         ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePrice) : partnerPricing.effectivePrice)
         : basePrice;
+
       
       const effectivePrice = priceToFormat / 100;
       const matchPrice = effectivePrice <= maxPrice;
@@ -118,8 +121,9 @@ const ToursPage = () => {
     .sort((a, b) => {
       const getPrice = (t: any) => {
         const isPrivate = t.mode_collective_enabled === false;
-        const basePrice = isPrivate ? (t.private_price || 130000) : t.price;
+        const basePrice = isPrivate ? (t.private_price || 0) : t.price;
         const partnerPricing = pricingByTourId[t.id];
+
         return partnerPricing
           ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePrice) : partnerPricing.effectivePrice)
           : basePrice;
@@ -194,7 +198,15 @@ const ToursPage = () => {
                   <span className="text-sm font-semibold">{Number(tour.rating || 0).toFixed(1)}</span>
                   <span className="text-muted-foreground text-xs">({tour.reviews_count || 0})</span>
                 </div>
-                <h3 className="font-display text-xl font-bold text-foreground mb-2">{tour.name}</h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-display text-xl font-bold text-foreground leading-tight">{tour.name}</h3>
+                  {(tour.reviews_count || 0) >= 15 && (
+                    <Badge className="bg-amber-500 text-white font-black uppercase text-[8px] tracking-widest px-1.5 py-0 rounded-sm">
+                      Top
+                    </Badge>
+                  )}
+                </div>
+
                 <div className="flex items-center gap-4 text-muted-foreground text-sm mb-4">
                   <span className="flex items-center gap-1"><MapPin size={14} />{tour.location}</span>
                   <span className="flex items-center gap-1"><Clock size={14} />{tour.duration}</span>
@@ -208,7 +220,8 @@ const ToursPage = () => {
                       <p className={`text-lg font-bold ${tour.mode_collective_enabled !== false ? "text-primary" : "text-secondary"}`}>
                         {(() => {
                           const isPrivate = tour.mode_collective_enabled === false;
-                          const basePublicPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
+                          const basePublicPrice = isPrivate ? (tour.private_price || 0) : tour.price;
+
                           const partnerPricing = pricingByTourId[tour.id];
                           const priceToFormat = partnerPricing
                             ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePublicPrice) : partnerPricing.effectivePrice)

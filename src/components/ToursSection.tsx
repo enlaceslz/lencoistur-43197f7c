@@ -1,9 +1,11 @@
-import { Star, Clock, MapPin } from "lucide-react";
+import { Star, Clock, MapPin, Sparkles } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+
 
 const tourLagoasAzuis = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465186872-0.jpg";
 const tourRioPreguicas = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465187850-1.jpeg";
@@ -98,7 +100,15 @@ const ToursSection = () => {
                     <span className="text-sm font-semibold">{Number(tour.rating || 0).toFixed(1)}</span>
                     <span className="text-muted-foreground text-xs">({tour.reviews_count || 0} {t("tours.reviews")})</span>
                   </div>
-                  <h3 className="font-display text-xl font-bold text-foreground mb-2">{tour.name}</h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-display text-xl font-bold text-foreground leading-tight">{tour.name}</h3>
+                    {(tour.reviews_count || 0) >= 15 && (
+                      <Badge className="bg-amber-500 text-white font-black uppercase text-[8px] tracking-widest px-1.5 py-0 rounded-sm">
+                        Top
+                      </Badge>
+                    )}
+                  </div>
+
                   <div className="flex items-center gap-4 text-muted-foreground text-sm mb-4">
                     <span className="flex items-center gap-1"><MapPin size={14} />{tour.location}</span>
                     <span className="flex items-center gap-1"><Clock size={14} />{tour.duration}</span>
