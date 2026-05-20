@@ -131,7 +131,7 @@ const AdminFinanceiro = () => {
           ? `[PARCEIRO NET] ${c.descricao}`
           : `[RECEBER] ${c.descricao} - ${c.cliente || "N/A"}`,
         method: c.partner_id ? "PARCEIRO" : "RECEBÍVEL",
-        value: c.valor * 100, // Normalized to cents
+        value: c.valor, // Removed * 100 as it's already in cents
         status: c.status === "recebido" ? "PAGO" : "PENDENTE",
         type: 'entrada' as const,
         original: c
@@ -142,7 +142,7 @@ const AdminFinanceiro = () => {
           ? `[COMISSÃO] ${c.descricao}`
           : `[SAÍDA] ${c.descricao} - ${c.fornecedor || "N/A"}`,
         method: c.collaborator_id ? "COLABORADOR" : "TRANSFERÊNCIA",
-        value: -c.valor * 100, // Normalized to cents
+        value: -c.valor, // Removed * 100 as it's already in cents
         status: c.status === "pago" ? "PAGO" : "PENDENTE",
         type: 'saida' as const,
         original: c
@@ -171,7 +171,7 @@ const AdminFinanceiro = () => {
     
     const fromFinance = monthContasReceber
       .filter(c => c.status === "recebido")
-      .reduce((s, c) => s + (c.valor * 100), 0);
+      .reduce((s, c) => s + c.valor, 0);
       
     return fromBookings + fromFinance;
   }, [monthBookings, monthContasReceber]);
@@ -179,7 +179,7 @@ const AdminFinanceiro = () => {
   const despesasMes = useMemo(() => {
     return monthContasPagar
       .filter(c => c.status === "pago")
-      .reduce((s, c) => s + (c.valor * 100), 0);
+      .reduce((s, c) => s + c.valor, 0);
   }, [monthContasPagar]);
 
   const lucroMes = receitaPaga - despesasMes;
@@ -532,14 +532,14 @@ const AdminFinanceiro = () => {
         <FinanceiroStats stats={stats} />
 
         {/* Navigation Tabs */}
-        <div className="relative">
-          <div className="flex items-center gap-2 bg-muted/20 p-2 rounded-[1.5rem] w-fit border border-border/30 backdrop-blur-md overflow-x-auto max-w-full no-scrollbar">
+        <div className="relative overflow-x-auto pb-4">
+          <div className="flex items-center gap-2 bg-muted/20 p-2 rounded-[1.5rem] w-fit border border-border/30 backdrop-blur-md whitespace-nowrap">
             {tabs.map((t) => (
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
                 className={cn(
-                  "flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 relative whitespace-nowrap",
+                  "flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 relative",
                   tab === t.key 
                     ? "text-white shadow-lg" 
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
