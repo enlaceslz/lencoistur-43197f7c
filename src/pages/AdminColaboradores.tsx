@@ -782,36 +782,37 @@ const AdminColaboradores = () => {
 
           <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col h-[calc(90vh-80px)]">
             <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
-              <div className="grid md:grid-cols-2 gap-4 py-4" />
-            <div className="md:col-span-2 flex flex-col items-center justify-center space-y-4 mb-4 pb-4 border-b">
-              <div className="relative group">
-                <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-100 border-2 border-slate-200 flex items-center justify-center">
-                  {form.avatar_url ? (
-                    <img src={form.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-                  ) : (
-                    <User size={64} className="text-slate-300" />
+              <div className="md:col-span-2 flex flex-col items-center justify-center space-y-4 mb-4 pb-4 border-b">
+                <div className="relative group">
+                  <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-100 border-2 border-slate-200 flex items-center justify-center">
+                    {form.avatar_url ? (
+                      <img src={form.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <User size={64} className="text-slate-300" />
+                    )}
+                  </div>
+                  <label className="absolute bottom-0 right-0 p-2 bg-blue-600 rounded-full text-white cursor-pointer hover:bg-blue-700 transition-colors shadow-lg group-hover:scale-110 transition-transform">
+                    <Camera size={18} />
+                    <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} disabled={uploading} />
+                  </label>
+                  {uploading && (
+                    <div className="absolute inset-0 bg-white/60 rounded-full flex items-center justify-center">
+                      <Loader2 className="animate-spin text-blue-600" size={32} />
+                    </div>
                   )}
                 </div>
-                <label className="absolute bottom-0 right-0 p-2 bg-blue-600 rounded-full text-white cursor-pointer hover:bg-blue-700 transition-colors shadow-lg group-hover:scale-110 transition-transform">
-                  <Camera size={18} />
-                  <input type="file" className="hidden" accept="image/*" onChange={handleAvatarUpload} disabled={uploading} />
-                </label>
-                {uploading && (
-                  <div className="absolute inset-0 bg-white/60 rounded-full flex items-center justify-center">
-                    <Loader2 className="animate-spin text-blue-600" size={32} />
-                  </div>
-                )}
+                <p className="text-xs text-muted-foreground">Clique na câmera para enviar uma foto</p>
               </div>
-              <p className="text-xs text-muted-foreground">Clique na câmera para enviar uma foto</p>
-            </div>
-            <div className="space-y-2">
-              <Label>Nome Completo</Label>
-              <Input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} />
-            </div>
-            <div className="space-y-2">
-              <Label>CPF (Obrigatório)</Label>
-              <Input value={form.document} onChange={(e) => setForm({...form, document: maskCPF(e.target.value)})} />
-            </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label>Nome Completo</Label>
+                  <Input value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} />
+                </div>
+                <div className="space-y-2">
+                  <Label>CPF (Obrigatório)</Label>
+                  <Input value={form.document} onChange={(e) => setForm({...form, document: maskCPF(e.target.value)})} />
+                </div>
             <div className="space-y-2">
               <Label>Tipo de Colaborador</Label>
               <Select value={form.type} onValueChange={(v: any) => setForm({...form, type: v})}>
@@ -929,11 +930,12 @@ const AdminColaboradores = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="md:col-span-2 space-y-2">
-              <Label>Observações</Label>
-              <Textarea value={form.observation} onChange={(e) => setForm({...form, observation: e.target.value})} />
+                <div className="md:col-span-2 space-y-2">
+                  <Label>Observações</Label>
+                  <Textarea value={form.observation} onChange={(e) => setForm({...form, observation: e.target.value})} />
+                </div>
+              </div>
             </div>
-          </div>
 
           <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0 z-10">
             <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="flex-1 h-12 rounded-xl font-bold">Cancelar</Button>
