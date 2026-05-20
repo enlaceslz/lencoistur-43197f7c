@@ -111,8 +111,6 @@ const AdminFinanceiro = () => {
   );
 
   const filteredTransactions = useMemo(() => {
-    // Bookings that are NOT in contas_receber (to avoid double counting)
-    // Actually, it's safer to only count confirmed bookings here if they don't have a booking_id in contas_receber
     const bookingIdsInFinance = new Set(monthContasReceber.map(c => c.booking_id).filter(Boolean));
 
     const all = [
@@ -124,7 +122,8 @@ const AdminFinanceiro = () => {
           method: (b.pay_method || "N/A").toUpperCase(),
           value: b.final_total,
           status: b.payment_status === "pago" ? "PAGO" : "PENDENTE",
-          type: 'entrada' as const
+          type: 'entrada' as const,
+          original: b
         })),
       ...monthContasReceber.map(c => ({
         date: c.recebido_em || c.vencimento,
@@ -132,9 +131,10 @@ const AdminFinanceiro = () => {
           ? `[PARCEIRO NET] ${c.descricao}`
           : `[RECEBER] ${c.descricao} - ${c.cliente || "N/A"}`,
         method: c.partner_id ? "PARCEIRO" : "RECEBÍVEL",
-        value: c.valor,
+        value: c.valor * 100, // Normalized to cents
         status: c.status === "recebido" ? "PAGO" : "PENDENTE",
-        type: 'entrada' as const
+        type: 'entrada' as const,
+        original: c
       })),
       ...monthContasPagar.map(c => ({
         date: c.pagamento_em || c.vencimento,
@@ -142,9 +142,10 @@ const AdminFinanceiro = () => {
           ? `[COMISSÃO] ${c.descricao}`
           : `[SAÍDA] ${c.descricao} - ${c.fornecedor || "N/A"}`,
         method: c.collaborator_id ? "COLABORADOR" : "TRANSFERÊNCIA",
-        value: -c.valor,
+        value: -c.valor * 100, // Normalized to cents
         status: c.status === "pago" ? "PAGO" : "PENDENTE",
-        type: 'saida' as const
+        type: 'saida' as const,
+        original: c
       }))
     ];
 
@@ -159,8 +160,9 @@ const AdminFinanceiro = () => {
       const matchesType = typeFilter === "todos" || t.type === typeFilter;
 
       return matchesSearch && matchesStatus && matchesType;
-    }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [monthBookings, monthContasPagar, monthContasReceber, searchTerm, statusFilter, typeFilter]);
+
 
   const receitaPaga = useMemo(() => {
     const fromBookings = monthBookings
@@ -169,7 +171,7 @@ const AdminFinanceiro = () => {
     
     const fromFinance = monthContasReceber
       .filter(c => c.status === "recebido")
-      .reduce((s, c) => s + (c.valor * 100), 0) / 100;
+      .reduce((s, c) => s + (c.valor * 100), 0);
       
     return fromBookings + fromFinance;
   }, [monthBookings, monthContasReceber]);
@@ -177,17 +179,19 @@ const AdminFinanceiro = () => {
   const despesasMes = useMemo(() => {
     return monthContasPagar
       .filter(c => c.status === "pago")
-      .reduce((s, c) => s + (c.valor * 100), 0) / 100;
+      .reduce((s, c) => s + (c.valor * 100), 0);
   }, [monthContasPagar]);
+
   const lucroMes = receitaPaga - despesasMes;
   const pagos = monthBookings.filter(b => b.payment_status === "pago");
   const ticketMedio = pagos.length > 0 ? Math.round(receitaPaga / pagos.length) : 0;
 
   const stats = [
-    { label: "Receita Paga", value: fmt(receitaPaga), change: `${pagos.length} reservas`, up: true, icon: DollarSign, color: "text-emerald-600" },
-    { label: "Despesas Pagas", value: fmt(despesasMes), change: `${monthContasPagar.filter(c => c.status === "pago").length} pagamentos`, up: true, icon: TrendingDown, color: "text-rose-600" },
-    { label: "Lucro Estimado", value: fmt(lucroMes), change: receitaPaga > 0 ? `${Math.round((lucroMes / receitaPaga) * 100)}% margem` : "0% margem", up: lucroMes > 0, icon: TrendingUp, color: "text-blue-600" },
-    { label: "Ticket Médio", value: fmt(ticketMedio), change: "por venda paga", up: true, icon: LayoutDashboard, color: "text-amber-600" },
+    { label: "Receita Paga", value: fmt(receitaPaga), change: `${pagos.length} reservas`, up: true, icon: DollarSign, color: "text-emerald-600", desc: "Total em caixa (Mês)" },
+    { label: "Despesas Pagas", value: fmt(despesasMes), change: `${monthContasPagar.filter(c => c.status === "pago").length} pagamentos`, up: false, icon: TrendingDown, color: "text-rose-600", desc: "Saídas liquidadas" },
+    { label: "Lucro Real", value: fmt(lucroMes), change: receitaPaga > 0 ? `${Math.round((lucroMes / receitaPaga) * 100)}% margem` : "0% margem", up: lucroMes > 0, icon: Wallet, color: "text-blue-600", desc: "Resultado líquido" },
+    { label: "Ticket Médio", value: fmt(ticketMedio), change: "por reserva paga", up: true, icon: TrendingUpIcon, color: "text-amber-600", desc: "Média de faturamento" },
+
   ];
 
   const tabs: { key: Tab; label: string; icon: React.ElementType }[] = [
