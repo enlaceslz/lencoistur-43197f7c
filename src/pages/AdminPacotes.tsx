@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
-  Search, Plus, Pencil, Package as PackageIcon, X, CheckCircle, GripVertical, Eye, Share2, Car, Compass, Trash2, Calendar, Target, Loader2, Clock, Upload, Moon, XCircle, FileText, Copy
+  Search, Plus, Pencil, Package as PackageIcon, X, CheckCircle, GripVertical, Eye, Share2, Car, Compass, Trash2, Calendar, Target, Loader2, Clock, Upload, Moon, XCircle, FileText, Copy, DollarSign
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -120,7 +120,20 @@ const AdminPacotes = () => {
   const openForm = (pkg?: any) => {
     if (pkg) {
       setEditingId(pkg.id);
-      setForm({ ...pkg, highlights: pkg.highlights || [], partner_price: pkg.partner_price || 0 });
+      setForm({
+        name: pkg.name || "",
+        slug: pkg.slug || "",
+        description: pkg.description || "",
+        days: pkg.days || 1,
+        nights: pkg.nights || 0,
+        original_price: pkg.original_price || 0,
+        discount_price: pkg.discount_price || 0,
+        partner_price: pkg.partner_price || 0,
+        banner_url: pkg.banner_url || "",
+        tag: pkg.tag || "",
+        active: pkg.active ?? true,
+        highlights: pkg.highlights || []
+      });
       
       const pkgTours = (pkg.package_tours || []).map((pt: any) => ({
         id: pt.tour_id, type: 'tour' as const, data: tours.find(t => t.id === pt.tour_id)
@@ -138,22 +151,20 @@ const AdminPacotes = () => {
     }
     setShowForm(true);
   };
+
   useEffect(() => {
-    if (showForm) {
+    if (showForm && !editingId) {
       const totalSite = selectedItems.reduce((acc, item) => acc + (item.data?.price || 0), 0);
       const totalPartner = selectedItems.reduce((acc, item) => acc + (item.data?.partner_price || 0), 0);
       
-      setForm(prev => {
-        // Only auto-initialize partner_price if it's currently 0
-        const shouldUpdatePartner = prev.partner_price === 0 && totalPartner > 0;
-        return { 
-          ...prev, 
-          discount_price: totalSite,
-          partner_price: shouldUpdatePartner ? totalPartner : prev.partner_price
-        };
-      });
+      setForm(prev => ({ 
+        ...prev, 
+        discount_price: totalSite,
+        partner_price: totalPartner
+      }));
     }
-  }, [selectedItems, showForm]);
+  }, [selectedItems, showForm, editingId]);
+
 
 
   const openView = (pkg: any) => {
@@ -239,11 +250,12 @@ const AdminPacotes = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {[
           { label: "Pacotes Ativos", value: packages.filter(p => p.active).length, icon: PackageIcon, color: "text-blue-500", bg: "bg-blue-500/10", desc: "Total em catálogo" },
-          { label: "Passeios Cadastrados", value: tours.length, icon: Compass, color: "text-emerald-500", bg: "bg-emerald-500/10", desc: "Opções de roteiro" },
-          { label: "Rotas de Transfer", value: transfers.length, icon: Car, color: "text-amber-500", bg: "bg-amber-500/10", desc: "Logística ativa" },
-          { label: "Preço Médio", value: fmt(packages.reduce((a, b) => a + (b.discount_price || 0), 0) / (packages.length || 1)), icon: Target, color: "text-purple-500", bg: "bg-purple-500/10", desc: "Valor promocional" }
+          { label: "Valor em Catálogo", value: fmt(packages.reduce((a, b) => a + (b.discount_price || 0), 0)), icon: DollarSign, color: "text-emerald-500", bg: "bg-emerald-500/10", desc: "Soma dos pacotes" },
+          { label: "Opções de Roteiro", value: tours.length + transfers.length, icon: Compass, color: "text-amber-500", bg: "bg-amber-500/10", desc: "Itens disponíveis" },
+          { label: "Ticket Médio", value: fmt(packages.reduce((a, b) => a + (b.discount_price || 0), 0) / (packages.length || 1)), icon: Target, color: "text-purple-500", bg: "bg-purple-500/10", desc: "Valor promocional" }
         ].map((stat, i) => (
           <div key={i} className="bg-white border border-border shadow-sm rounded-lg p-6 relative overflow-hidden group hover:border-primary/50">
+
             <div className="flex items-center justify-between mb-4">
               <div className={cn("w-12 h-12 rounded-lg flex items-center justify-center shadow-sm", stat.bg, stat.color)}>
                 <stat.icon size={22} />
@@ -321,11 +333,12 @@ const AdminPacotes = () => {
                   <Button 
                     variant="outline"
                     size="icon"
-                    onClick={() => openForm(pkg)} 
+                    onClick={() => openView(pkg)} 
                     className="h-10 w-10 rounded-lg transition-none"
                   >
                     <Eye size={16} />
                   </Button>
+
                   <Button 
                     variant="secondary"
                     size="icon"
