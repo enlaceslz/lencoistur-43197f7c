@@ -25,6 +25,7 @@ interface Lead {
   last_contact: string | null;
   score: number;
   converted_customer_id?: string | null;
+  notes?: string | null;
 }
 
 interface LeadsTabProps {
@@ -193,24 +194,24 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
         </div>
       </div>
 
-      <Card className="border-border overflow-hidden">
+      <Card className="border-border overflow-hidden rounded-3xl glass-card">
         <div className="overflow-x-auto">
           <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="text-muted-foreground">Nome</TableHead>
-              <TableHead className="text-muted-foreground">Contato</TableHead>
-              <TableHead className="text-muted-foreground">Origem</TableHead>
-              <TableHead className="text-muted-foreground">Interesse</TableHead>
-              <TableHead className="text-muted-foreground">Status</TableHead>
-              <TableHead className="text-muted-foreground text-center">Score</TableHead>
-              <TableHead />
+            <TableRow className="border-b border-border/40 hover:bg-transparent">
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4">Nome</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4">Contato</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4">Origem</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4">Interesse</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4">Status</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4 text-center">Score</TableHead>
+              <TableHead className="px-6 py-4" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.map((l) => (
-              <TableRow key={l.id}>
-                <TableCell className="font-semibold text-foreground">
+              <TableRow key={l.id} className="border-b border-border/40 group hover:bg-primary/5 transition-colors">
+                <TableCell className="font-semibold text-foreground px-6 py-4">
                   <div className="flex flex-col">
                     <span>{l.name}</span>
                     {l.source === "Seja um Parceiro" && (
