@@ -109,9 +109,10 @@ const AdminDashboard = () => {
 
     const stats = [
       { label: "Reservas Hoje", value: String(bookings.filter((b) => b.created_at?.slice(0, 10) === todayStr).length), change: "Diário", up: true, icon: Calendar, path: "/admin/reservas" },
+      { label: "Ticket Médio", value: fmt(thisMonthBookings.length > 0 ? thisRevenue / thisMonthBookings.length : 0), change: "Este Mês", up: true, icon: TrendingUp, path: "/admin/financeiro" },
       { label: "Receita (Mês)", value: fmt(thisRevenue), change: "Bruto", up: true, icon: DollarSign, path: "/admin/financeiro" },
-      { label: "Clientes", value: String(customerCount), change: "Base CRM", up: true, icon: Users, path: "/admin/crm" },
       { label: "Conformidade SGS", value: String(sgsStats.criticalRisks === 0 ? "100%" : "Alerta"), change: `${sgsStats.pendingActions} pendências`, up: sgsStats.criticalRisks === 0, icon: ShieldAlert, isSgs: true, path: "/admin/sgs" },
+
     ];
 
     const monthlyMap = new Map<string, { revenue: number; bookings: number; expenses: number; profit: number }>();
@@ -178,38 +179,54 @@ const AdminDashboard = () => {
   return (
     <AdminLayout title="Centro de Operações">
       <div className="space-y-8 pb-10">
-        {/* Executive Header */}
-        <div className="xl:col-span-4 bg-white rounded-lg p-10 relative overflow-hidden group border border-border shadow-sm">
-          <div className="absolute right-0 top-0 w-[500px] h-[500px] bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl transition-none" />
-          <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Sistema Ativo</span>
+        <div className="grid xl:grid-cols-4 gap-6">
+          <div className="xl:col-span-3 bg-white rounded-lg p-10 relative overflow-hidden group border border-border shadow-sm">
+            <div className="absolute right-0 top-0 w-[500px] h-[500px] bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl transition-none" />
+            <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Sistema Ativo</span>
+                  </div>
+                  <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">Painel Executivo</span>
                 </div>
-                <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">Painel Executivo</span>
+                <div>
+                  <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tighter leading-tight">
+                    Olá, <span className="text-gradient-primary">Gestor</span>
+                  </h2>
+                  <p className="text-sm text-muted-foreground max-w-xl leading-relaxed font-medium mt-3">
+                    A Lençóis Tour opera hoje com <span className="text-primary font-black uppercase tracking-widest text-[10px] bg-primary/10 px-2 py-0.5 rounded-md border border-primary/10">Conformidade Total</span>. 
+                    Temos {bookings.filter(b => b.status === 'pendente').length} novas reservas e {sgsStats.pendingActions} ações SGS pendentes.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tighter leading-tight">
-                  Olá, <span className="text-gradient-primary">Gestor</span>
-                </h2>
-                <p className="text-sm text-muted-foreground max-w-xl leading-relaxed font-medium mt-3">
-                  A Lençóis Tour opera hoje com <span className="text-primary font-black uppercase tracking-widest text-[10px] bg-primary/10 px-2 py-0.5 rounded-md border border-primary/10">Conformidade Total</span>. 
-                  Temos {bookings.filter(b => b.status === 'pendente').length} novas reservas e {sgsStats.pendingActions} ações SGS pendentes.
-                </p>
+              <div className="flex flex-wrap gap-3">
+                <button onClick={() => navigate("/admin/reservas")} className="bg-primary hover:bg-primary/90 text-white px-8 h-14 rounded-lg text-xs font-black uppercase tracking-widest shadow-sm transition-none flex items-center gap-3">
+                  <Calendar size={18} /> Nova Reserva
+                </button>
+                <button onClick={() => window.open('/', '_blank')} className="bg-white hover:bg-slate-50 text-foreground border border-slate-200 px-8 h-14 rounded-lg text-xs font-black uppercase tracking-widest transition-none flex items-center gap-3">
+                  <LayoutDashboard size={18} /> Ver Site
+                </button>
               </div>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <button onClick={() => navigate("/admin/reservas")} className="bg-primary hover:bg-primary/90 text-white px-8 h-14 rounded-lg text-xs font-black uppercase tracking-widest shadow-sm transition-none flex items-center gap-3">
-                <Calendar size={18} /> Nova Reserva
-              </button>
-              <button onClick={() => window.open('/', '_blank')} className="bg-white hover:bg-slate-50 text-foreground border border-slate-200 px-8 h-14 rounded-lg text-xs font-black uppercase tracking-widest transition-none flex items-center gap-3">
-                <LayoutDashboard size={18} /> Ver Site Público
-              </button>
             </div>
           </div>
+
+          <div className="bg-white rounded-lg p-6 border border-border shadow-sm flex flex-col justify-center items-center text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-amber-500/10 text-amber-600 flex items-center justify-center border border-amber-500/20">
+              <ShieldAlert size={32} />
+            </div>
+            <div>
+              <p className="text-sm font-black text-foreground uppercase tracking-widest">Segurança (SGS)</p>
+              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-1">Conformidade ISO 21101</p>
+            </div>
+            <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+              <div className="bg-amber-500 h-full w-[85%]" />
+            </div>
+            <p className="text-[11px] font-bold text-amber-600 uppercase tracking-widest">85% em Conformidade</p>
+          </div>
         </div>
+
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -227,7 +244,13 @@ const AdminDashboard = () => {
                 </div>
               </div>
               <p className="text-4xl font-black text-foreground tracking-tight">{stat.value}</p>
-              <p className="text-[11px] font-bold text-muted-foreground mt-2 uppercase tracking-widest">{stat.label}</p>
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
+                <span className="text-[9px] font-black bg-primary/5 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
+                  {stat.change}
+                </span>
+              </div>
+
             </div>
           ))}
         </div>
