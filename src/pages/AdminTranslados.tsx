@@ -137,10 +137,10 @@ const AdminTranslados = () => {
     <AdminLayout title="Translados">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {[
-          { label: "Total de Rotas", value: routes.length, icon: Car, color: "from-blue-500 to-indigo-600", desc: "Rede de logística" },
-          { label: "Rotas Ativas", value: activeRoutes.length, icon: MapPin, color: "from-emerald-500 to-teal-600", desc: "Em operação" },
-          { label: "Destinos", value: new Set(routes.flatMap(t => [t.origin, t.destination])).size, icon: MapPin, color: "from-amber-500 to-orange-600", desc: "Cidades atendidas" },
-          { label: "Tipos Veículo", value: new Set(routes.map(t => t.vehicle_type)).size, icon: Users, color: "from-purple-500 to-pink-600", desc: "Diversidade frota" },
+          { label: "Rede de Logística", value: routes.length, icon: Car, color: "from-blue-500 to-indigo-600", desc: "Total de rotas" },
+          { label: "Capacidade Operacional", value: routes.reduce((acc, r) => acc + (r.seats || 0), 0), icon: Users, color: "from-emerald-500 to-teal-600", desc: "Vagas totais" },
+          { label: "Hubs Atendidos", value: new Set(routes.flatMap(t => [t.origin, t.destination])).size, icon: MapPin, color: "from-amber-500 to-orange-600", desc: "Cidades/Pontos" },
+          { label: "Ticket Médio", value: fmt(routes.length > 0 ? routes.reduce((acc, r) => acc + r.price, 0) / routes.length : 0), icon: Percent, color: "from-purple-500 to-pink-600", desc: "Média por vaga" },
         ].map((stat, i) => (
           <div key={i} className="bg-white border border-border shadow-sm rounded-lg p-6 relative overflow-hidden group">
             <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
@@ -154,6 +154,7 @@ const AdminTranslados = () => {
             <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
           </div>
         ))}
+
       </div>
 
       <Card className="mb-8 border border-border shadow-sm overflow-hidden rounded-lg">
