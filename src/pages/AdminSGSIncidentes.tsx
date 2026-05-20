@@ -185,10 +185,13 @@ const AdminSGSIncidentes = () => {
               <option value="fechado">Fechado</option>
             </select>
           </div>
-          <button onClick={() => { setEditing(null); setForm(emptyForm); setShowForm(!showForm); }}
-            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-            <Plus size={16} /> Registrar Incidente
+          <button 
+            onClick={() => { setEditing(null); setForm(emptyForm); setShowForm(!showForm); }}
+            className="bg-destructive hover:bg-destructive/90 text-white px-8 h-14 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-destructive/20 transition-all active:scale-95 flex items-center gap-3"
+          >
+            <Plus size={18} strokeWidth={3} /> Registrar Ocorrência
           </button>
+
         </div>
 
         {showForm && (
