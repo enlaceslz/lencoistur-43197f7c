@@ -21,6 +21,8 @@ interface Review {
   comment: string | null;
   country: string | null;
   tour_id: string | null;
+  status: 'pending' | 'approved' | 'hidden';
+  is_featured: boolean;
   created_at: string;
   tour_name?: string;
 }
