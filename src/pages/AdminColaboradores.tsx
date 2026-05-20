@@ -930,11 +930,12 @@ const AdminColaboradores = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="md:col-span-2 space-y-2">
-              <Label>Observações</Label>
-              <Textarea value={form.observation} onChange={(e) => setForm({...form, observation: e.target.value})} />
+                <div className="md:col-span-2 space-y-2">
+                  <Label>Observações</Label>
+                  <Textarea value={form.observation} onChange={(e) => setForm({...form, observation: e.target.value})} />
+                </div>
+              </div>
             </div>
-          </div>
 
           <div className="bg-white border-t border-slate-100 p-4 md:p-6 flex gap-3 sticky bottom-0 z-10">
             <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="flex-1 h-12 rounded-xl font-bold">Cancelar</Button>
