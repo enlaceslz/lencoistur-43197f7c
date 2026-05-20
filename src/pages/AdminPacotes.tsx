@@ -335,11 +335,12 @@ const AdminPacotes = () => {
                   <Button 
                     variant="outline"
                     size="icon"
-                    onClick={() => openForm(pkg)} 
+                    onClick={() => openView(pkg)} 
                     className="h-10 w-10 rounded-lg transition-none"
                   >
                     <Eye size={16} />
                   </Button>
+
                   <Button 
                     variant="secondary"
                     size="icon"
