@@ -195,8 +195,19 @@ const AdminSGSIncidentes = () => {
         </div>
 
         {showForm && (
-          <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
-            <h3 className="font-display font-bold text-foreground">{editing ? "Editar" : "Registrar"} Incidente (P5 VATTI)</h3>
+          <form onSubmit={handleSubmit} className="glass-card border-none rounded-[2.5rem] p-8 space-y-8 animate-in-slide-down mb-10 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-8 opacity-5"><Activity size={120} className="text-destructive" /></div>
+            
+            <div>
+              <h3 className="text-xl font-black text-foreground uppercase tracking-tight flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center text-destructive shadow-inner">
+                  <Activity size={20} strokeWidth={3} />
+                </div>
+                {editing ? "Editar" : "Registrar"} Relato de Ocorrência
+              </h3>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-2 ml-13">Padrão ABNT ISO 21101 (Seção P5)</p>
+            </div>
+
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-semibold text-foreground mb-1 block">Tipo de Ocorrência *</label>
