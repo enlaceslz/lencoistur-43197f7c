@@ -108,9 +108,10 @@ const AdminParceiros = () => {
   const [form, setForm] = useState({
     name: "", type: "hotel", contact_name: "", phone: "", email: "",
     commission_rate: "10", cpf_cnpj: "", address: "", cnh: "", cnh_validade: "", cadastur: "",
-    remuneration_type: "comissao_percent", remuneration_value: "0",
+    remuneration_type: "comissao_percent", remuneration_value: "10",
     bank_name: "", bank_agency: "", bank_account: "", bank_pix_key: "",
-    credit_limit: "0", tags: ""
+    credit_limit: "500000", tags: ""
+
   });
 
   const [receivableForm, setReceivableForm] = useState({
@@ -336,6 +337,11 @@ const AdminParceiros = () => {
           observacoes: `Sincronizado automaticamente do módulo Parceiros (${form.type})`
         };
 
+        // If it's a guide, ensure we have the correct document type in the observation or specific field if available
+        if (form.type === "guia") {
+          condutorPayload.observacoes += ` - Cadastur: ${form.cadastur}`;
+        }
+
         const filter = form.cpf_cnpj 
           ? `nome.eq.${form.name.trim()},cpf.eq.${form.cpf_cnpj.trim()}`
           : `nome.eq.${form.name.trim()}`;
@@ -352,6 +358,7 @@ const AdminParceiros = () => {
           await supabase.from("sgs_condutores").insert(condutorPayload);
         }
       }
+
 
       toast.success(editPartner ? "Parceiro atualizado!" : "Parceiro cadastrado!");
       setDialogOpen(false);
