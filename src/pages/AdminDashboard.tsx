@@ -244,7 +244,13 @@ const AdminDashboard = () => {
                 </div>
               </div>
               <p className="text-4xl font-black text-foreground tracking-tight">{stat.value}</p>
-              <p className="text-[11px] font-bold text-muted-foreground mt-2 uppercase tracking-widest">{stat.label}</p>
+              <div className="flex items-center justify-between mt-2">
+                <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
+                <span className="text-[9px] font-black bg-primary/5 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
+                  {stat.change}
+                </span>
+              </div>
+
             </div>
           ))}
         </div>
