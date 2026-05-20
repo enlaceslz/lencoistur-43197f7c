@@ -196,7 +196,15 @@ const ToursPage = () => {
                   <span className="text-sm font-semibold">{Number(tour.rating || 0).toFixed(1)}</span>
                   <span className="text-muted-foreground text-xs">({tour.reviews_count || 0})</span>
                 </div>
-                <h3 className="font-display text-xl font-bold text-foreground mb-2">{tour.name}</h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-display text-xl font-bold text-foreground leading-tight">{tour.name}</h3>
+                  {(tour.reviews_count || 0) >= 15 && (
+                    <Badge className="bg-amber-500 text-white font-black uppercase text-[8px] tracking-widest px-1.5 py-0 rounded-sm">
+                      Top
+                    </Badge>
+                  )}
+                </div>
+
                 <div className="flex items-center gap-4 text-muted-foreground text-sm mb-4">
                   <span className="flex items-center gap-1"><MapPin size={14} />{tour.location}</span>
                   <span className="flex items-center gap-1"><Clock size={14} />{tour.duration}</span>
