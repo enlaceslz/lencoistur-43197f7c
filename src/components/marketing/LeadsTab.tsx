@@ -128,8 +128,8 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-        <h2 className="font-display font-bold text-lg text-foreground">Gestão de Leads</h2>
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 mb-8">
+        <h2 className="font-display font-black text-xl text-foreground tracking-tight">Gestão de Leads</h2>
         <div className="flex gap-2 w-full md:w-auto">
           <div className="relative flex-1 md:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
