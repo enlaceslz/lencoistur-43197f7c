@@ -8,9 +8,17 @@ const HERO_IMG_DEFAULT = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/ob
 
 const categoryKeys = ["boat", "eco", "gastro", "cultural", "kayak", "trekking"] as const;
 
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+
 const HeroSection = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchDate, setSearchDate] = useState("");
   const [heroImg, setHeroImg] = useState(HERO_IMG_DEFAULT);
+
   const [banners, setBanners] = useState<Array<{ url: string; id: string }>>([]);
   const [transition, setTransition] = useState<"fade" | "slide">("fade");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -107,17 +115,33 @@ const HeroSection = () => {
         <div className="animate-fade-up max-w-3xl mx-auto bg-card/95 backdrop-blur-sm rounded-2xl p-2 md:p-3 flex flex-col md:flex-row gap-2 md:gap-3 shadow-2xl" style={{ animationDelay: "0.3s" }}>
           <div className="flex items-center gap-3 flex-1 px-4 py-2.5 md:py-3 bg-muted rounded-xl">
             <MapPin size={18} className="text-primary shrink-0" />
-            <input type="text" placeholder={t("hero.searchWhere")} className="bg-transparent w-full outline-none text-sm md:text-base text-foreground placeholder:text-muted-foreground" />
+            <input 
+              type="text" 
+              placeholder={t("hero.searchWhere")} 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-transparent w-full outline-none text-sm md:text-base text-foreground placeholder:text-muted-foreground" 
+            />
           </div>
           <div className="flex items-center gap-3 flex-1 px-4 py-2.5 md:py-3 bg-muted rounded-xl">
             <Calendar size={18} className="text-primary shrink-0" />
-            <input type="text" placeholder={t("hero.searchWhen")} className="bg-transparent w-full outline-none text-sm md:text-base text-foreground placeholder:text-muted-foreground" />
+            <input 
+              type="text" 
+              placeholder={t("hero.searchWhen")} 
+              value={searchDate}
+              onChange={(e) => setSearchDate(e.target.value)}
+              className="bg-transparent w-full outline-none text-sm md:text-base text-foreground placeholder:text-muted-foreground" 
+            />
           </div>
-          <Link to="/passeios" className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-2.5 md:py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors text-sm md:text-base">
+          <button 
+            onClick={() => navigate(`/passeios?search=${encodeURIComponent(searchTerm)}`)}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-2.5 md:py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors text-sm md:text-base"
+          >
             <Search size={18} />
             {t("hero.search")}
-          </Link>
+          </button>
         </div>
+
 
         <div className="animate-fade-up mt-6" style={{ animationDelay: "0.4s" }}>
           <a
