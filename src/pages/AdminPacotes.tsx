@@ -120,7 +120,20 @@ const AdminPacotes = () => {
   const openForm = (pkg?: any) => {
     if (pkg) {
       setEditingId(pkg.id);
-      setForm({ ...pkg, highlights: pkg.highlights || [], partner_price: pkg.partner_price || 0 });
+      setForm({
+        name: pkg.name || "",
+        slug: pkg.slug || "",
+        description: pkg.description || "",
+        days: pkg.days || 1,
+        nights: pkg.nights || 0,
+        original_price: pkg.original_price || 0,
+        discount_price: pkg.discount_price || 0,
+        partner_price: pkg.partner_price || 0,
+        banner_url: pkg.banner_url || "",
+        tag: pkg.tag || "",
+        active: pkg.active ?? true,
+        highlights: pkg.highlights || []
+      });
       
       const pkgTours = (pkg.package_tours || []).map((pt: any) => ({
         id: pt.tour_id, type: 'tour' as const, data: tours.find(t => t.id === pt.tour_id)
@@ -138,6 +151,7 @@ const AdminPacotes = () => {
     }
     setShowForm(true);
   };
+
   useEffect(() => {
     if (showForm) {
       const totalSite = selectedItems.reduce((acc, item) => acc + (item.data?.price || 0), 0);
