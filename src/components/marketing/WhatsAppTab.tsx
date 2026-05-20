@@ -144,26 +144,28 @@ const WhatsAppTab = ({ campaigns, onRefresh }: WhatsAppTabProps) => {
           </TableHeader>
           <TableBody>
             {campaigns.map((c) => (
-              <TableRow key={c.id}>
-                <TableCell className="font-semibold text-foreground">{c.name}</TableCell>
-                <TableCell><Badge variant="outline" className={statusColors[c.status] || ""}>{c.status}</Badge></TableCell>
-                <TableCell className="text-center text-foreground">{c.sent.toLocaleString("pt-BR")}</TableCell>
-                <TableCell className="text-center text-foreground">{c.read_count.toLocaleString("pt-BR")}</TableCell>
-                <TableCell className="text-center text-foreground">{c.clicks.toLocaleString("pt-BR")}</TableCell>
-                <TableCell className="text-center font-semibold text-primary">
+              <TableRow key={c.id} className="border-b border-border/40 group hover:bg-primary/5 transition-colors">
+                <TableCell className="font-semibold text-foreground px-6 py-4">{c.name}</TableCell>
+                <TableCell className="px-6 py-4"><Badge variant="outline" className={statusColors[c.status] || ""}>{c.status}</Badge></TableCell>
+                <TableCell className="text-center text-foreground px-6 py-4">{c.sent.toLocaleString("pt-BR")}</TableCell>
+                <TableCell className="text-center text-foreground px-6 py-4">{c.read_count.toLocaleString("pt-BR")}</TableCell>
+                <TableCell className="text-center text-foreground px-6 py-4">{c.clicks.toLocaleString("pt-BR")}</TableCell>
+                <TableCell className="text-center font-black text-primary px-6 py-4">
                   {c.sent > 0 ? `${((c.clicks / c.sent) * 100).toFixed(1)}%` : "—"}
                 </TableCell>
-                <TableCell className="text-muted-foreground text-sm">{new Date(c.created_at).toLocaleDateString("pt-BR")}</TableCell>
-                <TableCell>
+                <TableCell className="text-muted-foreground text-[11px] font-bold uppercase tracking-wider px-6 py-4">{new Date(c.created_at).toLocaleDateString("pt-BR")}</TableCell>
+                <TableCell className="px-6 py-4">
                   <AlertDialog>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <AlertDialogTrigger asChild><Button variant="ghost" size="icon"><Trash2 size={14} className="text-destructive" /></Button></AlertDialogTrigger>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Remover permanentemente</p>
-                      </TooltipContent>
-                    </Tooltip>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <AlertDialogTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10"><Trash2 size={14} className="text-destructive" /></Button></AlertDialogTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent className="rounded-xl font-bold text-[10px] uppercase tracking-widest">
+                          <p>Remover permanentemente</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <AlertDialogContent>
                       <AlertDialogHeader><AlertDialogTitle>Remover campanha?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader>
                       <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => handleDelete(c.id)}>Remover</AlertDialogAction></AlertDialogFooter>
