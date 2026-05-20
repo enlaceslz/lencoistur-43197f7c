@@ -282,10 +282,15 @@ const AdminSGSIncidentes = () => {
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none resize-none" placeholder="O que aprendemos para evitar reincidência?" />
               </div>
             </div>
-            <div className="flex gap-3">
-              <button type="submit" className="bg-destructive hover:bg-destructive/90 text-destructive-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">{editing ? "Atualizar" : "Registrar"}</button>
-              <button type="button" onClick={() => { setShowForm(false); setEditing(null); }} className="bg-muted text-muted-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">Cancelar</button>
+            <div className="flex gap-4 pt-6 border-t border-border/50">
+              <button type="submit" className="flex-1 h-14 bg-destructive hover:bg-destructive/90 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-destructive/20 transition-all active:scale-95">
+                {editing ? "Salvar Alterações" : "Registrar Ocorrência Agora"}
+              </button>
+              <button type="button" onClick={() => { setShowForm(false); setEditing(null); }} className="px-10 h-14 bg-muted text-muted-foreground rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all">
+                Cancelar
+              </button>
             </div>
+
           </form>
         )}
 
