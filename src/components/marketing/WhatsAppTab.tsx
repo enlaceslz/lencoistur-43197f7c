@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Send, CheckCircle, Zap, Trash2 } from "lucide-react";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { statusColors } from "./statusColors";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -75,18 +75,20 @@ const WhatsAppTab = ({ campaigns, onRefresh }: WhatsAppTabProps) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="font-display font-bold text-lg text-foreground">Campanhas WhatsApp</h2>
+        <h2 className="font-display font-black text-xl text-foreground tracking-tight">Campanhas WhatsApp</h2>
         <Dialog open={open} onOpenChange={setOpen}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <DialogTrigger asChild>
-                <Button><Plus size={16} className="mr-1" /> Nova Campanha</Button>
-              </DialogTrigger>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Configurar nova campanha de mensagens em massa</p>
-            </TooltipContent>
-          </Tooltip>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DialogTrigger asChild>
+                  <Button className="rounded-2xl h-11 px-6 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-primary/20"><Plus size={16} className="mr-2" /> Nova Campanha</Button>
+                </DialogTrigger>
+              </TooltipTrigger>
+              <TooltipContent className="rounded-xl font-bold text-[10px] uppercase tracking-widest">
+                <p>Configurar nova campanha em massa</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <DialogContent className="sm:max-w-lg">
             <DialogHeader><DialogTitle>Nova Campanha WhatsApp</DialogTitle></DialogHeader>
             <div className="space-y-4 py-2">
@@ -125,43 +127,45 @@ const WhatsAppTab = ({ campaigns, onRefresh }: WhatsAppTabProps) => {
         </Dialog>
       </div>
 
-      <Card className="border-border overflow-hidden">
+      <Card className="border-border overflow-hidden rounded-[2rem] glass-card">
         <div className="overflow-x-auto">
           <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="text-muted-foreground">Campanha</TableHead>
-              <TableHead className="text-muted-foreground">Status</TableHead>
-              <TableHead className="text-muted-foreground text-center">Enviadas</TableHead>
-              <TableHead className="text-muted-foreground text-center">Lidas</TableHead>
-              <TableHead className="text-muted-foreground text-center">Cliques</TableHead>
-              <TableHead className="text-muted-foreground text-center">Taxa</TableHead>
-              <TableHead className="text-muted-foreground">Data</TableHead>
-              <TableHead />
+            <TableRow className="border-b border-border/40 hover:bg-transparent">
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4">Campanha</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4">Status</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4 text-center">Enviadas</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4 text-center">Lidas</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4 text-center">Cliques</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4 text-center">Taxa</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4">Data</TableHead>
+              <TableHead className="px-6 py-4" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {campaigns.map((c) => (
-              <TableRow key={c.id}>
-                <TableCell className="font-semibold text-foreground">{c.name}</TableCell>
-                <TableCell><Badge variant="outline" className={statusColors[c.status] || ""}>{c.status}</Badge></TableCell>
-                <TableCell className="text-center text-foreground">{c.sent.toLocaleString("pt-BR")}</TableCell>
-                <TableCell className="text-center text-foreground">{c.read_count.toLocaleString("pt-BR")}</TableCell>
-                <TableCell className="text-center text-foreground">{c.clicks.toLocaleString("pt-BR")}</TableCell>
-                <TableCell className="text-center font-semibold text-primary">
+              <TableRow key={c.id} className="border-b border-border/40 group hover:bg-primary/5 transition-colors">
+                <TableCell className="font-semibold text-foreground px-6 py-4">{c.name}</TableCell>
+                <TableCell className="px-6 py-4"><Badge variant="outline" className={statusColors[c.status] || ""}>{c.status}</Badge></TableCell>
+                <TableCell className="text-center text-foreground px-6 py-4">{c.sent.toLocaleString("pt-BR")}</TableCell>
+                <TableCell className="text-center text-foreground px-6 py-4">{c.read_count.toLocaleString("pt-BR")}</TableCell>
+                <TableCell className="text-center text-foreground px-6 py-4">{c.clicks.toLocaleString("pt-BR")}</TableCell>
+                <TableCell className="text-center font-black text-primary px-6 py-4">
                   {c.sent > 0 ? `${((c.clicks / c.sent) * 100).toFixed(1)}%` : "—"}
                 </TableCell>
-                <TableCell className="text-muted-foreground text-sm">{new Date(c.created_at).toLocaleDateString("pt-BR")}</TableCell>
-                <TableCell>
+                <TableCell className="text-muted-foreground text-[11px] font-bold uppercase tracking-wider px-6 py-4">{new Date(c.created_at).toLocaleDateString("pt-BR")}</TableCell>
+                <TableCell className="px-6 py-4">
                   <AlertDialog>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <AlertDialogTrigger asChild><Button variant="ghost" size="icon"><Trash2 size={14} className="text-destructive" /></Button></AlertDialogTrigger>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Remover permanentemente</p>
-                      </TooltipContent>
-                    </Tooltip>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <AlertDialogTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10"><Trash2 size={14} className="text-destructive" /></Button></AlertDialogTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent className="rounded-xl font-bold text-[10px] uppercase tracking-widest">
+                          <p>Remover permanentemente</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <AlertDialogContent>
                       <AlertDialogHeader><AlertDialogTitle>Remover campanha?</AlertDialogTitle><AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription></AlertDialogHeader>
                       <AlertDialogFooter><AlertDialogCancel>Cancelar</AlertDialogCancel><AlertDialogAction onClick={() => handleDelete(c.id)}>Remover</AlertDialogAction></AlertDialogFooter>
@@ -178,22 +182,34 @@ const WhatsAppTab = ({ campaigns, onRefresh }: WhatsAppTabProps) => {
         </div>
       </Card>
 
-      <div className="grid sm:grid-cols-3 gap-4">
-        <Card><CardContent className="p-4 text-center">
-          <Send size={24} className="mx-auto text-primary mb-2" />
-          <p className="text-2xl font-bold text-foreground">{totalSent.toLocaleString("pt-BR")}</p>
-          <p className="text-xs text-muted-foreground">Mensagens enviadas</p>
-        </CardContent></Card>
-        <Card><CardContent className="p-4 text-center">
-          <CheckCircle size={24} className="mx-auto text-green-600 mb-2" />
-          <p className="text-2xl font-bold text-foreground">{totalSent > 0 ? ((totalRead / totalSent) * 100).toFixed(1) : 0}%</p>
-          <p className="text-xs text-muted-foreground">Taxa de leitura</p>
-        </CardContent></Card>
-        <Card><CardContent className="p-4 text-center">
-          <Zap size={24} className="mx-auto text-blue-600 mb-2" />
-          <p className="text-2xl font-bold text-foreground">{totalSent > 0 ? ((totalClicked / totalSent) * 100).toFixed(1) : 0}%</p>
-          <p className="text-xs text-muted-foreground">Taxa de clique</p>
-        </CardContent></Card>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <Card className="glass-card rounded-3xl border-none shadow-sm group hover:bg-primary/5 transition-all">
+          <CardContent className="p-6 text-center">
+            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto mb-4 group-hover:scale-110 transition-transform">
+              <Send size={24} />
+            </div>
+            <p className="text-3xl font-black text-foreground tracking-tighter">{totalSent.toLocaleString("pt-BR")}</p>
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">Mensagens enviadas</p>
+          </CardContent>
+        </Card>
+        <Card className="glass-card rounded-3xl border-none shadow-sm group hover:bg-emerald-500/5 transition-all">
+          <CardContent className="p-6 text-center">
+            <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-600 mx-auto mb-4 group-hover:scale-110 transition-transform">
+              <CheckCircle size={24} />
+            </div>
+            <p className="text-3xl font-black text-foreground tracking-tighter">{totalSent > 0 ? ((totalRead / totalSent) * 100).toFixed(1) : 0}%</p>
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">Taxa de leitura</p>
+          </CardContent>
+        </Card>
+        <Card className="glass-card rounded-3xl border-none shadow-sm group hover:bg-blue-500/5 transition-all">
+          <CardContent className="p-6 text-center">
+            <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-600 mx-auto mb-4 group-hover:scale-110 transition-transform">
+              <Zap size={24} />
+            </div>
+            <p className="text-3xl font-black text-foreground tracking-tighter">{totalSent > 0 ? ((totalClicked / totalSent) * 100).toFixed(1) : 0}%</p>
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">Taxa de clique</p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

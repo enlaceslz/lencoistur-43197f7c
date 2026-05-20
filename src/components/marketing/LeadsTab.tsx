@@ -7,7 +7,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Smartphone, Trash2, Search, UserPlus, Loader2, ExternalLink } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, Smartphone, Trash2, Search, UserPlus, Loader2, ExternalLink, StickyNote } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { statusColors } from "./statusColors";
 import { useState } from "react";
@@ -25,6 +26,7 @@ interface Lead {
   last_contact: string | null;
   score: number;
   converted_customer_id?: string | null;
+  notes?: string | null;
 }
 
 interface LeadsTabProps {
@@ -65,6 +67,8 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
       interest: interest.trim().slice(0, 100) || null,
       status,
       score: Math.min(100, Math.max(0, Number(score) || 50)),
+      notes: "", // Initialize new field
+      engagement_history: [], // Initialize new field
     });
     setSaving(false);
     if (error) toast.error("Erro ao criar lead.");
@@ -124,20 +128,25 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-        <h2 className="font-display font-bold text-lg text-foreground">Gestão de Leads</h2>
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 mb-8">
+        <h2 className="font-display font-black text-xl text-foreground tracking-tight">Gestão de Leads</h2>
         <div className="flex gap-2 w-full md:w-auto">
-          <div className="relative flex-1 md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <Input placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+          <div className="relative flex-1 md:w-80 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
+            <Input 
+              placeholder="Buscar por nome, email ou fone..." 
+              value={search} 
+              onChange={(e) => setSearch(e.target.value)} 
+              className="pl-11 h-11 rounded-2xl bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary/30 transition-all text-sm font-medium" 
+            />
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <DialogTrigger asChild><Button><Plus size={16} className="mr-1" /> Lead</Button></DialogTrigger>
+                  <DialogTrigger asChild><Button className="rounded-2xl h-11 px-6 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-primary/20"><Plus size={16} className="mr-2" /> Novo Lead</Button></DialogTrigger>
                 </TooltipTrigger>
-                <TooltipContent>
+                <TooltipContent className="rounded-xl font-bold text-[10px] uppercase tracking-widest">
                   <p>Adicionar lead manualmente</p>
                 </TooltipContent>
               </Tooltip>
@@ -191,24 +200,24 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
         </div>
       </div>
 
-      <Card className="border-border overflow-hidden">
+      <Card className="border-border overflow-hidden rounded-3xl glass-card">
         <div className="overflow-x-auto">
           <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="text-muted-foreground">Nome</TableHead>
-              <TableHead className="text-muted-foreground">Contato</TableHead>
-              <TableHead className="text-muted-foreground">Origem</TableHead>
-              <TableHead className="text-muted-foreground">Interesse</TableHead>
-              <TableHead className="text-muted-foreground">Status</TableHead>
-              <TableHead className="text-muted-foreground text-center">Score</TableHead>
-              <TableHead />
+            <TableRow className="border-b border-border/40 hover:bg-transparent">
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4">Nome</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4">Contato</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4">Origem</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4">Interesse</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4">Status</TableHead>
+              <TableHead className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-6 py-4 text-center">Score</TableHead>
+              <TableHead className="px-6 py-4" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.map((l) => (
-              <TableRow key={l.id}>
-                <TableCell className="font-semibold text-foreground">
+              <TableRow key={l.id} className="border-b border-border/40 group hover:bg-primary/5 transition-colors">
+                <TableCell className="font-semibold text-foreground px-6 py-4">
                   <div className="flex flex-col">
                     <span>{l.name}</span>
                     {l.source === "Seja um Parceiro" && (
@@ -235,7 +244,7 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
                 <TableCell className="text-center">
                   <div className={`inline-flex items-center justify-center w-10 h-10 rounded-full text-sm font-bold ${getScoreColor(l.score)}`}>{l.score}</div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="px-6 py-4">
                   <div className="flex gap-1">
                     {l.source === "Seja um Parceiro" && l.status !== "convertido" && (
                       <TooltipProvider>
@@ -257,6 +266,45 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
                         </Tooltip>
                       </TooltipProvider>
                     )}
+
+                    <Dialog>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <DialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8"><StickyNote size={16} className="text-blue-500" /></Button>
+                            </DialogTrigger>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Ver Anotações</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <DialogContent className="sm:max-w-md rounded-[2rem] border-none shadow-2xl">
+                        <DialogHeader><DialogTitle className="font-black text-xl tracking-tight">Anotações: {l.name}</DialogTitle></DialogHeader>
+                        <div className="py-4">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3 block">Histórico e Observações</Label>
+                          <Textarea 
+                            className="min-h-[150px] bg-muted/30 border-none rounded-2xl focus:ring-1 focus:ring-primary p-4 text-sm leading-relaxed"
+                            placeholder="Adicione observações sobre o atendimento, preferências do cliente ou próximos passos..."
+                            defaultValue={l.notes || ""}
+                            onBlur={async (e) => {
+                              const newNotes = e.target.value;
+                              if (newNotes === l.notes) return;
+                              const { error } = await supabase.from("marketing_leads").update({ notes: newNotes }).eq("id", l.id);
+                              if (error) toast.error("Erro ao salvar nota.");
+                              else {
+                                toast.success("Nota salva!");
+                                onRefresh();
+                              }
+                            }}
+                          />
+                        </div>
+                        <DialogFooter>
+                          <DialogClose asChild><Button variant="outline" className="rounded-xl font-bold uppercase text-[10px] tracking-widest">Fechar</Button></DialogClose>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                     
                     {l.phone && (
                       <TooltipProvider>

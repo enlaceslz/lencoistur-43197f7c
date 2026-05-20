@@ -776,13 +776,16 @@ export type Database = {
       }
       marketing_leads: {
         Row: {
+          conversion_date: string | null
           converted_customer_id: string | null
           created_at: string
           email: string | null
+          engagement_history: Json | null
           id: string
           interest: string | null
           last_contact: string | null
           name: string
+          notes: string | null
           phone: string | null
           score: number
           source: string
@@ -790,13 +793,16 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          conversion_date?: string | null
           converted_customer_id?: string | null
           created_at?: string
           email?: string | null
+          engagement_history?: Json | null
           id?: string
           interest?: string | null
           last_contact?: string | null
           name: string
+          notes?: string | null
           phone?: string | null
           score?: number
           source?: string
@@ -804,13 +810,16 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          conversion_date?: string | null
           converted_customer_id?: string | null
           created_at?: string
           email?: string | null
+          engagement_history?: Json | null
           id?: string
           interest?: string | null
           last_contact?: string | null
           name?: string
+          notes?: string | null
           phone?: string | null
           score?: number
           source?: string
