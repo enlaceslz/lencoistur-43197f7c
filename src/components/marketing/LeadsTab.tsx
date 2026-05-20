@@ -65,6 +65,8 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
       interest: interest.trim().slice(0, 100) || null,
       status,
       score: Math.min(100, Math.max(0, Number(score) || 50)),
+      notes: "", // Initialize new field
+      engagement_history: [], // Initialize new field
     });
     setSaving(false);
     if (error) toast.error("Erro ao criar lead.");
