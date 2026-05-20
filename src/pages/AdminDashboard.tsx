@@ -109,9 +109,10 @@ const AdminDashboard = () => {
 
     const stats = [
       { label: "Reservas Hoje", value: String(bookings.filter((b) => b.created_at?.slice(0, 10) === todayStr).length), change: "Diário", up: true, icon: Calendar, path: "/admin/reservas" },
+      { label: "Ticket Médio", value: fmt(thisMonthBookings.length > 0 ? thisRevenue / thisMonthBookings.length : 0), change: "Este Mês", up: true, icon: TrendingUp, path: "/admin/financeiro" },
       { label: "Receita (Mês)", value: fmt(thisRevenue), change: "Bruto", up: true, icon: DollarSign, path: "/admin/financeiro" },
-      { label: "Clientes", value: String(customerCount), change: "Base CRM", up: true, icon: Users, path: "/admin/crm" },
       { label: "Conformidade SGS", value: String(sgsStats.criticalRisks === 0 ? "100%" : "Alerta"), change: `${sgsStats.pendingActions} pendências`, up: sgsStats.criticalRisks === 0, icon: ShieldAlert, isSgs: true, path: "/admin/sgs" },
+
     ];
 
     const monthlyMap = new Map<string, { revenue: number; bookings: number; expenses: number; profit: number }>();
