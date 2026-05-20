@@ -94,7 +94,7 @@ const TourDetail = () => {
   const privateOn = tour.mode_private_enabled ?? true;
   const showModeToggle = collectiveOn && privateOn;
   const isPrivate = tourMode === "privativo";
-  const basePublicPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
+  const basePublicPrice = isPrivate ? (tour.private_price || 0) : tour.price;
   const unitPrice = partnerPricing
     ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePublicPrice) : partnerPricing.effectivePrice)
     : basePublicPrice;

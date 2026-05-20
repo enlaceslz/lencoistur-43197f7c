@@ -105,11 +105,12 @@ const ToursPage = () => {
         (t.location || "").toLowerCase().includes(search.toLowerCase());
       
       const isPrivate = t.mode_collective_enabled === false;
-      const basePrice = isPrivate ? (t.private_price || 130000) : t.price;
+      const basePrice = isPrivate ? (t.private_price || 0) : t.price;
       const partnerPricing = pricingByTourId[t.id];
       const priceToFormat = partnerPricing
         ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePrice) : partnerPricing.effectivePrice)
         : basePrice;
+
       
       const effectivePrice = priceToFormat / 100;
       const matchPrice = effectivePrice <= maxPrice;
@@ -118,8 +119,9 @@ const ToursPage = () => {
     .sort((a, b) => {
       const getPrice = (t: any) => {
         const isPrivate = t.mode_collective_enabled === false;
-        const basePrice = isPrivate ? (t.private_price || 130000) : t.price;
+        const basePrice = isPrivate ? (t.private_price || 0) : t.price;
         const partnerPricing = pricingByTourId[t.id];
+
         return partnerPricing
           ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePrice) : partnerPricing.effectivePrice)
           : basePrice;
@@ -208,7 +210,8 @@ const ToursPage = () => {
                       <p className={`text-lg font-bold ${tour.mode_collective_enabled !== false ? "text-primary" : "text-secondary"}`}>
                         {(() => {
                           const isPrivate = tour.mode_collective_enabled === false;
-                          const basePublicPrice = isPrivate ? (tour.private_price || 130000) : tour.price;
+                          const basePublicPrice = isPrivate ? (tour.private_price || 0) : tour.price;
+
                           const partnerPricing = pricingByTourId[tour.id];
                           const priceToFormat = partnerPricing
                             ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePublicPrice) : partnerPricing.effectivePrice)
