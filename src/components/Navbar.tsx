@@ -207,10 +207,40 @@ const Navbar = () => {
               Entrar
             </Link>
           ) : (
-            <Button onClick={() => { setOpen(false); signOut(); }} variant="destructive" className="p-5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl mt-4">
-              Sair
-            </Button>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-2xl">
+                <Avatar className="h-12 w-12 border-2 border-primary/20">
+                  <AvatarImage src={user?.user_metadata?.avatar_url} />
+                  <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                    {user?.email?.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold truncate">{user?.email}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Minha Conta</p>
+                </div>
+              </div>
+              
+              {isAdmin && (
+                <Link to="/admin" onClick={() => setOpen(false)} className="flex items-center gap-3 text-lg font-black uppercase tracking-[0.2em] text-primary border-b border-border/50 pb-4">
+                  <LayoutDashboard size={20} /> Painel Admin
+                </Link>
+              )}
+              
+              <Link to="/minhas-reservas" onClick={() => setOpen(false)} className="flex items-center gap-3 text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">
+                <User size={20} /> Minhas Reservas
+              </Link>
+
+              <Link to="/admin/config" onClick={() => setOpen(false)} className="flex items-center gap-3 text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">
+                <Settings size={20} /> Configurações
+              </Link>
+              
+              <Button onClick={() => { setOpen(false); signOut(); }} variant="destructive" className="p-5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl mt-4 w-full flex items-center justify-center gap-2">
+                <LogOut size={18} /> Sair
+              </Button>
+            </div>
           )}
+
         </div>
       )}
     </nav>

@@ -51,8 +51,9 @@ const ToursPage = () => {
   const [partner, setPartner] = useState<{ id: string; name: string } | null>(null);
   const [pricingByTourId, setPricingByTourId] = useState<Record<string, { effectivePrice: number; effectivePrivatePrice?: number | null }>>({});
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(params.get("search") || "");
   const [sort, setSort] = useState("popular");
+
   const [maxPrice, setMaxPrice] = useState(3000);
 
   useEffect(() => {
