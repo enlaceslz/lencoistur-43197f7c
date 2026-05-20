@@ -171,7 +171,7 @@ const AdminFinanceiro = () => {
     
     const fromFinance = monthContasReceber
       .filter(c => c.status === "recebido")
-      .reduce((s, c) => s + (c.valor * 100), 0) / 100;
+      .reduce((s, c) => s + (c.valor * 100), 0);
       
     return fromBookings + fromFinance;
   }, [monthBookings, monthContasReceber]);
@@ -179,8 +179,9 @@ const AdminFinanceiro = () => {
   const despesasMes = useMemo(() => {
     return monthContasPagar
       .filter(c => c.status === "pago")
-      .reduce((s, c) => s + (c.valor * 100), 0) / 100;
+      .reduce((s, c) => s + (c.valor * 100), 0);
   }, [monthContasPagar]);
+
   const lucroMes = receitaPaga - despesasMes;
   const pagos = monthBookings.filter(b => b.payment_status === "pago");
   const ticketMedio = pagos.length > 0 ? Math.round(receitaPaga / pagos.length) : 0;
