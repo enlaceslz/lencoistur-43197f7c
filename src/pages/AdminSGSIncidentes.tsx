@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, AlertCircle, Pencil, Trash2, MapPin, Clock, Calendar, Shield } from "lucide-react";
+import { Plus, Search, AlertCircle, Pencil, Trash2, MapPin, Clock, Calendar, Shield, Activity } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
