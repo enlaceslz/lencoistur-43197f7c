@@ -187,10 +187,11 @@ const AdminFinanceiro = () => {
   const ticketMedio = pagos.length > 0 ? Math.round(receitaPaga / pagos.length) : 0;
 
   const stats = [
-    { label: "Receita Paga", value: fmt(receitaPaga), change: `${pagos.length} reservas`, up: true, icon: DollarSign, color: "text-emerald-600" },
-    { label: "Despesas Pagas", value: fmt(despesasMes), change: `${monthContasPagar.filter(c => c.status === "pago").length} pagamentos`, up: true, icon: TrendingDown, color: "text-rose-600" },
-    { label: "Lucro Estimado", value: fmt(lucroMes), change: receitaPaga > 0 ? `${Math.round((lucroMes / receitaPaga) * 100)}% margem` : "0% margem", up: lucroMes > 0, icon: TrendingUp, color: "text-blue-600" },
-    { label: "Ticket Médio", value: fmt(ticketMedio), change: "por venda paga", up: true, icon: LayoutDashboard, color: "text-amber-600" },
+    { label: "Receita Paga", value: fmt(receitaPaga), change: `${pagos.length} reservas`, up: true, icon: DollarSign, color: "text-emerald-600", desc: "Total em caixa (Mês)" },
+    { label: "Despesas Pagas", value: fmt(despesasMes), change: `${monthContasPagar.filter(c => c.status === "pago").length} pagamentos`, up: false, icon: TrendingDown, color: "text-rose-600", desc: "Saídas liquidadas" },
+    { label: "Lucro Real", value: fmt(lucroMes), change: receitaPaga > 0 ? `${Math.round((lucroMes / receitaPaga) * 100)}% margem` : "0% margem", up: lucroMes > 0, icon: Wallet, color: "text-blue-600", desc: "Resultado líquido" },
+    { label: "Ticket Médio", value: fmt(ticketMedio), change: "por reserva paga", up: true, icon: TrendingUpIcon, color: "text-amber-600", desc: "Média de faturamento" },
+
   ];
 
   const tabs: { key: Tab; label: string; icon: React.ElementType }[] = [
