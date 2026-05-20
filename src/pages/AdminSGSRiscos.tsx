@@ -169,10 +169,35 @@ const AdminSGSRiscos = () => {
   };
 
   return (
-    <AdminLayout title="SGS - Matriz de Riscos (P2)">
+    <AdminLayout title="SGS - Matriz de Riscos (ISO 21101)">
       <div className="space-y-6">
+        {/* Superior "Conformity" Section */}
+        <div className="bg-white rounded-lg p-8 border border-border shadow-sm mb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-1.5">
+              <h1 className="text-2xl font-black text-slate-900 tracking-tight">Análise de Perigos e Riscos</h1>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/10">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Matriz P2 Sincronizada</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex gap-4">
+              <div className="bg-slate-50 px-6 py-4 rounded-xl border border-slate-200">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Índice de Risco Médio</p>
+                <p className="text-xl font-black text-primary">
+                  {risks.length > 0 ? (risks.reduce((s, r) => s + r.risk_level, 0) / risks.length).toFixed(1) : "0.0"}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Summary cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 animate-in-fade" style={{ animationDelay: '0.1s' }}>
+
           {[
             { label: "Total de Riscos", value: summary.total, icon: AlertTriangle, color: "from-slate-500 to-slate-700", desc: "Mapeamento P2" },
             { label: "Aceitável (NR < 6)", value: summary.acceptable, icon: CheckCircle, color: "from-emerald-500 to-teal-600", desc: "Monitoramento" },

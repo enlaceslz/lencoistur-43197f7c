@@ -121,10 +121,10 @@ const AdminSGSDashboard = () => {
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {[
-                  { label: "Nível Lagoas", val: "85%", badge: "IDEAL", icon: Waves, iconCol: "text-blue-500" },
+                  { label: "Nível Lagoas", val: "85%", badge: "IDEAL", icon: Waves, iconCol: "text-blue-500", desc: "Volume hídrico alto" },
                   { label: "Clima (INMET)", val: "32°C", desc: "Ensolarado", icon: Sun, iconCol: "text-amber-500" },
-                  { label: "Vento (km/h)", val: "12 NE", desc: "Brisa Leve", icon: Activity, iconCol: "text-sky-500" },
-                  { label: "Ocupação", val: "64%", desc: "Capacidade", icon: UserCheck2, iconCol: "text-purple-500" },
+                  { label: "Checklists", val: stats.checklists > 0 ? "OK" : "PEND", desc: "Manutenção 4x4", icon: Wrench, iconCol: "text-sky-500" },
+                  { label: "Capacidade", val: "64%", desc: "Ocupação atual", icon: UserCheck2, iconCol: "text-purple-500" },
                 ].map((stat, i) => (
                   <div key={i} className="space-y-1">
                     <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">{stat.label}</p>
@@ -140,6 +140,7 @@ const AdminSGSDashboard = () => {
                 ))}
               </div>
             </div>
+
             <div className="bg-white rounded-lg p-6 border border-border relative overflow-hidden shadow-sm flex flex-col justify-center">
               <div className="absolute -right-4 -top-4 opacity-10 rotate-12"><Shield size={100} className="text-primary" /></div>
               <div className="text-center space-y-2">
