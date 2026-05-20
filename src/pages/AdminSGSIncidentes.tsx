@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, AlertCircle, Pencil, Trash2, MapPin, Clock, Calendar, Shield } from "lucide-react";
+import { Plus, Search, AlertCircle, Pencil, Trash2, MapPin, Clock, Calendar, Shield, Activity } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
@@ -116,12 +116,14 @@ const AdminSGSIncidentes = () => {
       if (form.severity === "alta" || form.severity === "critica") {
         await supabase.from("sgs_corrective_actions").insert({
           action_code: `AC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`,
-          description: `Ação corretiva para ${form.severity === "critica" ? "ACIDENTE CRÍTICO" : "incidente grave"}: ${form.description.slice(0, 100)}`,
-          responsible: form.guide_name || "A definir",
-          due_date: new Date(Date.now() + (form.severity === "critica" ? 3 : 7) * 86400000).toISOString().split("T")[0],
+          description: `AÇÃO CORRETIVA IMEDIATA: ${form.severity === "critica" ? "ACIDENTE CRÍTICO" : "Incidente grave"} em ${form.location}. Descrição: ${form.description.slice(0, 150)}...`,
+          responsible: form.guide_name || "Coordenador de Segurança",
+          due_date: new Date(Date.now() + (form.severity === "critica" ? 2 : 5) * 86400000).toISOString().split("T")[0],
+          status: "pendente",
         });
-        toast({ title: "⚠️ Ação corretiva gerada automaticamente (P3)" });
+        toast({ title: "⚠️ Ação corretiva gerada automaticamente no módulo de Ações (P3)" });
       }
+
     }
 
     setShowForm(false);
@@ -138,137 +140,176 @@ const AdminSGSIncidentes = () => {
 
   const summary = {
     total: incidents.length,
-    abertos: incidents.filter(i => i.status === "aberto").length,
+    abertos: incidents.filter(i => i.status === "aberto" || i.status === "investigando").length,
     graves: incidents.filter(i => i.severity === "alta" || i.severity === "critica").length,
+    preventivos: incidents.filter(i => i.type === "quase_incidente" || i.type === "sem_ocorrencia").length,
   };
 
   return (
-    <AdminLayout title="SGS - Registro de Incidentes (P5)">
+    <AdminLayout title="SGS - Relatos de Ocorrências">
       <div className="space-y-6">
-        {/* Summary */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        {/* Modern Summary Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {[
-            { label: "Total Registrados", value: summary.total, icon: AlertCircle, color: "text-slate-600", bg: "bg-slate-100" },
-            { label: "Ocorrências Abertas", value: summary.abertos, icon: Clock, color: "text-amber-600", bg: "bg-amber-100" },
-            { label: "Alta / Crítica", value: summary.graves, icon: AlertCircle, color: "text-rose-600", bg: "bg-rose-100" },
+            { label: "Histórico Total", value: summary.total, icon: AlertCircle, color: "from-slate-500 to-slate-700", desc: "Banco de dados" },
+            { label: "Em Tratamento", value: summary.abertos, icon: Clock, color: "from-amber-500 to-orange-600", desc: "Ação necessária" },
+            { label: "Eventos Críticos", value: summary.graves, icon: Shield, color: "from-rose-500 to-pink-600", desc: "Alta severidade" },
+            { label: "Relatos Preventivos", value: summary.preventivos, icon: Activity, color: "from-emerald-500 to-teal-600", desc: "Quase incidentes" },
           ].map((stat, i) => (
-            <Card key={i} className="border-none shadow-sm bg-card hover:shadow-md transition-all">
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} shadow-inner`}><stat.icon size={24} strokeWidth={2.5} /></div>
-                <div>
-                  <p className="text-2xl font-black text-foreground leading-none">{stat.value}</p>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-2">{stat.label}</p>
+            <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group">
+              <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
+              <div className="flex items-center justify-between mb-4">
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white shadow-lg`}>
+                  <stat.icon size={22} strokeWidth={2.5} />
                 </div>
-              </CardContent>
-            </Card>
+                <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{stat.desc}</div>
+              </div>
+              <p className="text-2xl font-black text-foreground tracking-tighter">{stat.value}</p>
+              <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
+            </div>
           ))}
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between gap-4">
-          <div className="flex gap-2 flex-1">
-            <div className="relative flex-1 max-w-md">
-              <Search size={16} className="absolute left-3 top-3 text-muted-foreground" />
-              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar incidentes..."
-                className="w-full pl-9 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/30" />
+
+        <div className="flex flex-col xl:flex-row gap-6 items-center justify-between glass-card p-8 rounded-[2.5rem] mb-10 animate-in-fade border border-white/20 shadow-xl shadow-black/5" style={{ animationDelay: '0.1s' }}>
+          <div className="flex flex-col md:flex-row gap-3 flex-1 w-full">
+            <div className="relative flex-1 group">
+              <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-primary/40 group-focus-within:text-primary transition-colors" />
+              <input 
+                value={search} 
+                onChange={(e) => setSearch(e.target.value)} 
+                placeholder="Buscar incidentes por descrição ou local..."
+                className="w-full pl-14 pr-4 h-14 bg-white/40 dark:bg-black/20 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-2xl text-sm font-semibold outline-none focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-muted-foreground/40" 
+              />
             </div>
-            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-              className="bg-card border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+            
+            <select 
+              value={filterStatus} 
+              onChange={e => setFilterStatus(e.target.value)}
+              className="h-14 px-6 bg-white/40 dark:bg-black/20 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-2xl text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all"
+            >
               <option value="todos">Todos status</option>
               <option value="aberto">Aberto</option>
               <option value="investigando">Investigando</option>
+
               <option value="resolvido">Resolvido</option>
               <option value="fechado">Fechado</option>
             </select>
           </div>
-          <button onClick={() => { setEditing(null); setForm(emptyForm); setShowForm(!showForm); }}
-            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2">
-            <Plus size={16} /> Registrar Incidente
+          <button 
+            onClick={() => { setEditing(null); setForm(emptyForm); setShowForm(!showForm); }}
+            className="bg-destructive hover:bg-destructive/90 text-white px-8 h-14 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-destructive/20 transition-all active:scale-95 flex items-center gap-3"
+          >
+            <Plus size={18} strokeWidth={3} /> Registrar Ocorrência
           </button>
+
         </div>
 
         {showForm && (
-          <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
-            <h3 className="font-display font-bold text-foreground">{editing ? "Editar" : "Registrar"} Incidente (P5 VATTI)</h3>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Tipo de Ocorrência *</label>
+          <form onSubmit={handleSubmit} className="glass-card border-none rounded-[2.5rem] p-8 space-y-8 animate-in-slide-down mb-10 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-8 opacity-5"><Activity size={120} className="text-destructive" /></div>
+            
+            <div>
+              <h3 className="text-xl font-black text-foreground uppercase tracking-tight flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center text-destructive shadow-inner">
+                  <Activity size={20} strokeWidth={3} />
+                </div>
+                {editing ? "Editar" : "Registrar"} Relato de Ocorrência
+              </h3>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-2 ml-13">Padrão ABNT ISO 21101 (Seção P5)</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Tipo de Ocorrência *</label>
                 <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all">
                   {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Data e Hora *</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Data e Hora *</label>
                 <input required type="datetime-local" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all" />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Passeio Relacionado</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Passeio Relacionado</label>
                 <select value={form.tour_id} onChange={(e) => setForm({ ...form, tour_id: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all">
                   <option value="">Nenhum</option>
                   {tours.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                 </select>
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Reserva Relacionada</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Reserva Relacionada</label>
                 <select value={form.booking_id} onChange={(e) => setForm({ ...form, booking_id: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all">
                   <option value="">Nenhuma</option>
                   {bookings.map(b => <option key={b.id} value={b.id}>{b.booking_code} - {b.item_name}</option>)}
                 </select>
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Local do Incidente *</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Local do Incidente *</label>
                 <input required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Ex: Lagoa Azul, Dunas" />
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all" placeholder="Ex: Lagoa Azul, Dunas" />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Gravidade *</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Gravidade *</label>
                 <select value={form.severity} onChange={(e) => setForm({ ...form, severity: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all">
                   {Object.entries(SEVERITY).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                 </select>
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Condutor Responsável</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Condutor Responsável</label>
                 <input value={form.guide_name} onChange={(e) => setForm({ ...form, guide_name: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all" />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Pessoas Envolvidas (Vítimas)</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Pessoas Envolvidas (Vítimas)</label>
                 <input value={form.people_involved} onChange={(e) => setForm({ ...form, people_involved: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Nomes e idades" />
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all" placeholder="Nomes e idades" />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Ação Tomada / Resposta</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Ação Tomada / Resposta</label>
                 <input value={form.action_taken} onChange={(e) => setForm({ ...form, action_taken: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Primeiros socorros, resgate..." />
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all" placeholder="Primeiros socorros, resgate..." />
               </div>
-              <div className="flex items-center gap-2 pt-6">
+
+              <div className="flex items-center gap-3 pt-6 bg-destructive/5 p-4 rounded-xl border border-destructive/10">
                 <input type="checkbox" id="pre_activated" checked={form.pre_activated} onChange={(e) => setForm({ ...form, pre_activated: e.target.checked })}
-                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary/30" />
-                <label htmlFor="pre_activated" className="text-sm font-bold text-destructive uppercase tracking-tighter">🚨 PRE Ativado</label>
+                  className="w-5 h-5 rounded border-border text-destructive focus:ring-destructive/30" />
+                <label htmlFor="pre_activated" className="text-sm font-black text-destructive uppercase tracking-widest cursor-pointer select-none flex items-center gap-2">
+                  🚨 PRE Ativado (Protocolo de Resposta a Emergência)
+                </label>
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Descrição (Fatos e Circunstâncias) *</label>
-                <textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none resize-none" placeholder="Relato detalhado..." />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Descrição (Fatos e Circunstâncias) *</label>
+                <textarea required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={4}
+                  className="w-full bg-muted/30 border border-border/40 rounded-xl px-4 py-3 text-sm font-bold text-foreground outline-none resize-none focus:ring-4 focus:ring-primary/10 transition-all" 
+                  placeholder="Relato detalhado do que aconteceu..." />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Lições Aprendidas (Prevenção)</label>
-                <textarea value={form.lessons_learned} onChange={(e) => setForm({ ...form, lessons_learned: e.target.value })} rows={3}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none resize-none" placeholder="O que aprendemos para evitar reincidência?" />
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Lições Aprendidas (Prevenção)</label>
+                <textarea value={form.lessons_learned} onChange={(e) => setForm({ ...form, lessons_learned: e.target.value })} rows={4}
+                  className="w-full bg-muted/30 border border-border/40 rounded-xl px-4 py-3 text-sm font-bold text-foreground outline-none resize-none focus:ring-4 focus:ring-primary/10 transition-all" 
+                  placeholder="O que aprendemos para evitar reincidência?" />
               </div>
             </div>
-            <div className="flex gap-3">
-              <button type="submit" className="bg-destructive hover:bg-destructive/90 text-destructive-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">{editing ? "Atualizar" : "Registrar"}</button>
-              <button type="button" onClick={() => { setShowForm(false); setEditing(null); }} className="bg-muted text-muted-foreground px-6 py-2.5 rounded-xl text-sm font-semibold">Cancelar</button>
+            <div className="flex gap-4 pt-6 border-t border-border/50">
+
+              <button type="submit" className="flex-1 h-14 bg-destructive hover:bg-destructive/90 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-destructive/20 transition-all active:scale-95">
+                {editing ? "Salvar Alterações" : "Registrar Ocorrência Agora"}
+              </button>
+              <button type="button" onClick={() => { setShowForm(false); setEditing(null); }} className="px-10 h-14 bg-muted text-muted-foreground rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all">
+                Cancelar
+              </button>
             </div>
           </form>
         )}
+
 
         {/* List */}
         <div className="space-y-3">
@@ -280,15 +321,16 @@ const AdminSGSIncidentes = () => {
               <p className="text-muted-foreground">Nenhum incidente registrado</p>
             </div>
           ) : filtered.map((inc) => (
-            <div key={inc.id} className="glass-card admin-card-hover rounded-[2.5rem] p-8 group relative overflow-hidden flex flex-col border border-border/50 transition-all">
-              <div className={`absolute top-0 left-0 w-2 h-full transition-colors ${inc.severity === 'critica' || inc.severity === 'alta' ? 'bg-destructive' : 'bg-primary'}`} />
+            <div key={inc.id} className="glass-card admin-card-hover rounded-[2.5rem] p-8 group relative overflow-hidden flex flex-col border-2 border-transparent transition-all hover:border-destructive/20">
+              <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${inc.severity === 'critica' || inc.severity === 'alta' ? 'bg-destructive' : 'bg-primary'}`} />
               
-              <div className="flex flex-col lg:flex-row justify-between gap-6">
-                <div className="flex-1 space-y-4">
+              <div className="flex flex-col lg:flex-row justify-between gap-8">
+                <div className="flex-1 space-y-6">
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className="font-mono text-[10px] font-black text-muted-foreground tracking-tighter uppercase px-2 py-0.5 bg-muted/50 rounded-lg border border-border/40">{inc.incident_code}</span>
                     <Badge variant="outline" className={`font-black text-[9px] uppercase px-3 py-1 rounded-full border shadow-sm ${SEVERITY[inc.severity]?.color}`}>
-                      Gravidade {SEVERITY[inc.severity]?.label}
+                      Severidade {SEVERITY[inc.severity]?.label}
+
                     </Badge>
                     <span className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-muted/50 text-muted-foreground border border-border/40">{TYPE_LABELS[inc.type] || inc.type}</span>
                     <Badge variant="secondary" className={`font-black text-[9px] uppercase px-3 py-1 rounded-full border ${STATUS_COLORS[inc.status] || ""}`}>
