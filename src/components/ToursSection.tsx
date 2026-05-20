@@ -1,9 +1,11 @@
-import { Star, Clock, MapPin } from "lucide-react";
+import { Star, Clock, MapPin, Sparkles } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+
 
 const tourLagoasAzuis = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465186872-0.jpg";
 const tourRioPreguicas = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465187850-1.jpeg";

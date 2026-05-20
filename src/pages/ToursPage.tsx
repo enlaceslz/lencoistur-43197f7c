@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Star, MapPin, Clock, Search, SlidersHorizontal } from "lucide-react";
+import { Star, MapPin, Clock, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { formatCurrency } from "@/lib/utils";
 import { fetchPartnerCatalogPricing } from "@/lib/catalogPricing";
+import { Badge } from "@/components/ui/badge";
+
 
 import tourLagoasAzuis from "@/assets/tour-lagoas-azuis-hero.jpg";
 import tourRioPreguicas from "@/assets/tour-rio-preguicas.jpg";

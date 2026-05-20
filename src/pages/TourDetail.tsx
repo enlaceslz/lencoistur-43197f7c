@@ -1,6 +1,7 @@
 import { useParams, Link, useSearchParams } from "react-router-dom";
-import { Star, MapPin, Clock, Users, ArrowLeft, Shield, CheckCircle, ChevronLeft, ChevronRight, Building2 } from "lucide-react";
+import { Star, MapPin, Clock, Users, ArrowLeft, Shield, CheckCircle, ChevronLeft, ChevronRight, Building2, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
