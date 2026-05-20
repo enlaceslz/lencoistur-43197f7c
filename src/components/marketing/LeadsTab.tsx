@@ -239,7 +239,7 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
                 <TableCell className="text-center">
                   <div className={`inline-flex items-center justify-center w-10 h-10 rounded-full text-sm font-bold ${getScoreColor(l.score)}`}>{l.score}</div>
                 </TableCell>
-                <TableCell>
+                <TableCell className="px-6 py-4">
                   <div className="flex gap-1">
                     {l.source === "Seja um Parceiro" && l.status !== "convertido" && (
                       <TooltipProvider>
@@ -261,6 +261,45 @@ const LeadsTab = ({ leads, onRefresh }: LeadsTabProps) => {
                         </Tooltip>
                       </TooltipProvider>
                     )}
+
+                    <Dialog>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <DialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8"><StickyNote size={16} className="text-blue-500" /></Button>
+                            </DialogTrigger>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Ver Anotações</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <DialogContent className="sm:max-w-md rounded-[2rem] border-none shadow-2xl">
+                        <DialogHeader><DialogTitle className="font-black text-xl tracking-tight">Anotações: {l.name}</DialogTitle></DialogHeader>
+                        <div className="py-4">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3 block">Histórico e Observações</Label>
+                          <Textarea 
+                            className="min-h-[150px] bg-muted/30 border-none rounded-2xl focus:ring-1 focus:ring-primary p-4 text-sm leading-relaxed"
+                            placeholder="Adicione observações sobre o atendimento, preferências do cliente ou próximos passos..."
+                            defaultValue={l.notes || ""}
+                            onBlur={async (e) => {
+                              const newNotes = e.target.value;
+                              if (newNotes === l.notes) return;
+                              const { error } = await supabase.from("marketing_leads").update({ notes: newNotes }).eq("id", l.id);
+                              if (error) toast.error("Erro ao salvar nota.");
+                              else {
+                                toast.success("Nota salva!");
+                                onRefresh();
+                              }
+                            }}
+                          />
+                        </div>
+                        <DialogFooter>
+                          <DialogClose asChild><Button variant="outline" className="rounded-xl font-bold uppercase text-[10px] tracking-widest">Fechar</Button></DialogClose>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                     
                     {l.phone && (
                       <TooltipProvider>
