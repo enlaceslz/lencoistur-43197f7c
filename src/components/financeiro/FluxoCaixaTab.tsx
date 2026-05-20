@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { PieChart as PieChartIcon, TrendingUp, Wallet, Zap, ArrowUpRight } from "lucide-react";
+import { PieChart as PieChartIcon, TrendingUp, Wallet, Zap, ArrowUpRight, DollarSign, ArrowDownRight } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   Legend, PieChart, Pie, Cell, AreaChart, Area
@@ -95,7 +95,27 @@ export default function FluxoCaixaTab({
   }, [monthBookings]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Quick Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        {[
+          { label: "Receita (Mês)", value: monthlyData[currentMonth].entradas, icon: DollarSign, color: "text-emerald-500", bg: "bg-emerald-50" },
+          { label: "Saídas (Mês)", value: monthlyData[currentMonth].despesas, icon: ArrowDownRight, color: "text-rose-500", bg: "bg-rose-50" },
+          { label: "Resultado Líquido", value: monthlyData[currentMonth].receitaLiquida, icon: Wallet, color: "text-blue-500", bg: "bg-blue-50" },
+          { label: "Descontos", value: monthlyData[currentMonth].descontos, icon: Zap, color: "text-amber-500", bg: "bg-amber-50" },
+        ].map((item, i) => (
+          <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className={`p-3 rounded-xl ${item.bg} ${item.color}`}>
+                <item.icon size={20} />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{item.label}</span>
+            </div>
+            <p className="text-2xl font-black text-slate-900">{fmt(item.value)}</p>
+          </div>
+        ))}
+      </div>
+
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg p-8 border border-slate-200 overflow-hidden h-full">
