@@ -208,62 +208,63 @@ const AdminSGSIncidentes = () => {
               <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-2 ml-13">Padrão ABNT ISO 21101 (Seção P5)</p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Tipo de Ocorrência *</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Tipo de Ocorrência *</label>
                 <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all">
                   {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Data e Hora *</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Data e Hora *</label>
                 <input required type="datetime-local" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all" />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Passeio Relacionado</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Passeio Relacionado</label>
                 <select value={form.tour_id} onChange={(e) => setForm({ ...form, tour_id: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all">
                   <option value="">Nenhum</option>
                   {tours.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                 </select>
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Reserva Relacionada</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Reserva Relacionada</label>
                 <select value={form.booking_id} onChange={(e) => setForm({ ...form, booking_id: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all">
                   <option value="">Nenhuma</option>
                   {bookings.map(b => <option key={b.id} value={b.id}>{b.booking_code} - {b.item_name}</option>)}
                 </select>
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Local do Incidente *</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Local do Incidente *</label>
                 <input required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Ex: Lagoa Azul, Dunas" />
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all" placeholder="Ex: Lagoa Azul, Dunas" />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Gravidade *</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Gravidade *</label>
                 <select value={form.severity} onChange={(e) => setForm({ ...form, severity: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all">
                   {Object.entries(SEVERITY).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                 </select>
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Condutor Responsável</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Condutor Responsável</label>
                 <input value={form.guide_name} onChange={(e) => setForm({ ...form, guide_name: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" />
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all" />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Pessoas Envolvidas (Vítimas)</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Pessoas Envolvidas (Vítimas)</label>
                 <input value={form.people_involved} onChange={(e) => setForm({ ...form, people_involved: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Nomes e idades" />
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all" placeholder="Nomes e idades" />
               </div>
-              <div>
-                <label className="text-sm font-semibold text-foreground mb-1 block">Ação Tomada / Resposta</label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Ação Tomada / Resposta</label>
                 <input value={form.action_taken} onChange={(e) => setForm({ ...form, action_taken: e.target.value })}
-                  className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none" placeholder="Primeiros socorros, resgate..." />
+                  className="w-full h-12 bg-muted/30 border border-border/40 rounded-xl px-4 text-sm font-bold text-foreground outline-none focus:ring-4 focus:ring-primary/10 transition-all" placeholder="Primeiros socorros, resgate..." />
               </div>
+
               <div className="flex items-center gap-2 pt-6">
                 <input type="checkbox" id="pre_activated" checked={form.pre_activated} onChange={(e) => setForm({ ...form, pre_activated: e.target.checked })}
                   className="w-4 h-4 rounded border-border text-primary focus:ring-primary/30" />
