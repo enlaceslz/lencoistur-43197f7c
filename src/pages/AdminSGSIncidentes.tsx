@@ -116,12 +116,14 @@ const AdminSGSIncidentes = () => {
       if (form.severity === "alta" || form.severity === "critica") {
         await supabase.from("sgs_corrective_actions").insert({
           action_code: `AC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`,
-          description: `Ação corretiva para ${form.severity === "critica" ? "ACIDENTE CRÍTICO" : "incidente grave"}: ${form.description.slice(0, 100)}`,
-          responsible: form.guide_name || "A definir",
-          due_date: new Date(Date.now() + (form.severity === "critica" ? 3 : 7) * 86400000).toISOString().split("T")[0],
+          description: `AÇÃO CORRETIVA IMEDIATA: ${form.severity === "critica" ? "ACIDENTE CRÍTICO" : "Incidente grave"} em ${form.location}. Descrição: ${form.description.slice(0, 150)}...`,
+          responsible: form.guide_name || "Coordenador de Segurança",
+          due_date: new Date(Date.now() + (form.severity === "critica" ? 2 : 5) * 86400000).toISOString().split("T")[0],
+          status: "pendente",
         });
-        toast({ title: "⚠️ Ação corretiva gerada automaticamente (P3)" });
+        toast({ title: "⚠️ Ação corretiva gerada automaticamente no módulo de Ações (P3)" });
       }
+
     }
 
     setShowForm(false);
