@@ -286,7 +286,9 @@ const AdminSGSIncidentes = () => {
                   className="w-full bg-muted/30 border border-border/40 rounded-xl px-4 py-3 text-sm font-bold text-foreground outline-none resize-none focus:ring-4 focus:ring-primary/10 transition-all" 
                   placeholder="O que aprendemos para evitar reincidência?" />
               </div>
+            </div>
             <div className="flex gap-4 pt-6 border-t border-border/50">
+
               <button type="submit" className="flex-1 h-14 bg-destructive hover:bg-destructive/90 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-destructive/20 transition-all active:scale-95">
                 {editing ? "Salvar Alterações" : "Registrar Ocorrência Agora"}
               </button>
