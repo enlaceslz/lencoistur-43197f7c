@@ -321,15 +321,16 @@ const AdminSGSIncidentes = () => {
               <p className="text-muted-foreground">Nenhum incidente registrado</p>
             </div>
           ) : filtered.map((inc) => (
-            <div key={inc.id} className="glass-card admin-card-hover rounded-[2.5rem] p-8 group relative overflow-hidden flex flex-col border border-border/50 transition-all">
-              <div className={`absolute top-0 left-0 w-2 h-full transition-colors ${inc.severity === 'critica' || inc.severity === 'alta' ? 'bg-destructive' : 'bg-primary'}`} />
+            <div key={inc.id} className="glass-card admin-card-hover rounded-[2.5rem] p-8 group relative overflow-hidden flex flex-col border-2 border-transparent transition-all hover:border-destructive/20">
+              <div className={`absolute top-0 left-0 w-1.5 h-full transition-colors ${inc.severity === 'critica' || inc.severity === 'alta' ? 'bg-destructive' : 'bg-primary'}`} />
               
-              <div className="flex flex-col lg:flex-row justify-between gap-6">
-                <div className="flex-1 space-y-4">
+              <div className="flex flex-col lg:flex-row justify-between gap-8">
+                <div className="flex-1 space-y-6">
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className="font-mono text-[10px] font-black text-muted-foreground tracking-tighter uppercase px-2 py-0.5 bg-muted/50 rounded-lg border border-border/40">{inc.incident_code}</span>
                     <Badge variant="outline" className={`font-black text-[9px] uppercase px-3 py-1 rounded-full border shadow-sm ${SEVERITY[inc.severity]?.color}`}>
-                      Gravidade {SEVERITY[inc.severity]?.label}
+                      Severidade {SEVERITY[inc.severity]?.label}
+
                     </Badge>
                     <span className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-muted/50 text-muted-foreground border border-border/40">{TYPE_LABELS[inc.type] || inc.type}</span>
                     <Badge variant="secondary" className={`font-black text-[9px] uppercase px-3 py-1 rounded-full border ${STATUS_COLORS[inc.status] || ""}`}>
