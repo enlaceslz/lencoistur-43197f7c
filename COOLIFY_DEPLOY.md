@@ -21,9 +21,10 @@ Este guia descreve como realizar o deploy desta aplicação no Coolify usando Do
 
 3. **Variáveis de Ambiente**:
    - No Coolify, vá para a aba **Environment Variables**.
-   - Adicione as seguintes variáveis necessárias pelo Supabase:
-     - `VITE_SUPABASE_URL`: A URL do seu projeto Supabase.
-     - `VITE_SUPABASE_ANON_KEY`: A chave anônima (anon key) do seu projeto Supabase.
+   - Adicione as seguintes variáveis necessárias:
+     - `VITE_SUPABASE_URL`: A URL da sua instância Supabase/PostgREST.
+     - `VITE_SUPABASE_PUBLISHABLE_KEY`: A chave anônima (anon key) da sua instância.
+     - **Nota**: Se você estiver usando o PostgreSQL direto do Coolify sem o Supabase, você precisará de uma camada de API (como PostgREST) para que o frontend continue funcionando sem alterações no código, já que o projeto foi construído sobre a SDK do Supabase.
 
 4. **Configurações Adicionais**:
    - Certifique-se de que a porta exposta no Coolify está configurada como `80` (conforme definido no `Dockerfile`).
