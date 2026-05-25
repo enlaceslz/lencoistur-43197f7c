@@ -7,6 +7,7 @@ import AdminRoute from "@/components/AdminRoute";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import Index from "./pages/Index.tsx";
 import Seguranca from "./pages/Seguranca.tsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
 import ToursPage from "./pages/ToursPage.tsx";
 import TourDetail from "./pages/TourDetail.tsx";
 import TransfersPage from "./pages/TransfersPage.tsx";
@@ -65,6 +66,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/seguranca" element={<Seguranca />} />
+          <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
           <Route path="/passeios" element={<ToursPage />} />
           <Route path="/passeios/:slug" element={<TourDetail />} />
           <Route path="/translados" element={<TransfersPage />} />
