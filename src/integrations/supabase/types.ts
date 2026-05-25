@@ -3145,6 +3145,10 @@ export type Database = {
       }
     }
     Functions: {
+      find_signable_term_id: {
+        Args: { p_booking_id: string; p_token: string }
+        Returns: string
+      }
       get_public_booking_v2: {
         Args: { p_booking_id: string }
         Returns: {

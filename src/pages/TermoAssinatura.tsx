@@ -147,11 +147,10 @@ const TermoAssinatura = () => {
             }
           };
 
-          // Try to find existing term for this booking
-          const { data: tData } = await supabase.from("sgs_risk_terms").select("*").eq("booking_id", bookingData.id).maybeSingle();
-          if (tData) {
-             // We use RPC to get full term data including customers if needed, but for now term exists
-             const { data: fullTData } = await supabase.rpc("get_public_term_v2", { p_term_id: tData.id, p_token: accessToken });
+          // Locate term via secure RPC (does not expose sign_access_token)
+          const { data: termIdData } = await supabase.rpc("find_signable_term_id", { p_booking_id: bookingData.id, p_token: accessToken });
+          if (termIdData) {
+             const { data: fullTData } = await supabase.rpc("get_public_term_v2", { p_term_id: termIdData, p_token: accessToken });
              if (fullTData && fullTData.length > 0) {
                 const tRow = fullTData[0];
                 termData = {
