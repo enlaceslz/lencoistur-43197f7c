@@ -157,7 +157,7 @@ export const CookieConsentBanner = () => {
                 Utilizamos cookies e tratamos dados pessoais para melhorar sua experiência, analisar tráfego e personalizar conteúdo. 
                 Você pode aceitar todos, rejeitar os não essenciais ou personalizar suas preferências. 
                 Seus direitos estão garantidos conforme a LGPD (Lei nº 13.709/2018).
-                Consulte nossa <a href="/politica-de-privacidade" target="_blank" className="text-primary hover:underline underline-offset-4">Política de Privacidade Completa</a>.
+                Consulte nossa <a href="/politica-de-privacidade" className="text-primary hover:underline underline-offset-4">Política de Privacidade Completa</a>.
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-2 w-full md:w-auto">
