@@ -52,6 +52,7 @@ export type Database = {
           birth_date: string | null
           booking_code: string
           collaborator_id: string | null
+          cpf: string | null
           created_at: string
           customer_id: string
           date: string | null
@@ -85,6 +86,7 @@ export type Database = {
           birth_date?: string | null
           booking_code: string
           collaborator_id?: string | null
+          cpf?: string | null
           created_at?: string
           customer_id: string
           date?: string | null
@@ -118,6 +120,7 @@ export type Database = {
           birth_date?: string | null
           booking_code?: string
           collaborator_id?: string | null
+          cpf?: string | null
           created_at?: string
           customer_id?: string
           date?: string | null

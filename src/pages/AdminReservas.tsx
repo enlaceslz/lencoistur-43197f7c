@@ -93,6 +93,7 @@ const AdminReservas = () => {
     customerName: "",
     customerEmail: "",
     customerPhone: "",
+    cpf: "",
     type: "tour" as "tour" | "transfer" | "package",
     itemName: "",
     date: "",
@@ -132,7 +133,7 @@ const AdminReservas = () => {
         supabase.from("tours").select("id, name, price, private_price, partner_price").eq("active", true),
         supabase.from("packages").select("id, name, discount_price, original_price, partner_price").eq("active", true),
         supabase.from("transfer_routes").select("id, origin, destination, price, partner_price").eq("active", true),
-        supabase.from("customers").select("id, name, email, phone, birth_date").order("name").limit(10)
+        supabase.from("customers").select("id, name, email, phone, birth_date, cpf").order("name").limit(10)
       ]);
 
       if (collabsRes.data) setCollaborators(collabsRes.data);
@@ -153,7 +154,7 @@ const AdminReservas = () => {
 
     const { data } = await supabase
       .from("customers")
-      .select("id, name, email, phone, birth_date")
+      .select("id, name, email, phone, birth_date, cpf")
       .ilike("name", `%${query}%`)
       .limit(5);
 
@@ -168,6 +169,7 @@ const AdminReservas = () => {
       customerEmail: customer.email || "",
       customerPhone: customer.phone || "",
       birthDate: customer.birth_date || "",
+      cpf: customer.cpf || "",
     }));
     setCustomerSearch("");
   };
@@ -289,6 +291,7 @@ const AdminReservas = () => {
         partnerNetPrice: "0",
         paid: false,
         birthDate: "",
+        cpf: "",
         companions: [],
       });
     } catch (error: any) {
@@ -320,6 +323,7 @@ const AdminReservas = () => {
       partnerId: selected.partnerId || "",
       paid: selected.paymentStatus === 'pago',
       birthDate: selected.birthDate || "",
+      cpf: selected.cpf || "",
       companions: [],
     });
     
@@ -477,7 +481,13 @@ const AdminReservas = () => {
                           <Label className="text-[10px] uppercase font-bold text-slate-400">Data de Nascimento</Label>
                           <p className="text-sm font-black text-slate-700">{format(new Date(wideBooking.birthDate + "T12:00:00"), "dd/MM/yyyy")}</p>
                         </div>
-                      )}
+                       )}
+                       {wideBooking.cpf && (
+                         <div className="pt-4 border-t border-slate-200/60">
+                           <Label className="text-[10px] uppercase font-bold text-slate-400">CPF</Label>
+                           <p className="text-sm font-black text-slate-700">{wideBooking.cpf}</p>
+                         </div>
+                       )}
                     </div>
                   </section>
 
@@ -936,14 +946,25 @@ const AdminReservas = () => {
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data de Nascimento</Label>
-                    <Input 
-                      type="date" 
-                      value={form.birthDate} 
-                      onChange={e => setForm({...form, birthDate: e.target.value})}
-                      className="rounded-xl h-12 font-semibold border-slate-200"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data de Nascimento</Label>
+                      <Input 
+                        type="date" 
+                        value={form.birthDate} 
+                        onChange={e => setForm({...form, birthDate: e.target.value})}
+                        className="rounded-xl h-12 font-semibold border-slate-200"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">CPF</Label>
+                      <Input 
+                        placeholder="000.000.000-00"
+                        value={form.cpf} 
+                        onChange={e => setForm({...form, cpf: e.target.value})}
+                        className="rounded-xl h-12 font-semibold border-slate-200"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
