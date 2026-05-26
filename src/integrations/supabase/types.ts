@@ -3160,6 +3160,7 @@ export type Database = {
         Returns: {
           booking_code: string
           created_at: string
+          customer_cpf: string
           customer_email: string
           customer_name: string
           date: string
