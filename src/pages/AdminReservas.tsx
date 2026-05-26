@@ -1074,10 +1074,11 @@ const AdminReservas = () => {
 
                     <Input 
                       placeholder="Ou digite o nome manualmente..." 
-                      value={form.itemName} 
-                      onChange={e => setForm({...form, itemName: e.target.value})}
+                      value={form.items[0].itemName} 
+                      onChange={e => updateItem(form.items[0].id, "itemName", e.target.value)}
                       className="rounded-xl h-10 text-xs font-semibold border-slate-200 mt-2"
                     />
+
                   </div>
                 </div>
               </div>
