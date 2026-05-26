@@ -94,22 +94,25 @@ const AdminReservas = () => {
     customerEmail: "",
     customerPhone: "",
     cpf: "",
-    type: "tour" as "tour" | "transfer" | "package",
-    itemName: "",
-    date: "",
-    guests: 1,
-    payMethod: "pix" as "pix" | "card" | "info",
-    unitPrice: "0",
-    discount: "0",
-    publicUnitPrice: "0",
     notes: "",
     collaboratorId: "",
     partnerId: "",
-    partnerNetPrice: "0",
     paid: false,
     birthDate: "",
     companions: [] as { name: string; cpf?: string; birthDate?: string; relationship?: string }[],
+    items: [{
+      id: Math.random().toString(36).substr(2, 9),
+      type: "tour" as "tour" | "transfer" | "package",
+      itemName: "",
+      date: "",
+      guests: 1,
+      unitPrice: "0",
+      discount: "0",
+      publicUnitPrice: "0",
+      partnerNetPrice: "0",
+    }]
   });
+
 
   const [companionForm, setCompanionForm] = useState({
     name: "",
