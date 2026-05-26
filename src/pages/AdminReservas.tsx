@@ -1029,7 +1029,7 @@ const AdminReservas = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tipo de Serviço</Label>
-                      <Select value={form.type} onValueChange={(v: any) => setForm({...form, type: v})}>
+                      <Select value={form.items[0].type} onValueChange={(v: any) => updateItem(form.items[0].id, "type", v)}>
                         <SelectTrigger className="rounded-xl h-12 font-semibold border-slate-200">
                           <SelectValue />
                         </SelectTrigger>
