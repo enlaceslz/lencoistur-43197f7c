@@ -166,7 +166,7 @@ const AdminReservas = () => {
     if (data) setCustomers(data);
   };
 
-  const handleSelectCustomer = (customer: any) => {
+  const handleSelectCustomer = async (customer: any) => {
     setForm(prev => ({
       ...prev,
       customerId: customer.id,
@@ -177,6 +177,13 @@ const AdminReservas = () => {
       cpf: customer.cpf || "",
     }));
     setCustomerSearch("");
+
+    // Buscar dependentes vinculados ao cliente
+    const { data: deps } = await supabase
+      .from("dependents")
+      .select("*")
+      .eq("customer_id", customer.id);
+    if (deps) setCustomerDependents(deps);
   };
 
   const filtered = bookings.filter((b) => {
