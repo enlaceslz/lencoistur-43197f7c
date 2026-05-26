@@ -97,6 +97,7 @@ const AdminReservas = () => {
     notes: "",
     collaboratorId: "",
     partnerId: "",
+    payMethod: "pix" as "pix" | "card" | "info",
     paid: false,
     birthDate: "",
     companions: [] as { name: string; cpf?: string; birthDate?: string; relationship?: string }[],
@@ -112,6 +113,7 @@ const AdminReservas = () => {
       partnerNetPrice: "0",
     }]
   });
+
 
 
   const [companionForm, setCompanionForm] = useState({
