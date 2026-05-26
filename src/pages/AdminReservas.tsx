@@ -1351,16 +1351,11 @@ const AdminReservas = () => {
           <div className="p-8 bg-slate-50 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6 rounded-b-lg">
             <div className="flex flex-col md:flex-row items-center gap-8">
               <div className="flex flex-col gap-1">
-                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Líquido Estimado</p>
+                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Geral Estimado</p>
                  <div className="flex items-baseline gap-2">
                    <span className="text-3xl font-black text-primary tracking-tighter">
-                     {formatCurrency((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount))}
+                     {formatCurrency(form.items.reduce((acc, item) => acc + (parseCurrencyToNumber(item.unitPrice) * item.guests) - parseCurrencyToNumber(item.discount), 0))}
                    </span>
-                   {parseCurrencyToNumber(form.partnerNetPrice) > 0 && (
-                     <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[10px] font-black uppercase py-0.5 px-2">
-                       Lucro: {formatCurrency(((parseCurrencyToNumber(form.unitPrice) * form.guests) - parseCurrencyToNumber(form.discount)) - (parseCurrencyToNumber(form.partnerNetPrice) * form.guests))}
-                     </Badge>
-                   )}
                  </div>
             </div>
               
@@ -1387,6 +1382,7 @@ const AdminReservas = () => {
                 </div>
               )}
             </div>
+
             <div className="flex gap-4 w-full md:w-auto">
               <Button variant="ghost" onClick={() => setShowNewForm(false)} className="flex-1 md:flex-none rounded-xl h-14 px-8 font-bold text-slate-500 hover:bg-slate-200 transition-all">
                 Descartar
