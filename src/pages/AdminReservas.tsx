@@ -89,6 +89,7 @@ const AdminReservas = () => {
 
   const [customerSearch, setCustomerSearch] = useState("");
   const [saving, setSaving] = useState(false);
+  const [customerDependents, setCustomerDependents] = useState<any[]>([]);
 
   const [form, setForm] = useState({
     customerId: "",
@@ -165,7 +166,7 @@ const AdminReservas = () => {
     if (data) setCustomers(data);
   };
 
-  const handleSelectCustomer = (customer: any) => {
+  const handleSelectCustomer = async (customer: any) => {
     setForm(prev => ({
       ...prev,
       customerId: customer.id,
@@ -176,6 +177,13 @@ const AdminReservas = () => {
       cpf: customer.cpf || "",
     }));
     setCustomerSearch("");
+
+    // Buscar dependentes vinculados ao cliente
+    const { data: deps } = await supabase
+      .from("dependents")
+      .select("*")
+      .eq("customer_id", customer.id);
+    if (deps) setCustomerDependents(deps);
   };
 
   const filtered = bookings.filter((b) => {
@@ -334,6 +342,7 @@ const AdminReservas = () => {
 
       setShowNewForm(false);
       setIsEditing(false);
+      setCustomerDependents([]);
       setForm({
         customerId: "",
         customerName: "",
@@ -366,8 +375,18 @@ const AdminReservas = () => {
     }
   };
 
-  const handleEdit = (booking: BookingItem) => {
+  const handleEdit = async (booking: BookingItem) => {
     setSelected(booking);
+    
+    // Buscar dependentes do cliente ao editar
+    if (booking.customerId) {
+      const { data: deps } = await supabase
+        .from("dependents")
+        .select("*")
+        .eq("customer_id", booking.customerId);
+      if (deps) setCustomerDependents(deps);
+    }
+
     
     let itemsToEdit = [booking];
     if (booking.groupId) {
@@ -669,7 +688,114 @@ const AdminReservas = () => {
               </Card>
             </div>
 
-            {/* Seção Itinerário */}
+
+            {/* Seção Dependentes */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-slate-500">
+                  <Users size={14} className="text-primary" />
+                  <h3 className="text-xs font-bold uppercase tracking-wider">Acompanhantes / Dependentes</h3>
+                </div>
+                {customerDependents.length > 0 && (
+                  <div className="flex gap-2">
+                    <span className="text-[10px] text-slate-400 font-medium">Importar do cadastro:</span>
+                    <div className="flex flex-wrap gap-1">
+                      {customerDependents.map(dep => (
+                        <Button 
+                          key={dep.id}
+                          variant="outline" 
+                          size="sm" 
+                          type="button"
+                          className="h-6 px-2 text-[9px] font-bold bg-white border-slate-200 hover:bg-primary/5 hover:text-primary transition-colors"
+                          onClick={() => {
+                            if (!form.companions.find(c => c.name === dep.name)) {
+                              setForm(prev => ({
+                                ...prev,
+                                companions: [...prev.companions, { 
+                                  name: dep.name, 
+                                  cpf: dep.cpf || "", 
+                                  birthDate: dep.birth_date || "",
+                                  relationship: dep.relationship || "Acompanhante"
+                                }]
+                              }));
+                            }
+                          }}
+                        >
+                          + {dep.name.split(' ')[0]}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <Card className="border-slate-200/60 shadow-none overflow-hidden">
+                <CardContent className="p-5 space-y-4 bg-white">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                    <div className="space-y-1.5 md:col-span-1">
+                      <Label className="text-[10px] font-black uppercase text-slate-400">Nome Completo</Label>
+                      <Input 
+                        placeholder="Nome do dependente" 
+                        value={companionForm.name} 
+                        onChange={e => setCompanionForm({...companionForm, name: e.target.value})}
+                        className="h-10 text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1.5 md:col-span-1">
+                      <Label className="text-[10px] font-black uppercase text-slate-400">Documento/CPF</Label>
+                      <Input 
+                        placeholder="CPF ou RG" 
+                        value={companionForm.cpf} 
+                        onChange={e => setCompanionForm({...companionForm, cpf: e.target.value})}
+                        className="h-10 text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1.5 md:col-span-1">
+                      <Label className="text-[10px] font-black uppercase text-slate-400">Nascimento</Label>
+                      <Input 
+                        type="date"
+                        value={companionForm.birthDate} 
+                        onChange={e => setCompanionForm({...companionForm, birthDate: e.target.value})}
+                        className="h-10 text-xs"
+                      />
+                    </div>
+                    <Button 
+                      onClick={addCompanion}
+                      type="button"
+                      className="h-10 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold uppercase tracking-widest"
+                    >
+                      <Plus size={14} className="mr-2" /> Adicionar
+                    </Button>
+                  </div>
+
+                  {form.companions.length > 0 && (
+                    <div className="pt-2 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                      {form.companions.map((comp, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl group animate-in fade-in slide-in-from-left-2 duration-200">
+                          <div className="flex flex-col">
+                            <span className="text-[11px] font-black text-slate-700 uppercase">{comp.name}</span>
+                            <div className="flex gap-2 mt-0.5">
+                              {comp.cpf && <span className="text-[9px] text-slate-400 font-bold">CPF: {comp.cpf}</span>}
+                              {comp.birthDate && <span className="text-[9px] text-slate-400 font-bold">NASC: {format(new Date(comp.birthDate + 'T12:00'), 'dd/MM/yy')}</span>}
+                            </div>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            type="button"
+                            onClick={() => removeCompanion(idx)}
+                            className="h-7 w-7 text-slate-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-slate-400">
@@ -965,6 +1091,16 @@ const AdminReservas = () => {
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+
+                {/* Dependentes */}
+                <div className="space-y-4">
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
+                    <Users size={14} /> Acompanhantes / Dependentes
+                  </h3>
+                  <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                    <DependentList customerId={selected.customerId || ""} />
                   </div>
                 </div>
 
