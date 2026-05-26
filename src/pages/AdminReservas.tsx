@@ -322,19 +322,10 @@ const AdminReservas = () => {
       };
 
       if (isEditing && selected) {
-        await updateBooking(selected.id, selected.customerId || "", {
-          ...payload,
-          type: payload.items[0].type,
-          itemName: payload.items[0].itemName,
-          date: payload.items[0].date,
-          guests: payload.items[0].guests,
-          unitPrice: payload.items[0].unitPrice,
-          discount: payload.items[0].discount,
-          publicUnitPrice: payload.items[0].publicUnitPrice,
-          partnerNetPrice: payload.items[0].partnerNetPrice,
-        });
+        await updateBooking(selected.id, selected.customerId || "", payload);
         toast({ title: "Sucesso", description: "Reserva atualizada com sucesso!" });
       } else {
+
         await addBooking(payload as any);
         toast({ title: "Sucesso", description: "Reserva(s) criada(s) com sucesso!" });
       }
@@ -497,7 +488,7 @@ const AdminReservas = () => {
                     <TableCell>{b.customerName}</TableCell>
                     <TableCell>{formatCurrency(b.finalTotal)}</TableCell>
                     <TableCell>
-                      <Button onClick={() => { setSelected(b); handleEdit(); }} variant="ghost" size="icon"><Pencil size={16} /></Button>
+                      <Button onClick={() => handleEdit(b)} variant="ghost" size="icon"><Pencil size={16} /></Button>
                     </TableCell>
                   </TableRow>
                 ))}
