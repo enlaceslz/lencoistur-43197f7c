@@ -525,7 +525,7 @@ const AdminReservas = () => {
                         <Button onClick={() => handleEdit(b)} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary transition-colors">
                           <Pencil size={14} />
                         </Button>
-                        <Button onClick={() => { setSelected(b); }} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 transition-colors">
+                        <Button onClick={() => handleShowDetail(b)} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 transition-colors">
                           <Eye size={14} />
                         </Button>
                         <Button onClick={() => window.open(`/voucher?id=${b.id}`, '_blank')} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-emerald-500 transition-colors">
@@ -893,6 +893,146 @@ const AdminReservas = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={showDetail} onOpenChange={setShowDetail}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 gap-0 border-none bg-white rounded-3xl overflow-hidden shadow-2xl">
+          {selected && (
+            <div className="flex flex-col">
+              <div className="p-8 bg-slate-900 text-white relative overflow-hidden">
+                <div className="absolute right-0 top-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <div className="relative space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="outline" className="border-white/20 text-white text-[10px] font-black uppercase tracking-widest px-4">
+                      Reserva {selected.bookingCode}
+                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge className={cn("text-[9px] font-bold uppercase py-1 px-3", statusConfig[selected.status]?.className)}>
+                        {statusConfig[selected.status]?.label}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-black tracking-tight uppercase">{selected.customerName}</h2>
+                    <div className="flex items-center gap-4 mt-2 text-slate-400 text-[11px] font-bold uppercase tracking-widest">
+                      <span className="flex items-center gap-1.5"><Phone size={12} className="text-primary" /> {selected.customerPhone}</span>
+                      <span className="flex items-center gap-1.5"><Mail size={12} className="text-primary" /> {selected.customerEmail || 'Sem e-mail'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-8 space-y-8">
+                {/* Itinerário Completo */}
+                <div className="space-y-4">
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
+                    <MapPin size={14} /> Itinerário do Grupo
+                  </h3>
+                  <div className="space-y-3">
+                    {bookings.filter(b => (selected.groupId ? b.groupId === selected.groupId : b.id === selected.id)).map((item, idx) => (
+                      <div key={item.id} className="flex items-start gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100 group transition-all hover:bg-white hover:shadow-md">
+                        <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[10px] font-black text-slate-400 shadow-sm shrink-0">
+                          {idx + 1}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <h4 className="text-[13px] font-black text-slate-900 uppercase truncate">{item.itemName}</h4>
+                            <span className="text-[12px] font-black text-primary">{formatCurrency(item.finalTotal)}</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                            <span className="flex items-center gap-1.5"><Calendar size={12} /> {format(new Date(item.date + 'T12:00'), 'dd/MM/yyyy')}</span>
+                            <span className="flex items-center gap-1.5"><Users size={12} /> {item.guests} Passageiros</span>
+                            <Badge variant="outline" className="text-[8px] h-4 bg-white border-slate-200">{item.type}</Badge>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Resumo Financeiro e Ações */}
+                <div className="grid grid-cols-2 gap-6">
+                  <Card className="border-slate-100 bg-slate-50/50 shadow-none">
+                    <CardContent className="p-6 space-y-3">
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Resumo do Pagamento</h4>
+                      <div className="flex justify-between items-end">
+                        <div className="space-y-1">
+                          <p className="text-[10px] text-slate-400 uppercase font-bold">Total do Grupo</p>
+                          <p className="text-2xl font-black text-slate-900 tracking-tight">
+                            {formatCurrency(bookings
+                              .filter(b => (selected.groupId ? b.groupId === selected.groupId : b.id === selected.id))
+                              .reduce((acc, b) => acc + b.finalTotal, 0)
+                            )}
+                          </p>
+                        </div>
+                        <Badge variant="outline" className="mb-1 bg-white uppercase text-[9px] font-black h-6">
+                          {selected.payMethod}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <div className="grid grid-cols-1 gap-3">
+                    {selected.paymentStatus !== 'pago' && (
+                      <Button 
+                        onClick={() => handleAction(() => confirmPayment(selected.id, selected.groupId), "Pagamento confirmado para todo o grupo!")}
+                        className="w-full h-12 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20"
+                      >
+                        <CheckCircle size={16} className="mr-2" /> Confirmar Pagamento
+                      </Button>
+                    )}
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={() => window.open(`/voucher?id=${selected.id}`, '_blank')}
+                        variant="outline"
+                        className="flex-1 h-12 border-slate-200 text-[10px] font-black uppercase tracking-widest hover:bg-slate-50"
+                      >
+                        <Printer size={16} className="mr-2" /> Voucher
+                      </Button>
+                      <Button 
+                        onClick={handleSendRiskTerm}
+                        variant="outline"
+                        className="flex-1 h-12 border-slate-200 text-[10px] font-black uppercase tracking-widest hover:bg-slate-50"
+                      >
+                        <Shield size={16} className="mr-2" /> Termo
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Ações de Perigo */}
+                <Separator className="bg-slate-100" />
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Ações Operacionais</p>
+                    <p className="text-[9px] text-slate-400">Cuidado: Estas ações alteram o status do grupo.</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {selected.status !== 'cancelada' && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleAction(() => cancelBooking(selected.id, selected.groupId), "Grupo cancelado com sucesso.")}
+                        className="text-amber-600 hover:text-amber-700 hover:bg-amber-50 text-[9px] font-black uppercase tracking-widest"
+                      >
+                        <XCircle size={14} className="mr-1.5" /> Cancelar
+                      </Button>
+                    )}
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleDelete(selected.id)}
+                      className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 text-[9px] font-black uppercase tracking-widest"
+                    >
+                      <Trash2 size={14} className="mr-1.5" /> Excluir
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
 
     </AdminLayout>
   );
