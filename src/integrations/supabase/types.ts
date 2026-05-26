@@ -3238,6 +3238,19 @@ export type Database = {
           item_name: string
         }[]
       }
+      submit_safety_survey: {
+        Args: {
+          p_booking_code: string
+          p_booking_id: string
+          p_comments?: string
+          p_danger_description?: string
+          p_danger_situations?: boolean
+          p_felt_safe: number
+          p_guide_explained_risks?: boolean
+          p_overall_rating: number
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
