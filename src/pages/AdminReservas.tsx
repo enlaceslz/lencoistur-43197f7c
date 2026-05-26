@@ -373,38 +373,44 @@ const AdminReservas = () => {
     }
   };
 
-  const handleEdit = () => {
-    if (!selected) return;
+  const handleEdit = (booking: BookingItem) => {
+    setSelected(booking);
+    
+    let itemsToEdit = [booking];
+    if (booking.groupId) {
+      itemsToEdit = bookings.filter(b => b.groupId === booking.groupId);
+    }
     
     setForm({
-      customerId: selected.customerId || "",
-      customerName: selected.customerName,
-      customerEmail: selected.customerEmail,
-      customerPhone: selected.customerPhone,
-      notes: selected.notes || "",
-      collaboratorId: selected.collaboratorId || "",
-      partnerId: selected.partnerId || "",
-      payMethod: selected.payMethod,
-      paid: selected.paymentStatus === 'pago',
-      birthDate: selected.birthDate || "",
-      cpf: selected.cpf || "",
+      customerId: booking.customerId || "",
+      customerName: booking.customerName,
+      customerEmail: booking.customerEmail,
+      customerPhone: booking.customerPhone,
+      notes: booking.notes || "",
+      collaboratorId: booking.collaboratorId || "",
+      partnerId: booking.partnerId || "",
+      payMethod: booking.payMethod,
+      paid: booking.paymentStatus === 'pago',
+      birthDate: booking.birthDate || "",
+      cpf: booking.cpf || "",
       companions: [],
-      items: [{
-        id: selected.id,
-        type: selected.type,
-        itemName: selected.itemName,
-        date: selected.date,
-        guests: selected.guests,
-        unitPrice: selected.unitPrice.toString(),
-        discount: selected.discount.toString(),
-        publicUnitPrice: (selected.publicUnitPrice || 0).toString(),
-        partnerNetPrice: (selected.partnerNetPrice || 0).toString(),
-      }]
+      items: itemsToEdit.map(item => ({
+        id: item.id,
+        type: item.type,
+        itemName: item.itemName,
+        date: item.date,
+        guests: item.guests,
+        unitPrice: item.unitPrice.toString(),
+        discount: item.discount.toString(),
+        publicUnitPrice: (item.publicUnitPrice || 0).toString(),
+        partnerNetPrice: (item.partnerNetPrice || 0).toString(),
+      }))
     });
     
     setIsEditing(true);
     setShowNewForm(true);
   };
+
 
   const addCompanion = () => {
     if (!companionForm.name) {
