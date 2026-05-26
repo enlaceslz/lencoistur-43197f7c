@@ -1083,6 +1083,16 @@ const AdminReservas = () => {
                   </div>
                 </div>
 
+                {/* Dependentes */}
+                <div className="space-y-4">
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
+                    <Users size={14} /> Acompanhantes / Dependentes
+                  </h3>
+                  <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                    <DependentList customerId={selected.customerId || ""} />
+                  </div>
+                </div>
+
                 {/* Resumo Financeiro e Ações */}
                 <div className="grid grid-cols-2 gap-6">
                   <Card className="border-slate-100 bg-slate-50/50 shadow-none">
