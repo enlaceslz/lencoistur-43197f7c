@@ -49,6 +49,7 @@ export type Database = {
       }
       bookings: {
         Row: {
+          birth_date: string | null
           booking_code: string
           collaborator_id: string | null
           created_at: string
@@ -81,6 +82,7 @@ export type Database = {
           voucher_url: string | null
         }
         Insert: {
+          birth_date?: string | null
           booking_code: string
           collaborator_id?: string | null
           created_at?: string
@@ -113,6 +115,7 @@ export type Database = {
           voucher_url?: string | null
         }
         Update: {
+          birth_date?: string | null
           booking_code?: string
           collaborator_id?: string | null
           created_at?: string
