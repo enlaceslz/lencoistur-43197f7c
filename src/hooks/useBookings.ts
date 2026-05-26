@@ -37,7 +37,9 @@ export interface BookingItem {
   partnerId?: string;
   termStatus?: "pendente" | "assinado" | "balcao";
   termPdfUrl?: string;
+  groupId?: string;
 }
+
 
 function generateBookingCode(): string {
   const year = new Date().getFullYear();
@@ -96,8 +98,10 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
     partnerId: row.partner_id || undefined,
     termStatus,
     termPdfUrl: term?.pdf_url || undefined,
+    groupId: row.group_id || undefined,
   };
 }
+
 
 export function useBookings() {
   const [bookings, setBookings] = useState<BookingItem[]>([]);

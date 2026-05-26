@@ -145,6 +145,8 @@ Deno.serve(async (req) => {
 
     const partnerData = partner_id ? await getPartnerData(partner_id) : null;
     const createdBookings = [];
+    const groupId = bookingItems.length > 1 ? crypto.randomUUID() : null;
+
 
     // Resolve or create customer once
     const { data: existingCustomer } = await supabaseAdmin
