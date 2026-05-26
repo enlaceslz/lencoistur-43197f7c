@@ -89,6 +89,7 @@ const AdminReservas = () => {
 
   const [customerSearch, setCustomerSearch] = useState("");
   const [saving, setSaving] = useState(false);
+  const [customerDependents, setCustomerDependents] = useState<any[]>([]);
 
   const [form, setForm] = useState({
     customerId: "",
