@@ -370,35 +370,28 @@ export function useBookings() {
   }, []);
 
   const deleteBooking = useCallback(async (id: string, groupId?: string) => {
-    const deleteQuery = supabase.from("bookings").delete();
-    if (groupId) {
-      deleteQuery.eq("group_id", groupId);
-    } else {
-      deleteQuery.eq("id", id);
-    }
+    let bookingIds = [id];
     
-    const { error: bookingError } = await deleteQuery;
+    if (groupId) {
+      const { data } = await supabase.from("bookings").select("id").eq("group_id", groupId);
+      if (data) bookingIds = data.map(b => b.id);
+    }
+
+    const { error: bookingError } = await supabase
+      .from("bookings")
+      .delete()
+      .in("id", bookingIds);
+    
     if (bookingError) throw bookingError;
 
-    // Limpar registros financeiros
-    const financeQuery = supabase.from("contas_receber").delete();
-    const pagarQuery = supabase.from("contas_pagar").delete();
-    const paymentsQuery = supabase.from("collaborator_payments").delete();
-
-    if (groupId) {
-      // Infelizmente contas_receber etc vinculam pelo booking_id, não group_id
-      // Precisamos buscar os IDs das reservas deletadas se quisermos ser precisos,
-      // ou apenas confiar que o usuário deletou um item por vez se não houver groupId.
-      // Se houver groupId, deletamos todos os registros financeiros que referenciem os itens do grupo.
-      // Mas para simplificar, o sistema atual lida bem com a deleção por booking_id.
-    }
-
+    // Limpar registros financeiros para todos os IDs afetados
     await Promise.all([
-      financeQuery.eq("booking_id", id),
-      pagarQuery.eq("booking_id", id),
-      paymentsQuery.eq("booking_id", id)
+      supabase.from("contas_receber").delete().in("booking_id", bookingIds),
+      supabase.from("contas_pagar").delete().in("booking_id", bookingIds),
+      supabase.from("collaborator_payments").delete().in("booking_id", bookingIds)
     ]);
   }, []);
+
 
 
   const updateBooking = useCallback(async (id: string, customerId: string, data: any) => {
