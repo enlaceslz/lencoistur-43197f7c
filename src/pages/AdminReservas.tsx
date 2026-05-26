@@ -393,43 +393,69 @@ const AdminReservas = () => {
     window.open(whatsappUrl, '_blank');
   };
 
-  const handleItemChange = (itemId: string) => {
-    let item: any;
-    if (form.type === "tour") {
-      item = tours.find(t => t.id === itemId);
-      if (item) {
-        setForm(prev => ({
-          ...prev,
-          itemName: item.name,
-          unitPrice: item.price.toString(),
-          publicUnitPrice: item.private_price?.toString() || item.price.toString(),
-          partnerNetPrice: item.partner_price ? item.partner_price.toString() : "0",
-        }));
+  const handleItemChange = (itemId: string, itemIndex: number) => {
+    let selectedItem: any;
+    const itemInForm = form.items[itemIndex];
+    
+    if (itemInForm.type === "tour") {
+      selectedItem = tours.find(t => t.id === itemId);
+      if (selectedItem) {
+        updateItem(itemInForm.id, "itemName", selectedItem.name);
+        updateItem(itemInForm.id, "unitPrice", selectedItem.price.toString());
+        updateItem(itemInForm.id, "publicUnitPrice", selectedItem.private_price?.toString() || selectedItem.price.toString());
+        updateItem(itemInForm.id, "partnerNetPrice", selectedItem.partner_price ? selectedItem.partner_price.toString() : "0");
       }
-    } else if (form.type === "package") {
-      item = packages.find(p => p.id === itemId);
-      if (item) {
-        setForm(prev => ({
-          ...prev,
-          itemName: item.name,
-          unitPrice: (item.discount_price || item.original_price).toString(),
-          publicUnitPrice: (item.original_price).toString(),
-          partnerNetPrice: item.partner_price ? item.partner_price.toString() : "0",
-        }));
+    } else if (itemInForm.type === "package") {
+      selectedItem = packages.find(p => p.id === itemId);
+      if (selectedItem) {
+        updateItem(itemInForm.id, "itemName", selectedItem.name);
+        updateItem(itemInForm.id, "unitPrice", (selectedItem.discount_price || selectedItem.original_price).toString());
+        updateItem(itemInForm.id, "publicUnitPrice", (selectedItem.original_price).toString());
+        updateItem(itemInForm.id, "partnerNetPrice", selectedItem.partner_price ? selectedItem.partner_price.toString() : "0");
       }
-    } else if (form.type === "transfer") {
-      item = transfers.find(t => t.id === itemId);
-      if (item) {
-        setForm(prev => ({
-          ...prev,
-          itemName: `${item.origin} → ${item.destination}`,
-          unitPrice: item.price.toString(),
-          publicUnitPrice: item.price.toString(),
-          partnerNetPrice: item.partner_price ? item.partner_price.toString() : "0",
-        }));
+    } else if (itemInForm.type === "transfer") {
+      selectedItem = transfers.find(t => t.id === itemId);
+      if (selectedItem) {
+        updateItem(itemInForm.id, "itemName", `${selectedItem.origin} → ${selectedItem.destination}`);
+        updateItem(itemInForm.id, "unitPrice", selectedItem.price.toString());
+        updateItem(itemInForm.id, "publicUnitPrice", selectedItem.price.toString());
+        updateItem(itemInForm.id, "partnerNetPrice", selectedItem.partner_price ? selectedItem.partner_price.toString() : "0");
       }
     }
   };
+
+  const addItem = () => {
+    setForm(prev => ({
+      ...prev,
+      items: [...prev.items, {
+        id: Math.random().toString(36).substr(2, 9),
+        type: "tour",
+        itemName: "",
+        date: "",
+        guests: 1,
+        unitPrice: "0",
+        discount: "0",
+        publicUnitPrice: "0",
+        partnerNetPrice: "0",
+      }]
+    }));
+  };
+
+  const removeItem = (id: string) => {
+    if (form.items.length === 1) return;
+    setForm(prev => ({
+      ...prev,
+      items: prev.items.filter(i => i.id !== id)
+    }));
+  };
+
+  const updateItem = (id: string, field: string, value: any) => {
+    setForm(prev => ({
+      ...prev,
+      items: prev.items.map(i => i.id === id ? { ...i, [field]: value } : i)
+    }));
+  };
+
 
 
   if (loading) return (
