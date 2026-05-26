@@ -217,6 +217,8 @@ export function useBookings() {
           publicUnitPrice: data.publicUnitPrice,
           publicTotal: data.publicTotal,
           partner_net_price: data.partnerNetPrice,
+          items: data.items,
+
         },
       });
 
