@@ -456,122 +456,141 @@ const AdminReservas = () => {
 
   return (
     <AdminLayout title="Gestão de Reservas">
-      <div className="flex flex-col gap-8 pb-10">
-        <div className="bg-white rounded-lg p-8 border border-border shadow-sm">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="space-y-1.5">
-              <h1 className="text-3xl font-black text-slate-900 tracking-tight">Painel de Operações</h1>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/5 border border-primary/10">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                  <span className="text-[10px] font-black text-primary uppercase tracking-widest">{bookings.length} Registros Encontrados</span>
-                </div>
-              </div>
+      <div className="flex flex-col gap-6 pb-10">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-xl border border-border shadow-sm">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold text-slate-900">Reservas</h1>
+            <div className="flex items-center gap-2">
+              <span className="flex h-2 w-2 rounded-full bg-primary" />
+              <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">{bookings.length} Registros Encontrados</span>
             </div>
-            
-            <button 
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+              <Input 
+                placeholder="Buscar reservas..." 
+                value={search} 
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9 h-11 border-slate-200"
+              />
+            </div>
+            <Button 
               onClick={() => setShowNewForm(true)} 
-              className="bg-primary hover:bg-primary/90 text-white px-8 h-14 rounded-lg text-[11px] font-black uppercase tracking-widest shadow-sm transition-none flex items-center gap-3"
+              className="bg-primary hover:bg-primary/90 text-white h-11 px-6 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm transition-all flex items-center gap-2"
             >
               <Plus size={18} /> Nova Reserva
-            </button>
+            </Button>
           </div>
         </div>
 
-        <div className="flex-1 bg-white rounded-lg border border-border flex flex-col overflow-hidden shadow-sm">
-          <div className="overflow-auto flex-1">
+        <div className="bg-white rounded-xl border border-border overflow-hidden shadow-sm">
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader className="bg-slate-50/50">
-                <TableRow>
-                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Cód/Data</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Cliente</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Serviço</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">Valor</TableHead>
-                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Status</TableHead>
-                  <TableHead className="text-right"></TableHead>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="text-xs font-bold uppercase tracking-wider text-slate-500 py-4">Cód/Data</TableHead>
+                  <TableHead className="text-xs font-bold uppercase tracking-wider text-slate-500">Passageiro</TableHead>
+                  <TableHead className="text-xs font-bold uppercase tracking-wider text-slate-500">Serviço / Tipo</TableHead>
+                  <TableHead className="text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Total</TableHead>
+                  <TableHead className="text-xs font-bold uppercase tracking-wider text-slate-500">Status</TableHead>
+                  <TableHead className="text-right pr-6"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtered.map(b => (
-                  <TableRow key={b.id} className={cn(b.groupId && "border-l-4 border-l-primary/20")}>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="text-[11px] font-black text-slate-900">{b.bookingCode}</span>
-                        <span className="text-[10px] text-slate-400">{format(new Date(b.date + 'T12:00'), 'dd/MM/yy')}</span>
+                  <TableRow key={b.id} className={cn("group transition-colors", b.groupId && "bg-primary/[0.01]")}>
+                    <TableCell className="py-4">
+                      <div className="flex items-center gap-3">
+                        {b.groupId && <div className="w-1 h-8 rounded-full bg-primary/40" title="Parte de um grupo" />}
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-slate-900">#{b.bookingCode}</span>
+                          <span className="text-xs text-slate-500 font-medium">{format(new Date(b.date + 'T12:00'), 'dd/MM/yyyy')}</span>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="text-[11px] font-bold text-slate-700 uppercase">{b.customerName}</span>
-                        <span className="text-[10px] text-slate-400">{b.customerPhone}</span>
+                        <span className="text-sm font-semibold text-slate-800 uppercase tracking-tight">{b.customerName}</span>
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                          <Phone size={10} />
+                          <span>{b.customerPhone}</span>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-[9px] h-5 bg-slate-100 border-none capitalize">{b.type}</Badge>
-                        <span className="text-[11px] font-medium text-slate-600">{b.itemName}</span>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-sm font-medium text-slate-700">{b.itemName}</span>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-[10px] px-2 py-0 h-5 bg-white border-slate-200 capitalize font-semibold">{b.type}</Badge>
+                          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{b.guests} PAX</span>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <span className="text-[12px] font-black text-slate-900">{formatCurrency(b.finalTotal)}</span>
+                      <span className="text-sm font-bold text-slate-900">{formatCurrency(b.finalTotal)}</span>
                     </TableCell>
                     <TableCell>
-                      <Badge className={cn("text-[9px] font-bold uppercase py-0.5", statusConfig[b.status]?.className)}>
+                      <Badge className={cn("text-[10px] font-bold uppercase px-2.5 py-0.5 border shadow-none", statusConfig[b.status]?.className)}>
                         {statusConfig[b.status]?.label}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button onClick={() => handleEdit(b)} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary transition-colors">
+                    <TableCell className="text-right pr-6">
+                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button onClick={() => handleEdit(b)} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary hover:bg-primary/5">
                           <Pencil size={14} />
                         </Button>
-                        <Button onClick={() => handleShowDetail(b)} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 transition-colors">
+                        <Button onClick={() => handleShowDetail(b)} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 hover:bg-slate-100">
                           <Eye size={14} />
                         </Button>
-                        <Button onClick={() => window.open(`/voucher?id=${b.id}`, '_blank')} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-emerald-500 transition-colors">
+                        <Button onClick={() => window.open(`/voucher?id=${b.id}`, '_blank')} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50">
                           <Printer size={14} />
                         </Button>
                       </div>
-
                     </TableCell>
                   </TableRow>
                 ))}
+                {filtered.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-48 text-center text-slate-400 font-medium">
+                      Nenhuma reserva encontrada para sua busca.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
-
           </div>
         </div>
       </div>
       
       <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
-        <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto p-0 gap-0 border-none bg-slate-50/50 backdrop-blur-xl">
-          <DialogHeader className="p-8 bg-white border-b sticky top-0 z-10">
-            <div className="flex items-center justify-between">
-              <div>
-                <DialogTitle className="text-2xl font-black text-slate-900 tracking-tight uppercase">
-                  {isEditing ? "Editar Reserva" : "Nova Reserva"}
-                </DialogTitle>
-                <p className="text-slate-500 text-[11px] font-bold uppercase tracking-widest mt-1">
-                  Preencha os detalhes da operação
-                </p>
-              </div>
-              <Badge variant="outline" className="h-8 px-4 bg-primary/5 text-primary border-primary/10 text-[10px] font-black uppercase tracking-widest">
-                CRM v3.0
-              </Badge>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden p-0 gap-0 border-none bg-slate-50 shadow-2xl rounded-2xl">
+          <DialogHeader className="p-6 bg-white border-b sticky top-0 z-10 flex flex-row items-center justify-between space-y-0">
+            <div>
+              <DialogTitle className="text-xl font-bold text-slate-900 tracking-tight">
+                {isEditing ? "Editar Reserva" : "Nova Reserva"}
+              </DialogTitle>
+              <p className="text-slate-500 text-xs font-medium mt-0.5">
+                Gerenciamento de passageiros e serviços
+              </p>
             </div>
+            <Badge variant="outline" className="h-7 px-3 bg-primary/5 text-primary border-primary/10 text-[10px] font-bold uppercase tracking-wider">
+              Sistema v3.2
+            </Badge>
           </DialogHeader>
 
-          <div className="p-8 space-y-8 pb-32">
+          <div className="p-6 space-y-6 overflow-y-auto max-h-[calc(90vh-140px)] scrollbar-thin">
             {/* Seção Cliente */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 text-slate-400">
-                <User size={16} />
-                <h3 className="text-[11px] font-black uppercase tracking-[0.2em]">Dados do Passageiro</h3>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-slate-500">
+                <User size={14} className="text-primary" />
+                <h3 className="text-xs font-bold uppercase tracking-wider">Dados do Passageiro</h3>
               </div>
-              <Card className="border-slate-200/60 shadow-sm overflow-hidden">
-                <CardContent className="p-6 space-y-4 bg-white">
+              <Card className="border-slate-200/60 shadow-none overflow-hidden">
+                <CardContent className="p-5 space-y-4 bg-white">
                   <div className="relative">
-                    <Label className="text-[10px] font-black uppercase text-slate-400 mb-1.5 block">Nome do Cliente</Label>
+                    <Label className="text-[11px] font-bold uppercase text-slate-400 mb-1.5 block">Nome do Cliente</Label>
                     <div className="relative">
                       <Input 
                         placeholder="Buscar ou digitar nome..." 
@@ -580,28 +599,28 @@ const AdminReservas = () => {
                           setForm({...form, customerName: e.target.value});
                           searchCustomers(e.target.value);
                         }}
-                        className="h-12 border-slate-200 focus:ring-primary/20 transition-all pl-10"
+                        className="h-11 border-slate-200 focus:ring-primary/20 transition-all pl-10"
                       />
-                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
                     </div>
                     {customerSearch && customers.length > 0 && (
-                      <div className="absolute z-20 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                      <div className="absolute z-20 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                         {customers.map(c => (
                           <button
                             key={c.id}
-                            className="w-full px-5 py-4 text-left hover:bg-slate-50 flex items-center justify-between transition-colors border-b border-slate-50 last:border-0"
+                            className="w-full px-4 py-3 text-left hover:bg-slate-50 flex items-center justify-between transition-colors border-b border-slate-50 last:border-0"
                             onClick={() => handleSelectCustomer(c)}
                           >
-                            <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center text-primary font-black text-xs uppercase">
-                                {c.name.slice(0, 2)}
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                                {c.name.slice(0, 2).toUpperCase()}
                               </div>
                               <div>
-                                <p className="text-[11px] font-black text-slate-900 uppercase tracking-tight">{c.name}</p>
+                                <p className="text-xs font-bold text-slate-900 uppercase tracking-tight">{c.name}</p>
                                 <p className="text-[10px] text-slate-400 font-medium">{c.email || 'Sem e-mail'}</p>
                               </div>
                             </div>
-                            <Badge variant="outline" className="text-[8px] font-black uppercase">Selecionar</Badge>
+                            <Badge variant="outline" className="text-[9px] font-bold uppercase py-0 px-2 h-5">Selecionar</Badge>
                           </button>
                         ))}
                       </div>
