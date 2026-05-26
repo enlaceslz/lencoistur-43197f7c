@@ -1054,7 +1054,7 @@ const AdminReservas = () => {
                   
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Serviço / Item</Label>
-                    <Select onValueChange={handleItemChange}>
+                    <Select onValueChange={(val) => handleItemChange(val, 0)}>
                       <SelectTrigger className="rounded-xl h-12 font-semibold border-slate-200">
                         <SelectValue placeholder="Selecione um serviço cadastrado..." />
                       </SelectTrigger>
