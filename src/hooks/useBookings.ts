@@ -85,7 +85,7 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
     pixCode: row.pix_code || undefined,
     notes: row.notes || undefined,
     customerId: row.customer_id,
-    cpf: customer?.cpf || undefined,
+    cpf: row.cpf || customer?.cpf || undefined,
     passport: customer?.passport || undefined,
     country: customer?.country || undefined,
     birthDate: row.birth_date || customer?.birth_date || undefined,
@@ -390,6 +390,7 @@ export function useBookings() {
         collaborator_id: data.collaboratorId || null,
         partner_id: data.partnerId || null,
         birth_date: data.birthDate || null,
+        cpf: data.cpf || null,
       })
       .eq("id", id);
       
