@@ -322,19 +322,10 @@ const AdminReservas = () => {
       };
 
       if (isEditing && selected) {
-        await updateBooking(selected.id, selected.customerId || "", {
-          ...payload,
-          type: payload.items[0].type,
-          itemName: payload.items[0].itemName,
-          date: payload.items[0].date,
-          guests: payload.items[0].guests,
-          unitPrice: payload.items[0].unitPrice,
-          discount: payload.items[0].discount,
-          publicUnitPrice: payload.items[0].publicUnitPrice,
-          partnerNetPrice: payload.items[0].partnerNetPrice,
-        });
+        await updateBooking(selected.id, selected.customerId || "", payload);
         toast({ title: "Sucesso", description: "Reserva atualizada com sucesso!" });
       } else {
+
         await addBooking(payload as any);
         toast({ title: "Sucesso", description: "Reserva(s) criada(s) com sucesso!" });
       }
@@ -373,38 +364,44 @@ const AdminReservas = () => {
     }
   };
 
-  const handleEdit = () => {
-    if (!selected) return;
+  const handleEdit = (booking: BookingItem) => {
+    setSelected(booking);
+    
+    let itemsToEdit = [booking];
+    if (booking.groupId) {
+      itemsToEdit = bookings.filter(b => b.groupId === booking.groupId);
+    }
     
     setForm({
-      customerId: selected.customerId || "",
-      customerName: selected.customerName,
-      customerEmail: selected.customerEmail,
-      customerPhone: selected.customerPhone,
-      notes: selected.notes || "",
-      collaboratorId: selected.collaboratorId || "",
-      partnerId: selected.partnerId || "",
-      payMethod: selected.payMethod,
-      paid: selected.paymentStatus === 'pago',
-      birthDate: selected.birthDate || "",
-      cpf: selected.cpf || "",
+      customerId: booking.customerId || "",
+      customerName: booking.customerName,
+      customerEmail: booking.customerEmail,
+      customerPhone: booking.customerPhone,
+      notes: booking.notes || "",
+      collaboratorId: booking.collaboratorId || "",
+      partnerId: booking.partnerId || "",
+      payMethod: booking.payMethod,
+      paid: booking.paymentStatus === 'pago',
+      birthDate: booking.birthDate || "",
+      cpf: booking.cpf || "",
       companions: [],
-      items: [{
-        id: selected.id,
-        type: selected.type,
-        itemName: selected.itemName,
-        date: selected.date,
-        guests: selected.guests,
-        unitPrice: selected.unitPrice.toString(),
-        discount: selected.discount.toString(),
-        publicUnitPrice: (selected.publicUnitPrice || 0).toString(),
-        partnerNetPrice: (selected.partnerNetPrice || 0).toString(),
-      }]
+      items: itemsToEdit.map(item => ({
+        id: item.id,
+        type: item.type,
+        itemName: item.itemName,
+        date: item.date,
+        guests: item.guests,
+        unitPrice: item.unitPrice.toString(),
+        discount: item.discount.toString(),
+        publicUnitPrice: (item.publicUnitPrice || 0).toString(),
+        partnerNetPrice: (item.partnerNetPrice || 0).toString(),
+      }))
     });
     
     setIsEditing(true);
     setShowNewForm(true);
   };
+
 
   const addCompanion = () => {
     if (!companionForm.name) {
@@ -478,56 +475,417 @@ const AdminReservas = () => {
             <Table>
               <TableHeader className="bg-slate-50/50">
                 <TableRow>
-                  <TableHead>Reserva</TableHead>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Valor</TableHead>
-                  <TableHead></TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Cód/Data</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Cliente</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Serviço</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">Valor</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Status</TableHead>
+                  <TableHead className="text-right"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtered.map(b => (
-                  <TableRow key={b.id}>
-                    <TableCell>{b.itemName}</TableCell>
-                    <TableCell>{b.customerName}</TableCell>
-                    <TableCell>{formatCurrency(b.finalTotal)}</TableCell>
+                  <TableRow key={b.id} className={cn(b.groupId && "border-l-4 border-l-primary/20")}>
                     <TableCell>
-                      <Button onClick={() => { setSelected(b); handleEdit(); }} variant="ghost" size="icon"><Pencil size={16} /></Button>
+                      <div className="flex flex-col">
+                        <span className="text-[11px] font-black text-slate-900">{b.bookingCode}</span>
+                        <span className="text-[10px] text-slate-400">{format(new Date(b.date + 'T12:00'), 'dd/MM/yy')}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="text-[11px] font-bold text-slate-700 uppercase">{b.customerName}</span>
+                        <span className="text-[10px] text-slate-400">{b.customerPhone}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-[9px] h-5 bg-slate-100 border-none capitalize">{b.type}</Badge>
+                        <span className="text-[11px] font-medium text-slate-600">{b.itemName}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className="text-[12px] font-black text-slate-900">{formatCurrency(b.finalTotal)}</span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={cn("text-[9px] font-bold uppercase py-0.5", statusConfig[b.status]?.className)}>
+                        {statusConfig[b.status]?.label}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button onClick={() => handleEdit(b)} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary transition-colors">
+                          <Pencil size={14} />
+                        </Button>
+                        <Button onClick={() => { setSelected(b); }} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 transition-colors">
+                          <Eye size={14} />
+                        </Button>
+                        <Button onClick={() => window.open(`/voucher?id=${b.id}`, '_blank')} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-emerald-500 transition-colors">
+                          <Printer size={14} />
+                        </Button>
+                      </div>
+
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+
           </div>
         </div>
       </div>
       
       <Dialog open={showNewForm} onOpenChange={setShowNewForm}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
-          <DialogHeader><DialogTitle>Nova Reserva</DialogTitle></DialogHeader>
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <Input placeholder="Nome" value={form.customerName} onChange={e => setForm({...form, customerName: e.target.value})} />
-              <Input placeholder="Email" value={form.customerEmail} onChange={e => setForm({...form, customerEmail: e.target.value})} />
-            </div>
-            {form.items.map((item, idx) => (
-              <div key={item.id} className="p-4 border rounded-lg space-y-2">
-                 <Select value={item.type} onValueChange={(v: any) => updateItem(item.id, "type", v)}>
-                   <SelectTrigger><SelectValue /></SelectTrigger>
-                   <SelectContent>
-                     <SelectItem value="tour">Tour</SelectItem>
-                     <SelectItem value="transfer">Translado</SelectItem>
-                     <SelectItem value="package">Pacote</SelectItem>
-                   </SelectContent>
-                 </Select>
-                 <Input placeholder="Serviço" value={item.itemName} onChange={e => updateItem(item.id, "itemName", e.target.value)} />
-                 <Input type="date" value={item.date} onChange={e => updateItem(item.id, "date", e.target.value)} />
+        <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto p-0 gap-0 border-none bg-slate-50/50 backdrop-blur-xl">
+          <DialogHeader className="p-8 bg-white border-b sticky top-0 z-10">
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle className="text-2xl font-black text-slate-900 tracking-tight uppercase">
+                  {isEditing ? "Editar Reserva" : "Nova Reserva"}
+                </DialogTitle>
+                <p className="text-slate-500 text-[11px] font-bold uppercase tracking-widest mt-1">
+                  Preencha os detalhes da operação
+                </p>
               </div>
-            ))}
-            <Button onClick={addItem}>Adicionar Item</Button>
-            <Button onClick={handleSave}>Salvar</Button>
+              <Badge variant="outline" className="h-8 px-4 bg-primary/5 text-primary border-primary/10 text-[10px] font-black uppercase tracking-widest">
+                CRM v3.0
+              </Badge>
+            </div>
+          </DialogHeader>
+
+          <div className="p-8 space-y-8 pb-32">
+            {/* Seção Cliente */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-slate-400">
+                <User size={16} />
+                <h3 className="text-[11px] font-black uppercase tracking-[0.2em]">Dados do Passageiro</h3>
+              </div>
+              <Card className="border-slate-200/60 shadow-sm overflow-hidden">
+                <CardContent className="p-6 space-y-4 bg-white">
+                  <div className="relative">
+                    <Label className="text-[10px] font-black uppercase text-slate-400 mb-1.5 block">Nome do Cliente</Label>
+                    <div className="relative">
+                      <Input 
+                        placeholder="Buscar ou digitar nome..." 
+                        value={form.customerName} 
+                        onChange={e => {
+                          setForm({...form, customerName: e.target.value});
+                          searchCustomers(e.target.value);
+                        }}
+                        className="h-12 border-slate-200 focus:ring-primary/20 transition-all pl-10"
+                      />
+                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                    </div>
+                    {customerSearch && customers.length > 0 && (
+                      <div className="absolute z-20 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        {customers.map(c => (
+                          <button
+                            key={c.id}
+                            className="w-full px-5 py-4 text-left hover:bg-slate-50 flex items-center justify-between transition-colors border-b border-slate-50 last:border-0"
+                            onClick={() => handleSelectCustomer(c)}
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center text-primary font-black text-xs uppercase">
+                                {c.name.slice(0, 2)}
+                              </div>
+                              <div>
+                                <p className="text-[11px] font-black text-slate-900 uppercase tracking-tight">{c.name}</p>
+                                <p className="text-[10px] text-slate-400 font-medium">{c.email || 'Sem e-mail'}</p>
+                              </div>
+                            </div>
+                            <Badge variant="outline" className="text-[8px] font-black uppercase">Selecionar</Badge>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="space-y-1.5">
+                      <Label className="text-[10px] font-black uppercase text-slate-400">E-mail</Label>
+                      <Input 
+                        placeholder="email@exemplo.com" 
+                        value={form.customerEmail} 
+                        onChange={e => setForm({...form, customerEmail: e.target.value})}
+                        className="h-11 bg-slate-50/50"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[10px] font-black uppercase text-slate-400">WhatsApp</Label>
+                      <Input 
+                        placeholder="(00) 00000-0000" 
+                        value={form.customerPhone} 
+                        onChange={e => setForm({...form, customerPhone: maskPhone(e.target.value)})}
+                        className="h-11 bg-slate-50/50"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[10px] font-black uppercase text-slate-400">CPF</Label>
+                      <Input 
+                        placeholder="000.000.000-00" 
+                        value={form.cpf} 
+                        onChange={e => setForm({...form, cpf: e.target.value})}
+                        className="h-11 bg-slate-50/50"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[10px] font-black uppercase text-slate-400">Nascimento</Label>
+                      <Input 
+                        type="date"
+                        value={form.birthDate} 
+                        onChange={e => setForm({...form, birthDate: e.target.value})}
+                        className="h-11 bg-slate-50/50"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Seção Itinerário */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <MapPin size={16} />
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.2em]">Itinerário / Serviços</h3>
+                </div>
+                <Button 
+                  onClick={addItem} 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-8 border-primary/20 text-primary hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest"
+                >
+                  <Plus size={14} className="mr-1" /> Adicionar Parada
+                </Button>
+              </div>
+
+              <div className="space-y-3">
+                {form.items.map((item, idx) => (
+                  <Card key={item.id} className="border-slate-200/60 shadow-sm relative overflow-visible group">
+                    <CardContent className="p-6 bg-white">
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                        <div className="md:col-span-2 space-y-1.5">
+                          <Label className="text-[10px] font-black uppercase text-slate-400">Tipo</Label>
+                          <Select value={item.type} onValueChange={(v: any) => updateItem(item.id, "type", v)}>
+                            <SelectTrigger className="h-11">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="tour">Passeio</SelectItem>
+                              <SelectItem value="transfer">Translado</SelectItem>
+                              <SelectItem value="package">Pacote</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="md:col-span-4 space-y-1.5">
+                          <Label className="text-[10px] font-black uppercase text-slate-400">Serviço</Label>
+                          <Select 
+                            value={item.itemName} 
+                            onValueChange={(v) => handleItemChange(v, idx)}
+                          >
+                            <SelectTrigger className="h-11">
+                              <SelectValue placeholder="Selecione o serviço..." />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-[300px]">
+                              {item.type === "tour" && tours.map(t => (
+                                <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
+                              ))}
+                              {item.type === "package" && packages.map(p => (
+                                <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>
+                              ))}
+                              {item.type === "transfer" && transfers.map(t => (
+                                <SelectItem key={t.id} value={`${t.origin} → ${t.destination}`}>{t.origin} → {t.destination}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="md:col-span-2 space-y-1.5">
+                          <Label className="text-[10px] font-black uppercase text-slate-400">Data</Label>
+                          <div className="relative">
+                            <Input 
+                              type="date" 
+                              value={item.date} 
+                              onChange={e => updateItem(item.id, "date", e.target.value)}
+                              className="h-11 pl-9"
+                            />
+                            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
+                          </div>
+                        </div>
+
+                        <div className="md:col-span-1 space-y-1.5">
+                          <Label className="text-[10px] font-black uppercase text-slate-400">Qtd</Label>
+                          <Input 
+                            type="number" 
+                            min="1" 
+                            value={item.guests} 
+                            onChange={e => updateItem(item.id, "guests", Number(e.target.value))}
+                            className="h-11"
+                          />
+                        </div>
+
+                        <div className="md:col-span-2 space-y-1.5">
+                          <Label className="text-[10px] font-black uppercase text-slate-400">Valor Unit.</Label>
+                          <Input 
+                            value={item.unitPrice} 
+                            onChange={e => updateItem(item.id, "unitPrice", maskCurrency(e.target.value))}
+                            className="h-11 font-bold text-slate-900"
+                          />
+                        </div>
+
+                        <div className="md:col-span-1 flex justify-end pb-1.5">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => removeItem(item.id)}
+                            className="text-slate-300 hover:text-rose-500 transition-colors"
+                            disabled={form.items.length === 1}
+                          >
+                            <Trash2 size={18} />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Seção Operacional e Financeira */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Briefcase size={16} />
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.2em]">Operacional</h3>
+                </div>
+                <Card className="border-slate-200/60 shadow-sm">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label className="text-[10px] font-black uppercase text-slate-400">Colaborador (Venda)</Label>
+                        <Select value={form.collaboratorId} onValueChange={v => setForm({...form, collaboratorId: v})}>
+                          <SelectTrigger className="h-11">
+                            <SelectValue placeholder="Selecione..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Nenhum</SelectItem>
+                            {collaborators.map(c => (
+                              <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-[10px] font-black uppercase text-slate-400">Parceiro (Origem)</Label>
+                        <Select value={form.partnerId} onValueChange={v => setForm({...form, partnerId: v})}>
+                          <SelectTrigger className="h-11">
+                            <SelectValue placeholder="Selecione..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">Venda Direta</SelectItem>
+                            {partners.map(p => (
+                              <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[10px] font-black uppercase text-slate-400">Observações Internas</Label>
+                      <Textarea 
+                        placeholder="Informações adicionais para a operação..." 
+                        value={form.notes} 
+                        onChange={e => setForm({...form, notes: e.target.value})}
+                        className="min-h-[100px] resize-none border-slate-200 bg-slate-50/30"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <CreditCard size={16} />
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.2em]">Financeiro</h3>
+                </div>
+                <Card className="border-slate-200/60 shadow-sm bg-primary/[0.02]">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label className="text-[10px] font-black uppercase text-slate-400">Forma de Pagto</Label>
+                        <Select value={form.payMethod} onValueChange={(v: any) => setForm({...form, payMethod: v})}>
+                          <SelectTrigger className="h-11">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pix">PIX</SelectItem>
+                            <SelectItem value="card">Cartão</SelectItem>
+                            <SelectItem value="info">Informações</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-[10px] font-black uppercase text-slate-400">Status Inicial</Label>
+                        <div className="flex items-center h-11 px-4 bg-white border border-slate-200 rounded-lg">
+                          <label className="flex items-center gap-2 cursor-pointer w-full">
+                            <input 
+                              type="checkbox" 
+                              checked={form.paid} 
+                              onChange={e => setForm({...form, paid: e.target.checked})}
+                              className="w-4 h-4 rounded text-primary focus:ring-primary border-slate-300"
+                            />
+                            <span className="text-[11px] font-bold text-slate-700 uppercase">Já está pago</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator className="bg-slate-200/60" />
+
+                    <div className="space-y-3 pt-2">
+                      <div className="flex justify-between text-[11px] text-slate-500 uppercase font-bold tracking-wider">
+                        <span>Subtotal ({form.items.length} itens)</span>
+                        <span>{formatCurrency(form.items.reduce((acc, item) => {
+                          const isPrivate = item.itemName.includes("(Privativo)");
+                          return acc + (isPrivate ? parseCurrencyToNumber(item.unitPrice) : parseCurrencyToNumber(item.unitPrice) * item.guests);
+                        }, 0))}</span>
+                      </div>
+                      <div className="flex justify-between text-xl font-black text-primary tracking-tight">
+                        <span className="uppercase text-xs self-center">Valor Final</span>
+                        <span>{formatCurrency(form.items.reduce((acc, item) => {
+                          const isPrivate = item.itemName.includes("(Privativo)");
+                          const total = isPrivate ? parseCurrencyToNumber(item.unitPrice) : parseCurrencyToNumber(item.unitPrice) * item.guests;
+                          return acc + total - parseCurrencyToNumber(item.discount || "0");
+                        }, 0))}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </div>
+
+          <DialogFooter className="p-8 bg-white border-t sticky bottom-0 z-10 flex flex-row items-center justify-between gap-4">
+            <Button 
+              variant="ghost" 
+              onClick={() => setShowNewForm(false)}
+              className="px-8 h-12 text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors"
+            >
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleSave} 
+              disabled={saving}
+              className="px-12 h-12 bg-primary hover:bg-primary/90 text-white text-[11px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all flex items-center gap-3"
+            >
+              {saving ? <Loader2 className="animate-spin" size={18} /> : (isEditing ? <CheckCircle size={18} /> : <Plus size={18} />)}
+              {isEditing ? "Atualizar Reserva" : "Confirmar Reserva"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
+
     </AdminLayout>
   );
 };

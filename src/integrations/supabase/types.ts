@@ -58,6 +58,7 @@ export type Database = {
           date: string | null
           discount: number
           final_total: number
+          group_id: string | null
           guests: number
           id: string
           invoice_issued: boolean | null
@@ -92,6 +93,7 @@ export type Database = {
           date?: string | null
           discount?: number
           final_total: number
+          group_id?: string | null
           guests?: number
           id?: string
           invoice_issued?: boolean | null
@@ -126,6 +128,7 @@ export type Database = {
           date?: string | null
           discount?: number
           final_total?: number
+          group_id?: string | null
           guests?: number
           id?: string
           invoice_issued?: boolean | null
@@ -3164,14 +3167,20 @@ export type Database = {
           customer_email: string
           customer_name: string
           date: string
+          discount: number
           final_total: number
+          group_id: string
           guests: number
           id: string
           item_name: string
           pay_method: string
           payment_status: string
+          public_total: number
+          public_unit_price: number
           status: string
+          total: number
           type: string
+          unit_price: number
         }[]
       }
       get_public_company_info: {

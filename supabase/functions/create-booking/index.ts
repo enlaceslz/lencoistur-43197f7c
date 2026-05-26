@@ -145,6 +145,8 @@ Deno.serve(async (req) => {
 
     const partnerData = partner_id ? await getPartnerData(partner_id) : null;
     const createdBookings = [];
+    const groupId = bookingItems.length > 1 ? crypto.randomUUID() : null;
+
 
     // Resolve or create customer once
     const { data: existingCustomer } = await supabaseAdmin
@@ -284,7 +286,9 @@ Deno.serve(async (req) => {
           partner_id: partner_id || null,
           birth_date: birthDate || null,
           cpf: cpf || null,
+          group_id: groupId,
         })
+
         .select("*, customers!customer_id(*)")
         .single();
 

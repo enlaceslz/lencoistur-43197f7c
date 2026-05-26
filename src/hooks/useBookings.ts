@@ -37,7 +37,9 @@ export interface BookingItem {
   partnerId?: string;
   termStatus?: "pendente" | "assinado" | "balcao";
   termPdfUrl?: string;
+  groupId?: string;
 }
+
 
 function generateBookingCode(): string {
   const year = new Date().getFullYear();
@@ -96,8 +98,10 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
     partnerId: row.partner_id || undefined,
     termStatus,
     termPdfUrl: term?.pdf_url || undefined,
+    groupId: row.group_id || undefined,
   };
 }
+
 
 export function useBookings() {
   const [bookings, setBookings] = useState<BookingItem[]>([]);
@@ -387,30 +391,42 @@ export function useBookings() {
     
     if (customerError) throw customerError;
 
-    const { error: bookingError } = await supabase
-      .from("bookings")
-      .update({
-        type: data.type,
-        item_name: data.itemName,
-        date: data.date,
-        guests: data.guests,
-        pay_method: data.payMethod,
-        unit_price: data.unitPrice,
-        total: data.total,
-        discount: data.discount,
-        final_total: data.finalTotal,
-        public_unit_price: data.publicUnitPrice || null,
-        public_total: data.publicTotal || null,
-        partner_net_price: data.partnerNetPrice || null,
-        notes: data.notes,
-        collaborator_id: data.collaboratorId || null,
-        partner_id: data.partnerId || null,
-        birth_date: data.birthDate || null,
-        cpf: data.cpf || null,
-      })
-      .eq("id", id);
-      
-    if (bookingError) throw bookingError;
+    // Se houver múltiplos itens no payload, atualizamos cada um
+    if (data.items && Array.isArray(data.items)) {
+      for (const item of data.items) {
+        if (item.id && !item.id.toString().includes('.')) { 
+          const isPrivate = item.itemName.includes("(Privativo)");
+          const total = isPrivate ? Number(item.unitPrice) : Number(item.unitPrice) * Number(item.guests);
+          const finalTotal = total - Number(item.discount);
+          const publicTotal = isPrivate ? Number(item.publicUnitPrice) : Number(item.publicUnitPrice) * Number(item.guests);
+
+          const { error: bookingError } = await supabase
+            .from("bookings")
+            .update({
+              type: item.type,
+              item_name: item.itemName,
+              date: item.date,
+              guests: Number(item.guests),
+              pay_method: data.payMethod,
+              unit_price: Number(item.unitPrice),
+              total,
+              discount: Number(item.discount),
+              final_total: finalTotal,
+              public_unit_price: Number(item.publicUnitPrice) || null,
+              public_total: publicTotal || null,
+              partner_net_price: Number(item.partnerNetPrice) || null,
+              notes: data.notes,
+              collaborator_id: data.collaboratorId === "none" ? null : data.collaboratorId || null,
+              partner_id: data.partnerId === "none" ? null : data.partnerId || null,
+              birth_date: data.birthDate || null,
+              cpf: data.cpf || null,
+            })
+            .eq("id", item.id);
+            
+          if (bookingError) throw bookingError;
+        }
+      }
+    }
 
     if (data.companions && data.companions.length > 0) {
       const deps = data.companions.map((c: any) => ({
@@ -423,8 +439,8 @@ export function useBookings() {
       const { error: depError } = await supabase.from("dependents").insert(deps);
       if (depError) console.error("Erro ao adicionar dependentes no update:", depError);
     }
-
   }, []);
+
 
   const markTermAsSignedAtCounter = useCallback(async (bookingId: string) => {
     // Buscar dados da reserva para criar o registro no termo
