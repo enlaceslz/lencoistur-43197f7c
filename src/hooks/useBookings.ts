@@ -389,6 +389,7 @@ export function useBookings() {
         notes: data.notes,
         collaborator_id: data.collaboratorId || null,
         partner_id: data.partnerId || null,
+        birth_date: data.birthDate || null,
       })
       .eq("id", id);
       
