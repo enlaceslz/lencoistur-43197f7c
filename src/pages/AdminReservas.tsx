@@ -215,64 +215,77 @@ const AdminReservas = () => {
   };
 
   const handleSave = async () => {
-    if (!form.customerName || !form.itemName || !form.date) {
-      toast({ title: "Atenção", description: "Preencha os campos obrigatórios", variant: "destructive" });
+    if (!form.customerName || form.items.some(i => !i.itemName || !i.date)) {
+      toast({ title: "Atenção", description: "Preencha o nome do cliente e todos os passeios/datas", variant: "destructive" });
       return;
     }
 
     setSaving(true);
     try {
-      // Validar Duplicidade (apenas para novas reservas)
+      // Validar Duplicidade (simplificado para múltiplos itens)
       if (!isEditing) {
-        const isDuplicate = bookings.some(b => 
-          (b.customerId === form.customerId || b.customerName.toLowerCase() === form.customerName.toLowerCase()) && 
-          b.date === form.date && 
-          b.itemName.toLowerCase() === form.itemName.toLowerCase() &&
-          b.status !== 'cancelada'
-        );
+        for (const item of form.items) {
+          const isDuplicate = bookings.some(b => 
+            (b.customerId === form.customerId || b.customerName.toLowerCase() === form.customerName.toLowerCase()) && 
+            b.date === item.date && 
+            b.itemName.toLowerCase() === item.itemName.toLowerCase() &&
+            b.status !== 'cancelada'
+          );
 
-        if (isDuplicate) {
-          toast({ 
-            title: "Reserva Duplicada", 
-            description: "Atenção: Este cliente já possui uma reserva para este passeio nesta data.", 
-            variant: "destructive" 
-          });
-          setSaving(false);
-          return;
+          if (isDuplicate) {
+            toast({ 
+              title: "Reserva Duplicada", 
+              description: `Atenção: O cliente já possui uma reserva para ${item.itemName} em ${item.date}.`, 
+              variant: "destructive" 
+            });
+            setSaving(false);
+            return;
+          }
         }
       }
 
-      const unitPriceNum = parseCurrencyToNumber(form.unitPrice);
-      const discountNum = parseCurrencyToNumber(form.discount);
-      const publicUnitPriceNum = parseCurrencyToNumber(form.publicUnitPrice);
-      const partnerNetPriceNum = parseCurrencyToNumber(form.partnerNetPrice);
-      
-      const total = (unitPriceNum * form.guests);
-      const publicTotal = (publicUnitPriceNum * form.guests);
-      const partnerTotal = (partnerNetPriceNum * form.guests);
-      const finalTotal = total - discountNum;
+      // Preparar itens para o payload
+      const processedItems = form.items.map(item => {
+        const unitPriceNum = parseCurrencyToNumber(item.unitPrice);
+        const discountNum = parseCurrencyToNumber(item.discount);
+        const publicUnitPriceNum = parseCurrencyToNumber(item.publicUnitPrice);
+        const partnerNetPriceNum = parseCurrencyToNumber(item.partnerNetPrice);
+        
+        return {
+          ...item,
+          unitPrice: unitPriceNum,
+          discount: discountNum,
+          publicUnitPrice: publicUnitPriceNum,
+          partnerNetPrice: partnerNetPriceNum,
+        };
+      });
 
       const payload = {
         ...form,
+        // Mandar o primeiro item como "default" para compatibilidade com o hook se necessário
+        type: form.items[0].type,
+        itemName: form.items[0].itemName,
+        date: form.items[0].date,
+        guests: form.items[0].guests,
+        unitPrice: parseCurrencyToNumber(form.items[0].unitPrice),
+        discount: parseCurrencyToNumber(form.items[0].discount),
+        publicUnitPrice: parseCurrencyToNumber(form.items[0].publicUnitPrice),
+        partnerNetPrice: parseCurrencyToNumber(form.items[0].partnerNetPrice),
+        
         isPaid: form.paid,
-        companions: form.companions,
-        unitPrice: unitPriceNum,
-        total,
-        discount: discountNum,
-        finalTotal,
-        publicUnitPrice: publicUnitPriceNum,
-        publicTotal,
-        partnerNetPrice: partnerNetPriceNum,
+        items: processedItems,
         collaboratorId: form.collaboratorId === "none" ? undefined : form.collaboratorId || undefined,
         partnerId: form.partnerId === "none" ? undefined : form.partnerId || undefined,
       };
 
       if (isEditing && selected) {
+        // No caso de edição, simplificamos para editar apenas a reserva selecionada por enquanto
+        // ou poderíamos expandir para editar múltiplas se necessário.
         await updateBooking(selected.id, selected.customerId || "", payload);
         toast({ title: "Sucesso", description: "Reserva atualizada com sucesso!" });
       } else {
-        await addBooking(payload);
-        toast({ title: "Sucesso", description: "Reserva criada com sucesso!" });
+        await addBooking(payload as any);
+        toast({ title: "Sucesso", description: "Reserva(s) criada(s) com sucesso!" });
       }
 
       setShowNewForm(false);
@@ -282,22 +295,25 @@ const AdminReservas = () => {
         customerName: "",
         customerEmail: "",
         customerPhone: "",
-        type: "tour",
-        itemName: "",
-        date: "",
-        guests: 1,
-        payMethod: "pix",
-        unitPrice: "0",
-        discount: "0",
-        publicUnitPrice: "0",
         notes: "",
         collaboratorId: "",
         partnerId: "",
-        partnerNetPrice: "0",
+        payMethod: "pix",
         paid: false,
         birthDate: "",
         cpf: "",
         companions: [],
+        items: [{
+          id: Math.random().toString(36).substr(2, 9),
+          type: "tour",
+          itemName: "",
+          date: "",
+          guests: 1,
+          unitPrice: "0",
+          discount: "0",
+          publicUnitPrice: "0",
+          partnerNetPrice: "0",
+        }]
       });
     } catch (error: any) {
       toast({ title: "Erro", description: error.message || "Erro ao salvar reserva", variant: "destructive" });
@@ -314,27 +330,31 @@ const AdminReservas = () => {
       customerName: selected.customerName,
       customerEmail: selected.customerEmail,
       customerPhone: selected.customerPhone,
-      type: selected.type,
-      itemName: selected.itemName,
-      date: selected.date,
-      guests: selected.guests,
-      payMethod: selected.payMethod,
-      unitPrice: selected.unitPrice.toString(),
-      discount: selected.discount.toString(),
-      publicUnitPrice: (selected.publicUnitPrice || 0).toString(),
-      partnerNetPrice: (selected.partnerNetPrice || 0).toString(),
       notes: selected.notes || "",
       collaboratorId: selected.collaboratorId || "",
       partnerId: selected.partnerId || "",
+      payMethod: selected.payMethod,
       paid: selected.paymentStatus === 'pago',
       birthDate: selected.birthDate || "",
       cpf: selected.cpf || "",
       companions: [],
+      items: [{
+        id: selected.id,
+        type: selected.type,
+        itemName: selected.itemName,
+        date: selected.date,
+        guests: selected.guests,
+        unitPrice: selected.unitPrice.toString(),
+        discount: selected.discount.toString(),
+        publicUnitPrice: (selected.publicUnitPrice || 0).toString(),
+        partnerNetPrice: (selected.partnerNetPrice || 0).toString(),
+      }]
     });
     
     setIsEditing(true);
     setShowNewForm(true);
   };
+
 
   const addCompanion = () => {
     if (!companionForm.name) {
