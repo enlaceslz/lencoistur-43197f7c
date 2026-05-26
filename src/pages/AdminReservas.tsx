@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { maskPhone, maskCurrency, parseCurrencyToNumber } from "@/lib/masks";
+import { maskPhone, maskCurrency, parseCurrencyToNumber, maskDate } from "@/lib/masks";
 import { Separator } from "@/components/ui/separator";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
@@ -106,6 +106,7 @@ const AdminReservas = () => {
     partnerId: "",
     partnerNetPrice: "0",
     paid: false,
+    birthDate: "",
     companions: [] as { name: string; cpf?: string; birthDate?: string; relationship?: string }[],
   });
 
@@ -166,6 +167,7 @@ const AdminReservas = () => {
       customerName: customer.name,
       customerEmail: customer.email || "",
       customerPhone: customer.phone || "",
+      birthDate: customer.birth_date || "",
     }));
     setCustomerSearch("");
   };
@@ -286,6 +288,7 @@ const AdminReservas = () => {
         partnerId: "",
         partnerNetPrice: "0",
         paid: false,
+        birthDate: "",
         companions: [],
       });
     } catch (error: any) {
@@ -316,6 +319,7 @@ const AdminReservas = () => {
       collaboratorId: selected.collaboratorId || "",
       partnerId: selected.partnerId || "",
       paid: selected.paymentStatus === 'pago',
+      birthDate: selected.birthDate || "",
       companions: [],
     });
     
@@ -925,6 +929,15 @@ const AdminReservas = () => {
                         className="rounded-xl h-12 font-semibold border-slate-200"
                       />
                     </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data de Nascimento</Label>
+                    <Input 
+                      type="date" 
+                      value={form.birthDate} 
+                      onChange={e => setForm({...form, birthDate: e.target.value})}
+                      className="rounded-xl h-12 font-semibold border-slate-200"
+                    />
                   </div>
                 </div>
               </div>
