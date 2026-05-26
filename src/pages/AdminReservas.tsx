@@ -1059,16 +1059,17 @@ const AdminReservas = () => {
                         <SelectValue placeholder="Selecione um serviço cadastrado..." />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border-slate-200">
-                        {form.type === "tour" && tours.map(t => (
+                        {form.items[0].type === "tour" && tours.map(t => (
                           <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
                         ))}
-                        {form.type === "package" && packages.map(p => (
+                        {form.items[0].type === "package" && packages.map(p => (
                           <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
                         ))}
-                        {form.type === "transfer" && transfers.map(t => (
+                        {form.items[0].type === "transfer" && transfers.map(t => (
                           <SelectItem key={t.id} value={t.id}>{`${t.origin} → ${t.destination}`}</SelectItem>
                         ))}
                       </SelectContent>
+
                     </Select>
 
                     <Input 
