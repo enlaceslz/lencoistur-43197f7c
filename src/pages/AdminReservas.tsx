@@ -1044,11 +1044,12 @@ const AdminReservas = () => {
                       <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data da Operação</Label>
                       <Input 
                         type="date" 
-                        value={form.date} 
-                        onChange={e => setForm({...form, date: e.target.value})}
+                        value={form.items[0].date} 
+                        onChange={e => updateItem(form.items[0].id, "date", e.target.value)}
                         className="rounded-xl h-12 font-semibold border-slate-200"
                       />
                     </div>
+
                   </div>
                   
                   <div className="space-y-2">
