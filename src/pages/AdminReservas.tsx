@@ -940,14 +940,25 @@ const AdminReservas = () => {
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data de Nascimento</Label>
-                    <Input 
-                      type="date" 
-                      value={form.birthDate} 
-                      onChange={e => setForm({...form, birthDate: e.target.value})}
-                      className="rounded-xl h-12 font-semibold border-slate-200"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Data de Nascimento</Label>
+                      <Input 
+                        type="date" 
+                        value={form.birthDate} 
+                        onChange={e => setForm({...form, birthDate: e.target.value})}
+                        className="rounded-xl h-12 font-semibold border-slate-200"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">CPF</Label>
+                      <Input 
+                        placeholder="000.000.000-00"
+                        value={form.cpf} 
+                        onChange={e => setForm({...form, cpf: e.target.value})}
+                        className="rounded-xl h-12 font-semibold border-slate-200"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
