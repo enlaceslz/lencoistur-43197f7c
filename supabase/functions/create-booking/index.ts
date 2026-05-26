@@ -325,6 +325,7 @@ Deno.serve(async (req) => {
           collaborator_id: collaboratorId || null,
           partner_id: partner_id || null,
           birth_date: birthDate || null,
+          cpf: cpf || null,
         })
         .select("*, customers!customer_id(*)")
         .single();
