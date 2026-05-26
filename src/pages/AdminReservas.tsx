@@ -472,6 +472,12 @@ const AdminReservas = () => {
                         <Label className="text-[10px] uppercase font-bold text-slate-400">Telefone / WhatsApp</Label>
                         <p className="text-sm font-black text-slate-700">{wideBooking.customerPhone}</p>
                       </div>
+                      {wideBooking.birthDate && (
+                        <div className="pt-4 border-t border-slate-200/60">
+                          <Label className="text-[10px] uppercase font-bold text-slate-400">Data de Nascimento</Label>
+                          <p className="text-sm font-black text-slate-700">{format(new Date(wideBooking.birthDate + "T12:00:00"), "dd/MM/yyyy")}</p>
+                        </div>
+                      )}
                     </div>
                   </section>
 
