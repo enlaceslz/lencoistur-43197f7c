@@ -324,6 +324,7 @@ Deno.serve(async (req) => {
           booking_code: generateBookingCode(),
           collaborator_id: collaboratorId || null,
           partner_id: partner_id || null,
+          birth_date: birthDate || null,
         })
         .select("*, customers!customer_id(*)")
         .single();
@@ -377,6 +378,22 @@ Deno.serve(async (req) => {
         throw custErr;
       }
       customerId = newCustomer.id;
+    } else {
+      // Update existing customer info to keep CRM updated
+      const updateData: any = {};
+      if (customerName) updateData.name = String(customerName).trim();
+      if (customerPhone) updateData.phone = String(customerPhone).trim();
+      if (cpf) updateData.cpf = cpf;
+      if (passport) updateData.passport = passport;
+      if (country) updateData.country = country;
+      if (birthDate) updateData.birth_date = birthDate;
+
+      if (Object.keys(updateData).length > 0) {
+        await supabaseAdmin
+          .from("customers")
+          .update(updateData)
+          .eq("id", customerId);
+      }
     }
 
     // Check for duplicate booking
