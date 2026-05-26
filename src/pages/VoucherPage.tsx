@@ -27,33 +27,40 @@ const VoucherPage = () => {
         return;
       }
 
-      const bookingData = (data as any)[0];
-
+      const bookings = data as any[];
+      const bookingData = bookings[0];
 
       const { data: company } = await supabase.from("sgs_empresa").select("*").limit(1).maybeSingle();
+
+      const items = bookings.map(b => ({
+        itemName: b.item_name,
+        type: b.type,
+        date: b.date,
+        guests: b.guests,
+        unitPrice: b.unit_price,
+        total: b.total,
+        discount: b.discount,
+        finalTotal: b.final_total,
+        publicUnitPrice: b.public_unit_price,
+        publicTotal: b.public_total,
+      }));
 
       const receiptData: ReceiptData = {
         bookingCode: bookingData.booking_code,
         customerName: bookingData.customer_name || "Cliente",
         customerEmail: bookingData.customer_email || "",
         customerPhone: "",
-        itemName: bookingData.item_name,
-        type: bookingData.type as any,
-        date: bookingData.date,
-        guests: bookingData.guests,
-        unitPrice: 0,
-        total: bookingData.final_total,
-        discount: 0,
-        finalTotal: bookingData.final_total,
         payMethod: bookingData.pay_method as any,
         paymentStatus: bookingData.payment_status as any,
         status: bookingData.status as any,
         pixCode: null,
         createdAt: bookingData.created_at,
         notes: null,
-        cpf: "",
-        passport: ""
+        cpf: bookingData.customer_cpf || "",
+        passport: "",
+        items
       };
+
 
 
       // Since this page's purpose is to show the receipt, we trigger the print logic
