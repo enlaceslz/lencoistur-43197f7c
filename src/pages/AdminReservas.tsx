@@ -520,7 +520,11 @@ const AdminReservas = () => {
                         <Button onClick={() => { setSelected(b); }} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 transition-colors">
                           <Eye size={14} />
                         </Button>
+                        <Button onClick={() => window.open(`/voucher?id=${b.id}`, '_blank')} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-emerald-500 transition-colors">
+                          <Printer size={14} />
+                        </Button>
                       </div>
+
                     </TableCell>
                   </TableRow>
                 ))}
