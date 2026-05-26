@@ -74,7 +74,9 @@ const AdminReservas = () => {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<BookingItem | null>(null);
   const [showNewForm, setShowNewForm] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
   const [actionLoading, setActionLoading] = useState(false);
   const [showWideView, setShowWideView] = useState(false);
   const [isWideViewNewWindow, setIsWideViewNewWindow] = useState(false);
@@ -401,6 +403,12 @@ const AdminReservas = () => {
     setIsEditing(true);
     setShowNewForm(true);
   };
+
+  const handleShowDetail = (booking: BookingItem) => {
+    setSelected(booking);
+    setShowDetail(true);
+  };
+
 
 
   const addCompanion = () => {
