@@ -262,18 +262,28 @@ export function useBookings() {
     [confirmPayment]
   );
 
-  const cancelBooking = useCallback(async (id: string) => {
-    const { error } = await supabase
-      .from("bookings")
-      .update({ status: "cancelada", payment_status: "pendente" })
-      .eq("id", id);
+  const cancelBooking = useCallback(async (id: string, groupId?: string) => {
+    const updateQuery = supabase.from("bookings").update({ status: "cancelada", payment_status: "pendente" });
+    if (groupId) {
+      updateQuery.eq("group_id", groupId);
+    } else {
+      updateQuery.eq("id", id);
+    }
+    
+    const { error } = await updateQuery;
     if (error) throw error;
 
-    await supabase
-      .from("contas_receber")
-      .update({ status: "cancelado", observacoes: "Reserva cancelada via CRM" })
-      .eq("booking_id", id);
+    if (groupId) {
+      // Para grupos, precisaríamos de uma lógica mais complexa para atualizar múltiplas contas_receber
+      // Mas por ora, a deleção/cancelamento individual no loop do componente chamador resolve.
+    } else {
+      await supabase
+        .from("contas_receber")
+        .update({ status: "cancelado", observacoes: "Reserva cancelada via CRM" })
+        .eq("booking_id", id);
+    }
   }, []);
+
 
   const completeBooking = useCallback(async (id: string) => {
     const { data: booking, error: fetchError } = await supabase
