@@ -58,6 +58,7 @@ export type Database = {
           date: string | null
           discount: number
           final_total: number
+          group_id: string | null
           guests: number
           id: string
           invoice_issued: boolean | null
@@ -92,6 +93,7 @@ export type Database = {
           date?: string | null
           discount?: number
           final_total: number
+          group_id?: string | null
           guests?: number
           id?: string
           invoice_issued?: boolean | null
@@ -126,6 +128,7 @@ export type Database = {
           date?: string | null
           discount?: number
           final_total?: number
+          group_id?: string | null
           guests?: number
           id?: string
           invoice_issued?: boolean | null
