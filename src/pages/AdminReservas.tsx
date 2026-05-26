@@ -475,25 +475,58 @@ const AdminReservas = () => {
             <Table>
               <TableHeader className="bg-slate-50/50">
                 <TableRow>
-                  <TableHead>Reserva</TableHead>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Valor</TableHead>
-                  <TableHead></TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Cód/Data</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Cliente</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Serviço</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">Valor</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-500">Status</TableHead>
+                  <TableHead className="text-right"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtered.map(b => (
-                  <TableRow key={b.id}>
-                    <TableCell>{b.itemName}</TableCell>
-                    <TableCell>{b.customerName}</TableCell>
-                    <TableCell>{formatCurrency(b.finalTotal)}</TableCell>
+                  <TableRow key={b.id} className={cn(b.groupId && "border-l-4 border-l-primary/20")}>
                     <TableCell>
-                      <Button onClick={() => handleEdit(b)} variant="ghost" size="icon"><Pencil size={16} /></Button>
+                      <div className="flex flex-col">
+                        <span className="text-[11px] font-black text-slate-900">{b.bookingCode}</span>
+                        <span className="text-[10px] text-slate-400">{format(new Date(b.date + 'T12:00'), 'dd/MM/yy')}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="text-[11px] font-bold text-slate-700 uppercase">{b.customerName}</span>
+                        <span className="text-[10px] text-slate-400">{b.customerPhone}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-[9px] h-5 bg-slate-100 border-none capitalize">{b.type}</Badge>
+                        <span className="text-[11px] font-medium text-slate-600">{b.itemName}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className="text-[12px] font-black text-slate-900">{formatCurrency(b.finalTotal)}</span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={cn("text-[9px] font-bold uppercase py-0.5", statusConfig[b.status]?.className)}>
+                        {statusConfig[b.status]?.label}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button onClick={() => handleEdit(b)} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary transition-colors">
+                          <Pencil size={14} />
+                        </Button>
+                        <Button onClick={() => { setSelected(b); }} variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 transition-colors">
+                          <Eye size={14} />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+
           </div>
         </div>
       </div>
