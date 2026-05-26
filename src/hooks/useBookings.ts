@@ -391,6 +391,58 @@ export function useBookings() {
     
     if (customerError) throw customerError;
 
+    // Se houver múltiplos itens no payload, atualizamos cada um
+    if (data.items && Array.isArray(data.items)) {
+      for (const item of data.items) {
+        // Se o item já tiver um ID (é uma edição), atualizamos. 
+        // Se não tiver (novo item adicionado na edição), inserimos.
+        if (item.id && !item.id.includes('.')) { // Simple check for existing IDs
+          const { error: bookingError } = await supabase
+            .from("bookings")
+            .update({
+              type: item.type,
+              item_name: item.itemName,
+              date: item.date,
+              guests: item.guests,
+              pay_method: data.payMethod,
+              unit_price: item.unitPrice,
+              total: item.type === "tour" && item.itemName.includes("(Privativo)") ? item.unitPrice : item.unitPrice * item.guests,
+              discount: item.discount,
+              final_total: (item.type === "tour" && item.itemName.includes("(Privativo)") ? item.unitPrice : item.unitPrice * item.guests) - item.discount,
+              public_unit_price: item.publicUnitPrice || null,
+              public_total: (item.type === "tour" && item.itemName.includes("(Privativo)") ? item.publicUnitPrice : item.publicUnitPrice * item.guests) || null,
+              partner_net_price: item.partnerNetPrice || null,
+              notes: data.notes,
+              collaborator_id: data.collaboratorId || null,
+              partner_id: data.partnerId || null,
+              birth_date: data.birthDate || null,
+              cpf: data.cpf || null,
+            })
+            .eq("id", item.id);
+            
+          if (bookingError) throw bookingError;
+        } else {
+          // Inserir novo item no grupo (opcional por enquanto, vamos focar em editar os existentes)
+        }
+      }
+    } else {
+      // Fallback para comportamento antigo
+      const { error: bookingError } = await supabase
+
+      .from("customers")
+      .update({
+        name: data.customerName,
+        email: data.customerEmail,
+        phone: data.customerPhone,
+        cpf: data.cpf,
+        passport: data.passport,
+        country: data.country,
+        birth_date: data.birthDate,
+      })
+      .eq("id", customerId);
+    
+    if (customerError) throw customerError;
+
     const { error: bookingError } = await supabase
       .from("bookings")
       .update({
