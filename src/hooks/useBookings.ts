@@ -412,40 +412,57 @@ export function useBookings() {
 
     // Se houver múltiplos itens no payload, atualizamos cada um
     if (data.items && Array.isArray(data.items)) {
-      for (const item of data.items) {
-        if (item.id && !item.id.toString().includes('.')) { 
-          const isPrivate = item.itemName.includes("(Privativo)");
-          const total = isPrivate ? Number(item.unitPrice) : Number(item.unitPrice) * Number(item.guests);
-          const finalTotal = total - Number(item.discount);
-          const publicTotal = isPrivate ? Number(item.publicUnitPrice) : Number(item.publicUnitPrice) * Number(item.guests);
+      // Obter o group_id atual da reserva principal se não estiver no payload
+      let groupId = data.groupId;
+      if (!groupId) {
+        const { data: currentBooking } = await supabase.from("bookings").select("group_id").eq("id", id).single();
+        groupId = currentBooking?.group_id;
+      }
 
-          const { error: bookingError } = await supabase
-            .from("bookings")
-            .update({
-              type: item.type,
-              item_name: item.itemName,
-              date: item.date,
-              guests: Number(item.guests),
-              pay_method: data.payMethod,
-              unit_price: Number(item.unitPrice),
-              total,
-              discount: Number(item.discount),
-              final_total: finalTotal,
-              public_unit_price: Number(item.publicUnitPrice) || null,
-              public_total: publicTotal || null,
-              partner_net_price: Number(item.partnerNetPrice) || null,
-              notes: data.notes,
-              collaborator_id: data.collaboratorId === "none" ? null : data.collaboratorId || null,
-              partner_id: data.partnerId === "none" ? null : data.partnerId || null,
-              birth_date: data.birthDate || null,
-              cpf: data.cpf || null,
-            })
-            .eq("id", item.id);
-            
-          if (bookingError) throw bookingError;
+      for (const item of data.items) {
+        const isNew = !item.id || item.id.length < 20; // UUIDs are 36 chars
+        const isPrivate = item.itemName.includes("(Privativo)");
+        const total = isPrivate ? Number(item.unitPrice) : Number(item.unitPrice) * Number(item.guests);
+        const finalTotal = total - Number(item.discount);
+        const publicTotal = isPrivate ? Number(item.publicUnitPrice) : Number(item.publicUnitPrice) * Number(item.guests);
+
+        const bookingData = {
+          type: item.type,
+          item_name: item.itemName,
+          date: item.date,
+          guests: Number(item.guests),
+          pay_method: data.payMethod,
+          unit_price: Number(item.unitPrice),
+          total,
+          discount: Number(item.discount),
+          final_total: finalTotal,
+          public_unit_price: Number(item.publicUnitPrice) || null,
+          public_total: publicTotal || null,
+          partner_net_price: Number(item.partnerNetPrice) || null,
+          notes: data.notes,
+          collaborator_id: data.collaboratorId === "none" ? null : data.collaboratorId || null,
+          partner_id: data.partnerId === "none" ? null : data.partnerId || null,
+          birth_date: data.birthDate || null,
+          cpf: data.cpf || null,
+          group_id: groupId,
+          customer_id: customerId
+        };
+
+        if (isNew) {
+          // Criar novo item no grupo
+          await supabase.from("bookings").insert({
+            ...bookingData,
+            booking_code: `RES-${new Date().getFullYear()}-${Math.floor(Math.random() * 9999).toString().padStart(4, "0")}`,
+            status: "pendente",
+            payment_status: "pendente"
+          });
+        } else {
+          // Atualizar item existente
+          await supabase.from("bookings").update(bookingData).eq("id", item.id);
         }
       }
     }
+
 
     if (data.companions && data.companions.length > 0) {
       const deps = data.companions.map((c: any) => ({
