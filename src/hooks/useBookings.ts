@@ -412,15 +412,27 @@ export function useBookings() {
 
     // Se houver múltiplos itens no payload, atualizamos cada um
     if (data.items && Array.isArray(data.items)) {
-      // Obter o group_id atual da reserva principal se não estiver no payload
+      // Obter o group_id atual
       let groupId = data.groupId;
       if (!groupId) {
         const { data: currentBooking } = await supabase.from("bookings").select("group_id").eq("id", id).single();
         groupId = currentBooking?.group_id;
       }
 
+      // Se houver um grupo, vamos identificar itens para remover
+      if (groupId) {
+        const { data: currentItems } = await supabase.from("bookings").select("id").eq("group_id", groupId);
+        if (currentItems) {
+          const newItemIds = data.items.map((i: any) => i.id).filter((id: string) => id && id.length > 20);
+          const idsToDelete = currentItems.filter((ci: any) => !newItemIds.includes(ci.id)).map((ci: any) => ci.id);
+          if (idsToDelete.length > 0) {
+            await supabase.from("bookings").delete().in("id", idsToDelete);
+          }
+        }
+      }
+
       for (const item of data.items) {
-        const isNew = !item.id || item.id.length < 20; // UUIDs are 36 chars
+        const isNew = !item.id || item.id.length < 20;
         const isPrivate = item.itemName.includes("(Privativo)");
         const total = isPrivate ? Number(item.unitPrice) : Number(item.unitPrice) * Number(item.guests);
         const finalTotal = total - Number(item.discount);
@@ -449,7 +461,6 @@ export function useBookings() {
         };
 
         if (isNew) {
-          // Criar novo item no grupo
           await supabase.from("bookings").insert({
             ...bookingData,
             booking_code: `RES-${new Date().getFullYear()}-${Math.floor(Math.random() * 9999).toString().padStart(4, "0")}`,
@@ -457,11 +468,11 @@ export function useBookings() {
             payment_status: "pendente"
           });
         } else {
-          // Atualizar item existente
           await supabase.from("bookings").update(bookingData).eq("id", item.id);
         }
       }
     }
+
 
 
     if (data.companions && data.companions.length > 0) {
