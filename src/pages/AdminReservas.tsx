@@ -387,7 +387,6 @@ const AdminReservas = () => {
       if (deps) setCustomerDependents(deps);
     }
 
-    setSelected(booking);
     
     let itemsToEdit = [booking];
     if (booking.groupId) {
