@@ -57,33 +57,41 @@ Deno.serve(async (req) => {
       birthDate, notes, companions, collaboratorId, partner_id,
       unitPrice: overrideUnitPrice,
       discount: overrideDiscount,
-      publicUnitPrice: overridePublicUnitPrice
+      publicUnitPrice: overridePublicUnitPrice,
+      items // New field for multiple items
     } = body;
 
     const trimmedEmail = typeof customerEmail === "string" ? customerEmail.trim().toLowerCase() : "";
     const guestsNum = Number(guests);
 
-    if (
-      !allowedTypes.has(String(type)) ||
-      !isNonEmptyString(itemName) ||
-      !isNonEmptyString(customerName) ||
-      !isValidEmail(trimmedEmail) ||
-      !allowedPayMethods.has(String(payMethod)) ||
-      !Number.isInteger(guestsNum) ||
-      guestsNum < 1 ||
-      guestsNum > 50
-    ) {
-      console.error("Invalid booking payload received", {
-        type,
-        itemName: typeof itemName === "string" ? itemName.slice(0, 80) : null,
-        payMethod,
-        guests,
-        customerEmail: previewEmail(trimmedEmail),
-      });
+    // If items is not provided, create a single-item array for processing
+    const bookingItems = items && Array.isArray(items) ? items : [{
+      type, itemName, date, guests: guestsNum,
+      unitPrice: overrideUnitPrice,
+      discount: overrideDiscount,
+      publicUnitPrice: overridePublicUnitPrice
+    }];
+
+    if (!isNonEmptyString(customerName) || !isValidEmail(trimmedEmail) || !allowedPayMethods.has(String(payMethod))) {
       return new Response(
-        JSON.stringify({ error: "Campos obrigatórios faltando" }),
+        JSON.stringify({ error: "Campos do cliente ou método de pagamento inválidos" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    for (const item of bookingItems) {
+      if (
+        !allowedTypes.has(String(item.type)) ||
+        !isNonEmptyString(item.itemName) ||
+        !Number.isInteger(Number(item.guests)) ||
+        Number(item.guests) < 1
+      ) {
+        console.error("Invalid booking item received", item);
+        return new Response(
+          JSON.stringify({ error: `Dados do item inválidos: ${item.itemName || 'Sem nome'}` }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     console.log("Receiving booking request summary", {
