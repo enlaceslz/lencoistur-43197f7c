@@ -3,11 +3,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 
-export interface ReceiptData {
-  bookingCode: string;
-  customerName: string;
-  customerEmail: string;
-  customerPhone?: string;
+export interface ReceiptItem {
   itemName: string;
   type: string;
   date: string;
@@ -18,6 +14,13 @@ export interface ReceiptData {
   finalTotal: number;
   publicUnitPrice?: number;
   publicTotal?: number;
+}
+
+export interface ReceiptData {
+  bookingCode: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
   payMethod: string;
   paymentStatus: string;
   status: string;
@@ -26,7 +29,20 @@ export interface ReceiptData {
   notes?: string | null;
   cpf?: string;
   passport?: string;
+  items?: ReceiptItem[];
+  // Legacy fields for backward compatibility
+  itemName?: string;
+  type?: string;
+  date?: string;
+  guests?: number;
+  unitPrice?: number;
+  total?: number;
+  discount?: number;
+  finalTotal?: number;
+  publicUnitPrice?: number;
+  publicTotal?: number;
 }
+
 
 const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const fmtDate = (d: string) => {
@@ -80,7 +96,7 @@ function generateReceiptHTML(rawData: ReceiptData, company?: any): string {
     customerName: esc(rawData.customerName) as string,
     customerEmail: esc(rawData.customerEmail) as string,
     customerPhone: rawData.customerPhone ? esc(rawData.customerPhone) : rawData.customerPhone,
-    itemName: esc(rawData.itemName) as string,
+    itemName: rawData.itemName ? esc(rawData.itemName) : "",
     notes: rawData.notes ? esc(rawData.notes) : rawData.notes,
     pixCode: rawData.pixCode ? esc(rawData.pixCode) : rawData.pixCode,
     cpf: rawData.cpf ? esc(rawData.cpf) : rawData.cpf,
@@ -270,12 +286,22 @@ function generateReceiptHTML(rawData: ReceiptData, company?: any): string {
     </div>
 
     <div class="section-title">Detalhes dos Serviços</div>
-    <div class="grid">
-      <div class="field"><label>Categoria</label><p>${data.type === "package" ? "Pacote de Experiências" : (data.type === "tour" || data.type === "passeio" ? "Passeio Turístico" : "Translado / Rota")}</p></div>
-      <div class="field"><label>Serviço / Itinerário</label><p>${data.itemName}</p></div>
-      <div class="field"><label>Data Agendada</label><p>${fmtDate(data.date)}</p></div>
-      <div class="field"><label>Total de Passageiros</label><p>${data.guests} pessoa(s)</p></div>
+    <div class="services-list" style="margin-bottom: 32px;">
+      ${(data.items && data.items.length > 0 ? data.items : [{
+        itemName: data.itemName,
+        type: data.type,
+        date: data.date,
+        guests: data.guests
+      }]).map(item => `
+        <div class="grid" style="margin-bottom: 16px; border-bottom: 1px dashed #f1f5f9; padding-bottom: 16px;">
+          <div class="field"><label>Categoria</label><p>${item.type === "package" ? "Pacote" : (item.type === "tour" || item.type === "passeio" ? "Passeio" : "Translado")}</p></div>
+          <div class="field"><label>Serviço / Itinerário</label><p>${esc(item.itemName)}</p></div>
+          <div class="field"><label>Data Agendada</label><p>${fmtDate(item.date || "")}</p></div>
+          <div class="field"><label>Total de Passageiros</label><p>${item.guests} pessoa(s)</p></div>
+        </div>
+      `).join('')}
     </div>
+
 
     ${data.notes ? `
     <div class="section-title">Observações Importantes</div>
@@ -286,25 +312,42 @@ function generateReceiptHTML(rawData: ReceiptData, company?: any): string {
 
     <div class="section-title">Resumo Financeiro</div>
     <div class="financial-card">
-      <div class="fin-row">
-        <span>${data.guests}x ${data.itemName} (${fmt(data.publicUnitPrice || data.unitPrice)})</span>
-        <span>${fmt(data.publicTotal || data.total)}</span>
-      </div>
-      ${data.discount > 0 && !data.publicTotal ? `
-      <div class="fin-row discount">
-        <span>Desconto Especial (PIX/Promoção)</span>
-        <span>-${fmt(data.discount)}</span>
-      </div>
-      ` : ""}
-      <div class="fin-row">
+      ${(data.items && data.items.length > 0 ? data.items : [{
+        itemName: data.itemName,
+        guests: data.guests,
+        unitPrice: data.unitPrice,
+        total: data.total,
+        publicUnitPrice: data.publicUnitPrice,
+        publicTotal: data.publicTotal,
+        discount: data.discount,
+        finalTotal: data.finalTotal
+      }]).map(item => `
+        <div class="fin-row">
+          <span>${item.guests}x ${esc(item.itemName)} (${fmt(item.publicUnitPrice || item.unitPrice || 0)})</span>
+          <span>${fmt(item.publicTotal || item.total || 0)}</span>
+        </div>
+        ${(item.discount || 0) > 0 && !(item.publicTotal) ? `
+        <div class="fin-row discount">
+          <span>Desconto Especial</span>
+          <span>-${fmt(item.discount || 0)}</span>
+        </div>
+        ` : ""}
+      `).join('')}
+      
+      <div class="fin-row" style="margin-top: 8px;">
         <span>Forma de Pagamento</span>
         <span>${payLabel(data.payMethod)}</span>
       </div>
       <div class="fin-total">
         <span>VALOR TOTAL</span>
-        <span>${fmt(data.publicTotal || data.finalTotal)}</span>
+        <span>${fmt(
+          data.items && data.items.length > 0 
+            ? data.items.reduce((acc, item) => acc + (item.publicTotal || item.finalTotal || 0), 0)
+            : (data.publicTotal || data.finalTotal || 0)
+        )}</span>
       </div>
     </div>
+
 
     ${data.pixCode && data.paymentStatus !== "pago" ? `
     <div class="pix-container">
