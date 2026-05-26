@@ -342,6 +342,7 @@ const AdminReservas = () => {
 
       setShowNewForm(false);
       setIsEditing(false);
+      setCustomerDependents([]);
       setForm({
         customerId: "",
         customerName: "",
