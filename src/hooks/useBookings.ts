@@ -182,7 +182,17 @@ export function useBookings() {
         companions?: { name: string; cpf?: string; birthDate?: string; relationship?: string }[];
         partnerId?: string;
         isPaid?: boolean;
+        items?: {
+          type: "tour" | "transfer" | "package";
+          itemName: string;
+          date: string;
+          guests: number;
+          unitPrice?: number;
+          discount?: number;
+          publicUnitPrice?: number;
+        }[];
       }
+
     ): Promise<BookingItem> => {
       const { data: result, error } = await supabase.functions.invoke("create-booking", {
         body: {
