@@ -94,16 +94,6 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log("Receiving booking request summary", {
-      type,
-      itemName: itemName.trim().slice(0, 80),
-      payMethod,
-      guests: guestsNum,
-      customerEmail: previewEmail(trimmedEmail),
-      hasPartner: Boolean(partner_id),
-      hasCollaborator: Boolean(collaboratorId),
-    });
-    
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -119,7 +109,6 @@ Deno.serve(async (req) => {
       
       if (!authError && authData?.user) {
         userId = authData.user.id;
-        // Check if user is admin
         const { data: roleData } = await supabaseAdmin
           .from("user_roles")
           .select("role")
@@ -129,6 +118,30 @@ Deno.serve(async (req) => {
         isAdmin = !!roleData;
       }
     }
+
+    const getPartnerData = async (id: string) => {
+      const { data } = await supabaseAdmin
+        .from("partners")
+        .select("commission_rate, remuneration_type, remuneration_value")
+        .eq("id", id)
+        .maybeSingle();
+      return data;
+    };
+
+    const calculatePartnerPrice = (basePrice: number, partnerPriceDefined: number | undefined | null, partner: any) => {
+      if (!partner) return basePrice;
+      if (partnerPriceDefined && partnerPriceDefined > 0) return partnerPriceDefined;
+      
+      const rType = partner.remuneration_type || "comissao_percent";
+      const rValue = partner.remuneration_value || partner.commission_rate || 0;
+
+      if (rType === "comissao_percent") {
+        return Math.round(basePrice * (1 - rValue / 100));
+      } else if (rType === "valor_por_passeio") {
+        return Math.max(0, basePrice - (rValue * 100));
+      }
+      return basePrice;
+    };
 
     const partnerData = partner_id ? await getPartnerData(partner_id) : null;
     const createdBookings = [];
@@ -246,7 +259,6 @@ Deno.serve(async (req) => {
       const finalTotal = total - discount;
       const pixCode = payMethod === "pix" ? generatePixCode() : null;
 
-      // Create booking record
       const { data: booking, error: bookingErr } = await supabaseAdmin
         .from("bookings")
         .insert({
@@ -278,17 +290,18 @@ Deno.serve(async (req) => {
 
       if (bookingErr) throw bookingErr;
       createdBookings.push(booking);
-      
-      if (companions?.length > 0) {
-        const deps = companions.map((c: any) => ({
-          customer_id: customerId,
-          name: c.name,
-          cpf: c.cpf || null,
-          birth_date: c.birthDate || null,
-          relationship: c.relationship || 'Acompanhante'
-        }));
-        await supabaseAdmin.from("dependents").insert(deps);
-      }
+    }
+
+    // Add dependents only once if provided
+    if (companions?.length > 0 && customerId) {
+      const deps = companions.map((c: any) => ({
+        customer_id: customerId,
+        name: c.name,
+        cpf: c.cpf || null,
+        birth_date: c.birthDate || null,
+        relationship: c.relationship || 'Acompanhante'
+      }));
+      await supabaseAdmin.from("dependents").insert(deps);
     }
 
     return new Response(JSON.stringify(createdBookings.length === 1 ? createdBookings[0] : createdBookings), {
@@ -302,3 +315,4 @@ Deno.serve(async (req) => {
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
+});
