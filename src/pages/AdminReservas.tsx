@@ -375,7 +375,18 @@ const AdminReservas = () => {
     }
   };
 
-  const handleEdit = (booking: BookingItem) => {
+  const handleEdit = async (booking: BookingItem) => {
+    setSelected(booking);
+    
+    // Buscar dependentes do cliente ao editar
+    if (booking.customerId) {
+      const { data: deps } = await supabase
+        .from("dependents")
+        .select("*")
+        .eq("customer_id", booking.customerId);
+      if (deps) setCustomerDependents(deps);
+    }
+
     setSelected(booking);
     
     let itemsToEdit = [booking];
