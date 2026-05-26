@@ -182,7 +182,17 @@ export function useBookings() {
         companions?: { name: string; cpf?: string; birthDate?: string; relationship?: string }[];
         partnerId?: string;
         isPaid?: boolean;
+        items?: {
+          type: "tour" | "transfer" | "package";
+          itemName: string;
+          date: string;
+          guests: number;
+          unitPrice?: number;
+          discount?: number;
+          publicUnitPrice?: number;
+        }[];
       }
+
     ): Promise<BookingItem> => {
       const { data: result, error } = await supabase.functions.invoke("create-booking", {
         body: {
@@ -207,6 +217,8 @@ export function useBookings() {
           publicUnitPrice: data.publicUnitPrice,
           publicTotal: data.publicTotal,
           partner_net_price: data.partnerNetPrice,
+          items: data.items,
+
         },
       });
 
@@ -216,20 +228,24 @@ export function useBookings() {
         throw new Error(errorMsg);
       }
 
-      const mapped = mapDbToBooking(result, result.customers);
+      const results = Array.isArray(result) ? result : [result];
+      const mappedResults = results.map(r => mapDbToBooking(r, r.customers));
       
       if (data.isPaid) {
-        try {
-          await confirmPayment(mapped.id);
-          mapped.paymentStatus = "pago";
-          mapped.status = "confirmada";
-        } catch (confirmErr) {
-          console.error("Erro ao confirmar pagamento inicial:", confirmErr);
+        for (const mapped of mappedResults) {
+          try {
+            await confirmPayment(mapped.id);
+            mapped.paymentStatus = "pago";
+            mapped.status = "confirmada";
+          } catch (confirmErr) {
+            console.error("Erro ao confirmar pagamento inicial:", confirmErr);
+          }
         }
       }
 
-      setBookings((prev) => [mapped, ...prev]);
-      return mapped;
+      setBookings((prev) => [...mappedResults, ...prev]);
+      return mappedResults[0]; // Returning the first one for compatibility
+
     },
     [confirmPayment]
   );
