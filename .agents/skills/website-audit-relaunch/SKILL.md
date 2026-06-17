@@ -1,5 +1,5 @@
 ---
-name: Website Audit & Relaunch
+name: website-audit-relaunch
 description: "Análise sistemática em 5 dimensões: técnica, usabilidade, conteúdo, SEO e conversão — com plano de relaunch."
 ---
 

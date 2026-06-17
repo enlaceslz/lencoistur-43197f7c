@@ -1,5 +1,5 @@
 ---
-name: AI Design Workflow
+name: ai-design-workflow
 description: "Framework para usar IA como assistente de design com limites bem definidos: estrutura de prompt (papel / contexto / tarefa / formato / restrições), implantação da IA por fase do projeto e fluxo de validação humana. Define onde a IA acelera o trabalho (geração de variantes, copy, assets) e onde a decisão criativa precisa ser do designer."
 ---
 
