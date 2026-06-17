@@ -1,6 +1,6 @@
 ---
 name: Cloud Migration
-description: Guia completo passo a passo para migrar do Supabase Cloud gerenciado pelo Lovable para sua própria instância: exporta o schema e os dados, recria as Edge Functions, atualiza as variáveis de ambiente, configura Auth com domínio customizado, e valida tudo após a migração. Inclui árvore de decisão para manter o Lovable como IDE ou trocar de plataforma.
+description: "Guia completo passo a passo para migrar do Supabase Cloud gerenciado pelo Lovable para sua própria instância: exporta o schema e os dados, recria as Edge Functions, atualiza as variáveis de ambiente, configura Auth com domínio customizado, e valida tudo após a migração. Inclui árvore de decisão para manter o Lovable como IDE ou trocar de plataforma."
 ---
 
 Guide me through migrating this project from Lovable Cloud to my own Supabase.
