@@ -56,18 +56,23 @@
     --sidebar-border: 217 91% 60%;
     --sidebar-ring: 217 91% 60%;
 
-    /* Admin theme tokens */
-    --admin-sidebar-bg: 222 47% 11%;
-    --admin-sidebar-fg: 210 40% 90%;
-    --admin-sidebar-active: 217 91% 60%;
-    --admin-sidebar-hover: 222 47% 15%;
+    /* Admin theme tokens — aligned to brand (navy / gold / sand) */
+    --admin-sidebar-bg: 222 47% 11%;        /* navy */
+    --admin-sidebar-fg: 35 40% 92%;          /* sand-tinted */
+    --admin-sidebar-active: 41 72% 52%;      /* gold */
+    --admin-sidebar-hover: 222 40% 18%;
     --admin-header-bg: 0 0% 100%;
-    --admin-accent: 217 91% 60%;
-    --admin-accent-soft: 217 91% 96%;
-    --admin-success: 152 60% 42%;
-    --admin-success-soft: 152 60% 94%;
-    --admin-warn: 38 92% 50%;
-    --admin-warn-soft: 38 92% 94%;
+    --admin-accent: 41 72% 52%;              /* gold */
+    --admin-accent-soft: 41 72% 94%;
+    --admin-success: 152 55% 38%;
+    --admin-success-soft: 152 55% 94%;
+    --admin-warn: 32 92% 50%;
+    --admin-warn-soft: 32 92% 94%;
+    --admin-danger: 0 72% 50%;
+    --admin-danger-soft: 0 72% 96%;
+    --admin-surface: 35 40% 97%;             /* sand-tinted body */
+    --admin-text: 222 47% 14%;
+    --admin-text-muted: 222 20% 38%;
   }
 }
 
