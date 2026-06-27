@@ -22,7 +22,7 @@
     --secondary-foreground: 222 47% 11%;
 
     --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted-foreground: 215 20% 38%;
 
     --accent: 217 91% 60%;
     --accent-foreground: 210 40% 98%;
@@ -44,7 +44,7 @@
     --whatsapp: 142 70% 40%;
     --whatsapp-hover: 142 70% 34%;
 
-    --font-display: 'DM Sans', sans-serif;
+    --font-display: 'Playfair Display', serif;
     --font-body: 'DM Sans', sans-serif;
 
     --sidebar-background: 222 47% 11%;
@@ -121,13 +121,11 @@
     @apply bg-white/80 backdrop-blur-xl border border-white/60 shadow-lg shadow-black/[0.03];
   }
   .animate-in-fade {
-    /* Animations disabled for professional, direct style */
-    opacity: 1;
-    transform: none;
+    animation: fadeIn 0.6s ease-out both;
   }
   @keyframes fadeIn {
-    from { opacity: 1; }
-    to { opacity: 1; }
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
   }
 }
 
