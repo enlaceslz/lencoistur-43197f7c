@@ -10,10 +10,13 @@ i18n
   .use(initReactI18next)
   .init({
     resources: { pt: { translation: pt }, en: { translation: en }, es: { translation: es } },
+    lng: typeof window !== "undefined" ? localStorage.getItem("i18nextLng") || "pt" : "pt",
     fallbackLng: "pt",
+    supportedLngs: ["pt", "en", "es"],
+    nonExplicitSupportedLngs: true,
     interpolation: { escapeValue: false },
     detection: {
-      order: ["localStorage", "navigator"],
+      order: ["localStorage"],
       caches: ["localStorage"],
     },
   });
