@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Star, MapPin, Clock, Search, SlidersHorizontal, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
 import { formatCurrency } from "@/lib/utils";
 import { fetchPartnerCatalogPricing } from "@/lib/catalogPricing";
 import { Badge } from "@/components/ui/badge";
