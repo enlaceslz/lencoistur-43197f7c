@@ -147,29 +147,27 @@ export const CookieConsentBanner = () => {
           aria-label="Consentimento de Cookies"
           className="fixed bottom-0 left-0 right-0 z-50 p-4 md:p-6 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]"
         >
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex-1 space-y-2">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-primary" />
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-sm md:text-base font-semibold flex items-center gap-2 mb-0.5">
+                <ShieldCheck className="w-4 h-4 text-primary" />
                 Privacidade e Cookies
               </h2>
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                Utilizamos cookies e tratamos dados pessoais para melhorar sua experiência, analisar tráfego e personalizar conteúdo. 
-                Você pode aceitar todos, rejeitar os não essenciais ou personalizar suas preferências. 
-                Seus direitos estão garantidos conforme a LGPD (Lei nº 13.709/2018).
-                Consulte nossa <a href="/politica-de-privacidade" className="text-primary hover:underline underline-offset-4">Política de Privacidade Completa</a>.
+              <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 leading-snug line-clamp-2 md:line-clamp-none">
+                Usamos cookies para melhorar sua experiência (LGPD).{" "}
+                <a href="/politica-de-privacidade" className="text-primary hover:underline underline-offset-4">Saiba mais</a>.
               </p>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-2 w-full md:w-auto">
-              <Button variant="outline" size="sm" onClick={() => setShowModal(true)} className="flex-1 md:flex-none">
-                <Settings className="w-4 h-4 mr-2" />
-                Personalizar
+            <div className="flex items-center justify-end gap-2 shrink-0">
+              <Button variant="ghost" size="sm" onClick={() => setShowModal(true)} className="text-slate-600 px-2">
+                <Settings className="w-4 h-4 md:mr-1.5" />
+                <span className="hidden md:inline">Personalizar</span>
               </Button>
-              <Button variant="ghost" size="sm" onClick={handleRejectNonEssential} className="flex-1 md:flex-none text-slate-600 hover:text-red-500">
-                Rejeitar Não Essenciais
+              <Button variant="outline" size="sm" onClick={handleRejectNonEssential}>
+                Rejeitar
               </Button>
-              <Button onClick={handleAcceptAll} size="sm" className="flex-1 md:flex-none bg-primary hover:bg-primary/90">
-                Aceitar Todos
+              <Button onClick={handleAcceptAll} size="sm" className="bg-primary hover:bg-primary/90">
+                Aceitar
               </Button>
             </div>
           </div>
