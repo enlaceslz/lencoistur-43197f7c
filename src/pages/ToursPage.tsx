@@ -139,6 +139,11 @@ const ToursPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Passeios nos Lençóis Maranhenses | Lençóis Tour"
+        description="Reserve passeios às Lagoas Azuis, Rio Preguiças, trekking nas dunas e mais. Saída de Santo Amaro do Maranhão com 4x4 licenciados e guias locais."
+        path="/passeios"
+      />
       <Navbar />
 
       <div className="pt-24 pb-10 bg-gradient-sand">
