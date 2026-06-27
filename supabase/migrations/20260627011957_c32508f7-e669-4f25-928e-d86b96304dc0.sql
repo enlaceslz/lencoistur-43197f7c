@@ -1,0 +1,1 @@
+GRANT SELECT ON public.public_tours TO anon, authenticated;
