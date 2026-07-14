@@ -8,8 +8,6 @@ import {
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 
 const MONTH_LABELS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 const fmt = (v: number) => formatCurrency(v);
@@ -80,6 +78,8 @@ export default function DRETab({
   const margemOp = receitaBruta > 0 ? (lucroOp / receitaBruta) * 100 : 0;
 
   const exportDRE = async () => {
+    const { default: jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF();
     const monthName = MONTH_LABELS[currentMonth];
     

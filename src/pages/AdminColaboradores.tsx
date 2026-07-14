@@ -27,8 +27,6 @@ import { maskCPF, maskPhone, maskCEP, maskCurrency, parseCurrencyToNumber } from
 import { formatCurrency, validateCPF, cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 
 
 interface Collaborator {
@@ -333,8 +331,10 @@ const AdminColaboradores = () => {
     (c.type || "").toLowerCase().includes(search.toLowerCase())
   );
 
-  const generatePDF = () => {
+  const generatePDF = async () => {
     try {
+      const { default: jsPDF } = await import("jspdf");
+      const { default: autoTable } = await import("jspdf-autotable");
       const doc = new jsPDF();
       const dateStr = format(new Date(), "dd/MM/yyyy HH:mm");
       

@@ -5,8 +5,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Shield, CheckCircle, AlertTriangle, FileText, Pencil, Trash2, Users } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 import { Button } from "@/components/ui/button";
 
 // Riscos inerentes conforme P6 VATTI
@@ -308,6 +306,8 @@ const TermoAssinatura = () => {
       const fileName = `termo_${booking?.booking_code || 'SGS'}_${Date.now()}.pdf`;
 
       // 1. Generate PDF locally
+      const { default: jsPDF } = await import("jspdf");
+      const { default: autoTable } = await import("jspdf-autotable");
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();

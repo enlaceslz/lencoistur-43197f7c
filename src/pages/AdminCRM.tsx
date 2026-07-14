@@ -8,8 +8,6 @@ import {
   ChevronRight, Star, Heart, Activity, Award, Shield, User, 
   MoreHorizontal, Map, Filter, ArrowRight, UserCheck, UserPlus2
 } from "lucide-react";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -695,11 +693,15 @@ const AdminCRMContent = () => {
     toast.success(`${filtered.length} clientes exportados!`);
   };
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
     if (filtered.length === 0) {
       toast.error("Nenhum cliente para exportar.");
       return;
     }
+
+    const { default: jsPDF } = await import("jspdf");
+
+    const { default: autoTable } = await import("jspdf-autotable");
 
     const doc = new jsPDF();
     const tableColumn = ["Nome", "Email", "Telefone", "Documento", "Cidade/UF", "Reservas", "Total Gasto"];
@@ -737,7 +739,9 @@ const AdminCRMContent = () => {
     toast.success(`${filtered.length} clientes exportados para PDF!`);
   };
 
-  const exportClientPDF = (c: Customer) => {
+  const exportClientPDF = async (c: Customer) => {
+    const { default: jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF();
     
     // Header

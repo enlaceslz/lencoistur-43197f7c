@@ -11,8 +11,6 @@ import { Plus, Loader2, Pencil, Trash2, Calendar, Tag, User, AlertCircle, CheckC
 import { toast } from "sonner";
 import { formatCurrency, cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { NumericFormat } from "react-number-format";
 
 const fmt = (v: number) => formatCurrency(v);
@@ -188,6 +186,8 @@ export default function ContasPagarTab({ company }: { company?: any }) {
   };
 
   const exportPDF = async () => {
+    const { default: jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF();
     const brandName = company?.nome_fantasia || "LENÇÓIS TOUR";
     const now = new Date();

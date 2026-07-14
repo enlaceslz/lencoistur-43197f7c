@@ -21,8 +21,6 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { maskCPF, maskCNPJ, maskPhone, maskCpfCnpj } from "@/lib/masks";
 import { Separator } from "@/components/ui/separator";
 import { ptBR } from "date-fns/locale";
@@ -426,6 +424,8 @@ const AdminParceiros = () => {
   };
 
   const exportPDF = async () => {
+    const { default: jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF();
     const now = new Date();
     const dateStr = now.toLocaleDateString("pt-BR");
