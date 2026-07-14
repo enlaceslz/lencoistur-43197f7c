@@ -331,7 +331,7 @@ const AdminColaboradores = () => {
     (c.type || "").toLowerCase().includes(search.toLowerCase())
   );
 
-  const generatePDF = () => {
+  const generatePDF = async () => {
     try {
       const { default: jsPDF } = await import("jspdf");
       const { default: autoTable } = await import("jspdf-autotable");

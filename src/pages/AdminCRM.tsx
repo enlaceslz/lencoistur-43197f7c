@@ -693,7 +693,7 @@ const AdminCRMContent = () => {
     toast.success(`${filtered.length} clientes exportados!`);
   };
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
     if (filtered.length === 0) {
       toast.error("Nenhum cliente para exportar.");
       return;
@@ -739,7 +739,7 @@ const AdminCRMContent = () => {
     toast.success(`${filtered.length} clientes exportados para PDF!`);
   };
 
-  const exportClientPDF = (c: Customer) => {
+  const exportClientPDF = async (c: Customer) => {
     const { default: jsPDF } = await import("jspdf");
     const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF();
