@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface SiteSettings {
@@ -23,36 +23,43 @@ export interface EmpresaSettings {
   email: string;
 }
 
+interface SiteSettingsResult {
+  site: SiteSettings | null;
+  empresa: EmpresaSettings | null;
+}
+
+const fetchSiteSettings = async (): Promise<SiteSettingsResult> => {
+  const { data, error } = await supabase
+    .from("site_settings")
+    .select("key, value")
+    .in("key", ["site", "empresa"]);
+
+  if (error) throw error;
+
+  const site = (data?.find((s) => s.key === "site")?.value as unknown as SiteSettings) ?? null;
+  const empresa = (data?.find((s) => s.key === "empresa")?.value as unknown as EmpresaSettings) ?? null;
+
+  return { site, empresa };
+};
+
+/**
+ * Cached site settings shared across every consumer via react-query.
+ * Previously each mount refetched — this generated thousands of DB calls
+ * (see slow_queries: `site_settings` was the #1 hotspot).
+ * staleTime = 5 min: settings change rarely, dedup across the whole app.
+ */
 export const useSiteSettings = () => {
-  const [site, setSite] = useState<SiteSettings | null>(null);
-  const [empresa, setEmpresa] = useState<EmpresaSettings | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useQuery({
+    queryKey: ["site-settings"],
+    queryFn: fetchSiteSettings,
+    staleTime: 5 * 60_000,
+    gcTime: 30 * 60_000,
+  });
 
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("site_settings")
-          .select("key, value");
-
-        if (error) throw error;
-        
-        if (data) {
-          const siteData = data.find(s => s.key === "site")?.value as unknown as SiteSettings;
-          const empresaData = data.find(s => s.key === "empresa")?.value as unknown as EmpresaSettings;
-          
-          if (siteData) setSite(siteData);
-          if (empresaData) setEmpresa(empresaData);
-        }
-      } catch (err) {
-        console.error("Error fetching site settings:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSettings();
-  }, []);
-
-  return { site, settings: site, empresa, loading };
+  return {
+    site: data?.site ?? null,
+    settings: data?.site ?? null,
+    empresa: data?.empresa ?? null,
+    loading: isLoading,
+  };
 };
