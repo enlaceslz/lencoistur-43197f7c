@@ -1,6 +1,6 @@
 ---
-name: usability
-description: "Avaliação de usabilidade usando as 10 heurísticas de Nielsen e critérios ISO 9241: formulários com apenas campos obrigatórios, conteúdo escaneável (máximo 8-10 palavras por linha, fonte mínima 18px), mensagens de erro com solução clara, e foco em conclusão de tarefas sem fricção. Entrega uma lista priorizada de melhorias com impacto direto em conversão."
+name: Usability
+description: Avaliação de usabilidade usando as 10 heurísticas de Nielsen e critérios ISO 9241: formulários com apenas campos obrigatórios, conteúdo escaneável (máximo 8-10 palavras por linha, fonte mínima 18px), mensagens de erro com solução clara, e foco em conclusão de tarefas sem fricção. Entrega uma lista priorizada de melhorias com impacto direto em conversão.
 ---
 
 Run a usability evaluation on this project using Nielsen's 10 Heuristics and conversion optimization principles.
