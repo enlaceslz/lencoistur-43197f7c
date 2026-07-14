@@ -78,6 +78,8 @@ export default function DRETab({
   const margemOp = receitaBruta > 0 ? (lucroOp / receitaBruta) * 100 : 0;
 
   const exportDRE = async () => {
+    const { default: jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF();
     const monthName = MONTH_LABELS[currentMonth];
     

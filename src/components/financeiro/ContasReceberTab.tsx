@@ -234,6 +234,8 @@ export default function ContasReceberTab({ company }: { company?: any }) {
   };
 
   const exportPDF = async () => {
+    const { default: jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF();
     const brandName = company?.nome_fantasia || "LENÇÓIS TOUR";
     const now = new Date();

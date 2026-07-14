@@ -306,6 +306,8 @@ const TermoAssinatura = () => {
       const fileName = `termo_${booking?.booking_code || 'SGS'}_${Date.now()}.pdf`;
 
       // 1. Generate PDF locally
+      const { default: jsPDF } = await import("jspdf");
+      const { default: autoTable } = await import("jspdf-autotable");
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();

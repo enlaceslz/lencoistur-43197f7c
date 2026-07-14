@@ -699,6 +699,10 @@ const AdminCRMContent = () => {
       return;
     }
 
+    const { default: jsPDF } = await import("jspdf");
+
+    const { default: autoTable } = await import("jspdf-autotable");
+
     const doc = new jsPDF();
     const tableColumn = ["Nome", "Email", "Telefone", "Documento", "Cidade/UF", "Reservas", "Total Gasto"];
     const tableRows: any[] = [];
@@ -736,6 +740,8 @@ const AdminCRMContent = () => {
   };
 
   const exportClientPDF = (c: Customer) => {
+    const { default: jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF();
     
     // Header

@@ -333,6 +333,8 @@ const AdminColaboradores = () => {
 
   const generatePDF = () => {
     try {
+      const { default: jsPDF } = await import("jspdf");
+      const { default: autoTable } = await import("jspdf-autotable");
       const doc = new jsPDF();
       const dateStr = format(new Date(), "dd/MM/yyyy HH:mm");
       

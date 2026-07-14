@@ -424,6 +424,8 @@ const AdminParceiros = () => {
   };
 
   const exportPDF = async () => {
+    const { default: jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF();
     const now = new Date();
     const dateStr = now.toLocaleDateString("pt-BR");
