@@ -70,16 +70,6 @@ const AdminParceiros = () => {
     name: "", label: "", icon: "Building2", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
   });
 
-  useEffect(() => { 
-    fetchInitialData(); 
-  }, []);
-
-  const fetchInitialData = async () => {
-    setLoading(true);
-    await Promise.all([fetchPartners(), fetchTypes(), fetchCompany()]);
-    setLoading(false);
-  };
-
   const fetchPartnerBookings = async (partnerId: string) => {
     setLoadingBookings(true);
     const { data, error } = await supabase
@@ -88,7 +78,7 @@ const AdminParceiros = () => {
       .eq("partner_id", partnerId)
       .order("created_at", { ascending: false })
       .limit(10);
-    
+
     if (!error && data) {
       setPartnerBookings(data);
     }
@@ -103,38 +93,18 @@ const AdminParceiros = () => {
       .eq("partner_id", partnerId)
       .order("vencimento", { ascending: false })
       .limit(10);
-    
+
     if (!error && data) {
       setPartnerReceivables(data);
     }
     setLoadingReceivables(false);
   };
 
-  const fetchCompany = async () => {
-    const { data } = await supabase.from("sgs_empresa").select("*").limit(1).maybeSingle();
-    if (data) setCompany(data);
-  };
+  // Backwards-compatible aliases so existing handlers keep working after the
+  // data layer moved to usePartnersData / react-query.
+  const fetchPartners = refreshPartners;
+  const fetchTypes = refreshTypes;
 
-  const fetchPartners = async () => {
-    const { data } = await supabase.from("partners").select("*").order("created_at", { ascending: false });
-    if (data) setPartners(data as Partner[]);
-  };
-
-  const fetchTypes = async () => {
-    const { data } = await supabase.from("partner_types").select("*").order("label", { ascending: true });
-    if (data && data.length > 0) {
-      setPartnerTypes(data as PartnerType[]);
-    } else {
-      // Fallback types if database is empty
-      setPartnerTypes([
-        { id: '1', name: 'hotel', label: 'Hotel/Pousada', icon: 'Building2', color: 'blue' },
-        { id: '2', name: 'guia', label: 'Guia de Turismo', icon: 'Compass', color: 'green' },
-        { id: '3', name: 'motorista', label: 'Motorista', icon: 'Car', color: 'amber' },
-        { id: '4', name: 'agencia', label: 'Agência', icon: 'Users', color: 'purple' },
-        { id: '5', name: 'restaurante', label: 'Restaurante', icon: 'Utensils', color: 'rose' }
-      ]);
-    }
-  };
 
   const openNew = () => {
     setEditPartner(null);
