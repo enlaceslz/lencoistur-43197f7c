@@ -279,7 +279,7 @@ export function useBookings() {
       return mappedResults[0]; // Returning the first one for compatibility
 
     },
-    [confirmPayment]
+    [confirmPayment, queryClient]
   );
 
   const cancelBooking = useCallback(async (id: string, groupId?: string) => {
