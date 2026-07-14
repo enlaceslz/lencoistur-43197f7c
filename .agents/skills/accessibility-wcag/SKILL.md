@@ -1,6 +1,6 @@
 ---
-name: accessibility-wcag
-description: "Conformidade WCAG 2.1 AA, HTML semântico, ARIA, navegação por teclado, contraste e compliance BFSG."
+name: Accessibility (WCAG)
+description: Conformidade WCAG 2.1 AA, HTML semântico, ARIA, navegação por teclado, contraste e compliance BFSG.
 ---
 
 Audit this project for accessibility compliance (WCAG 2.1 AA). Provide specific violations and fixes.
