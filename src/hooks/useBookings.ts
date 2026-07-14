@@ -103,15 +103,32 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
   };
 }
 
+const BOOKINGS_QUERY_KEY = ["bookings", "admin", "list"] as const;
+const BOOKINGS_PAGE_SIZE = 1000;
+
+async function fetchBookingsFromDb(): Promise<BookingItem[]> {
+  const { data, error } = await supabase
+    .from("bookings")
+    .select(
+      "id, booking_code, type, item_name, date, guests, unit_price, total, discount, final_total, public_unit_price, public_total, partner_net_price, pay_method, status, payment_status, created_at, pix_code, notes, customer_id, cpf, birth_date, invoice_url, voucher_url, collaborator_id, partner_id, group_id, customers!customer_id(name, email, phone, cpf, passport, country, birth_date), collaborators(name), sgs_risk_terms(pdf_url, accepted, signed_at_counter)"
+    )
+    .order("created_at", { ascending: false })
+    .limit(BOOKINGS_PAGE_SIZE);
+
+  if (error) throw error;
+  return (data ?? []).map((row: any) => mapDbToBooking(row, row.customers));
+}
 
 export function useBookings() {
   const queryClient = useQueryClient();
 
-  const { data: bookings = [], isLoading: loading } = useQuery({
+  const { data: bookings = [], isLoading: loading } = useQuery<BookingItem[]>({
     queryKey: BOOKINGS_QUERY_KEY,
     queryFn: fetchBookingsFromDb,
     staleTime: 30_000,
   });
+
+
 
   const invalidate = useCallback(
     () => queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEY }),
@@ -253,7 +270,12 @@ export function useBookings() {
         }
       }
 
-      setBookings((prev) => [...mappedResults, ...prev]);
+      // Optimistic prepend so the UI shows the new booking immediately;
+      // the realtime subscription + invalidate() will reconcile shortly after.
+      queryClient.setQueryData<BookingItem[]>(BOOKINGS_QUERY_KEY, (prev = []) => [
+        ...mappedResults,
+        ...prev,
+      ]);
       return mappedResults[0]; // Returning the first one for compatibility
 
     },
