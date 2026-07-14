@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -102,41 +103,55 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
   };
 }
 
+const BOOKINGS_QUERY_KEY = ["bookings", "admin", "list"] as const;
+const BOOKINGS_PAGE_SIZE = 1000;
+
+async function fetchBookingsFromDb(): Promise<BookingItem[]> {
+  const { data, error } = await supabase
+    .from("bookings")
+    .select(
+      "id, booking_code, type, item_name, date, guests, unit_price, total, discount, final_total, public_unit_price, public_total, partner_net_price, pay_method, status, payment_status, created_at, pix_code, notes, customer_id, cpf, birth_date, invoice_url, voucher_url, collaborator_id, partner_id, group_id, customers!customer_id(name, email, phone, cpf, passport, country, birth_date), collaborators(name), sgs_risk_terms(pdf_url, accepted, signed_at_counter)"
+    )
+    .order("created_at", { ascending: false })
+    .limit(BOOKINGS_PAGE_SIZE);
+
+  if (error) throw error;
+  return (data ?? []).map((row: any) => mapDbToBooking(row, row.customers));
+}
 
 export function useBookings() {
-  const [bookings, setBookings] = useState<BookingItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  const fetchBookings = useCallback(async () => {
-    setLoading(true);
-    const { data: bookingsData } = await supabase
-      .from("bookings")
-      .select("*, customers!customer_id(*), collaborators(name), sgs_risk_terms(pdf_url, accepted, signed_at_counter)")
-      .order("created_at", { ascending: false });
+  const { data: bookings = [], isLoading: loading } = useQuery<BookingItem[]>({
+    queryKey: BOOKINGS_QUERY_KEY,
+    queryFn: fetchBookingsFromDb,
+    staleTime: 30_000,
+  });
 
-    if (bookingsData) {
-      setBookings(
-        bookingsData.map((row: any) => mapDbToBooking(row, row.customers))
-      );
-    }
-    setLoading(false);
-  }, []);
+
+
+  const invalidate = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEY }),
+    [queryClient]
+  );
+
+  // Backwards-compatible alias for callers that used refresh() to force reload.
+  const fetchBookings = invalidate;
 
   useEffect(() => {
-    fetchBookings();
-
-    // Realtime subscription
     const channel = supabase
       .channel("bookings-changes")
       .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, () => {
-        fetchBookings();
+        // React-query dedups concurrent invalidations, so a burst of realtime
+        // events triggers a single refetch instead of one per event.
+        invalidate();
       })
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchBookings]);
+  }, [invalidate]);
 
   const confirmPayment = useCallback(async (id: string, groupId?: string) => {
     const query = supabase.from("bookings").select("*, customers!customer_id(name)");
@@ -255,11 +270,16 @@ export function useBookings() {
         }
       }
 
-      setBookings((prev) => [...mappedResults, ...prev]);
+      // Optimistic prepend so the UI shows the new booking immediately;
+      // the realtime subscription + invalidate() will reconcile shortly after.
+      queryClient.setQueryData<BookingItem[]>(BOOKINGS_QUERY_KEY, (prev = []) => [
+        ...mappedResults,
+        ...prev,
+      ]);
       return mappedResults[0]; // Returning the first one for compatibility
 
     },
-    [confirmPayment]
+    [confirmPayment, queryClient]
   );
 
   const cancelBooking = useCallback(async (id: string, groupId?: string) => {
