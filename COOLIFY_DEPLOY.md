@@ -1,151 +1,146 @@
 # Deploy no Coolify (VPS) — lencois.tur.br
 
-Este guia descreve como realizar o deploy da aplicação **LençóisTour** em uma VPS gerenciada pelo **Coolify**, usando Docker, com o domínio **https://lencois.tur.br**.
+Guia de deploy da aplicação **LençóisTour** em VPS gerenciada pelo **Coolify**, usando Docker + Bun + Nginx, para o domínio **https://lencois.tur.br**.
+
+> Backend (Postgres, Auth, Storage, Edge Functions) permanece no **Lovable Cloud**. Este deploy hospeda apenas a SPA estática.
 
 ---
 
 ## 1. Pré-requisitos
 
-- VPS Linux (Ubuntu 22.04+ recomendado) com:
-  - Mínimo 2 vCPU / 4 GB RAM / 40 GB SSD
-  - Portas **80** e **443** liberadas no firewall
-  - IPv4 público fixo
-- **Coolify v4+** instalado e rodando na VPS
-- Acesso ao repositório Git do projeto (público ou via deploy key)
-- Domínio **lencois.tur.br** registrado, com acesso ao painel de DNS
+- VPS Linux (Ubuntu 22.04+): 2 vCPU / 4 GB RAM / 40 GB SSD
+- Portas **80** e **443** liberadas
+- **Coolify v4+** instalado
+- Acesso ao repositório Git (público ou via deploy key)
+- Domínio **lencois.tur.br** com acesso ao DNS
 
-### Instalação rápida do Coolify (caso ainda não tenha)
+Instalação rápida do Coolify:
 ```bash
 curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
 ```
-Após a instalação, acesse `http://SEU_IP_VPS:8000` para concluir o setup inicial.
 
 ---
 
-## 2. Configuração de DNS para `lencois.tur.br`
+## 2. DNS
 
-No painel do seu registrador (Registro.br ou outro), adicione os registros apontando para o IP da VPS:
+No registrador do domínio, aponte para o IP da VPS:
 
-| Tipo  | Nome | Valor              | TTL  |
-|-------|------|--------------------|------|
-| A     | @    | `IP_DA_SUA_VPS`    | 3600 |
-| A     | www  | `IP_DA_SUA_VPS`    | 3600 |
+| Tipo | Nome | Valor           | TTL  |
+|------|------|-----------------|------|
+| A    | @    | `IP_DA_VPS`     | 3600 |
+| A    | www  | `IP_DA_VPS`     | 3600 |
 
-> A propagação pode levar de alguns minutos até 24h. Verifique em [dnschecker.org](https://dnschecker.org).
+Verifique propagação em [dnschecker.org](https://dnschecker.org).
 
 ---
 
 ## 3. Criar o recurso no Coolify
 
-1. Acesse o painel do Coolify e selecione (ou crie) um **Project** e um **Environment** (ex.: `production`).
-2. Clique em **+ New Resource → Public Repository** (ou **Private Repository** com deploy key).
-3. Cole a URL do repositório Git do projeto.
-4. Em **Build Pack**, selecione **Dockerfile** — o Coolify detectará o `Dockerfile` na raiz automaticamente.
-5. Em **Branch**, selecione a branch de produção (ex.: `main`).
-6. Em **Ports Exposes**, confirme `80` (porta exposta pelo Nginx dentro do container).
+1. **+ New Resource → Public/Private Repository**
+2. Cole a URL do repositório e escolha a branch (`main`)
+3. **Build Pack**: `Dockerfile` (detectado automaticamente na raiz)
+4. **Ports Exposes**: `80`
 
 ---
 
-## 4. Variáveis de Ambiente
+## 4. Variáveis de ambiente (Build Variables)
 
-Em **Environment Variables**, adicione as variáveis abaixo (necessárias em build-time pelo Vite — marque a opção **"Build Variable"** para cada uma):
+Adicione em **Environment Variables** e marque **"Build Variable"** — o Vite congela esses valores no bundle:
 
-| Variável                          | Valor                                                    |
-|-----------------------------------|----------------------------------------------------------|
-| `VITE_SUPABASE_URL`               | URL do projeto Supabase (Lovable Cloud)                  |
-| `VITE_SUPABASE_PUBLISHABLE_KEY`   | Anon/Publishable key do Supabase                         |
-| `VITE_SUPABASE_PROJECT_ID`        | ID do projeto Supabase                                   |
+| Variável                        | Valor                                  |
+|---------------------------------|----------------------------------------|
+| `VITE_SUPABASE_URL`             | URL do projeto Lovable Cloud           |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Anon/Publishable key                   |
+| `VITE_SUPABASE_PROJECT_ID`      | ID do projeto Lovable Cloud            |
 
-> ⚠️ Estas variáveis precisam estar disponíveis **durante o build** (Vite injeta os valores nos assets estáticos). Caso altere alguma, é necessário fazer um **Redeploy** (build completo), não apenas restart.
+O `Dockerfile` já declara `ARG` correspondentes e o Coolify injeta cada Build Variable como `--build-arg`.
 
-Nunca cadastre secrets do tipo service-role ou chaves privadas aqui — elas devem ficar apenas em Edge Functions/servidor.
+> ⚠️ **Nunca** coloque `SUPABASE_SERVICE_ROLE_KEY` ou outros segredos aqui. Segredos servidor-side vivem apenas nas Edge Functions do Lovable Cloud.
+
+Após alterar qualquer Build Variable → **Redeploy** completo (não basta restart).
 
 ---
 
-## 5. Configurar o domínio `lencois.tur.br`
+## 5. Domínio HTTPS
 
-1. Na aba **General / Domains** do recurso no Coolify, defina os FQDNs:
-   ```
-   https://lencois.tur.br
-   https://www.lencois.tur.br
-   ```
-2. O Coolify provisiona automaticamente certificado SSL via **Let's Encrypt** (Traefik). Garanta que:
-   - O DNS já propagou para o IP da VPS
-   - As portas **80** e **443** estão abertas (necessárias para o desafio HTTP-01)
-3. Opcionalmente, defina `https://lencois.tur.br` como domínio primário e configure redirect `www → root` (ou vice-versa).
+Em **General → Domains**, defina:
+```
+https://lencois.tur.br
+https://www.lencois.tur.br
+```
+O Coolify emite certificado via **Let's Encrypt** (Traefik). Requisitos:
+- DNS propagado
+- Portas 80 e 443 abertas (desafio HTTP-01)
+
+Defina `https://lencois.tur.br` como primário e configure redirect `www → root`.
 
 ---
 
 ## 6. Deploy
 
-1. Clique em **Deploy** e acompanhe os logs em **Deployments → Logs**.
-2. Build esperado (multi-stage):
-   - Stage 1 (`node:20-slim`) → `pnpm install --frozen-lockfile` + `pnpm run build` (Vite gera `/dist`)
-   - Stage 2 (`nginx:stable-alpine`) → serve `/dist` em `/usr/share/nginx/html` na porta 80
-3. Após o status ficar **Running**, acesse https://lencois.tur.br para validar.
+1. Clique em **Deploy** e acompanhe **Deployments → Logs**.
+2. Build multi-stage esperado:
+   - Stage 1 (`oven/bun:1.1-alpine`): `bun install --frozen-lockfile` + `bun run build` → gera `/dist`
+   - Stage 2 (`nginx:stable-alpine`): serve `/dist` em `/usr/share/nginx/html` na porta 80
+3. Ao ficar **Running**, valide em https://lencois.tur.br
 
-> Observação: o projeto usa **pnpm** (via `corepack`). Não substitua por `npm ci` no Dockerfile — o `pnpm-lock.yaml` é a fonte de verdade.
+> O projeto usa **Bun** (`bun.lock`). Não substitua por `npm ci`/`pnpm install` no Dockerfile.
 
 ---
 
-## 7. SPA Routing e cache (já configurado)
+## 7. SPA routing e cache
 
-O `nginx.conf` incluso no projeto cuida de:
-- **Fallback SPA** (`try_files $uri /index.html`) — necessário para React Router
-- Cache longo para assets versionados em `/assets/*`
+O `nginx.conf` do projeto já cobre:
+- Fallback SPA (`try_files $uri /index.html`) para React Router
+- Cache longo em `/assets/*` (arquivos versionados pelo Vite)
 - Headers básicos de segurança
 
-Nenhuma configuração extra é necessária no Coolify para deep links funcionarem após refresh.
+Nenhuma configuração extra no Coolify para deep links / refresh.
 
 ---
 
 ## 8. Healthcheck e logs
 
-### Healthcheck (Coolify → Configuration → Healthcheck)
-- **Path**: `/`  • **Port**: `80`
-- **Interval**: `30s` • **Timeout**: `10s` • **Retries**: `3`
-- Espera-se HTTP `200` retornando o `index.html`.
+**Healthcheck** (Configuration → Healthcheck):
+- Path `/` • Port `80` • Interval `30s` • Timeout `10s` • Retries `3`
+- Espera HTTP `200`. Já embutido no `Dockerfile` via `HEALTHCHECK`.
 
-### Logs
-- **Build logs**: Coolify → Deployments → selecione o deploy → **Logs**
-- **Runtime logs** (Nginx): Coolify → Resource → **Logs** (stdout/stderr do container)
-- Para erros 5xx persistentes, verifique se o build gerou `/dist/index.html` e se as variáveis `VITE_SUPABASE_*` estavam presentes **no momento do build**.
-
----
-
-## 9. Atualizações futuras
-
-- **Auto Deploy on Push**: ative em **Configuration → General** para que cada push na branch de produção dispare um novo build.
-- **Manual Redeploy**: use sempre que alterar variáveis de ambiente marcadas como Build Variable (Vite congela esses valores no bundle).
-- **Rollback**: o Coolify mantém histórico de deployments — clique em uma versão anterior e use **Redeploy** para reverter.
-- **Limpeza**: ative **Configuration → Advanced → Prune old images** para evitar enchimento do disco da VPS.
+**Logs**:
+- Build: Deployments → deploy → Logs
+- Runtime (Nginx): Resource → Logs
+- Erros 5xx: confirmar que `/dist/index.html` foi gerado e que as `VITE_SUPABASE_*` estavam no build
 
 ---
 
-## 10. Backup e Disaster Recovery
+## 9. Atualizações e rollback
 
-### Frontend (VPS / Coolify)
-- O frontend é stateless — o "backup" é o próprio repositório Git. Em caso de perda da VPS:
-  1. Reprovisione o Coolify em nova VPS.
-  2. Recrie o recurso apontando para o mesmo repositório e branch.
-  3. Recoloque as variáveis `VITE_SUPABASE_*` e refaça o deploy.
-- Faça backup periódico da **configuração do Coolify** (Settings → Backups).
+- **Auto Deploy on Push**: Configuration → General
+- **Redeploy manual**: obrigatório após mudar Build Variables
+- **Rollback**: histórico de deployments → Redeploy da versão anterior
+- **Prune old images**: Configuration → Advanced (evita encher disco)
 
-### Backend (Lovable Cloud)
-- Backups automáticos do PostgreSQL são gerenciados pelo Lovable Cloud.
-- Storage buckets (`tour-images`, `vouchers`, `company-documents`, `customer-documents`, `financeiro`, `avatars`) ficam no Lovable Cloud — sem backup local necessário.
-- Edge Functions ficam versionadas no repositório (`supabase/functions/*`).
+---
+
+## 10. Backup / DR
+
+**Frontend** (stateless): backup é o próprio repositório Git. Em perda da VPS:
+1. Reprovisione Coolify em nova VPS
+2. Recrie o recurso apontando para o mesmo repositório
+3. Reponha as `VITE_SUPABASE_*` e redeploy
+
+Faça backup da configuração do Coolify (Settings → Backups).
+
+**Backend** (Lovable Cloud): Postgres, Storage (`tour-images`, `vouchers`, `company-documents`, `customer-documents`, `financeiro`, `avatars`) e Edge Functions ficam versionados no Cloud + repositório (`supabase/functions/*`). Export de dados: Cloud → Advanced settings → Export data.
 
 ---
 
 ## 11. Backend (Lovable Cloud)
 
-Este deploy contempla apenas o **frontend** (SPA estática servida pelo Nginx). O backend permanece no **Lovable Cloud**:
-- PostgreSQL + RLS (todas as tabelas com políticas default-deny)
-- Edge Functions (`catalog-pricing`, `create-booking`, `handle-public-term`, `send-term-email`, `ai-analysis`, `chat`)
-- Auth e Storage
+- Postgres + RLS default-deny em todas as tabelas
+- Edge Functions: `catalog-pricing`, `create-booking`, `handle-public-term`, `send-term-email`, `ai-analysis`, `chat`
+- Auth (email/senha + Google) e Storage
 
-Não é necessário hospedar backend na VPS. As variáveis `VITE_SUPABASE_*` devem apontar para o projeto Cloud correto.
+Não replique o backend na VPS. Apenas garanta que as `VITE_SUPABASE_*` apontem para o projeto Cloud correto.
 
 ---
 
@@ -153,43 +148,44 @@ Não é necessário hospedar backend na VPS. As variáveis `VITE_SUPABASE_*` dev
 
 | Sintoma | Causa provável | Ação |
 |---|---|---|
-| Build falha em `pnpm install` | Lockfile desatualizado | Rode `pnpm install` localmente, commit `pnpm-lock.yaml` |
-| Página em branco em produção | `VITE_SUPABASE_*` ausentes no build | Marque como **Build Variable** e faça **Redeploy** |
-| 404 ao recarregar `/admin` | `nginx.conf` não foi copiado | Verifique stage 2 do Dockerfile e refaça build |
-| SSL não emite | DNS não propagou ou porta 80 bloqueada | `dig lencois.tur.br`, libere 80/443 no firewall |
-| CORS/401 ao chamar backend | URL/Anon key apontando para projeto errado | Confira `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` |
-| Edge Function 500 | Função fora do Lovable Cloud | Verifique no painel Lovable Cloud |
-| Container reinicia em loop | OOM | Suba a VPS para 4 GB+ ou aumente swap |
+| Build falha em `bun install` | Lockfile desatualizado | Rode `bun install` local e commit `bun.lock` |
+| Página em branco em produção | `VITE_SUPABASE_*` ausentes no build | Marque como Build Variable + Redeploy |
+| 404 ao recarregar `/admin` | `nginx.conf` não copiado | Verifique stage 2 do Dockerfile |
+| SSL não emite | DNS não propagou / porta 80 bloqueada | `dig lencois.tur.br`, libere 80/443 |
+| CORS ou 401 no backend | Vars apontando para projeto errado | Confira `VITE_SUPABASE_URL`/`_PUBLISHABLE_KEY` |
+| Edge Function 500 | Erro na função no Cloud | Veja logs no painel Lovable Cloud |
+| Container em restart loop (OOM) | RAM insuficiente | Suba VPS para 4 GB+ ou adicione swap |
 
 ---
 
 ## 13. Segurança da VPS
 
-- Mantenha o SO atualizado: `apt update && apt upgrade -y` (semanal).
-- Use **UFW**: libere apenas `22`, `80`, `443` (e `8000` apenas do seu IP, para o painel Coolify).
-- Desative login root por senha — use chaves SSH e considere **fail2ban**.
-- Proteja o painel Coolify (`:8000`) com IP allowlist e 2FA.
+- `apt update && apt upgrade -y` semanal
+- **UFW**: libere apenas `22`, `80`, `443` (e `8000` restrito ao seu IP para o painel Coolify)
+- SSH somente por chave, root desabilitado, considere **fail2ban**
+- Painel Coolify: IP allowlist + 2FA
 
 ---
 
 ## 14. Checklist final
 
-- [ ] DNS `lencois.tur.br` e `www.lencois.tur.br` → IP da VPS
-- [ ] Portas 80/443 abertas no firewall da VPS
-- [ ] Variáveis `VITE_SUPABASE_*` configuradas como **Build Variables**
+- [ ] DNS `lencois.tur.br` e `www` apontando para o IP da VPS
+- [ ] Portas 80/443 abertas no firewall
+- [ ] `VITE_SUPABASE_*` configuradas como **Build Variables**
 - [ ] Domínios HTTPS adicionados no Coolify
-- [ ] Certificado Let's Encrypt emitido com sucesso
-- [ ] Healthcheck configurado (`/` na porta 80)
+- [ ] Certificado Let's Encrypt emitido
+- [ ] Healthcheck respondendo em `/` porta 80
 - [ ] Auto Deploy on Push habilitado
 - [ ] Backup do Coolify configurado
-- [ ] Firewall da VPS endurecido (UFW + SSH com chave)
-- [ ] https://lencois.tur.br carregando a aplicação
+- [ ] VPS endurecida (UFW + SSH por chave)
+- [ ] https://lencois.tur.br carregando corretamente
 - [ ] Login admin, reservas e checkout testados em produção
 
 ---
 
 ## Arquivos relevantes
-- `Dockerfile` — build multi-stage (Node 20 slim + pnpm → Nginx Alpine)
-- `nginx.conf` — fallback SPA + cache de assets
-- `.env` — gerenciado pelo Lovable Cloud (não comitar em produção)
-- `pnpm-lock.yaml` — fonte de verdade para reprodutibilidade do build
+
+- `Dockerfile` — build multi-stage (Bun 1.1 Alpine → Nginx Alpine)
+- `nginx.conf` — fallback SPA + cache de assets versionados
+- `bun.lock` — fonte de verdade para reprodutibilidade do build
+- `.env` — gerenciado pelo Lovable Cloud (não versionar em produção)
