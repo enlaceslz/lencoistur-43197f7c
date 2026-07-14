@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -104,39 +105,36 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
 
 
 export function useBookings() {
-  const [bookings, setBookings] = useState<BookingItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  const fetchBookings = useCallback(async () => {
-    setLoading(true);
-    const { data: bookingsData } = await supabase
-      .from("bookings")
-      .select("*, customers!customer_id(*), collaborators(name), sgs_risk_terms(pdf_url, accepted, signed_at_counter)")
-      .order("created_at", { ascending: false });
+  const { data: bookings = [], isLoading: loading } = useQuery({
+    queryKey: BOOKINGS_QUERY_KEY,
+    queryFn: fetchBookingsFromDb,
+    staleTime: 30_000,
+  });
 
-    if (bookingsData) {
-      setBookings(
-        bookingsData.map((row: any) => mapDbToBooking(row, row.customers))
-      );
-    }
-    setLoading(false);
-  }, []);
+  const invalidate = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEY }),
+    [queryClient]
+  );
+
+  // Backwards-compatible alias for callers that used refresh() to force reload.
+  const fetchBookings = invalidate;
 
   useEffect(() => {
-    fetchBookings();
-
-    // Realtime subscription
     const channel = supabase
       .channel("bookings-changes")
       .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, () => {
-        fetchBookings();
+        // React-query dedups concurrent invalidations, so a burst of realtime
+        // events triggers a single refetch instead of one per event.
+        invalidate();
       })
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchBookings]);
+  }, [invalidate]);
 
   const confirmPayment = useCallback(async (id: string, groupId?: string) => {
     const query = supabase.from("bookings").select("*, customers!customer_id(name)");
