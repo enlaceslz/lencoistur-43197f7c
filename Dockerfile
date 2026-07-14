@@ -1,17 +1,29 @@
-FROM node:20-slim AS base
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+# syntax=docker/dockerfile:1.6
 
-FROM base AS build
-COPY . /usr/src/app
+# --- Stage 1: build the Vite SPA with Bun ---
+FROM oven/bun:1.1-alpine AS build
 WORKDIR /usr/src/app
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-RUN pnpm run build
 
+# Build-time env vars (Vite freezes these into the bundle)
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_PUBLISHABLE_KEY
+ARG VITE_SUPABASE_PROJECT_ID
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
+ENV VITE_SUPABASE_PROJECT_ID=$VITE_SUPABASE_PROJECT_ID
+
+# Install deps (cached) then build
+COPY package.json bun.lock ./
+RUN --mount=type=cache,id=bun,target=/root/.bun/install/cache \
+    bun install --frozen-lockfile
+COPY . .
+RUN bun run build
+
+# --- Stage 2: serve static assets with Nginx ---
 FROM nginx:stable-alpine
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html
-# Copy a custom nginx config to handle SPA routing if needed
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD wget -q --spider http://127.0.0.1/ || exit 1
 CMD ["nginx", "-g", "daemon off;"]
