@@ -8,8 +8,6 @@ import {
   Wrench, ClipboardList, Loader2, Waves, Sun, Award, CheckCircle2, Clock, FileText, Info
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
-import { jsPDF } from "jspdf";
-import "jspdf-autotable";
 
 const AdminSGSDashboard = () => {
   const navigate = useNavigate();
