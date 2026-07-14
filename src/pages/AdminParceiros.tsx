@@ -26,64 +26,15 @@ import { Separator } from "@/components/ui/separator";
 import { ptBR } from "date-fns/locale";
 import { formatDate } from "@/lib/utils";
 import { NumericFormat } from "react-number-format";
-
-
-interface PartnerType {
-  id: string;
-  name: string;
-  label: string;
-  icon: string;
-  color: string;
-}
-
-interface Partner {
-  id: string;
-  name: string;
-  type: string;
-  contact_name: string | null;
-  phone: string | null;
-  email: string | null;
-  commission_rate: number | null;
-  active: boolean;
-  cpf_cnpj: string | null;
-  address: string | null;
-  cnh: string | null;
-  cnh_validade: string | null;
-  cadastur: string | null;
-  remuneration_type: string | null;
-  remuneration_value: number | null;
-  bank_name: string | null;
-  bank_agency: string | null;
-  bank_account: string | null;
-  bank_pix_key: string | null;
-  credit_limit: number | null;
-  tags: string[] | null;
-}
-
-const iconMap: Record<string, any> = {
-  Building2, Compass, Car, Users, MapPin, Search, Plus, Edit, Trash2, Loader2, Banknote, Landmark, Percent, FileText, Calendar, Clock, Phone, Mail, User
-};
-
-const getIcon = (name: string) => iconMap[name] || Building2;
-
-const getGradient = (color: string) => {
-  if (color.includes("blue")) return "from-blue-500 to-indigo-600";
-  if (color.includes("green")) return "from-emerald-500 to-teal-600";
-  if (color.includes("amber") || color.includes("yellow")) return "from-amber-500 to-orange-600";
-  if (color.includes("purple") || color.includes("pink")) return "from-purple-500 to-pink-600";
-  if (color.includes("rose") || color.includes("red")) return "from-rose-500 to-red-600";
-  return "from-slate-500 to-slate-700";
-};
-
-function isCnpj(value: string): boolean {
-  return value.replace(/\D/g, "").length >= 14;
-}
+import type { Partner, PartnerType } from "@/features/parceiros/types";
+import { iconMap, getIcon, getGradient, isCnpj } from "@/features/parceiros/utils";
+import { usePartnersData } from "@/features/parceiros/usePartnersData";
 
 
 const AdminParceiros = () => {
-  const [partners, setPartners] = useState<Partner[]>([]);
-  const [partnerTypes, setPartnerTypes] = useState<PartnerType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { partners, partnerTypes, company, loading, refreshPartners, refreshTypes } = usePartnersData();
+
+  // Local UI state only — data lives in react-query cache now.
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("todos");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -95,7 +46,6 @@ const AdminParceiros = () => {
   const [deleteTypeId, setDeleteTypeId] = useState<string | null>(null);
   const [cnpjLoading, setCnpjLoading] = useState(false);
   const [viewPartner, setViewPartner] = useState<Partner | null>(null);
-  const [company, setCompany] = useState<any>(null);
   const [receivableDialogOpen, setReceivableDialogOpen] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   const [partnerBookings, setPartnerBookings] = useState<any[]>([]);
@@ -120,16 +70,6 @@ const AdminParceiros = () => {
     name: "", label: "", icon: "Building2", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
   });
 
-  useEffect(() => { 
-    fetchInitialData(); 
-  }, []);
-
-  const fetchInitialData = async () => {
-    setLoading(true);
-    await Promise.all([fetchPartners(), fetchTypes(), fetchCompany()]);
-    setLoading(false);
-  };
-
   const fetchPartnerBookings = async (partnerId: string) => {
     setLoadingBookings(true);
     const { data, error } = await supabase
@@ -138,7 +78,7 @@ const AdminParceiros = () => {
       .eq("partner_id", partnerId)
       .order("created_at", { ascending: false })
       .limit(10);
-    
+
     if (!error && data) {
       setPartnerBookings(data);
     }
@@ -153,38 +93,18 @@ const AdminParceiros = () => {
       .eq("partner_id", partnerId)
       .order("vencimento", { ascending: false })
       .limit(10);
-    
+
     if (!error && data) {
       setPartnerReceivables(data);
     }
     setLoadingReceivables(false);
   };
 
-  const fetchCompany = async () => {
-    const { data } = await supabase.from("sgs_empresa").select("*").limit(1).maybeSingle();
-    if (data) setCompany(data);
-  };
+  // Backwards-compatible aliases so existing handlers keep working after the
+  // data layer moved to usePartnersData / react-query.
+  const fetchPartners = refreshPartners;
+  const fetchTypes = refreshTypes;
 
-  const fetchPartners = async () => {
-    const { data } = await supabase.from("partners").select("*").order("created_at", { ascending: false });
-    if (data) setPartners(data as Partner[]);
-  };
-
-  const fetchTypes = async () => {
-    const { data } = await supabase.from("partner_types").select("*").order("label", { ascending: true });
-    if (data && data.length > 0) {
-      setPartnerTypes(data as PartnerType[]);
-    } else {
-      // Fallback types if database is empty
-      setPartnerTypes([
-        { id: '1', name: 'hotel', label: 'Hotel/Pousada', icon: 'Building2', color: 'blue' },
-        { id: '2', name: 'guia', label: 'Guia de Turismo', icon: 'Compass', color: 'green' },
-        { id: '3', name: 'motorista', label: 'Motorista', icon: 'Car', color: 'amber' },
-        { id: '4', name: 'agencia', label: 'Agência', icon: 'Users', color: 'purple' },
-        { id: '5', name: 'restaurante', label: 'Restaurante', icon: 'Utensils', color: 'rose' }
-      ]);
-    }
-  };
 
   const openNew = () => {
     setEditPartner(null);
