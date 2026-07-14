@@ -8,8 +8,6 @@ import {
   ChevronRight, Star, Heart, Activity, Award, Shield, User, 
   MoreHorizontal, Map, Filter, ArrowRight, UserCheck, UserPlus2
 } from "lucide-react";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

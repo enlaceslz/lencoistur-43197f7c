@@ -8,8 +8,6 @@ import {
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 
 const MONTH_LABELS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 const fmt = (v: number) => formatCurrency(v);

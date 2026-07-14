@@ -5,8 +5,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Shield, CheckCircle, AlertTriangle, FileText, Pencil, Trash2, Users } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 import { Button } from "@/components/ui/button";
 
 // Riscos inerentes conforme P6 VATTI
