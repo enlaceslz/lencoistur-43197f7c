@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
@@ -10,9 +11,12 @@ import TestimonialsSection from "@/components/TestimonialsSection";
 import FAQSection from "@/components/FAQSection";
 import PartnersSection from "@/components/PartnersSection";
 import Footer from "@/components/Footer";
-import WhatsAppFloat from "@/components/WhatsAppFloat";
-import AIChatbot from "@/components/AIChatbot";
 import SEO from "@/components/SEO";
+
+// Floating widgets are not above-the-fold content — lazy-load them so their
+// JS stays out of the homepage's initial payload.
+const WhatsAppFloat = lazy(() => import("@/components/WhatsAppFloat"));
+const AIChatbot = lazy(() => import("@/components/AIChatbot"));
 
 const Index = () => {
   return (
@@ -42,8 +46,10 @@ const Index = () => {
       <FAQSection />
       <PartnersSection />
       <Footer />
-      <WhatsAppFloat />
-      <AIChatbot />
+      <Suspense fallback={null}>
+        <WhatsAppFloat />
+        <AIChatbot />
+      </Suspense>
     </div>
   );
 };
