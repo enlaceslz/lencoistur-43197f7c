@@ -2,7 +2,8 @@
 
 Sistema completo para operação de turismo de aventura na **Rota das Emoções – Lençóis Maranhenses, Santo Amaro – MA**, desenvolvido para a empresa **LENÇÓIS TOUR**.
 
-> **URL de produção:** [lencoistur.lovable.app](https://lencoistur.lovable.app)
+> **URL de produção:** [lencois.tur.br](https://lencois.tur.br)
+> **Backend:** Self-hosted Supabase (VPS Ubuntu 24.04, Docker, Coolify v4+, Traefik)
 
 ---
 
@@ -210,6 +211,62 @@ Certifique-se de que as variáveis `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY
 - **ABNT NBR ISO 21102** – Competência dos Líderes de Turismo de Aventura
 - **ABNT NBR ISO 21103** – Informações aos Participantes de Turismo de Aventura
 - **Devolutiva VATI** – Plano de Ação para Segurança Turística
+
+---
+
+## ⚡ Otimizações de Performance
+
+### Frontend
+- `React.memo` aplicado em componentes de lista em páginas admin (CRM, Colaboradores, Passeios, Documentos, Avaliações, Translados, Pacotes, SGS)
+- Sidebar memoizado com `isActive` prop
+- `AdminRoute` memoizado para evitar re-renders desnecessários
+
+### Backend (Supabase)
+- **Operações transacionais atômicas via RPC (SECURITY DEFINER):**
+  - `confirm_payment_transaction(p_booking_id, p_group_id)` — atualiza status + batch insert `contas_receber` em uma transação; ignora duplicatas via `NOT EXISTS`
+  - `cancel_booking_transaction(p_booking_id, p_group_id)` — cancela reserva + atualiza `contas_receber` atomicamente
+  - `update_booking_customer_transaction(p_booking_id, p_customer_id, p_customer_data, p_items, p_companions)` — sincroniza customer, itens (insert/update/delete), dependentes em transação única
+  - `mark_term_signed_transaction(p_booking_id)` — upsert atômico em `sgs_risk_terms` (unique constraint em `booking_id`)
+  - `complete_booking_transaction(p_booking_id)` — marca "concluída" + gera comissões/parcelas com `FOR UPDATE` lock
+  - `delete_booking_transaction(p_booking_id, p_group_id)` — deleta financeiro → booking em ordem respeitando FKs, tudo atomicamente
+- **Eliminação de N+1 queries em `useBookings.ts`:**
+  - `confirmPayment`: batch insert de `contas_receber` (antes 1 query por item)
+  - `updateBooking`: batch insert + `Promise.all` para updates
+  - `completeBooking`: paralelização de queries com `Promise.all`
+  - `addBooking`: `confirmPayment` em paralelo via `Promise.allSettled` (tolerância a falha parcial)
+- **Substituição de `select("*")` por colunas explícitas em:**
+  - `AdminFinanceiro.tsx`, `AdminRelatorios.tsx`, `AdminReservas.tsx`
+  - `ToursPage.tsx`, `TourDetail.tsx`
+- **Constraint única em `sgs_risk_terms.booking_id`** para evitar termos duplicados
+- **Verificação de duplicata no DB** (AdminReservas) em vez de estado local stale
+
+### Infraestrutura
+- Nginx com headers de cache para assets estáticos
+- Build Docker multi-stage (node:20-alpine → nginx:stable-alpine)
+
+---
+
+## 🚀 Migration SQL Recente
+
+**20260715000001_atomic_booking_ops.sql**
+
+Adiciona 4 funções RPC SECURITY DEFINER para operações atômicas:
+
+- **`confirm_payment_transaction(p_booking_id, p_group_id)`** — Atualiza status + batch insert `contas_receber` (evita duplicatas)
+- **`cancel_booking_transaction(p_booking_id, p_group_id)`** — Cancela reserva + atualiza `contas_receber`
+- **`update_booking_customer_transaction(p_booking_id, p_customer_id, p_customer_data, p_items, p_companions)`** — Sincroniza customer, itens, dependentes em uma única transação
+- **`mark_term_signed_transaction(p_booking_id)`** — Upsert atômico em `sgs_risk_terms` (novo unique constraint em `booking_id`)
+
+**20260715000002_complete_delete_rpc.sql**
+
+Adiciona:
+
+- **`complete_booking_transaction(p_booking_id)`** — Marca "concluída" + gera comissões/parcelas
+- **`delete_booking_transaction(p_booking_id, p_group_id)`** — Deleta registros financeiros na ordem correta de chave estrangeira
+
+Todas functions concedidas a `authenticated` (e `anon` conforme necessário).
+
+O frontend (`src/hooks/useBookings.ts`) utiliza agora os RPCs transacionais, eliminando `N+1` e falhas nas transações financeiras.
 
 ---
 

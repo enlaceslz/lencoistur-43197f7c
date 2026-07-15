@@ -200,23 +200,22 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   const activeNotifs = notifications.filter(n => !dismissed.has(n.id));
   const errorCount = activeNotifs.filter(n => n.type === "error").length;
 
-  const SidebarLink = ({ icon: Icon, label, path, indent = false }: SidebarItem & { indent?: boolean }) => {
-    const active = location.pathname === path || (path !== "/admin" && location.pathname.startsWith(path));
+  const SidebarLink = React.memo(({ icon: Icon, label, path, indent = false, isActive }: SidebarItem & { indent?: boolean; isActive: boolean }) => {
     return (
       <Link
         to={path}
         onClick={() => setSidebarOpen(false)}
         className={`flex items-center gap-3 px-4 py-2.5 rounded-md text-[14px] font-medium ${
-          active 
+          isActive 
             ? "bg-primary text-white" 
             : "text-white/70 hover:text-white hover:bg-white/10"
         } ${sidebarCollapsed ? "justify-center px-0 mx-2" : "mx-2"}`}
       >
-        <Icon size={indent ? 16 : 20} className={active ? "text-white" : ""} />
+        <Icon size={indent ? 16 : 20} className={isActive ? "text-white" : ""} />
         {!sidebarCollapsed && <span className="truncate">{label}</span>}
       </Link>
     );
-  };
+  });
 
   const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : "AD";
 
@@ -242,7 +241,10 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
             {filteredMainGroups.map((group, idx) => (
               <div key={idx} className={idx > 0 ? "pt-4" : ""}>
                 {!sidebarCollapsed && <p className="px-4 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">{group.title}</p>}
-                {group.items.map(item => <SidebarLink key={item.path} {...item} />)}
+                {group.items.map(item => {
+                  const isActive = location.pathname === item.path || (item.path !== "/admin" && location.pathname.startsWith(item.path));
+                  return <SidebarLink key={item.path} {...item} isActive={isActive} />;
+                })}
               </div>
             ))}
             
@@ -254,7 +256,10 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
                 </button>
                 {sgsOpen && !sidebarCollapsed && (
                   <div className="mt-2 space-y-1">
-                    {visibleSgsItems.map(item => <SidebarLink key={item.path} {...item} indent />)}
+                    {visibleSgsItems.map(item => {
+                      const isActive = location.pathname === item.path || (item.path !== "/admin/sgs" && location.pathname.startsWith(item.path));
+                      return <SidebarLink key={item.path} {...item} indent isActive={isActive} />;
+                    })}
                   </div>
                 )}
               </div>

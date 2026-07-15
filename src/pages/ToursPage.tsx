@@ -62,7 +62,7 @@ const ToursPage = () => {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const { data, error } = await supabase.from("public_tours" as "tours").select("*").order("name");
+      const { data, error } = await supabase.from("public_tours" as "tours").select("id, slug, name, images, location, mode_collective_enabled, mode_private_enabled, private_price, price, rating, reviews_count, tag, duration, pix_discount").order("name");
       if (error) {
         console.error("Erro ao carregar passeios:", error);
       }

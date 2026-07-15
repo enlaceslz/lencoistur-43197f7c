@@ -31,16 +31,25 @@ const DependentList = ({ customerId }: { customerId: string }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     const fetchDeps = async () => {
-      if (!customerId) return;
-      const { data } = await supabase
-        .from("dependents")
-        .select("*")
-        .eq("customer_id", customerId);
-      if (data) setDependents(data);
-      setLoading(false);
+      if (!customerId) { setLoading(false); return; }
+      try {
+        const { data, error } = await supabase
+          .from("dependents")
+          .select("id, customer_id, name, cpf, birth_date")
+          .eq("customer_id", customerId);
+        if (!cancelled) {
+          if (error) throw error;
+          if (data) setDependents(data);
+        }
+      } catch (err) {
+        console.error("Erro ao carregar dependentes:", err);
+      }
+      if (!cancelled) setLoading(false);
     };
     fetchDeps();
+    return () => { cancelled = true; };
   }, [customerId]);
 
   if (loading) return <div className="text-[10px] text-slate-400">Carregando dependentes...</div>;
@@ -125,6 +134,7 @@ const AdminReservas = () => {
   });
 
   useEffect(() => {
+    let cancelled = false;
     const fetchData = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const wideViewId = urlParams.get('wide_view_id');
@@ -132,38 +142,50 @@ const AdminReservas = () => {
         setIsWideViewNewWindow(true);
       }
 
-      const [collabsRes, partnersRes, toursRes, pkgsRes, transfersRes, customersRes] = await Promise.all([
-        supabase.from("collaborators").select("id, name").eq("status", "active"),
-        supabase.from("partners").select("id, name").eq("active", true),
-        supabase.from("tours").select("id, name, price, private_price, partner_price").eq("active", true),
-        supabase.from("packages").select("id, name, discount_price, original_price, partner_price").eq("active", true),
-        supabase.from("transfer_routes").select("id, origin, destination, price, partner_price").eq("active", true),
-        supabase.from("customers").select("id, name, email, phone, birth_date, cpf").order("name").limit(10)
-      ]);
+      try {
+        const [collabsRes, partnersRes, toursRes, pkgsRes, transfersRes, customersRes] = await Promise.all([
+          supabase.from("collaborators").select("id, name").eq("status", "active"),
+          supabase.from("partners").select("id, name").eq("active", true),
+          supabase.from("tours").select("id, name, price, private_price, partner_price").eq("active", true),
+          supabase.from("packages").select("id, name, discount_price, original_price, partner_price").eq("active", true),
+          supabase.from("transfer_routes").select("id, origin, destination, price, partner_price").eq("active", true),
+          supabase.from("customers").select("id, name, email, phone, birth_date, cpf").order("name").limit(10)
+        ]);
 
-      if (collabsRes.data) setCollaborators(collabsRes.data);
-      if (partnersRes.data) setPartners(partnersRes.data);
-      if (toursRes.data) setTours(toursRes.data);
-      if (pkgsRes.data) setPackages(pkgsRes.data);
-      if (transfersRes.data) setTransfers(transfersRes.data);
-      if (customersRes.data) setCustomers(customersRes.data);
-
+        if (!cancelled) {
+          if (collabsRes.data) setCollaborators(collabsRes.data);
+          if (partnersRes.data) setPartners(partnersRes.data);
+          if (toursRes.data) setTours(toursRes.data);
+          if (pkgsRes.data) setPackages(pkgsRes.data);
+          if (transfersRes.data) setTransfers(transfersRes.data);
+          if (customersRes.data) setCustomers(customersRes.data);
+        }
+      } catch (err) {
+        console.error("Erro ao carregar dados de suporte:", err);
+        toast({ title: "Erro", description: "Falha ao carregar dados do sistema", variant: "destructive" });
+      }
     };
 
     fetchData();
+    return () => { cancelled = true; };
   }, []);
 
   const searchCustomers = async (query: string) => {
     setCustomerSearch(query);
     if (query.length < 2) return;
 
-    const { data } = await supabase
-      .from("customers")
-      .select("id, name, email, phone, birth_date, cpf")
-      .ilike("name", `%${query}%`)
-      .limit(5);
+    try {
+      const { data, error } = await supabase
+        .from("customers")
+        .select("id, name, email, phone, birth_date, cpf")
+        .ilike("name", `%${query}%`)
+        .limit(5);
 
-    if (data) setCustomers(data);
+      if (error) throw error;
+      if (data) setCustomers(data);
+    } catch (err) {
+      console.error("Erro ao buscar clientes:", err);
+    }
   };
 
   const handleSelectCustomer = async (customer: any) => {
@@ -178,12 +200,16 @@ const AdminReservas = () => {
     }));
     setCustomerSearch("");
 
-    // Buscar dependentes vinculados ao cliente
-    const { data: deps } = await supabase
-      .from("dependents")
-      .select("*")
-      .eq("customer_id", customer.id);
-    if (deps) setCustomerDependents(deps);
+    try {
+      const { data: deps, error } = await supabase
+        .from("dependents")
+        .select("id, customer_id, name, cpf, birth_date, relationship")
+        .eq("customer_id", customer.id);
+      if (error) throw error;
+      if (deps) setCustomerDependents(deps);
+    } catch (err) {
+      console.error("Erro ao buscar dependentes:", err);
+    }
   };
 
   const filtered = bookings.filter((b) => {
@@ -293,15 +319,30 @@ const AdminReservas = () => {
     setSaving(true);
     try {
       if (!isEditing) {
-        for (const item of form.items) {
-          const isDuplicate = bookings.some(b => 
-            (b.customerId === form.customerId || b.customerName.toLowerCase() === form.customerName.toLowerCase()) && 
-            b.date === item.date && 
-            b.itemName.toLowerCase() === item.itemName.toLowerCase() &&
-            b.status !== 'cancelada'
-          );
+        let customerIds: string[] = [];
+        if (form.customerId) {
+          customerIds = [form.customerId];
+        } else {
+          const { data: found } = await supabase
+            .from("customers")
+            .select("id")
+            .ilike("name", form.customerName.toLowerCase())
+            .limit(5);
+          if (found) customerIds = found.map(c => c.id);
+        }
 
-          if (isDuplicate) {
+        for (const item of form.items) {
+          const { count, error } = await supabase
+            .from("bookings")
+            .select("id", { count: "exact", head: true })
+            .eq("item_name", item.itemName)
+            .eq("date", item.date)
+            .neq("status", "cancelada")
+            .in("customer_id", customerIds.length > 0 ? customerIds : ["00000000-0000-0000-0000-000000000000"]);
+
+          if (error) throw error;
+
+          if (count && count > 0) {
             toast({ 
               title: "Reserva Duplicada", 
               description: `Atenção: O cliente já possui uma reserva para ${item.itemName} em ${item.date}.`, 
@@ -380,11 +421,16 @@ const AdminReservas = () => {
     
     // Buscar dependentes do cliente ao editar
     if (booking.customerId) {
-      const { data: deps } = await supabase
-        .from("dependents")
-        .select("*")
-        .eq("customer_id", booking.customerId);
-      if (deps) setCustomerDependents(deps);
+      try {
+        const { data: deps, error } = await supabase
+          .from("dependents")
+          .select("id, customer_id, name, cpf, birth_date, relationship")
+          .eq("customer_id", booking.customerId);
+        if (error) throw error;
+        if (deps) setCustomerDependents(deps);
+      } catch (err) {
+        console.error("Erro ao buscar dependentes:", err);
+      }
     }
 
     

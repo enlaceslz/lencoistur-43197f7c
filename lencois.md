@@ -173,12 +173,19 @@ ADDITIONAL_REDIRECT_URLS=https://bolao.ai.slz.br/**
 
 ### Migrations
 
-~140 arquivos SQL em `/opt/lencois/lencois-test/supabase/migrations/`.
+~145 arquivos SQL em `/opt/lencois/lencois-test/supabase/migrations/`.
 Tabelas criadas: `bookings`, `tours`, `customers`, `partners`, `package_tours`,
 `reviews`, `notifications`, `sgs_*` (gestão de segurança), `financeiro_*` etc.
 
 Permissões PostgREST configuradas para `anon` e `authenticated` em todas as
 tabelas públicas.
+
+**Migrations recentes de operações atômicas:**
+
+| Migration | Descrição |
+|-----------|-----------|
+| `20260715000001_atomic_booking_ops.sql` | 4 RPCs SECURITY DEFINER: `confirm_payment_transaction`, `cancel_booking_transaction`, `update_booking_customer_transaction`, `mark_term_signed_transaction` + unique constraint `sgs_risk_terms.booking_id` |
+| `20260715000002_complete_delete_rpc.sql` | 2 RPCs SECURITY DEFINER: `complete_booking_transaction`, `delete_booking_transaction` |
 
 ### Edge Functions
 
@@ -251,6 +258,40 @@ npm run lint    # ESLint
 | Hash | Descrição |
 |------|-----------|
 | `cb270bb` | Switch Dockerfile from Bun to Node/npm for Coolify compat |
+| `14a38af` | Fix canAccess: treat empty permissions as allow-all |
+| `00b3da2` | Refactor sidebar: permission filtering, nested route active state |
+
+---
+
+## Otimizações de Performance
+
+### Frontend
+- `React.memo` aplicado em componentes de lista (CRM, Colaboradores, Passeios, etc.)
+- `SidebarLink` memoizado com `isActive` prop
+- `AdminRoute` memoizado para evitar re-renders
+
+### Backend (Supabase)
+- **Operações transacionais atômicas via RPC (SECURITY DEFINER):**
+  - `confirm_payment_transaction(p_booking_id, p_group_id)` — atualiza status + batch insert `contas_receber` em uma transação; ignora duplicatas via `NOT EXISTS`
+  - `cancel_booking_transaction(p_booking_id, p_group_id)` — cancela reserva + atualiza `contas_receber` atomicamente
+  - `update_booking_customer_transaction(p_booking_id, p_customer_id, p_customer_data, p_items, p_companions)` — sincroniza customer, itens (insert/update/delete), dependentes em transação única
+  - `mark_term_signed_transaction(p_booking_id)` — upsert atômico em `sgs_risk_terms` (unique constraint em `booking_id`)
+  - `complete_booking_transaction(p_booking_id)` — marca "concluída" + gera comissões/parcelas com `FOR UPDATE` lock
+  - `delete_booking_transaction(p_booking_id, p_group_id)` — deleta financeiro → booking em ordem respeitando FKs
+- **Eliminação de N+1 queries em `useBookings.ts`:**
+  - `confirmPayment`: batch insert de `contas_receber` (antes 1 query por item)
+  - `updateBooking`: batch insert + `Promise.all` para updates
+  - `completeBooking`: paralelização de queries com `Promise.all`
+  - `addBooking`: `confirmPayment` em paralelo via `Promise.allSettled` (tolerância a falha parcial)
+- **Substituição de `select("*")` por colunas explícitas:**
+  - `AdminFinanceiro.tsx`, `AdminRelatorios.tsx`, `AdminReservas.tsx`
+  - `ToursPage.tsx`, `TourDetail.tsx`
+- **Constraint única em `sgs_risk_terms.booking_id`** para evitar termos duplicados
+- **Verificação de duplicata no DB** (AdminReservas) em vez de estado local stale
+
+### Infraestrutura
+- Nginx com headers de cache para assets estáticos
+- Build Docker multi-stage (node:20-alpine → nginx:stable-alpine)
 
 ---
 

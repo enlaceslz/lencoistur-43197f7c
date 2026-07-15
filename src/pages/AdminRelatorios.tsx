@@ -47,13 +47,13 @@ const AdminRelatorios = () => {
   const [empresa, setEmpresa] = useState<any>(null);
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      const { data } = await supabase.from("site_settings").select("*");
-      if (data) {
-        const emp = data.find(s => s.key === "empresa")?.value;
-        setEmpresa(emp);
-      }
-    };
+      const fetchSettings = async () => {
+        const { data } = await supabase.from("site_settings").select("key, value");
+        if (data) {
+          const emp = data.find(s => s.key === "empresa")?.value;
+          setEmpresa(emp);
+        }
+      };
     fetchSettings();
   }, []);
 
@@ -65,7 +65,7 @@ const AdminRelatorios = () => {
 
     try {
       if (activeTab === "reservas") {
-        let query = supabase.from("bookings").select("*").gte("created_at", since).order("created_at", { ascending: false });
+        let query = supabase.from("bookings").select("status, created_at, final_total, guests").gte("created_at", since).order("created_at", { ascending: false });
         if (statusFilter !== "all") query = query.eq("status", statusFilter);
         const { data: bookings } = await query;
         const b = bookings || [];
@@ -89,8 +89,8 @@ const AdminRelatorios = () => {
           raw: b,
         });
       } else if (activeTab === "financeiro") {
-        let queryCR = supabase.from("contas_receber").select("*").gte("created_at", since);
-        let queryCP = supabase.from("contas_pagar").select("*").gte("created_at", since);
+        let queryCR = supabase.from("contas_receber").select("created_at, status, valor, categoria").gte("created_at", since);
+        let queryCP = supabase.from("contas_pagar").select("created_at, status, valor").gte("created_at", since);
         if (statusFilter !== "all") {
           queryCR = queryCR.eq("status", statusFilter);
           queryCP = queryCP.eq("status", statusFilter);
@@ -109,7 +109,7 @@ const AdminRelatorios = () => {
           receitas: Object.entries(catReceitas).map(([name, value]) => ({ name, value })),
         });
       } else if (activeTab === "clientes") {
-        const { data: customers } = await supabase.from("customers").select("*").order("created_at", { ascending: false });
+        const { data: customers } = await supabase.from("customers").select("created_at").order("created_at", { ascending: false });
         const c = customers || [];
         const byMonth: Record<string, number> = {};
         c.forEach((cl: any) => {
@@ -137,8 +137,8 @@ const AdminRelatorios = () => {
         });
       } else if (activeTab === "sgs") {
         const [risks, incidents] = await Promise.all([
-          supabase.from("sgs_risks").select("*"),
-          supabase.from("sgs_incidents").select("*").gte("created_at", since),
+          supabase.from("sgs_risks").select("id"),
+          supabase.from("sgs_incidents").select("created_at, status").gte("created_at", since),
         ]);
         setData({
           totalRisks: (risks.data || []).length,
@@ -146,7 +146,7 @@ const AdminRelatorios = () => {
           openIncidents: (incidents.data || []).filter((i: any) => i.status !== "fechado").length,
         });
       } else if (activeTab === "marketing") {
-        const { data: leads } = await supabase.from("marketing_leads").select("*");
+        const { data: leads } = await supabase.from("marketing_leads").select("source, status");
         const l = leads || [];
         const bySource: Record<string, number> = {};
         l.forEach((ld: any) => { bySource[ld.source] = (bySource[ld.source] || 0) + 1; });
@@ -157,7 +157,7 @@ const AdminRelatorios = () => {
         });
       } else if (activeTab === "parceiros") {
         const [partners, bookings] = await Promise.all([
-          supabase.from("partners").select("*"),
+          supabase.from("partners").select("id, name, type, active"),
           supabase.from("bookings").select("final_total, partner_id").not("partner_id", "is", null).gte("created_at", since)
         ]);
         const p = partners.data || [];
@@ -181,7 +181,7 @@ const AdminRelatorios = () => {
           })).sort((a, b) => b.revenue - a.revenue).slice(0, 5)
         });
       } else if (activeTab === "usuarios") {
-        const { data: users } = await supabase.from("user_management").select("*");
+        const { data: users } = await supabase.from("user_management").select("role, status");
         const u = users || [];
         const byRole: Record<string, number> = {};
         u.forEach((us: any) => { byRole[us.role] = (byRole[us.role] || 0) + 1; });

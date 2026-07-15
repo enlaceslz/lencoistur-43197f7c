@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Search, UserCheck, AlertTriangle, Shield, Pencil, Trash2, X } from "lucide-react";
@@ -9,6 +9,77 @@ const TRAINING_TYPES: Record<string, string> = {
   primeiros_socorros: "Primeiros Socorros", resgate_lagoa: "Resgate em Lagoa",
   conducao_offroad: "Condução Off-Road", atendimento_turista: "Atendimento ao Turista", outro: "Outro",
 };
+
+const TrainingRow = memo(({ training, onDelete }: { training: any; onDelete: (id: string) => void }) => (
+  <div key={training.id} className="flex items-center justify-between text-xs py-1.5 px-3 bg-muted/50 rounded-lg">
+    <span className="text-foreground">{training.training_name} ({TRAINING_TYPES[training.training_type]})</span>
+    <div className="flex items-center gap-2">
+      {training.expiry_date && <span className="text-muted-foreground">Validade: {new Date(training.expiry_date + "T12:00").toLocaleDateString("pt-BR")}</span>}
+      <span className={`px-2 py-0.5 rounded-full font-semibold ${training.status === "vencido" ? "bg-destructive/10 text-destructive" : training.status === "vencendo" ? "bg-secondary/10 text-secondary" : "bg-primary/10 text-primary"}`}>{training.status}</span>
+      <button onClick={() => onDelete(training.id)} className="p-1 rounded hover:bg-destructive/10 text-destructive ml-1">
+        <Trash2 size={12} />
+      </button>
+    </div>
+  </div>
+));
+
+const StaffCard = memo(({ member, trainings, expired, showTrainingForm, trainingForm, onEdit, onDelete, onToggleTrainingForm, onAddTraining, onTrainingFormChange, onDeleteTraining }: {
+  member: any; trainings: any[]; expired: boolean; showTrainingForm: boolean;
+  trainingForm: { training_name: string; training_type: string; completed_date: string; expiry_date: string };
+  onEdit: (s: any) => void; onDelete: (id: string) => void;
+  onToggleTrainingForm: () => void; onAddTraining: (e: React.FormEvent) => void;
+  onTrainingFormChange: (field: string, value: string) => void; onDeleteTraining: (id: string) => void;
+}) => (
+  <div className={`bg-card border rounded-2xl p-5 hover:shadow-md transition-all ${expired ? "border-destructive/50" : "border-border"}`}>
+    <div className="flex flex-col sm:flex-row justify-between gap-3 mb-4">
+      <div className="flex items-center gap-3">
+        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${member.blocked ? "bg-destructive/10" : "bg-primary/10"}`}>
+          <UserCheck size={24} className={member.blocked ? "text-destructive" : "text-primary"} />
+        </div>
+        <div>
+          <h4 className="font-bold text-foreground text-lg">{member.name}</h4>
+          <p className="text-xs text-muted-foreground font-medium uppercase tracking-tight">{ROLES[member.role]} {member.blocked && <span className="text-destructive ml-1">· BLOQUEADO</span>}</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <button onClick={() => onEdit(member)} className="p-2 rounded-lg hover:bg-muted text-muted-foreground" title="Editar">
+          <Pencil size={16} />
+        </button>
+        <button onClick={() => onDelete(member.id)} className="p-2 rounded-lg hover:bg-destructive/10 text-destructive" title="Excluir">
+          <Trash2 size={16} />
+        </button>
+        <button onClick={onToggleTrainingForm}
+          className="ml-2 bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5">
+          <Shield size={14} /> Treinamento
+        </button>
+      </div>
+    </div>
+
+    {showTrainingForm && (
+      <form onSubmit={onAddTraining} className="bg-muted rounded-xl p-4 mb-3 space-y-3">
+        <div className="grid sm:grid-cols-4 gap-3">
+          <input required value={trainingForm.training_name} onChange={(e) => onTrainingFormChange("training_name", e.target.value)}
+            placeholder="Nome do treinamento" className="bg-card border border-border rounded-xl px-3 py-2 text-sm text-foreground outline-none" />
+          <select value={trainingForm.training_type} onChange={(e) => onTrainingFormChange("training_type", e.target.value)}
+            className="bg-card border border-border rounded-xl px-3 py-2 text-sm text-foreground outline-none">
+            {Object.entries(TRAINING_TYPES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          </select>
+          <input type="date" required value={trainingForm.completed_date} onChange={(e) => onTrainingFormChange("completed_date", e.target.value)}
+            className="bg-card border border-border rounded-xl px-3 py-2 text-sm text-foreground outline-none" />
+          <input type="date" value={trainingForm.expiry_date} onChange={(e) => onTrainingFormChange("expiry_date", e.target.value)}
+            placeholder="Validade" className="bg-card border border-border rounded-xl px-3 py-2 text-sm text-foreground outline-none" />
+        </div>
+        <button type="submit" className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-semibold">Salvar Treinamento</button>
+      </form>
+    )}
+
+    {trainings.length > 0 && (
+      <div className="space-y-1">
+        {trainings.map((t) => <TrainingRow key={t.id} training={t} onDelete={onDeleteTraining} />)}
+      </div>
+    )}
+  </div>
+));
 
 const AdminSGSEquipe = () => {
   const [staff, setStaff] = useState<any[]>([]);
@@ -187,68 +258,20 @@ const AdminSGSEquipe = () => {
           const sTrainings = getStaffTrainings(s.id);
           const expired = hasExpiredTraining(s.id);
           return (
-            <div key={s.id} className={`bg-card border rounded-2xl p-5 hover:shadow-md transition-all ${expired ? "border-destructive/50" : "border-border"}`}>
-              <div className="flex flex-col sm:flex-row justify-between gap-3 mb-4">
-                <div className="flex items-center gap-3">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${s.blocked ? "bg-destructive/10" : "bg-primary/10"}`}>
-                    <UserCheck size={24} className={s.blocked ? "text-destructive" : "text-primary"} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-foreground text-lg">{s.name}</h4>
-                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-tight">{ROLES[s.role]} {s.blocked && <span className="text-destructive ml-1">· BLOQUEADO</span>}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button onClick={() => openEdit(s)} className="p-2 rounded-lg hover:bg-muted text-muted-foreground" title="Editar">
-                    <Pencil size={16} />
-                  </button>
-                  <button onClick={() => handleDelete(s.id)} className="p-2 rounded-lg hover:bg-destructive/10 text-destructive" title="Excluir">
-                    <Trash2 size={16} />
-                  </button>
-                  <button onClick={() => setShowTrainingForm(showTrainingForm === s.id ? null : s.id)}
-                    className="ml-2 bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5">
-                    <Shield size={14} /> Treinamento
-                  </button>
-                </div>
-              </div>
-
-              {showTrainingForm === s.id && (
-                <form onSubmit={addTraining} className="bg-muted rounded-xl p-4 mb-3 space-y-3">
-                  <div className="grid sm:grid-cols-4 gap-3">
-                    <input required value={trainingForm.training_name} onChange={(e) => setTrainingForm({ ...trainingForm, training_name: e.target.value })}
-                      placeholder="Nome do treinamento" className="bg-card border border-border rounded-xl px-3 py-2 text-sm text-foreground outline-none" />
-                    <select value={trainingForm.training_type} onChange={(e) => setTrainingForm({ ...trainingForm, training_type: e.target.value })}
-                      className="bg-card border border-border rounded-xl px-3 py-2 text-sm text-foreground outline-none">
-                      {Object.entries(TRAINING_TYPES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                    </select>
-                    <input type="date" required value={trainingForm.completed_date} onChange={(e) => setTrainingForm({ ...trainingForm, completed_date: e.target.value })}
-                      className="bg-card border border-border rounded-xl px-3 py-2 text-sm text-foreground outline-none" />
-                    <input type="date" value={trainingForm.expiry_date} onChange={(e) => setTrainingForm({ ...trainingForm, expiry_date: e.target.value })}
-                      placeholder="Validade" className="bg-card border border-border rounded-xl px-3 py-2 text-sm text-foreground outline-none" />
-                  </div>
-                  <button type="submit" className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-semibold">Salvar Treinamento</button>
-                </form>
-              )}
-
-              {sTrainings.length > 0 && (
-                <div className="space-y-1">
-                  {sTrainings.map((t) => (
-                    <div key={t.id} className="flex items-center justify-between text-xs py-1.5 px-3 bg-muted/50 rounded-lg">
-                      <span className="text-foreground">{t.training_name} ({TRAINING_TYPES[t.training_type]})</span>
-                      <div className="flex items-center gap-2">
-                        {t.expiry_date && <span className="text-muted-foreground">Validade: {new Date(t.expiry_date + "T12:00").toLocaleDateString("pt-BR")}</span>}
-                        <span className={`px-2 py-0.5 rounded-full font-semibold ${
-                          t.status === "vencido" ? "bg-destructive/10 text-destructive" : t.status === "vencendo" ? "bg-secondary/10 text-secondary" : "bg-primary/10 text-primary"
-                        }`}>{t.status}</span>
-                        <button onClick={() => deleteTraining(t.id)} className="p-1 rounded hover:bg-destructive/10 text-destructive ml-1">
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <StaffCard
+              key={s.id}
+              member={s}
+              trainings={sTrainings}
+              expired={expired}
+              showTrainingForm={showTrainingForm === s.id}
+              trainingForm={trainingForm}
+              onEdit={openEdit}
+              onDelete={handleDelete}
+              onToggleTrainingForm={() => setShowTrainingForm(showTrainingForm === s.id ? null : s.id)}
+              onAddTraining={addTraining}
+              onTrainingFormChange={(field, value) => setTrainingForm(prev => ({ ...prev, [field]: value }))}
+              onDeleteTraining={deleteTraining}
+            />
           );
         })}
       </div>

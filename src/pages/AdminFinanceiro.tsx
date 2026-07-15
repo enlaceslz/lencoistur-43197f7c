@@ -69,10 +69,10 @@ const AdminFinanceiro = () => {
       setLoading(true);
       try {
         const [{ data: bkData }, { data: cpData }, { data: crData }, { data: compData }] = await Promise.all([
-          supabase.from("bookings").select("*, customers(name, email, phone)").order("created_at", { ascending: false }),
-          supabase.from("contas_pagar").select("*"),
-          supabase.from("contas_receber").select("*"),
-          supabase.from("sgs_empresa").select("*").limit(1).maybeSingle()
+          supabase.from("bookings").select("id, booking_code, item_name, final_total, total, discount, status, payment_status, pay_method, created_at, date, customers(name, email, phone), invoice_number, invoice_issued, receipt_issued, invoice_url, voucher_url").order("created_at", { ascending: false }),
+          supabase.from("contas_pagar").select("id, vencimento, pago_em, descricao, valor, status, partner_id, cliente, collaborator_id, fornecedor"),
+          supabase.from("contas_receber").select("id, vencimento, recebido_em, descricao, valor, status, partner_id, cliente, booking_id"),
+          supabase.from("sgs_empresa").select("nome_fantasia, cnpj, endereco, telefone, logo_url").limit(1).maybeSingle()
         ]);
         if (bkData) setBookings(bkData as any);
         if (cpData) setContasPagar(cpData);

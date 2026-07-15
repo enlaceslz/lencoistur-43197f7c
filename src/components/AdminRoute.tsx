@@ -1,7 +1,8 @@
+import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
-const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+const AdminRouteComponent = ({ children }: { children: React.ReactNode }) => {
   const { user, isAdmin, loading } = useAuth();
 
   if (loading) {
@@ -29,5 +30,7 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
 
   return <>{children}</>;
 };
+
+const AdminRoute = React.memo(AdminRouteComponent);
 
 export default AdminRoute;

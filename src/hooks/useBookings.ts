@@ -163,47 +163,12 @@ export function useBookings(customerId?: string) {
   }, [invalidate, user]);
 
   const confirmPayment = useCallback(async (id: string, groupId?: string) => {
-    const query = supabase.from("bookings").select("*, customers!customer_id(name)");
-    
-    if (groupId) {
-      query.eq("group_id", groupId);
-    } else {
-      query.eq("id", id);
-    }
-    
-    const { data: bookingsData, error: fetchError } = await query;
-
-    if (fetchError || !bookingsData) throw fetchError || new Error("Reserva não encontrada");
-
-    const updateQuery = supabase.from("bookings").update({ status: "confirmada", payment_status: "pago" });
-    if (groupId) {
-      updateQuery.eq("group_id", groupId);
-    } else {
-      updateQuery.eq("id", id);
-    }
-    
-    const { error: updateError } = await updateQuery;
-    if (updateError) throw updateError;
-
-    // Integrar com Financeiro para cada item
-    for (const booking of bookingsData) {
-      const { error: financeError } = await supabase
-        .from("contas_receber")
-        .insert({
-          descricao: `Reserva ${booking.booking_code} - ${booking.item_name}`,
-          valor: booking.final_total,
-          vencimento: booking.date || new Date().toISOString().slice(0, 10),
-          status: "recebido",
-          categoria: booking.partner_id ? "parceiro" : "reserva",
-          cliente: booking.customers?.name || "Cliente",
-          booking_id: booking.id,
-          partner_id: booking.partner_id || null,
-          recebido_em: new Date().toISOString().slice(0, 10),
-          observacoes: `Gerado automaticamente via CRM (Reserva ${booking.booking_code})${booking.partner_id ? ' - Venda via Parceiro' : ''}`
-        });
-
-      if (financeError) console.error("Erro ao gerar conta a receber:", financeError);
-    }
+    const { data, error } = await supabase.rpc("confirm_payment_transaction", {
+      p_booking_id: id,
+      p_group_id: groupId || null,
+    });
+    if (error) throw error;
+    return data;
   }, []);
 
 
@@ -268,14 +233,16 @@ export function useBookings(customerId?: string) {
       const mappedResults = results.map(r => mapDbToBooking(r, r.customers));
       
       if (data.isPaid) {
-        for (const mapped of mappedResults) {
-          try {
-            await confirmPayment(mapped.id);
-            mapped.paymentStatus = "pago";
-            mapped.status = "confirmada";
-          } catch (confirmErr) {
-            console.error("Erro ao confirmar pagamento inicial:", confirmErr);
-          }
+        const results = await Promise.allSettled(
+          mappedResults.map(mapped =>
+            confirmPayment(mapped.id).then(() => {
+              mapped.paymentStatus = "pago";
+              mapped.status = "confirmada";
+            })
+          )
+        );
+        for (const r of results) {
+          if (r.status === "rejected") console.error("Erro ao confirmar pagamento inicial:", r.reason);
         }
       }
 
@@ -292,102 +259,19 @@ export function useBookings(customerId?: string) {
   );
 
   const cancelBooking = useCallback(async (id: string, groupId?: string) => {
-    const updateQuery = supabase.from("bookings").update({ status: "cancelada", payment_status: "pendente" });
-    if (groupId) {
-      updateQuery.eq("group_id", groupId);
-    } else {
-      updateQuery.eq("id", id);
-    }
-    
-    const { error } = await updateQuery;
+    const { error } = await supabase.rpc("cancel_booking_transaction", {
+      p_booking_id: id,
+      p_group_id: groupId || null,
+    });
     if (error) throw error;
-
-    if (groupId) {
-      // Para grupos, precisaríamos de uma lógica mais complexa para atualizar múltiplas contas_receber
-      // Mas por ora, a deleção/cancelamento individual no loop do componente chamador resolve.
-    } else {
-      await supabase
-        .from("contas_receber")
-        .update({ status: "cancelado", observacoes: "Reserva cancelada via CRM" })
-        .eq("booking_id", id);
-    }
   }, []);
 
 
   const completeBooking = useCallback(async (id: string) => {
-    const { data: booking, error: fetchError } = await supabase
-      .from("bookings")
-      .select("*, customers!customer_id(name)")
-      .eq("id", id)
-      .single();
-
-    if (fetchError) throw fetchError;
-
-    const { error: updateError } = await supabase
-      .from("bookings")
-      .update({ status: "concluida" })
-      .eq("id", id);
-    
-    if (updateError) throw updateError;
-
-    if (booking.collaborator_id) {
-      const { data: collab } = await supabase
-        .from("collaborators")
-        .select("*")
-        .eq("id", booking.collaborator_id)
-        .single();
-
-      if (collab) {
-        let commissionAmount = 0;
-        if (collab.payment_type === "commission") {
-          commissionAmount = Math.round((booking.final_total * collab.payment_value) / 100);
-        } else if (collab.payment_type === "per_tour" || collab.payment_type === "daily") {
-          commissionAmount = collab.payment_value * 100;
-        }
-
-        if (commissionAmount > 0) {
-          const description = `Comissão/Pagamento: ${booking.item_name} (Reserva ${booking.booking_code})`;
-          
-          await supabase.from("collaborator_payments").insert({
-            collaborator_id: collab.id,
-            booking_id: booking.id,
-            amount: commissionAmount / 100,
-            description,
-            due_date: new Date().toISOString().slice(0, 10),
-            status: "pending"
-          });
-
-          await supabase.from("contas_pagar").insert({
-            descricao: `Colaborador: ${collab.name} - ${description}`,
-            valor: commissionAmount / 100,
-            vencimento: new Date().toISOString().slice(0, 10),
-            status: "pendente",
-            categoria: "comissão",
-            fornecedor: collab.name,
-            booking_id: booking.id,
-            collaborator_id: collab.id,
-            observacoes: `Gerado automaticamente na conclusão da reserva ${booking.booking_code}`
-          });
-        }
-      }
-    }
-
-    if (!booking.collaborator_id) {
-      const { error: costError } = await supabase
-        .from("contas_pagar")
-        .insert({
-          descricao: `Custo Operacional: ${booking.item_name} (Reserva ${booking.booking_code})`,
-          valor: Math.round(booking.final_total * 0.4) / 100,
-          vencimento: new Date().toISOString().slice(0, 10),
-          status: "pendente",
-          categoria: "operacional",
-          fornecedor: "Operação Interna",
-          booking_id: booking.id,
-          observacoes: `Gerado automaticamente na conclusão da reserva ${booking.booking_code}`
-        });
-
-      if (costError) console.error("Erro ao gerar custo operacional:", costError);
-    }
+    const { error } = await supabase.rpc("complete_booking_transaction", {
+      p_booking_id: id,
+    });
+    if (error) throw error;
   }, []);
 
   const updateBookingNotes = useCallback(async (id: string, notes: string) => {
@@ -399,171 +283,44 @@ export function useBookings(customerId?: string) {
   }, []);
 
   const deleteBooking = useCallback(async (id: string, groupId?: string) => {
-    let bookingIds = [id];
-    
-    if (groupId) {
-      const { data } = await supabase.from("bookings").select("id").eq("group_id", groupId);
-      if (data) bookingIds = data.map(b => b.id);
-    }
-
-    const { error: bookingError } = await supabase
-      .from("bookings")
-      .delete()
-      .in("id", bookingIds);
-    
-    if (bookingError) throw bookingError;
-
-    // Limpar registros financeiros para todos os IDs afetados
-    await Promise.all([
-      supabase.from("contas_receber").delete().in("booking_id", bookingIds),
-      supabase.from("contas_pagar").delete().in("booking_id", bookingIds),
-      supabase.from("collaborator_payments").delete().in("booking_id", bookingIds)
-    ]);
+    const { error } = await supabase.rpc("delete_booking_transaction", {
+      p_booking_id: id,
+      p_group_id: groupId || null,
+    });
+    if (error) throw error;
   }, []);
 
 
 
   const updateBooking = useCallback(async (id: string, customerId: string, data: any) => {
-    const { error: customerError } = await supabase
-      .from("customers")
-      .update({
-        name: data.customerName,
-        email: data.customerEmail,
-        phone: data.customerPhone,
+    const { error } = await supabase.rpc("update_booking_customer_transaction", {
+      p_booking_id: id,
+      p_customer_id: customerId,
+      p_customer_data: {
+        customerName: data.customerName,
+        customerEmail: data.customerEmail,
+        customerPhone: data.customerPhone,
         cpf: data.cpf,
         passport: data.passport,
         country: data.country,
-        birth_date: data.birthDate,
-      })
-      .eq("id", customerId);
-    
-    if (customerError) throw customerError;
-
-    // Se houver múltiplos itens no payload, atualizamos cada um
-    if (data.items && Array.isArray(data.items)) {
-      // Obter o group_id atual
-      let groupId = data.groupId;
-      if (!groupId) {
-        const { data: currentBooking } = await supabase.from("bookings").select("group_id").eq("id", id).single();
-        groupId = currentBooking?.group_id;
-      }
-
-      // Se houver um grupo, vamos identificar itens para remover
-      if (groupId) {
-        const { data: currentItems } = await supabase.from("bookings").select("id").eq("group_id", groupId);
-        if (currentItems) {
-          const newItemIds = data.items.map((i: any) => i.id).filter((id: string) => id && id.length > 20);
-          const idsToDelete = currentItems.filter((ci: any) => !newItemIds.includes(ci.id)).map((ci: any) => ci.id);
-          if (idsToDelete.length > 0) {
-            await supabase.from("bookings").delete().in("id", idsToDelete);
-          }
-        }
-      }
-
-      for (const item of data.items) {
-        const isNew = !item.id || item.id.length < 20;
-        const isPrivate = item.itemName.includes("(Privativo)");
-        const total = isPrivate ? Number(item.unitPrice) : Number(item.unitPrice) * Number(item.guests);
-        const finalTotal = total - Number(item.discount);
-        const publicTotal = isPrivate ? Number(item.publicUnitPrice) : Number(item.publicUnitPrice) * Number(item.guests);
-
-        const bookingData = {
-          type: item.type,
-          item_name: item.itemName,
-          date: item.date,
-          guests: Number(item.guests),
-          pay_method: data.payMethod,
-          unit_price: Number(item.unitPrice),
-          total,
-          discount: Number(item.discount),
-          final_total: finalTotal,
-          public_unit_price: Number(item.publicUnitPrice) || null,
-          public_total: publicTotal || null,
-          partner_net_price: Number(item.partnerNetPrice) || null,
-          notes: data.notes,
-          collaborator_id: data.collaboratorId === "none" ? null : data.collaboratorId || null,
-          partner_id: data.partnerId === "none" ? null : data.partnerId || null,
-          birth_date: data.birthDate || null,
-          cpf: data.cpf || null,
-          group_id: groupId,
-          customer_id: customerId
-        };
-
-        if (isNew) {
-          await supabase.from("bookings").insert({
-            ...bookingData,
-            booking_code: `RES-${new Date().getFullYear()}-${Math.floor(Math.random() * 9999).toString().padStart(4, "0")}`,
-            status: "pendente",
-            payment_status: "pendente"
-          });
-        } else {
-          await supabase.from("bookings").update(bookingData).eq("id", item.id);
-        }
-      }
-    }
-
-
-
-    if (data.companions && data.companions.length > 0) {
-      const deps = data.companions.map((c: any) => ({
-        customer_id: customerId,
-        name: c.name,
-        cpf: c.cpf || null,
-        birth_date: c.birthDate || null,
-        relationship: c.relationship || 'Acompanhante'
-      }));
-      const { error: depError } = await supabase.from("dependents").insert(deps);
-      if (depError) console.error("Erro ao adicionar dependentes no update:", depError);
-    }
+        birthDate: data.birthDate,
+        notes: data.notes,
+        payMethod: data.payMethod,
+        collaboratorId: data.collaboratorId,
+        partnerId: data.partnerId,
+      },
+      p_items: data.items || [],
+      p_companions: data.companions || [],
+    });
+    if (error) throw error;
   }, []);
 
 
   const markTermAsSignedAtCounter = useCallback(async (bookingId: string) => {
-    // Buscar dados da reserva para criar o registro no termo
-    const { data: booking, error: fetchError } = await supabase
-      .from("bookings")
-      .select("*, customers!customer_id(*)")
-      .eq("id", bookingId)
-      .single();
-
-    if (fetchError) throw fetchError;
-
-    // Verificar se já existe um termo
-    const { data: existingTerm } = await supabase
-      .from("sgs_risk_terms")
-      .select("id")
-      .eq("booking_id", bookingId)
-      .maybeSingle();
-
-    if (existingTerm) {
-      const { error: updateError } = await supabase
-        .from("sgs_risk_terms")
-        .update({ 
-          accepted: true, 
-          signed_at_counter: true,
-          signed_at: new Date().toISOString()
-        })
-        .eq("id", existingTerm.id);
-      
-      if (updateError) throw updateError;
-    } else {
-      const { error: insertError } = await supabase
-        .from("sgs_risk_terms")
-        .insert({
-          booking_id: bookingId,
-          customer_id: booking.customer_id,
-          customer_name: booking.customers?.name,
-          phone: booking.customers?.phone,
-          tour_name: booking.item_name,
-          accepted: true,
-          signed_at_counter: true,
-          signed_at: new Date().toISOString(),
-          term_date: new Date().toISOString().slice(0, 10)
-        });
-      
-      if (insertError) throw insertError;
-    }
-    
+    const { error } = await supabase.rpc("mark_term_signed_transaction", {
+      p_booking_id: bookingId,
+    });
+    if (error) throw error;
     await fetchBookings();
   }, [fetchBookings]);
 

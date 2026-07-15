@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +32,133 @@ const emptyForm = {
   price: 0, partner_price: 0, vehicle_type: "Van Executiva", seats: 10,
   departures: "", active: true, pix_discount: 0,
 };
+
+const TransladoCard = memo(({
+  id, origin, destination, active, vehicle_type, duration,
+  price, pix_discount, partner_price,
+  onDetail, onEdit, onDelete,
+}: {
+  id: string; origin: string; destination: string; active: boolean;
+  vehicle_type: string; duration: string; price: number;
+  pix_discount: number; partner_price: number;
+  onDetail: () => void; onEdit: () => void; onDelete: () => void;
+}) => (
+  <div className="bg-white border border-border shadow-sm rounded-lg overflow-hidden group transition-none">
+    <div className="p-8">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4 bg-primary/5 p-3 rounded-lg flex-1 group-hover:bg-primary/10 transition-none">
+          <div className="flex flex-col items-center">
+            <p className="text-xs font-black text-primary/40 uppercase tracking-tighter leading-none mb-1">DE</p>
+            <p className="font-black text-base text-foreground tracking-tight">{origin}</p>
+          </div>
+          <ArrowRight className="text-primary/30 mx-auto" size={16} strokeWidth={3} />
+          <div className="flex flex-col items-center text-right">
+            <p className="text-xs font-black text-primary/40 uppercase tracking-tighter leading-none mb-1">PARA</p>
+            <p className="font-black text-base text-foreground tracking-tight">{destination}</p>
+          </div>
+        </div>
+        <Badge
+          className={cn(
+            "ml-4 rounded-lg px-3 py-1.5 font-black text-[9px] uppercase tracking-widest border-none shadow-sm",
+            active
+              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+              : "bg-muted text-muted-foreground"
+          )}
+        >
+          {active ? "Ativa" : "Inativa"}
+        </Badge>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-border group/item">
+          <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
+            <Car size={14} />
+          </div>
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Veículo</p>
+            <p className="text-xs font-bold text-foreground line-clamp-1">{vehicle_type}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-border group/item">
+          <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500">
+            <Clock size={14} />
+          </div>
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Duração</p>
+            <p className="text-xs font-bold text-foreground">{duration || "\u2014"}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between pt-6 border-t border-border/40">
+        <div>
+          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-1">Valor por Vaga</span>
+          <div className="flex items-baseline gap-2">
+            <p className="text-2xl font-black text-foreground tracking-tighter">{fmt(price)}</p>
+            {pix_discount > 0 && (
+              <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-none font-black text-[9px] px-1.5 h-4">
+                -{pix_discount}% PIX
+              </Badge>
+            )}
+          </div>
+          {partner_price > 0 && (
+            <p className="text-[10px] font-bold text-primary mt-1">Parceiro: {fmt(partner_price)}</p>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onDetail}
+                  className="h-11 w-11 rounded-lg bg-slate-50 hover:bg-primary hover:text-white transition-none border border-border shadow-sm active:scale-95"
+                >
+                  <Eye size={18} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="bg-primary text-white font-black text-[10px] px-4 py-2 rounded-lg shadow-md">Detalhes</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onEdit}
+                  className="h-11 w-11 rounded-lg bg-slate-50 hover:bg-amber-500 hover:text-white transition-none border border-border shadow-sm active:scale-95"
+                >
+                  <Pencil size={18} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="bg-amber-500 text-white font-black text-[10px] px-4 py-2 rounded-lg shadow-md">Editar</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onDelete}
+                  className="h-11 w-11 rounded-lg bg-slate-50 hover:bg-rose-500 hover:text-white transition-none border border-border shadow-sm active:scale-95 text-rose-500/60"
+                >
+                  <Trash2 size={18} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="bg-rose-500 text-white font-black text-[10px] px-4 py-2 rounded-lg shadow-md">Excluir</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      </div>
+    </div>
+  </div>
+));
 
 const AdminTranslados = () => {
   const [routes, setRoutes] = useState<any[]>([]);
@@ -192,128 +319,22 @@ const AdminTranslados = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((route, index) => (
-            <div 
+          {filtered.map(route => (
+            <TransladoCard
               key={route.id}
-              className="bg-white border border-border shadow-sm rounded-lg overflow-hidden group transition-none"
-            >
-              <div className="p-8">
-                {/* Card Header - Route */}
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center gap-4 bg-primary/5 p-3 rounded-lg flex-1 group-hover:bg-primary/10 transition-none">
-                    <div className="flex flex-col items-center">
-                      <p className="text-xs font-black text-primary/40 uppercase tracking-tighter leading-none mb-1">DE</p>
-                      <p className="font-black text-base text-foreground tracking-tight">{route.origin}</p>
-                    </div>
-                    <ArrowRight className="text-primary/30 mx-auto" size={16} strokeWidth={3} />
-                    <div className="flex flex-col items-center text-right">
-                      <p className="text-xs font-black text-primary/40 uppercase tracking-tighter leading-none mb-1">PARA</p>
-                      <p className="font-black text-base text-foreground tracking-tight">{route.destination}</p>
-                    </div>
-                  </div>
-                  <Badge 
-                    className={cn(
-                      "ml-4 rounded-lg px-3 py-1.5 font-black text-[9px] uppercase tracking-widest border-none shadow-sm",
-                      route.active 
-                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" 
-                        : "bg-muted text-muted-foreground"
-                    )}
-                  >
-                    {route.active ? "Ativa" : "Inativa"}
-                  </Badge>
-                </div>
-
-                {/* Route Details */}
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-border group/item">
-                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
-                      <Car size={14} />
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Veículo</p>
-                      <p className="text-xs font-bold text-foreground line-clamp-1">{route.vehicle_type}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border border-border group/item">
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500">
-                      <Clock size={14} />
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Duração</p>
-                      <p className="text-xs font-bold text-foreground">{route.duration || "—"}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Price and Actions */}
-                <div className="flex items-center justify-between pt-6 border-t border-border/40">
-                  <div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-1">Valor por Vaga</span>
-                    <div className="flex items-baseline gap-2">
-                      <p className="text-2xl font-black text-foreground tracking-tighter">{fmt(route.price)}</p>
-                      {route.pix_discount > 0 && (
-                        <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-none font-black text-[9px] px-1.5 h-4">
-                          -{route.pix_discount}% PIX
-                        </Badge>
-                      )}
-                    </div>
-                    {route.partner_price > 0 && (
-                      <p className="text-[10px] font-bold text-primary mt-1">Parceiro: {fmt(route.partner_price)}</p>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            onClick={() => setDetailRoute(route)}
-                            className="h-11 w-11 rounded-lg bg-slate-50 hover:bg-primary hover:text-white transition-none border border-border shadow-sm active:scale-95"
-                          >
-                            <Eye size={18} />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="bg-primary text-white font-black text-[10px] px-4 py-2 rounded-lg shadow-md">Detalhes</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                    
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            onClick={() => openEdit(route)}
-                            className="h-11 w-11 rounded-lg bg-slate-50 hover:bg-amber-500 hover:text-white transition-none border border-border shadow-sm active:scale-95"
-                          >
-                            <Pencil size={18} />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="bg-amber-500 text-white font-black text-[10px] px-4 py-2 rounded-lg shadow-md">Editar</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            onClick={() => setDeleteId(route.id)}
-                            className="h-11 w-11 rounded-lg bg-slate-50 hover:bg-rose-500 hover:text-white transition-none border border-border shadow-sm active:scale-95 text-rose-500/60"
-                          >
-                            <Trash2 size={18} />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="bg-rose-500 text-white font-black text-[10px] px-4 py-2 rounded-lg shadow-md">Excluir</TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                </div>
-              </div>
-            </div>
+              id={route.id}
+              origin={route.origin}
+              destination={route.destination}
+              active={route.active}
+              vehicle_type={route.vehicle_type}
+              duration={route.duration}
+              price={route.price}
+              pix_discount={route.pix_discount}
+              partner_price={route.partner_price}
+              onDetail={() => setDetailRoute(route)}
+              onEdit={() => openEdit(route)}
+              onDelete={() => setDeleteId(route.id)}
+            />
           ))}
 
           {filtered.length === 0 && (

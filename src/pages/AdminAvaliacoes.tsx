@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,161 @@ interface TourOption {
   name: string;
 }
 
+interface AvaliacaoCardProps {
+  id: string;
+  author: string;
+  country: string | null;
+  rating: number;
+  comment: string | null;
+  tourName: string;
+  createdAt: string;
+  status: Review['status'];
+  isFeatured: boolean;
+  idx: number;
+  onDelete: (id: string) => void;
+  onStatusToggle: (id: string, currentStatus: string) => void;
+  onFeaturedToggle: (id: string, currentFeatured: boolean) => void;
+}
+
+const AvaliacaoCard = memo(({
+  id,
+  author,
+  country,
+  rating,
+  comment,
+  tourName,
+  createdAt,
+  status,
+  isFeatured,
+  idx,
+  onDelete,
+  onStatusToggle,
+  onFeaturedToggle,
+}: AvaliacaoCardProps) => (
+  <div
+    className="glass-card admin-card-hover rounded-[2.5rem] overflow-hidden border border-white/20 bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-2xl shadow-black/5 group flex flex-col h-full animate-in-slide-up"
+    style={{ animationDelay: `${idx * 0.05}s` }}
+  >
+    <div className="p-8 flex-1 space-y-6">
+      <div className="flex justify-between items-start">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-[1.25rem] bg-primary/5 flex items-center justify-center text-primary/40 font-black text-xl border border-primary/10 shadow-inner group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+            {author.substring(0, 2).toUpperCase()}
+          </div>
+          <div className="space-y-1">
+            <h4 className="font-black text-foreground tracking-tight line-clamp-1">{author}</h4>
+            <div className="flex items-center gap-2">
+              <MapPin size={10} className="text-primary/60" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">{country || "Visitante"}</span>
+            </div>
+          </div>
+        </div>
+        <div className="bg-amber-400/10 px-2.5 py-1 rounded-xl flex items-center gap-1">
+          <Star size={12} className="text-amber-500 fill-amber-400" />
+          <span className="text-xs font-black text-amber-600">{rating}</span>
+        </div>
+      </div>
+
+      <div className="relative">
+        <Quote className="absolute -left-2 -top-2 text-primary/10 w-10 h-10 -z-10" strokeWidth={3} />
+        <p className="text-sm font-medium text-foreground/70 leading-relaxed italic line-clamp-4 relative z-10 pl-4 border-l-2 border-primary/20">
+          &ldquo;{comment || "Experiência maravilhosa, recomendo a todos!"}&rdquo;
+        </p>
+      </div>
+
+      <div className="space-y-3 pt-4">
+        <div className="flex items-center gap-3 bg-white/50 dark:bg-white/5 p-3 rounded-2xl border border-white/40 dark:border-white/10 group/item">
+          <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover/item:scale-110 transition-transform">
+            <Compass size={14} />
+          </div>
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Referente a</p>
+            <p className="text-xs font-bold text-foreground truncate max-w-[160px]">{tourName}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 bg-white/50 dark:bg-white/5 p-3 rounded-2xl border border-white/40 dark:border-white/10 group/item">
+          <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover/item:scale-110 transition-transform">
+            <Calendar size={14} />
+          </div>
+          <div>
+            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 leading-none mb-1">Data</p>
+            <p className="text-xs font-bold text-foreground">{new Date(createdAt).toLocaleDateString("pt-BR")}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div className="p-4 bg-white/20 dark:bg-black/20 border-t border-white/40 dark:border-white/10 flex justify-between items-center">
+      <div className="flex gap-2">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn("h-10 w-10 rounded-xl transition-all", status === 'approved' ? "text-emerald-500 bg-emerald-500/10" : "text-slate-300")}
+                onClick={() => onStatusToggle(id, status)}
+              >
+                {status === 'approved' ? <Eye size={18} /> : <EyeOff size={18} />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="font-black text-[10px] uppercase">
+              {status === 'approved' ? "Ocultar do Site" : "Exibir no Site"}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn("h-10 w-10 rounded-xl transition-all", isFeatured ? "text-amber-500 bg-amber-500/10" : "text-slate-300")}
+                onClick={() => onFeaturedToggle(id, isFeatured)}
+              >
+                <Award size={18} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="font-black text-[10px] uppercase">
+              {isFeatured ? "Remover Destaque" : "Destacar na Home"}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+
+      <AlertDialog>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-rose-50 text-rose-300 hover:text-rose-500 transition-all border-none">
+                  <Trash2 size={18} />
+                </Button>
+              </AlertDialogTrigger>
+            </TooltipTrigger>
+            <TooltipContent className="bg-rose-500 text-white font-black text-[10px] uppercase border-none">Remover Registro</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <AlertDialogContent className="rounded-[2rem] border-none shadow-2xl glass-card">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-black text-rose-500 flex items-center gap-2">
+              <Trash2 size={24} /> Confirmar Exclusão
+            </AlertDialogTitle>
+            <AlertDialogDescription className="font-medium">
+              Esta ação removerá permanentemente o depoimento de **{author}** da vitrine pública e do banco de dados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="pt-4">
+            <AlertDialogCancel className="rounded-xl font-bold">Manter Depoimento</AlertDialogCancel>
+            <AlertDialogAction onClick={() => onDelete(id)} className="rounded-xl font-black uppercase text-xs bg-rose-500 hover:bg-rose-600">Sim, Remover Agora</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  </div>
+));
+
 const AdminAvaliacoes = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [tours, setTours] = useState<TourOption[]>([]);
@@ -59,7 +214,7 @@ const AdminAvaliacoes = () => {
     if (data) setTours(data);
   };
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase
       .from("reviews")
@@ -73,13 +228,30 @@ const AdminAvaliacoes = () => {
       })));
     }
     setLoading(false);
-  };
+  }, []);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     const { error } = await supabase.from("reviews").delete().eq("id", id);
     if (error) toast.error("Erro ao remover avaliação.");
     else { toast.success("Avaliação removida."); fetchReviews(); }
-  };
+  }, [fetchReviews]);
+
+  const handleStatusToggle = useCallback(async (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'approved' ? 'hidden' : 'approved';
+    const { error } = await supabase.from("reviews").update({ status: newStatus } as any).eq("id", id);
+    if (!error) {
+      toast.success(newStatus === 'approved' ? "Avaliação aprovada!" : "Avaliação oculta.");
+      fetchReviews();
+    }
+  }, [fetchReviews]);
+
+  const handleFeaturedToggle = useCallback(async (id: string, currentFeatured: boolean) => {
+    const { error } = await supabase.from("reviews").update({ is_featured: !currentFeatured } as any).eq("id", id);
+    if (!error) {
+      toast.success(currentFeatured ? "Destaque removido." : "Definida como destaque!");
+      fetchReviews();
+    }
+  }, [fetchReviews]);
 
   const handleCreate = async () => {
     if (!formAuthor.trim()) { toast.error("Informe o autor."); return; }

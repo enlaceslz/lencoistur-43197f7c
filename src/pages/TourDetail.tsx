@@ -28,7 +28,7 @@ const TourDetail = () => {
     if (!slug) return;
     const partnerId = params.get("partner_id") || params.get("partner");
     const load = async () => {
-      const { data: t, error } = await supabase.from("public_tours" as "tours").select("*").eq("slug", slug).single();
+      const { data: t, error } = await supabase.from("public_tours" as "tours").select("id, slug, name, category, images, includes, highlights, tag, price, private_price, location, duration, group_size, rating, reviews_count, description, difficulty, departure, operator, vehicle_capacity, mode_collective_enabled, mode_private_enabled, default_mode, pix_discount").eq("slug", slug).single();
       if (error) {
         console.error("Erro ao carregar detalhes do passeio:", error);
       }
@@ -58,7 +58,7 @@ const TourDetail = () => {
         if (initial === "coletivo" && !collectiveOn) initial = "privativo";
         setTourMode(initial);
 
-        const { data: r } = await supabase.from("reviews").select("*").eq("tour_id", t.id).order("created_at", { ascending: false });
+        const { data: r } = await supabase.from("reviews").select("id, tour_id, author, avatar, country, created_at, rating, comment").eq("tour_id", t.id).order("created_at", { ascending: false });
         setTourReviews(r || []);
       }
       setLoading(false);

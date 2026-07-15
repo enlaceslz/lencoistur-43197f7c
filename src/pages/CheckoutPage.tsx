@@ -38,61 +38,32 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     const load = async () => {
-      if (type === "tour" && slug) {
-        const { data } = await supabase.from("public_tours" as "tours").select("*").eq("slug", slug).single();
-        setTour(data);
-        if (partnerId && data?.id) {
-          try {
-            const pricing = await fetchPartnerCatalogPricing(partnerId, [{ key: data.id, type: "tour", id: data.id }]);
-            setPartner(pricing.partner);
-            const item = pricing.items[data.id];
-            setPartnerPricing(item ? { effectivePrice: item.effectivePrice, effectivePrivatePrice: item.effectivePrivatePrice } : null);
-          } catch {
-            setPartner(null);
-            setPartnerPricing(null);
-          }
-        } else {
-          setPartner(null);
-          setPartnerPricing(null);
-        }
-      } else if (type === "transfer" && transferId) {
-        const { data } = await supabase.from("public_transfer_routes" as "transfer_routes").select("*").eq("id", transferId).single();
-        setTransfer(data);
-        if (partnerId && data?.id) {
-          try {
-            const pricing = await fetchPartnerCatalogPricing(partnerId, [{ key: data.id, type: "transfer", id: data.id }]);
-            setPartner(pricing.partner);
-            const item = pricing.items[data.id];
-            setPartnerPricing(item ? { effectivePrice: item.effectivePrice } : null);
-          } catch {
-            setPartner(null);
-            setPartnerPricing(null);
-          }
-        } else {
-          setPartner(null);
-          setPartnerPricing(null);
-        }
-      } else if (type === "package" && (packageSlug || packageId)) {
-        let query = supabase.from("public_packages" as "packages").select("*");
-        if (packageId) {
-          query = query.eq("id", packageId);
-        } else {
-          query = query.eq("slug", packageSlug);
-        }
-        
-        const { data } = await query.maybeSingle();
-        
-        if (data) {
-          setPkg({
-            id: data.id,
-            name: data.name,
-            slug: data.slug,
-            price: data.discount_price,
-          });
-
-          if (partnerId) {
+      try {
+        if (type === "tour" && slug) {
+          const { data, error } = await supabase.from("public_tours" as "tours").select("*").eq("slug", slug).single();
+          if (error) throw error;
+          setTour(data);
+          if (partnerId && data?.id) {
             try {
-              const pricing = await fetchPartnerCatalogPricing(partnerId, [{ key: data.id, type: "package", id: data.id }]);
+              const pricing = await fetchPartnerCatalogPricing(partnerId, [{ key: data.id, type: "tour", id: data.id }]);
+              setPartner(pricing.partner);
+              const item = pricing.items[data.id];
+              setPartnerPricing(item ? { effectivePrice: item.effectivePrice, effectivePrivatePrice: item.effectivePrivatePrice } : null);
+            } catch {
+              setPartner(null);
+              setPartnerPricing(null);
+            }
+          } else {
+            setPartner(null);
+            setPartnerPricing(null);
+          }
+        } else if (type === "transfer" && transferId) {
+          const { data, error } = await supabase.from("public_transfer_routes" as "transfer_routes").select("*").eq("id", transferId).single();
+          if (error) throw error;
+          setTransfer(data);
+          if (partnerId && data?.id) {
+            try {
+              const pricing = await fetchPartnerCatalogPricing(partnerId, [{ key: data.id, type: "transfer", id: data.id }]);
               setPartner(pricing.partner);
               const item = pricing.items[data.id];
               setPartnerPricing(item ? { effectivePrice: item.effectivePrice } : null);
@@ -104,7 +75,44 @@ const CheckoutPage = () => {
             setPartner(null);
             setPartnerPricing(null);
           }
+        } else if (type === "package" && (packageSlug || packageId)) {
+          let query = supabase.from("public_packages" as "packages").select("*");
+          if (packageId) {
+            query = query.eq("id", packageId);
+          } else {
+            query = query.eq("slug", packageSlug);
+          }
+          
+          const { data, error } = await query.maybeSingle();
+          if (error) throw error;
+          
+          if (data) {
+            setPkg({
+              id: data.id,
+              name: data.name,
+              slug: data.slug,
+              price: data.discount_price,
+            });
+
+            if (partnerId) {
+              try {
+                const pricing = await fetchPartnerCatalogPricing(partnerId, [{ key: data.id, type: "package", id: data.id }]);
+                setPartner(pricing.partner);
+                const item = pricing.items[data.id];
+                setPartnerPricing(item ? { effectivePrice: item.effectivePrice } : null);
+              } catch {
+                setPartner(null);
+                setPartnerPricing(null);
+              }
+            } else {
+              setPartner(null);
+              setPartnerPricing(null);
+            }
+          }
         }
+      } catch (err) {
+        console.error("Erro ao carregar dados do checkout:", err);
+        toast({ title: "Erro ao carregar", description: "Não foi possível carregar os dados do serviço.", variant: "destructive" });
       }
       setLoadingItem(false);
     };
@@ -184,6 +192,26 @@ const CheckoutPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const errors: string[] = [];
+    if (!name.trim()) errors.push("Nome completo é obrigatório");
+    if (!email.trim()) errors.push("E-mail é obrigatório");
+    if (!phone.trim()) errors.push("Telefone é obrigatório");
+    if (nationality === "br" && cpf && cpf.replace(/\D/g, "").length !== 11)
+      errors.push("CPF deve ter 11 dígitos");
+    if (nationality === "foreign" && !passport.trim())
+      errors.push("Passaporte é obrigatório para estrangeiros");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
+      errors.push("E-mail inválido");
+    if (phone.replace(/\D/g, "").length < 10)
+      errors.push("Telefone deve ter pelo menos 10 dígitos");
+
+    if (errors.length > 0) {
+      toast({ title: "Verifique os dados", description: errors.join(". "), variant: "destructive" });
+      setSubmitting(false);
+      return;
+    }
+
     setSubmitting(true);
     try {
       const booking = await addBooking({
@@ -196,9 +224,9 @@ const CheckoutPage = () => {
         discount: displayDiscount,
         finalTotal,
         payMethod,
-        customerName: name,
-        customerEmail: email,
-        customerPhone: phone,
+        customerName: name.trim(),
+        customerEmail: email.trim(),
+        customerPhone: phone.trim(),
         cpf: nationality === "br" ? cpf : undefined,
         passport: nationality === "foreign" ? passport : undefined,
         country: nationality === "foreign" ? country : "Brasil",
