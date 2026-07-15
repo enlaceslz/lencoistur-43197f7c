@@ -160,7 +160,12 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
 
   useEffect(() => { localStorage.setItem("admin-sidebar-collapsed", String(sidebarCollapsed)); }, [sidebarCollapsed]);
 
-  const canAccess = (key?: string) => !key || !!userPermissions[key];
+  const canAccess = (key?: string) => {
+    if (!key) return true;
+    const permKeys = Object.keys(userPermissions);
+    if (permKeys.length === 0) return true;
+    return !!userPermissions[key];
+  };
 
   const filteredMainGroups = mainGroups
     .map(g => ({ ...g, items: g.items.filter(i => canAccess(i.permissionKey)) }))
