@@ -18,13 +18,13 @@ const AdminSGSPesquisas = () => {
   useEffect(() => { load(); loadBookings(); }, []);
 
   const loadBookings = async () => {
-    const { data } = await supabase.from("bookings").select("id, booking_code, item_name, customer_name").order("created_at", { ascending: false }).limit(50);
+    const { data } = await supabase.from("bookings").select("id, booking_code, item_name, customers!bookings_customer_id_fkey(name)").order("created_at", { ascending: false }).limit(50);
     setBookings(data || []);
   };
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("sgs_safety_surveys").select("*, bookings(booking_code, item_name, customer_name)").order("created_at", { ascending: false });
+    const { data } = await supabase.from("sgs_safety_surveys").select("*, bookings!booking_id(booking_code, item_name, customers!bookings_customer_id_fkey(name))").order("created_at", { ascending: false });
     setSurveys(data || []);
     setLoading(false);
   };
@@ -106,7 +106,7 @@ const AdminSGSPesquisas = () => {
                   className="w-full bg-muted border border-border rounded-xl px-3 py-2.5 text-sm text-foreground outline-none">
                   <option value="">Nenhuma / Geral</option>
                   {bookings.map(b => (
-                    <option key={b.id} value={b.id}>{b.booking_code} - {b.customer_name} ({b.item_name})</option>
+                    <option key={b.id} value={b.id}>{b.booking_code} - {b.customers?.name} ({b.item_name})</option>
                   ))}
                 </select>
               </div>
@@ -172,7 +172,7 @@ const AdminSGSPesquisas = () => {
                   </div>
                   <div>
                     <h4 className="font-display font-black text-sm text-foreground flex items-center gap-2">
-                      {s.bookings?.customer_name ? `Feedback: ${s.bookings.customer_name}` : `Anônimo #${s.id.slice(0, 4).toUpperCase()}`}
+                      {s.bookings?.customers?.name ? `Feedback: ${s.bookings.customers.name}` : `Anônimo #${s.id.slice(0, 4).toUpperCase()}`}
                       {s.danger_situations && <Badge variant="destructive" className="text-[8px] font-black uppercase py-0 px-2 rounded-full">Alerta de Risco</Badge>}
                     </h4>
                     <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">
