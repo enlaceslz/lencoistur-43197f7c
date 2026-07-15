@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { supabase } from "@/integrations/supabase/client";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import galleryPanorama from "@/assets/gallery-panorama-dunas.jpg";
 import galleryBanho from "@/assets/gallery-banho-lagoa.jpg";
 import gallery4x4 from "@/assets/gallery-4x4-dunas.jpg";
@@ -19,23 +19,9 @@ const DEFAULT_GALLERY = [
 
 const GallerySection = () => {
   const [lightbox, setLightbox] = useState<number | null>(null);
-  const [galleryImages, setGalleryImages] = useState(DEFAULT_GALLERY);
+  const { gallery } = useSiteSettings();
+  const galleryImages = (gallery?.images && gallery.images.length > 0 ? gallery.images : DEFAULT_GALLERY) as { src: string; alt: string }[];
   const { t } = useTranslation();
-
-  useEffect(() => {
-    const loadGallery = async () => {
-      const { data } = await supabase
-        .from("site_settings")
-        .select("value")
-        .eq("key", "gallery")
-        .maybeSingle();
-      
-      if (data && Array.isArray((data.value as any)?.images)) {
-        setGalleryImages((data.value as any).images);
-      }
-    };
-    loadGallery();
-  }, []);
 
   const navigate = (dir: number) => {
     if (lightbox === null) return;

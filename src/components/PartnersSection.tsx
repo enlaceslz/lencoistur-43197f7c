@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const partnerTypeKeys = [
   { icon: Building2, key: "hotels", count: "50+" },
@@ -18,10 +19,11 @@ const partnerTypeKeys = [
 
 const PartnersSection = () => {
   const { t } = useTranslation();
+  const { site } = useSiteSettings();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(site?.exibirParceiros !== false);
   
   const [form, setForm] = useState({
     name: "",
@@ -32,22 +34,10 @@ const PartnersSection = () => {
   });
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      const { data } = await supabase
-        .from("site_settings")
-        .select("value")
-        .eq("key", "site")
-        .maybeSingle();
-      
-      if (data?.value && typeof data.value === 'object') {
-        const siteSettings = data.value as any;
-        if (siteSettings.exibirParceiros !== undefined) {
-          setIsVisible(siteSettings.exibirParceiros);
-        }
-      }
-    };
-    fetchSettings();
-  }, []);
+    if (site?.exibirParceiros !== undefined) {
+      setIsVisible(site.exibirParceiros);
+    }
+  }, [site]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -2,7 +2,7 @@ import { Search, MapPin, Calendar, ShieldCheck } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import heroImgDefault from "@/assets/hero-travel.jpg";
 
 const HERO_IMG_DEFAULT = heroImgDefault;
@@ -14,34 +14,24 @@ const categoryKeys = ["boat", "eco", "gastro", "cultural", "kayak", "trekking"] 
 const HeroSection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { site } = useSiteSettings();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchDate, setSearchDate] = useState("");
   const [heroImg, setHeroImg] = useState(HERO_IMG_DEFAULT);
 
-  const [banners, setBanners] = useState<Array<{ url: string; id: string }>>([]);
+  const banners = site?.banners ?? [];
   const [transition, setTransition] = useState<"fade" | "slide">("fade");
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    const loadSettings = async () => {
-      const { data } = await supabase
-        .from("site_settings")
-        .select("value")
-        .eq("key", "site")
-        .maybeSingle();
-      
-      if (data) {
-        const val = data.value as any;
-        if (val?.banners && val.banners.length > 0) {
-          setBanners(val.banners);
-          setTransition(val.bannerTransition || "fade");
-        } else if (val?.bannerUrl) {
-          setHeroImg(val.bannerUrl);
-        }
+    if (site) {
+      if (site.banners && site.banners.length > 0) {
+        setTransition(site.bannerTransition || "fade");
+      } else if (site.bannerUrl) {
+        setHeroImg(site.bannerUrl);
       }
-    };
-    loadSettings();
-  }, []);
+    }
+  }, [site]);
 
   useEffect(() => {
     if (banners.length <= 1) return;
