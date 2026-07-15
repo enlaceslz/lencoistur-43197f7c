@@ -1467,16 +1467,18 @@ const AdminConfig = () => {
                 </Tooltip>
               </div>
 
-              <div className="space-y-6">
+              <form onSubmit={(e) => { e.preventDefault(); handleChangePassword(); }} className="space-y-6">
                 <div className="space-y-2">
-                  <Label>Nova Senha</Label>
+                  <Label htmlFor="nova-senha">Nova Senha</Label>
                   <div className="relative">
                     <Input
+                      id="nova-senha"
                       type={showPassword ? "text" : "password"}
                       value={novaSenha}
                       onChange={(e) => setNovaSenha(e.target.value)}
                       placeholder="Mínimo 8 caracteres"
                       maxLength={72}
+                      autoComplete="new-password"
                     />
                     <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" onClick={() => setShowPassword(!showPassword)}>
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -1484,23 +1486,23 @@ const AdminConfig = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>Confirmar Nova Senha</Label>
-                  <Input type={showPassword ? "text" : "password"} value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} placeholder="Repita a nova senha" maxLength={72} />
+                  <Label htmlFor="confirmar-senha">Confirmar Nova Senha</Label>
+                  <Input id="confirmar-senha" type={showPassword ? "text" : "password"} value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} placeholder="Repita a nova senha" maxLength={72} autoComplete="new-password" />
                 </div>
                 {novaSenha && novaSenha.length < 8 && <p className="text-xs text-destructive">A senha deve ter pelo menos 8 caracteres.</p>}
                 {confirmarSenha && novaSenha !== confirmarSenha && <p className="text-xs text-destructive">As senhas não conferem.</p>}
-              </div>
 
-              <div className="flex justify-end pt-8 border-t border-border mt-8">
-                <Button 
-                  onClick={handleChangePassword} 
-                  disabled={changingPassword || !novaSenha} 
-                  className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-slate-500/20 bg-slate-700 hover:bg-slate-800 text-white transition-all active:scale-95 flex items-center gap-2"
-                >
-                  {changingPassword ? <Loader2 size={18} className="animate-spin" /> : <Shield size={18} />}
-                  Atualizar Senha de Acesso
-                </Button>
-              </div>
+                <div className="flex justify-end pt-8 border-t border-border mt-8">
+                  <Button 
+                    type="submit"
+                    disabled={changingPassword || !novaSenha} 
+                    className="rounded-xl px-12 h-12 font-black uppercase tracking-widest shadow-lg shadow-slate-500/20 bg-slate-700 hover:bg-slate-800 text-white transition-all active:scale-95 flex items-center gap-2"
+                  >
+                    {changingPassword ? <Loader2 size={18} className="animate-spin" /> : <Shield size={18} />}
+                    Atualizar Senha de Acesso
+                  </Button>
+                </div>
+              </form>
             </CardContent>
           </Card>
         </TabsContent>
@@ -1663,7 +1665,7 @@ const AdminConfig = () => {
               </div>
 
               {isAddingUser && (
-                <div className="bg-muted/50 p-6 rounded-2xl border border-border space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                <form onSubmit={(e) => { e.preventDefault(); handleAddUser(); }} className="bg-muted/50 p-6 rounded-2xl border border-border space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
                   <div className="flex items-center justify-between">
                     <h4 className="font-bold text-foreground flex items-center gap-2">
                       <UserPlus size={16} /> Cadastrar Novo Usuário do Sistema
@@ -1674,16 +1676,18 @@ const AdminConfig = () => {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="space-y-2">
-                      <Label>Nome Completo</Label>
-                      <Input 
+                      <Label htmlFor="new-user-name">Nome Completo</Label>
+                      <Input
+                        id="new-user-name"
                         placeholder="Ex: João da Silva" 
                         value={newUser.full_name}
                         onChange={e => setNewUser({...newUser, full_name: e.target.value})}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>E-mail (Login)</Label>
+                      <Label htmlFor="new-user-email">E-mail (Login)</Label>
                       <Input 
+                        id="new-user-email"
                         type="email" 
                         placeholder="joao@lencoistour.com" 
                         value={newUser.email}
@@ -1691,17 +1695,20 @@ const AdminConfig = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Senha Inicial</Label>
+                      <Label htmlFor="new-user-password">Senha Inicial</Label>
                       <Input 
+                        id="new-user-password"
                         type="password" 
                         placeholder="••••••••" 
                         value={newUser.password}
                         onChange={e => setNewUser({...newUser, password: e.target.value})}
+                        autoComplete="new-password"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Hierarquia</Label>
+                      <Label htmlFor="new-user-role">Hierarquia</Label>
                       <select 
+                        id="new-user-role"
                         className="w-full h-10 px-3 rounded-xl border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-all hover:border-primary/50"
                         value={newUser.role}
                         onChange={e => setNewUser({...newUser, role: e.target.value})}
@@ -1715,7 +1722,7 @@ const AdminConfig = () => {
                   </div>
                   <div className="flex justify-end pt-2">
                     <Button 
-                      onClick={handleAddUser}
+                      type="submit"
                       disabled={saving}
                       className="bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold px-8"
                     >
@@ -1723,7 +1730,7 @@ const AdminConfig = () => {
                       Salvar Usuário
                     </Button>
                   </div>
-                </div>
+                </form>
               )}
 
               {isEditingPermissions && editingUser && (
