@@ -95,14 +95,14 @@ const PackagesSection = () => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {dbPackages.map((pkg) => {
+          {(dbPackages || []).map((pkg) => {
             const discount = pkg.original_price > 0 ? Math.round(((pkg.original_price - pkg.discount_price) / pkg.original_price) * 100) : 0;
             const pkgTours = (pkg.package_tours || []).map((pt: any) => pt.tour).filter(Boolean);
 
             return (
               <div key={pkg.id} className="bg-card border border-border rounded-lg overflow-hidden group">
                 <div className="relative h-48 flex">
-                  {pkgTours.length > 0 ? pkgTours.slice(0, 3).map((tour: any, idx: number) => (
+                  {(pkgTours || []).length > 0 ? (pkgTours || []).slice(0, 3).map((tour: any, idx: number) => (
                     <div key={`${pkg.id}-${tour.id}-${idx}`} className="flex-1 overflow-hidden">
                       {tour.images?.[0] ? (
                         <img src={tour.images[0]} alt={tour.name} className="w-full h-full object-cover aspect-[4/3]" loading="lazy" />
@@ -133,7 +133,7 @@ const PackagesSection = () => {
                   </div>
 
                   <div className="space-y-2">
-                    {pkg.highlights.map((h) => (
+                    {(pkg.highlights || []).map((h) => (
                       <div key={h} className="flex items-center gap-2 text-sm text-foreground">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
                         {h}

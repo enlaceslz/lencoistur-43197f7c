@@ -23,7 +23,7 @@ const AIChatbot = () => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
-  const suggestedQuestions = t("chatbot.questions", { returnObjects: true }) as string[];
+  const suggestedQuestions = (t("chatbot.questions", { returnObjects: true }) as unknown as string[]) || [];
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || isLoading) return;

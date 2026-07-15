@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Star, MapPin, Clock, Search, SlidersHorizontal, Sparkles } from "lucide-react";
@@ -54,53 +54,59 @@ const ToursPage = () => {
   const [partner, setPartner] = useState<{ id: string; name: string } | null>(null);
   const [pricingByTourId, setPricingByTourId] = useState<Record<string, { effectivePrice: number; effectivePrivatePrice?: number | null }>>({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState(params.get("search") || "");
   const [sort, setSort] = useState("popular");
 
   const [maxPrice, setMaxPrice] = useState(3000);
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      const { data, error } = await supabase.from("public_tours" as "tours").select("id, slug, name, images, location, mode_collective_enabled, mode_private_enabled, private_price, price, rating, reviews_count, tag, duration, pix_discount").order("name");
-      if (error) {
-        console.error("Erro ao carregar passeios:", error);
-      }
-      const safeTours = data || [];
-      setTours(safeTours);
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    const { data, error } = await supabase.from("public_tours" as "tours").select("id, slug, name, images, location, mode_collective_enabled, mode_private_enabled, private_price, price, rating, reviews_count, tag, duration, pix_discount").order("name");
+    if (error) {
+      console.error("Erro ao carregar passeios:", error);
+      setError("Não foi possível carregar os passeios. Tente novamente.");
+      setLoading(false);
+      return;
+    }
+    const safeTours = data || [];
+    setTours(safeTours);
 
-      if (partnerId && safeTours.length > 0) {
-        try {
-          const pricing = await fetchPartnerCatalogPricing(
-            partnerId,
-            safeTours.map((tour) => ({ key: tour.id, type: "tour" as const, id: tour.id })),
-          );
+    if (partnerId && safeTours.length > 0) {
+      try {
+        const pricing = await fetchPartnerCatalogPricing(
+          partnerId,
+          safeTours.map((tour) => ({ key: tour.id, type: "tour" as const, id: tour.id })),
+        );
 
-          setPartner(pricing.partner);
-          setPricingByTourId(
-            Object.fromEntries(
-              Object.entries(pricing.items).map(([key, value]) => [
-                key,
-                {
-                  effectivePrice: value.effectivePrice,
-                  effectivePrivatePrice: value.effectivePrivatePrice,
-                },
-              ]),
-            ),
-          );
-        } catch {
-          setPartner(null);
-          setPricingByTourId({});
-        }
-      } else {
+        setPartner(pricing.partner);
+        setPricingByTourId(
+          Object.fromEntries(
+            Object.entries(pricing.items).map(([key, value]) => [
+              key,
+              {
+                effectivePrice: value.effectivePrice,
+                effectivePrivatePrice: value.effectivePrivatePrice,
+              },
+            ]),
+          ),
+        );
+      } catch {
         setPartner(null);
         setPricingByTourId({});
       }
+    } else {
+      setPartner(null);
+      setPricingByTourId({});
+    }
 
-      setLoading(false);
-    };
-    load();
+    setLoading(false);
   }, [partnerId]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const filtered = tours
     .filter((t) => {
@@ -177,6 +183,18 @@ const ToursPage = () => {
         <p className="text-muted-foreground text-sm mb-6">
           {loading ? "Carregando..." : `${filtered.length} passeio(s) encontrado(s)`}
         </p>
+
+        {error && (
+          <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
+            <p className="text-muted-foreground">{error}</p>
+            <button
+              onClick={() => load()}
+              className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-bold transition-colors hover:bg-primary/90"
+            >
+              Tentar novamente
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((tour) => (

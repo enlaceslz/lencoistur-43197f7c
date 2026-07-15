@@ -229,8 +229,8 @@ export function useBookings(customerId?: string) {
         throw new Error(errorMsg);
       }
 
-      const results = Array.isArray(result) ? result : [result];
-      const mappedResults = results.map(r => mapDbToBooking(r, r.customers));
+      const results = result ? (Array.isArray(result) ? result : [result]) : [];
+      const mappedResults = results.map(r => mapDbToBooking(r, r?.customers));
       
       if (data.isPaid) {
         const results = await Promise.allSettled(

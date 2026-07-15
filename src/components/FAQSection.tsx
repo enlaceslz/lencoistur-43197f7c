@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 
 const FAQSection = () => {
   const { t } = useTranslation();
-  const items = t("faq.items", { returnObjects: true }) as { q: string; a: string }[];
+  const items = (t("faq.items", { returnObjects: true }) as { q: string; a: string }[]) || [];
 
   return (
     <section id="faq" className="py-24 md:py-32 bg-gradient-to-b from-white to-ocean-light/20">

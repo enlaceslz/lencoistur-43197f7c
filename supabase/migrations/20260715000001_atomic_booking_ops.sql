@@ -45,9 +45,9 @@ BEGIN
   END IF;
 
   -- Update status
-  UPDATE bookings
+  UPDATE bookings b
   SET status = 'confirmada', payment_status = 'pago', updated_at = now()
-  WHERE id = ANY(v_booking_ids);
+  WHERE b.id = ANY(v_booking_ids);
 
   -- Insert contas_receber (skip existing)
   INSERT INTO contas_receber
@@ -85,7 +85,7 @@ CREATE OR REPLACE FUNCTION public.cancel_booking_transaction(
   p_booking_id UUID DEFAULT NULL,
   p_group_id    UUID DEFAULT NULL
 )
-RETURNS TABLE (LIKE bookings)
+RETURNS SETOF bookings
 LANGUAGE plpgsql SECURITY DEFINER
 SET statement_timeout = '30s'
 AS $$
@@ -93,22 +93,22 @@ DECLARE
   v_booking_ids UUID[];
 BEGIN
   IF p_group_id IS NOT NULL THEN
-    SELECT array_agg(id) INTO v_booking_ids FROM bookings WHERE group_id = p_group_id;
+    SELECT array_agg(b.id) INTO v_booking_ids FROM bookings b WHERE b.group_id = p_group_id;
   ELSIF p_booking_id IS NOT NULL THEN
     v_booking_ids := ARRAY[p_booking_id];
   ELSE
     RAISE EXCEPTION 'p_booking_id or p_group_id required';
   END IF;
 
-  UPDATE bookings
+  UPDATE bookings b
   SET status = 'cancelada', payment_status = 'pendente', updated_at = now()
-  WHERE id = ANY(v_booking_ids);
+  WHERE b.id = ANY(v_booking_ids);
 
-  UPDATE contas_receber
+  UPDATE contas_receber cr
   SET status = 'cancelado',
       observacoes = 'Reserva cancelada via CRM',
       updated_at = now()
-  WHERE booking_id = ANY(v_booking_ids);
+  WHERE cr.booking_id = ANY(v_booking_ids);
 
   RETURN QUERY
   SELECT b.* FROM bookings b WHERE b.id = ANY(v_booking_ids);
@@ -129,7 +129,7 @@ CREATE OR REPLACE FUNCTION public.update_booking_customer_transaction(
   p_items        JSONB,     -- array of item objects
   p_companions   JSONB      -- array of companion objects
 )
-RETURNS TABLE (LIKE bookings)
+RETURNS SETOF bookings
 LANGUAGE plpgsql SECURITY DEFINER
 SET statement_timeout = '30s'
 AS $$

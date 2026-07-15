@@ -10,7 +10,7 @@ const WhatsAppFloat = () => {
   const [msgIndex, setMsgIndex] = useState(0);
   const [dismissed, setDismissed] = useState(false);
 
-  const smartMessages = t("whatsappFloat.messages", { returnObjects: true }) as string[];
+  const smartMessages = (t("whatsappFloat.messages", { returnObjects: true }) as unknown as string[]) || [];
 
   useEffect(() => {
     const timer = setTimeout(() => setShowBubble(true), 5000);

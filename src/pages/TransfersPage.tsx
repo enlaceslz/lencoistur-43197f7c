@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Clock, MapPin, Users, Car, Ship, ChevronDown } from "lucide-react";
@@ -8,15 +8,29 @@ import Footer from "@/components/Footer";
 const TransfersPage = () => {
   const [routes, setRoutes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [date, setDate] = useState("");
   const [passengers, setPassengers] = useState(1);
 
-  useEffect(() => {
-    supabase.from("public_transfer_routes" as "transfer_routes").select("*").order("origin")
-      .then(({ data }) => { setRoutes(data || []); setLoading(false); });
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    const { data, error } = await supabase.from("public_transfer_routes" as "transfer_routes").select("*").order("origin");
+    if (error) {
+      console.error("Erro ao carregar translados:", error);
+      setError("Não foi possível carregar os translados. Tente novamente.");
+      setLoading(false);
+      return;
+    }
+    setRoutes(data || []);
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const origins = [...new Set(routes.map((r) => r.origin))];
   const destinations = origin
@@ -86,6 +100,18 @@ const TransfersPage = () => {
         <p className="text-muted-foreground text-sm mb-6">
           {loading ? "Carregando..." : `${filtered.length} rota(s) disponível(is)`}
         </p>
+
+        {error && (
+          <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
+            <p className="text-muted-foreground">{error}</p>
+            <button
+              onClick={() => load()}
+              className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-bold transition-colors hover:bg-primary/90"
+            >
+              Tentar novamente
+            </button>
+          </div>
+        )}
 
         <div className="space-y-4">
           {filtered.map((route) => {

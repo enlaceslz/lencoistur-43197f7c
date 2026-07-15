@@ -85,7 +85,7 @@ serve(async (req) => {
         })
       }
 
-      let currentTermId = termId
+      const currentTermId = termId
       // Trust only the server-stored ids, never the client payload
       const trustedBookingId = existingTerm.booking_id
       const trustedCustomerId = existingTerm.customer_id

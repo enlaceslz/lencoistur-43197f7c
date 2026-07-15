@@ -58,7 +58,7 @@ const GallerySection = () => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {galleryImages.map((img, i) => (
+          {(galleryImages || []).map((img, i) => (
             <button
               key={i}
               onClick={() => setLightbox(i)}

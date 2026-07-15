@@ -9,7 +9,7 @@
 CREATE OR REPLACE FUNCTION public.complete_booking_transaction(
   p_booking_id UUID
 )
-RETURNS bookings
+RETURNS SETOF bookings
 LANGUAGE plpgsql SECURITY DEFINER
 SET statement_timeout = '30s'
 AS $$
@@ -82,7 +82,7 @@ BEGIN
        'Gerado automaticamente na conclusão da reserva ' || v_booking.booking_code);
   END IF;
 
-  RETURN v_booking;
+  RETURN QUERY SELECT b.* FROM bookings b WHERE b.id = p_booking_id;
 END;
 $$;
 
@@ -103,7 +103,7 @@ DECLARE
   v_booking_ids UUID[];
 BEGIN
   IF p_group_id IS NOT NULL THEN
-    SELECT array_agg(id) INTO v_booking_ids FROM bookings WHERE group_id = p_group_id;
+    SELECT array_agg(b.id) INTO v_booking_ids FROM bookings b WHERE b.group_id = p_group_id;
   ELSIF p_booking_id IS NOT NULL THEN
     v_booking_ids := ARRAY[p_booking_id];
   ELSE
@@ -111,12 +111,12 @@ BEGIN
   END IF;
 
   -- Delete financial records (must precede booking delete for non-cascade FKs)
-  DELETE FROM contas_receber WHERE booking_id = ANY(v_booking_ids);
-  DELETE FROM contas_pagar WHERE booking_id = ANY(v_booking_ids);
-  DELETE FROM collaborator_payments WHERE booking_id = ANY(v_booking_ids);
+  DELETE FROM contas_receber cr WHERE cr.booking_id = ANY(v_booking_ids);
+  DELETE FROM contas_pagar cp WHERE cp.booking_id = ANY(v_booking_ids);
+  DELETE FROM collaborator_payments cp2 WHERE cp2.booking_id = ANY(v_booking_ids);
 
   -- Delete bookings (cascade handles sgs_risk_terms, etc.)
-  DELETE FROM bookings WHERE id = ANY(v_booking_ids);
+  DELETE FROM bookings b WHERE b.id = ANY(v_booking_ids);
 END;
 $$;
 

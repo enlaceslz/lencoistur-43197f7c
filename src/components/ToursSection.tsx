@@ -70,7 +70,7 @@ const ToursSection = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {tours.map((tour) => {
+          {(tours || []).map((tour) => {
             const image = getTourImage(tour);
             return (
               <Link to={`/passeios/${tour.slug}${partnerId ? `?partner_id=${partnerId}` : ''}`} key={tour.id}

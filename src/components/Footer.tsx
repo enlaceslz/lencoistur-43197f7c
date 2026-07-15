@@ -44,7 +44,7 @@ const Footer = () => {
           <div>
             <h4 className="font-display font-bold text-lg mb-4">{t("footer.toursTitle")}</h4>
             <ul className="space-y-2 text-primary-foreground/60 text-sm">
-              {tourLinks.map((link) => (
+              {(tourLinks || []).map((link) => (
                 <li key={link}>
                   <Link to="/passeios" className="hover:text-secondary transition-colors inline-block py-1">
                     {link}
