@@ -48,8 +48,12 @@ const AdminTranslados = () => {
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("transfer_routes").select("*").order("origin");
-    setRoutes(data || []);
+    try {
+      const { data } = await supabase.from("transfer_routes").select("*").order("origin");
+      setRoutes(data || []);
+    } catch (err) {
+      console.error("Erro ao carregar translados:", err);
+    }
     setLoading(false);
   };
 

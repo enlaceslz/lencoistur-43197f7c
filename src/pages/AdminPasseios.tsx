@@ -78,12 +78,16 @@ const AdminPasseios = () => {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("tours").select("*").order("name");
-    if (error) {
-      console.error("Erro ao carregar passeios:", error);
-      toast.error("Erro ao carregar catálogo: " + error.message);
+    try {
+      const { data, error } = await supabase.from("tours").select("*").order("name");
+      if (error) {
+        console.error("Erro ao carregar passeios:", error);
+        toast.error("Erro ao carregar catálogo: " + error.message);
+      }
+      setTours(data || []);
+    } catch (err) {
+      console.error("Erro ao carregar passeios:", err);
     }
-    setTours(data || []);
     setLoading(false);
   };
 

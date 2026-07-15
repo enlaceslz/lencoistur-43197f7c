@@ -73,15 +73,19 @@ const AdminPacotes = () => {
 
   const loadData = async () => {
     setLoading(true);
-    const [pkgRes, tourRes, transRes] = await Promise.all([
-      supabase.from("packages").select("*, package_tours(tour_id), package_transfers(transfer_route_id)").order("created_at", { ascending: false }),
-      supabase.from("tours").select("id, name, price, partner_price").eq("active", true).order("name"),
-      supabase.from("transfer_routes").select("id, origin, destination, price, partner_price").eq("active", true).order("origin")
-    ]);
+    try {
+      const [pkgRes, tourRes, transRes] = await Promise.all([
+        supabase.from("packages").select("*, package_tours(tour_id), package_transfers(transfer_route_id)").order("created_at", { ascending: false }),
+        supabase.from("tours").select("id, name, price, partner_price").eq("active", true).order("name"),
+        supabase.from("transfer_routes").select("id, origin, destination, price, partner_price").eq("active", true).order("origin")
+      ]);
 
-    if (pkgRes.data) setPackages(pkgRes.data);
-    setTours(tourRes.data || []);
-    setTransfers(transRes.data || []);
+      if (pkgRes.data) setPackages(pkgRes.data);
+      setTours(tourRes.data || []);
+      setTransfers(transRes.data || []);
+    } catch (err) {
+      console.error("Erro ao carregar pacotes:", err);
+    }
     setLoading(false);
   };
 
@@ -747,8 +751,8 @@ const AdminPacotes = () => {
                               const fileExt = file.name.split('.').pop();
                               const fileName = `${Math.random()}.${fileExt}`;
                               const filePath = `package-banners/${fileName}`;
-                              await supabase.storage.from('images').upload(filePath, file);
-                              const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(filePath);
+                              await supabase.storage.from('tour-images').upload(filePath, file);
+                              const { data: { publicUrl } } = supabase.storage.from('tour-images').getPublicUrl(filePath);
                               
                               await supabase.from("packages").update({ banner_url: publicUrl }).eq("id", viewingPackage.id);
                               setViewingPackage({ ...viewingPackage, banner_url: publicUrl });
