@@ -67,16 +67,20 @@ const AdminFinanceiro = () => {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const [{ data: bkData }, { data: cpData }, { data: crData }, { data: compData }] = await Promise.all([
-        supabase.from("bookings").select("*, customers(name, email, phone)").order("created_at", { ascending: false }),
-        supabase.from("contas_pagar").select("*"),
-        supabase.from("contas_receber").select("*"),
-        supabase.from("sgs_empresa").select("*").limit(1).maybeSingle()
-      ]);
-      if (bkData) setBookings(bkData as any);
-      if (cpData) setContasPagar(cpData);
-      if (crData) setContasReceber(crData);
-      if (compData) setCompany(compData);
+      try {
+        const [{ data: bkData }, { data: cpData }, { data: crData }, { data: compData }] = await Promise.all([
+          supabase.from("bookings").select("*, customers(name, email, phone)").order("created_at", { ascending: false }),
+          supabase.from("contas_pagar").select("*"),
+          supabase.from("contas_receber").select("*"),
+          supabase.from("sgs_empresa").select("*").limit(1).maybeSingle()
+        ]);
+        if (bkData) setBookings(bkData as any);
+        if (cpData) setContasPagar(cpData);
+        if (crData) setContasReceber(crData);
+        if (compData) setCompany(compData);
+      } catch (err) {
+        console.error("Erro ao carregar dados financeiros:", err);
+      }
       setLoading(false);
     };
     load();
@@ -135,7 +139,7 @@ const AdminFinanceiro = () => {
         original: c
       })),
       ...monthContasPagar.map(c => ({
-        date: c.pagamento_em || c.vencimento,
+        date: c.pago_em || c.vencimento,
         desc: c.collaborator_id
           ? `[COMISSÃO] ${c.descricao}`
           : `[SAÍDA] ${c.descricao} - ${c.fornecedor || "N/A"}`,

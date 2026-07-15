@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -25,16 +25,29 @@ const formatPhone = (v: string) => {
 
 const MinhasReservas = () => {
   const { user, loading: authLoading } = useAuth();
-  const { bookings, loading: bookingsLoading, confirmPayment, cancelBooking } = useBookings();
+  const [customerId, setCustomerId] = useState<string | undefined>(undefined);
+  const { bookings, loading: bookingsLoading, confirmPayment, cancelBooking } = useBookings(customerId);
   const [filter, setFilter] = useState("todas");
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (user?.id) {
+      supabase.from("customers").select("id").eq("user_id", user.id).maybeSingle().then(({ data, error }) => {
+        if (!error && data) setCustomerId(data.id);
+      });
+    }
+  }, [user?.id]);
+
   const filtered = filter === "todas" ? bookings : bookings.filter((b) => b.status === filter);
 
   const copyPix = (code: string) => {
-    navigator.clipboard.writeText(code);
-    toast({ title: "Código PIX copiado!", description: "Cole no app do seu banco." });
+    try {
+      navigator.clipboard.writeText(code);
+      toast({ title: "Código PIX copiado!", description: "Cole no app do seu banco." });
+    } catch {
+      toast({ title: "Erro ao copiar", description: "Não foi possível copiar o código PIX.", variant: "destructive" });
+    }
   };
 
   const handleCancel = async (id: string) => {
@@ -225,9 +238,17 @@ const MinhasReservas = () => {
                         {b.termStatus === "assinado" ? (
                           <button
                             onClick={async () => {
-                              const { data } = await supabase.storage.from("customer-documents").createSignedUrl(b.termPdfUrl!, 300);
-                              if (data?.signedUrl) window.open(data.signedUrl, '_blank');
-                              else toast({ title: "Erro", description: "Não foi possível gerar o link do documento.", variant: "destructive" });
+                              try {
+                                if (!b.termPdfUrl) {
+                                  toast({ title: "Erro", description: "Documento não encontrado.", variant: "destructive" });
+                                  return;
+                                }
+                                const { data } = await supabase.storage.from("customer-documents").createSignedUrl(b.termPdfUrl, 300);
+                                if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+                                else toast({ title: "Erro", description: "Não foi possível gerar o link do documento.", variant: "destructive" });
+                              } catch {
+                                toast({ title: "Erro", description: "Erro ao acessar o documento.", variant: "destructive" });
+                              }
                             }}
                             className="bg-green-500/10 text-green-600 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-500/20 transition-colors flex items-center gap-1"
                           >

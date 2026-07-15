@@ -107,8 +107,8 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
 const BOOKINGS_QUERY_KEY = ["bookings", "admin", "list"] as const;
 const BOOKINGS_PAGE_SIZE = 1000;
 
-async function fetchBookingsFromDb(): Promise<BookingItem[]> {
-  const { data, error } = await supabase
+async function fetchBookingsFromDb(customerId?: string): Promise<BookingItem[]> {
+  let query = supabase
     .from("bookings")
     .select(
       "id, booking_code, type, item_name, date, guests, unit_price, total, discount, final_total, public_unit_price, public_total, partner_net_price, pay_method, status, payment_status, created_at, pix_code, notes, customer_id, cpf, birth_date, invoice_url, voucher_url, collaborator_id, partner_id, group_id, customers!customer_id(name, email, phone, cpf, passport, country, birth_date), collaborators(name), sgs_risk_terms(pdf_url, accepted, signed_at_counter)"
@@ -116,17 +116,22 @@ async function fetchBookingsFromDb(): Promise<BookingItem[]> {
     .order("created_at", { ascending: false })
     .limit(BOOKINGS_PAGE_SIZE);
 
+  if (customerId) {
+    query = query.eq("customer_id", customerId);
+  }
+
+  const { data, error } = await query;
   if (error) throw error;
   return (data ?? []).map((row: any) => mapDbToBooking(row, row.customers));
 }
 
-export function useBookings() {
+export function useBookings(customerId?: string) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
   const { data: bookings = [], isLoading: loading } = useQuery<BookingItem[]>({
-    queryKey: BOOKINGS_QUERY_KEY,
-    queryFn: fetchBookingsFromDb,
+    queryKey: [...BOOKINGS_QUERY_KEY, customerId],
+    queryFn: () => fetchBookingsFromDb(customerId),
     staleTime: 30_000,
     enabled: !!user,
   });
