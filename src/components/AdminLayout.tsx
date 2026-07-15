@@ -141,6 +141,10 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   const { settings } = useSiteSettings();
 
   useEffect(() => {
+    if (location.pathname.startsWith("/admin/sgs")) setSgsOpen(true);
+  }, [location.pathname]);
+
+  useEffect(() => {
     const fetch = async () => {
       if (!user?.id) return;
       const { data } = await supabase.from("user_management").select("role, permissions").eq("user_id", user.id).maybeSingle();
