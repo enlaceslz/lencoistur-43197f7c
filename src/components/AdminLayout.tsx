@@ -21,101 +21,106 @@ interface Notification {
   time: string;
 }
 
-const mainGroups = [
+interface SidebarItem {
+  icon: any; label: string; path: string; permissionKey?: string;
+}
+
+interface SidebarGroup {
+  title: string | null;
+  items: SidebarItem[];
+}
+
+const mainGroups: SidebarGroup[] = [
   {
     title: "Gestão",
     items: [
-      { icon: Home, label: "Dashboard", path: "/admin" },
-      { icon: Compass, label: "Passeios", path: "/admin/passeios" },
-      { icon: ShoppingCart, label: "Reservas", path: "/admin/reservas" },
-      { icon: FileText, label: "Pacotes", path: "/admin/pacotes" },
-      { icon: Car, label: "Translados", path: "/admin/translados" },
+      { icon: Home, label: "Dashboard", path: "/admin", permissionKey: "dashboard" },
+      { icon: Compass, label: "Passeios", path: "/admin/passeios", permissionKey: "passeios" },
+      { icon: ShoppingCart, label: "Reservas", path: "/admin/reservas", permissionKey: "reservas" },
+      { icon: FileText, label: "Pacotes", path: "/admin/pacotes", permissionKey: "pacotes" },
+      { icon: Car, label: "Translados", path: "/admin/translados", permissionKey: "translados" },
     ],
   },
   {
     title: "Relacionamento",
     items: [
-      { icon: Users, label: "Clientes (CRM)", path: "/admin/crm" },
-      { icon: UserCheck, label: "Parceiros", path: "/admin/parceiros" },
-      { icon: UserCheck2, label: "Colaboradores", path: "/admin/colaboradores" },
-      { icon: Star, label: "Avaliações", path: "/admin/avaliacoes" },
+      { icon: Users, label: "Clientes (CRM)", path: "/admin/crm", permissionKey: "crm" },
+      { icon: UserCheck, label: "Parceiros", path: "/admin/parceiros", permissionKey: "parceiros" },
+      { icon: UserCheck2, label: "Colaboradores", path: "/admin/colaboradores", permissionKey: "colaboradores" },
+      { icon: Star, label: "Avaliações", path: "/admin/avaliacoes", permissionKey: "avaliacoes" },
     ],
   },
   {
     title: "Administrativo",
     items: [
-      { icon: CreditCard, label: "Financeiro", path: "/admin/financeiro" },
-      { icon: Megaphone, label: "Marketing", path: "/admin/marketing" },
-      { icon: FileText, label: "Documentação", path: "/admin/documentos" },
-      { icon: BarChart3, label: "Relatórios", path: "/admin/relatorios" },
+      { icon: CreditCard, label: "Financeiro", path: "/admin/financeiro", permissionKey: "financeiro" },
+      { icon: Megaphone, label: "Marketing", path: "/admin/marketing", permissionKey: "marketing" },
+      { icon: FileText, label: "Documentação", path: "/admin/documentos", permissionKey: "documentos" },
+      { icon: BarChart3, label: "Relatórios", path: "/admin/relatorios", permissionKey: "relatorios" },
     ],
   },
   {
     title: "Tecnologia",
     items: [
-      { icon: Bot, label: "IA Gateway", path: "/admin/ia" },
-      { icon: Settings, label: "Configurações", path: "/admin/config" },
-      { icon: HelpCircle, label: "Ajuda", path: "/admin/ajuda" },
+      { icon: Bot, label: "IA Gateway", path: "/admin/ia", permissionKey: "ia_gateway" },
+      { icon: Settings, label: "Configurações", path: "/admin/config", permissionKey: "configuracoes" },
+      { icon: HelpCircle, label: "Ajuda", path: "/admin/ajuda", permissionKey: "ajuda" },
     ],
   },
 ];
 
-const mainItems = mainGroups.flatMap(g => g.items);
-
-const sgsGroups = [
+const sgsGroups: SidebarGroup[] = [
   {
     title: null,
     items: [
-      { icon: BarChart3, label: "Painel de Controle", path: "/admin/sgs" },
+      { icon: BarChart3, label: "Painel de Controle", path: "/admin/sgs", permissionKey: "sgs" },
     ],
   },
   {
     title: "Documentação e Conformidade",
     items: [
-      { icon: Building2, label: "Dados da Empresa", path: "/admin/sgs/empresa" },
-      { icon: UserCheck, label: "Equipe (ISO 21102)", path: "/admin/sgs/equipe" },
-      { icon: Truck, label: "Fornecedores", path: "/admin/sgs/fornecedores" },
-      { icon: FileText, label: "PGSAT (ICMBio)", path: "/admin/sgs/pgsat" },
-      { icon: ClipboardCheck, label: "Auditorias", path: "/admin/sgs/auditorias" },
+      { icon: Building2, label: "Dados da Empresa", path: "/admin/sgs/empresa", permissionKey: "sgs_empresa" },
+      { icon: UserCheck, label: "Equipe (ISO 21102)", path: "/admin/sgs/equipe", permissionKey: "sgs_equipe" },
+      { icon: Truck, label: "Fornecedores", path: "/admin/sgs/fornecedores", permissionKey: "sgs_fornecedores" },
+      { icon: FileText, label: "PGSAT (ICMBio)", path: "/admin/sgs/pgsat", permissionKey: "sgs_pgsat" },
+      { icon: ClipboardCheck, label: "Auditorias", path: "/admin/sgs/auditorias", permissionKey: "sgs_auditorias" },
     ],
   },
   {
     title: "Operação e Segurança",
     items: [
-      { icon: Car, label: "Frota de Veículos", path: "/admin/sgs/veiculos" },
-      { icon: UserCheck2, label: "Condutores", path: "/admin/sgs/condutores" },
-      { icon: Users, label: "Visitantes", path: "/admin/sgs/condutores-visitantes" },
-      { icon: Map, label: "Rotas e Trilhas", path: "/admin/sgs/rotas" },
-      { icon: ClipboardCheck, label: "Checklists Operacionais", path: "/admin/sgs/checklists" },
-      { icon: Shield, label: "Briefings de Segurança", path: "/admin/sgs/briefings" },
-      { icon: ClipboardList, label: "Controles Internos (P5)", path: "/admin/sgs/controles" },
+      { icon: Car, label: "Frota de Veículos", path: "/admin/sgs/veiculos", permissionKey: "sgs_veiculos" },
+      { icon: UserCheck2, label: "Condutores", path: "/admin/sgs/condutores", permissionKey: "sgs_condutores" },
+      { icon: Users, label: "Visitantes", path: "/admin/sgs/condutores-visitantes", permissionKey: "sgs_visitantes" },
+      { icon: Map, label: "Rotas e Trilhas", path: "/admin/sgs/rotas", permissionKey: "sgs_rotas" },
+      { icon: ClipboardCheck, label: "Checklists Operacionais", path: "/admin/sgs/checklists", permissionKey: "sgs_checklists" },
+      { icon: Shield, label: "Briefings de Segurança", path: "/admin/sgs/briefings", permissionKey: "sgs_briefings" },
+      { icon: ClipboardList, label: "Controles Internos (P5)", path: "/admin/sgs/controles", permissionKey: "sgs_controles" },
     ],
   },
   {
     title: "Monitoramento e Riscos",
     items: [
-      { icon: AlertTriangle, label: "Matriz de Riscos", path: "/admin/sgs/riscos" },
-      { icon: Activity, label: "Relatos de Ocorrências", path: "/admin/sgs/incidentes" },
-      { icon: ClipboardCheck, label: "Plano de Ações", path: "/admin/sgs/acoes" },
-      { icon: FileText, label: "Termos de Risco", path: "/admin/sgs/termos" },
-      { icon: Star, label: "Avaliação de Segurança", path: "/admin/sgs/pesquisas" },
+      { icon: AlertTriangle, label: "Matriz de Riscos", path: "/admin/sgs/riscos", permissionKey: "sgs_riscos" },
+      { icon: Activity, label: "Relatos de Ocorrências", path: "/admin/sgs/incidentes", permissionKey: "sgs_incidentes" },
+      { icon: ClipboardCheck, label: "Plano de Ações", path: "/admin/sgs/acoes", permissionKey: "sgs_acoes" },
+      { icon: FileText, label: "Termos de Risco", path: "/admin/sgs/termos", permissionKey: "sgs_termos" },
+      { icon: Star, label: "Avaliação de Segurança", path: "/admin/sgs/pesquisas", permissionKey: "sgs_pesquisas" },
     ],
   },
 ];
 
-const sgsItems = sgsGroups.flatMap(g => g.items);
-
-const getBreadcrumbs = (pathname: string) => {
+const getBreadcrumbs = (pathname: string, mainItems: SidebarItem[], sgsItems: SidebarItem[]) => {
   const parts = pathname.split("/").filter(Boolean);
   const crumbs: { label: string; path: string }[] = [];
   if (parts[0] === "admin") {
     crumbs.push({ label: "Admin", path: "/admin" });
     if (parts[1] === "sgs") {
       crumbs.push({ label: "SGS", path: "/admin/sgs" });
-      const sgsItem = sgsItems.find(i => i.path === pathname);
+      const sgsItem = sgsItems.find(i => pathname.startsWith(i.path));
       if (sgsItem && sgsItem.path !== "/admin/sgs") crumbs.push({ label: sgsItem.label, path: sgsItem.path });
     } else if (parts[1]) {
-      const mainItem = mainItems.find(i => i.path === pathname);
+      const mainItem = mainItems.find(i => pathname === i.path);
       if (mainItem) crumbs.push({ label: mainItem.label, path: mainItem.path });
       else if (parts[1] === "config") {
         crumbs.push({ label: "Configurações", path: "/admin/config" });
@@ -155,8 +160,21 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
 
   useEffect(() => { localStorage.setItem("admin-sidebar-collapsed", String(sidebarCollapsed)); }, [sidebarCollapsed]);
 
+  const canAccess = (key?: string) => !key || !!userPermissions[key];
+
+  const filteredMainGroups = mainGroups
+    .map(g => ({ ...g, items: g.items.filter(i => canAccess(i.permissionKey)) }))
+    .filter(g => g.items.length > 0);
+
+  const filteredSgsGroups = sgsGroups
+    .map(g => ({ ...g, items: g.items.filter(i => canAccess(i.permissionKey)) }))
+    .filter(g => g.items.length > 0);
+
+  const visibleMainItems = filteredMainGroups.flatMap(g => g.items);
+  const visibleSgsItems = filteredSgsGroups.flatMap(g => g.items);
+
   const isSgsActive = location.pathname.startsWith("/admin/sgs");
-  const breadcrumbs = getBreadcrumbs(location.pathname);
+  const breadcrumbs = getBreadcrumbs(location.pathname, visibleMainItems, visibleSgsItems);
 
   useEffect(() => {
     const loadNotifs = async () => {
@@ -177,8 +195,8 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   const activeNotifs = notifications.filter(n => !dismissed.has(n.id));
   const errorCount = activeNotifs.filter(n => n.type === "error").length;
 
-  const SidebarLink = ({ icon: Icon, label, path, indent = false }: { icon: any; label: string; path: string; indent?: boolean }) => {
-    const active = location.pathname === path;
+  const SidebarLink = ({ icon: Icon, label, path, indent = false }: SidebarItem & { indent?: boolean }) => {
+    const active = location.pathname === path || (path !== "/admin" && location.pathname.startsWith(path));
     return (
       <Link
         to={path}
@@ -216,24 +234,26 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
           </div>
 
           <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1 scrollbar-none">
-            {mainGroups.map((group, idx) => (
+            {filteredMainGroups.map((group, idx) => (
               <div key={idx} className={idx > 0 ? "pt-4" : ""}>
                 {!sidebarCollapsed && <p className="px-4 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">{group.title}</p>}
                 {group.items.map(item => <SidebarLink key={item.path} {...item} />)}
               </div>
             ))}
             
-            <div className="pt-6 border-t border-white/5 mt-6">
-              <button onClick={() => setSgsOpen(!sgsOpen)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-[13px] font-bold text-white/40 hover:text-white hover:bg-white/[0.05] ${sidebarCollapsed ? "justify-center px-0" : ""}`}>
-                <Shield size={18} />
-                {!sidebarCollapsed && <span className="flex-1 text-left">SGS - Segurança</span>}
-              </button>
-              {sgsOpen && !sidebarCollapsed && (
-                <div className="mt-2 space-y-1">
-                  {sgsItems.map(item => <SidebarLink key={item.path} {...item} indent />)}
-                </div>
-              )}
-            </div>
+            {filteredSgsGroups.length > 0 && (
+              <div className="pt-6 border-t border-white/5 mt-6">
+                <button onClick={() => setSgsOpen(!sgsOpen)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-md text-[13px] font-bold text-white/40 hover:text-white hover:bg-white/[0.05] ${sidebarCollapsed ? "justify-center px-0" : ""}`}>
+                  <Shield size={18} />
+                  {!sidebarCollapsed && <span className="flex-1 text-left">SGS - Segurança</span>}
+                </button>
+                {sgsOpen && !sidebarCollapsed && (
+                  <div className="mt-2 space-y-1">
+                    {visibleSgsItems.map(item => <SidebarLink key={item.path} {...item} indent />)}
+                  </div>
+                )}
+              </div>
+            )}
           </nav>
 
           <div className="p-4 border-t border-white/5">
