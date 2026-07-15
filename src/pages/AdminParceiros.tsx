@@ -32,7 +32,7 @@ import { usePartnersData } from "@/features/parceiros/usePartnersData";
 
 
 const AdminParceiros = () => {
-  const { partners, partnerTypes, company, loading, refreshPartners, refreshTypes } = usePartnersData();
+  const { partners, partnerTypes, company, loading, isError, refreshPartners, refreshTypes } = usePartnersData();
 
   // Local UI state only — data lives in react-query cache now.
   const [search, setSearch] = useState("");
@@ -52,6 +52,10 @@ const AdminParceiros = () => {
   const [partnerReceivables, setPartnerReceivables] = useState<any[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
   const [loadingReceivables, setLoadingReceivables] = useState(false);
+
+  useEffect(() => {
+    if (isError) console.error("Erro ao carregar dados de parceiros");
+  }, [isError]);
 
   const [form, setForm] = useState({
     name: "", type: "hotel", contact_name: "", phone: "", email: "",

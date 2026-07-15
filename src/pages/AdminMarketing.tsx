@@ -21,14 +21,18 @@ const AdminMarketing = () => {
 
   const fetchAll = async () => {
     setLoading(true);
-    const [leadsRes, campaignsRes, rulesRes] = await Promise.all([
-      supabase.from("marketing_leads").select("*").order("created_at", { ascending: false }),
-      supabase.from("marketing_campaigns").select("*").order("created_at", { ascending: false }),
-      supabase.from("remarketing_rules").select("*").order("created_at", { ascending: false }),
-    ]);
-    if (leadsRes.data) setLeads(leadsRes.data);
-    if (campaignsRes.data) setCampaigns(campaignsRes.data);
-    if (rulesRes.data) setRules(rulesRes.data);
+    try {
+      const [leadsRes, campaignsRes, rulesRes] = await Promise.all([
+        supabase.from("marketing_leads").select("*").order("created_at", { ascending: false }),
+        supabase.from("marketing_campaigns").select("*").order("created_at", { ascending: false }),
+        supabase.from("remarketing_rules").select("*").order("created_at", { ascending: false }),
+      ]);
+      if (leadsRes.data) setLeads(leadsRes.data);
+      if (campaignsRes.data) setCampaigns(campaignsRes.data);
+      if (rulesRes.data) setRules(rulesRes.data);
+    } catch (err) {
+      console.error("Erro ao carregar marketing:", err);
+    }
     setLoading(false);
   };
 

@@ -69,6 +69,7 @@ export function usePartnersData() {
     partnerTypes: typesQ.data ?? [],
     company: companyQ.data ?? null,
     loading: partnersQ.isLoading || typesQ.isLoading,
+    isError: partnersQ.isError || typesQ.isError,
     refreshPartners,
     refreshTypes,
   };
