@@ -1,10 +1,6 @@
-# syntax=docker/dockerfile:1.6
-
-# --- Stage 1: build the Vite SPA with Bun ---
-FROM oven/bun:1.1-alpine AS build
+FROM node:20-alpine AS build
 WORKDIR /usr/src/app
 
-# Build-time env vars (Vite freezes these into the bundle)
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_PUBLISHABLE_KEY
 ARG VITE_SUPABASE_PROJECT_ID
@@ -12,12 +8,10 @@ ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
 ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
 ENV VITE_SUPABASE_PROJECT_ID=$VITE_SUPABASE_PROJECT_ID
 
-# Install deps (cached) then build
-COPY package.json bun.lock ./
-RUN --mount=type=cache,id=bun,target=/root/.bun/install/cache \
-    bun install --frozen-lockfile
+COPY package.json package-lock.json ./
+RUN npm install
 COPY . .
-RUN bun run build
+RUN npm run build
 
 # --- Stage 2: serve static assets with Nginx ---
 FROM nginx:stable-alpine
