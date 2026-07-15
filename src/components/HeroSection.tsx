@@ -3,8 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import heroImgDefault from "@/assets/hero-travel.jpg";
 
-const HERO_IMG_DEFAULT = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/banners/banner-1777596368007.png";
+const HERO_IMG_DEFAULT = heroImgDefault;
 
 const categoryKeys = ["boat", "eco", "gastro", "cultural", "kayak", "trekking"] as const;
 

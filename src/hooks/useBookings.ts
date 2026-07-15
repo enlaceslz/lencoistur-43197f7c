@@ -2,6 +2,7 @@ import { useCallback, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface BookingItem {
   id: string;
@@ -121,11 +122,13 @@ async function fetchBookingsFromDb(): Promise<BookingItem[]> {
 
 export function useBookings() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: bookings = [], isLoading: loading } = useQuery<BookingItem[]>({
     queryKey: BOOKINGS_QUERY_KEY,
     queryFn: fetchBookingsFromDb,
     staleTime: 30_000,
+    enabled: !!user,
   });
 
 
@@ -139,6 +142,7 @@ export function useBookings() {
   const fetchBookings = invalidate;
 
   useEffect(() => {
+    if (!user) return;
     const channel = supabase
       .channel("bookings-changes")
       .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, () => {
@@ -151,7 +155,7 @@ export function useBookings() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [invalidate]);
+  }, [invalidate, user]);
 
   const confirmPayment = useCallback(async (id: string, groupId?: string) => {
     const query = supabase.from("bookings").select("*, customers!customer_id(name)");

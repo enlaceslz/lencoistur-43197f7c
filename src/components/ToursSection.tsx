@@ -5,37 +5,32 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-
-
-const tourLagoasAzuis = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465186872-0.jpg";
-const tourRioPreguicas = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465187850-1.jpeg";
-const tourEcologico = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465188808-2.webp";
-const tourGastronomico = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465186872-0.jpg";
-const tourCultural = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465187850-1.jpeg";
-const tourCaiaque = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465188808-2.webp";
-const tourTrekking = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465186872-0.jpg";
-const tourQuadriciclo = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465187850-1.jpeg";
-const tourLagoaAzul2 = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465188808-2.webp";
-const tourLagoaAzul3 = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465186872-0.jpg";
-const tourPanorama = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465187850-1.jpeg";
-const tourBanho = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465188808-2.webp";
-const tour4x4 = "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465186872-0.jpg";
+import imgLagoasAzuis from "@/assets/tour-lagoas-azuis-hero.jpg";
+import imgRioPreguicas from "@/assets/tour-rio-preguicas.jpg";
+import imgEcologico from "@/assets/tour-roteiro-ecologico.jpg";
+import imgGastronomico from "@/assets/tour-gastronomico.jpg";
+import imgCultural from "@/assets/tour-cultural.jpg";
+import imgCaiaque from "@/assets/tour-caiaque.jpg";
+import imgTrekking from "@/assets/tour-trekking.jpg";
+import imgQuadriciclo from "@/assets/tour-quadriciclo.jpg";
+import imgLagoaAzul2 from "@/assets/tour-lagoa-azul-2.jpg";
+import imgLagoaAzul3 from "@/assets/tour-lagoa-azul-3.jpg";
 
 const localImageMap: Record<string, string> = {
-  "lagoas-azuis": tourLagoasAzuis,
-  "betania": tourLagoaAzul2,
-  "america": tourLagoaAzul3,
-  "ponta-verde": tourPanorama,
-  "emendadas": tourBanho,
-  "circuito-municipal-gaivota": tour4x4,
-  "travosa": tourLagoasAzuis,
-  "passeio-de-barco": tourRioPreguicas,
-  "roteiro-ecologico": tourEcologico,
-  "passeio-gastronomico": tourGastronomico,
-  "roteiro-cultural": tourCultural,
-  "descida-de-caiaque": tourCaiaque,
-  "trekking-nas-dunas": tourTrekking,
-  "passeio-de-quadriciclo": tourQuadriciclo,
+  "lagoas-azuis": imgLagoasAzuis,
+  "betania": imgLagoaAzul2,
+  "america": imgLagoaAzul3,
+  "ponta-verde": imgLagoasAzuis,
+  "emendadas": imgLagoasAzuis,
+  "circuito-municipal-gaivota": imgLagoasAzuis,
+  "travosa": imgLagoasAzuis,
+  "passeio-de-barco": imgRioPreguicas,
+  "roteiro-ecologico": imgEcologico,
+  "passeio-gastronomico": imgGastronomico,
+  "roteiro-cultural": imgCultural,
+  "descida-de-caiaque": imgCaiaque,
+  "trekking-nas-dunas": imgTrekking,
+  "passeio-de-quadriciclo": imgQuadriciclo,
 };
 
 

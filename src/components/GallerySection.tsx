@@ -2,14 +2,19 @@ import { useState, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
+import galleryPanorama from "@/assets/gallery-panorama-dunas.jpg";
+import galleryBanho from "@/assets/gallery-banho-lagoa.jpg";
+import gallery4x4 from "@/assets/gallery-4x4-dunas.jpg";
+import galleryFarol from "@/assets/gallery-farol-mandacaru.jpg";
+import galleryPorDoSol from "@/assets/gallery-por-do-sol.jpg";
 
 const DEFAULT_GALLERY = [
-  { src: "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465186872-0.jpg", alt: "Panorama das dunas e lagoas ao pôr do sol" },
-  { src: "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465187850-1.jpeg", alt: "Turistas nadando nas lagoas cristalinas dos Lençóis Maranhenses" },
-  { src: "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465188808-2.webp", alt: "Passeio de 4x4 nas dunas dos Lençóis Maranhenses" },
-  { src: "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465186872-0.jpg", alt: "Farol de Mandacaru - Lençóis Maranhenses" },
-  { src: "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465187850-1.jpeg", alt: "Pôr do sol deslumbrante nos Lençóis Maranhenses" },
-  { src: "https://ppzdmxenxqsyebmsymro.supabase.co/storage/v1/object/public/tour-images/gallery/img-1777465188808-2.webp", alt: "Dunas brancas e lagoas azuis dos Lençóis Maranhenses - Santo Amaro" }
+  { src: galleryPanorama, alt: "Panorama das dunas e lagoas ao pôr do sol" },
+  { src: galleryBanho, alt: "Turistas nadando nas lagoas cristalinas dos Lençóis Maranhenses" },
+  { src: gallery4x4, alt: "Passeio de 4x4 nas dunas dos Lençóis Maranhenses" },
+  { src: galleryFarol, alt: "Farol de Mandacaru - Lençóis Maranhenses" },
+  { src: galleryPorDoSol, alt: "Pôr do sol deslumbrante nos Lençóis Maranhenses" },
+  { src: galleryPanorama, alt: "Dunas brancas e lagoas azuis dos Lençóis Maranhenses - Santo Amaro" }
 ];
 
 const GallerySection = () => {

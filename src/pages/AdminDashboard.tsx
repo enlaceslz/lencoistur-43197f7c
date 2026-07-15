@@ -63,7 +63,7 @@ const AdminDashboard = () => {
 
     const load = async () => {
       const [bRes, cRes, rRes, aRes, collabRes, cpRes] = await Promise.all([
-        supabase.from("bookings").select("*, customers!fk_bookings_customer(name, email)").order("created_at", { ascending: false }),
+        supabase.from("bookings").select("*, customers!bookings_customer_id_fkey(name, email)").order("created_at", { ascending: false }),
         supabase.from("customers").select("id", { count: "exact", head: true }),
         supabase.from("sgs_risks").select("risk_level"),
         supabase.from("sgs_corrective_actions").select("id").eq("status", "pendente"),
