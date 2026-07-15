@@ -57,6 +57,7 @@ const HeroSection = () => {
               className="w-full h-full object-cover sm:object-center"
               width={1920}
               height={1080}
+              fetchPriority="high"
             />
           </div>
         ))
@@ -66,6 +67,8 @@ const HeroSection = () => {
           alt="Vista aérea dos Lençóis Maranhenses com lagoas azuis e dunas brancas - Santo Amaro MA"
           className="absolute inset-0 w-full h-full object-cover sm:object-center"
           width={1920}
+          height={1080}
+          fetchPriority="high"
           height={1080}
         />
       )}

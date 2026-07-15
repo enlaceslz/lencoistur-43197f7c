@@ -165,7 +165,7 @@ const PackageDetail = () => {
                   <div key={tour.id} className="bg-card border border-border rounded-lg overflow-hidden flex flex-col md:flex-row gap-6 p-4">
                     <div className="w-full md:w-48 h-32 rounded-lg overflow-hidden shrink-0">
                       {tour.images?.[0] ? (
-                        <img src={tour.images[0]} alt={tour.name} className="w-full h-full object-cover" />
+                        <img src={tour.images[0]} alt={tour.name} loading="lazy" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full bg-muted flex items-center justify-center">
                           <Info size={24} className="text-muted-foreground" />
