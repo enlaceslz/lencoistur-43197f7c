@@ -246,12 +246,14 @@ export function useBookings(customerId?: string) {
         }
       }
 
-      // Optimistic prepend so the UI shows the new booking immediately;
-      // the realtime subscription + invalidate() will reconcile shortly after.
-      queryClient.setQueryData<BookingItem[]>(BOOKINGS_QUERY_KEY, (prev = []) => [
-        ...mappedResults,
-        ...prev,
-      ]);
+      // Optimistic prepend so the UI shows the new booking immediately.
+      // Match the exact active query key (which includes customerId for
+      // MinhasReservas) so the customer-scoped list also updates.
+      // The realtime subscription will reconcile shortly after.
+      queryClient.setQueryData<BookingItem[]>(
+        [...BOOKINGS_QUERY_KEY, customerId],
+        (prev = []) => [...mappedResults, ...prev]
+      );
       return mappedResults[0]; // Returning the first one for compatibility
 
     },
@@ -280,7 +282,8 @@ export function useBookings(customerId?: string) {
       .update({ notes })
       .eq("id", id);
     if (error) throw error;
-  }, []);
+    invalidate();
+  }, [invalidate]);
 
   const deleteBooking = useCallback(async (id: string, groupId?: string) => {
     const { error } = await supabase.rpc("delete_booking_transaction", {
@@ -313,7 +316,8 @@ export function useBookings(customerId?: string) {
       p_companions: data.companions || [],
     });
     if (error) throw error;
-  }, []);
+    invalidate();
+  }, [invalidate]);
 
 
   const markTermAsSignedAtCounter = useCallback(async (bookingId: string) => {
