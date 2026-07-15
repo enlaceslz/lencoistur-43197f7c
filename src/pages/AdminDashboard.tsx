@@ -62,33 +62,36 @@ const AdminDashboard = () => {
     const currentYear = now.getFullYear();
 
     const load = async () => {
-      const [bRes, cRes, rRes, aRes, collabRes, cpRes] = await Promise.all([
-        supabase.from("bookings").select("*, customers!bookings_customer_id_fkey(name, email)").order("created_at", { ascending: false }),
-        supabase.from("customers").select("id", { count: "exact", head: true }),
-        supabase.from("sgs_risks").select("risk_level"),
-        supabase.from("sgs_corrective_actions").select("id").eq("status", "pendente"),
-        supabase.from("collaborators").select("id", { count: "exact", head: true }),
-        supabase.from("contas_pagar").select("valor, status, vencimento")
-      ]);
-      setBookings((bRes.data as any[]) || []);
-      setCustomerCount(cRes.count || 0);
-      setCollabCount(collabRes.count || 0);
-      setExpenses((cpRes.data as any[]) || []);
+      try {
+        const [bRes, cRes, rRes, aRes, collabRes, cpRes] = await Promise.all([
+          supabase.from("bookings").select("*, customers!bookings_customer_id_fkey(name, email)").order("created_at", { ascending: false }),
+          supabase.from("customers").select("id", { count: "exact", head: true }),
+          supabase.from("sgs_risks").select("risk_level"),
+          supabase.from("sgs_corrective_actions").select("id").eq("status", "pendente"),
+          supabase.from("collaborators").select("id", { count: "exact", head: true }),
+          supabase.from("contas_pagar").select("valor, status, vencimento")
+        ]);
+        setBookings((bRes.data as any[]) || []);
+        setCustomerCount(cRes.count || 0);
+        setCollabCount(collabRes.count || 0);
+        setExpenses((cpRes.data as any[]) || []);
 
-      const expensesData = (cpRes.data as any[]) || [];
-      const monthStart = new Date(currentYear, currentMonth, 1).toISOString();
-      const thisMonthExpenses = expensesData
-        .filter(e => e.vencimento >= monthStart && e.status === 'pago')
-        .reduce((sum, e) => sum + Number(e.valor), 0);
-      setTotalExpenses(thisMonthExpenses);
-      
-      const risks = (rRes.data as any[]) || [];
-      setSgsStats({
-        activeRisks: risks.length,
-        criticalRisks: risks.filter(r => r.risk_level >= 12).length,
-        pendingActions: aRes.data?.length || 0
-      });
-      
+        const expensesData = (cpRes.data as any[]) || [];
+        const monthStart = new Date(currentYear, currentMonth, 1).toISOString();
+        const thisMonthExpenses = expensesData
+          .filter(e => e.vencimento >= monthStart && e.status === 'pago')
+          .reduce((sum, e) => sum + Number(e.valor), 0);
+        setTotalExpenses(thisMonthExpenses);
+        
+        const risks = (rRes.data as any[]) || [];
+        setSgsStats({
+          activeRisks: risks.length,
+          criticalRisks: risks.filter(r => r.risk_level >= 12).length,
+          pendingActions: aRes.data?.length || 0
+        });
+      } catch (err) {
+        console.error("Erro ao carregar dashboard:", err);
+      }
       setLoading(false);
     };
     load();
