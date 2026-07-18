@@ -419,14 +419,11 @@ consistência de centavos/reais e limpeza de imports mortos.
 - Nenhuma credencial exposta nos commits do git.
 
 ### Correções aplicadas em 2026-07-18
-- **RLS site_settings**: políticas INSERT/UPDATE/DELETE usavam `has_role(auth.uid(), 'admin'::app_role)`
-  que lê `auth.users.app_metadata` — vazio para todos os usuários. Criada função
-  `public.is_admin()` (SECURITY INVOKER) que faz JOIN entre `auth.users` e
-  `user_management` por email. Policies recriadas com `is_admin()`.
-- **notifications**: tabela não tinha coluna `user_id` — GET retornava 400.
-  Adicionada coluna `user_id UUID REFERENCES auth.users(id)`, criadas policies
-  RLS para `authenticated` (`user_own_notifications` filtrando por `auth.uid()`).
-- Migração SQL em `supabase/migrations/20260718_fix_rls.sql`.
+- **RLS site_settings**: faltava `GRANT INSERT, UPDATE, DELETE ... TO authenticated`.
+  Policies `has_role()` usam `user_roles` (correto) — admin André tem `role='admin'`
+  em `user_roles`, então funciona. Migração em `supabase/migrations/20260718_fix_rls.sql`.
+- **notifications**: tabela não tinha coluna `user_id` — GET retornava 400. Adicionada
+  coluna, grants e policy RLS `user_own_notifications`.
 
 ### Pendências observadas (baixa prioridade)
 - `validatePixKey` em `AdminConfig.tsx` duplica a lógica de validação de CPF que
