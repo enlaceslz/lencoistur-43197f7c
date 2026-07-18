@@ -1,0 +1,13 @@
+node_modules
+.git
+.gitignore
+bun.lock
+bun.lockb
+*.md
+*.docx
+*.save
+dist
+.env
+eslint.config.js
+playwright*
+vitest.config.ts
