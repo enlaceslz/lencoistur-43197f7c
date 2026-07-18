@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Loader2, Pencil, Trash2, Link2, Calendar, User, Tag, CheckCircle2, AlertCircle, Printer, Search, FileText, Upload, X, ExternalLink, Save, XCircle } from "lucide-react";
+
 import { toast } from "sonner";
 import { formatCurrency, cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
