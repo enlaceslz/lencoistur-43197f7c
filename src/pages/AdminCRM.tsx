@@ -175,6 +175,11 @@ const validateForm = (form: CustomerForm): string | null => {
   return null;
 };
 
+const cpfIsInvalid = (customer: Customer): boolean => {
+  if (customer.country !== "Brasil" || !customer.cpf) return false;
+  return !validateCPF(customer.cpf);
+};
+
 const calculateAge = (birthDate: string | null) => {
   if (!birthDate) return null;
   const today = new Date();
@@ -1037,6 +1042,18 @@ const AdminCRMContent = () => {
                                       </span>
                                     ))}
                                     {c.tags?.length > 2 && <span className="text-[8px] text-muted-foreground">+{c.tags.length - 2}</span>}
+                                    {cpfIsInvalid(c) && (
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <span className="text-[8px] px-1 bg-red-100 text-red-700 rounded uppercase font-bold tracking-tighter cursor-help">
+                                            CPF inválido
+                                          </span>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>CPF cadastrado é inválido. Edite e corrija.</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    )}
                                   </div>
                                   <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-medium mt-1">
                                     <Mail size={10} />
@@ -1277,6 +1294,11 @@ const AdminCRMContent = () => {
                     maxLength={14}
                     className="rounded-xl"
                   />
+                  {form.cpf && !validateCPF(form.cpf) && (
+                    <p className="text-[10px] mt-1 font-bold text-red-600">
+                      CPF atual é inválido. Corrija antes de salvar.
+                    </p>
+                  )}
                 </>
               ) : (
                 <>
