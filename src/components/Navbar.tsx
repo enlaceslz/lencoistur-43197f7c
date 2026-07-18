@@ -6,6 +6,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { useAuth } from "@/hooks/useAuth";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useLocalizedPath } from "@/lib/useLocalizedPath";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -26,16 +27,27 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const isHome = location.pathname === "/";
+  const loc = useLocalizedPath();
+  const isHome = (() => {
+    const stripped = location.pathname.replace(/^\/[a-z]{2}/, "") || "/";
+    return stripped === "/";
+  })();
   const { t } = useTranslation();
   const { site: settings } = useSiteSettings();
   const { user, signOut, isAdmin } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
+    let timeoutId: NodeJS.Timeout;
+    const handleScroll = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => setScrolled(window.scrollY > 50), 100);
+    };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, []);
 
   const navTheme = isHome && !scrolled && !open ? "light" : "dark";
@@ -47,7 +59,7 @@ const Navbar = () => {
         : "bg-white/70 backdrop-blur-xl border-b border-border/40 py-4 shadow-sm"
     }`}>
       <div className="container mx-auto flex items-center justify-between px-6 md:px-12">
-        <Link to="/" className="flex items-center gap-3 group">
+        <Link to={loc("/")} className="flex items-center gap-3 group">
           {settings?.logoUrl ? (
             <img 
               src={settings.logoUrl} 
@@ -62,23 +74,22 @@ const Navbar = () => {
         </Link>
 
         <div className={`hidden lg:flex items-center gap-10 text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-500 ${navTheme === "light" ? "text-white/90" : "text-foreground/70"}`}>
-          <Link to="/passeios" className="hover:text-primary transition-all hover:translate-y-[-1px] flex items-center gap-2">
+          <Link to={loc("/passeios")} className="hover:text-primary transition-all hover:translate-y-[-1px] flex items-center gap-2">
             <Compass size={14} className="opacity-50" /> {t("nav.tours")}
           </Link>
-          <Link to="/translados" className="hover:text-primary transition-all hover:translate-y-[-1px] flex items-center gap-2">
+          <Link to={loc("/translados")} className="hover:text-primary transition-all hover:translate-y-[-1px] flex items-center gap-2">
             <Car size={14} className="opacity-50" /> {t("nav.transfers")}
           </Link>
-          <Link to="/seguranca" className="hover:text-primary transition-all hover:translate-y-[-1px] flex items-center gap-2">
+          <Link to={loc("/seguranca")} className="hover:text-primary transition-all hover:translate-y-[-1px] flex items-center gap-2">
             <Shield size={14} className="opacity-50" /> {t("nav.safety")}
           </Link>
-          <Link to="/minhas-reservas" className="hover:text-primary transition-all hover:translate-y-[-1px] flex items-center gap-2">
+          <Link to={loc("/minhas-reservas")} className="hover:text-primary transition-all hover:translate-y-[-1px] flex items-center gap-2">
             <User size={14} className="opacity-50" /> {t("nav.myBookings")}
           </Link>
           
           <div className="flex items-center gap-6 pl-6 border-l border-current/10">
             {user && (
               <div className="flex items-center gap-4 mr-2">
-                {/* Notificações */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="relative hover:bg-primary/10 rounded-full">
@@ -129,14 +140,13 @@ const Navbar = () => {
                       )}
                     </ScrollArea>
                     <div className="p-2 bg-muted/30 text-center border-t border-border/40">
-                      <Button variant="ghost" size="sm" className="w-full text-[10px] uppercase font-bold text-muted-foreground hover:bg-transparent" onClick={() => navigate("/minhas-reservas")}>
+                      <Button variant="ghost" size="sm" className="w-full text-[10px] uppercase font-bold text-muted-foreground hover:bg-transparent" onClick={() => navigate(loc("/minhas-reservas"))}>
                         Ver todas as reservas
                       </Button>
                     </div>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Perfil */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="p-0 hover:bg-transparent">
@@ -160,7 +170,7 @@ const Navbar = () => {
                         <span className="font-bold text-xs uppercase tracking-wider">Painel Admin</span>
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem onClick={() => navigate("/minhas-reservas")} className="rounded-xl py-2.5 cursor-pointer">
+                    <DropdownMenuItem onClick={() => navigate(loc("/minhas-reservas"))} className="rounded-xl py-2.5 cursor-pointer">
                       <User size={16} className="mr-2" />
                       <span className="font-bold text-xs uppercase tracking-wider">Minhas Reservas</span>
                     </DropdownMenuItem>
@@ -195,13 +205,12 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {open && (
         <div className="lg:hidden fixed inset-x-0 top-[100%] h-screen bg-white/95 backdrop-blur-2xl border-t border-border/40 p-8 flex flex-col gap-6 animate-in slide-in-from-top duration-500">
-          <Link to="/passeios" onClick={() => setOpen(false)} className="text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">{t("nav.tours")}</Link>
-          <Link to="/translados" onClick={() => setOpen(false)} className="text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">{t("nav.transfers")}</Link>
-          <Link to="/seguranca" onClick={() => setOpen(false)} className="text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">{t("nav.safety")}</Link>
-          <Link to="/minhas-reservas" onClick={() => setOpen(false)} className="text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">{t("nav.myBookings")}</Link>
+          <Link to={loc("/passeios")} onClick={() => setOpen(false)} className="text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">{t("nav.tours")}</Link>
+          <Link to={loc("/translados")} onClick={() => setOpen(false)} className="text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">{t("nav.transfers")}</Link>
+          <Link to={loc("/seguranca")} onClick={() => setOpen(false)} className="text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">{t("nav.safety")}</Link>
+          <Link to={loc("/minhas-reservas")} onClick={() => setOpen(false)} className="text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">{t("nav.myBookings")}</Link>
           {!user ? (
             <Link to="/admin/login" onClick={() => setOpen(false)} className="bg-primary text-white p-5 rounded-2xl font-black text-xs uppercase tracking-widest text-center shadow-xl shadow-primary/20 mt-4">
               Entrar
@@ -227,7 +236,7 @@ const Navbar = () => {
                 </Link>
               )}
               
-              <Link to="/minhas-reservas" onClick={() => setOpen(false)} className="flex items-center gap-3 text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">
+              <Link to={loc("/minhas-reservas")} onClick={() => setOpen(false)} className="flex items-center gap-3 text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">
                 <User size={20} /> Minhas Reservas
               </Link>
 

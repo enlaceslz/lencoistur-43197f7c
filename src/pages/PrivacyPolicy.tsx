@@ -1,5 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { Shield, Lock, Eye, FileText, Scale } from "lucide-react";
 
 /**
@@ -11,9 +13,15 @@ import { Shield, Lock, Eye, FileText, Scale } from "lucide-react";
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <SEO
+        title="Política de Privacidade | Lençóis Tour"
+        description="Política de privacidade e proteção de dados da Lençóis Tour. Saiba como tratamos suas informações pessoais."
+        path="/politica-de-privacidade"
+      />
       <Navbar />
       
       <main className="max-w-4xl mx-auto px-4 py-24">
+        <Breadcrumbs items={[{ label: "Início", path: "/" }, { label: "Política de Privacidade" }]} />
         <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 md:p-12">
           <header className="mb-12 border-b border-slate-100 dark:border-slate-800 pb-8">
             <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">

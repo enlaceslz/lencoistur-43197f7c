@@ -1,13 +1,16 @@
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Clock, Sparkles, CheckCircle, Shield, Info, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowLeft, Clock, Sparkles, CheckCircle, Shield, Info, ArrowRight, Loader2, Calendar, Users } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@/lib/utils";
 import { ShareWithFriend } from "@/components/ShareWithFriend";
 import { fetchPartnerCatalogPricing } from "@/lib/catalogPricing";
+import { useLocalizedPath } from "@/lib/useLocalizedPath";
 
 interface Package {
   id: string;
@@ -28,10 +31,13 @@ const PackageDetail = () => {
   const partnerId = params.get("partner_id") || params.get("partner");
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const loc = useLocalizedPath();
   const [pkg, setPkg] = useState<any>(null);
   const [partner, setPartner] = useState<{ id: string; name: string } | null>(null);
   const [partnerPrice, setPartnerPrice] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [guests, setGuests] = useState(2);
+  const [selectedDate, setSelectedDate] = useState("");
 
   useEffect(() => {
     const load = async () => {
@@ -85,7 +91,7 @@ const PackageDetail = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
         <Loader2 className="animate-spin text-primary mb-4" size={48} />
-        <p className="text-muted-foreground animate-pulse font-medium">Carregando experiências...</p>
+        <p className="text-muted-foreground font-medium">{t("packageDetail.loading")}</p>
       </div>
     );
   }
@@ -97,10 +103,10 @@ const PackageDetail = () => {
           <div className="w-20 h-20 bg-destructive/10 text-destructive rounded-full flex items-center justify-center mx-auto mb-6">
             <Info size={40} />
           </div>
-          <h1 className="font-display text-2xl font-bold mb-2">Ops! Experiência não encontrada</h1>
-          <p className="text-muted-foreground mb-8">O pacote que você está procurando pode ter sido removido ou o link está incorreto.</p>
-          <Link to="/" className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground rounded-lg font-bold transition-none hover:bg-primary/90">
-            Voltar para Início
+          <h1 className="font-display text-2xl font-bold mb-2">{t("packageDetail.notFound")}</h1>
+          <p className="text-muted-foreground mb-8">{t("packageDetail.notFoundDesc")}</p>
+          <Link to={loc("/")} className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground rounded-lg font-bold transition-none hover:bg-primary/90">
+            {t("packageDetail.backHome")}
           </Link>
         </div>
       </div>
@@ -112,20 +118,41 @@ const PackageDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={`${pkg.name} | Lençóis Tour`}
+        description={pkg.description}
+        path={`/pacotes/${pkg.slug}`}
+        image={pkg.banner_url}
+        type="product"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: pkg.name,
+          description: pkg.description,
+          offers: {
+            "@type": "Offer",
+            price: pkg.discount_price / 100,
+            priceCurrency: "BRL",
+            availability: "https://schema.org/InStock",
+          },
+        }}
+      />
       <Navbar />
       <div className="pt-28 pb-20 container mx-auto px-4">
-        <button onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8">
-          <ArrowLeft size={18} /> Voltar
+        <button onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-2">
+          <ArrowLeft size={18} /> {t("packageDetail.back")}
         </button>
-
+        <Breadcrumbs items={[{ label: "Início", path: "/" }, { label: "Pacotes", path: "/" }, { label: pkg?.name || "Detalhes" }]} />
         <div className="grid lg:grid-cols-3 gap-12">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <span className="bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1.5 rounded-full">{pkg.tag}</span>
+                {pkg.tag && (
+                  <span className="bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1.5 rounded-full">{pkg.tag}</span>
+                )}
                 {!partner && pkg.original_price > 0 && (
-                  <span className="bg-destructive text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full">Economia de {discount}%</span>
+                  <span className="bg-destructive text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full">{t("packageDetail.economy", { discount })}</span>
                 )}
                 {partner && (
                   <span className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1">
@@ -143,8 +170,8 @@ const PackageDetail = () => {
                   <Clock size={24} />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Duração</p>
-                  <p className="text-lg font-bold text-foreground">{pkg.days} dias</p>
+                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">{t("packageDetail.duration")}</p>
+                  <p className="text-lg font-bold text-foreground">{pkg.days} {t("packageDetail.days")}</p>
                 </div>
               </div>
               <div className="bg-card border border-border rounded-lg p-5 flex items-center gap-4">
@@ -152,14 +179,14 @@ const PackageDetail = () => {
                   <Sparkles size={24} />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Atividades</p>
-                  <p className="text-lg font-bold text-foreground">{pkgTours.length} passeios inclusos</p>
+                  <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">{t("packageDetail.activities")}</p>
+                  <p className="text-lg font-bold text-foreground">{pkgTours.length} {t("packageDetail.toursIncluded")}</p>
                 </div>
               </div>
             </div>
 
             <div>
-              <h2 className="font-display text-2xl font-bold text-foreground mb-6">O que está incluso neste pacote</h2>
+              <h2 className="font-display text-2xl font-bold text-foreground mb-6">{t("packageDetail.included")}</h2>
               <div className="space-y-4">
                 {pkgTours.map((tour, index) => (
                   <div key={tour.id} className="bg-card border border-border rounded-lg overflow-hidden flex flex-col md:flex-row gap-6 p-4">
@@ -178,8 +205,8 @@ const PackageDetail = () => {
                         <h3 className="font-display font-bold text-lg">{tour.name}</h3>
                       </div>
                       <p className="text-sm text-muted-foreground line-clamp-2">{tour.description}</p>
-                      <Link to={`/passeios/${tour.slug}`} className="text-primary text-sm font-semibold hover:underline inline-flex items-center gap-1">
-                        Ver detalhes <ArrowRight size={14} />
+                      <Link to={loc(`/passeios/${tour.slug}`)} className="text-primary text-sm font-semibold hover:underline inline-flex items-center gap-1">
+                        {t("packageDetail.viewDetails")} <ArrowRight size={14} />
                       </Link>
                     </div>
                   </div>
@@ -189,7 +216,7 @@ const PackageDetail = () => {
 
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
               <h3 className="font-display font-bold text-primary mb-4 flex items-center gap-2">
-                <Shield size={20} /> Segurança e Garantia Lençóis Tour
+                <Shield size={20} /> {t("packageDetail.security")}
               </h3>
               <ul className="space-y-3">
                 {[
@@ -213,46 +240,75 @@ const PackageDetail = () => {
             <div className="bg-card border border-border rounded-lg p-6 shadow-sm sticky top-28">
               <div className="mb-6">
                 {!partner && pkg.original_price > 0 && (
-                  <p className="text-sm text-muted-foreground line-through">De {formatCurrency(pkg.original_price)}</p>
+                  <p className="text-sm text-muted-foreground line-through">{t("packageDetail.from", { price: formatCurrency(pkg.original_price) })}</p>
                 )}
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-bold text-primary font-display">
                     {formatCurrency(partnerPrice ?? pkg.discount_price)}
                   </span>
-                  <span className="text-muted-foreground">/ pessoa</span>
+                  <span className="text-muted-foreground">{t("packageDetail.perPerson")}</span>
                 </div>
                 {!partner && pkg.original_price > 0 && (
-                  <p className="text-xs text-green-600 font-semibold mt-1">Você economiza {formatCurrency(pkg.original_price - pkg.discount_price)} neste combo!</p>
+                  <p className="text-xs text-green-600 font-semibold mt-1">{t("packageDetail.youSave", { price: formatCurrency(pkg.original_price - pkg.discount_price) })}</p>
                 )}
                 {partner && (
-                  <p className="text-xs text-primary font-semibold mt-1">Aplicada tarifa líquida de parceiro</p>
+                  <p className="text-xs text-primary font-semibold mt-1">{t("packageDetail.partnerRate")}</p>
                 )}
               </div>
 
               <div className="space-y-4 mb-6">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground flex items-center gap-2">
-                    <CheckCircle size={16} className="text-primary" /> Reserva Instantânea
+                    <CheckCircle size={16} className="text-primary" /> {t("packageDetail.instantBooking")}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground flex items-center gap-2">
-                    <CheckCircle size={16} className="text-primary" /> Sem taxas ocultas
+                    <CheckCircle size={16} className="text-primary" /> {t("packageDetail.noHiddenFees")}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground flex items-center gap-2">
-                    <CheckCircle size={16} className="text-primary" /> Pagamento Seguro
+                    <CheckCircle size={16} className="text-primary" /> {t("packageDetail.securePayment")}
                   </span>
+                </div>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">{t("packageDetail.date")}</label>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                    <input
+                      type="date"
+                      value={selectedDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                      className="w-full h-11 pl-10 pr-4 rounded-lg border border-border bg-background text-sm font-medium outline-none focus:border-primary transition-none"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">{t("packageDetail.participants")}</label>
+                  <div className="relative">
+                    <Users className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                    <input
+                      type="number"
+                      min={1}
+                      max={20}
+                      value={guests}
+                      onChange={(e) => setGuests(Math.max(1, Number(e.target.value)))}
+                      className="w-full h-11 pl-10 pr-4 rounded-lg border border-border bg-background text-sm font-bold outline-none focus:border-primary transition-none"
+                    />
+                  </div>
                 </div>
               </div>
 
               <div className="space-y-3">
                 <Link
-                  to={`/checkout?type=package&id=${pkg.id}${partnerId ? `&partner_id=${partnerId}` : ''}`}
+                  to={`/checkout?type=package&id=${pkg.id}${partnerId ? `&partner_id=${partnerId}` : ''}${selectedDate ? `&date=${selectedDate}` : ''}&guests=${guests}`}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-4 rounded-lg font-bold text-lg transition-none flex items-center justify-center gap-2"
                 >
-                  Reservar Pacote
+                  {t("packageDetail.bookPackage")}
                 </Link>
                 <a
                   href={`https://wa.me/5598985880954?text=${encodeURIComponent(`Olá! Gostaria de reservar o ${pkg.name}.`)}`}
@@ -260,14 +316,14 @@ const PackageDetail = () => {
                   rel="noopener noreferrer"
                   className="w-full border border-border hover:bg-muted text-foreground py-4 rounded-lg font-bold transition-none flex items-center justify-center gap-2"
                 >
-                  Falar com Especialista
+                  {t("packageDetail.talkExpert")}
                 </a>
               </div>
               
               <div className="space-y-3">
                 <ShareWithFriend itemName={pkg.name} itemUrl={window.location.href} />
                 <p className="text-[10px] text-center text-muted-foreground mt-4">
-                  Ao reservar, você concorda com nossos termos de uso e política de cancelamento.
+                  {t("packageDetail.terms")}
                 </p>
               </div>
             </div>

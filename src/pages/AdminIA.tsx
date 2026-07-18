@@ -16,7 +16,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 interface TourDemand {
@@ -185,7 +185,7 @@ const AdminIA = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 animate-in-fade" style={{ animationDelay: '0.1s' }}>
         {[
           { label: "Reservas (Mês)", value: totalBookings, icon: MessageSquare, color: "from-blue-500 to-indigo-600", desc: "Volume mensal" },
-          { label: "Receita (Mês)", value: `R$ ${(monthRevenue / 100).toLocaleString("pt-BR", { minimumFractionDigits: 0 })}`, icon: Bot, color: "from-emerald-500 to-teal-600", desc: "Faturamento" },
+          { label: "Receita (Mês)", value: formatCurrency(monthRevenue), icon: Bot, color: "from-emerald-500 to-teal-600", desc: "Faturamento" },
           { label: "Conversão", value: `${conversionRate}%`, icon: TrendingUp, color: "from-purple-500 to-pink-600", desc: "Taxa de vendas" },
           { label: "Passeios Ativos", value: tourDemand.length, icon: ThumbsUp, color: "from-amber-500 to-orange-600", desc: "Portfólio" },
         ].map((stat, i) => (
@@ -296,7 +296,7 @@ const AdminIA = () => {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xl font-black text-primary tracking-tighter">R$ {(t.revenue / 100).toLocaleString("pt-BR", { minimumFractionDigits: 0 })}</p>
+                      <p className="text-xl font-black text-primary tracking-tighter">{formatCurrency(t.revenue)}</p>
                       <Badge variant="outline" className={cn(
                         "mt-1 text-[9px] font-black uppercase tracking-widest border-none px-2",
                         t.trend === "up" ? "bg-emerald-50 text-emerald-600" :

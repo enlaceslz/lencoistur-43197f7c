@@ -1,11 +1,15 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEO from "@/components/SEO";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { Shield, CheckCircle, AlertTriangle, Phone, FileText, Activity, Users, Award, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
+import { useLocalizedPath } from "@/lib/useLocalizedPath";
 
 const Seguranca = () => {
   const { t } = useTranslation();
+  const loc = useLocalizedPath();
 
   const isoStandards = [
     {
@@ -39,11 +43,17 @@ const Seguranca = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Segurança | Lençóis Tour — SGS ISO 21101"
+        description="Sistema de Gestão de Segurança (SGS) da Lençóis Tour. Conformidade com ABNT NBR ISO 21101, 21102, 21103. Turismo de aventura responsável."
+        path="/seguranca"
+      />
       <Navbar />
       
-      {/* Hero Section */}
       <section className="pt-32 pb-16 bg-ocean-light/30">
-        <div className="container mx-auto px-4 text-center">
+        <div className="container mx-auto px-4">
+          <Breadcrumbs items={[{ label: "Início", path: "/" }, { label: "Segurança" }]} />
+          <div className="text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-bold mb-6">
             <Shield size={16} />
             <span>SGS — Sistema de Gestão de Segurança</span>
@@ -56,12 +66,13 @@ const Seguranca = () => {
             Operamos em total conformidade com as normas técnicas brasileiras e internacionais.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/passeios" className="bg-primary text-white px-8 py-4 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all">
+            <Link to={loc("/passeios")} className="bg-primary text-white px-8 py-4 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all">
               Conheça nossos roteiros
             </Link>
             <a href="#iso" className="bg-white text-foreground border border-border px-8 py-4 rounded-2xl font-bold hover:bg-muted transition-all">
               Normas ISO
             </a>
+          </div>
           </div>
         </div>
       </section>
@@ -222,10 +233,10 @@ const Seguranca = () => {
               Agora que você sabe que está em boas mãos, que tal escolher o roteiro perfeito para sua viagem?
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/passeios" className="bg-white text-primary px-8 py-4 rounded-2xl font-bold hover:bg-muted transition-all">
+              <Link to={loc("/passeios")} className="bg-white text-primary px-8 py-4 rounded-2xl font-bold hover:bg-muted transition-all">
                 Ver todos os passeios
               </Link>
-              <Link to="/minhas-reservas" className="bg-primary-dark text-white border border-white/20 px-8 py-4 rounded-2xl font-bold hover:bg-primary-dark/80 transition-all">
+              <Link to={loc("/minhas-reservas")} className="bg-primary-dark text-white border border-white/20 px-8 py-4 rounded-2xl font-bold hover:bg-primary-dark/80 transition-all">
                 Minhas reservas
               </Link>
             </div>

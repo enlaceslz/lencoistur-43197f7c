@@ -7,12 +7,12 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter
+  Dialog, DialogContent, DialogTitle
 } from "@/components/ui/dialog";
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import {
-  Search, Plus, Pencil, Trash2, Eye, EyeOff, Compass, Users, Clock, Star, X, Upload, Link as LinkIcon, Image as ImageIcon, GripVertical, Percent, MapPin, CheckCircle, Sparkles, Copy, Shield, Loader2,
-  Save, XCircle, Building2, DollarSign, Activity, ExternalLink
+  Search, Plus, Pencil, Trash2, Eye, Compass, Users, Clock, Star, X, Upload, Link as LinkIcon, Image as ImageIcon, Percent, MapPin, CheckCircle, Sparkles, Copy, Shield, Loader2,
+  XCircle, DollarSign, Activity, ExternalLink
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -86,6 +86,7 @@ const AdminPasseios = () => {
       }
       setTours(data || []);
     } catch (err) {
+      toast.error("Erro ao carregar dados");
       console.error("Erro ao carregar passeios:", err);
     }
     setLoading(false);
@@ -229,7 +230,7 @@ const AdminPasseios = () => {
 
     if (!editingId) {
       payload.rating = 5.0;
-      payload.reviews_count = Math.floor(Math.random() * 20) + 5;
+      payload.reviews_count = 0;
     }
 
     if (!payload.name) {
@@ -259,41 +260,57 @@ const AdminPasseios = () => {
       payload.default_mode = "coletivo";
     }
 
-    let error;
-    if (editingId) {
-      ({ error } = await supabase.from("tours").update(payload).eq("id", editingId));
-    } else {
-      ({ error } = await supabase.from("tours").insert(payload));
-    }
+    try {
+      let error;
+      if (editingId) {
+        ({ error } = await supabase.from("tours").update(payload).eq("id", editingId));
+      } else {
+        ({ error } = await supabase.from("tours").insert(payload));
+      }
 
-    if (error) {
-      toast.error(`Erro ao salvar: ${error.message}`);
-    } else {
-      toast.success(editingId ? "Passeio atualizado!" : "Passeio criado!");
-      setShowForm(false);
-      setEditingId(null);
-      load();
+      if (error) {
+        toast.error(`Erro ao salvar: ${error.message}`);
+      } else {
+        toast.success(editingId ? "Passeio atualizado!" : "Passeio criado!");
+        setShowForm(false);
+        setEditingId(null);
+        load();
+      }
+    } catch (err) {
+      toast.error("Erro ao salvar passeio");
     }
   };
 
   const handleDuplicate = async (t: any) => {
-    const { id, created_at, updated_at, ...rest } = t;
-    const payload = { ...rest, name: `${t.name} (Cópia)`, slug: `${t.slug}-copia-${Date.now().toString().slice(-4)}`, active: false };
-    const { error } = await supabase.from("tours").insert(payload);
-    if (error) toast.error("Erro ao duplicar");
-    else { toast.success("Passeio duplicado!"); load(); }
+    try {
+      const { id, created_at, updated_at, ...rest } = t;
+      const payload = { ...rest, name: `${t.name} (Cópia)`, slug: `${t.slug}-copia-${Date.now().toString().slice(-4)}`, active: false };
+      const { error } = await supabase.from("tours").insert(payload);
+      if (error) toast.error("Erro ao duplicar");
+      else { toast.success("Passeio duplicado!"); load(); }
+    } catch (err) {
+      toast.error("Erro ao duplicar passeio");
+    }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Excluir este passeio?")) return;
-    const { error } = await supabase.from("tours").delete().eq("id", id);
-    if (error) toast.error("Erro ao excluir");
-    else { toast.success("Passeio excluído"); load(); }
+    try {
+      const { error } = await supabase.from("tours").delete().eq("id", id);
+      if (error) toast.error("Erro ao excluir");
+      else { toast.success("Passeio excluído"); load(); }
+    } catch (err) {
+      toast.error("Erro ao excluir passeio");
+    }
   };
 
   const toggleActive = async (id: string, current: boolean) => {
-    await supabase.from("tours").update({ active: !current }).eq("id", id);
-    load();
+    try {
+      await supabase.from("tours").update({ active: !current }).eq("id", id);
+      load();
+    } catch (err) {
+      toast.error("Erro ao alterar status");
+    }
   };
 
   const sortedTours = [...tours].sort((a, b) => (b.reviews_count || 0) - (a.reviews_count || 0));
@@ -361,7 +378,7 @@ const AdminPasseios = () => {
                     <div className="space-y-4">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-lg bg-primary text-white flex items-center justify-center font-black text-xl overflow-hidden">
-                          {wideTour.images?.[0] ? <img src={wideTour.images[0]} className="w-full h-full object-cover" /> : wideTour.name[0]}
+                          {wideTour.images?.[0] ? <img src={wideTour.images[0]} alt={wideTour.name} className="w-full h-full object-cover" /> : wideTour.name[0]}
                         </div>
                         <div>
                           <p className="text-sm font-black text-slate-700">{wideTour.name}</p>
@@ -472,7 +489,7 @@ const AdminPasseios = () => {
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                   <span className="text-[10px] font-black text-primary uppercase tracking-widest">{tours.length} Serviços no Catálogo</span>
                 </div>
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Gestão de Inventário</span>
@@ -942,7 +959,7 @@ const AdminPasseios = () => {
                       <div className="flex items-center gap-4">
                         <div className="relative shrink-0">
                           {t.images?.[0] ? (
-                            <img src={t.images[0]} className="w-14 h-14 rounded-lg object-cover shadow-sm" />
+                            <img src={t.images[0]} alt={t.name} className="w-14 h-14 rounded-lg object-cover shadow-sm" />
                           ) : (
                             <div className="w-14 h-14 rounded-lg bg-slate-100 flex items-center justify-center text-muted-foreground">
                               <Compass size={24} />
@@ -1210,12 +1227,12 @@ const AdminPasseios = () => {
                     {detailTour.images?.length > 0 && (
                       <div className="grid grid-cols-4 gap-3 mb-6">
                         <div className="col-span-4 lg:col-span-3 aspect-video relative rounded-3xl overflow-hidden border border-slate-200 shadow-sm">
-                          <img src={detailTour.images[0]} className="w-full h-full object-cover" />
+                          <img src={detailTour.images[0]} alt={detailTour.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="hidden lg:flex flex-col gap-3">
                           {detailTour.images.slice(1, 4).map((img: string, i: number) => (
                             <div key={i} className="flex-1 aspect-square rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
-                              <img src={img} className="w-full h-full object-cover" />
+                              <img src={img} alt={`${detailTour.name} ${i + 2}`} className="w-full h-full object-cover" />
                             </div>
                           ))}
                         </div>

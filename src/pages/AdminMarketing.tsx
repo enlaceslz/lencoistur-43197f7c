@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import { Users, Megaphone, TrendingUp, RefreshCw, MessageSquare, Mail, Target, Loader2, Save } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import { Users, Megaphone, TrendingUp, RefreshCw, MessageSquare, Mail, Target, Loader2 } from "lucide-react";
 import WhatsAppTab from "@/components/marketing/WhatsAppTab";
 import EmailTab from "@/components/marketing/EmailTab";
 import LeadsTab from "@/components/marketing/LeadsTab";
 import RemarketingTab from "@/components/marketing/RemarketingTab";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 type Tab = "whatsapp" | "email" | "leads" | "remarketing";
 
@@ -32,6 +30,7 @@ const AdminMarketing = () => {
       if (rulesRes.data) setRules(rulesRes.data);
     } catch (err) {
       console.error("Erro ao carregar marketing:", err);
+      toast.error("Erro ao carregar dados de marketing");
     }
     setLoading(false);
   };

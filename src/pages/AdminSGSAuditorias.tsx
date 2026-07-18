@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, ClipboardCheck, CheckCircle, XCircle, Loader2, User, Calendar, FileText } from "lucide-react";
+import { Plus, ClipboardCheck, CheckCircle, XCircle, Loader2, Calendar, FileText } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const CATEGORIES: Record<string, string> = {
@@ -23,21 +23,27 @@ const AdminSGSAuditorias = () => {
   useEffect(() => { load(); }, []);
 
   const load = async () => {
-    setLoading(true);
-    const [auditsRes, itemsRes, collabsRes] = await Promise.all([
-      supabase.from("sgs_audits").select("*").order("date", { ascending: false }),
-      supabase.from("sgs_audit_items").select("*"),
-      supabase.from("collaborators").select("id, name").eq("status", "active").order("name"),
-    ]);
-    setAudits(auditsRes.data || []);
-    setAuditItems(itemsRes.data || []);
-    setCollaborators(collabsRes.data || []);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const [auditsRes, itemsRes, collabsRes] = await Promise.all([
+        supabase.from("sgs_audits").select("*").order("date", { ascending: false }),
+        supabase.from("sgs_audit_items").select("*"),
+        supabase.from("collaborators").select("id, name").eq("status", "active").order("name"),
+      ]);
+      setAudits(auditsRes.data || []);
+      setAuditItems(itemsRes.data || []);
+      setCollaborators(collabsRes.data || []);
+    } catch (err: any) {
+      toast({ title: "Erro ao carregar auditorias", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const code = `AUD-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 999) + 1).padStart(3, "0")}`;
+    try {
+      e.preventDefault();
+      const code = `AUD-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 999) + 1).padStart(3, "0")}`;
     const compliantCount = checklist.filter((c) => c.compliant).length;
     const score = ((compliantCount / checklist.length) * 100).toFixed(1);
 
@@ -61,18 +67,25 @@ const AdminSGSAuditorias = () => {
     setForm({ auditor: "", auditor_id: "", observations: "" });
     setChecklist(Object.keys(CATEGORIES).map((cat) => ({ category: cat, item_name: CATEGORIES[cat], compliant: false, observation: "" })));
     load();
+    } catch (err: any) {
+      toast({ title: "Erro ao finalizar auditoria", description: err.message, variant: "destructive" });
+    }
   };
 
   const createAction = async (item: any, auditCode: string) => {
-    const code = `AC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`;
-    const { error } = await supabase.from("sgs_corrective_actions").insert({
-      action_code: code,
-      description: `Ação corretiva para não conformidade na auditoria ${auditCode}: ${item.item_name}. Obs: ${item.observation || "Nenhuma"}`,
-      status: "pendente",
-      responsible: "Gestor de Segurança",
-    });
-    if (error) toast({ title: "Erro ao criar ação", variant: "destructive" });
-    else toast({ title: "Ação corretiva criada!", description: `Código: ${code}` });
+    try {
+      const code = `AC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`;
+      const { error } = await supabase.from("sgs_corrective_actions").insert({
+        action_code: code,
+        description: `Ação corretiva para não conformidade na auditoria ${auditCode}: ${item.item_name}. Obs: ${item.observation || "Nenhuma"}`,
+        status: "pendente",
+        responsible: "Gestor de Segurança",
+      });
+      if (error) toast({ title: "Erro ao criar ação", variant: "destructive" });
+      else toast({ title: "Ação corretiva criada!", description: `Código: ${code}` });
+    } catch (err: any) {
+      toast({ title: "Erro ao criar ação corretiva", description: err.message, variant: "destructive" });
+    }
   };
 
   const getAuditItems = (auditId: string) => auditItems.filter((i) => i.audit_id === auditId);
@@ -185,7 +198,7 @@ const AdminSGSAuditorias = () => {
                       <h4 className="font-display font-black text-xl text-foreground group-hover:text-primary transition-colors leading-tight uppercase tracking-tighter">{audit.audit_code}</h4>
                       <div className="flex items-center gap-2 mt-1">
                         <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[8px] font-black">
-                          {audit.auditor?.charAt(0).toUpperCase()}
+                          {audit.auditor?.charAt(0)?.toUpperCase() || ''}
                         </div>
                         <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Auditor: {audit.auditor}</p>
                       </div>

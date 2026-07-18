@@ -1,9 +1,11 @@
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
+import { useLocalizedPath } from "@/lib/useLocalizedPath";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Shield, CreditCard, QrCode, Banknote, Users, CalendarDays, MapPin, CheckCircle, Copy, Clock, Printer, Building2 } from "lucide-react";
+import { ArrowLeft, Shield, CreditCard, QrCode, Banknote, Users, CalendarDays, MapPin, CheckCircle, Copy, Clock, Printer, Building2, Loader2 } from "lucide-react";
 import { printReceipt } from "@/components/BookingReceipt";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Helmet } from "react-helmet-async";
 import { useState, useEffect } from "react";
 import { useBookings, type BookingItem } from "@/hooks/useBookings";
 import { toast } from "@/hooks/use-toast";
@@ -13,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { fetchPartnerCatalogPricing } from "@/lib/catalogPricing";
 
 const CheckoutPage = () => {
-
+  const loc = useLocalizedPath();
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { addBooking } = useBookings();
@@ -172,12 +174,28 @@ const CheckoutPage = () => {
     }
   }, [guests]);
 
+  if (loadingItem) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Helmet>
+          <title>Finalizar Reserva | Lençóis Tour</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <Loader2 className="animate-spin text-primary" size={32} />
+      </div>
+    );
+  }
+
   if (!tour && !transfer && !pkg) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
+        <Helmet>
+          <title>Item não encontrado | Lençóis Tour</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
         <div className="text-center">
           <h1 className="font-display text-2xl font-bold text-foreground mb-4">Item não encontrado</h1>
-          <Link to="/passeios" className="text-primary hover:underline">Ver passeios</Link>
+          <Link to={loc("/passeios")} className="text-primary hover:underline">Ver passeios</Link>
         </div>
       </div>
     );
@@ -255,6 +273,10 @@ const CheckoutPage = () => {
   if (confirmedBooking) {
     return (
       <div className="min-h-screen bg-background">
+        <Helmet>
+          <title>Reserva Confirmada | Lençóis Tour</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
         <Navbar />
         <div className="pt-32 pb-20 container mx-auto px-4 max-w-lg">
           <div className="text-center mb-8">
@@ -379,7 +401,7 @@ const CheckoutPage = () => {
             )}
             
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link to="/minhas-reservas" className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors text-center">
+              <Link to={loc("/minhas-reservas")} className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors text-center">
                 Ver Minhas Reservas
               </Link>
               {confirmedBooking.payMethod !== "info" && (
@@ -428,6 +450,10 @@ const CheckoutPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Finalizar Reserva | Lençóis Tour</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <Navbar />
       <div className="pt-24 pb-4 container mx-auto px-4">
         <button onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm">

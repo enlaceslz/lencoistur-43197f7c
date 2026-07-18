@@ -1,22 +1,21 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import {
-  BarChart3, Download, TrendingUp, Users, ShoppingCart, Shield,
-  CreditCard, Calendar, Filter, Printer, PieChart, Activity, MapPin, Mail, Phone, UserPlus, Save
+  BarChart3, TrendingUp, Users, ShoppingCart, Shield,
+  CreditCard, Calendar, Filter, Printer, Activity, MapPin, Mail, Phone, UserPlus
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer,
-  PieChart as RePieChart, Pie, Cell, LineChart, Line, Legend, AreaChart, Area
+  PieChart as RePieChart, Pie, Cell, Legend, AreaChart, Area
 } from "recharts";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { parseISO } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { formatDate } from "@/lib/utils";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 
 type ReportType = "reservas" | "financeiro" | "clientes" | "passeios" | "sgs" | "marketing" | "parceiros" | "usuarios";
 
@@ -36,7 +35,7 @@ const COLORS = [
   "hsl(217,91%,60%)", "hsl(152,60%,42%)", "hsl(38,92%,50%)", "hsl(280,60%,50%)",
 ];
 
-const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmt = (v: number) => formatCurrency(v);
 
 const AdminRelatorios = () => {
   const [activeTab, setActiveTab] = useState<ReportType>("reservas");
@@ -323,7 +322,7 @@ const AdminRelatorios = () => {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32 space-y-4 bg-white border border-border rounded-lg shadow-sm">
             <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-            <p className="text-sm font-black uppercase tracking-widest text-muted-foreground animate-pulse">Processando Inteligência de Dados...</p>
+            <p className="text-sm font-black uppercase tracking-widest text-muted-foreground">Processando Inteligência de Dados...</p>
           </div>
         ) : (
           <div className="space-y-8">
@@ -331,24 +330,24 @@ const AdminRelatorios = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {activeTab === "reservas" && (
                 <>
-                  <KPICard label="Total Reservas" value={data.total} icon={ShoppingCart} color="text-blue-500" />
-                  <KPICard label="Receita Bruta" value={fmt(data.revenue)} icon={TrendingUp} color="text-emerald-500" />
-                  <KPICard label="Ticket Médio" value={fmt(data.avgTicket)} icon={Activity} color="text-amber-500" />
-                  <KPICard label="Total Pax" value={data.guests} icon={Users} color="text-purple-500" />
+                  <KPICard label="Total Reservas" value={data.total || 0} icon={ShoppingCart} color="text-blue-500" />
+                  <KPICard label="Receita Bruta" value={fmt(data.revenue || 0)} icon={TrendingUp} color="text-emerald-500" />
+                  <KPICard label="Ticket Médio" value={fmt(data.avgTicket || 0)} icon={Activity} color="text-amber-500" />
+                  <KPICard label="Total Pax" value={data.guests || 0} icon={Users} color="text-purple-500" />
                 </>
               )}
               {activeTab === "financeiro" && (
                 <>
-                  <KPICard label="Saldo Atual" value={fmt(data.saldo)} icon={CreditCard} color={data.saldo >= 0 ? "text-emerald-500" : "text-destructive"} />
-                  <KPICard label="Total Recebido" value={fmt(data.recebido)} icon={TrendingUp} color="text-emerald-500" />
-                  <KPICard label="Total Pago" value={fmt(data.pago)} icon={Activity} color="text-destructive" />
-                  <KPICard label="A Receber" value={fmt(data.totalReceber)} icon={Calendar} color="text-blue-500" />
+                  <KPICard label="Saldo Atual" value={fmt(data.saldo || 0)} icon={CreditCard} color={(data.saldo || 0) >= 0 ? "text-emerald-500" : "text-destructive"} />
+                  <KPICard label="Total Recebido" value={fmt(data.recebido || 0)} icon={TrendingUp} color="text-emerald-500" />
+                  <KPICard label="Total Pago" value={fmt(data.pago || 0)} icon={Activity} color="text-destructive" />
+                  <KPICard label="A Receber" value={fmt(data.totalReceber || 0)} icon={Calendar} color="text-blue-500" />
                 </>
               )}
               {activeTab === "passeios" && (
                 <>
-                  <KPICard label="Receita Passeios" value={fmt(data.totalRevenue)} icon={TrendingUp} color="text-emerald-500" />
-                  <KPICard label="Pax Transportados" value={data.totalGuests} icon={Users} color="text-blue-500" />
+                  <KPICard label="Receita Passeios" value={fmt(data.totalRevenue || 0)} icon={TrendingUp} color="text-emerald-500" />
+                  <KPICard label="Pax Transportados" value={data.totalGuests || 0} icon={Users} color="text-blue-500" />
                 </>
               )}
               {activeTab === "sgs" && (
@@ -366,14 +365,14 @@ const AdminRelatorios = () => {
               )}
               {activeTab === "parceiros" && (
                 <>
-                  <KPICard label="Total Parceiros" value={data.total} icon={UserPlus} color="text-blue-500" />
-                  <KPICard label="Parceiros Ativos" value={data.active} icon={Activity} color="text-emerald-500" />
+                  <KPICard label="Total Parceiros" value={data.total || 0} icon={UserPlus} color="text-blue-500" />
+                  <KPICard label="Parceiros Ativos" value={data.active || 0} icon={Activity} color="text-emerald-500" />
                 </>
               )}
               {activeTab === "usuarios" && (
                 <>
-                  <KPICard label="Total Usuários" value={data.total} icon={Users} color="text-blue-500" />
-                  <KPICard label="Usuários Ativos" value={data.active} icon={Activity} color="text-emerald-500" />
+                  <KPICard label="Total Usuários" value={data.total || 0} icon={Users} color="text-blue-500" />
+                  <KPICard label="Usuários Ativos" value={data.active || 0} icon={Activity} color="text-emerald-500" />
                 </>
               )}
             </div>
@@ -388,7 +387,7 @@ const AdminRelatorios = () => {
                         <defs><linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/></linearGradient></defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                         <XAxis dataKey="date" fontSize={10} tick={{fill: '#9ca3af', fontWeight: '900'}} axisLine={false} tickLine={false} tickFormatter={(v) => formatDate(parseISO(v), 'dd MMM')} />
-                        <YAxis fontSize={10} tick={{fill: '#9ca3af', fontWeight: '900'}} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${v/100}`} />
+                        <YAxis fontSize={10} tick={{fill: '#9ca3af', fontWeight: '900'}} axisLine={false} tickLine={false} tickFormatter={(v) => formatCurrency(v)} />
                         <ChartTooltip content={<CustomTooltip />} />
                         <Area type="monotone" dataKey="total" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
                       </AreaChart>
@@ -425,7 +424,7 @@ const AdminRelatorios = () => {
                       <BarChart data={[{ name: 'Fluxo', recebido: data.recebido, pago: data.pago }]}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                         <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                        <YAxis fontSize={10} axisLine={false} tickLine={false} tickFormatter={(v) => `R$ ${(v/100).toLocaleString('pt-BR')}`} />
+                        <YAxis fontSize={10} axisLine={false} tickLine={false} tickFormatter={(v) => formatCurrency(v)} />
                         <ChartTooltip formatter={(v: number) => fmt(v)} />
                         <Bar dataKey="recebido" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                         <Bar dataKey="pago" fill="hsl(var(--destructive))" radius={[4, 4, 0, 0]} />
@@ -441,7 +440,7 @@ const AdminRelatorios = () => {
                       <BarChart data={data.byTour}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
                         <XAxis dataKey="name" fontSize={10} axisLine={false} tickLine={false} />
-                        <YAxis fontSize={10} axisLine={false} tickLine={false} tickFormatter={(v) => `R$ ${(v/100).toLocaleString('pt-BR')}`} />
+                        <YAxis fontSize={10} axisLine={false} tickLine={false} tickFormatter={(v) => formatCurrency(v)} />
                         <ChartTooltip formatter={(v: number) => fmt(v)} />
                         <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Receita" />
                       </BarChart>
@@ -469,7 +468,7 @@ const AdminRelatorios = () => {
                       <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={data.topPartners} layout="vertical" margin={{ left: 20 }}>
                           <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e5e7eb" />
-                          <XAxis type="number" fontSize={10} tickFormatter={(v) => `R$${v/100}`} />
+                          <XAxis type="number" fontSize={10} tickFormatter={(v) => formatCurrency(v)} />
                           <YAxis dataKey="name" type="category" fontSize={10} width={80} />
                           <ChartTooltip formatter={(v: any) => fmt(v)} />
                           <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />

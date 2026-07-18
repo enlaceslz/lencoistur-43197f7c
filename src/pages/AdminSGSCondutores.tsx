@@ -102,7 +102,7 @@ const AdminSGSCondutores = () => {
   };
 
   const isDateExpired = (d: string | null) => d && new Date(d) < new Date();
-  const filtered = condutores.filter(c => c.nome.toLowerCase().includes(search.toLowerCase()) || (c.cpf && c.cpf.includes(search)));
+  const filtered = condutores.filter(c => (c.nome || "").toLowerCase().includes(search.toLowerCase()) || (c.cpf && c.cpf.includes(search)));
   const set = (k: string, v: any) => {
     let value = v;
     if (k === "cpf") value = maskCPF(v);

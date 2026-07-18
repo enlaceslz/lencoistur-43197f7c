@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, Truck, AlertTriangle, ShieldCheck } from "lucide-react";
+import { Plus, AlertTriangle, ShieldCheck } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
@@ -123,10 +123,10 @@ const AdminSGSFornecedores = () => {
                   </div>
                   <div>
                     <h4 className="font-display font-black text-lg text-foreground group-hover:text-primary transition-colors">{s.supplier_name}</h4>
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{TYPES[s.supplier_type]} {s.blocked && <span className="text-destructive ml-1">· ⛔ {s.block_reason}</span>}</p>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{TYPES[s.supplier_type] || "Desconhecido"} {s.blocked && <span className="text-destructive ml-1">· ⛔ {s.block_reason}</span>}</p>
                   </div>
                 </div>
-                <Badge variant="outline" className={`font-black text-[9px] uppercase px-3 py-1 rounded-full border ${STATUS_COLORS[s.status]}`}>
+                <Badge variant="outline" className={`font-black text-[9px] uppercase px-3 py-1 rounded-full border ${STATUS_COLORS[s.status] || ""}`}>
                   {s.status}
                 </Badge>
               </div>

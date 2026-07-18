@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Calendar, Users, Copy, QrCode, Clock, CheckCircle, XCircle, AlertCircle, Printer, LogIn, Shield, FileText } from "lucide-react";
 import { useBookings } from "@/hooks/useBookings";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
+import { formatCurrency } from "@/lib/utils";
 import { PrintReceiptButton } from "@/components/BookingReceipt";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
+import { useLocalizedPath } from "@/lib/useLocalizedPath";
 
 const statusConfig: Record<string, { label: string; className: string; icon: typeof CheckCircle }> = {
   confirmada: { label: "Confirmada", className: "bg-primary/10 text-primary", icon: CheckCircle },
@@ -24,7 +27,8 @@ const formatPhone = (v: string) => {
 };
 
 const MinhasReservas = () => {
-  const { user, loading: authLoading } = useAuth();
+  const loc = useLocalizedPath();
+  const { user, loading: authLoading, isAdmin } = useAuth();
   const [customerId, setCustomerId] = useState<string | undefined>(undefined);
   const { bookings, loading: bookingsLoading, confirmPayment, cancelBooking } = useBookings(customerId);
   const [filter, setFilter] = useState("todas");
@@ -39,7 +43,7 @@ const MinhasReservas = () => {
     }
   }, [user?.id]);
 
-  const filtered = filter === "todas" ? bookings : bookings.filter((b) => b.status === filter);
+  const filtered = filter === "todas" ? (bookings || []) : (bookings || []).filter((b) => b.status === filter);
 
   const copyPix = (code: string) => {
     try {
@@ -93,6 +97,10 @@ const MinhasReservas = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Minhas Reservas | Lençóis Tour</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <Navbar />
       <div className="pt-28 pb-20 container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
@@ -109,7 +117,7 @@ const MinhasReservas = () => {
                   filter === s ? "bg-primary text-primary-foreground" : "bg-card border border-border text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {s === "todas" ? `Todas (${bookings.length})` : statusConfig[s]?.label || s}
+                {s === "todas" ? `Todas (${(bookings || []).length})` : statusConfig[s]?.label || s}
               </button>
             ))}
           </div>
@@ -144,7 +152,7 @@ const MinhasReservas = () => {
                     </div>
                     <div className="text-right">
                       <p className="font-display text-xl font-bold text-primary">
-                        {(b.finalTotal / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                        {formatCurrency(b.finalTotal)}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {b.paymentStatus === "pago" ? (
@@ -182,20 +190,22 @@ const MinhasReservas = () => {
                             </TooltipContent>
                           </Tooltip>
 
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                onClick={() => handleSimulatePayment(b.id)}
-                                disabled={isProcessing === b.id}
-                                className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
-                              >
-                                {isProcessing === b.id ? "Processando..." : "Simular Pagamento"}
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Simular confirmação de pagamento (Apenas Teste)</p>
-                            </TooltipContent>
-                          </Tooltip>
+                          {isAdmin && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  onClick={() => handleSimulatePayment(b.id)}
+                                  disabled={isProcessing === b.id}
+                                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
+                                >
+                                  {isProcessing === b.id ? "Processando..." : "Simular Pagamento"}
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Simular confirmação de pagamento (Apenas Admin)</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
                         </div>
                       </div>
                       <div className="mt-3 flex gap-3">
@@ -365,7 +375,7 @@ const MinhasReservas = () => {
                 <p className="text-lg text-muted-foreground mb-4">
                   {bookings.length === 0 ? "Você ainda não tem reservas" : "Nenhuma reserva neste filtro"}
                 </p>
-                <Link to="/passeios" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors inline-block">
+                <Link to={loc("/passeios")} className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl font-semibold transition-colors inline-block">
                   Explorar Passeios
                 </Link>
               </div>

@@ -6,19 +6,27 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import SEO from "@/components/SEO";
 
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getTourEffectivePrice } from "@/lib/utils";
 import { ShareWithFriend } from "@/components/ShareWithFriend";
 import { fetchPartnerCatalogPricing } from "@/lib/catalogPricing";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { useTranslation } from "react-i18next";
+import { useLocalizedPath } from "@/lib/useLocalizedPath";
 
 const TourDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const [params] = useSearchParams();
+  const { t } = useTranslation();
+  const loc = useLocalizedPath();
   const [tour, setTour] = useState<any>(null);
   const [partner, setPartner] = useState<{ id: string; name: string } | null>(null);
   const [partnerPricing, setPartnerPricing] = useState<{ effectivePrice: number; effectivePrivatePrice?: number | null } | null>(null);
   const [tourReviews, setTourReviews] = useState<any[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentImg, setCurrentImg] = useState(0);
   const [guests, setGuests] = useState(2);
   const [selectedDate, setSelectedDate] = useState("");
@@ -28,39 +36,48 @@ const TourDetail = () => {
     if (!slug) return;
     const partnerId = params.get("partner_id") || params.get("partner");
     const load = async () => {
-      const { data: t, error } = await supabase.from("public_tours" as "tours").select("id, slug, name, category, images, includes, highlights, tag, price, private_price, location, duration, group_size, rating, reviews_count, description, difficulty, departure, operator, vehicle_capacity, mode_collective_enabled, mode_private_enabled, default_mode, pix_discount").eq("slug", slug).single();
-      if (error) {
-        console.error("Erro ao carregar detalhes do passeio:", error);
+      setLoading(true);
+      setError(null);
+      const { data: t, error: err } = await supabase.from("public_tours" as "tours").select("id, slug, name, category, images, includes, highlights, tag, price, private_price, location, duration, group_size, rating, reviews_count, description, difficulty, departure, operator, vehicle_capacity, mode_collective_enabled, mode_private_enabled, default_mode, pix_discount").eq("slug", slug).single();
+      if (err) {
+        console.error("Erro ao carregar detalhes do passeio:", err);
+        setError("Não foi possível carregar os detalhes deste passeio.");
+        setLoading(false);
+        return;
+      }
+      if (!t) {
+        setError("not_found");
+        setLoading(false);
+        return;
       }
       setTour(t);
-      if (t) {
-        if (partnerId) {
-          try {
-            const pricing = await fetchPartnerCatalogPricing(partnerId, [{ key: t.id, type: "tour", id: t.id }]);
-            setPartner(pricing.partner);
-            const item = pricing.items[t.id];
-            setPartnerPricing(item ? { effectivePrice: item.effectivePrice, effectivePrivatePrice: item.effectivePrivatePrice } : null);
-          } catch {
-            setPartner(null);
-            setPartnerPricing(null);
-          }
-        } else {
+      if (partnerId) {
+        try {
+          const pricing = await fetchPartnerCatalogPricing(partnerId, [{ key: t.id, type: "tour", id: t.id }]);
+          setPartner(pricing.partner);
+          const item = pricing.items[t.id];
+          setPartnerPricing(item ? { effectivePrice: item.effectivePrice, effectivePrivatePrice: item.effectivePrivatePrice } : null);
+        } catch {
           setPartner(null);
           setPartnerPricing(null);
         }
-
-        // Apply admin-configured default mode
-        const collectiveOn = t.mode_collective_enabled ?? true;
-        const privateOn = t.mode_private_enabled ?? true;
-        const adminDefault = (t.default_mode === "coletivo" || t.default_mode === "privativo") ? t.default_mode : "privativo";
-        let initial: "coletivo" | "privativo" = adminDefault;
-        if (initial === "privativo" && !privateOn) initial = "coletivo";
-        if (initial === "coletivo" && !collectiveOn) initial = "privativo";
-        setTourMode(initial);
-
-        const { data: r } = await supabase.from("reviews").select("id, tour_id, author, avatar, country, created_at, rating, comment").eq("tour_id", t.id).order("created_at", { ascending: false });
-        setTourReviews(r || []);
+      } else {
+        setPartner(null);
+        setPartnerPricing(null);
       }
+
+      const collectiveOn = t.mode_collective_enabled ?? true;
+      const privateOn = t.mode_private_enabled ?? true;
+      const adminDefault = (t.default_mode === "coletivo" || t.default_mode === "privativo") ? t.default_mode : "privativo";
+      let initial: "coletivo" | "privativo" = adminDefault;
+      if (initial === "privativo" && !privateOn) initial = "coletivo";
+      if (initial === "coletivo" && !collectiveOn) initial = "privativo";
+      setTourMode(initial);
+
+      setReviewsLoading(true);
+      const { data: r } = await supabase.from("reviews").select("id, tour_id, author, avatar, country, created_at, rating, comment").eq("tour_id", t.id).order("created_at", { ascending: false });
+      setTourReviews(r || []);
+      setReviewsLoading(false);
       setLoading(false);
     };
     load();
@@ -74,12 +91,36 @@ const TourDetail = () => {
     );
   }
 
+  if (error === "not_found" || (!tour && error)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <h1 className="font-display text-3xl font-bold text-foreground mb-4">{t("tourDetail.notFound")}</h1>
+          <Link to={loc("/passeios")} className="text-primary hover:underline">{t("tourDetail.viewAll")}</Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center max-w-md">
+          <h1 className="font-display text-2xl font-bold text-foreground mb-4">{error}</h1>
+          <button onClick={() => window.location.reload()} className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors">
+            Tentar novamente
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!tour) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <h1 className="font-display text-3xl font-bold text-foreground mb-4">Passeio não encontrado</h1>
-          <Link to="/passeios" className="text-primary hover:underline">Ver todos os passeios</Link>
+          <h1 className="font-display text-3xl font-bold text-foreground mb-4">{t("tourDetail.notFound")}</h1>
+          <Link to={loc("/passeios")} className="text-primary hover:underline">{t("tourDetail.viewAll")}</Link>
         </div>
       </div>
     );
@@ -88,34 +129,51 @@ const TourDetail = () => {
   const images = tour.images || [];
   const includes = tour.includes || [];
   const highlights = tour.highlights || [];
-  const isBoatTour = tour.slug === "passeio-de-barco" || /barco/i.test(tour.name || "") || /barco/i.test(tour.category || "");
+  const isBoatTour = tour.category === "Passeio de Barco";
   const vehicleCapacity = isBoatTour ? 12 : (tour.vehicle_capacity || 9);
   const vehicleLabel = isBoatTour ? "embarcação" : "veículo";
   const collectiveOn = tour.mode_collective_enabled ?? true;
   const privateOn = tour.mode_private_enabled ?? true;
   const showModeToggle = collectiveOn && privateOn;
   const isPrivate = tourMode === "privativo";
-  const basePublicPrice = isPrivate ? (tour.private_price || 0) : tour.price;
-  const unitPrice = partnerPricing
-    ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePublicPrice) : partnerPricing.effectivePrice)
-    : basePublicPrice;
+  const unitPrice = getTourEffectivePrice(tour, partnerPricing);
   const totalPrice = isPrivate ? unitPrice : unitPrice * guests;
   const maxGuests = vehicleCapacity;
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={`${tour.name} | Lençóis Tour`}
+        description={tour.description?.slice(0, 160) || "Passeio nos Lençóis Maranhenses com a Lençóis Tour."}
+        path={`/passeios/${tour.slug}`}
+        image={images[0]}
+        type="product"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: tour.name,
+          description: tour.description,
+          image: images[0],
+          offers: {
+            "@type": "Offer",
+            price: unitPrice / 100,
+            priceCurrency: "BRL",
+            availability: "https://schema.org/InStock",
+          },
+        }}
+      />
       <Navbar />
 
       <div className="pt-24 pb-4 container mx-auto px-4">
-        <Link to="/passeios" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm">
-          <ArrowLeft size={16} /> Voltar para passeios
+        <Link to={loc("/passeios")} className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm mb-2">
+          <ArrowLeft size={16} /> {t("tourDetail.back")}
         </Link>
+        <Breadcrumbs items={[{ label: "Início", path: "/" }, { label: "Passeios", path: "/passeios" }, { label: tour?.name || "Detalhes" }]} />
       </div>
 
       <div className="container mx-auto px-4 pb-20">
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
-            {/* Gallery */}
             {images.length > 0 && (
               <>
                 <div className="relative rounded-2xl overflow-hidden">
@@ -160,8 +218,8 @@ const TourDetail = () => {
               <div className="flex items-center gap-3 mb-3">
                 <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">{tour.name}</h1>
                 {(tour.reviews_count || 0) >= 15 && (
-                  <Badge className="bg-amber-500 text-white font-black uppercase text-[10px] tracking-widest px-2 py-0.5 rounded-md animate-pulse">
-                    <Sparkles size={12} className="mr-1" /> Mais Vendido
+                  <Badge className="bg-amber-500 text-white font-black uppercase text-[10px] tracking-widest px-2 py-0.5 rounded-md">
+                    <Sparkles size={12} className="mr-1" /> {t("tourDetail.bestSeller")}
                   </Badge>
                 )}
               </div>
@@ -171,19 +229,19 @@ const TourDetail = () => {
                 <span className="flex items-center gap-1"><Clock size={16} className="text-primary" />{tour.duration}</span>
                 <span className="flex items-center gap-1"><Users size={16} className="text-primary" />{tour.group_size}</span>
                 <span className="flex items-center gap-1 text-secondary font-semibold">
-                  <Star size={16} fill="currentColor" />{Number(tour.rating || 0).toFixed(1)} ({tour.reviews_count || 0} avaliações)
+                  <Star size={16} fill="currentColor" />{Number(tour.rating || 0).toFixed(1)} ({tour.reviews_count || 0} {t("tours.reviews")})
                 </span>
               </div>
             </div>
 
             <div>
-              <h2 className="font-display text-xl font-bold text-foreground mb-3">Sobre o Passeio</h2>
+              <h2 className="font-display text-xl font-bold text-foreground mb-3">{t("tourDetail.about")}</h2>
               <p className="text-muted-foreground leading-relaxed">{tour.description}</p>
             </div>
 
             {highlights.length > 0 && (
               <div>
-                <h2 className="font-display text-xl font-bold text-foreground mb-3">Destaques</h2>
+                <h2 className="font-display text-xl font-bold text-foreground mb-3">{t("tourDetail.highlights")}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {highlights.map((h: string) => (
                     <div key={h} className="flex items-center gap-3 bg-ocean-light rounded-xl px-4 py-3">
@@ -197,7 +255,7 @@ const TourDetail = () => {
 
             {includes.length > 0 && (
               <div>
-                <h2 className="font-display text-xl font-bold text-foreground mb-3">O que está incluso</h2>
+                <h2 className="font-display text-xl font-bold text-foreground mb-3">{t("tourDetail.includes")}</h2>
                 <div className="flex flex-wrap gap-3">
                   {includes.map((item: string) => (
                     <span key={item} className="bg-muted text-foreground px-4 py-2 rounded-full text-sm flex items-center gap-2">
@@ -210,10 +268,10 @@ const TourDetail = () => {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: "Dificuldade", value: tour.difficulty },
-                { label: "Grupo", value: tour.group_size },
-                { label: "Saída", value: tour.departure },
-                { label: "Operador", value: tour.operator },
+                { label: t("tourDetail.difficulty"), value: tour.difficulty },
+                { label: t("tourDetail.group"), value: tour.group_size },
+                { label: t("tourDetail.departure"), value: tour.departure },
+                { label: t("tourDetail.operator"), value: tour.operator },
               ].map((item) => (
                 <div key={item.label} className="bg-card border border-border rounded-xl p-4">
                   <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
@@ -222,10 +280,14 @@ const TourDetail = () => {
               ))}
             </div>
 
-            {tourReviews.length > 0 && (
+            {reviewsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+              </div>
+            ) : tourReviews.length > 0 && (
               <div>
                 <h2 className="font-display text-xl font-bold text-foreground mb-4">
-                  Avaliações ({tourReviews.length})
+                  {t("tourDetail.reviews")} ({tourReviews.length})
                 </h2>
                 <div className="space-y-4">
                   {tourReviews.map((review) => (
@@ -268,10 +330,9 @@ const TourDetail = () => {
                   <Badge className="bg-primary text-[9px] text-white font-black uppercase">Ativo</Badge>
                 </div>
               )}
-              {/* Tour Mode Toggle */}
               {showModeToggle ? (
                 <div>
-                  <label className="text-sm font-semibold text-foreground mb-2 block">Modalidade</label>
+                  <label className="text-sm font-semibold text-foreground mb-2 block">{t("tourDetail.mode")}</label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => setTourMode("coletivo")}
@@ -283,7 +344,7 @@ const TourDetail = () => {
                     >
                       <div className="flex flex-col items-center gap-1">
                         <Users size={18} />
-                        <span>Coletivo</span>
+                        <span>{t("tourDetail.modeCollective")}</span>
                       </div>
                     </button>
                     <button
@@ -296,26 +357,26 @@ const TourDetail = () => {
                     >
                       <div className="flex flex-col items-center gap-1">
                         <Shield size={18} />
-                        <span>Privativo</span>
+                        <span>{t("tourDetail.modePrivate")}</span>
                       </div>
                     </button>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
                     {isPrivate
-                      ? `${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} exclusiva para até ${vehicleCapacity} pessoas`
-                      : `Valor por pessoa · ${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} compartilhada (até ${vehicleCapacity} pessoas)`}
+                      ? `${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} ${t("tourDetail.modePrivateDesc", { capacity: vehicleCapacity })}`
+                      : `${t("tourDetail.modeCollectiveDesc")} · ${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} ${t("tourDetail.modeSharedDesc", { capacity: vehicleCapacity })}`}
                   </p>
                 </div>
               ) : (
                 <div className="bg-muted/50 border border-border rounded-xl px-4 py-3">
                   <div className="flex items-center gap-2 text-foreground font-semibold text-sm">
                     {isPrivate ? <Shield size={16} className="text-secondary" /> : <Users size={16} className="text-primary" />}
-                    Modalidade {isPrivate ? "Privativa" : "Coletiva"}
+                    {isPrivate ? t("tourDetail.modePrivate") : t("tourDetail.modeCollective")}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     {isPrivate
-                      ? `${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} exclusiva para até ${vehicleCapacity} pessoas`
-                      : `Valor por pessoa · ${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} compartilhada (até ${vehicleCapacity} pessoas)`}
+                      ? `${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} ${t("tourDetail.modePrivateDesc", { capacity: vehicleCapacity })}`
+                      : `${t("tourDetail.modeCollectiveDesc")} · ${vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1)} ${t("tourDetail.modeSharedDesc", { capacity: vehicleCapacity })}`}
                   </p>
                 </div>
               )}
@@ -323,18 +384,18 @@ const TourDetail = () => {
               <div>
                 {isPrivate ? (
                   <>
-                    <span className="text-xs text-muted-foreground">{vehicleLabel} exclusiva</span>
+                    <span className="text-xs text-muted-foreground">{t("tourDetail.privateUnit", { vehicle: vehicleLabel.charAt(0).toUpperCase() + vehicleLabel.slice(1) })}</span>
                     <div className="flex items-baseline gap-1">
                       <span className="font-display text-3xl font-bold text-secondary">{formatCurrency(unitPrice)}</span>
-                      <span className="text-muted-foreground text-sm">/ até {vehicleCapacity} pessoas</span>
+                      <span className="text-muted-foreground text-sm">{t("tourDetail.perVehicle", { capacity: vehicleCapacity })}</span>
                     </div>
                   </>
                 ) : (
                   <>
-                    <span className="text-xs text-muted-foreground">a partir de</span>
+                    <span className="text-xs text-muted-foreground">{t("tourDetail.from")}</span>
                     <div className="flex items-baseline gap-1">
                       <span className="font-display text-3xl font-bold text-primary">{formatCurrency(unitPrice)}</span>
-                      <span className="text-muted-foreground text-sm">/ pessoa</span>
+                      <span className="text-muted-foreground text-sm">{t("tourDetail.perPerson")}</span>
                     </div>
                   </>
                 )}
@@ -342,13 +403,13 @@ const TourDetail = () => {
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-semibold text-foreground mb-1.5 block">Data do passeio</label>
+                  <label className="text-sm font-semibold text-foreground mb-1.5 block">{t("tourDetail.date")}</label>
                   <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}
                     className="w-full bg-muted border border-border rounded-xl px-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-primary/30" />
                 </div>
                 <div>
                   <label className="text-sm font-semibold text-foreground mb-1.5 block">
-                    {isPrivate ? "Passageiros (inclusos no preço)" : "Participantes"}
+                    {isPrivate ? t("tourDetail.passengers") : t("tourDetail.participants")}
                   </label>
                   <div className="flex items-center gap-4 bg-muted border border-border rounded-xl px-4 py-3">
                     <button onClick={() => setGuests(Math.max(1, guests - 1))}
@@ -363,26 +424,26 @@ const TourDetail = () => {
               <div className="border-t border-border pt-4 space-y-2">
                 {isPrivate ? (
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">{isBoatTour ? "Embarcação privativa" : "Veículo privativo"} ({guests} passageiros)</span>
+                    <span className="text-muted-foreground">{t("tourDetail.pickup", { guests })}</span>
                     <span className="text-foreground font-semibold">{formatCurrency(totalPrice)}</span>
                   </div>
                 ) : (
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">{formatCurrency(unitPrice)} × {guests} pessoas</span>
+                    <span className="text-muted-foreground">{t("tourDetail.priceBreakdown", { price: formatCurrency(unitPrice), guests })}</span>
                     <span className="text-foreground font-semibold">{formatCurrency(totalPrice)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Taxa de serviço</span>
+                  <span className="text-muted-foreground">{t("tourDetail.serviceFee")}</span>
                   <span className="text-foreground font-semibold">{formatCurrency(0)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-lg border-t border-border pt-3">
-                  <span className="text-foreground">Total</span>
+                  <span className="text-foreground">{t("tourDetail.total")}</span>
                   <div className="text-right">
                     <span className={isPrivate ? "text-secondary" : "text-primary"}>{formatCurrency(totalPrice)}</span>
                     {tour.pix_discount > 0 && !partner && (
                       <p className="text-[11px] text-green-600 font-semibold">
-                        ou {formatCurrency(Math.round(totalPrice * (1 - tour.pix_discount / 100)))} no PIX
+                        {t("tourDetail.pixDiscount", { price: formatCurrency(Math.round(totalPrice * (1 - tour.pix_discount / 100))) })}
                       </p>
                     )}
                   </div>
@@ -390,18 +451,18 @@ const TourDetail = () => {
               </div>
 
               <div className="space-y-3">
-                <Link to={`/checkout?type=tour&tour=${tour.slug}&pax=${guests}&date=${selectedDate}&mode=${tourMode}${partner ? `&partner_id=${partner.id}` : ''}`}
+                <Link to={loc(`/checkout?type=tour&tour=${tour.slug}&pax=${guests}&date=${selectedDate}&mode=${tourMode}${partner ? `&partner_id=${partner.id}` : ''}`)}
                   className={`w-full py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-xl block text-center active:scale-95 ${
                     isPrivate
                       ? "bg-secondary hover:bg-secondary/90 text-secondary-foreground shadow-secondary/20"
                       : "bg-primary hover:bg-primary/90 text-primary-foreground shadow-primary/20"
                   }`}>
-                  Continuar Reserva
+                  {t("tourDetail.continue")}
                 </Link>
                 <ShareWithFriend itemName={tour.name} itemUrl={window.location.href} />
                 <div className="flex items-center justify-center gap-2 text-muted-foreground text-[10px]">
                   <Shield size={12} />
-                  <span>Cancelamento grátis até 24h antes</span>
+                  <span>{t("tourDetail.freeCancel")}</span>
                 </div>
               </div>
             </div>

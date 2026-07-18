@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import AdminRoute from "@/components/AdminRoute";
+import LanguageLayout from "@/components/LanguageLayout";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 
 // Public routes — keep eager for fast first paint on marketing site
@@ -96,6 +97,7 @@ const App = () => (
             <Route path="/pacotes/:slug" element={<PackageDetail />} />
             <Route path="/assinatura-termo" element={<TermoAssinatura />} />
             <Route path="/voucher" element={<VoucherPage />} />
+
             <Route path="/admin/login" element={<AdminLogin />} />
 
             <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
@@ -132,6 +134,21 @@ const App = () => (
             <Route path="/admin/sgs/pesquisas" element={<AdminRoute><AdminSGSPesquisas /></AdminRoute>} />
             <Route path="/admin/relatorios" element={<AdminRoute><AdminRelatorios /></AdminRoute>} />
             <Route path="/admin/ajuda" element={<AdminRoute><AdminAjuda /></AdminRoute>} />
+
+            <Route path="/:lang" element={<LanguageLayout />}>
+              <Route index element={<Index />} />
+              <Route path="seguranca" element={<Seguranca />} />
+              <Route path="politica-de-privacidade" element={<PrivacyPolicy />} />
+              <Route path="passeios" element={<ToursPage />} />
+              <Route path="passeios/:slug" element={<TourDetail />} />
+              <Route path="translados" element={<TransfersPage />} />
+              <Route path="checkout" element={<CheckoutPage />} />
+              <Route path="minhas-reservas" element={<MinhasReservas />} />
+              <Route path="pacotes/:slug" element={<PackageDetail />} />
+              <Route path="assinatura-termo" element={<TermoAssinatura />} />
+              <Route path="voucher" element={<VoucherPage />} />
+            </Route>
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

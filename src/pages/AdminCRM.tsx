@@ -12,16 +12,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import CustomerStats from "@/components/crm/CustomerStats";
-import CustomerInteractionHistory from "@/components/crm/CustomerInteractionHistory";
 import { NumericFormat } from "react-number-format";
 import { maskCPF, maskPhone, maskCEP, maskDate } from "@/lib/masks";
+import { formatCurrency, validateCPF } from "@/lib/utils";
 
 interface Customer {
   id: string;
@@ -136,35 +135,7 @@ const emptyDependentForm: DependentForm = {
   relationship: "Filho(a)"
 };
 
-const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-// Helper masks already defined above
-const fmtPrice = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-
-const isValidCPF = (cpf: string) => {
-  const digits = cpf.replace(/\D/g, "");
-  if (digits.length !== 11) return false;
-  if (/^(\d)\1+$/.test(digits)) return false;
-
-  let sum = 0;
-  for (let i = 1; i <= 9; i++) {
-    sum += parseInt(digits.substring(i - 1, i)) * (11 - i);
-  }
-  let remainder = (sum * 10) % 11;
-  if (remainder === 10 || remainder === 11) remainder = 0;
-  if (remainder !== parseInt(digits.substring(9, 10))) return false;
-
-  sum = 0;
-  for (let i = 1; i <= 10; i++) {
-    sum += parseInt(digits.substring(i - 1, i)) * (12 - i);
-  }
-  remainder = (sum * 10) % 11;
-  if (remainder === 10 || remainder === 11) remainder = 0;
-  if (remainder !== parseInt(digits.substring(10, 11))) return false;
-
-  return true;
-};
+const VIP_THRESHOLD = 500000;
 
 const payStatusConfig: Record<string, { label: string; className: string }> = {
   pago: { label: "Pago", className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" },
@@ -203,7 +174,7 @@ const validateForm = (form: CustomerForm): string | null => {
 
   if (form.country === "Brasil") {
     if (!form.cpf) return "CPF é obrigatório para brasileiros.";
-    if (!isValidCPF(form.cpf)) return "CPF inválido.";
+    if (!validateCPF(form.cpf)) return "CPF inválido.";
   } else if (!form.passport) {
     return "Passaporte ou Documento é obrigatório para estrangeiros.";
   }
@@ -241,6 +212,9 @@ const AdminCRMContent = () => {
   const [dependents, setDependents] = useState<Dependent[]>([]);
   const [allDependents, setAllDependents] = useState<(Dependent & { customer_name: string })[]>([]);
   const [filter, setFilter] = useState<"all" | "with_bookings" | "no_bookings" | "dependents">("all");
+
+  const [page, setPage] = useState(1);
+  const pageSize = 50;
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -294,6 +268,8 @@ const AdminCRMContent = () => {
   useEffect(() => {
     fetchCustomers();
   }, []);
+
+  useEffect(() => { setPage(1); }, [search, filter]);
 
   const fetchAllDependents = async () => {
     const { data } = await supabase
@@ -372,7 +348,7 @@ const AdminCRMContent = () => {
         totalBookings: bookingsByCustomer[c.id]?.count || 0,
         totalSpent: bookingsByCustomer[c.id]?.total || 0,
         lastBooking: bookingsByCustomer[c.id]?.lastDate || null,
-        ltvCategory: (bookingsByCustomer[c.id]?.total || 0) > 500000 ? "VIP" : (bookingsByCustomer[c.id]?.count || 0) >= 3 ? "Fiel" : "Novo" as any
+        ltvCategory: (bookingsByCustomer[c.id]?.total || 0) > VIP_THRESHOLD ? "VIP" : (bookingsByCustomer[c.id]?.count || 0) >= 3 ? "Fiel" : "Novo" as any
       }));
 
       setCustomers(mappedCustomers);
@@ -681,7 +657,7 @@ const AdminCRMContent = () => {
     }
     const header = "Nome,Email,Telefone,Documento,Data Nascimento,Status,Pais,CEP,Endereco,Cidade,Estado,Reservas,Total Gasto,Cadastro,Observacoes\n";
     const rows = filtered.map(c =>
-      `"${c.name}","${c.email}","${c.phone || ""}","${c.country === "Brasil" ? (c.cpf || "") : (c.passport || "")}","${c.birth_date || ""}","${c.status}","${c.country || "Brasil"}","${c.cep || ""}","${(c.address || "").replace(/"/g, '""')}","${c.city || ""}","${c.state || ""}",${c.totalBookings},"${fmt(c.totalSpent)}","${new Date(c.created_at).toLocaleDateString("pt-BR")}","${(c.notes || "").replace(/"/g, '""')}"`
+      `"${c.name}","${c.email}","${c.phone || ""}","${c.country === "Brasil" ? (c.cpf || "") : (c.passport || "")}","${c.birth_date || ""}","${c.status}","${c.country || "Brasil"}","${c.cep || ""}","${(c.address || "").replace(/"/g, '""')}","${c.city || ""}","${c.state || ""}",${c.totalBookings},"${formatCurrency(c.totalSpent)}","${new Date(c.created_at).toLocaleDateString("pt-BR")}","${(c.notes || "").replace(/"/g, '""')}"`
     ).join("\n");
     const blob = new Blob([header + rows], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -715,7 +691,7 @@ const AdminCRMContent = () => {
         c.country === "Brasil" ? (c.cpf ? maskCPF(c.cpf) : "—") : (c.passport || "—"),
         c.city ? `${c.city}/${c.state || ""}` : "—",
         c.totalBookings,
-        fmt(c.totalSpent)
+        formatCurrency(c.totalSpent)
       ];
       tableRows.push(customerData);
     });
@@ -791,30 +767,33 @@ const AdminCRMContent = () => {
     doc.line(14, 202, 196, 202);
     doc.setFont("helvetica", "normal");
     doc.text(`Total de Reservas: ${c.totalBookings}`, 14, 210);
-    doc.text(`Total Gasto: ${fmt(c.totalSpent)}`, 14, 217);
+    doc.text(`Total Gasto: ${formatCurrency(c.totalSpent)}`, 14, 217);
     doc.text(`Última Reserva: ${c.lastBooking ? new Date(c.lastBooking).toLocaleDateString("pt-BR") : "—"}`, 14, 224);
 
     doc.setFontSize(8);
     doc.setTextColor(150);
     doc.text(`Ficha gerada em ${new Date().toLocaleString("pt-BR")}`, 14, 285);
 
-    doc.save(`cliente_${c.name.replace(/\s+/g, "_")}.pdf`);
+    doc.save(`cliente_${(c.name || "sem_nome").replace(/\s+/g, "_")}.pdf`);
     toast.success("Ficha do cliente gerada com sucesso!");
   };
 
   const filtered = customers.filter((c) => {
     const q = search.toLowerCase();
-    const matchesSearch = c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || (c.phone || "").includes(q) || (c.cpf || "").includes(q) || (c.passport || "").toLowerCase().includes(q) || (c.city || "").toLowerCase().includes(q);
+    const matchesSearch = (c.name || "").toLowerCase().includes(q) || (c.email || "").toLowerCase().includes(q) || (c.phone || "").includes(q) || (c.cpf || "").includes(q) || (c.passport || "").toLowerCase().includes(q) || (c.city || "").toLowerCase().includes(q);
     if (filter === "with_bookings") return matchesSearch && c.totalBookings > 0;
     if (filter === "no_bookings") return matchesSearch && c.totalBookings === 0;
-    if (filter === "dependents") return false; // Handled separately
+    if (filter === "dependents") return false;
     return matchesSearch;
   });
 
   const filteredDependents = allDependents.filter((d) => {
     const q = search.toLowerCase();
-    return d.name.toLowerCase().includes(q) || (d.cpf || "").includes(q) || d.customer_name.toLowerCase().includes(q);
+    return (d.name || "").toLowerCase().includes(q) || (d.cpf || "").includes(q) || (d.customer_name || "").toLowerCase().includes(q);
   });
+
+  const totalPages = Math.ceil((filter === "dependents" ? filteredDependents : filtered).length / pageSize);
+  const paginated = (filter === "dependents" ? filteredDependents : filtered).slice((page - 1) * pageSize, page * pageSize);
 
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
@@ -829,8 +808,8 @@ const AdminCRMContent = () => {
   const clientStats = [
     { label: "Total de Clientes", value: customers.length.toString(), icon: Users, color: "text-primary" },
     { label: "Novos (Mês)", value: newThisMonth.toString(), icon: UserPlus, color: "text-purple-600" },
-    { label: "Receita Total", value: fmt(totalRevenue), icon: DollarSign, color: "text-blue-600" },
-    { label: "Ticket Médio", value: withBookings > 0 ? fmt(Math.round(totalRevenue / withBookings)) : "R$ 0", icon: Smartphone, color: "text-amber-600" },
+    { label: "Receita Total", value: formatCurrency(totalRevenue), icon: DollarSign, color: "text-blue-600" },
+    { label: "Ticket Médio", value: withBookings > 0 ? formatCurrency(Math.round(totalRevenue / withBookings)) : "R$ 0", icon: Smartphone, color: "text-amber-600" },
   ];
 
   if (loading) {
@@ -957,7 +936,7 @@ const AdminCRMContent = () => {
                                 </div>
                               </div>
                               <div className="text-right">
-                                <p className="text-sm font-black text-primary mb-1">{fmt(b.final_total)}</p>
+                                <p className="text-sm font-black text-primary mb-1">{formatCurrency(b.final_total)}</p>
                                 <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-tighter ${statusConfig[b.status]?.className || ""}`}>
                                   {statusConfig[b.status]?.label || b.status}
                                 </Badge>
@@ -1017,8 +996,8 @@ const AdminCRMContent = () => {
           {[
             { label: "Base de Clientes", value: customers.length, icon: Users, color: "text-primary", bg: "bg-primary/5", desc: "Total de titulares" },
             { label: "Novos Parceiros", value: newThisMonth, icon: UserPlus, color: "text-primary", bg: "bg-primary/5", desc: "Registrados este mês" },
-            { label: "LTV Consolidado", value: fmt(totalRevenue), icon: DollarSign, color: "text-primary", bg: "bg-primary/5", desc: "Receita histórica" },
-            { label: "Ticket Médio", value: withBookings > 0 ? fmt(Math.round(totalRevenue / withBookings)) : "R$ 0", icon: Target, color: "text-primary", bg: "bg-primary/5", desc: "Valor por cliente" },
+            { label: "LTV Consolidado", value: formatCurrency(totalRevenue), icon: DollarSign, color: "text-primary", bg: "bg-primary/5", desc: "Receita histórica" },
+            { label: "Ticket Médio", value: withBookings > 0 ? formatCurrency(Math.round(totalRevenue / withBookings)) : "R$ 0", icon: Target, color: "text-primary", bg: "bg-primary/5", desc: "Valor por cliente" },
           ].map((stat, i) => (
             <div key={i} className="glass-card admin-card-hover rounded-[2rem] p-6 relative overflow-hidden group border border-white/20 shadow-xl shadow-black/5 bg-white">
               <div className="absolute right-0 top-0 w-24 h-24 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl group-hover:bg-primary/10 transition-colors" />
@@ -1091,7 +1070,7 @@ const AdminCRMContent = () => {
             </div>
 
             <div className="overflow-hidden">
-              {(filter === "dependents" ? filteredDependents : filtered).length === 0 ? (
+              {paginated.length === 0 ? (
                 <div className="text-center py-20 bg-muted/20 rounded-[2rem] border border-dashed border-border/50">
                   <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4 opacity-50">
                     <Users size={32} />
@@ -1113,7 +1092,7 @@ const AdminCRMContent = () => {
                   </thead>
                   <tbody>
                     {filter === "dependents" ? (
-                      filteredDependents.map((d) => {
+                      paginated.map((d: any) => {
                         const age = calculateAge(d.birth_date);
                         return (
                           <tr
@@ -1163,7 +1142,7 @@ const AdminCRMContent = () => {
                         );
                       })
                     ) : (
-                      filtered.map((c) => {
+                      paginated.map((c: any) => {
                         const hasDependents = allDependents.some(d => d.customer_id === c.id);
                         const ltvColor = c.ltvCategory === "VIP" ? "bg-purple-100 text-purple-700 border-purple-200" : c.ltvCategory === "Fiel" ? "bg-blue-100 text-blue-700 border-blue-200" : "bg-muted text-muted-foreground border-border";
                         
@@ -1179,7 +1158,7 @@ const AdminCRMContent = () => {
                             <td className="py-4 px-4">
                               <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-xs font-black shrink-0 shadow-sm group-hover:bg-primary group-hover:text-white transition-none">
-                                  {c.name.trim() ? c.name.trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
+                                  {(c.name || "").trim() ? (c.name || "").trim().split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "C"}
                                 </div>
                                 <div className="min-w-0">
                                   <p className="font-bold text-foreground truncate flex items-center gap-2 group-hover:text-primary transition-colors">
@@ -1225,7 +1204,7 @@ const AdminCRMContent = () => {
                             </td>
                             <td className="py-4 px-2 text-right hidden sm:table-cell">
                               <div className="flex flex-col items-end">
-                                <span className="text-sm font-black text-foreground">{fmt(c.totalSpent)}</span>
+                                <span className="text-sm font-black text-foreground">{formatCurrency(c.totalSpent)}</span>
                                 <span className="text-[9px] uppercase font-bold text-primary tracking-widest">LTV TOTAL</span>
                               </div>
                             </td>
@@ -1293,13 +1272,26 @@ const AdminCRMContent = () => {
                   </tbody>
                 </table>
                 <div className="flex items-center justify-between mt-6 pt-4 border-t border-border/50">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Lençóis Tour CRM Live</p>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-green-500" />
+                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Lençóis Tour CRM Live</p>
+                    </div>
+                    <Badge variant="secondary" className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg">
+                      {(filter === "dependents" ? filteredDependents : filtered).length} registro(s)
+                    </Badge>
                   </div>
-                  <Badge variant="secondary" className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg">
-                    {(filter === "dependents" ? filteredDependents : filtered).length} registro(s)
-                  </Badge>
+                  {totalPages > 1 && (
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm" className="h-8 px-3 text-xs rounded-lg" disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}>
+                        Anterior
+                      </Button>
+                      <span className="text-[10px] font-bold text-muted-foreground">{page} / {totalPages}</span>
+                      <Button variant="outline" size="sm" className="h-8 px-3 text-xs rounded-lg" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>
+                        Próximo
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1754,7 +1746,7 @@ const AdminCRMContent = () => {
                                     </div>
                                   </div>
                                   <div className="text-right">
-                                    <p className="text-sm font-black text-primary mb-1">{fmt(b.final_total)}</p>
+                                    <p className="text-sm font-black text-primary mb-1">{formatCurrency(b.final_total)}</p>
                                     <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-tighter ${statusConfig[b.status]?.className || ""}`}>
                                       {statusConfig[b.status]?.label || b.status}
                                     </Badge>

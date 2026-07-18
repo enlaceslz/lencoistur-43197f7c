@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/utils";
 import { fetchPartnerCatalogPricing } from "@/lib/catalogPricing";
+import { useLocalizedPath } from "@/lib/useLocalizedPath";
 
 interface Package {
   id: string;
@@ -22,6 +23,7 @@ interface Package {
 
 const PackagesSection = () => {
   const { t } = useTranslation();
+  const loc = useLocalizedPath();
   const [params] = useSearchParams();
   const partnerId = params.get("partner_id") || params.get("partner");
   const [dbPackages, setDbPackages] = useState<Package[]>([]);
@@ -155,7 +157,7 @@ const PackagesSection = () => {
                         <span className="text-xs text-muted-foreground">{t("packages.perPerson")}</span>
                       </div>
                     </div>
-                    <Link to={`/pacotes/${pkg.slug}${partnerId ? `?partner_id=${partnerId}` : ''}`} className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-semibold transition-none flex items-center gap-2">
+                    <Link to={loc(`/pacotes/${pkg.slug}${partnerId ? `?partner_id=${partnerId}` : ''}`)} className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-semibold transition-none flex items-center gap-2">
                       {t("packages.view")} <ArrowRight size={14} />
                     </Link>
                   </div>

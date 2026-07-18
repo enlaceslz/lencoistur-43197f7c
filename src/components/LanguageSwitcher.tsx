@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Globe } from "lucide-react";
 import {
   DropdownMenu,
@@ -17,9 +18,26 @@ interface Props {
   variant?: "light" | "dark";
 }
 
+const toLangPath = (path: string, targetLang: string, currentLang: string): string => {
+  const stripped = currentLang !== "pt" ? path.replace(/^\/[a-z]{2}/, "") || "/" : path;
+  if (targetLang === "pt") return stripped;
+  const base = stripped === "/" ? "" : stripped;
+  return `/${targetLang}${base}`;
+};
+
 const LanguageSwitcher = ({ variant = "dark" }: Props) => {
   const { i18n } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const current = languages.find((l) => l.code === i18n.language) || languages[0];
+
+  const handleChange = (code: string) => {
+    if (code === i18n.language) return;
+    const target = toLangPath(location.pathname, code, i18n.language);
+    const qs = location.search;
+    navigate(`${target}${qs}`, { replace: true });
+    i18n.changeLanguage(code);
+  };
 
   return (
     <DropdownMenu>
@@ -35,7 +53,7 @@ const LanguageSwitcher = ({ variant = "dark" }: Props) => {
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
-            onClick={() => i18n.changeLanguage(lang.code)}
+            onClick={() => handleChange(lang.code)}
             className={`cursor-pointer ${i18n.language === lang.code ? "bg-muted font-semibold" : ""}`}
           >
             <span className="mr-2">{lang.flag}</span>

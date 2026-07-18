@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, RefreshCw, Trash2, Plus, Users, UserPlus, ShieldCheck, Mail, Lock, Key, LayoutDashboard, Compass, ShoppingCart, Car, UserCheck, UserCheck2, Megaphone, FileText, BarChart3, Settings, Edit, Fingerprint, QrCode } from "lucide-react";
+import { Building2, Globe, CreditCard, Bell, Shield, Save, Loader2, Eye, EyeOff, Upload, Image, X, CheckCircle, AlertCircle, Banknote, Landmark, Database, Download, UploadCloud, Clock, HardDrive, Trash2, Plus, Users, UserPlus, ShieldCheck, Mail, Key, LayoutDashboard, Compass, ShoppingCart, Car, UserCheck, UserCheck2, Megaphone, FileText, BarChart3, Settings, Edit, Fingerprint } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
@@ -206,6 +206,7 @@ const AdminConfig = () => {
       if (error) throw error;
       setSystemUsers(data || []);
     } catch (err) {
+      toast.error("Erro ao carregar usuários");
       console.error("Error loading users:", err);
     } finally {
       setUsersLoading(false);
@@ -1348,7 +1349,7 @@ const AdminConfig = () => {
                   <div>
                     <h3 className="text-2xl font-black text-foreground tracking-tight">Alertas e Notificações</h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                      <div className="w-2 h-2 rounded-full bg-amber-500" />
                       <p className="text-sm font-medium text-muted-foreground">Configure como a agência será avisada sobre novos eventos.</p>
                     </div>
                   </div>
@@ -1769,7 +1770,7 @@ const AdminConfig = () => {
                             {module.label}
                           </span>
                           {hasAccess && (
-                            <div className="mt-1 w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
+                            <div className="mt-1 w-1.5 h-1.5 rounded-full bg-teal-500" />
                           )}
                         </button>
                       );

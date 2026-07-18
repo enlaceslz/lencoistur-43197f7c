@@ -3,7 +3,7 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { ClipboardCheck, Plus, CheckCircle, Circle, Trash2, Calendar, User, Loader2 } from "lucide-react";
+import { ClipboardCheck, Plus, CheckCircle, Circle, Trash2, User } from "lucide-react";
 
 const CHECKLIST_TEMPLATES: Record<string, string[]> = {
   veiculo_diario: ["Nível de óleo", "Nível de água/radiador", "Pressão dos pneus", "Estado dos pneus (desgaste)", "Freios (teste)", "Luzes (farol/lanterna/seta)", "Limpador/lavador de para-brisa", "Cinto de segurança (todos)", "Extintor de incêndio (validade)", "Triângulo de sinalização", "Macaco e chave de roda", "Estepe calibrado", "Kit primeiros socorros", "Documentação do veículo", "Combustível suficiente"],
@@ -63,7 +63,11 @@ const AdminSGSChecklists = () => {
     const { data: cl, error } = await supabase.from("sgs_checklists").insert(payload).select().single();
     if (error || !cl) { toast({ title: "Erro", description: error?.message, variant: "destructive" }); return; }
     if (templateItems.length > 0) {
-      await supabase.from("sgs_checklist_items").insert(templateItems.map(i => ({ ...i, checklist_id: cl.id })));
+      try {
+        await supabase.from("sgs_checklist_items").insert(templateItems.map(i => ({ ...i, checklist_id: cl.id })));
+      } catch {
+        toast({ title: "Erro ao inserir itens", variant: "destructive" });
+      }
     }
     toast({ title: "Checklist criado!" });
     setForm({ titulo: "", tipo: "veiculo_diario", responsavel: "", observacoes: "", veiculo_id: "", condutor_id: "", booking_id: "" });
@@ -83,7 +87,11 @@ const AdminSGSChecklists = () => {
     if (!confirm("Excluir este checklist? Esta ação não pode ser desfeita.")) return;
     
     // Delete items first
-    await supabase.from("sgs_checklist_items").delete().eq("checklist_id", id);
+    try {
+      await supabase.from("sgs_checklist_items").delete().eq("checklist_id", id);
+    } catch {
+      toast({ title: "Erro ao excluir itens", variant: "destructive" });
+    }
     
     const { error } = await supabase.from("sgs_checklists").delete().eq("id", id);
     if (error) {
@@ -95,7 +103,11 @@ const AdminSGSChecklists = () => {
   };
 
   const toggleChecklistItem = async (itemId: string, current: boolean) => {
-    await supabase.from("sgs_checklist_items").update({ conforme: !current }).eq("id", itemId);
+    try {
+      await supabase.from("sgs_checklist_items").update({ conforme: !current }).eq("id", itemId);
+    } catch {
+      toast({ title: "Erro ao atualizar item", variant: "destructive" });
+    }
     load();
   };
 
@@ -199,7 +211,7 @@ const AdminSGSChecklists = () => {
                         <h4 className="font-black text-foreground group-hover:text-primary transition-colors leading-tight truncate">{cl.titulo}</h4>
                         <div className="flex items-center gap-2 mt-1">
                           <Badge variant="secondary" className="bg-muted text-muted-foreground font-black text-[8px] uppercase px-1.5 py-0 rounded border">
-                            {cl.tipo.replace('_', ' ')}
+                            {(cl.tipo || "").replace('_', ' ')}
                           </Badge>
                           <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">
                             {new Date(cl.created_at).toLocaleDateString("pt-BR")}

@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { ReceiptData, printReceipt } from "@/components/BookingReceipt";
 import { Loader2 } from "lucide-react";
+import { useLocalizedPath } from "@/lib/useLocalizedPath";
 
 const VoucherPage = () => {
+  const loc = useLocalizedPath();
   const [params] = useSearchParams();
   const id = params.get("id");
   const [loading, setLoading] = useState(true);
@@ -13,7 +16,7 @@ const VoucherPage = () => {
   useEffect(() => {
     const fetchBooking = async () => {
       if (!id) {
-        navigate("/");
+        navigate(loc("/"));
         return;
       }
 
@@ -74,6 +77,10 @@ const VoucherPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4">
+      <Helmet>
+        <title>Comprovante de Reserva | Lençóis Tour</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       {loading ? (
         <div className="text-center space-y-4">
           <Loader2 className="animate-spin text-primary mx-auto" size={40} />

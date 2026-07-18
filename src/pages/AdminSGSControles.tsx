@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { 
-  Plus, Search, Shield, FileText, ClipboardList, 
-  Wrench, AlertCircle, CheckCircle2, Trash2, Pencil,
-  Download, ExternalLink, Activity
+import {
+  Plus, Shield, FileText, ClipboardList,
+  Wrench, Trash2, ExternalLink, Activity
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -45,56 +44,77 @@ const AdminSGSControles = () => {
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
-    setLoading(true);
-    const [equipRes, procRes] = await Promise.all([
-      supabase.from("sgs_equipment").select("*").order("name"),
-      supabase.from("sgs_procedures").select("*").order("title"),
-    ]);
-    setEquipment(equipRes.data || []);
-    setProcedures(procRes.data || []);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const [equipRes, procRes] = await Promise.all([
+        supabase.from("sgs_equipment").select("*").order("name"),
+        supabase.from("sgs_procedures").select("*").order("title"),
+      ]);
+      setEquipment(equipRes.data || []);
+      setProcedures(procRes.data || []);
+    } catch (err: any) {
+      toast({ title: "Erro ao carregar dados", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAddEquip = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { error } = await supabase.from("sgs_equipment").insert(equipForm);
-    if (error) { toast({ title: "Erro", variant: "destructive" }); return; }
-    toast({ title: "Equipamento cadastrado!" });
-    setShowEquipForm(false);
-    setEquipForm({ 
-      name: "", category: "resgate", status: "operacional", 
-      last_inspection: "", next_inspection: "", responsible: "", notes: "" 
-    });
-    loadData();
+    try {
+      e.preventDefault();
+      const { error } = await supabase.from("sgs_equipment").insert(equipForm);
+      if (error) { toast({ title: "Erro", variant: "destructive" }); return; }
+      toast({ title: "Equipamento cadastrado!" });
+      setShowEquipForm(false);
+      setEquipForm({ 
+        name: "", category: "resgate", status: "operacional", 
+        last_inspection: "", next_inspection: "", responsible: "", notes: "" 
+      });
+      loadData();
+    } catch (err: any) {
+      toast({ title: "Erro ao cadastrar equipamento", description: err.message, variant: "destructive" });
+    }
   };
 
   const handleAddProc = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const { error } = await supabase.from("sgs_procedures").insert(procForm);
-    if (error) { toast({ title: "Erro", variant: "destructive" }); return; }
-    toast({ title: "Procedimento cadastrado!" });
-    setShowProcForm(false);
-    setProcForm({ 
-      title: "", category: "seguranca", description: "", 
-      version: "1.0", status: "vigente", file_url: "" 
-    });
-    loadData();
+    try {
+      e.preventDefault();
+      const { error } = await supabase.from("sgs_procedures").insert(procForm);
+      if (error) { toast({ title: "Erro", variant: "destructive" }); return; }
+      toast({ title: "Procedimento cadastrado!" });
+      setShowProcForm(false);
+      setProcForm({ 
+        title: "", category: "seguranca", description: "", 
+        version: "1.0", status: "vigente", file_url: "" 
+      });
+      loadData();
+    } catch (err: any) {
+      toast({ title: "Erro ao cadastrar procedimento", description: err.message, variant: "destructive" });
+    }
   };
 
   const deleteEquip = async (id: string) => {
-    if (!confirm("Excluir este equipamento?")) return;
-    const { error } = await supabase.from("sgs_equipment").delete().eq("id", id);
-    if (error) { toast({ title: "Erro ao excluir", variant: "destructive" }); return; }
-    toast({ title: "Removido com sucesso" });
-    loadData();
+    try {
+      if (!confirm("Excluir este equipamento?")) return;
+      const { error } = await supabase.from("sgs_equipment").delete().eq("id", id);
+      if (error) { toast({ title: "Erro ao excluir", variant: "destructive" }); return; }
+      toast({ title: "Removido com sucesso" });
+      loadData();
+    } catch (err: any) {
+      toast({ title: "Erro ao excluir equipamento", description: err.message, variant: "destructive" });
+    }
   };
 
   const deleteProc = async (id: string) => {
-    if (!confirm("Excluir este procedimento?")) return;
-    const { error } = await supabase.from("sgs_procedures").delete().eq("id", id);
-    if (error) { toast({ title: "Erro ao excluir", variant: "destructive" }); return; }
-    toast({ title: "Removido com sucesso" });
-    loadData();
+    try {
+      if (!confirm("Excluir este procedimento?")) return;
+      const { error } = await supabase.from("sgs_procedures").delete().eq("id", id);
+      if (error) { toast({ title: "Erro ao excluir", variant: "destructive" }); return; }
+      toast({ title: "Removido com sucesso" });
+      loadData();
+    } catch (err: any) {
+      toast({ title: "Erro ao excluir procedimento", description: err.message, variant: "destructive" });
+    }
   };
 
   return (
@@ -226,7 +246,7 @@ const AdminSGSControles = () => {
                     {item.next_inspection && (
                       <div className="flex justify-between p-2 rounded-xl bg-muted/30 border border-border/50 text-[10px] font-black uppercase tracking-widest">
                         <span className="text-muted-foreground">Próxima Inspeção</span>
-                        <span className={new Date(item.next_inspection) < new Date() ? 'text-destructive animate-pulse' : 'text-foreground'}>
+                        <span className={new Date(item.next_inspection) < new Date() ? 'text-destructive' : 'text-foreground'}>
                           {new Date(item.next_inspection + "T12:00").toLocaleDateString("pt-BR")}
                         </span>
                       </div>

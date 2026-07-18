@@ -2,6 +2,7 @@ import { Printer, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
+import { formatCurrency } from "@/lib/utils";
 
 export interface ReceiptItem {
   itemName: string;
@@ -44,7 +45,7 @@ export interface ReceiptData {
 }
 
 
-const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmt = (v: number) => formatCurrency(v);
 const fmtDate = (d: string) => {
   if (!d) return "—";
   try { return new Date(d + "T12:00").toLocaleDateString("pt-BR"); } catch { return d; }
@@ -108,7 +109,7 @@ function generateReceiptHTML(rawData: ReceiptData, company?: any): string {
   const address = esc(company?.endereco || "Santo Amaro do Maranhão, MA");
   const phone = esc(company?.telefone || "(98) 98588-0954");
   const email = esc(company?.email || "contato@lencoistur.com");
-  const logoUrl = company?.logo_url ? esc(company.logo_url) : null;
+  const logoUrl = company?.logo_url && !/^javascript:/i.test(company.logo_url) ? esc(company.logo_url) : null;
 
   return `
 <!DOCTYPE html>
@@ -377,18 +378,33 @@ function generateReceiptHTML(rawData: ReceiptData, company?: any): string {
 
 export function printReceipt(data: ReceiptData, company?: any) {
   const html = generateReceiptHTML(data, company);
-  const printWindow = window.open("", "_blank", "width=800,height=900");
-  if (!printWindow) return;
-  printWindow.document.write(html);
-  printWindow.document.close();
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const printWindow = window.open(url, "_blank", "width=800,height=900");
+  if (!printWindow) {
+    URL.revokeObjectURL(url);
+    return;
+  }
   printWindow.onload = () => {
     printWindow.print();
+    URL.revokeObjectURL(url);
   };
 }
 
 export function downloadReceiptPDF(data: ReceiptData, company?: any) {
-  // Uses print-to-PDF via browser dialog
-  printReceipt(data, company);
+  const html = generateReceiptHTML(data, company);
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const printWindow = window.open(url, "_blank", "width=800,height=900");
+  if (!printWindow) {
+    URL.revokeObjectURL(url);
+    return;
+  }
+  printWindow.onload = () => {
+    printWindow.focus();
+    printWindow.print();
+    URL.revokeObjectURL(url);
+  };
 }
 
 interface PrintReceiptButtonProps {

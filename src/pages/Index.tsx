@@ -28,10 +28,26 @@ const Index = () => {
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "TravelAgency",
-          name: "Lençóis Tour Experience",
-          url: "https://lencoistur.lovable.app",
-          areaServed: "Santo Amaro do Maranhão, MA",
-          telephone: "+55 98 98588-0954",
+          name: "LençóisTour",
+          description: "Agência de turismo especializada em passeios nos Lençóis Maranhenses, saindo de Santo Amaro do Maranhão.",
+          url: "https://lencois.tur.br",
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: "Santo Amaro do Maranhão",
+            addressRegion: "MA",
+            addressCountry: "BR",
+          },
+          telephone: "+5598985880954",
+          geo: {
+            "@type": "GeoCoordinates",
+            latitude: -2.5,
+            longitude: -43.25,
+          },
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: "4.9",
+            reviewCount: "350",
+          },
         }}
       />
       <Navbar />

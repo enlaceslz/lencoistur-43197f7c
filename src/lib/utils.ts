@@ -21,6 +21,33 @@ export function formatCurrency(value: number) {
   });
 }
 
+export function getTourEffectivePrice(
+  tour: {
+    mode_collective_enabled?: boolean | null;
+    price: number;
+    private_price?: number | null;
+  },
+  partnerPricing?: { effectivePrice: number; effectivePrivatePrice?: number | null } | null,
+): number {
+  const isPrivate = tour.mode_collective_enabled === false;
+  const basePrice = isPrivate ? (tour.private_price || 0) : tour.price;
+  return partnerPricing
+    ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePrice) : partnerPricing.effectivePrice)
+    : basePrice;
+}
+
+export function getTourDisplayMode(
+  tour: { mode_collective_enabled?: boolean | null; mode_private_enabled?: boolean | null; default_mode?: string | null },
+): "coletivo" | "privativo" {
+  const collectiveOn = tour.mode_collective_enabled ?? true;
+  const privateOn = tour.mode_private_enabled ?? true;
+  const adminDefault = (tour.default_mode === "coletivo" || tour.default_mode === "privativo") ? tour.default_mode : "privativo";
+  let mode: "coletivo" | "privativo" = adminDefault;
+  if (mode === "privativo" && !privateOn) mode = "coletivo";
+  if (mode === "coletivo" && !collectiveOn) mode = "privativo";
+  return mode;
+}
+
 export function validateCPF(cpf: string): boolean {
   const cleanCPF = cpf.replace(/\D/g, "");
 

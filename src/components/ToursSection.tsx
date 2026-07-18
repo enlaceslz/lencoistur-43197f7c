@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { useLocalizedPath } from "@/lib/useLocalizedPath";
 import imgLagoasAzuis from "@/assets/tour-lagoas-azuis-hero.jpg";
 import imgRioPreguicas from "@/assets/tour-rio-preguicas.jpg";
 import imgEcologico from "@/assets/tour-roteiro-ecologico.jpg";
@@ -37,17 +38,25 @@ const localImageMap: Record<string, string> = {
 
 const ToursSection = () => {
   const { t } = useTranslation();
+  const loc = useLocalizedPath();
   const [params] = useSearchParams();
   const partnerId = params.get("partner_id") || params.get("partner");
   const [tours, setTours] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    setLoading(true);
     supabase.from("public_tours" as "tours").select("*").order("reviews_count", { ascending: false }).limit(8)
       .then(({ data, error }) => {
         if (error) {
           console.error("Erro ao carregar passeios na Home:", error);
+          setError("Não foi possível carregar os passeios.");
+        } else {
+          setTours(data || []);
+          setError(data && data.length === 0 ? "empty" : null);
         }
-        setTours(data || []);
+        setLoading(false);
       });
   }, []);
 
@@ -70,10 +79,27 @@ const ToursSection = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {(tours || []).map((tour) => {
+          {loading ? (
+            <div className="col-span-full flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+            </div>
+          ) : error === "empty" ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-muted-foreground text-lg">Nenhum passeio disponível no momento.</p>
+            </div>
+          ) : error ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-muted-foreground text-lg">{error}</p>
+            </div>
+          ) : (tours || []).length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-muted-foreground text-lg">Nenhum passeio encontrado.</p>
+            </div>
+          ) : (
+            (tours || []).map((tour) => {
             const image = getTourImage(tour);
             return (
-              <Link to={`/passeios/${tour.slug}${partnerId ? `?partner_id=${partnerId}` : ''}`} key={tour.id}
+              <Link to={loc(`/passeios/${tour.slug}${partnerId ? `?partner_id=${partnerId}` : ''}`)} key={tour.id}
                 className="group bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
                 <div className="relative h-64 overflow-hidden">
                   {image ? (
@@ -139,11 +165,11 @@ const ToursSection = () => {
                 </div>
               </Link>
             );
-          })}
+          }))}
         </div>
 
         <div className="text-center mt-10">
-          <Link to="/passeios"
+          <Link to={loc("/passeios")}
             className="inline-block border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-3 rounded-xl font-semibold transition-colors">
             {t("tours.viewAll")}
           </Link>

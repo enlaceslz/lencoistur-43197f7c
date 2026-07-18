@@ -5,27 +5,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter
+  Dialog, DialogContent, DialogHeader, DialogTitle
 } from "@/components/ui/dialog";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
-import { Car, MapPin, Clock, Users, Plus, Pencil, Trash2, Search, Loader2, Percent, Eye, ArrowRight, X, Save, XCircle } from "lucide-react";
+import { Car, MapPin, Clock, Users, Plus, Pencil, Trash2, Search, Loader2, Percent, Eye, ArrowRight, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { NumericFormat } from "react-number-format";
-
-const fmt = (v: number) => `R$ ${(v / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-const maskCurrency = (v: string) => {
-  const n = v.replace(/\D/g, "");
-  return (Number(n) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
-};
-
-const parseCurrency = (v: string) => {
-  return Number(v.replace(/\D/g, ""));
-};
 
 const emptyForm = {
   origin: "", destination: "", duration: "", distance: "",
@@ -95,7 +84,7 @@ const TransladoCard = memo(({
         <div>
           <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 block mb-1">Valor por Vaga</span>
           <div className="flex items-baseline gap-2">
-            <p className="text-2xl font-black text-foreground tracking-tighter">{fmt(price)}</p>
+            <p className="text-2xl font-black text-foreground tracking-tighter">{formatCurrency(price)}</p>
             {pix_discount > 0 && (
               <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-none font-black text-[9px] px-1.5 h-4">
                 -{pix_discount}% PIX
@@ -103,7 +92,7 @@ const TransladoCard = memo(({
             )}
           </div>
           {partner_price > 0 && (
-            <p className="text-[10px] font-bold text-primary mt-1">Parceiro: {fmt(partner_price)}</p>
+            <p className="text-[10px] font-bold text-primary mt-1">Parceiro: {formatCurrency(partner_price)}</p>
           )}
         </div>
         <div className="flex gap-2">
@@ -176,10 +165,15 @@ const AdminTranslados = () => {
   const load = async () => {
     setLoading(true);
     try {
-      const { data } = await supabase.from("transfer_routes").select("*").order("origin");
-      setRoutes(data || []);
+      const { data, error } = await supabase.from("transfer_routes").select("*").order("origin");
+      if (error) {
+        console.error("Erro ao carregar translados:", error);
+        toast.error("Erro ao carregar rotas");
+      } else {
+        setRoutes(data || []);
+      }
     } catch (err) {
-      console.error("Erro ao carregar translados:", err);
+      toast.error("Erro ao carregar dados");
     }
     setLoading(false);
   };
@@ -227,33 +221,41 @@ const AdminTranslados = () => {
       pix_discount: Math.max(0, Math.min(50, Number(form.pix_discount) || 0)),
     };
 
-    let error;
-    if (editingId) {
-      ({ error } = await supabase.from("transfer_routes").update(payload).eq("id", editingId));
-    } else {
-      ({ error } = await supabase.from("transfer_routes").insert(payload));
-    }
+    try {
+      let error;
+      if (editingId) {
+        ({ error } = await supabase.from("transfer_routes").update(payload).eq("id", editingId));
+      } else {
+        ({ error } = await supabase.from("transfer_routes").insert(payload));
+      }
 
-    if (error) {
-      toast.error("Erro ao salvar rota: " + error.message);
-    } else {
-      toast.success(editingId ? "Rota atualizada!" : "Rota criada!");
-      setShowForm(false);
-      setForm(emptyForm);
-      setEditingId(null);
-      load();
+      if (error) {
+        toast.error("Erro ao salvar rota: " + error.message);
+      } else {
+        toast.success(editingId ? "Rota atualizada!" : "Rota criada!");
+        setShowForm(false);
+        setForm(emptyForm);
+        setEditingId(null);
+        load();
+      }
+    } catch (err) {
+      toast.error("Erro ao salvar rota");
     }
     setSaving(false);
   };
 
   const handleDelete = async () => {
     if (!deleteId) return;
-    const { error } = await supabase.from("transfer_routes").delete().eq("id", deleteId);
-    if (error) {
-      toast.error("Erro ao excluir rota.");
-    } else {
-      toast.success("Rota excluída.");
-      load();
+    try {
+      const { error } = await supabase.from("transfer_routes").delete().eq("id", deleteId);
+      if (error) {
+        toast.error("Erro ao excluir rota.");
+      } else {
+        toast.success("Rota excluída.");
+        load();
+      }
+    } catch (err) {
+      toast.error("Erro ao excluir rota");
     }
     setDeleteId(null);
   };
@@ -261,7 +263,7 @@ const AdminTranslados = () => {
   const activeRoutes = routes.filter(r => r.active);
   const filtered = routes.filter(r => {
     const q = search.toLowerCase();
-    return r.origin.toLowerCase().includes(q) || r.destination.toLowerCase().includes(q) || (r.vehicle_type || "").toLowerCase().includes(q);
+    return (r.origin || "").toLowerCase().includes(q) || (r.destination || "").toLowerCase().includes(q) || (r.vehicle_type || "").toLowerCase().includes(q);
   });
 
   return (
@@ -271,7 +273,7 @@ const AdminTranslados = () => {
           { label: "Rede de Logística", value: routes.length, icon: Car, color: "from-blue-500 to-indigo-600", desc: "Total de rotas" },
           { label: "Capacidade Operacional", value: routes.reduce((acc, r) => acc + (r.seats || 0), 0), icon: Users, color: "from-emerald-500 to-teal-600", desc: "Vagas totais" },
           { label: "Hubs Atendidos", value: new Set(routes.flatMap(t => [t.origin, t.destination])).size, icon: MapPin, color: "from-amber-500 to-orange-600", desc: "Cidades/Pontos" },
-          { label: "Ticket Médio", value: fmt(routes.length > 0 ? routes.reduce((acc, r) => acc + r.price, 0) / routes.length : 0), icon: Percent, color: "from-purple-500 to-pink-600", desc: "Média por vaga" },
+          { label: "Ticket Médio", value: formatCurrency(routes.length > 0 ? routes.reduce((acc, r) => acc + r.price, 0) / routes.length : 0), icon: Percent, color: "from-purple-500 to-pink-600", desc: "Média por vaga" },
         ].map((stat, i) => (
           <div key={i} className="bg-white border border-border shadow-sm rounded-lg p-6 relative overflow-hidden group">
             <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
@@ -315,7 +317,7 @@ const AdminTranslados = () => {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-24 space-y-4">
           <Loader2 className="animate-spin text-primary" size={40} />
-          <p className="text-muted-foreground animate-pulse font-bold uppercase tracking-widest text-xs">Carregando rotas...</p>
+          <p className="text-muted-foreground font-bold uppercase tracking-widest text-xs">Carregando rotas...</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -373,31 +375,6 @@ const AdminTranslados = () => {
 
           <form onSubmit={handleSubmit} className="flex flex-col h-[calc(90vh-80px)]">
             <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Site (R$)</Label>
-                  <NumericFormat
-                    value={form.price / 100}
-                    onValueChange={(values) => setForm({ ...form, price: Math.round((values.floatValue || 0) * 100) })}
-                    thousandSeparator="."
-                    decimalSeparator=","
-                    prefix="R$ "
-                    className="flex h-12 w-full px-4 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-black text-foreground outline-none focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase text-primary/60 tracking-widest ml-1">Preço Parceiro (R$)</Label>
-                  <NumericFormat
-                    value={form.partner_price / 100}
-                    onValueChange={(values) => setForm({ ...form, partner_price: Math.round((values.floatValue || 0) * 100) })}
-                    thousandSeparator="."
-                    decimalSeparator=","
-                    prefix="R$ "
-                    className="flex h-12 w-full px-4 rounded-xl border border-primary/20 bg-primary/5 focus:bg-white transition-all font-black text-primary outline-none focus:ring-2 focus:ring-primary/20"
-                  />
-                </div>
-              </div>
-
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-black uppercase tracking-widest text-muted-foreground/60 mb-2 block ml-1">Origem *</label>
@@ -408,7 +385,7 @@ const AdminTranslados = () => {
                 <Input required value={form.destination} onChange={e => setForm({ ...form, destination: e.target.value })} placeholder="Ex: Barreirinhas" className="h-12 rounded-xl bg-muted/30" />
               </div>
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço (R$) *</Label>
+                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Preço Site (R$) *</Label>
                 <NumericFormat
                   value={form.price / 100}
                   onValueChange={(values) => setForm({ ...form, price: Math.round(Number(values.floatValue) * 100) })}
@@ -417,6 +394,17 @@ const AdminTranslados = () => {
                   prefix="R$ "
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 h-12 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 transition-all outline-none"
                   required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-primary/60 tracking-widest ml-1">Preço Parceiro (R$)</Label>
+                <NumericFormat
+                  value={form.partner_price / 100}
+                  onValueChange={(values) => setForm({ ...form, partner_price: Math.round((values.floatValue || 0) * 100) })}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  prefix="R$ "
+                  className="flex h-12 w-full px-4 rounded-xl border border-primary/20 bg-primary/5 focus:bg-white transition-all font-black text-primary outline-none focus:ring-2 focus:ring-primary/20"
                 />
               </div>
               <div>
@@ -545,7 +533,7 @@ const AdminTranslados = () => {
               <div className="flex items-center justify-between bg-gradient-to-r from-primary to-indigo-600 rounded-[2rem] p-6 text-white shadow-xl shadow-primary/20">
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Tarifa por Vaga</p>
-                  <p className="font-black text-3xl tracking-tighter">{fmt(detailRoute.price)}</p>
+                  <p className="font-black text-3xl tracking-tighter">{formatCurrency(detailRoute.price)}</p>
                 </div>
                 {detailRoute.pix_discount > 0 && (
                   <div className="text-right">
@@ -553,7 +541,7 @@ const AdminTranslados = () => {
                       -{detailRoute.pix_discount}% NO PIX
                     </Badge>
                     <p className="text-lg font-black tracking-tight">
-                      {fmt(Math.round(detailRoute.price * (1 - detailRoute.pix_discount / 100)))}
+                      {formatCurrency(Math.round(detailRoute.price * (1 - detailRoute.pix_discount / 100)))}
                     </p>
                   </div>
                 )}

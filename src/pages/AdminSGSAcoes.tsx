@@ -30,14 +30,21 @@ const AdminSGSAcoes = () => {
     ]).then(([incRes, riskRes]) => {
       if (incRes.data) setIncidents(incRes.data.map(i => ({ id: i.id, code: i.incident_code, desc: i.description?.slice(0, 60) || "" })));
       if (riskRes.data) setRisks(riskRes.data.map(r => ({ id: r.id, code: r.risk_code, hazard: r.hazard?.slice(0, 60) || "" })));
+    }).catch((err) => {
+      toast({ title: "Erro ao carregar dados", description: err.message, variant: "destructive" });
     });
   }, [showForm]);
 
   const load = async () => {
-    setLoading(true);
-    const { data } = await supabase.from("sgs_corrective_actions").select("*, sgs_incidents(incident_code), sgs_risks(risk_code, hazard)").order("created_at", { ascending: false });
-    setActions(data || []);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const { data } = await supabase.from("sgs_corrective_actions").select("*, sgs_incidents(incident_code), sgs_risks(risk_code, hazard)").order("created_at", { ascending: false });
+      setActions(data || []);
+    } catch (err: any) {
+      toast({ title: "Erro ao carregar ações", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -65,7 +72,7 @@ const AdminSGSAcoes = () => {
     load();
   };
 
-  const filtered = actions.filter((a) => !search || a.description?.toLowerCase().includes(search.toLowerCase()));
+  const filtered = actions.filter((a) => !search || (a.description || "").toLowerCase().includes(search.toLowerCase()));
 
   return (
     <AdminLayout title="SGS - Ações Corretivas">
@@ -160,7 +167,7 @@ const AdminSGSAcoes = () => {
             {loading ? (
               <div className="md:col-span-2 flex flex-col items-center justify-center py-20">
                 <Loader2 className="animate-spin text-primary mb-4" size={32} />
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground animate-pulse">Sincronizando Ações...</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ">Sincronizando Ações...</p>
               </div>
             ) : filtered.length === 0 ? (
               <div className="md:col-span-2 glass-card rounded-[2.5rem] p-20 text-center border-2 border-dashed border-border/40">
@@ -183,7 +190,7 @@ const AdminSGSAcoes = () => {
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-mono text-[10px] font-black text-muted-foreground tracking-tighter uppercase px-2 py-0.5 bg-muted/50 rounded-lg border border-border/40">{a.action_code}</span>
                           <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${st.color}`}>{st.label}</span>
-                          {isOverdue && <span className="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-rose-500 text-white animate-pulse">ATRASADA</span>}
+                          {isOverdue && <span className="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-rose-500 text-white">ATRASADA</span>}
                         </div>
                         <h4 className="font-black text-foreground group-hover:text-primary transition-colors leading-tight line-clamp-1">{a.description}</h4>
                       </div>
@@ -196,7 +203,7 @@ const AdminSGSAcoes = () => {
                         <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Responsável</p>
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[10px] font-black shadow-sm">
-                            {a.responsible?.charAt(0).toUpperCase()}
+                            {a.responsible?.charAt(0)?.toUpperCase() || ''}
                           </div>
                           <span className="text-xs font-black text-foreground">{a.responsible}</span>
                         </div>

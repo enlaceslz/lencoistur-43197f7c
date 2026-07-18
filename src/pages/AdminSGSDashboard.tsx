@@ -4,10 +4,10 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import {
-  Shield, AlertTriangle, CheckCircle, Activity, Phone, Car, UserCheck2, Map, Truck, Star,
-  Wrench, ClipboardList, Loader2, Waves, Sun, Award, CheckCircle2, Clock, FileText, Info
+  Shield, AlertTriangle, CheckCircle, Activity, UserCheck2, Truck, Star,
+  Wrench, ClipboardList, Loader2, Waves, Sun, Award, FileText
 } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
+import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 const AdminSGSDashboard = () => {
   const navigate = useNavigate();
@@ -22,6 +22,7 @@ const AdminSGSDashboard = () => {
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
+    try {
     setLoading(true);
     const [risksRes, incidentsRes, actionsRes, staffRes, surveysRes, briefingsRes, termsRes, veiculosRes, condutoresRes, checklistsRes, bookingsRes, equipmentRes, proceduresRes] = await Promise.all([
       supabase.from("sgs_risks").select("*"),
@@ -90,7 +91,11 @@ const AdminSGSDashboard = () => {
       { name: "Inaceitável", value: risks.filter((r: any) => r.risk_level >= 12).length, fill: "hsl(var(--destructive))" },
     ]);
 
-    setLoading(false);
+    } catch (err: any) {
+      toast({ title: "Erro ao carregar dashboard", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const statCards = [
@@ -105,7 +110,7 @@ const AdminSGSDashboard = () => {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-32 space-y-4">
           <Loader2 className="animate-spin text-primary" size={40} />
-          <p className="text-muted-foreground animate-pulse font-black uppercase text-xs tracking-widest">Sincronizando Sistema de Segurança...</p>
+          <p className="text-muted-foreground font-black uppercase text-xs tracking-widest">Sincronizando Sistema de Segurança...</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -185,7 +190,7 @@ const AdminSGSDashboard = () => {
               <button key={s.label} onClick={() => navigate(s.path)} className="bg-white rounded-lg border border-border p-6 text-left relative overflow-hidden group shadow-sm transition-none">
                 <div className="flex items-center justify-between mb-6">
                   <div className={`w-12 h-12 rounded-lg flex items-center justify-center bg-primary/10 ${s.color}`}><s.icon size={22} strokeWidth={2.5} /></div>
-                  {s.urgent && <div className="w-2 h-2 rounded-full bg-destructive animate-pulse" />}
+                  {s.urgent && <div className="w-2 h-2 rounded-full bg-destructive" />}
                 </div>
                 <p className="text-2xl font-black text-foreground tracking-tighter">{s.value}</p>
                 <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{s.label}</p>

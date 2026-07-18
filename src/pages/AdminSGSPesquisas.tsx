@@ -156,7 +156,7 @@ const AdminSGSPesquisas = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {loading ? (
-            <div className="col-span-full py-12 text-center text-muted-foreground animate-pulse">Carregando pesquisas...</div>
+            <div className="col-span-full py-12 text-center text-muted-foreground">Carregando pesquisas...</div>
           ) : surveys.length === 0 ? (
             <div className="col-span-full py-12 text-center text-muted-foreground bg-muted/30 rounded-3xl border-2 border-dashed border-border">
               Nenhuma pesquisa registrada pós-passeio.

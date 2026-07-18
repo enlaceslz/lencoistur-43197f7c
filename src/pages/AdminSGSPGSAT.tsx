@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { FileText, Plus, Download, Shield, Loader2 } from "lucide-react";
+import { FileText, Plus, Download, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 const AdminSGSPGSAT = () => {
@@ -55,7 +55,12 @@ const AdminSGSPGSAT = () => {
   };
 
   const updateStatus = async (id: string, status: string) => {
-    await supabase.from("sgs_pgsat").update({ status }).eq("id", id);
+    try {
+      await supabase.from("sgs_pgsat").update({ status }).eq("id", id);
+    } catch {
+      toast({ title: "Erro ao atualizar status", variant: "destructive" });
+      return;
+    }
     toast({ title: `Status atualizado para ${status}` });
     load();
   };

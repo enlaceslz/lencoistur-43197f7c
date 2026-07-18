@@ -33,34 +33,45 @@ const AdminSGSBriefings = () => {
     if (!showForm) return;
     supabase.from("tours").select("id, name").eq("active", true).order("name").then(({ data }) => {
       if (data) setTours(data);
+    }).catch((err) => {
+      toast({ title: "Erro ao carregar passeios", description: err.message, variant: "destructive" });
     });
   }, [showForm]);
 
   const load = async () => {
-    setLoading(true);
-    const { data } = await supabase.from("sgs_briefings").select("*, tours(name)").order("created_at", { ascending: false });
-    setBriefings(data || []);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const { data } = await supabase.from("sgs_briefings").select("*, tours(name)").order("created_at", { ascending: false });
+      setBriefings(data || []);
+    } catch (err: any) {
+      toast({ title: "Erro ao carregar briefings", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const allChecked = CHECKLIST_ITEMS.every(item => form[item.key as keyof typeof form]);
-    const submitData: any = { ...form, completed: allChecked };
-    if (!submitData.tour_id) delete submitData.tour_id;
-    
-    let res;
-    if (editId) res = await supabase.from("sgs_briefings").update(submitData).eq("id", editId);
-    else res = await supabase.from("sgs_briefings").insert(submitData);
+    try {
+      e.preventDefault();
+      const allChecked = CHECKLIST_ITEMS.every(item => form[item.key as keyof typeof form]);
+      const submitData: any = { ...form, completed: allChecked };
+      if (!submitData.tour_id) delete submitData.tour_id;
+      
+      let res;
+      if (editId) res = await supabase.from("sgs_briefings").update(submitData).eq("id", editId);
+      else res = await supabase.from("sgs_briefings").insert(submitData);
 
-    if (res.error) {
-      toast({ title: "Erro ao registrar resumo", variant: "destructive" });
-    } else {
-      toast({ title: editId ? "Resumo atualizado!" : (allChecked ? "Resumo completo registrado!" : "⚠️ Resumo registrado com itens pendentes") });
-      setShowForm(false);
-      setEditId(null);
-      setForm({ guide_name: "", language: "pt", tour_id: "", safety_rules: false, tour_risks: false, lagoon_behavior: false, group_distance: false, emergency_orientation: false, notes: "" });
-      load();
+      if (res.error) {
+        toast({ title: "Erro ao registrar resumo", variant: "destructive" });
+      } else {
+        toast({ title: editId ? "Resumo atualizado!" : (allChecked ? "Resumo completo registrado!" : "⚠️ Resumo registrado com itens pendentes") });
+        setShowForm(false);
+        setEditId(null);
+        setForm({ guide_name: "", language: "pt", tour_id: "", safety_rules: false, tour_risks: false, lagoon_behavior: false, group_distance: false, emergency_orientation: false, notes: "" });
+        load();
+      }
+    } catch (err: any) {
+      toast({ title: "Erro ao registrar resumo", description: err.message, variant: "destructive" });
     }
   };
 
@@ -82,13 +93,17 @@ const AdminSGSBriefings = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Excluir este resumo de segurança?")) return;
-    const { error } = await supabase.from("sgs_briefings").delete().eq("id", id);
-    if (error) {
-      toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Resumo excluído!" });
-      load();
+    try {
+      if (!confirm("Excluir este resumo de segurança?")) return;
+      const { error } = await supabase.from("sgs_briefings").delete().eq("id", id);
+      if (error) {
+        toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Resumo excluído!" });
+        load();
+      }
+    } catch (err: any) {
+      toast({ title: "Erro ao excluir resumo", description: err.message, variant: "destructive" });
     }
   };
 

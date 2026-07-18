@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useCallback, memo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -77,18 +77,26 @@ const AdminDocumentos = () => {
   };
 
   const loadTypes = async () => {
-    const { data } = await supabase.from("document_types").select("*").order("name");
-    setDocTypes((data as DocType[]) || []);
-    if (data && data.length > 0 && !form.type) {
-      setForm(prev => ({ ...prev, type: data[0].value }));
+    try {
+      const { data } = await supabase.from("document_types").select("*").order("name");
+      setDocTypes((data as DocType[]) || []);
+      if (data && data.length > 0 && !form.type) {
+        setForm(prev => ({ ...prev, type: data[0].value }));
+      }
+    } catch (err) {
+      toast.error("Erro ao carregar tipos de documento");
     }
   };
 
   const load = async () => {
     setLoading(true);
     await loadTypes();
-    const { data } = await supabase.from("documents").select("*").order("created_at", { ascending: false });
-    setDocs((data as Doc[]) || []);
+    try {
+      const { data } = await supabase.from("documents").select("*").order("created_at", { ascending: false });
+      setDocs((data as Doc[]) || []);
+    } catch (err) {
+      toast.error("Erro ao carregar documentos");
+    }
     setLoading(false);
   };
 
@@ -115,7 +123,6 @@ const AdminDocumentos = () => {
       // Store the storage path, not a public URL (bucket is private)
       file_url = path;
       file_name = selectedFile.name;
-      file_name = selectedFile.name;
     }
 
     const payload = {
@@ -128,25 +135,35 @@ const AdminDocumentos = () => {
       file_name,
     };
 
-    if (editId) {
-      const { error } = await supabase.from("documents").update(payload).eq("id", editId);
-      if (error) toast.error(error.message); else toast.success("Documento atualizado!");
-    } else {
-      const { error } = await supabase.from("documents").insert(payload);
-      if (error) toast.error(error.message); else toast.success("Documento cadastrado!");
+    try {
+      if (editId) {
+        const { error } = await supabase.from("documents").update(payload).eq("id", editId);
+        if (error) throw error;
+        toast.success("Documento atualizado!");
+      } else {
+        const { error } = await supabase.from("documents").insert(payload);
+        if (error) throw error;
+        toast.success("Documento cadastrado!");
+      }
+      setDialogOpen(false);
+      resetForm();
+      load();
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao salvar documento");
     }
-
     setUploading(false);
-    setDialogOpen(false);
-    resetForm();
-    load();
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Excluir este documento?")) return;
-    await supabase.from("documents").delete().eq("id", id);
-    toast.success("Documento excluído");
-    load();
+    try {
+      const { error } = await supabase.from("documents").delete().eq("id", id);
+      if (error) throw error;
+      toast.success("Documento excluído");
+      load();
+    } catch (err) {
+      toast.error("Erro ao excluir documento");
+    }
   };
 
   const handleSaveType = async () => {
@@ -155,32 +172,39 @@ const AdminDocumentos = () => {
       return;
     }
 
-    if (editTypeId) {
-      const { error } = await supabase.from("document_types").update({
-        name: typeForm.name,
-        value: typeForm.value.toLowerCase().replace(/\s+/g, "_")
-      }).eq("id", editTypeId);
-      if (error) toast.error(error.message); else toast.success("Tipo de documento atualizado!");
-    } else {
-      const { error } = await supabase.from("document_types").insert({
-        name: typeForm.name,
-        value: typeForm.value.toLowerCase().replace(/\s+/g, "_")
-      });
-      if (error) toast.error(error.message); else toast.success("Tipo de documento cadastrado!");
+    try {
+      if (editTypeId) {
+        const { error } = await supabase.from("document_types").update({
+          name: typeForm.name,
+          value: typeForm.value.toLowerCase().replace(/\s+/g, "_")
+        }).eq("id", editTypeId);
+        if (error) throw error;
+        toast.success("Tipo de documento atualizado!");
+      } else {
+        const { error } = await supabase.from("document_types").insert({
+          name: typeForm.name,
+          value: typeForm.value.toLowerCase().replace(/\s+/g, "_")
+        });
+        if (error) throw error;
+        toast.success("Tipo de documento cadastrado!");
+      }
+      setTypeForm({ name: "", value: "" });
+      setEditTypeId(null);
+      loadTypes();
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao salvar tipo de documento");
     }
-
-    setTypeForm({ name: "", value: "" });
-    setEditTypeId(null);
-    loadTypes();
   };
 
   const handleDeleteType = async (id: string) => {
     if (!confirm("Excluir este tipo de documento?")) return;
-    const { error } = await supabase.from("document_types").delete().eq("id", id);
-    if (error) toast.error("Não foi possível excluir. Verifique se existem documentos usando este tipo.");
-    else {
+    try {
+      const { error } = await supabase.from("document_types").delete().eq("id", id);
+      if (error) throw error;
       toast.success("Tipo excluído");
       loadTypes();
+    } catch (err) {
+      toast.error("Não foi possível excluir. Verifique se existem documentos usando este tipo.");
     }
   };
 
@@ -195,22 +219,22 @@ const AdminDocumentos = () => {
   };
 
 
-  const filtered = docs.filter(d => {
-    const matchSearch = d.name.toLowerCase().includes(search.toLowerCase());
+  const filtered = useMemo(() => docs.filter(d => {
+    const matchSearch = (d.name || "").toLowerCase().includes(search.toLowerCase());
     const matchType = !filterType || d.type === filterType;
     return matchSearch && matchType;
-  });
+  }), [docs, search, filterType]);
 
-  const expiringSoon = docs.filter(d => {
+  const expiringSoon = useMemo(() => docs.filter(d => {
     if (!d.expiry_date) return false;
     const diff = (new Date(d.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
     return diff >= 0 && diff <= 30;
-  });
+  }), [docs]);
 
-  const expired = docs.filter(d => {
+  const expired = useMemo(() => docs.filter(d => {
     if (!d.expiry_date) return false;
     return new Date(d.expiry_date) < new Date();
-  });
+  }), [docs]);
 
   const statusBadge = (status: string) => {
     const s = STATUS_OPTIONS.find(o => o.value === status);

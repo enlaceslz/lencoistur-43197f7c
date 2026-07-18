@@ -5,13 +5,30 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 const FAQSection = () => {
   const { t } = useTranslation();
   const items = (t("faq.items", { returnObjects: true }) as { q: string; a: string }[]) || [];
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.a,
+      },
+    })),
+  };
+
   return (
     <section id="faq" className="py-24 md:py-32 bg-gradient-to-b from-white to-ocean-light/20">
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
+      </Helmet>
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <p className="text-primary font-bold tracking-[0.2em] uppercase text-xs mb-4 opacity-80">

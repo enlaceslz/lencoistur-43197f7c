@@ -3,7 +3,7 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { Map, Plus, Search, Pencil, Trash2, Clock, Footprints, Loader2 } from "lucide-react";
+import { Map, Plus, Search, Pencil, Trash2 } from "lucide-react";
 
 const DIFICULDADE: Record<string, { label: string; color: string }> = {
   facil: { label: "Fácil", color: "bg-primary/10 text-primary" },
@@ -59,7 +59,7 @@ const AdminSGSRotas = () => {
     }
   };
 
-  const filtered = rotas.filter(r => r.nome.toLowerCase().includes(search.toLowerCase()) || r.tipo.toLowerCase().includes(search.toLowerCase()));
+  const filtered = rotas.filter(r => (r.nome || "").toLowerCase().includes(search.toLowerCase()) || (r.tipo || "").toLowerCase().includes(search.toLowerCase()));
   const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
 
   return (
@@ -132,11 +132,11 @@ const AdminSGSRotas = () => {
                       </div>
                       <div className="min-w-0">
                         <h4 className="font-black text-foreground group-hover:text-primary transition-colors leading-tight truncate">{r.nome}</h4>
-                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-0.5">{r.tipo.replace("_", " ")}</p>
+                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-0.5">{(r.tipo || "").replace("_", " ")}</p>
                       </div>
                     </div>
                     <div className="flex flex-col gap-2 items-end">
-                      <Badge variant="outline" className={`font-black text-[9px] uppercase px-2.5 py-0.5 rounded-lg border ${dif.color}`}>
+                      <Badge variant="outline" className={`font-black text-[9px] uppercase px-2.5 py-0.5 rounded-lg border ${(DIFICULDADE[r.dificuldade] || DIFICULDADE.moderado).color}`}>
                         {dif.label}
                       </Badge>
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">

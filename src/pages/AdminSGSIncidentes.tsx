@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Search, AlertCircle, Pencil, Trash2, MapPin, Clock, Calendar, Shield, Activity } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 
@@ -58,14 +57,21 @@ const AdminSGSIncidentes = () => {
     ]).then(([{ data: tData }, { data: bData }]) => {
       if (tData) setTours(tData);
       if (bData) setBookings(bData.map(b => ({ id: b.id, booking_code: b.booking_code, item_name: b.item_name })));
+    }).catch((err) => {
+      toast({ title: "Erro ao carregar opções", description: err.message, variant: "destructive" });
     });
   }, [showForm]);
 
   const load = async () => {
-    setLoading(true);
-    const { data } = await supabase.from("sgs_incidents").select("*, tours(name), bookings(booking_code)").order("date", { ascending: false });
-    setIncidents(data || []);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const { data } = await supabase.from("sgs_incidents").select("*, tours(name), bookings(booking_code)").order("date", { ascending: false });
+      setIncidents(data || []);
+    } catch (err: any) {
+      toast({ title: "Erro ao carregar incidentes", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const openEdit = (inc: any) => {
@@ -84,16 +90,24 @@ const AdminSGSIncidentes = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Excluir este incidente?")) return;
-    await supabase.from("sgs_incidents").delete().eq("id", id);
-    toast({ title: "Incidente excluído." });
-    load();
+    try {
+      if (!confirm("Excluir este incidente?")) return;
+      await supabase.from("sgs_incidents").delete().eq("id", id);
+      toast({ title: "Incidente excluído." });
+      load();
+    } catch (err: any) {
+      toast({ title: "Erro ao excluir incidente", description: err.message, variant: "destructive" });
+    }
   };
 
   const updateStatus = async (id: string, status: string) => {
-    await supabase.from("sgs_incidents").update({ status }).eq("id", id);
-    toast({ title: `Status atualizado para: ${status}` });
-    load();
+    try {
+      await supabase.from("sgs_incidents").update({ status }).eq("id", id);
+      toast({ title: `Status atualizado para: ${status}` });
+      load();
+    } catch (err: any) {
+      toast({ title: "Erro ao atualizar status", description: err.message, variant: "destructive" });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -114,14 +128,18 @@ const AdminSGSIncidentes = () => {
 
       // Auto corrective action for alta/critica (P3 link)
       if (form.severity === "alta" || form.severity === "critica") {
-        await supabase.from("sgs_corrective_actions").insert({
+        const { error: acError } = await supabase.from("sgs_corrective_actions").insert({
           action_code: `AC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`,
           description: `AÇÃO CORRETIVA IMEDIATA: ${form.severity === "critica" ? "ACIDENTE CRÍTICO" : "Incidente grave"} em ${form.location}. Descrição: ${form.description.slice(0, 150)}...`,
           responsible: form.guide_name || "Coordenador de Segurança",
           due_date: new Date(Date.now() + (form.severity === "critica" ? 2 : 5) * 86400000).toISOString().split("T")[0],
           status: "pendente",
         });
-        toast({ title: "⚠️ Ação corretiva gerada automaticamente no módulo de Ações (P3)" });
+        if (acError) {
+          toast({ title: "Erro ao gerar ação corretiva", description: acError.message, variant: "destructive" });
+        } else {
+          toast({ title: "⚠️ Ação corretiva gerada automaticamente no módulo de Ações (P3)" });
+        }
       }
 
     }
@@ -133,7 +151,7 @@ const AdminSGSIncidentes = () => {
   };
 
   const filtered = incidents.filter((i) => {
-    const matchSearch = !search || i.description?.toLowerCase().includes(search.toLowerCase()) || i.location?.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = !search || (i.description || "").toLowerCase().includes(search.toLowerCase()) || (i.location || "").toLowerCase().includes(search.toLowerCase());
     const matchStatus = filterStatus === "todos" || i.status === filterStatus;
     return matchSearch && matchStatus;
   });
@@ -336,7 +354,7 @@ const AdminSGSIncidentes = () => {
                     <Badge variant="secondary" className={`font-black text-[9px] uppercase px-3 py-1 rounded-full border ${STATUS_COLORS[inc.status] || ""}`}>
                       {inc.status}
                     </Badge>
-                    {inc.pre_activated && <span className="px-3 py-1 rounded-full text-[9px] font-black bg-destructive text-white animate-pulse shadow-lg shadow-destructive/20">🚨 PRE ATIVADO</span>}
+                    {inc.pre_activated && <span className="px-3 py-1 rounded-full text-[9px] font-black bg-destructive text-white shadow-lg shadow-destructive/20">🚨 PRE ATIVADO</span>}
                   </div>
 
                   <div>

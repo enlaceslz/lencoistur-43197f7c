@@ -1,7 +1,7 @@
 import { useEffect, useState, memo } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Search, UserCheck, AlertTriangle, Shield, Pencil, Trash2, X } from "lucide-react";
+import { Plus, UserCheck, Shield, Pencil, Trash2, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const ROLES: Record<string, string> = { guia: "Guia", motorista: "Motorista", apoio: "Apoio" };
@@ -145,7 +145,11 @@ const AdminSGSEquipe = () => {
     if (!confirm("Excluir este membro da equipe? Isso também removerá seus treinamentos vinculados.")) return;
     
     // First delete trainings
-    await supabase.from("sgs_staff_trainings").delete().eq("staff_id", id);
+    try {
+      await supabase.from("sgs_staff_trainings").delete().eq("staff_id", id);
+    } catch {
+      toast({ title: "Erro ao excluir treinamentos", variant: "destructive" });
+    }
     
     const { error } = await supabase.from("sgs_staff").delete().eq("id", id);
     if (error) {

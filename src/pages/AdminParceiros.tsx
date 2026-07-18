@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
+  Dialog, DialogContent, DialogTitle,
 } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -23,8 +23,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { maskCPF, maskCNPJ, maskPhone, maskCpfCnpj } from "@/lib/masks";
 import { Separator } from "@/components/ui/separator";
-import { ptBR } from "date-fns/locale";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatCurrency } from "@/lib/utils";
 import { NumericFormat } from "react-number-format";
 import type { Partner, PartnerType } from "@/features/parceiros/types";
 import { iconMap, getIcon, getGradient, isCnpj } from "@/features/parceiros/utils";
@@ -438,7 +437,7 @@ const AdminParceiros = () => {
 
   const filtered = partners.filter((p) => {
     const q = search.toLowerCase();
-    const matchSearch = p.name.toLowerCase().includes(q) || (p.contact_name || "").toLowerCase().includes(q) || (p.email || "").toLowerCase().includes(q) || (p.cpf_cnpj || "").includes(q);
+    const matchSearch = (p.name || "").toLowerCase().includes(q) || (p.contact_name || "").toLowerCase().includes(q) || (p.email || "").toLowerCase().includes(q) || (p.cpf_cnpj || "").includes(q);
     const matchType = typeFilter === "todos" || p.type === typeFilter;
     return matchSearch && matchType;
   });
@@ -462,7 +461,7 @@ const AdminParceiros = () => {
           { label: "Parceiros", value: partners.length, icon: Building2, color: "from-blue-500 to-indigo-600", desc: "Total cadastrado" },
           { label: "Ativos", value: activeCount, icon: CheckCircle2, color: "from-emerald-500 to-teal-600", desc: "Operando" },
           { label: "Tipos", value: partnerTypes.length, icon: Settings2, color: "from-amber-500 to-orange-600", desc: "Categorias" },
-          { label: "Crédito Total", value: `R$ ${partners.reduce((a, b) => a + (b.credit_limit || 0), 0).toLocaleString("pt-BR")}`, icon: Banknote, color: "from-purple-500 to-pink-600", desc: "Limite global" },
+          { label: "Crédito Total", value: `R$ ${(partners.reduce((a, b) => a + (b.credit_limit || 0), 0)).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`, icon: Banknote, color: "from-purple-500 to-pink-600", desc: "Limite global" },
         ].map((stat, i) => (
           <div key={i} className="group relative overflow-hidden rounded-lg p-6 border border-border bg-white shadow-sm">
             <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} transition-transform duration-500 group-hover:scale-105`} />
@@ -1257,7 +1256,7 @@ const AdminParceiros = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs font-black text-primary">R$ {(booking.final_total / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-xs font-black text-primary">{formatCurrency(booking.final_total)}</p>
                         <Badge variant="outline" className={`text-[8px] font-black uppercase px-2 py-0 border-none ${
                           booking.status === 'confirmed' ? 'bg-emerald-50 text-emerald-600' : 
                           booking.status === 'pending' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-600'
@@ -1305,7 +1304,7 @@ const AdminParceiros = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs font-black text-emerald-600">R$ {(receivable.valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-xs font-black text-emerald-600">{formatCurrency(receivable.valor)}</p>
                         <Badge variant="outline" className={`text-[8px] font-black uppercase px-2 py-0 border-none ${
                           receivable.status === 'pago' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
                         }`}>

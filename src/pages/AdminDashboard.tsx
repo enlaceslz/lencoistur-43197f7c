@@ -1,14 +1,13 @@
 import { useEffect, useState, useMemo } from "react";
 import {
-  DollarSign, TrendingUp, Users, Calendar,
-  ArrowUpRight, ArrowDownRight, Loader2, ShieldAlert,
-  PieChart as PieChartIcon, LayoutDashboard, Briefcase, Star, MapPin,
-  CheckCircle2, Clock, XCircle, Search, Filter, ChevronRight, User, ArrowRight
+  DollarSign, TrendingUp, Calendar,
+  Loader2, ShieldAlert,
+  LayoutDashboard,
+  CheckCircle2, Clock, XCircle, ArrowRight
 } from "lucide-react";
 
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, PieChart, Pie, Cell
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 import AdminLayout from "@/components/AdminLayout";
@@ -189,7 +188,7 @@ const AdminDashboard = () => {
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
                     <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Sistema Ativo</span>
                   </div>
                   <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">Painel Executivo</span>

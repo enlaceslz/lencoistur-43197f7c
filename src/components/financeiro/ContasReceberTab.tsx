@@ -5,24 +5,15 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Loader2, Pencil, Trash2, Link2, Calendar, User, Tag, CheckCircle2, AlertCircle, Printer, Search, FileText, Upload, X, ExternalLink, DollarSign, Save, XCircle } from "lucide-react";
+import { Plus, Loader2, Pencil, Trash2, Link2, Calendar, User, Tag, CheckCircle2, AlertCircle, Printer, Search, FileText, Upload, X, ExternalLink, Save, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { formatCurrency, cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { NumericFormat } from "react-number-format";
 
 const fmt = (v: number) => formatCurrency(v);
-
-const maskCurrency = (v: string) => {
-  const n = v.replace(/\D/g, "");
-  return (Number(n) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
-};
-
-const parseCurrency = (v: string) => {
-  return Number(v.replace(/\D/g, ""));
-};
 
 const fmtDate = (d: string | null) => {
   if (!d) return "—";

@@ -1,5 +1,6 @@
 import { Star } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Helmet } from "react-helmet-async";
 
 const testimonials = [
   { name: "Rafael Almeida", quote: "Foi a melhor experiência que já tive em viagem no Brasil. O guia era super atencioso, explicou tudo sobre a região e ainda nos levou para ver o pôr do sol mais lindo da minha vida.", country: "Brasil" },
@@ -8,11 +9,33 @@ const testimonials = [
   { name: "Juliana Ribeiro", quote: "Fechei o roteiro completo com a agência e deu tudo certo: transfer pontual, pousada confortável e passeios incríveis nas lagoas. Recomendo muito a Lençóis Tour para quem quer praticidade.", country: "Brasil" },
 ];
 
+const reviewSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  itemListElement: testimonials.map((t, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    item: {
+      "@type": "Review",
+      author: { "@type": "Person", name: t.name },
+      reviewBody: t.quote,
+      reviewRating: {
+        "@type": "Rating",
+        ratingValue: "5",
+        bestRating: "5",
+      },
+    },
+  })),
+};
+
 const TestimonialsSection = () => {
   const { t } = useTranslation();
 
   return (
     <section className="py-24 md:py-32 bg-white">
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(reviewSchema)}</script>
+      </Helmet>
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <p className="text-primary font-bold tracking-[0.2em] uppercase text-xs mb-4 opacity-80">{t("testimonials.label")}</p>

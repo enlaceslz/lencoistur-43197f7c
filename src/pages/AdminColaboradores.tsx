@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -23,10 +23,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { maskCPF, maskPhone, maskCEP, maskCurrency, parseCurrencyToNumber } from "@/lib/masks";
+import { maskCPF, maskPhone, maskCurrency, parseCurrencyToNumber } from "@/lib/masks";
 import { formatCurrency, validateCPF, cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 
 
 interface Collaborator {
@@ -109,14 +107,14 @@ const AdminColaboradores = () => {
 
   const fetchCollabTypes = async () => {
     const { data, error } = await supabase.from("collaborator_types").select("*").order("name");
-    if (!error) setCollabTypes(data as CollabType[]);
+    if (!error) setCollabTypes((data ?? []) as CollabType[]);
   };
 
   const fetchCollaborators = async () => {
     setLoading(true);
     const { data, error } = await supabase.from("collaborators").select("*").order("name");
     if (error) toast.error("Erro ao carregar colaboradores");
-    else setCollaborators(data as Collaborator[]);
+    else setCollaborators((data ?? []) as Collaborator[]);
     setLoading(false);
   };
 
@@ -175,7 +173,7 @@ const AdminColaboradores = () => {
   const openNewPayment = (c: Collaborator) => {
     setSelectedCollab(c);
     setPaymentForm({
-      amount: maskCurrency(String(c.payment_value)),
+      amount: maskCurrency(c.payment_type === 'commission' ? "0" : String(c.payment_value)),
       description: `Pagamento ${c.payment_type === 'daily' ? 'Diária' : c.payment_type === 'monthly' ? 'Mensal' : 'Serviço'}`,
       due_date: format(new Date(), "yyyy-MM-dd")
     });
@@ -325,7 +323,7 @@ const AdminColaboradores = () => {
   };
 
   const filtered = collaborators.filter(c => 
-    c.name.toLowerCase().includes(search.toLowerCase()) || 
+    (c.name || "").toLowerCase().includes(search.toLowerCase()) || 
     (c.email || "").toLowerCase().includes(search.toLowerCase()) ||
     (c.document || "").includes(search) ||
     (c.type || "").toLowerCase().includes(search.toLowerCase())
@@ -504,10 +502,10 @@ const AdminColaboradores = () => {
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center font-bold text-lg text-primary overflow-hidden shadow-inner">
-                            {c.avatar_url ? (
+                              {c.avatar_url ? (
                               <img src={c.avatar_url} alt={c.name} className="w-full h-full object-cover" />
                             ) : (
-                              c.name.substring(0, 2).toUpperCase()
+                              (c.name || "??").substring(0, 2).toUpperCase()
                             )}
                           </div>
                           <div>
@@ -572,7 +570,7 @@ const AdminColaboradores = () => {
                           <TableCell className="py-3">
                             <div className="flex items-center gap-3">
                               <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center font-bold text-xs text-slate-400 shadow-inner group-hover:scale-110 transition-transform">
-                                {c.avatar_url ? <img src={c.avatar_url} className="w-full h-full object-cover rounded-lg" /> : c.name.substring(0, 2).toUpperCase()}
+                                {c.avatar_url ? <img src={c.avatar_url} alt={c.name} className="w-full h-full object-cover rounded-lg" /> : (c.name || "??").substring(0, 2).toUpperCase()}
                               </div>
                               <div>
                                 <p className="font-bold text-slate-800 text-xs leading-none mb-1 group-hover:text-primary transition-colors">{c.name}</p>
@@ -633,7 +631,7 @@ const AdminColaboradores = () => {
                         {selectedCollab.avatar_url ? (
                           <img src={selectedCollab.avatar_url} alt={selectedCollab.name} className="w-full h-full object-cover" />
                         ) : (
-                          selectedCollab.name.substring(0, 2).toUpperCase()
+                          (selectedCollab.name || "??").substring(0, 2).toUpperCase()
                         )}
                       </div>
                       <Badge className={cn("absolute -bottom-2 -right-2 w-8 h-8 rounded-full border-4 border-white flex items-center justify-center shadow-lg", selectedCollab.status === 'active' ? "bg-green-500" : "bg-slate-300")}>
@@ -1155,7 +1153,7 @@ const AdminColaboradores = () => {
                     <img src={selectedCollab.avatar_url} alt={selectedCollab.name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-blue-100 text-blue-600 font-bold text-4xl">
-                      {selectedCollab.name.substring(0, 2).toUpperCase()}
+                      {(selectedCollab.name || "??").substring(0, 2).toUpperCase()}
                     </div>
                   )}
                 </div>

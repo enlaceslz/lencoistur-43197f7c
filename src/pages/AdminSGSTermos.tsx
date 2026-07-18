@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Plus, CheckCircle, XCircle, Shield, FileText, Printer, Users, Trash2, UserPlus, Search, Edit, Eye, Settings, Save, Send, Link as LinkIcon, Loader2, MessageCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { ptBR } from "date-fns/locale";
 import { formatDate } from "@/lib/utils";
 
 const HEALTH_QUESTIONS_LIST = [
@@ -318,9 +317,6 @@ const AdminSGSTermos = () => {
       return;
     }
 
-    const win = window.open("", "_blank");
-    if (!win) return;
-
     const termDate = term.term_date ? new Date(term.term_date + "T12:00:00") : new Date();
     const formattedDate = formatDate(termDate, "dd 'de' MMMM 'de' yyyy");
     
@@ -479,8 +475,9 @@ const AdminSGSTermos = () => {
       </html>
     `;
 
-    win.document.write(html);
-    win.document.close();
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
   };
 
   const filtered = terms.filter(t => {
@@ -816,11 +813,11 @@ const AdminSGSTermos = () => {
                       >
                         <option value="">Selecione o Responsável</option>
                         {/* Option 1: The main customer */}
-                        {customers.find(c => c.id === form.customer_id) && (
-                          <option value={customers.find(c => c.id === form.customer_id).name}>
-                            {customers.find(c => c.id === form.customer_id).name} (Cliente Principal)
+                        {(() => { const mainCustomer = customers.find(c => c.id === form.customer_id); return mainCustomer ? (
+                          <option value={mainCustomer.name}>
+                            {mainCustomer.name} (Cliente Principal)
                           </option>
-                        )}
+                        ) : null; })()}
                         {/* Option 2: Other adult companions already added */}
                         {form.minors.filter(m => m.is_adult).map(adult => (
                           <option key={adult.id} value={adult.full_name}>

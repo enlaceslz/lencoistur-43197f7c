@@ -5,9 +5,11 @@ import { Star, MapPin, Clock, Search, SlidersHorizontal, Sparkles } from "lucide
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEO from "@/components/SEO";
-import { formatCurrency } from "@/lib/utils";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { formatCurrency, getTourEffectivePrice } from "@/lib/utils";
 import { fetchPartnerCatalogPricing } from "@/lib/catalogPricing";
 import { Badge } from "@/components/ui/badge";
+import { useLocalizedPath } from "@/lib/useLocalizedPath";
 
 
 import tourLagoasAzuis from "@/assets/tour-lagoas-azuis-hero.jpg";
@@ -48,6 +50,7 @@ const getTourImage = (tour: any) => {
 };
 
 const ToursPage = () => {
+  const loc = useLocalizedPath();
   const [params] = useSearchParams();
   const partnerId = params.get("partner_id") || params.get("partner");
   const [tours, setTours] = useState<any[]>([]);
@@ -112,31 +115,13 @@ const ToursPage = () => {
     .filter((t) => {
       const matchSearch = t.name.toLowerCase().includes(search.toLowerCase()) ||
         (t.location || "").toLowerCase().includes(search.toLowerCase());
-      
-      const isPrivate = t.mode_collective_enabled === false;
-      const basePrice = isPrivate ? (t.private_price || 0) : t.price;
-      const partnerPricing = pricingByTourId[t.id];
-      const priceToFormat = partnerPricing
-        ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePrice) : partnerPricing.effectivePrice)
-        : basePrice;
-
-      
-      const effectivePrice = priceToFormat / 100;
+      const effectivePrice = getTourEffectivePrice(t, pricingByTourId[t.id] || null) / 100;
       const matchPrice = effectivePrice <= maxPrice;
       return matchSearch && matchPrice;
     })
     .sort((a, b) => {
-      const getPrice = (t: any) => {
-        const isPrivate = t.mode_collective_enabled === false;
-        const basePrice = isPrivate ? (t.private_price || 0) : t.price;
-        const partnerPricing = pricingByTourId[t.id];
-
-        return partnerPricing
-          ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePrice) : partnerPricing.effectivePrice)
-          : basePrice;
-      };
-      const priceA = getPrice(a) / 100;
-      const priceB = getPrice(b) / 100;
+      const priceA = getTourEffectivePrice(a, pricingByTourId[a.id] || null) / 100;
+      const priceB = getTourEffectivePrice(b, pricingByTourId[b.id] || null) / 100;
       if (sort === "price-asc") return priceA - priceB;
       if (sort === "price-desc") return priceB - priceA;
       if (sort === "rating") return (Number(b.rating) || 0) - (Number(a.rating) || 0);
@@ -149,11 +134,22 @@ const ToursPage = () => {
         title="Passeios nos Lençóis Maranhenses | Lençóis Tour"
         description="Reserve passeios às Lagoas Azuis, Rio Preguiças, trekking nas dunas e mais. Saída de Santo Amaro do Maranhão com 4x4 licenciados e guias locais."
         path="/passeios"
+        jsonLd={filtered.length > 0 ? {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          itemListElement: filtered.map((tour, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            url: `${import.meta.env.VITE_SITE_URL || "https://lencois.tur.br"}/passeios/${tour.slug}`,
+            name: tour.name,
+          })),
+        } : undefined}
       />
       <Navbar />
 
       <div className="pt-24 pb-10 bg-gradient-sand">
         <div className="container mx-auto px-4">
+          <Breadcrumbs items={[{ label: "Início", path: "/" }, { label: "Passeios" }]} />
           <h1 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-3">Nossos Passeios</h1>
           <p className="text-muted-foreground text-lg">Encontre a experiência perfeita nos Lençóis Maranhenses</p>
         </div>
@@ -198,7 +194,7 @@ const ToursPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((tour) => (
-            <Link to={`/passeios/${tour.slug}${partnerId ? `?partner_id=${partnerId}` : ''}`} key={tour.id}
+            <Link to={loc(`/passeios/${tour.slug}${partnerId ? `?partner_id=${partnerId}` : ''}`)} key={tour.id}
               className="group bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
               <div className="relative h-56 overflow-hidden">
                 {getTourImage(tour) ? (
@@ -242,16 +238,7 @@ const ToursPage = () => {
                     </span>
                     <div className="flex items-baseline gap-1">
                       <p className={`text-lg font-bold ${tour.mode_collective_enabled !== false ? "text-primary" : "text-secondary"}`}>
-                        {(() => {
-                          const isPrivate = tour.mode_collective_enabled === false;
-                          const basePublicPrice = isPrivate ? (tour.private_price || 0) : tour.price;
-
-                          const partnerPricing = pricingByTourId[tour.id];
-                          const priceToFormat = partnerPricing
-                            ? (isPrivate ? (partnerPricing.effectivePrivatePrice || basePublicPrice) : partnerPricing.effectivePrice)
-                            : basePublicPrice;
-                          return formatCurrency(priceToFormat);
-                        })()}
+                        {formatCurrency(getTourEffectivePrice(tour, pricingByTourId[tour.id] || null))}
                       </p>
                       {tour.pix_discount > 0 && !partnerId && (
                         <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">

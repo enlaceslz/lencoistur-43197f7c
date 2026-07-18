@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Lock, Mail, MapPin, Shield, AlertTriangle, Waves } from "lucide-react";
+import { Helmet } from "react-helmet-async";
+import { Eye, EyeOff, Lock, Mail, Shield, AlertTriangle, Waves } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const AdminLogin = () => {
@@ -60,8 +61,8 @@ const AdminLogin = () => {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-[#0a1628] via-[#0d2847] to-[#0a1628] relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-secondary/30 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/20 rounded-full blur-3xl animate-pulse delay-1000" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-secondary/30 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/20 rounded-full blur-3xl delay-1000" />
         </div>
         <div className="w-full max-w-md text-center relative z-10">
           <div className="bg-card/95 backdrop-blur-xl border border-border/50 rounded-2xl p-8 shadow-2xl">
@@ -86,6 +87,10 @@ const AdminLogin = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-[#0a1628] via-[#0d2847] to-[#0a1628] relative overflow-hidden">
+      <Helmet>
+        <title>Login Administrativo | Lençóis Tour</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       {/* Ambient effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-secondary/8 rounded-full blur-[100px]" />

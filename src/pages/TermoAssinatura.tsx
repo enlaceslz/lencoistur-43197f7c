@@ -1,8 +1,11 @@
 import { useEffect, useState, useRef } from "react";
-import { useSearchParams, useNavigate, Link } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useLocalizedPath } from "@/lib/useLocalizedPath";
+import SEO from "@/components/SEO";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { Shield, CheckCircle, AlertTriangle, FileText, Pencil, Trash2, Users } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -40,8 +43,8 @@ const HEALTH_QUESTIONS = [
 ];
 
 const TermoAssinatura = () => {
+  const loc = useLocalizedPath();
   const [params] = useSearchParams();
-  const navigate = useNavigate();
   const bookingCode = params.get("booking")?.trim() || "";
   const bookingIdParam = params.get("booking_id") || "";
   const termId = params.get("id") || "";
@@ -201,9 +204,9 @@ const TermoAssinatura = () => {
             .eq("customer_id", bookingData.customer_id);
           
           if (dependentsData) {
-            const existingNames = new Set(preLoadedCompanions.map(c => c.full_name.toLowerCase()));
+            const existingNames = new Set(preLoadedCompanions.map(c => (c.full_name || "").toLowerCase()));
             dependentsData.forEach(d => {
-              if (!existingNames.has(d.name.toLowerCase())) {
+              if (!existingNames.has((d.name || "").toLowerCase())) {
                 preLoadedCompanions.push({
                   id: d.id,
                   full_name: d.name,
@@ -219,6 +222,7 @@ const TermoAssinatura = () => {
       }
     } catch (err) {
       console.error("Error loading term data:", err);
+      toast.error("Erro ao carregar termo");
     }
     setLoading(false);
   };
@@ -350,8 +354,8 @@ const TermoAssinatura = () => {
       autoTable(doc, {
         startY: currentY,
         body: [
-          ["Participante:", booking.customers?.name || "Cliente", "Reserva:", booking.booking_code],
-          ["Atividade:", booking.item_name, "Data:", new Date(booking.date + "T12:00").toLocaleDateString("pt-BR")],
+          ["Participante:", booking.customers?.name || "Cliente", "Reserva:", booking?.booking_code],
+          ["Atividade:", booking?.item_name, "Data:", new Date((booking?.date || "") + "T12:00").toLocaleDateString("pt-BR")],
           ["Documento:", booking.customers?.cpf || booking.customers?.passport || "Não informado", "Local:", `${company?.cidade || "Santo Amaro"} - ${company?.estado || "MA"}`],
         ],
         theme: 'grid',
@@ -513,6 +517,11 @@ const TermoAssinatura = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+        <SEO
+          title="Termo de Ciência e Assinatura | Lençóis Tour"
+          description="Termo de ciência e responsabilidade para participantes dos passeios da Lençóis Tour."
+          path="/assinatura-termo"
+        />
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
@@ -521,12 +530,17 @@ const TermoAssinatura = () => {
   if (!booking && !term) {
     return (
       <div className="min-h-screen bg-background">
+        <SEO
+          title="Reserva não encontrada | Lençóis Tour"
+          description="O código da reserva não foi encontrado. Verifique seu e-mail ou WhatsApp."
+          path="/assinatura-termo"
+        />
         <Navbar />
         <div className="pt-32 container mx-auto px-4 max-w-lg text-center">
           <AlertTriangle size={48} className="text-amber-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-4">Reserva não encontrada</h1>
           <p className="text-muted-foreground mb-8">Verifique o código da reserva no seu e-mail ou WhatsApp.</p>
-          <Link to="/" className="bg-primary text-white px-6 py-2 rounded-xl">Voltar para Início</Link>
+          <Link to={loc("/")} className="bg-primary text-white px-6 py-2 rounded-xl">Voltar para Início</Link>
         </div>
       </div>
     );
@@ -535,6 +549,11 @@ const TermoAssinatura = () => {
   if (signed) {
     return (
       <div className="min-h-screen bg-background">
+        <SEO
+          title="Termo Assinado | Lençóis Tour"
+          description="Termo de ciência de risco assinado com sucesso. Tudo pronto para sua aventura nos Lençóis Maranhenses!"
+          path="/assinatura-termo"
+        />
         <Navbar />
         <div className="pt-32 container mx-auto px-4 max-w-lg text-center">
           <CheckCircle size={64} className="text-green-500 mx-auto mb-6" />
@@ -544,8 +563,8 @@ const TermoAssinatura = () => {
             Tudo pronto para sua aventura!
           </p>
           <div className="flex flex-col gap-3">
-            <Link to="/minhas-reservas" className="bg-primary text-white px-6 py-3 rounded-xl font-semibold">Minhas Reservas</Link>
-            <Link to="/" className="text-primary hover:underline">Voltar para Início</Link>
+            <Link to={loc("/minhas-reservas")} className="bg-primary text-white px-6 py-3 rounded-xl font-semibold">Minhas Reservas</Link>
+            <Link to={loc("/")} className="text-primary hover:underline">Voltar para Início</Link>
           </div>
         </div>
         <Footer />
@@ -555,8 +574,14 @@ const TermoAssinatura = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Termo de Ciência e Assinatura | Lençóis Tour"
+        description="Termo de ciência e responsabilidade para participantes dos passeios da Lençóis Tour. Informações sobre riscos e segurança."
+        path="/assinatura-termo"
+      />
       <Navbar />
       <div className="pt-32 pb-20 container mx-auto px-4 max-w-2xl">
+        <Breadcrumbs items={[{ label: "Início", path: "/" }, { label: "Assinar Termo" }]} />
         <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-sm">
           {/* Header */}
           <div className="bg-primary/5 p-6 border-b border-border">

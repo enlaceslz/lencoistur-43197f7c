@@ -1,12 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Plus, Calendar, DollarSign, Clock, CheckCircle, XCircle, ChevronRight, FileDown, LayoutGrid, List, Loader2, User, Phone, Mail, MapPin, CreditCard, Trash2, Printer, Download, Eye, MoreHorizontal, Users, Tag, Briefcase, UserCheck, Pencil, Shield, Smartphone, FileText, Activity, Building2, LayoutDashboard } from "lucide-react";
+import { Search, Plus, Calendar, CheckCircle, XCircle, Loader2, User, Phone, Mail, MapPin, CreditCard, Trash2, Printer, Eye, Users, Briefcase, Pencil, Shield } from "lucide-react";
 import { useBookings, BookingItem } from "@/hooks/useBookings";
 import { formatCurrency, cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
@@ -16,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { maskPhone, maskCurrency, parseCurrencyToNumber, maskDate } from "@/lib/masks";
+import { maskPhone, maskCurrency, parseCurrencyToNumber } from "@/lib/masks";
 import { Separator } from "@/components/ui/separator";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
@@ -45,6 +44,7 @@ const DependentList = ({ customerId }: { customerId: string }) => {
         }
       } catch (err) {
         console.error("Erro ao carregar dependentes:", err);
+        toast.error("Erro ao carregar dados");
       }
       if (!cancelled) setLoading(false);
     };
@@ -117,6 +117,7 @@ const AdminReservas = () => {
       id: Math.random().toString(36).substr(2, 9),
       type: "tour" as "tour" | "transfer" | "package",
       itemName: "",
+      mode: "coletivo" as "coletivo" | "privativo",
       date: "",
       guests: 1,
       unitPrice: "0",
@@ -185,6 +186,7 @@ const AdminReservas = () => {
       if (data) setCustomers(data);
     } catch (err) {
       console.error("Erro ao buscar clientes:", err);
+      toast.error("Erro ao carregar dados");
     }
   };
 
@@ -209,12 +211,13 @@ const AdminReservas = () => {
       if (deps) setCustomerDependents(deps);
     } catch (err) {
       console.error("Erro ao buscar dependentes:", err);
+      toast.error("Erro ao carregar dados");
     }
   };
 
   const filtered = bookings.filter((b) => {
     const q = search.toLowerCase();
-    return b.customerName.toLowerCase().includes(q) || b.itemName.toLowerCase().includes(q) || b.bookingCode.toLowerCase().includes(q);
+    return (b.customerName || "").toLowerCase().includes(q) || (b.itemName || "").toLowerCase().includes(q) || (b.bookingCode || "").toLowerCase().includes(q);
   });
 
   const totalPago = bookings.filter((b) => b.paymentStatus === "pago" && b.status !== "cancelada").reduce((a, b) => a + b.finalTotal, 0);
@@ -265,6 +268,7 @@ const AdminReservas = () => {
         updateItem(itemInForm.id, "unitPrice", selectedItem.price.toString());
         updateItem(itemInForm.id, "publicUnitPrice", selectedItem.private_price?.toString() || selectedItem.price.toString());
         updateItem(itemInForm.id, "partnerNetPrice", selectedItem.partner_price ? selectedItem.partner_price.toString() : "0");
+        updateItem(itemInForm.id, "mode", selectedItem.mode_collective_enabled !== false ? "coletivo" : "privativo");
       }
     } else if (itemInForm.type === "package") {
       selectedItem = packages.find(p => p.id === itemId);
@@ -292,6 +296,7 @@ const AdminReservas = () => {
         id: Math.random().toString(36).substr(2, 9),
         type: "tour",
         itemName: "",
+        mode: "coletivo",
         date: "",
         guests: 1,
         unitPrice: "0",
@@ -401,6 +406,7 @@ const AdminReservas = () => {
           id: Math.random().toString(36).substr(2, 9),
           type: "tour",
           itemName: "",
+          mode: "coletivo",
           date: "",
           guests: 1,
           unitPrice: "0",
@@ -430,6 +436,7 @@ const AdminReservas = () => {
         if (deps) setCustomerDependents(deps);
       } catch (err) {
         console.error("Erro ao buscar dependentes:", err);
+        toast.error("Erro ao carregar dados");
       }
     }
 
@@ -456,6 +463,7 @@ const AdminReservas = () => {
         id: item.id,
         type: item.type,
         itemName: item.itemName,
+        mode: (item as any).mode || (item.itemName?.includes("(Privativo)") || false ? "privativo" : "coletivo"),
         date: item.date,
         guests: item.guests,
         unitPrice: item.unitPrice.toString(),
@@ -505,8 +513,12 @@ const AdminReservas = () => {
     const baseUrl = window.location.origin;
     const link = `${baseUrl}/assinatura-termo?booking_id=${selected.id}`;
     
-    navigator.clipboard.writeText(link);
-    toast({ title: "Copiado", description: "Link do termo copiado!" });
+    try {
+      navigator.clipboard.writeText(link);
+      toast({ title: "Copiado", description: "Link do termo copiado!" });
+    } catch {
+      toast({ title: "Link", description: link });
+    }
     
     const message = encodeURIComponent(`Olá ${selected.customerName}, aqui está o link para assinatura do Termo de Responsabilidade da sua reserva ${selected.bookingCode}: ${link}`);
     const whatsappUrl = `https://wa.me/${selected.customerPhone.replace(/\D/g, '')}?text=${message}`;
@@ -515,8 +527,29 @@ const AdminReservas = () => {
 
   if (loading) return (
     <AdminLayout title="Gestão de Reservas">
-      <div className="flex items-center justify-center py-32"><Loader2 className="animate-spin text-primary" size={40} /></div>
+      <div className="flex flex-col gap-6 pb-10">
+        <div className="h-24 bg-slate-100 rounded-xl" />
+        <div className="bg-white rounded-xl border border-border">
+          {[1,2,3,4,5].map(i => (
+            <div key={i} className="flex items-center gap-4 p-5 border-b border-border last:border-0">
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-slate-100 rounded w-1/4" />
+                <div className="h-3 bg-slate-100 rounded w-1/2" />
+              </div>
+              <div className="h-4 bg-slate-100 rounded w-20" />
+              <div className="h-6 bg-slate-100 rounded-full w-24" />
+            </div>
+          ))}
+        </div>
+      </div>
     </AdminLayout>
+  );
+
+  const groupBookings = useMemo(() =>
+    selected
+      ? bookings.filter(b => (selected.groupId ? b.groupId === selected.groupId : b.id === selected.id))
+      : [],
+    [selected, bookings]
   );
 
   return (
@@ -678,7 +711,7 @@ const AdminReservas = () => {
                           >
                             <div className="flex items-center gap-3">
                               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                                {c.name.slice(0, 2).toUpperCase()}
+                                {(c.name || "").slice(0, 2).toUpperCase()}
                               </div>
                               <div>
                                 <p className="text-xs font-bold text-slate-900 uppercase tracking-tight">{c.name}</p>
@@ -767,7 +800,7 @@ const AdminReservas = () => {
                             }
                           }}
                         >
-                          + {dep.name.split(' ')[0]}
+                          + {(dep.name || "").split(' ')[0]}
                         </Button>
                       ))}
                     </div>
@@ -876,6 +909,21 @@ const AdminReservas = () => {
                             </SelectContent>
                           </Select>
                         </div>
+
+                        {item.type === "tour" && (
+                        <div className="md:col-span-1 space-y-1.5">
+                          <Label className="text-[10px] font-black uppercase text-slate-400">Modo</Label>
+                          <Select value={item.mode} onValueChange={(v: any) => updateItem(item.id, "mode", v)}>
+                            <SelectTrigger className="h-11">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="coletivo">Coletivo</SelectItem>
+                              <SelectItem value="privativo">Privativo</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        )}
 
                         <div className="md:col-span-4 space-y-1.5">
                           <Label className="text-[10px] font-black uppercase text-slate-400">Serviço</Label>
@@ -1046,15 +1094,13 @@ const AdminReservas = () => {
                       <div className="flex justify-between text-[11px] text-slate-500 uppercase font-bold tracking-wider">
                         <span>Subtotal ({form.items.length} itens)</span>
                         <span>{formatCurrency(form.items.reduce((acc, item) => {
-                          const isPrivate = item.itemName.includes("(Privativo)");
-                          return acc + (isPrivate ? parseCurrencyToNumber(item.unitPrice) : parseCurrencyToNumber(item.unitPrice) * item.guests);
+                          return acc + (item.mode === "privativo" ? parseCurrencyToNumber(item.unitPrice) : parseCurrencyToNumber(item.unitPrice) * item.guests);
                         }, 0))}</span>
                       </div>
                       <div className="flex justify-between text-xl font-black text-primary tracking-tight">
                         <span className="uppercase text-xs self-center">Valor Final</span>
                         <span>{formatCurrency(form.items.reduce((acc, item) => {
-                          const isPrivate = item.itemName.includes("(Privativo)");
-                          const total = isPrivate ? parseCurrencyToNumber(item.unitPrice) : parseCurrencyToNumber(item.unitPrice) * item.guests;
+                          const total = item.mode === "privativo" ? parseCurrencyToNumber(item.unitPrice) : parseCurrencyToNumber(item.unitPrice) * item.guests;
                           return acc + total - parseCurrencyToNumber(item.discount || "0");
                         }, 0))}</span>
                       </div>
@@ -1119,7 +1165,7 @@ const AdminReservas = () => {
                     <MapPin size={14} /> Itinerário do Grupo
                   </h3>
                   <div className="space-y-3">
-                    {bookings.filter(b => (selected.groupId ? b.groupId === selected.groupId : b.id === selected.id)).map((item, idx) => (
+                    {groupBookings.map((item, idx) => (
                       <div key={item.id} className="flex items-start gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100 group transition-all hover:bg-white hover:shadow-md">
                         <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[10px] font-black text-slate-400 shadow-sm shrink-0">
                           {idx + 1}
@@ -1159,10 +1205,7 @@ const AdminReservas = () => {
                         <div className="space-y-1">
                           <p className="text-[10px] text-slate-400 uppercase font-bold">Total do Grupo</p>
                           <p className="text-2xl font-black text-slate-900 tracking-tight">
-                            {formatCurrency(bookings
-                              .filter(b => (selected.groupId ? b.groupId === selected.groupId : b.id === selected.id))
-                              .reduce((acc, b) => acc + b.finalTotal, 0)
-                            )}
+                            {formatCurrency(groupBookings.reduce((acc, b) => acc + b.finalTotal, 0))}
                           </p>
                         </div>
                         <Badge variant="outline" className="mb-1 bg-white uppercase text-[9px] font-black h-6">

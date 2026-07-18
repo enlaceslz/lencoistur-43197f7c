@@ -1,8 +1,10 @@
+import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { Search, MapPin, Calendar, ShieldCheck } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { useLocalizedPath } from "@/lib/useLocalizedPath";
 import heroImgDefault from "@/assets/hero-travel.jpg";
 
 const HERO_IMG_DEFAULT = heroImgDefault;
@@ -14,6 +16,7 @@ const categoryKeys = ["boat", "eco", "gastro", "cultural", "kayak", "trekking"] 
 const HeroSection = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const loc = useLocalizedPath();
   const { site } = useSiteSettings();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchDate, setSearchDate] = useState("");
@@ -42,7 +45,11 @@ const HeroSection = () => {
   }, [banners.length]);
 
   return (
-    <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
+    <>
+      <Helmet>
+        <link rel="preload" as="image" href={heroImg} fetchpriority="high" />
+      </Helmet>
+      <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
       {banners.length > 0 ? (
         banners.map((banner, index) => (
           <div
@@ -69,14 +76,13 @@ const HeroSection = () => {
           width={1920}
           height={1080}
           fetchPriority="high"
-          height={1080}
         />
       )}
       <div className="absolute inset-0 bg-gradient-hero" />
 
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="flex flex-col items-center gap-2 mb-4 animate-fade-up">
-          <Link to="/seguranca" className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-secondary-foreground text-[10px] md:text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/20 transition-all">
+          <Link to={loc("/seguranca")} className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-secondary-foreground text-[10px] md:text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/20 transition-all">
             <ShieldCheck size={14} className="text-secondary" />
             Compromisso com sua Segurança — ISO 21101
           </Link>
@@ -96,7 +102,7 @@ const HeroSection = () => {
           {categoryKeys.map((key) => (
             <Link
               key={key}
-              to="/passeios"
+              to={loc("/passeios")}
               className="bg-card/90 backdrop-blur-sm text-foreground hover:bg-secondary hover:text-secondary-foreground px-4 py-2.5 md:px-5 md:py-3 rounded-xl font-semibold text-xs md:text-sm transition-colors"
             >
               {t(`hero.categories.${key}`)}
@@ -126,7 +132,7 @@ const HeroSection = () => {
             />
           </div>
           <button 
-            onClick={() => navigate(`/passeios?search=${encodeURIComponent(searchTerm)}`)}
+            onClick={() => navigate(loc(`/passeios?search=${encodeURIComponent(searchTerm)}`))}
             className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-2.5 md:py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors text-sm md:text-base"
           >
             <Search size={18} />
@@ -147,6 +153,7 @@ const HeroSection = () => {
         </div>
       </div>
     </section>
+    </>
   );
 };
 

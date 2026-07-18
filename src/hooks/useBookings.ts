@@ -45,8 +45,9 @@ export interface BookingItem {
 
 function generateBookingCode(): string {
   const year = new Date().getFullYear();
+  const timestamp = Date.now().toString(36).toUpperCase().slice(-4);
   const num = String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0");
-  return `RES-${year}-${num}`;
+  return `RES-${year}-${timestamp}${num}`;
 }
 
 function generatePixCode(): string {
@@ -105,7 +106,7 @@ function mapDbToBooking(row: any, customer?: any): BookingItem {
 }
 
 const BOOKINGS_QUERY_KEY = ["bookings", "admin", "list"] as const;
-const BOOKINGS_PAGE_SIZE = 1000;
+const BOOKINGS_PAGE_SIZE = 5000;
 
 async function fetchBookingsFromDb(customerId?: string): Promise<BookingItem[]> {
   let query = supabase

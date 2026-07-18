@@ -184,7 +184,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                   
                   {dayBookings.length > 0 && (
                     <div className="flex flex-col items-end gap-1 md:gap-1.5">
-                      <Badge variant="secondary" className="bg-primary/10 text-primary border border-primary/20 text-[7px] md:text-[9px] font-black h-4 md:h-5 px-1 md:px-2.5 rounded-full animate-pulse">
+                      <Badge variant="secondary" className="bg-primary/10 text-primary border border-primary/20 text-[7px] md:text-[9px] font-black h-4 md:h-5 px-1 md:px-2.5 rounded-full">
                         {dayBookings.length}
                       </Badge>
                       <div className="hidden md:flex -space-x-2 overflow-hidden p-0.5">
@@ -233,7 +233,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({ bookings, onSe
                                 <div className="flex items-center gap-1 md:gap-2.5">
                                   <div className={cn("w-1.5 h-1.5 md:w-2.5 md:h-2.5 rounded-full ring-2 md:ring-4 ring-white/30", statusConfig[booking.status]?.color)} />
                                   <p className="text-[7px] md:text-[11px] font-black text-muted-foreground truncate opacity-100 uppercase tracking-tight md:tracking-[0.15em] leading-none">
-                                    {booking.itemName.split('(')[0].trim().substring(0, 10)}
+                                      {booking.itemName}
                                   </p>
                                 </div>
                               </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, memo } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import { Card, CardContent } from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Star, ThumbsUp, MessageSquare, TrendingUp, Loader2, Trash2, Plus, Search, Filter, Save, MapPin, Calendar, Quote, CheckCircle2, Compass, Eye, EyeOff, Award } from "lucide-react";
+import { Star, ThumbsUp, MessageSquare, TrendingUp, Loader2, Trash2, Plus, Search, Filter, MapPin, Calendar, Quote, CheckCircle2, Compass, Eye, EyeOff, Award } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -210,66 +210,95 @@ const AdminAvaliacoes = () => {
   }, []);
 
   const fetchTours = async () => {
-    const { data } = await supabase.from("tours").select("id, name").order("name");
-    if (data) setTours(data);
+    try {
+      const { data } = await supabase.from("tours").select("id, name").order("name");
+      if (data) setTours(data);
+    } catch (err) {
+      toast.error("Erro ao carregar avaliações");
+    }
   };
 
   const fetchReviews = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from("reviews")
-      .select("*, tours(name)")
-      .order("created_at", { ascending: false });
+    try {
+      const { data } = await supabase
+        .from("reviews")
+        .select("*, tours(name)")
+        .order("created_at", { ascending: false });
 
-    if (data) {
-      setReviews(data.map((r: any) => ({
-        ...r,
-        tour_name: r.tours?.name || "Passeio Geral",
-      })));
+      if (data) {
+        setReviews(data.map((r: any) => ({
+          ...r,
+          tour_name: r.tours?.name || "Passeio Geral",
+        })));
+      }
+    } catch (err) {
+      toast.error("Erro ao carregar avaliações");
     }
     setLoading(false);
   }, []);
 
   const handleDelete = useCallback(async (id: string) => {
-    const { error } = await supabase.from("reviews").delete().eq("id", id);
-    if (error) toast.error("Erro ao remover avaliação.");
-    else { toast.success("Avaliação removida."); fetchReviews(); }
+    try {
+      const { error } = await supabase.from("reviews").delete().eq("id", id);
+      if (error) toast.error("Erro ao remover avaliação.");
+      else { toast.success("Avaliação removida."); fetchReviews(); }
+    } catch (err) {
+      toast.error("Erro ao remover avaliação");
+    }
   }, [fetchReviews]);
 
   const handleStatusToggle = useCallback(async (id: string, currentStatus: string) => {
-    const newStatus = currentStatus === 'approved' ? 'hidden' : 'approved';
-    const { error } = await supabase.from("reviews").update({ status: newStatus } as any).eq("id", id);
-    if (!error) {
-      toast.success(newStatus === 'approved' ? "Avaliação aprovada!" : "Avaliação oculta.");
-      fetchReviews();
+    try {
+      const newStatus = currentStatus === 'approved' ? 'hidden' : 'approved';
+      const { error } = await supabase.from("reviews").update({ status: newStatus } as any).eq("id", id);
+      if (error) {
+        toast.error("Erro ao alterar status da avaliação");
+      } else {
+        toast.success(newStatus === 'approved' ? "Avaliação aprovada!" : "Avaliação oculta.");
+        fetchReviews();
+      }
+    } catch (err) {
+      toast.error("Erro ao alterar status da avaliação");
     }
   }, [fetchReviews]);
 
   const handleFeaturedToggle = useCallback(async (id: string, currentFeatured: boolean) => {
-    const { error } = await supabase.from("reviews").update({ is_featured: !currentFeatured } as any).eq("id", id);
-    if (!error) {
-      toast.success(currentFeatured ? "Destaque removido." : "Definida como destaque!");
-      fetchReviews();
+    try {
+      const { error } = await supabase.from("reviews").update({ is_featured: !currentFeatured } as any).eq("id", id);
+      if (error) {
+        toast.error("Erro ao alterar destaque da avaliação");
+      } else {
+        toast.success(currentFeatured ? "Destaque removido." : "Definida como destaque!");
+        fetchReviews();
+      }
+    } catch (err) {
+      toast.error("Erro ao alterar destaque da avaliação");
     }
   }, [fetchReviews]);
 
   const handleCreate = async () => {
     if (!formAuthor.trim()) { toast.error("Informe o autor."); return; }
     setSaving(true);
-    const { error } = await supabase.from("reviews").insert({
-      author: formAuthor.trim().slice(0, 100),
-      rating: formRating,
-      comment: formComment.trim().slice(0, 1000) || null,
-      country: formCountry.trim().slice(0, 50) || null,
-      tour_id: formTourId || null,
-    });
-    setSaving(false);
-    if (error) toast.error("Erro ao criar avaliação.");
-    else {
-      toast.success("Avaliação criada!");
-      setDialogOpen(false);
-      resetForm();
-      fetchReviews();
+    try {
+      const { error } = await supabase.from("reviews").insert({
+        author: formAuthor.trim().slice(0, 100),
+        rating: formRating,
+        comment: formComment.trim().slice(0, 1000) || null,
+        country: formCountry.trim().slice(0, 50) || null,
+        tour_id: formTourId || null,
+      });
+      setSaving(false);
+      if (error) toast.error("Erro ao criar avaliação.");
+      else {
+        toast.success("Avaliação criada!");
+        setDialogOpen(false);
+        resetForm();
+        fetchReviews();
+      }
+    } catch (err) {
+      setSaving(false);
+      toast.error("Erro ao criar avaliação");
     }
   };
 
@@ -283,7 +312,7 @@ const AdminAvaliacoes = () => {
 
   const filtered = reviews.filter((r) => {
     const matchSearch = search === "" ||
-      r.author.toLowerCase().includes(search.toLowerCase()) ||
+      (r.author || "").toLowerCase().includes(search.toLowerCase()) ||
       (r.comment || "").toLowerCase().includes(search.toLowerCase()) ||
       (r.country || "").toLowerCase().includes(search.toLowerCase());
     const matchRating = filterRating === "all" || r.rating === Number(filterRating);
@@ -302,7 +331,7 @@ const AdminAvaliacoes = () => {
       <AdminLayout title="Avaliações">
         <div className="flex flex-col items-center justify-center py-32 space-y-4">
           <Loader2 className="animate-spin text-primary" size={40} />
-          <p className="text-muted-foreground animate-pulse font-black uppercase tracking-widest text-xs">Carregando Depoimentos...</p>
+          <p className="text-muted-foreground font-black uppercase tracking-widest text-xs">Carregando Depoimentos...</p>
         </div>
       </AdminLayout>
     );
@@ -440,7 +469,7 @@ const AdminAvaliacoes = () => {
 
       {/* Grid of Reviews */}
       {filtered.length === 0 ? (
-        <div className="col-span-full h-80 flex flex-col items-center justify-center space-y-6 bg-white/40 dark:bg-black/20 backdrop-blur-xl rounded-[3rem] border-2 border-dashed border-white/40 dark:border-white/10 animate-pulse">
+        <div className="col-span-full h-80 flex flex-col items-center justify-center space-y-6 bg-white/40 dark:bg-black/20 backdrop-blur-xl rounded-[3rem] border-2 border-dashed border-white/40 dark:border-white/10">
           <div className="w-20 h-20 rounded-[2rem] bg-muted/20 flex items-center justify-center text-muted-foreground/40 shadow-inner">
             <MessageSquare size={40} />
           </div>

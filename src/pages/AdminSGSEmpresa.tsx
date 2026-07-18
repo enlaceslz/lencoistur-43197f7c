@@ -107,8 +107,12 @@ const AdminSGSEmpresa = () => {
 
       // Auto-save logo_url if empresa already exists
       if (form.id) {
-        await supabase.from("sgs_empresa").update({ logo_url: logoUrl }).eq("id", form.id);
-        toast({ title: "Logo atualizado!" });
+        try {
+          await supabase.from("sgs_empresa").update({ logo_url: logoUrl }).eq("id", form.id);
+          toast({ title: "Logo atualizado!" });
+        } catch {
+          toast({ title: "Erro ao atualizar logo", variant: "destructive" });
+        }
       } else {
         toast({ title: "Logo carregado! Salve os dados para confirmar." });
       }
@@ -124,8 +128,12 @@ const AdminSGSEmpresa = () => {
     setLogoPreview(null);
     setForm(prev => ({ ...prev, logo_url: "" }));
     if (form.id) {
-      await supabase.from("sgs_empresa").update({ logo_url: null }).eq("id", form.id);
-      toast({ title: "Logo removido!" });
+      try {
+        await supabase.from("sgs_empresa").update({ logo_url: null }).eq("id", form.id);
+        toast({ title: "Logo removido!" });
+      } catch {
+        toast({ title: "Erro ao remover logo", variant: "destructive" });
+      }
     }
   };
 

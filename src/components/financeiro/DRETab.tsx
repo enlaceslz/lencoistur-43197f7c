@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { 
-  TrendingUp, TrendingDown, DollarSign, PieChart, 
+  TrendingUp, PieChart, 
   ArrowUpRight, ArrowDownRight, Info, Target, LayoutDashboard, Printer, ShieldCheck, Zap
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
@@ -147,7 +147,7 @@ export default function DRETab({
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 glass-card p-8 rounded-[2.5rem] border border-white/20">
         <div className="space-y-1">
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
             <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Visão Estratégica</p>
           </div>
           <h2 className="text-3xl font-black text-foreground tracking-tight">Análise de Lucratividade</h2>

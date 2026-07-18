@@ -50,13 +50,12 @@ const GallerySection = () => {
               onClick={() => setLightbox(i)}
               className={`relative overflow-hidden rounded-2xl group cursor-pointer ${i === 0 ? "col-span-2 row-span-2" : ""}`}
             >
-              <img
-                src={img.src}
-                alt={img.alt}
-                loading="lazy"
-                className={`w-full object-cover aspect-square md:aspect-auto group-hover:scale-110 transition-transform duration-500 ${i === 0 ? "h-full min-h-[300px]" : "h-48 md:h-56"}`}
-                loading="lazy"
-              />
+               <img
+                  src={img.src}
+                  alt={img.alt}
+                  loading="lazy"
+                  className={`w-full object-cover aspect-square md:aspect-auto group-hover:scale-110 transition-transform duration-500 ${i === 0 ? "h-full min-h-[300px]" : "h-48 md:h-56"}`}
+                />
               <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors duration-300" />
             </button>
           ))}

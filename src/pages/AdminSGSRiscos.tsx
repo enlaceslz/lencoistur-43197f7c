@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, AlertTriangle, Search, Info, Pencil, Trash2, Printer, CheckCircle, Clock } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 
@@ -75,10 +74,15 @@ const AdminSGSRiscos = () => {
   useEffect(() => { loadRisks(); }, []);
 
   const loadRisks = async () => {
-    setLoading(true);
-    const { data } = await supabase.from("sgs_risks").select("*").order("risk_level", { ascending: false });
-    setRisks((data as Risk[]) || []);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const { data } = await supabase.from("sgs_risks").select("*").order("risk_level", { ascending: false });
+      setRisks((data as Risk[]) || []);
+    } catch (err: any) {
+      toast({ title: "Erro ao carregar riscos", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const generateCode = () => `RSK-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`;
@@ -97,10 +101,14 @@ const AdminSGSRiscos = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Excluir este risco?")) return;
-    await supabase.from("sgs_risks").delete().eq("id", id);
-    toast({ title: "Risco excluído." });
-    loadRisks();
+    try {
+      if (!confirm("Excluir este risco?")) return;
+      await supabase.from("sgs_risks").delete().eq("id", id);
+      toast({ title: "Risco excluído." });
+      loadRisks();
+    } catch (err: any) {
+      toast({ title: "Erro ao excluir risco", description: err.message, variant: "destructive" });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -126,26 +134,34 @@ const AdminSGSRiscos = () => {
       // P3: Auto-create corrective action if NR >= 6
       if (level >= 6) {
         const rc = riskClass(level);
-        await supabase.from("sgs_corrective_actions").insert({
-          action_code: `AC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`,
-          description: `Ação ${level >= 12 ? "URGENTE" : "corretiva"} para risco: ${form.hazard} (NR=${level})`,
-          responsible: form.responsible,
-          due_date: new Date(Date.now() + (level >= 12 ? 3 : 14) * 86400000).toISOString().split("T")[0],
-        });
-        toast({
-          title: level >= 12 ? "🚨 Ação URGENTE criada automaticamente" : "⚠️ Ação corretiva criada automaticamente",
-          description: `Risco ${rc.label} detectado (NR = ${level}). ${rc.action}.`,
-        });
+        try {
+          await supabase.from("sgs_corrective_actions").insert({
+            action_code: `AC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`,
+            description: `Ação ${level >= 12 ? "URGENTE" : "corretiva"} para risco: ${form.hazard} (NR=${level})`,
+            responsible: form.responsible,
+            due_date: new Date(Date.now() + (level >= 12 ? 3 : 14) * 86400000).toISOString().split("T")[0],
+          });
+          toast({
+            title: level >= 12 ? "🚨 Ação URGENTE criada automaticamente" : "⚠️ Ação corretiva criada automaticamente",
+            description: `Risco ${rc.label} detectado (NR = ${level}). ${rc.action}.`,
+          });
+        } catch (err: any) {
+          toast({ title: "Erro ao criar ação corretiva", description: err.message, variant: "destructive" });
+        }
       }
       // Obs VATTI: Riscos com probabilidade baixa mas consequência alta também devem ser tratados
       if (form.probability <= 2 && form.impact >= 4 && level < 6) {
-        await supabase.from("sgs_corrective_actions").insert({
-          action_code: `AC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`,
-          description: `Monitoramento especial: ${form.hazard} — probabilidade baixa mas consequência alta (P=${form.probability}, C=${form.impact})`,
-          responsible: form.responsible,
-          due_date: new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
-        });
-        toast({ title: "📋 Ação de monitoramento criada", description: "Conforme VATTI: riscos com P baixa e C alta devem ser tratados." });
+        try {
+          await supabase.from("sgs_corrective_actions").insert({
+            action_code: `AC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 9999) + 1).padStart(4, "0")}`,
+            description: `Monitoramento especial: ${form.hazard} — probabilidade baixa mas consequência alta (P=${form.probability}, C=${form.impact})`,
+            responsible: form.responsible,
+            due_date: new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
+          });
+          toast({ title: "📋 Ação de monitoramento criada", description: "Conforme VATTI: riscos com P baixa e C alta devem ser tratados." });
+        } catch (err: any) {
+          toast({ title: "Erro ao criar ação de monitoramento", description: err.message, variant: "destructive" });
+        }
       }
     }
 
@@ -156,7 +172,7 @@ const AdminSGSRiscos = () => {
   };
 
   const filtered = risks.filter((r) => {
-    const matchSearch = !search || r.activity.toLowerCase().includes(search.toLowerCase()) || r.hazard.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = !search || (r.activity || "").toLowerCase().includes(search.toLowerCase()) || (r.hazard || "").toLowerCase().includes(search.toLowerCase());
     const matchStage = filterStage === "todas" || r.stage === filterStage;
     return matchSearch && matchStage;
   });
@@ -178,7 +194,7 @@ const AdminSGSRiscos = () => {
               <h1 className="text-2xl font-black text-slate-900 tracking-tight">Análise de Perigos e Riscos</h1>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/10">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Matriz P2 Sincronizada</span>
                 </div>
               </div>
@@ -554,7 +570,7 @@ const AdminSGSRiscos = () => {
               <div className="mt-auto pt-4 border-t border-border/50 flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[10px] font-black">
-                    {r.responsible?.charAt(0).toUpperCase() || 'R'}
+                    {r.responsible?.charAt(0)?.toUpperCase() || 'R'}
                   </div>
                   <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Resp: {r.responsible}</span>
                 </div>

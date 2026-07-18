@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
-  Search, Plus, Pencil, Package as PackageIcon, X, CheckCircle, GripVertical, Eye, Share2, Car, Compass, Trash2, Calendar, Target, Loader2, Clock, Upload, Moon, XCircle, FileText, Copy, DollarSign
+  Search, Plus, Pencil, Package as PackageIcon, X, CheckCircle, GripVertical, Eye, Share2, Compass, Trash2, Calendar, Target, Loader2, Clock, Upload, Moon, XCircle, FileText, Copy, DollarSign
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, KeyboardSensor } from '@dnd-kit/core';
@@ -46,8 +46,6 @@ const SortableItem = ({ item, type, index, onRemove }: { item: any, type: 'tour'
   );
 };
 
-const fmt = (v: number) => (Number(v) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-
 const AdminPacotes = () => {
   const [packages, setPackages] = useState<any[]>([]);
   const [tours, setTours] = useState<any[]>([]);
@@ -68,6 +66,7 @@ const AdminPacotes = () => {
   });
 
   const [selectedItems, setSelectedItems] = useState<{id: string, type: 'tour' | 'transfer', data: any}[]>([]);
+  const manualPriceEdit = useRef(false);
 
   useEffect(() => { loadData(); }, []);
 
@@ -80,11 +79,17 @@ const AdminPacotes = () => {
         supabase.from("transfer_routes").select("id, origin, destination, price, partner_price").eq("active", true).order("origin")
       ]);
 
-      if (pkgRes.data) setPackages(pkgRes.data);
-      setTours(tourRes.data || []);
-      setTransfers(transRes.data || []);
+      if (pkgRes.error) console.error("Erro ao carregar pacotes:", pkgRes.error);
+      else setPackages(pkgRes.data);
+
+      if (tourRes.error) console.error("Erro ao carregar passeios:", tourRes.error);
+      else setTours(tourRes.data || []);
+
+      if (transRes.error) console.error("Erro ao carregar translados:", transRes.error);
+      else setTransfers(transRes.data || []);
     } catch (err) {
-      console.error("Erro ao carregar pacotes:", err);
+      toast.error("Erro ao carregar dados");
+      console.error("Erro ao carregar dados:", err);
     }
     setLoading(false);
   };
@@ -153,11 +158,12 @@ const AdminPacotes = () => {
       setForm({ name: "", slug: "", description: "", days: 1, nights: 0, original_price: 0, discount_price: 0, partner_price: 0, banner_url: "", tag: "", active: true, highlights: [] });
       setSelectedItems([]);
     }
+    manualPriceEdit.current = false;
     setShowForm(true);
   };
 
   useEffect(() => {
-    if (showForm && !editingId) {
+    if (showForm && !editingId && !manualPriceEdit.current) {
       const totalSite = selectedItems.reduce((acc, item) => acc + (item.data?.price || 0), 0);
       const totalPartner = selectedItems.reduce((acc, item) => acc + (item.data?.partner_price || 0), 0);
       
@@ -243,7 +249,8 @@ const AdminPacotes = () => {
   };
 
   const sharePackage = (pkg: any) => {
-    const shareText = `💎 *CAMPANHA: ${pkg.name.toUpperCase()}*\n\n📍 ${pkg.description || 'Roteiro completo'}\n\n💰 Por apenas: *${fmt(pkg.discount_price)}*\n\n🔗 Confira os detalhes: ${window.location.origin}/pacote/${pkg.slug}`;
+    const desc = pkg.description ? (pkg.description.length > 120 ? pkg.description.substring(0, 120) + '...' : pkg.description) : 'Roteiro completo';
+    const shareText = `💎 *CAMPANHA: ${pkg.name.toUpperCase()}*\n\n📍 ${desc}\n\n💰 Por apenas: *${formatCurrency(pkg.discount_price)}*\n\n🔗 Confira os detalhes: ${window.location.origin}/pacote/${pkg.slug}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
   };
 
@@ -254,9 +261,9 @@ const AdminPacotes = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {[
           { label: "Pacotes Ativos", value: packages.filter(p => p.active).length, icon: PackageIcon, color: "text-blue-500", bg: "bg-blue-500/10", desc: "Total em catálogo" },
-          { label: "Valor em Catálogo", value: fmt(packages.reduce((a, b) => a + (b.discount_price || 0), 0)), icon: DollarSign, color: "text-emerald-500", bg: "bg-emerald-500/10", desc: "Soma dos pacotes" },
+          { label: "Valor em Catálogo", value: formatCurrency(packages.reduce((a, b) => a + (b.discount_price || 0), 0)), icon: DollarSign, color: "text-emerald-500", bg: "bg-emerald-500/10", desc: "Soma dos pacotes" },
           { label: "Opções de Roteiro", value: tours.length + transfers.length, icon: Compass, color: "text-amber-500", bg: "bg-amber-500/10", desc: "Itens disponíveis" },
-          { label: "Ticket Médio", value: fmt(packages.reduce((a, b) => a + (b.discount_price || 0), 0) / (packages.length || 1)), icon: Target, color: "text-purple-500", bg: "bg-purple-500/10", desc: "Valor promocional" }
+          { label: "Ticket Médio", value: formatCurrency(packages.reduce((a, b) => a + (b.discount_price || 0), 0) / (packages.length || 1)), icon: Target, color: "text-purple-500", bg: "bg-purple-500/10", desc: "Valor promocional" }
         ].map((stat, i) => (
           <div key={i} className="bg-white border border-border shadow-sm rounded-lg p-6 relative overflow-hidden group hover:border-primary/50">
 
@@ -285,11 +292,11 @@ const AdminPacotes = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {packages.filter(p => p.name.toLowerCase().includes(search.toLowerCase())).map((pkg, idx) => (
+        {packages.filter(p => (p.name || "").toLowerCase().includes(search.toLowerCase())).map((pkg, idx) => (
           <Card key={pkg.id} className="overflow-hidden border border-border shadow-sm rounded-lg group">
             <div className="relative h-44 overflow-hidden">
               <img 
-                src={pkg.banner_url || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80"} 
+                src={pkg.banner_url || "/placeholder.svg"} 
                 className="w-full h-full object-cover" 
                 alt={pkg.name} 
               />
@@ -319,8 +326,8 @@ const AdminPacotes = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-[10px] text-muted-foreground uppercase font-black leading-none mb-1">Preço Site</p>
-                  <p className="text-lg font-black text-primary">{fmt(pkg.discount_price)}</p>
-                  <p className="text-[9px] text-primary/60 font-black mt-1">Parceiro: {pkg.partner_price ? fmt(pkg.partner_price) : "Padrão"}</p>
+                  <p className="text-lg font-black text-primary">{formatCurrency(pkg.discount_price)}</p>
+                  <p className="text-[9px] text-primary/60 font-black mt-1">Parceiro: {pkg.partner_price ? formatCurrency(pkg.partner_price) : "Padrão"}</p>
                 </div>
               </div>
               
@@ -427,6 +434,7 @@ const AdminPacotes = () => {
                             value={form.discount_price / 100}
                             onValueChange={(values) => {
                               const { floatValue } = values;
+                              manualPriceEdit.current = true;
                               setForm(prev => ({ ...prev, discount_price: Math.round((floatValue || 0) * 100) }));
                             }}
                             thousandSeparator="."
@@ -446,6 +454,7 @@ const AdminPacotes = () => {
                             value={form.partner_price / 100}
                             onValueChange={(values) => {
                               const { floatValue } = values;
+                              manualPriceEdit.current = true;
                               setForm(prev => ({ ...prev, partner_price: Math.round((floatValue || 0) * 100) }));
                             }}
                             thousandSeparator="."
@@ -664,7 +673,7 @@ const AdminPacotes = () => {
               <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 custom-scrollbar">
                 <div className="relative aspect-[21/9] rounded-lg overflow-hidden shadow-md border-2 border-white">
                   <img 
-                    src={viewingPackage.banner_url || "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80"} 
+                    src={viewingPackage.banner_url || "/placeholder.svg"} 
                     className="w-full h-full object-cover" 
                     alt={viewingPackage.name} 
                   />
@@ -683,7 +692,7 @@ const AdminPacotes = () => {
                         </div>
                       )}
                       <div className="flex items-center gap-2 text-primary font-black text-2xl">
-                        {fmt(viewingPackage.discount_price)}
+                        {formatCurrency(viewingPackage.discount_price)}
                       </div>
                     </div>
                   </div>

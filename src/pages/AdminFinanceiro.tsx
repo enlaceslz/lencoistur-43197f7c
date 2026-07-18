@@ -3,15 +3,12 @@ import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   DollarSign, TrendingUp, TrendingDown, CreditCard, Wallet, Receipt,
   Loader2, Download, Printer, LayoutDashboard, FileText, Search,
-  Calendar as CalendarIcon, Filter, ArrowUpRight, ArrowDownRight,
-  TrendingUp as TrendingUpIcon, Plus, MoreHorizontal, CheckCircle2,
-  Clock, XCircle, CreditCard as CreditCardIcon, Banknote
+  TrendingUp as TrendingUpIcon,
 } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import FinanceiroStats from "@/components/financeiro/FinanceiroStats";
@@ -21,7 +18,6 @@ import ContasReceberTab from "@/components/financeiro/ContasReceberTab";
 import DRETab from "@/components/financeiro/DRETab";
 import NotasFiscaisTab from "@/components/financeiro/NotasFiscaisTab";
 import { formatCurrency, cn } from "@/lib/utils";
-import { NumericFormat } from "react-number-format";
 
 type Tab = "fluxo" | "pagar" | "receber" | "dre" | "notas";
 
@@ -363,7 +359,7 @@ const AdminFinanceiro = () => {
       <AdminLayout title="Financeiro">
         <div className="flex flex-col items-center justify-center py-32 space-y-4">
           <Loader2 className="animate-spin text-primary" size={40} />
-          <p className="text-muted-foreground animate-pulse">Carregando dados financeiros...</p>
+          <p className="text-muted-foreground">Carregando dados financeiros...</p>
         </div>
       </AdminLayout>
     );

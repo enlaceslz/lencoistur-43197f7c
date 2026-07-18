@@ -51,7 +51,12 @@ const AdminSGSCondutoresVisitantes = () => {
   };
 
   const updateStatus = async (id: string, status: string) => {
-    await supabase.from("sgs_condutores_visitantes").update({ status }).eq("id", id);
+    try {
+      await supabase.from("sgs_condutores_visitantes").update({ status }).eq("id", id);
+    } catch {
+      toast({ title: "Erro ao atualizar status", variant: "destructive" });
+      return;
+    }
     toast({ title: `Status atualizado para ${STATUS_LABELS[status]?.label}` });
     load();
   };
