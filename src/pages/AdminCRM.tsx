@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import AdminLayout from "@/components/AdminLayout";
-import { 
-  Search, Phone, Mail, Globe, Eye, Download, Loader2, Users, ShoppingBag, 
-  DollarSign, MapPin, Smartphone, RefreshCw, Calendar, Plus, 
-  Pencil, Trash2, X, Save, UserPlus, Baby, FileText, Printer, 
-  Paperclip, Upload, History, Tag as TagIcon, Target, CheckCircle2,
-  ChevronRight, Star, Heart, Activity, Award, Shield, User, 
-  MoreHorizontal, Map, Filter, ArrowRight, UserCheck, UserPlus2
+import {
+  Search, Phone, Mail, Eye, Download, Loader2, Users, ShoppingBag,
+  DollarSign, MapPin, Smartphone, RefreshCw, Plus,
+  Pencil, Trash2, X, Save, UserPlus, Baby, FileText,
+  History, Tag as TagIcon, Target, CheckCircle2,
+  User
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -469,6 +468,7 @@ const AdminCRMContent = () => {
       toast.success("Cliente atualizado!");
       if (selectedCustomer?.id === editingCustomer.id) {
         setSelectedCustomer({ ...selectedCustomer, ...payload });
+        selectCustomer({ ...selectedCustomer, ...payload });
       }
     } else {
       const { error } = await supabase.from("customers").insert(payload);
@@ -783,7 +783,6 @@ const AdminCRMContent = () => {
     const matchesSearch = (c.name || "").toLowerCase().includes(q) || (c.email || "").toLowerCase().includes(q) || (c.phone || "").includes(q) || (c.cpf || "").includes(q) || (c.passport || "").toLowerCase().includes(q) || (c.city || "").toLowerCase().includes(q);
     if (filter === "with_bookings") return matchesSearch && c.totalBookings > 0;
     if (filter === "no_bookings") return matchesSearch && c.totalBookings === 0;
-    if (filter === "dependents") return false;
     return matchesSearch;
   });
 
@@ -804,13 +803,6 @@ const AdminCRMContent = () => {
 
   const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0);
   const withBookings = customers.filter((c) => c.totalBookings > 0).length;
-
-  const clientStats = [
-    { label: "Total de Clientes", value: customers.length.toString(), icon: Users, color: "text-primary" },
-    { label: "Novos (Mês)", value: newThisMonth.toString(), icon: UserPlus, color: "text-purple-600" },
-    { label: "Receita Total", value: formatCurrency(totalRevenue), icon: DollarSign, color: "text-blue-600" },
-    { label: "Ticket Médio", value: withBookings > 0 ? formatCurrency(Math.round(totalRevenue / withBookings)) : "R$ 0", icon: Smartphone, color: "text-amber-600" },
-  ];
 
   if (loading) {
     return (
