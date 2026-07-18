@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback, memo } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { useLocalizedPath } from "@/lib/useLocalizedPath";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import {
   Home, Compass, Car, Users, UserCheck, CreditCard, Settings,
@@ -130,6 +131,23 @@ const getBreadcrumbs = (pathname: string, mainItems: SidebarItem[], sgsItems: Si
   return crumbs;
 };
 
+const SidebarLink = memo(({ icon: Icon, label, path, indent = false, isActive, sidebarCollapsed, onClose }: SidebarItem & { indent?: boolean; isActive: boolean; sidebarCollapsed: boolean; onClose: () => void }) => {
+  return (
+    <Link
+      to={path}
+      onClick={onClose}
+      className={`flex items-center gap-3 px-4 py-2.5 rounded-md text-[14px] font-medium ${
+        isActive 
+          ? "bg-primary text-white" 
+          : "text-white/70 hover:text-white hover:bg-white/10"
+      } ${sidebarCollapsed ? "justify-center px-0 mx-2" : "mx-2"}`}
+    >
+      <Icon size={indent ? 16 : 20} className={isActive ? "text-white" : ""} />
+      {!sidebarCollapsed && <span className="truncate">{label}</span>}
+    </Link>
+  );
+});
+
 const AdminLayout = ({ children, title }: { children: React.ReactNode; title: string }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => localStorage.getItem("admin-sidebar-collapsed") === "true");
@@ -140,6 +158,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   const [userRole, setUserRole] = useState<string>("operador");
   const [userPermissions, setUserPermissions] = useState<Record<string, boolean>>({});
   const notifRef = useRef<HTMLDivElement>(null);
+  const loc = useLocalizedPath();
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
@@ -150,36 +169,36 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   }, [location.pathname]);
 
   useEffect(() => {
-    const fetch = async () => {
+    const loadUserManagement = async () => {
       if (!user?.id) return;
       const { data } = await supabase.from("user_management").select("role, permissions").eq("user_id", user.id).maybeSingle();
       if (data) { setUserRole(data.role); setUserPermissions((data.permissions as any) || {}); }
     };
-    fetch();
+    loadUserManagement();
   }, [user]);
 
   useEffect(() => { localStorage.setItem("admin-sidebar-collapsed", String(sidebarCollapsed)); }, [sidebarCollapsed]);
 
-  const canAccess = (key?: string) => {
+  const canAccess = useCallback((key?: string) => {
     if (!key) return true;
     const permKeys = Object.keys(userPermissions);
     if (permKeys.length === 0) return true;
     return !!userPermissions[key];
-  };
+  }, [userPermissions]);
 
-  const filteredMainGroups = mainGroups
+  const filteredMainGroups = useMemo(() => mainGroups
     .map(g => ({ ...g, items: g.items.filter(i => canAccess(i.permissionKey)) }))
-    .filter(g => g.items.length > 0);
+    .filter(g => g.items.length > 0), [canAccess]);
 
-  const filteredSgsGroups = sgsGroups
+  const filteredSgsGroups = useMemo(() => sgsGroups
     .map(g => ({ ...g, items: g.items.filter(i => canAccess(i.permissionKey)) }))
-    .filter(g => g.items.length > 0);
+    .filter(g => g.items.length > 0), [canAccess]);
 
-  const visibleMainItems = filteredMainGroups.flatMap(g => g.items);
-  const visibleSgsItems = filteredSgsGroups.flatMap(g => g.items);
+  const visibleMainItems = useMemo(() => filteredMainGroups.flatMap(g => g.items), [filteredMainGroups]);
+  const visibleSgsItems = useMemo(() => filteredSgsGroups.flatMap(g => g.items), [filteredSgsGroups]);
 
   const isSgsActive = location.pathname.startsWith("/admin/sgs");
-  const breadcrumbs = getBreadcrumbs(location.pathname, visibleMainItems, visibleSgsItems);
+  const breadcrumbs = useMemo(() => getBreadcrumbs(location.pathname, visibleMainItems, visibleSgsItems), [location.pathname, visibleMainItems, visibleSgsItems]);
 
   useEffect(() => {
     const loadNotifs = async () => {
@@ -200,23 +219,6 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
   const activeNotifs = notifications.filter(n => !dismissed.has(n.id));
   const errorCount = activeNotifs.filter(n => n.type === "error").length;
 
-  const SidebarLink = React.memo(({ icon: Icon, label, path, indent = false, isActive }: SidebarItem & { indent?: boolean; isActive: boolean }) => {
-    return (
-      <Link
-        to={path}
-        onClick={() => setSidebarOpen(false)}
-        className={`flex items-center gap-3 px-4 py-2.5 rounded-md text-[14px] font-medium ${
-          isActive 
-            ? "bg-primary text-white" 
-            : "text-white/70 hover:text-white hover:bg-white/10"
-        } ${sidebarCollapsed ? "justify-center px-0 mx-2" : "mx-2"}`}
-      >
-        <Icon size={indent ? 16 : 20} className={isActive ? "text-white" : ""} />
-        {!sidebarCollapsed && <span className="truncate">{label}</span>}
-      </Link>
-    );
-  });
-
   const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : "AD";
 
   return (
@@ -224,7 +226,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
       <div className="min-h-screen bg-slate-50 flex font-body">
         <aside className={`fixed inset-y-0 left-0 z-50 ${sidebarCollapsed ? "w-[70px]" : "w-[260px]"} bg-slate-900 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col border-r border-slate-800`}>
           <div className={`px-4 py-6 ${sidebarCollapsed ? "flex justify-center" : ""}`}>
-            <Link to="/" className="flex items-center gap-3">
+            <Link to={loc("/")} className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center shrink-0">
                 <span className="text-white font-bold text-lg">LT</span>
               </div>
@@ -243,7 +245,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
                 {!sidebarCollapsed && <p className="px-4 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">{group.title}</p>}
                 {group.items.map(item => {
                   const isActive = location.pathname === item.path || (item.path !== "/admin" && location.pathname.startsWith(item.path));
-                  return <SidebarLink key={item.path} {...item} isActive={isActive} />;
+                  return <SidebarLink key={item.path} {...item} isActive={isActive} sidebarCollapsed={sidebarCollapsed} onClose={() => setSidebarOpen(false)} />;
                 })}
               </div>
             ))}
@@ -258,7 +260,7 @@ const AdminLayout = ({ children, title }: { children: React.ReactNode; title: st
                   <div className="mt-2 space-y-1">
                     {visibleSgsItems.map(item => {
                       const isActive = location.pathname === item.path || (item.path !== "/admin/sgs" && location.pathname.startsWith(item.path));
-                      return <SidebarLink key={item.path} {...item} indent isActive={isActive} />;
+                      return <SidebarLink key={item.path} {...item} indent isActive={isActive} sidebarCollapsed={sidebarCollapsed} onClose={() => setSidebarOpen(false)} />;
                     })}
                   </div>
                 )}
