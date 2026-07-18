@@ -312,3 +312,27 @@ npm run lint    # ESLint
 - O Coolify está presente mas o deploy atual é manual via `docker compose`
 - O container `lencoistur` roda na rede `coolify` para comunicação com o
   Traefik gerenciado pelo Coolify
+
+---
+
+## ⚠️ Pendências / Riscos conhecidos
+
+### Convenção de preços inconsistente (NÃO alterar sem validação de negócio)
+
+- `formatCurrency(value)` em `src/lib/utils.ts` **divide o valor por 100**
+  (trata o input como **centavos**).
+- Porém os dados em `tours.price`, `packages.discount_price` etc. estão
+  gravados como **valores baixos** (ex: tour "Lagoas Azuis" `price=150`,
+  "Passeio de Quadriciclo" `price=200`; pacote "Aventura Completa"
+  `discount_price=999`).
+- Efeito atual em produção: um tour de `150` é exibido como **R$ 1,50**
+  (150/100) e um pacote de `999` como **R$ 9,99**.
+- **Duas hipóteses**, com resolução oposta:
+  1. Os **dados** deveriam estar em centavos (`150` → `15000` para R$ 150).
+     Correção = migração de dados (`UPDATE ... SET price = price * 100`).
+  2. O **`formatCurrency`** não deveria dividir por 100 (dados já em reais).
+     Correção = remover o `/100` de `formatCurrency` e dos vários
+     `getTourEffectivePrice(...) / 100` espalhados.
+- **Risco financeiro alto** (checkout/cobrança 100x). Requer decisão do dono
+  do produto antes de qualquer alteração. Documentado em 2026-07-18.
+

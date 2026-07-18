@@ -6,7 +6,8 @@
     "partners": "Partners",
     "bookNow": "Book Now",
     "home": "Home",
-    "myBookings": "My Bookings"
+    "myBookings": "My Bookings",
+    "packages": "Packages"
   },
   "hero": {
     "location": "Santo Amaro do Maranhão",
@@ -56,7 +57,8 @@
     "toursCount": "tours",
     "perPerson": "/ person",
     "view": "View",
-    "whatsappCta": "Build Your Custom Package on WhatsApp"
+    "whatsappCta": "Build Your Custom Package on WhatsApp",
+    "empty": "No packages available at the moment."
   },
   "transfersDetail": {
     "title": "Transfers",
@@ -148,10 +150,22 @@
     "label": "Simple & Fast",
     "title": "How It Works",
     "steps": {
-      "choose": { "title": "Choose Your Tour", "desc": "Explore our catalog of experiences in the Lençóis Maranhenses." },
-      "book": { "title": "Book Online", "desc": "Secure payment via PIX, card or bank slip. Instant confirmation." },
-      "enjoy": { "title": "Live the Experience", "desc": "Our guides pick you up at the hotel. Just enjoy!" },
-      "review": { "title": "Rate Us", "desc": "Share your experience and help other travelers." }
+      "choose": {
+        "title": "Choose Your Tour",
+        "desc": "Explore our catalog of experiences in the Lençóis Maranhenses."
+      },
+      "book": {
+        "title": "Book Online",
+        "desc": "Secure payment via PIX, card or bank slip. Instant confirmation."
+      },
+      "enjoy": {
+        "title": "Live the Experience",
+        "desc": "Our guides pick you up at the hotel. Just enjoy!"
+      },
+      "review": {
+        "title": "Rate Us",
+        "desc": "Share your experience and help other travelers."
+      }
     }
   },
   "testimonials": {
@@ -184,22 +198,62 @@
     "notFound": "Didn't find your answer?",
     "whatsappCta": "📱 Contact Us on WhatsApp",
     "items": [
-      { "q": "What is the best time to visit the Lençóis Maranhenses?", "a": "The best time is between June and August, when the lagoons are full after the rainy season (January to May). However, you can find lagoons from May to November, depending on rainfall." },
-      { "q": "How to get to Santo Amaro do Maranhão?", "a": "The most common access is via São Luís (MA). From there, you can take a van transfer (4h30 trip) or rent a car. You can also arrive via Barreirinhas and then go to Santo Amaro by Toyota 4x4 (3h)." },
-      { "q": "Do I need to be physically fit for the tours?", "a": "It depends on the route. 4x4 tours to the lagoons are accessible for all ages. Dune trekking requires moderate fitness, with 2h to 4h walks under the sun. We have routes for all profiles!" },
-      { "q": "Do tours include hotel pickup?", "a": "Yes! All our tours include pickup and return to your inn or hotel in Santo Amaro. Just provide the address when booking." },
-      { "q": "Can I cancel my booking?", "a": "Yes. We offer free cancellation up to 24 hours before the tour. After that, a 50% fee applies. In case of bad weather, we reschedule at no extra cost." },
-      { "q": "What payment methods are accepted?", "a": "We accept PIX (5% discount), credit cards (up to 3 interest-free installments), bank transfer and cash. Payment can be made online at booking or in person." },
-      { "q": "Is it safe to swim in the lagoons?", "a": "Yes! The Lençóis lagoons are freshwater, shallow (usually up to 3m) and without currents. Water temperature is pleasant (25°C to 30°C). Our guides know the safest and most beautiful lagoons." },
-      { "q": "Can children participate in the tours?", "a": "Yes! We have family routes ideal for children. 4x4 tours and lagoons are perfect for families. For trekking and ATV, we recommend a minimum age of 12." }
+      {
+        "q": "What is the best time to visit the Lençóis Maranhenses?",
+        "a": "The best time is between June and August, when the lagoons are full after the rainy season (January to May). However, you can find lagoons from May to November, depending on rainfall."
+      },
+      {
+        "q": "How to get to Santo Amaro do Maranhão?",
+        "a": "The most common access is via São Luís (MA). From there, you can take a van transfer (4h30 trip) or rent a car. You can also arrive via Barreirinhas and then go to Santo Amaro by Toyota 4x4 (3h)."
+      },
+      {
+        "q": "Do I need to be physically fit for the tours?",
+        "a": "It depends on the route. 4x4 tours to the lagoons are accessible for all ages. Dune trekking requires moderate fitness, with 2h to 4h walks under the sun. We have routes for all profiles!"
+      },
+      {
+        "q": "Do tours include hotel pickup?",
+        "a": "Yes! All our tours include pickup and return to your inn or hotel in Santo Amaro. Just provide the address when booking."
+      },
+      {
+        "q": "Can I cancel my booking?",
+        "a": "Yes. We offer free cancellation up to 24 hours before the tour. After that, a 50% fee applies. In case of bad weather, we reschedule at no extra cost."
+      },
+      {
+        "q": "What payment methods are accepted?",
+        "a": "We accept PIX (5% discount), credit cards (up to 3 interest-free installments), bank transfer and cash. Payment can be made online at booking or in person."
+      },
+      {
+        "q": "Is it safe to swim in the lagoons?",
+        "a": "Yes! The Lençóis lagoons are freshwater, shallow (usually up to 3m) and without currents. Water temperature is pleasant (25°C to 30°C). Our guides know the safest and most beautiful lagoons."
+      },
+      {
+        "q": "Can children participate in the tours?",
+        "a": "Yes! We have family routes ideal for children. 4x4 tours and lagoons are perfect for families. For trekking and ATV, we recommend a minimum age of 12."
+      }
     ]
   },
   "footer": {
     "desc": "Lençóis Tour Experience is your gateway to the Lençóis Maranhenses. Strategically located in Santo Amaro, we offer the most authentic and safe experience in the region.",
     "toursTitle": "Experiences",
-    "tourLinks": ["Betânia", "Emendadas", "Gaivota Lagoon", "Ponta Verde", "América", "ATV Tour", "Kayak Descent", "Dune Trekking"],
+    "tourLinks": [
+      "Betânia",
+      "Emendadas",
+      "Gaivota Lagoon",
+      "Ponta Verde",
+      "América",
+      "ATV Tour",
+      "Kayak Descent",
+      "Dune Trekking"
+    ],
     "companyTitle": "Institutional",
-    "companyLinks": { "about": "Our Story", "safety": "Safety Management (SGS)", "partner": "Become a Partner", "transfers": "VIP Transfers", "terms": "Risk Awareness Terms", "privacy": "Privacy" },
+    "companyLinks": {
+      "about": "Our Story",
+      "safety": "Safety Management (SGS)",
+      "partner": "Become a Partner",
+      "transfers": "VIP Transfers",
+      "terms": "Risk Awareness Terms",
+      "privacy": "Privacy"
+    },
     "contactTitle": "Contact Us",
     "seals": "Safety & Quality",
     "copyright": "© 2026 Lençóis Tour Experience. All rights reserved. CNPJ: 11.622.667/0001-42"

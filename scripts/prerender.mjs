@@ -57,6 +57,7 @@ try {
 const STATIC_ROUTES = [
   { path: "/", priority: 1.0 },
   { path: "/passeios", priority: 0.9 },
+  { path: "/pacotes", priority: 0.9 },
   { path: "/translados", priority: 0.8 },
   { path: "/seguranca", priority: 0.7 },
   { path: "/politica-de-privacidade", priority: 0.5 },

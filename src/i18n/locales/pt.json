@@ -8,7 +8,8 @@
     "bookNow": "Reservar Agora",
     "home": "Início",
     "myBookings": "Minhas Reservas",
-    "about": "Sobre"
+    "about": "Sobre",
+    "packages": "Pacotes"
   },
   "hero": {
     "location": "Santo Amaro do Maranhão",
@@ -58,7 +59,8 @@
     "toursCount": "passeios",
     "perPerson": "/ pessoa",
     "view": "Ver",
-    "whatsappCta": "Monte seu Pacote Personalizado no WhatsApp"
+    "whatsappCta": "Monte seu Pacote Personalizado no WhatsApp",
+    "empty": "Nenhum pacote disponível no momento."
   },
   "transfersDetail": {
     "title": "Translados",
@@ -150,10 +152,22 @@
     "label": "Simples e Rápido",
     "title": "Como Funciona",
     "steps": {
-      "choose": { "title": "Escolha seu Passeio", "desc": "Explore nosso catálogo de experiências nos Lençóis Maranhenses." },
-      "book": { "title": "Reserve Online", "desc": "Pagamento seguro via PIX, cartão ou boleto. Confirmação instantânea." },
-      "enjoy": { "title": "Viva a Experiência", "desc": "Nossos guias buscam você no hotel. Só aproveitar!" },
-      "review": { "title": "Avalie", "desc": "Compartilhe sua experiência e ajude outros viajantes." }
+      "choose": {
+        "title": "Escolha seu Passeio",
+        "desc": "Explore nosso catálogo de experiências nos Lençóis Maranhenses."
+      },
+      "book": {
+        "title": "Reserve Online",
+        "desc": "Pagamento seguro via PIX, cartão ou boleto. Confirmação instantânea."
+      },
+      "enjoy": {
+        "title": "Viva a Experiência",
+        "desc": "Nossos guias buscam você no hotel. Só aproveitar!"
+      },
+      "review": {
+        "title": "Avalie",
+        "desc": "Compartilhe sua experiência e ajude outros viajantes."
+      }
     }
   },
   "testimonials": {
@@ -186,28 +200,61 @@
     "notFound": "Não encontrou sua resposta?",
     "whatsappCta": "📱 Fale Conosco no WhatsApp",
     "items": [
-      { "q": "Qual a melhor época para visitar os Lençóis Maranhenses?", "a": "A melhor época é entre junho e agosto, quando as lagoas estão cheias após o período de chuvas (janeiro a maio). Porém, é possível encontrar lagoas de maio a novembro, dependendo do volume de chuvas do ano." },
-      { "q": "Como chegar em Santo Amaro do Maranhão?", "a": "O acesso mais comum é via São Luís (MA). De lá, você pode pegar um transfer de van (4h30 de viagem) ou alugar um carro. Também é possível chegar por Barreirinhas e de lá seguir para Santo Amaro de Toyota 4x4 (3h)." },
-      { "q": "Preciso de preparo físico para os passeios?", "a": "Depende do roteiro. Passeios de 4x4 às lagoas são acessíveis para todas as idades. Já o trekking nas dunas exige um preparo moderado, com caminhadas de 2h a 4h sob sol. Temos roteiros para todos os perfis!" },
-      { "q": "Os passeios incluem transporte do hotel?", "a": "Sim! Todos os nossos passeios incluem busca e retorno na sua pousada ou hotel em Santo Amaro. Basta informar o endereço no momento da reserva." },
-      { "q": "Posso cancelar minha reserva?", "a": "Sim. Oferecemos cancelamento gratuito até 24 horas antes do passeio. Após esse prazo, será cobrada uma taxa de 50% do valor. Em caso de mau tempo, reagendamos sem custo adicional." },
-      { "q": "Quais formas de pagamento são aceitas?", "a": "Aceitamos PIX (com 5% de desconto), cartões de crédito (em até 3x sem juros), transferência bancária e dinheiro. O pagamento pode ser feito online no momento da reserva ou presencialmente." },
-      { "q": "É seguro nadar nas lagoas?", "a": "Sim! As lagoas dos Lençóis são de água doce, rasas (geralmente até 3m) e sem correnteza. A temperatura da água é agradável (entre 25°C e 30°C). Nossos guias conhecem as lagoas mais seguras e bonitas." },
-      { "q": "Crianças podem participar dos passeios?", "a": "Sim! Temos roteiros familiares ideais para crianças. Os passeios de 4x4 e as lagoas são perfeitos para famílias. Para trekking e quadriciclo, recomendamos idade mínima de 12 anos." }
+      {
+        "q": "Qual a melhor época para visitar os Lençóis Maranhenses?",
+        "a": "A melhor época é entre junho e agosto, quando as lagoas estão cheias após o período de chuvas (janeiro a maio). Porém, é possível encontrar lagoas de maio a novembro, dependendo do volume de chuvas do ano."
+      },
+      {
+        "q": "Como chegar em Santo Amaro do Maranhão?",
+        "a": "O acesso mais comum é via São Luís (MA). De lá, você pode pegar um transfer de van (4h30 de viagem) ou alugar um carro. Também é possível chegar por Barreirinhas e de lá seguir para Santo Amaro de Toyota 4x4 (3h)."
+      },
+      {
+        "q": "Preciso de preparo físico para os passeios?",
+        "a": "Depende do roteiro. Passeios de 4x4 às lagoas são acessíveis para todas as idades. Já o trekking nas dunas exige um preparo moderado, com caminhadas de 2h a 4h sob sol. Temos roteiros para todos os perfis!"
+      },
+      {
+        "q": "Os passeios incluem transporte do hotel?",
+        "a": "Sim! Todos os nossos passeios incluem busca e retorno na sua pousada ou hotel em Santo Amaro. Basta informar o endereço no momento da reserva."
+      },
+      {
+        "q": "Posso cancelar minha reserva?",
+        "a": "Sim. Oferecemos cancelamento gratuito até 24 horas antes do passeio. Após esse prazo, será cobrada uma taxa de 50% do valor. Em caso de mau tempo, reagendamos sem custo adicional."
+      },
+      {
+        "q": "Quais formas de pagamento são aceitas?",
+        "a": "Aceitamos PIX (com 5% de desconto), cartões de crédito (em até 3x sem juros), transferência bancária e dinheiro. O pagamento pode ser feito online no momento da reserva ou presencialmente."
+      },
+      {
+        "q": "É seguro nadar nas lagoas?",
+        "a": "Sim! As lagoas dos Lençóis são de água doce, rasas (geralmente até 3m) e sem correnteza. A temperatura da água é agradável (entre 25°C e 30°C). Nossos guias conhecem as lagoas mais seguras e bonitas."
+      },
+      {
+        "q": "Crianças podem participar dos passeios?",
+        "a": "Sim! Temos roteiros familiares ideais para crianças. Os passeios de 4x4 e as lagoas são perfeitos para famílias. Para trekking e quadriciclo, recomendamos idade mínima de 12 anos."
+      }
     ]
   },
   "footer": {
     "desc": "A Lençóis Tour Experience é a sua porta de entrada para os Lençóis Maranhenses. Localizada estrategicamente em Santo Amaro, oferecemos a experiência mais autêntica e segura da região.",
     "toursTitle": "Experiências",
-    "tourLinks": ["Lagoa da Gaivota", "Circuito Betânia", "Circuito Emendadas", "Canto do Atins", "Circuito Ponta Verde", "Trekking nas Dunas", "Passeio de Quadriciclo", "Descida de Caiaque"],
+    "tourLinks": [
+      "Lagoa da Gaivota",
+      "Circuito Betânia",
+      "Circuito Emendadas",
+      "Canto do Atins",
+      "Circuito Ponta Verde",
+      "Trekking nas Dunas",
+      "Passeio de Quadriciclo",
+      "Descida de Caiaque"
+    ],
     "companyTitle": "Institucional",
-    "companyLinks": { 
-      "about": "Sobre a Empresa", 
-      "safety": "Segurança (SGS)", 
-      "partner": "Seja um Parceiro", 
-      "transfers": "Transporte e Translados", 
-      "terms": "Termos de Uso", 
-      "privacy": "Privacidade" 
+    "companyLinks": {
+      "about": "Sobre a Empresa",
+      "safety": "Segurança (SGS)",
+      "partner": "Seja um Parceiro",
+      "transfers": "Transporte e Translados",
+      "terms": "Termos de Uso",
+      "privacy": "Privacidade"
     },
     "contactTitle": "Atendimento",
     "seals": "Certificações de Qualidade",

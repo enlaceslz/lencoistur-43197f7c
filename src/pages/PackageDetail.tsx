@@ -142,7 +142,7 @@ const PackageDetail = () => {
         <button onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-2">
           <ArrowLeft size={18} /> {t("packageDetail.back")}
         </button>
-        <Breadcrumbs items={[{ label: "Início", path: "/" }, { label: "Pacotes", path: "/" }, { label: pkg?.name || "Detalhes" }]} />
+        <Breadcrumbs items={[{ label: "Início", path: "/" }, { label: "Pacotes", path: "/pacotes" }, { label: pkg?.name || "Detalhes" }]} />
         <div className="grid lg:grid-cols-3 gap-12">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">

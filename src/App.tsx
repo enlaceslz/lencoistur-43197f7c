@@ -21,6 +21,7 @@ const TransfersPage = lazy(() => import("./pages/TransfersPage.tsx"));
 const CheckoutPage = lazy(() => import("./pages/CheckoutPage.tsx"));
 const MinhasReservas = lazy(() => import("./pages/MinhasReservas.tsx"));
 const PackageDetail = lazy(() => import("./pages/PackageDetail.tsx"));
+const PackagesPage = lazy(() => import("./pages/PackagesPage.tsx"));
 const TermoAssinatura = lazy(() => import("./pages/TermoAssinatura.tsx"));
 const VoucherPage = lazy(() => import("./pages/VoucherPage.tsx"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin.tsx"));
@@ -94,6 +95,7 @@ const App = () => (
             <Route path="/translados" element={<TransfersPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/minhas-reservas" element={<MinhasReservas />} />
+            <Route path="/pacotes" element={<PackagesPage />} />
             <Route path="/pacotes/:slug" element={<PackageDetail />} />
             <Route path="/assinatura-termo" element={<TermoAssinatura />} />
             <Route path="/voucher" element={<VoucherPage />} />
@@ -144,6 +146,7 @@ const App = () => (
               <Route path="translados" element={<TransfersPage />} />
               <Route path="checkout" element={<CheckoutPage />} />
               <Route path="minhas-reservas" element={<MinhasReservas />} />
+              <Route path="pacotes" element={<PackagesPage />} />
               <Route path="pacotes/:slug" element={<PackageDetail />} />
               <Route path="assinatura-termo" element={<TermoAssinatura />} />
               <Route path="voucher" element={<VoucherPage />} />

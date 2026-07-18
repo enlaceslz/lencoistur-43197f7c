@@ -1,4 +1,4 @@
-import { Menu, X, Compass, Car, Shield, User, Bell, LogOut, LayoutDashboard, Settings } from "lucide-react";
+import { Menu, X, Compass, Car, Shield, User, Bell, LogOut, LayoutDashboard, Settings, Package } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -79,6 +79,9 @@ const Navbar = () => {
           </Link>
           <Link to={loc("/translados")} className="hover:text-primary transition-all hover:translate-y-[-1px] flex items-center gap-2">
             <Car size={14} className="opacity-50" /> {t("nav.transfers")}
+          </Link>
+          <Link to={loc("/pacotes")} className="hover:text-primary transition-all hover:translate-y-[-1px] flex items-center gap-2">
+            <Package size={14} className="opacity-50" /> {t("nav.packages")}
           </Link>
           <Link to={loc("/seguranca")} className="hover:text-primary transition-all hover:translate-y-[-1px] flex items-center gap-2">
             <Shield size={14} className="opacity-50" /> {t("nav.safety")}
@@ -209,6 +212,7 @@ const Navbar = () => {
         <div className="lg:hidden fixed inset-x-0 top-[100%] h-screen bg-white/95 backdrop-blur-2xl border-t border-border/40 p-8 flex flex-col gap-6 animate-in slide-in-from-top duration-500">
           <Link to={loc("/passeios")} onClick={() => setOpen(false)} className="text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">{t("nav.tours")}</Link>
           <Link to={loc("/translados")} onClick={() => setOpen(false)} className="text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">{t("nav.transfers")}</Link>
+          <Link to={loc("/pacotes")} onClick={() => setOpen(false)} className="text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">{t("nav.packages")}</Link>
           <Link to={loc("/seguranca")} onClick={() => setOpen(false)} className="text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">{t("nav.safety")}</Link>
           <Link to={loc("/minhas-reservas")} onClick={() => setOpen(false)} className="text-lg font-black uppercase tracking-[0.2em] text-foreground border-b border-border/50 pb-4">{t("nav.myBookings")}</Link>
           {!user ? (
