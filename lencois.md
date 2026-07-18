@@ -404,16 +404,24 @@ consistência de centavos/reais e limpeza de imports mortos.
 - **Restauração:** `gunzip -c arquivo.sql.gz | docker exec -i supabase-db psql -U postgres -d postgres`
   (usar `--clean --if-exists` para sobrescrever; cuidado com tabelas de
   terceiros no mesmo banco — o dump é do DB inteiro).
-- Backup antigo estático `/root/backup-2026-06-25.sql` (8.9MB, estado de
-  18/jul 03:00, pré-correções de hoje) pode ser removido após confirmar o
-  novo esquema rotativo.
 
 ### Containers (Coolify + manual)
 - `lencoistur` (app, rede `coolify`, Traefik): `restart: unless-stopped`,
   healthcheck via `wget`. Redeploy manual com `docker compose up -d` em
   `/opt/lencois/deploy`.
 - Supabase stack saudável (db, rest, auth, storage, realtime, etc.).
-- `docker system prune` semanal (domingo 04:00, `until=72h`) — não afeta a
-  imagem `lencoistur:latest` (container ativo).
+- `docker system prune` semanal (domingo 04:00, `until=72h`).
+
+### Melhorias no build (2026-07-18)
+- Dockerfile: `npm install` → `npm ci` (builds reproduzíveis, lockfile
+  obrigatório).
+- `.dockerignore` já excluía `node_modules`, `.git`, `.env`, `dist`.
+- Nenhuma credencial exposta nos commits do git.
+
+### Pendências observadas (baixa prioridade)
+- `package.json` não tem script `typecheck` (tsc --noEmit) — executado
+  manualmente na revisão. Adicionar se desejar CI.
+- Cobertura de testes: `src/test/example.test.ts` é o único arquivo de
+  teste — nenhum módulo tem teste automatizado.
 
 
