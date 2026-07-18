@@ -10,7 +10,7 @@ ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
 ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
 
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm ci
 COPY . .
 
 # Build Vite
