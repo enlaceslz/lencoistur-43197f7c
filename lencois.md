@@ -419,8 +419,8 @@ consistência de centavos/reais e limpeza de imports mortos.
 - Nenhuma credencial exposta nos commits do git.
 
 ### Pendências observadas (baixa prioridade)
-- `package.json` não tem script `typecheck` (tsc --noEmit) — executado
-  manualmente na revisão. Adicionar se desejar CI.
+- `package.json` agora tem script `typecheck` (`tsc --noEmit`) — adicionado
+  em 2026-07-18.
 - Cobertura de testes: `src/test/example.test.ts` é o único arquivo de
   teste — nenhum módulo tem teste automatizado.
 
