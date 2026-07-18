@@ -352,7 +352,7 @@ const CheckoutPage = () => {
           <div className="bg-card border border-border rounded-2xl p-6 space-y-3 mb-6">
             <h3 className="font-display font-bold text-foreground">Detalhes da Reserva</h3>
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">{type === "tour" ? "Passeio" : "Translado"}</span>
+              <span className="text-muted-foreground">{type === "tour" ? "Passeio" : type === "package" ? "Pacote" : "Translado"}</span>
               <span className="font-semibold text-foreground">{confirmedBooking.itemName}</span>
             </div>
             <div className="flex justify-between text-sm">

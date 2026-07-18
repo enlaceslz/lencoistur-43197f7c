@@ -107,13 +107,13 @@ const AdminPacotes = () => {
       const filePath = `package-banners/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('images')
+        .from('tour-images')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from('images')
+        .from('tour-images')
         .getPublicUrl(filePath);
 
       setForm(prev => ({ ...prev, banner_url: publicUrl }));
@@ -191,10 +191,12 @@ const AdminPacotes = () => {
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
-    if (active.id !== over.id) {
-      const oldIndex = selectedItems.findIndex(i => `${i.type}-${i.id}` === active.id);
-      const newIndex = selectedItems.findIndex(i => `${i.type}-${i.id}` === over.id);
-      setSelectedItems(arrayMove(selectedItems, oldIndex, newIndex));
+    if (over && active.id !== over.id) {
+      const oldIndex = selectedItems.findIndex((i, idx) => `${i.type}-${i.id}-${idx}` === active.id);
+      const newIndex = selectedItems.findIndex((i, idx) => `${i.type}-${i.id}-${idx}` === over.id);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setSelectedItems(arrayMove(selectedItems, oldIndex, newIndex));
+      }
     }
   };
 
@@ -250,7 +252,7 @@ const AdminPacotes = () => {
 
   const sharePackage = (pkg: any) => {
     const desc = pkg.description ? (pkg.description.length > 120 ? pkg.description.substring(0, 120) + '...' : pkg.description) : 'Roteiro completo';
-    const shareText = `💎 *CAMPANHA: ${pkg.name.toUpperCase()}*\n\n📍 ${desc}\n\n💰 Por apenas: *${formatCurrency(pkg.discount_price)}*\n\n🔗 Confira os detalhes: ${window.location.origin}/pacote/${pkg.slug}`;
+    const shareText = `💎 *CAMPANHA: ${pkg.name.toUpperCase()}*\n\n📍 ${desc}\n\n💰 Por apenas: *${formatCurrency(pkg.discount_price)}*\n\n🔗 Confira os detalhes: ${window.location.origin}/pacotes/${pkg.slug}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
   };
 

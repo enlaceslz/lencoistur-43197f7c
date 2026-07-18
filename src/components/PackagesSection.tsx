@@ -76,7 +76,7 @@ const PackagesSection = () => {
     };
 
     fetchPackages();
-  }, []);
+  }, [partnerId]);
 
   if (loading) return null;
   if (dbPackages.length === 0) return null;
@@ -118,8 +118,8 @@ const PackagesSection = () => {
                     </div>
                   )}
                   <div className="absolute top-3 left-3 flex gap-2">
-                    <span className="bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1.5 rounded-full">{pkg.tag}</span>
-                    <span className="bg-destructive text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full">-{discount}%</span>
+                    {pkg.tag && <span className="bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1.5 rounded-full">{pkg.tag}</span>}
+                    {discount > 0 && <span className="bg-destructive text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full">-{discount}%</span>}
                   </div>
                 </div>
 
