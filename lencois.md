@@ -419,6 +419,13 @@ consistência de centavos/reais e limpeza de imports mortos.
 - Nenhuma credencial exposta nos commits do git.
 
 ### Pendências observadas (baixa prioridade)
+- `validatePixKey` em `AdminConfig.tsx` duplica a lógica de validação de CPF que
+  já existe em `src/lib/utils.ts:validateCPF` — diferenças de retorno impedem
+  substituição direta sem refatoração.
+- Backup/restore via `AdminConfig` é 100% client-side (`supabase.from().select("*")`
+  → JSON → download → upload). Restore usa `.delete()` com sentinel UUID
+  (`"00000000-..."`) que efetivamente apaga todos os registros. Funciona mas
+  é frágil para dados grandes e sem atomicidade.
 - `package.json` agora tem script `typecheck` (`tsc --noEmit`) — adicionado
   em 2026-07-18.
 - Cobertura de testes: `src/test/example.test.ts` é o único arquivo de
