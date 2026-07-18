@@ -353,4 +353,37 @@ produção pós-redeploy:
   reviews, sgs_*). Backup em `/root/backup-precos-20260718_171220/test_tour_deleted.sql`.
   Prerender rebuildado sem cache para refletir o catálogo limpo.
 
+---
+
+## Revisão de Módulos (2026-07-18)
+
+Revisão de código dos módulos admin do LençóisTur. Foco: bugs funcionais,
+consistência de centavos/reais e limpeza de imports mortos.
+
+### Correções aplicadas
+- **AdminCRM (`src/pages/AdminCRM.tsx`)**:
+  - Filtro "Dependentes" quebrado (retornava lista vazia) — corrigido.
+  - Wide view não atualizava após edição do cliente — corrigido (re-busca).
+  - Imports lucide mortos removidos; variável `clientStats` morta removida.
+  - Extraído `src/components/CustomerWideView.tsx` (eliminou ~170 linhas
+    duplicadas entre pop-up e dialog).
+  - Sinalização de CPF inválido na listagem/edição; CPF legado
+    `000.000.000-00` limpo no banco (backup em `customers_pos_update.sql`).
+- **AdminPacotes (`src/pages/AdminPacotes.tsx`)**: `original_price` (preço
+  tachado "de R$ X") não era definido ao montar pacote por seleção de tours —
+  agora recebe a soma dos itens, tornando o "de/por" coerente.
+
+### Limpeza de imports mortos
+- `AdminColaboradores`: 10 ícones lucide removidos.
+- `financeiro/*` (ContasPagar, ContasReceber, FinanceiroStats): 12 ícones removidos.
+
+### Verificações de consistência (sem alteração)
+- **Centavos vs reais**: todos os módulos (`CRM`, `Colaboradores`, `Financeiro`,
+  `Passeios`, `Pacotes`, `Reservas`, `Translados`, `Parceiros`) usam
+  `NumericFormat` com `/100` (display) e `*100` (save), ou `parseCurrencyToNumber`
+  (→ centavos), exibindo via `formatCurrency` (÷100). Consistente.
+- `partners.commission_rate` é **percentual** (não centavos) — correto, não mexer.
+- Varredura global: **nenhum** ícone lucide morto restante em `src/`.
+- `tsc --noEmit` e `vite build` passam em todos os módulos revisados.
+
 
