@@ -23,8 +23,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { maskCPF, maskPhone, maskCurrency, parseCurrencyToNumber } from "@/lib/masks";
+import { maskCPF, maskPhone, maskCurrency, parseCurrencyToNumber, maskCEP } from "@/lib/masks";
 import { formatCurrency, validateCPF, cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 
 interface Collaborator {

@@ -299,6 +299,7 @@ const AdminPacotes = () => {
                 src={pkg.banner_url || "/placeholder.svg"} 
                 className="w-full h-full object-cover" 
                 alt={pkg.name} 
+                onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/placeholder.svg"; }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute top-3 left-3">
@@ -676,6 +677,7 @@ const AdminPacotes = () => {
                     src={viewingPackage.banner_url || "/placeholder.svg"} 
                     className="w-full h-full object-cover" 
                     alt={viewingPackage.name} 
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/placeholder.svg"; }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-8">
                     <Badge className="w-fit mb-3 bg-primary text-white font-black uppercase tracking-widest px-4 py-1.5 rounded-full text-xs border-none shadow-lg">

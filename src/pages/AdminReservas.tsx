@@ -525,6 +525,13 @@ const AdminReservas = () => {
     window.open(whatsappUrl, '_blank');
   };
 
+  const groupBookings = useMemo(() =>
+    selected
+      ? bookings.filter(b => (selected.groupId ? b.groupId === selected.groupId : b.id === selected.id))
+      : [],
+    [selected, bookings]
+  );
+
   if (loading) return (
     <AdminLayout title="Gestão de Reservas">
       <div className="flex flex-col gap-6 pb-10">
@@ -543,13 +550,6 @@ const AdminReservas = () => {
         </div>
       </div>
     </AdminLayout>
-  );
-
-  const groupBookings = useMemo(() =>
-    selected
-      ? bookings.filter(b => (selected.groupId ? b.groupId === selected.groupId : b.id === selected.id))
-      : [],
-    [selected, bookings]
   );
 
   return (
