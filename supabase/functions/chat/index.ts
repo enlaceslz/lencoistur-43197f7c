@@ -35,6 +35,7 @@ const VALID_ROLES = ["user", "assistant"];
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 12;
 const allowedOrigins = new Set([
+  "https://lencois.tur.br",
   "https://lencoistur.lovable.app",
   "https://id-preview--16dcb051-a2c2-428e-b885-595f7b457f88.lovable.app",
   "http://localhost:3000",
