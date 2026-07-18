@@ -270,6 +270,21 @@ O frontend (`src/hooks/useBookings.ts`) utiliza agora os RPCs transacionais, eli
 
 ---
 
+## 🛠️ Histórico de Manutenção
+
+### 2026-07-18 – Correções de acesso e mídia
+
+- **Módulo Pacotes (`AdminPacotes.tsx`):** o botão "Salvar Alterações" ficava fora da área visível em telas menores (dentro de um formulário com `overflow-y-auto` dentro de `DialogContent` com `overflow-hidden`). Corrigido tornando a barra de ações (`Cancelar`/`Salvar`) `sticky bottom-0` com fundo sólido e sombra, e removido o `pb-20` compensatório da coluna lateral.
+- **Storage (`tour-images`):** adicionada policy de leitura pública (`Public read tour images` — `SELECT` para `anon` e `authenticated`), ausente anteriormente. Sem ela, as imagens dos passeios não eram servidas anonimamente.
+- **Catálogo de Passeios (`tours`):** os registros estavam com `images = {}` (vazio). Foram populadas as imagens de capa de cada passeio (`caiaque`, `lagoas-azuis`, `quadriciclo`, `ecologico`, `gastronomico`) no bucket `tour-images`, com as URLs gravadas em `tours.images`.
+- **Usuário administrador:** criado usuário de autenticação (`auth.users`) vinculado ao perfil em `user_management` e autorizado via `user_roles` (`admin` + `tenant_admin`). Observação: `auth.users.role` deve permanecer `authenticated` (o Supabase usa esse valor como database role no JWT); a autorização de aplicação é feita pela função `has_role()` sobre `user_roles`.
+
+### Notas de deploy
+
+As alterações de código (`src/pages/AdminPacotes.tsx`) exigem `npm run build` e reimplantação do container que serve `lencois.tur.br` para chegarem ao ambiente de produção. As correções de banco/storage (policies, `tours.images`, usuário) foram aplicadas diretamente na instância de produção.
+
+---
+
 ## 📄 Licença
 
 Projeto proprietário – **LENÇÓIS TOUR** © 2026. Todos os direitos reservados.
