@@ -257,9 +257,18 @@ npm run lint    # ESLint
 
 | Hash | Descrição |
 |------|-----------|
+| `7f5dc4c` | Fix admin runtime crashes and 400/404 errors (format/date-fns, React #300, contas_pagar 400, img fallback) |
+| `a9fcae8` | Fix admin crash: ReferenceError AdminLayout is not defined (bundle corrompido pelo minificador) |
 | `cb270bb` | Switch Dockerfile from Bun to Node/npm for Coolify compat |
 | `14a38af` | Fix canAccess: treat empty permissions as allow-all |
 | `00b3da2` | Refactor sidebar: permission filtering, nested route active state |
+
+### Correções de dados em produção (fora do git)
+
+| Data | Tabela | Alteração | Motivo |
+|------|--------|-----------|--------|
+| 2026-07-18 | `packages` | `banner_url` de 2 pacotes (aventura-completa, romantico) setado para `NULL` | Apontavam para `/images/packages/*.jpg` inexistentes (HTTP 404 no console). Front usa fallback `/placeholder.svg` para `null`. Backup em `/root/backup-packages-banner_url-*.txt` |
+
 
 ---
 
