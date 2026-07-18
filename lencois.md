@@ -317,24 +317,23 @@ npm run lint    # ESLint
 
 ## ⚠️ Pendências / Riscos conhecidos
 
-### Convenção de preços — RESOLVIDO (2026-07-18)
+### Convenção de preços — VERIFICADO (2026-07-18)
 
 - **Convenção oficial:** todos os valores monetários são armazenados em
   **centavos** (inteiros). `formatCurrency(value)` divide por 100 para exibir.
-- Os dados legados estavam gravados em **reais** (ex: tour `price=150` em vez
-  de `15000`), fazendo o site exibir R$ 1,50 no lugar de R$ 150,00.
-- **Correção aplicada:** `UPDATE ... SET coluna = coluna * 100` em todas as
-  colunas monetárias das tabelas do sistema (apenas `tours` e `packages`
-  tinham dados; demais estavam vazias). Views `public_*` refletem
-  automaticamente. Backup em `/root/backup-precos-<timestamp>/`
-  (dump `--column-inserts` + snapshots).
-- Colunas migradas: `tours` (price, private_price, partner_price,
-  partner_private_price), `packages` (original_price, discount_price,
-  partner_price), `transfer_routes`, `bookings`, `contas_pagar/receber`,
-  `collaborators`, `collaborator_payments`.
+- **Os dados JÁ estão corretos em centavos.** Ex: `tours.price=15000` →
+  exibido **R$ 150,00** (correto). `packages.original_price=120000` →
+  **R$ 1.200,00** (correto). A hipótese de multiplicar ×100 foi testada em 1
+  linha, revelou-se ERRADA (quadruplicaria os preços) e foi **revertida 100%** —
+  nenhuma tabela foi alterada. Backup de segurança mantido em
+  `/root/backup-precos-20260718_171220/` (dump `--column-inserts`).
+- **NÃO aplicar** `UPDATE coluna = coluna * 100`: os preços já seguem a
+  convenção centavos e a UI exibe corretamente.
 - **Nota:** ao inserir novos preços (admin), sempre gravar em centavos — o
   formulário do admin já faz isso (`Math.round(valor * 100)`).
-- **Pendência menor:** o registro "Test Tour" (`price=1000000` = R$ 10.000)
-  é dado de teste e pode ser removido quando conveniente.
+- **Test Tour removido** (2026-07-18): registro de teste (`price=1000000`)
+  excluído da tabela `tours` após verificar 0 referências (package_tours,
+  reviews, sgs_*). Backup em `/root/backup-precos-20260718_171220/test_tour_deleted.sql`.
+  Prerender rebuildado sem cache para refletir o catálogo limpo.
 
 
