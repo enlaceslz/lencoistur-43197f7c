@@ -169,6 +169,7 @@ const AdminPacotes = () => {
       
       setForm(prev => ({ 
         ...prev, 
+        original_price: totalSite,
         discount_price: totalSite,
         partner_price: totalPartner
       }));
