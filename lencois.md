@@ -315,6 +315,23 @@ npm run lint    # ESLint
 
 ---
 
+## Auditoria SEO (concluída — 2026-07-18)
+
+Briefing detalhado em `/root/lencois.md`. Itens entregues e revalidados em
+produção pós-redeploy:
+- i18n por URL (`/passeios`, `/en/passeios`, `/es/passeios`) com hreflang +
+  canonical únicos e `x-default`.
+- Brotli (`ngx_brotli` compilado do source), HSTS, headers de segurança,
+  redirect www→non-www (308), 404 com SEO próprio.
+- Prerender estático de 42 rotas (14×3), sitemap 42 URLs, robots.txt.
+- Structured data: TravelAgency, Product/Offer, FAQPage, BreadcrumbList,
+  ItemList, Review, Service. Páginas transacionais em `noindex`.
+- JPEG optimization (quality=80 progressive), font preload, cache headers.
+- **Pendente (externo):** submeter sitemap ao Google Search Console (requer
+  acesso à conta do dono). **Futuro:** WebP, Service Worker.
+
+---
+
 ## ⚠️ Pendências / Riscos conhecidos
 
 ### Convenção de preços — VERIFICADO (2026-07-18)
