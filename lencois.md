@@ -386,4 +386,34 @@ consistência de centavos/reais e limpeza de imports mortos.
 - Varredura global: **nenhum** ícone lucide morto restante em `src/`.
 - `tsc --noEmit` e `vite build` passam em todos os módulos revisados.
 
+---
+
+## Backup & Operação (2026-07-18)
+
+### Banco de dados (Postgres / Supabase self-hosted)
+- Container: `supabase-db` (postgres:17). Volume de dados:
+  `/var/lib/docker/volumes/supabase_db-config/_data` (config) e o data dir
+  montado em `/opt/supabase/docker/volumes/db/data`.
+- **Backup automático diário (03:00)** via `/root/backup-lencois.sh`,
+  agendado no crontab. Gera `/root/backups/lencois/lencois_YYYYMMDD_HHMMSS.sql.gz`
+  (formato gzip, ~870KB) e mantém retenção de **7 dias**.
+- **Histórico de backups pontuais** (manuais, pré-mudança) em
+  `/root/backup-precos-20260718_171220/` — dumps de `customers`,
+  `customer_documents`, `tours`/`packages` (com `--column-inserts`) e
+  `test_tour_deleted.sql`, `customers_pos_update.sql`.
+- **Restauração:** `gunzip -c arquivo.sql.gz | docker exec -i supabase-db psql -U postgres -d postgres`
+  (usar `--clean --if-exists` para sobrescrever; cuidado com tabelas de
+  terceiros no mesmo banco — o dump é do DB inteiro).
+- Backup antigo estático `/root/backup-2026-06-25.sql` (8.9MB, estado de
+  18/jul 03:00, pré-correções de hoje) pode ser removido após confirmar o
+  novo esquema rotativo.
+
+### Containers (Coolify + manual)
+- `lencoistur` (app, rede `coolify`, Traefik): `restart: unless-stopped`,
+  healthcheck via `wget`. Redeploy manual com `docker compose up -d` em
+  `/opt/lencois/deploy`.
+- Supabase stack saudável (db, rest, auth, storage, realtime, etc.).
+- `docker system prune` semanal (domingo 04:00, `until=72h`) — não afeta a
+  imagem `lencoistur:latest` (container ativo).
+
 
