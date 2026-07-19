@@ -1,5 +1,6 @@
 import { memo, useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
+import { StatCard } from "@/components/StatCard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -269,25 +270,38 @@ const AdminTranslados = () => {
   return (
     <AdminLayout title="Translados">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {[
-          { label: "Rede de Logística", value: routes.length, icon: Car, color: "from-blue-500 to-indigo-600", desc: "Total de rotas" },
-          { label: "Capacidade Operacional", value: routes.reduce((acc, r) => acc + (r.seats || 0), 0), icon: Users, color: "from-emerald-500 to-teal-600", desc: "Vagas totais" },
-          { label: "Hubs Atendidos", value: new Set(routes.flatMap(t => [t.origin, t.destination])).size, icon: MapPin, color: "from-amber-500 to-orange-600", desc: "Cidades/Pontos" },
-          { label: "Ticket Médio", value: formatCurrency(routes.length > 0 ? routes.reduce((acc, r) => acc + r.price, 0) / routes.length : 0), icon: Percent, color: "from-purple-500 to-pink-600", desc: "Média por vaga" },
-        ].map((stat, i) => (
-          <div key={i} className="bg-white border border-border shadow-sm rounded-lg p-6 relative overflow-hidden group">
-            <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity`} />
-            <div className="flex items-center justify-between mb-4">
-              <div className={cn("w-12 h-12 rounded-lg flex items-center justify-center text-white shadow-sm transition-none", stat.color.replace('from-', 'bg-').split(' ')[0])}>
-                <stat.icon size={22} strokeWidth={2.5} />
-              </div>
-              <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{stat.desc}</div>
-            </div>
-            <p className="text-2xl font-black text-foreground tracking-tighter">{stat.value}</p>
-            <p className="text-[10px] font-black text-muted-foreground mt-1 uppercase tracking-[0.2em]">{stat.label}</p>
-          </div>
-        ))}
-
+        <StatCard
+          label="Rede de Logística"
+          value={routes.length}
+          icon={Car}
+          iconClassName="text-white bg-blue-500"
+          blurClassName="bg-blue-500/5"
+          desc="Total de rotas"
+        />
+        <StatCard
+          label="Capacidade Operacional"
+          value={routes.reduce((acc, r) => acc + (r.seats || 0), 0)}
+          icon={Users}
+          iconClassName="text-white bg-emerald-500"
+          blurClassName="bg-emerald-500/5"
+          desc="Vagas totais"
+        />
+        <StatCard
+          label="Hubs Atendidos"
+          value={new Set(routes.flatMap(t => [t.origin, t.destination])).size}
+          icon={MapPin}
+          iconClassName="text-white bg-amber-500"
+          blurClassName="bg-amber-500/5"
+          desc="Cidades/Pontos"
+        />
+        <StatCard
+          label="Ticket Médio"
+          value={formatCurrency(routes.length > 0 ? routes.reduce((acc, r) => acc + r.price, 0) / routes.length : 0)}
+          icon={Percent}
+          iconClassName="text-white bg-purple-500"
+          blurClassName="bg-purple-500/5"
+          desc="Média por vaga"
+        />
       </div>
 
       <Card className="mb-8 border border-border shadow-sm overflow-hidden rounded-lg">

@@ -360,6 +360,20 @@ As alterações de código (`src/pages/AdminPacotes.tsx`) exigem `npm run build`
 
 ---
 
+## 🧩 Componentização (manutenção 2026-07-19)
+
+### Aplicado
+- Criado `src/components/StatCard.tsx` — componente reutilizável de responsabilidade única para exibir métricas (ícone, valor, label, descrição). Substitui o JSX inline duplicado nas páginas admin.
+- `AdminTranslados.tsx` e `AdminPacotes.tsx`: grids de estatísticas refatorados para usar `<StatCard>` (menos duplicação, SRP).
+- `AdminParceiros.tsx` mantido com seu estilo próprio de cards (gradiente colorido) — não forçado ao padrão genérico para preservar o design.
+
+### Recomendações (refatoração maior, fora do escopo pontual)
+- `AdminCRM` (1656 linhas), `AdminConfig` (2092), `AdminColaboradores` (1269), `AdminPasseios` (1327): dividir em subcomponentes (formulários, modais, tabelas) e extrair hooks de dados (`useXData`) já iniciado em `usePartnersData`.
+- Extrair componentes de tabela genéricos (`DataTable`) reutilizáveis entre módulos admin.
+- Mover lógica de backup/restore de `AdminConfig` para um hook/módulo dedicado.
+
+---
+
 ## 📄 Licença
 
 Projeto proprietário – **LENÇÓIS TOUR** © 2026. Todos os direitos reservados.

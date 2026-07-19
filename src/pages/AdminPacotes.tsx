@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
+import { StatCard } from "@/components/StatCard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -262,26 +263,38 @@ const AdminPacotes = () => {
   return (
     <AdminLayout title="Pacotes & Campanhas">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {[
-          { label: "Pacotes Ativos", value: packages.filter(p => p.active).length, icon: PackageIcon, color: "text-blue-500", bg: "bg-blue-500/10", desc: "Total em catálogo" },
-          { label: "Valor em Catálogo", value: formatCurrency(packages.reduce((a, b) => a + (b.discount_price || 0), 0)), icon: DollarSign, color: "text-emerald-500", bg: "bg-emerald-500/10", desc: "Soma dos pacotes" },
-          { label: "Opções de Roteiro", value: tours.length + transfers.length, icon: Compass, color: "text-amber-500", bg: "bg-amber-500/10", desc: "Itens disponíveis" },
-          { label: "Ticket Médio", value: formatCurrency(packages.reduce((a, b) => a + (b.discount_price || 0), 0) / (packages.length || 1)), icon: Target, color: "text-purple-500", bg: "bg-purple-500/10", desc: "Valor promocional" }
-        ].map((stat, i) => (
-          <div key={i} className="bg-white border border-border shadow-sm rounded-lg p-6 relative overflow-hidden group hover:border-primary/50">
-
-            <div className="flex items-center justify-between mb-4">
-              <div className={cn("w-12 h-12 rounded-lg flex items-center justify-center shadow-sm", stat.bg, stat.color)}>
-                <stat.icon size={22} />
-              </div>
-              <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">{stat.desc}</div>
-            </div>
-            <div className="space-y-1">
-              <p className="text-2xl font-black text-foreground">{stat.value}</p>
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{stat.label}</p>
-            </div>
-          </div>
-        ))}
+        <StatCard
+          label="Pacotes Ativos"
+          value={packages.filter(p => p.active).length}
+          icon={PackageIcon}
+          iconClassName="text-blue-500 bg-blue-500/10"
+          blurClassName="bg-blue-500/10"
+          desc="Total em catálogo"
+        />
+        <StatCard
+          label="Valor em Catálogo"
+          value={formatCurrency(packages.reduce((a, b) => a + (b.discount_price || 0), 0))}
+          icon={DollarSign}
+          iconClassName="text-emerald-500 bg-emerald-500/10"
+          blurClassName="bg-emerald-500/10"
+          desc="Soma dos pacotes"
+        />
+        <StatCard
+          label="Opções de Roteiro"
+          value={tours.length + transfers.length}
+          icon={Compass}
+          iconClassName="text-amber-500 bg-amber-500/10"
+          blurClassName="bg-amber-500/10"
+          desc="Itens disponíveis"
+        />
+        <StatCard
+          label="Ticket Médio"
+          value={formatCurrency(packages.reduce((a, b) => a + (b.discount_price || 0), 0) / (packages.length || 1))}
+          icon={Target}
+          iconClassName="text-purple-500 bg-purple-500/10"
+          blurClassName="bg-purple-500/10"
+          desc="Valor promocional"
+        />
       </div>
 
       <div className="flex flex-col md:flex-row gap-4 mb-8 items-center">
