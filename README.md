@@ -122,6 +122,8 @@ Módulo de segurança em conformidade com **ABNT NBR ISO 21101, 21102, 21103** e
 | Booking Code | Gerado por trigger (`LT-YYYYMMDD-XXXX`) anti-enumeração |
 | Escalação de Privilégios | INSERT/UPDATE/DELETE bloqueados na tabela `user_roles` |
 | Storage | Buckets `tour-images` e `colaboradores` para imagens e fotos de perfil |
+| Rate Limiting | Traefik (Coolify): `/login` (5/min, burst 10), `/admin/*` (20/min, burst 40) e `/auth/v1/token` (10/min, burst 20) — mitigação de brute force |
+| Headers Segurança | Traefik injeta `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, HSTS e `Permissions-Policy` em `/login` e `/admin` |
 
 ### Edge Functions
 | Função | Descrição |
@@ -315,6 +317,7 @@ As alterações de código (`src/pages/AdminPacotes.tsx`) exigem `npm run build`
 - Nenhum segredo/chave (`service_role`, JWT) commitado; `.env` está no `.gitignore`.
 - Autenticação via client Supabase (sem token manual em `localStorage`/`sessionStorage`); `localStorage` usado apenas para UI (sidebar, cookie consent, backup metadata).
 - Sem `eval`/`new Function`/`innerHTML`.
+- **Rate limiting em produção (Traefik/Coolify):** implantado `lencois-ratelimit.yaml` em `/data/coolify/proxy/dynamic/` (arquivo separado do `lencois.yaml` gerenciado pelo Coolify, para não ser sobrescrito). Protege `/login` (5 req/min, burst 10), `/admin/*` (20 req/min, burst 40) e `/auth/v1/token` (10 req/min, burst 20) contra brute force; injeta ainda headers de segurança (`X-Frame-Options`, `X-Content-Type-Options`, HSTS, `Referrer-Policy`). Testado: burst gera `429`.
 
 ### Qualidade / débito técnico (recomendações)
 - Uso generalizado de `any` (pior em `AdminRelatorios` 33, `AdminSGSTermos` 24, `AdminReservas` 18, `AdminPacotes` 17, `AdminConfig` 17). Tipar payloads/retornos do Supabase reduziria erros em runtime.
