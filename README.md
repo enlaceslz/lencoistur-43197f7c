@@ -395,6 +395,18 @@ As alterações de código (`src/pages/AdminPacotes.tsx`) exigem `npm run build`
 
 ---
 
+## 🧹 Console / Performance (manutenção 2026-07-19)
+
+### Aplicado
+- **`HeroSection.tsx`:** removido `<link rel="preload" as="image">` injetado via `Helmet` (gerava o warning do Chrome *"was preloaded using link preload but not used within a few seconds"* em `/login` e `/passeios`, pois o link persistia no `<head>` mesmo sem o Hero montado). A priorização da imagem do hero passa a ser feita exclusivamente via `fetchPriority="high"` na própria `<img>` (já presente), que não gera o warning.
+- **`CookieConsentBanner.tsx`:** removidos `console.log("LGPD: ...")` de carregamento de scripts (ruído de desenvolvimento que vazava para o console de produção). A lógica de consentimento (incluindo respeito a `navigator.doNotTrack`) permanece intacta; os pontos de integração com GTM/analytics continuam como placeholders comentados.
+
+### Verificado (OK)
+- Build (`vite build`) compila sem erros; `tsc --noEmit` e `eslint` passam (apenas 1 warning pré-existente de `useEffect` deps, não relacionado).
+- Em produção: 0 ocorrências de `LGPD: Carregando` e 0 de `preload as=image` no bundle servido.
+
+---
+
 ## 📄 Licença
 
 Projeto proprietário – **LENÇÓIS TOUR** © 2026. Todos os direitos reservados.
