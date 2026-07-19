@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Helmet } from "react-helmet-async";
 import { Search, MapPin, Calendar, ShieldCheck } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -46,9 +45,6 @@ const HeroSection = () => {
 
   return (
     <>
-      <Helmet>
-        <link rel="preload" as="image" href={heroImg} fetchpriority="high" />
-      </Helmet>
       <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
       {banners.length > 0 ? (
         banners.map((banner, index) => (

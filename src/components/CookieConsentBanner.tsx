@@ -71,17 +71,14 @@ export const CookieConsentBanner = () => {
   const applyConsent = (prefs: CookiePreferences) => {
     // Respeitar Do Not Track do navegador
     if (navigator.doNotTrack === "1") {
-      console.log("LGPD: DoNotTrack detectado. Scripts não essenciais bloqueados.");
       return;
     }
 
     // Placeholder para carregamento de scripts baseados em consentimento
     if (prefs.analytics) {
-      console.log("LGPD: Carregando scripts analíticos...");
       // Ex: window.initGoogleAnalytics();
     }
     if (prefs.marketing) {
-      console.log("LGPD: Carregando scripts de marketing...");
       // Ex: window.initFacebookPixel();
     }
   };
