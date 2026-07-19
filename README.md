@@ -407,6 +407,20 @@ As alterações de código (`src/pages/AdminPacotes.tsx`) exigem `npm run build`
 
 ---
 
+## 🐞 Correção de Erros em Produção (2026-07-19, `erros20.txt`)
+
+### Aplicado
+- **`ReferenceError: backupProgress is not defined` (AdminConfig):** a declaração de estado `const [backupProgress, setBackupProgress] = useState(...)` havia sido perdida em edição anterior, quebrando o componente inteiro via `ErrorBoundary`. Restaurada em `src/pages/AdminConfig.tsx:121`.
+- **`400 Bad Request` em `public_tours` e `public_packages`:** as views públicas omitiam a coluna `partner_price` (e `partner_private_price` em tours), mas o frontend a selecionava → PostgREST retornava 400 ("column does not exist"), quebrando o carregamento de passeios/pacotes na Home. Criada a migration `20260719000000_fix_public_views_partner_price.sql` recriando as views com as colunas corretas (mantendo `security_invoker=true` e os `GRANT`s). Aplicada em produção.
+
+### Verificado (OK)
+- `tsc --noEmit` e `eslint` passam.
+- Queries exatas do erro (`public_tours?select=...partner_price...` e `public_packages?select=...partner_price...`) retornam **200** com a anon key (antes 400).
+- Bundle de produção `AdminConfig-*.js` contém a declaração de `backupProgress` (sem `ReferenceError`).
+- Rebuild da imagem + deploy via `docker compose` → site `200`.
+
+---
+
 ## 📄 Licença
 
 Projeto proprietário – **LENÇÓIS TOUR** © 2026. Todos os direitos reservados.
