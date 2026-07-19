@@ -118,6 +118,7 @@ const AdminConfig = () => {
   const [uploadingGallery, setUploadingGallery] = useState(false);
   const [uploadingBanner, setUploadingBanner] = useState(false);
   const [backupLoading, setBackupLoading] = useState(false);
+  const [backupProgress, setBackupProgress] = useState<{ current: string; total: number; count: number } | null>(null);
   const [restoreLoading, setRestoreLoading] = useState(false);
   const [backupHistory, setBackupHistory] = useState<Array<{ date: string; tables: number; records: number; size: string }>>(() => {
     const saved = localStorage.getItem("backup_history");
