@@ -341,6 +341,25 @@ As alterações de código (`src/pages/AdminPacotes.tsx`) exigem `npm run build`
 
 ---
 
+## 🛡️ Tratamento de Erros (manutenção 2026-07-19)
+
+### Aplicado
+- **`AdminConfig.tsx` (`handleRestore`):** `JSON.parse` do arquivo de backup agora tem tratamento específico — JSON malformado retorna mensagem amigável ("Arquivo de backup corrompido ou inválido") em vez de erro genérico.
+
+### Verificado (já robusto)
+- `AIChatbot.tsx`: try/catch no `fetch` (streaming SSE) + `JSON.parse` por linha, com mensagem amigável (`chatbot.error`).
+- `CookieConsentBanner.tsx`: `JSON.parse(localStorage)` com fallback para reexibir o banner.
+- `AdminParceiros.lookupCnpj`: try/catch com mensagem "CNPJ não encontrado na base da Receita Federal".
+- `AdminCRM.handleCepSearch` / `AdminColaboradores.handleCepSearch`: try/catch (ViaCEP).
+- `AdminConfig`: backup/restore e upload com try/catch, mensagens `toast`, `finally` para reset de loading, confirmações destrutivas via `window.confirm`.
+
+### Recomendações
+- Padronizar mensagens de erro em um helper `getErrorMessage(err)` (evita expor stack traces internos ao usuário).
+- Substituir `window.confirm` por diálogos acessíveis (o `Dialog` já existe no projeto).
+- Validar respostas de APIs externas (ViaCEP/BrasilAPI) antes de espalhar nos formulários.
+
+---
+
 ## 📄 Licença
 
 Projeto proprietário – **LENÇÓIS TOUR** © 2026. Todos os direitos reservados.

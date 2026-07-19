@@ -523,7 +523,15 @@ const AdminConfig = () => {
     setBackupProgress({ current: "Analisando arquivo...", total: 100, count: 0 });
     try {
       const text = await file.text();
-      const parsed = JSON.parse(text);
+      let parsed: any;
+      try {
+        parsed = JSON.parse(text);
+      } catch {
+        toast.error("Arquivo de backup corrompido ou inválido (JSON malformado).");
+        setRestoreLoading(false);
+        setBackupProgress(null);
+        return;
+      }
 
       if (!parsed.metadata || !parsed.data) {
         toast.error("Arquivo de backup inválido. Formato não reconhecido.");
