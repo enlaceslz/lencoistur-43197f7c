@@ -912,13 +912,13 @@ const AdminPasseios = () => {
           <div className="overflow-auto flex-1 no-scrollbar">
           <Table className="min-w-[1000px] table-fixed">
             <colgroup>
-              <col className="w-[30%]" />
+              <col className="w-[28%]" />
               <col className="w-[12%]" />
-              <col className="w-[15%]" />
-              <col className="w-[15%]" />
-              <col className="w-[15%]" />
+              <col className="w-[14%]" />
+              <col className="w-[14%]" />
+              <col className="w-[14%]" />
               <col className="w-[8%]" />
-              <col className="w-[5%]" />
+              <col className="w-[10%]" />
             </colgroup>
           <TableHeader className="bg-slate-50">
             <TableRow className="hover:bg-transparent border-b border-border/40">
@@ -1057,12 +1057,61 @@ const AdminPasseios = () => {
                       <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-primary/10 hover:text-primary transition-none" onClick={() => setDetailTour(t)}>
-                              <Eye size={16} />
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-primary/10 hover:text-primary transition-none" onClick={() => setDetailTour(t)}>
+                              <Eye size={14} />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>Visualizar Detalhes</p>
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 rounded-lg hover:bg-emerald-100 hover:text-emerald-600 transition-none" 
+                              onClick={() => window.open(`${window.location.origin}/passeios/${t.slug}`, '_blank')}
+                            >
+                              <ExternalLink size={14} />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Ver no Site</p>
+                          </TooltipContent>
+                        </Tooltip>
+                        
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-blue-100 hover:text-blue-600 transition-none" onClick={() => handleDuplicate(t)}>
+                              <Copy size={14} />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Duplicar Passeio</p>
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-primary/10 hover:text-primary transition-none" onClick={() => openEdit(t)}>
+                              <Pencil size={14} />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Editar Passeio</p>
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-destructive hover:bg-destructive/10 transition-none" onClick={() => handleDelete(t.id)}>
+                              <Trash2 size={14} />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Excluir Passeio</p>
                           </TooltipContent>
                         </Tooltip>
 
