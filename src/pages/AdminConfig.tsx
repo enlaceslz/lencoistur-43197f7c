@@ -121,7 +121,13 @@ const AdminConfig = () => {
   const [restoreLoading, setRestoreLoading] = useState(false);
   const [backupHistory, setBackupHistory] = useState<Array<{ date: string; tables: number; records: number; size: string }>>(() => {
     const saved = localStorage.getItem("backup_history");
-    return saved ? JSON.parse(saved) : [];
+    if (!saved) return [];
+    try {
+      const parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
   });
   const [systemUsers, setSystemUsers] = useState<any[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);

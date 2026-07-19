@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Trans } from "react-i18next";
 
 const AboutSection = () => {
   const { t } = useTranslation();
@@ -14,8 +15,12 @@ const AboutSection = () => {
           <p className="text-muted-foreground text-lg leading-relaxed mb-6">
             {t("about.p1")}
           </p>
-          <p className="text-muted-foreground leading-relaxed mb-6" dangerouslySetInnerHTML={{ __html: t("about.p2") }} />
-          <p className="text-muted-foreground leading-relaxed mb-8" dangerouslySetInnerHTML={{ __html: t("about.p3") }} />
+          <p className="text-muted-foreground leading-relaxed mb-6">
+            <Trans i18nKey="about.p2" components={{ strong: <strong /> }} />
+          </p>
+          <p className="text-muted-foreground leading-relaxed mb-8">
+            <Trans i18nKey="about.p3" components={{ strong: <strong /> }} />
+          </p>
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 mt-12">
             {[

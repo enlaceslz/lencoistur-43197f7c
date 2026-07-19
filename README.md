@@ -305,6 +305,24 @@ As alterações de código (`src/pages/AdminPacotes.tsx`) exigem `npm run build`
 
 ---
 
+## 🔍 Revisão de Código (manutenção 2026-07-19)
+
+### Aplicado
+- **`AboutSection.tsx`:** removido `dangerouslySetInnerHTML` (XSS potencial via i18n) — passou a usar `<Trans>` com componente `strong`, renderização segura.
+- **`AdminConfig.tsx`:** `JSON.parse(localStorage)` envolto em `try/catch` (evita crash se o `backup_history` estiver corrompido).
+
+### Segurança — verificado (OK)
+- Nenhum segredo/chave (`service_role`, JWT) commitado; `.env` está no `.gitignore`.
+- Autenticação via client Supabase (sem token manual em `localStorage`/`sessionStorage`); `localStorage` usado apenas para UI (sidebar, cookie consent, backup metadata).
+- Sem `eval`/`new Function`/`innerHTML`.
+
+### Qualidade / débito técnico (recomendações)
+- Uso generalizado de `any` (pior em `AdminRelatorios` 33, `AdminSGSTermos` 24, `AdminReservas` 18, `AdminPacotes` 17, `AdminConfig` 17). Tipar payloads/retornos do Supabase reduziria erros em runtime.
+- `dangerouslySetInnerHTML` remanescente em `components/ui/chart.tsx` (estilos do Recharts — padrão da lib, baixo risco).
+- Validação de entrada confia em `toast` no frontend; regras críticas (preço, CPF) devem continuar validadas server-side via RLS (já ativo).
+
+---
+
 ## 📄 Licença
 
 Projeto proprietário – **LENÇÓIS TOUR** © 2026. Todos os direitos reservados.
