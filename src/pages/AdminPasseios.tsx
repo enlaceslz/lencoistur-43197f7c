@@ -11,8 +11,11 @@ import {
 } from "@/components/ui/dialog";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import {
   Search, Plus, Pencil, Trash2, Eye, Compass, Users, Clock, Star, X, Upload, Link as LinkIcon, Image as ImageIcon, Percent, MapPin, CheckCircle, Sparkles, Copy, Shield, Loader2,
-  XCircle, DollarSign, Activity, ExternalLink
+  XCircle, DollarSign, Activity, ExternalLink, MoreHorizontal
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -912,13 +915,13 @@ const AdminPasseios = () => {
           <div className="overflow-auto flex-1 no-scrollbar">
           <Table className="min-w-[1000px] table-fixed">
             <colgroup>
-              <col className="w-[28%]" />
+              <col className="w-[30%]" />
               <col className="w-[12%]" />
-              <col className="w-[14%]" />
-              <col className="w-[14%]" />
-              <col className="w-[14%]" />
-              <col className="w-[8%]" />
-              <col className="w-[10%]" />
+              <col className="w-[15%]" />
+              <col className="w-[15%]" />
+              <col className="w-[15%]" />
+              <col className="w-[6%]" />
+              <col className="w-[7%]" />
             </colgroup>
           <TableHeader className="bg-slate-50">
             <TableRow className="hover:bg-transparent border-b border-border/40">
@@ -1038,19 +1041,56 @@ const AdminPasseios = () => {
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+                      <Badge className={cn("font-black text-[9px] uppercase px-3 py-1.5 border-none", t.active ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700")}>
+                        {t.active ? <CheckCircle size={12} className="mr-1" /> : <XCircle size={12} className="mr-1" />}
+                        {t.active ? "Publicado" : "Pausado"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right pr-6">
+                      <div className="flex items-center justify-end gap-0.5" onClick={(e) => e.stopPropagation()}>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <button onClick={() => toggleActive(t.id, t.active)}
-                              className={`font-black text-[9px] uppercase px-3 py-1.5 rounded-lg border transition-none flex items-center gap-1.5 ${t.active ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200"}`}>
-                              {t.active ? <CheckCircle size={12} /> : <XCircle size={12} />}
-                              {t.active ? "Publicado" : "Pausado"}
-                            </button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-primary/10 hover:text-primary" onClick={() => setDetailTour(t)}>
+                              <Eye size={14} />
+                            </Button>
                           </TooltipTrigger>
-                          <TooltipContent>
-                            <p>{t.active ? "Clique para ocultar este passeio do site" : "Clique para tornar este passeio visível no site"}</p>
-                          </TooltipContent>
+                          <TooltipContent><p>Visualizar Detalhes</p></TooltipContent>
                         </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-primary/10 hover:text-primary" onClick={() => openEdit(t)}>
+                              <Pencil size={14} />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent><p>Editar Passeio</p></TooltipContent>
+                        </Tooltip>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-slate-100">
+                              <MoreHorizontal size={14} />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="min-w-[160px]">
+                            <DropdownMenuItem onClick={() => window.open(`${window.location.origin}/passeios/${t.slug}`, '_blank')}>
+                              <ExternalLink size={14} className="mr-2" /> Ver no Site
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDuplicate(t)}>
+                              <Copy size={14} className="mr-2" /> Duplicar Passeio
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => toggleActive(t.id, t.active)}
+                            >
+                              {t.active ? <XCircle size={14} className="mr-2" /> : <CheckCircle size={14} className="mr-2" />}
+                              {t.active ? "Pausar" : "Publicar"}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleDelete(t.id)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 size={14} className="mr-2" /> Excluir
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </TableCell>
                     <TableCell className="text-right pr-6">
