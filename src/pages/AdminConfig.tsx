@@ -358,7 +358,7 @@ const AdminConfig = () => {
     setGallery({ images: newImages });
   };
 
-  const BACKUP_TABLES = [
+  const WHITELISTED_BACKUP_TABLES = [
     // 1. Independent / Metadata / Types
     "site_settings", "ai_settings", "collaborator_types", "partner_types", "document_types",
     "sgs_empresa", "sgs_risk_terms", "sgs_procedures", "sgs_equipment", "sgs_rotas",
@@ -371,29 +371,25 @@ const AdminConfig = () => {
     // 3. Child Entities (Transactional / Related)
     "bookings", "packages", "package_tours", "package_transfers", "dependents", "documents",
     "customer_documents", "customer_interactions", "contas_pagar", "contas_receber", "reviews",
-    "sgs_incidents", "sgs_corrective_actions", "sgs_staff_trainings", "sgs_audits", 
-    "sgs_audit_items", "sgs_briefings", "sgs_risk_term_minors", "sgs_safety_surveys", 
-    "sgs_supplier_compliance", "sgs_checklists", "sgs_checklist_items", "sgs_pgsat", 
-    "sgs_condutores", "sgs_condutores_visitantes", "notifications", "remarketing_rules", 
-    "marketing_leads", "collaborator_payments"
-  ] as string[];
+    "sgs_incidents", "sgs_corrective_actions", "sgs_staff_trainings", "sgs_audits",
+    "sgs_checklist_items", "sgs_checklists", "sgs_condutores", "sgs_condutores_visitantes",
+    "sgs_pgsat", "sgs_safety_surveys", "sgs_supplier_compliance"
+  ];
 
   const STORAGE_BUCKETS = ["tour-images", "company-documents", "customer-documents", "avatars", "vouchers", "financeiro"] as const;
 
-  const [backupProgress, setBackupProgress] = useState<{ current: string; total: number; count: number } | null>(null);
-
   const handleBackup = async () => {
     setBackupLoading(true);
-    setBackupProgress({ current: "Iniciando backup...", total: BACKUP_TABLES.length + STORAGE_BUCKETS.length, count: 0 });
+    setBackupProgress({ current: "Iniciando backup...", total: WHITELISTED_BACKUP_TABLES.length + STORAGE_BUCKETS.length, count: 0 });
     try {
       const backup: Record<string, any> = {};
       let totalRecords = 0;
 
-      // Backup Database Tables
-      for (let i = 0; i < BACKUP_TABLES.length; i++) {
-        const table = BACKUP_TABLES[i];
+      // Backup Database Tables (apenas tabelas da whitelist)
+      for (let i = 0; i < WHITELISTED_BACKUP_TABLES.length; i++) {
+        const table = WHITELISTED_BACKUP_TABLES[i];
         setBackupProgress(prev => prev ? { ...prev, current: `Exportando tabela: ${table}`, count: i } : null);
-        
+
         const { data, error } = await supabase.from(table as any).select("*");
         if (error) {
           console.error(`Erro ao exportar ${table}:`, error.message);
@@ -410,8 +406,8 @@ const AdminConfig = () => {
 
       for (let i = 0; i < STORAGE_BUCKETS.length; i++) {
         const bucket = STORAGE_BUCKETS[i];
-        setBackupProgress(prev => prev ? { ...prev, current: `Escaneando arquivos: ${bucket}`, count: BACKUP_TABLES.length + i } : null);
-        
+        setBackupProgress(prev => prev ? { ...prev, current: `Escaneando arquivos: ${bucket}`, count: WHITELISTED_BACKUP_TABLES.length + i } : null);
+
         // Recursive function to list all files in a bucket
         const listAllFiles = async (path: string = ""): Promise<string[]> => {
           const { data: files, error } = await supabase.storage.from(bucket).list(path);
@@ -419,7 +415,7 @@ const AdminConfig = () => {
             console.error(`Erro ao listar ${bucket}/${path}:`, error.message);
             return [];
           }
-          
+
           let filePaths: string[] = [];
           for (const file of files) {
             const fullPath = path ? `${path}/${file.name}` : file.name;
@@ -436,7 +432,7 @@ const AdminConfig = () => {
         };
 
         const allFilePaths = await listAllFiles();
-        
+
         if (allFilePaths.length > 0) {
           storageBackup[bucket] = [];
           for (const filePath of allFilePaths) {
@@ -472,7 +468,7 @@ const AdminConfig = () => {
         metadata: {
           version: "1.2",
           created_at: now.toISOString(),
-          tables_count: BACKUP_TABLES.length,
+          tables_count: WHITELISTED_BACKUP_TABLES.length,
           total_records: totalRecords,
           total_files: totalFiles,
           app: "LençóisTour ERP",
@@ -493,7 +489,7 @@ const AdminConfig = () => {
 
       setBackupHistory((prev) => {
         const newHistory = [
-          { date: now.toISOString(), tables: BACKUP_TABLES.length, records: totalRecords, size: `${sizeMB} MB` },
+          { date: now.toISOString(), tables: WHITELISTED_BACKUP_TABLES.length, records: totalRecords, size: `${sizeMB} MB` },
           ...prev.slice(0, 9),
         ];
         localStorage.setItem("backup_history", JSON.stringify(newHistory));
@@ -590,8 +586,8 @@ const AdminConfig = () => {
       // Restore Database Tables
       // Step 1: Delete all current data in reverse order (children first)
       // Only delete tables that are present in the backup to avoid wiping data that isn't being replaced
-      const tablesInBackup = Object.keys(parsed.data);
-      const DELETE_ORDER = [...BACKUP_TABLES].reverse().filter(t => tablesInBackup.includes(t));
+        const tablesInBackup = Object.keys(parsed.data);
+        const DELETE_ORDER = [...WHITELISTED_BACKUP_TABLES].reverse().filter(t => tablesInBackup.includes(t));
       
       for (let i = 0; i < DELETE_ORDER.length; i++) {
         const table = DELETE_ORDER[i];
@@ -603,14 +599,14 @@ const AdminConfig = () => {
       }
 
       // Step 2: Insert backup data in original order (parents first)
-      for (let i = 0; i < BACKUP_TABLES.length; i++) {
-        const table = BACKUP_TABLES[i];
+      for (let i = 0; i < WHITELISTED_BACKUP_TABLES.length; i++) {
+        const table = WHITELISTED_BACKUP_TABLES[i];
         if (!tablesInBackup.includes(table)) continue;
         
         const rows = parsed.data[table];
         if (!rows || !Array.isArray(rows) || rows.length === 0) continue;
 
-        setBackupProgress({ current: `Restaurando tabela: ${table}`, total: BACKUP_TABLES.length, count: i });
+        setBackupProgress({ current: `Restaurando tabela: ${table}`, total: WHITELISTED_BACKUP_TABLES.length, count: i });
 
         // Insert backup data in batches of 100
         for (let j = 0; j < rows.length; j += 100) {
