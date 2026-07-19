@@ -285,6 +285,21 @@ As alterações de código (`src/pages/AdminPacotes.tsx`) exigem `npm run build`
 
 ---
 
+## ⚡ Otimizações de Performance (manutenção 2026-07-19)
+
+### Aplicado nesta sessão
+- **Home – `ToursSection.tsx`:** substituído `select("*")` por colunas explícitas (`id, slug, name, description, location, duration, rating, reviews_count, price, private_price, partner_price, mode_collective_enabled, mode_private_enabled, pix_discount, tag, images`). A home deixou de baixar `includes`/`highlights`/campos longos de todos os passeios.
+- **Home – `PackagesSection.tsx`:** substituído `select("*")` por colunas explícitas em `public_packages`.
+- Consultas já otimizadas (não mexer): `useBookings` (RPC atômicas, `staleTime`, realtime dedup), `useSiteSettings` e `usePartnersData` (React Query com cache compartilhado).
+
+### Recomendações pendentes (baixo risco, alto ganho)
+- Substituir `select("*")` por colunas explícitas em módulos admin que listam muitas linhas: `AdminCRM` (`customers`), `AdminColaboradores`, `AdminTranslados`, `AdminPasseios`, módulos SGS (`sgs_risks`, `sgs_incidents`, `sgs_staff`, etc.).
+- `AdminPasseios`/`AdminCRM`: migrar de `useEffect`+`useState` para `useQuery` (cache + dedup) — evita refetch a cada montagem.
+- `useNotifications`: refetch total em cada evento realtime; usar update otimista + `invalidateQueries` pontual em vez de `fetchNotifications()` completo.
+- Paginação/limite em listas administrativas grandes (`bookings` já limita em 5000; SGS usa `.limit(50)` em alguns pontos — padronizar).
+
+---
+
 ## 📄 Licença
 
 Projeto proprietário – **LENÇÓIS TOUR** © 2026. Todos os direitos reservados.

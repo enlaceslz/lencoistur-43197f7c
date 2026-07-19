@@ -36,9 +36,7 @@ const PackagesSection = () => {
       const [{ data: data }, { data: packageTours }] = await Promise.all([
         supabase
         .from("public_packages" as "packages")
-        .select(`
-          *
-        `)
+        .select("id, name, slug, description, days, original_price, discount_price, partner_price, tag, highlights, active, created_at")
         .order("created_at", { ascending: false }),
         supabase.from("public_package_tour_items" as "package_tours").select("package_id, tour_id, tour_name, tour_slug, tour_images")
       ]);

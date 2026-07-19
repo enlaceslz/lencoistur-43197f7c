@@ -47,7 +47,7 @@ const ToursSection = () => {
 
   useEffect(() => {
     setLoading(true);
-    supabase.from("public_tours" as "tours").select("*").order("reviews_count", { ascending: false }).limit(8)
+    supabase.from("public_tours" as "tours").select("id, slug, name, description, location, duration, rating, reviews_count, price, private_price, partner_price, mode_collective_enabled, mode_private_enabled, pix_discount, tag, images").order("reviews_count", { ascending: false }).limit(8)
       .then(({ data, error }) => {
         if (error) {
           console.error("Erro ao carregar passeios na Home:", error);
