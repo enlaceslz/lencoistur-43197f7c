@@ -323,6 +323,24 @@ As alterações de código (`src/pages/AdminPacotes.tsx`) exigem `npm run build`
 
 ---
 
+## 🎨 UI/UX (manutenção 2026-07-19)
+
+### Aplicado
+- **`AdminLogin.tsx`:** `autoComplete="email"` → `autoComplete="username"` no campo de e-mail (prática recomendada para formulários de login; elimina o aviso de acessibilidade "Password forms should have username fields" do Chrome e melhora o preenchimento automático/gerenciadores de senha).
+- **`AdminPasseios.tsx`:** `loading="lazy"` na miniatura de imagem na tabela de passeios (lazy-load em listagens).
+
+### Verificado (boas práticas já presentes)
+- Imagens com `alt` em toda a UI pública e admin.
+- `AdminLogin`: labels associadas (`htmlFor`), `aria-label` no toggle de senha, foco visível (`focus:ring`), responsivo (`max-w-md` + `px-4`), estados de loading/erro.
+- Ícones decorativos com `pointer-events-none` (não interceptam clique).
+
+### Recomendações
+- Adotar `focus-visible:` consistente em todos os botões/links (além de `focus:`).
+- Garantir contraste AA em textos `muted-foreground` sobre fundos claros.
+- Testar fluxos com navegação por teclado e leitor de tela (NVDA/VoiceOver).
+
+---
+
 ## 📄 Licença
 
 Projeto proprietário – **LENÇÓIS TOUR** © 2026. Todos os direitos reservados.

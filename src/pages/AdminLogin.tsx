@@ -138,7 +138,7 @@ const AdminLogin = () => {
                   placeholder="seu@email.com"
                   className="w-full bg-muted/50 border border-border/50 rounded-xl pl-11 pr-4 py-3 text-foreground text-sm outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary/50 placeholder:text-muted-foreground/40 transition-all"
                   required
-                  autoComplete="email"
+                  autoComplete="username"
                   maxLength={255}
                 />
               </div>
