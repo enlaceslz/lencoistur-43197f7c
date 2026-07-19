@@ -292,11 +292,16 @@ As alterações de código (`src/pages/AdminPacotes.tsx`) exigem `npm run build`
 - **Home – `PackagesSection.tsx`:** substituído `select("*")` por colunas explícitas em `public_packages`.
 - Consultas já otimizadas (não mexer): `useBookings` (RPC atômicas, `staleTime`, realtime dedup), `useSiteSettings` e `usePartnersData` (React Query com cache compartilhado).
 
-### Recomendações pendentes (baixo risco, alto ganho)
-- Substituir `select("*")` por colunas explícitas em módulos admin que listam muitas linhas: `AdminCRM` (`customers`), `AdminColaboradores`, `AdminTranslados`, `AdminPasseios`, módulos SGS (`sgs_risks`, `sgs_incidents`, `sgs_staff`, etc.).
-- `AdminPasseios`/`AdminCRM`: migrar de `useEffect`+`useState` para `useQuery` (cache + dedup) — evita refetch a cada montagem.
-- `useNotifications`: refetch total em cada evento realtime; usar update otimista + `invalidateQueries` pontual em vez de `fetchNotifications()` completo.
-- Paginação/limite em listas administrativas grandes (`bookings` já limita em 5000; SGS usa `.limit(50)` em alguns pontos — padronizar).
+### Aplicado (admin, 2026-07-19)
+- `AdminTranslados`: `select("*")` → colunas explícitas em `transfer_routes`.
+- `AdminPasseios`: `select("*")` → colunas explícitas em `tours` (lista + edição cobertas).
+- `useNotifications`: update incremental via realtime (sem refetch completo).
+
+### Recomendações pendentes (requerem refatoração de formulário)
+- `AdminCRM` (`customers`) e `AdminColaboradores` (`collaborators`): usam `payload = { ...form }` no upsert, então reduzir o `select` exige antes tornar o payload explícito — manter `select("*")` até refatorar.
+- Módulos SGS (`sgs_risks`, `sgs_incidents`, `sgs_staff`, etc.): listagens com `select("*")`; reduzir colunas onde o formulário usar payload explícito.
+- Migrar listas admin de `useEffect`+`useState` para `useQuery` (cache + dedup).
+- Padronizar paginação/limite em listas grandes.
 
 ---
 

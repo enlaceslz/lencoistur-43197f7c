@@ -165,7 +165,7 @@ const AdminTranslados = () => {
   const load = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.from("transfer_routes").select("*").order("origin");
+      const { data, error } = await supabase.from("transfer_routes").select("id, origin, destination, duration, distance, price, partner_price, vehicle_type, seats, departures, active, pix_discount").order("origin");
       if (error) {
         console.error("Erro ao carregar translados:", error);
         toast.error("Erro ao carregar rotas");
