@@ -372,6 +372,24 @@ As alterações de código (`src/pages/AdminPacotes.tsx`) exigem `npm run build`
 - Extrair componentes de tabela genéricos (`DataTable`) reutilizáveis entre módulos admin.
 - Mover lógica de backup/restore de `AdminConfig` para um hook/módulo dedicado.
 
+## 🔒 Módulo SGS – Revisão de Segurança e Qualidade (2026-07-19)
+
+### Aplicado
+- **`AdminSGSDashboard.tsx`:** reduzido `select("*")` para colunas explícitas em 6 das 13 queries do dashboard (sgs_risks, sgs_incidents, sgs_corrective_actions, sgs_staff_trainings, sgs_veiculos, sgs_condutores). `sgs_condutores` passou a usar `{ count: "exact", head: true }` (zero dados transferidos, apenas contagem). Redução de carga no primeiro acesso ao dashboard SGS.
+
+### Segurança — verificado (OK)
+- **RLS ativo** em todas as 22 tabelas SGS verificadas (`pg_policies`). Confirma a documentação anterior.
+- Sem `dangerouslySetInnerHTML`, `eval`, `innerHTML` em nenhuma página SGS.
+- Nenhum segredo/chave exposto no frontend SGS.
+- Termos de risco (`sgs_risk_terms` / `sgs_risk_term_minors`): FK `ON DELETE CASCADE` ativo — exclusão de termo limpa dependentes automaticamente.
+- Geração de PDF usa template strings com dados do banco (assinaturas em base64 via `img src`) — risco controlado, sem entrada de usuário maliciosa.
+
+### Qualidade (recomendações)
+- **Uso excessivo de `any`** (piores: `AdminSGSTermos` 24, `AdminSGSDashboard` 16, `AdminSGSFornecedores` 1). Muitos casts `as any` no upsert — tipar com `Database['public']['Tables']['sgs_*']['Row']` reduziria erros de runtime.
+- **`select("*")` remanescente** em 12 páginas SGS (justificado na maioria porque formulários de edição usam `{ ...form }` no upsert). Exceto `AdminSGSTermos` (linha 97-102) onde o `select("*")` em `customers` + `tours` + `veiculos` + `empresa` + `bookings` carrega dados desnecessários para a listagem (só `name` e `cpf` são usados na tabela).
+- **`window.confirm`** em operações destrutivas (exclusão de termo, incidente, risco) — substituir por `Dialog` nativo do projeto melhoraria acessibilidade e consistência.
+- **Transações atômicas:** exclusão de termo (linha 197-200) deleta minors manualmente antes do termo — redundante com CASCADE, mas código seguro. Ideal seria usar RPC `SECURITY DEFINER`.
+
 ---
 
 ## 📄 Licença
