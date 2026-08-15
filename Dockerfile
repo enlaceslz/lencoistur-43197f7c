@@ -23,7 +23,7 @@ RUN npx playwright install --with-deps chromium 2>&1
 RUN node scripts/prerender.mjs
 
 # --- Build Brotli module for Nginx ---
-FROM nginx:stable-alpine AS brotli
+FROM nginx:1.30.4-alpine AS brotli
 
 RUN apk add --no-cache git gcc make musl-dev pcre2-dev zlib-dev linux-headers brotli-dev
 
@@ -38,14 +38,25 @@ RUN cd nginx-${NGINX_VERSION} \
   && make modules 2>&1
 
 # --- Stage 3: serve static assets with Nginx ---
-FROM nginx:stable-alpine
+FROM nginx:1.30.4-alpine
+
 COPY --from=brotli /nginx-1.30.4/objs/ngx_http_brotli_filter_module.so /usr/lib/nginx/modules/
 COPY --from=brotli /nginx-1.30.4/objs/ngx_http_brotli_static_module.so /usr/lib/nginx/modules/
 COPY --from=brotli /usr/lib/libbrotli*.so* /usr/lib/
 RUN sed -i '1i load_module /usr/lib/nginx/modules/ngx_http_brotli_filter_module.so;\nload_module /usr/lib/nginx/modules/ngx_http_brotli_static_module.so;' /etc/nginx/nginx.conf
+
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf.template
+COPY security-headers.conf /etc/nginx/conf.d/security-headers.conf
+
+# Entrypoint para processar template com envsubst
+RUN apk add --no-cache gettext-envsubst
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-  CMD wget -q --spider http://127.0.0.1/ || exit 1
+  CMD wget -q --spider http://127.0.0.1/health && wget -q --spider http://${SUPABASE_KONG_HOST:-supabase-kong}:${SUPABASE_KONG_PORT:-8000}/health 2>/dev/null || exit 1
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
