@@ -286,6 +286,14 @@ O frontend (`src/hooks/useBookings.ts`) utiliza agora os RPCs transacionais, eli
 - **Hardening de accesso anônimo.** Revogado `SELECT` do `anon` sobre `partners`/`partner_types` (só lidas por admin/parceiro; RLS já blindava) e sobre **17 tabelas órfãs do stack "bolão" removido** + `push_subscriptions` (não referenciadas por frontend/edges/scripts). Restaram somente os grants anônimos estritamente necessários: INSERT em `bookings`/`customers` e SELECT em `public_*`, `reviews`, `site_settings`. Migração `20260901000003_revoke_anon_orpha_bolao.sql`.
 - **Validação (role `anon`):** catálogo público → 200 com preços públicos; `?select=partner_price` → 400; base tables, `partners`, tabelas do bolão → 401; OpenAPI sem `partner_price`/`partner_private_price`; checkout end-to-end → 200 (booking `LT-...` criado e limpo); `service_role`/admin mantêm acesso. Containers healthy, Restarts=0.
 
+### Auditoria visual completa (02/09/2026)
+- Browser renderizado (FluxBox + Chromium no display `:10`) cobrindo 12 rotas públicas (home, passeios, quadriciclo, pacotes, translados, reservas, checkout, seguranca, politicas, voucher, /admin/login): **zero erros de console/rede, zero imagens quebradas, zero overflow horizontal** em desktop e mobile (viewport 390x844).
+- **Checkout E2E confirmado**: formulário preenchido + submissão → reserva no Supabase DB + PIX gerado. Preço R$1.800,00 (tarifa fixa por grupo, design intencional).
+- **Console.txt/console2.txt:** causa raiz confirmada = extensão do navegador (`nkeimhogjdpnpccoofpliimaahmaaome` service worker), não do site. Em browser limpo: **nenhum erro** em qualquer navegação.
+- **Responsividade mobile:** todas as rotas `scrollWidth == clientWidth`, layout se empilha corretamente.
+- **Screenshots** para conferir: `/tmp/final_home.png`, `/tmp/final_tour.png`, `/tmp/final_pacotes.png`, `/tmp/final_checkout_item.png`, `/tmp/final_partner_checkout.png`, `/tmp/final_confirmado.png`.
+- **Fix P1:** edge function `catalog-pricing/index.ts` — regex `isUuid` relaxada de RFC4122 v4-only para qualquer UUID hex 36-char, aceitando IDs seed como `a0000000-...`. Commit `d2273e6` | Push `origin/main`.
+
 ### 2026-07-18 – Correções de acesso e mídia
 
 - **Módulo Pacotes (`AdminPacotes.tsx`):** o botão "Salvar Alterações" ficava fora da área visível em telas menores (dentro de um formulário com `overflow-y-auto` dentro de `DialogContent` com `overflow-hidden`). Corrigido tornando a barra de ações (`Cancelar`/`Salvar`) `sticky bottom-0` com fundo sólido e sombra, e removido o `pb-20` compensatório da coluna lateral.
