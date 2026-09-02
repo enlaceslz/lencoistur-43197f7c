@@ -122,6 +122,9 @@ Módulo de segurança em conformidade com **ABNT NBR ISO 21101, 21102, 21103** e
 | Booking Code | Gerado por trigger (`LT-YYYYMMDD-XXXX`) anti-enumeração |
 | Escalação de Privilégios | INSERT/UPDATE/DELETE bloqueados na tabela `user_roles` |
 | Storage | Buckets `tour-images` e `colaboradores` para imagens e fotos de perfil |
+| Catálogo público (views) | `public_tours`/`public_packages`/`public_transfer_routes`/`public_package_tour_items` são **`SECURITY DEFINER`** e **não incluem** `partner_price`/`partner_private_price` (preços de parceiro) |
+| Acesso anônimo mínimo | `anon` tem apenas: INSERT em `bookings`/`customers` (checkout) e SELECT em `public_*` views, `reviews`, `site_settings` — **sem** acesso a tabelas base (`tours`, `packages`, `transfer_routes`, `partners` etc.) |
+| Preços de parceiro | Entregues somente via edge function `catalog-pricing`, que exige sessão de admin/parceiro autenticada |
 | Rate Limiting | Traefik (Coolify): `/login` (5/min, burst 10), `/admin/*` (20/min, burst 40) e `/auth/v1/token` (10/min, burst 20) — mitigação de brute force |
 | Headers Segurança | Traefik injeta `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, HSTS e `Permissions-Policy` em `/login` e `/admin` |
 
@@ -130,6 +133,7 @@ Módulo de segurança em conformidade com **ABNT NBR ISO 21101, 21102, 21103** e
 |--------|-----------|
 | `chat` | Chatbot IA com Lovable AI Gateway |
 | `create-booking` | Processamento seguro de novas reservas |
+| `catalog-pricing` | Fornece preços de parceiro (comissão/valor) — exige admin ou o próprio parceiro; usa `service_role` sobre as tabelas base |
 | `auth-email-hook` | Envio de e-mails transacionais e de autenticação customizados |
 
 ---
@@ -273,6 +277,14 @@ O frontend (`src/hooks/useBookings.ts`) utiliza agora os RPCs transacionais, eli
 ---
 
 ## 🛠️ Histórico de Manutenção
+
+### 2026-09-02 – Segurança: checkout (P0) + fuga de preços de parceiro (P1) + hardenização
+
+- **Proxy `/functions/` no Nginx (P0 — checkout 100% quebrado).** O `nginx.conf` não tinha `location` para `/functions/`; `supabase.functions.invoke()` chamava `https://lencois.tur.br/functions/v1/*` e o POST caía no SPA fallback retornando **405** → `create-booking`, `catalog-pricing`, `chat`, `send-term-email` e `handle-public-term` quebrados. **Fix:** `location ^~ /functions/` no `nginx.conf` com `proxy_pass` ao `supabase_backend/functions/`. Rebuild + redeploy do container.
+- **Grants de `service_role` ausentes (P0 — checkout falhava `permission denied`).** Este stack Supabase restringe grants por default; `service_role` não tinha SELECT/INSERT sobre as tabelas usadas pelas edge functions. **Fix:** GRANTs explícitos a `service_role` (+ `authenticated` em `customers`/`dependents`) via `supabase/migrations/20260901000000_fix_functions_grants.sql`. PostgREST exige grant mesmo com `BYPASSRLS`.
+- **Fuga de preços de parceiro (`partner_price`/`partner_private_price`) (P1).** As views públicas eram `SECURITY INVOKER`, o que exigia `SELECT` do `anon` sobre as tabelas base (`tours`, `packages`, `transfer_routes`), permitindo ler os preços de parceiro direto em `/rest/v1/tours?select=partner_price`. **Fix (Opção B):** views públicas passaram a **`SECURITY DEFINER`** (executam como owner, sem exigir grant do `anon` na base) e **foram removidas as colunas `partner_price`/`partner_private_price`**; `REVOKE SELECT` do `anon` sobre as base tables. Frontend público ajustado para não selecionar `partner_price` (os preços de parceiro passam a vir só da edge `catalog-pricing`). Migração `20260901000002_close_partner_price_leak.sql`.
+- **Hardening de accesso anônimo.** Revogado `SELECT` do `anon` sobre `partners`/`partner_types` (só lidas por admin/parceiro; RLS já blindava) e sobre **17 tabelas órfãs do stack "bolão" removido** + `push_subscriptions` (não referenciadas por frontend/edges/scripts). Restaram somente os grants anônimos estritamente necessários: INSERT em `bookings`/`customers` e SELECT em `public_*`, `reviews`, `site_settings`. Migração `20260901000003_revoke_anon_orpha_bolao.sql`.
+- **Validação (role `anon`):** catálogo público → 200 com preços públicos; `?select=partner_price` → 400; base tables, `partners`, tabelas do bolão → 401; OpenAPI sem `partner_price`/`partner_private_price`; checkout end-to-end → 200 (booking `LT-...` criado e limpo); `service_role`/admin mantêm acesso. Containers healthy, Restarts=0.
 
 ### 2026-07-18 – Correções de acesso e mídia
 
