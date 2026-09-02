@@ -10,7 +10,7 @@ type ItemType = "tour" | "package" | "transfer";
 const validTypes = new Set<ItemType>(["tour", "package", "transfer"]);
 
 function isUuid(value: unknown): value is string {
-  return typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+  return typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 }
 
 function calcPartnerPrice(basePrice: number, partnerPriceDefined: number | null | undefined, partner: { commission_rate: number | null; remuneration_type: string | null; remuneration_value: number | null } | null) {
