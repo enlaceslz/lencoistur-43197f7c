@@ -126,3 +126,11 @@ REVOKE SELECT ON public.tours           FROM anon;
 REVOKE SELECT ON public.packages        FROM anon;
 REVOKE SELECT ON public.transfer_routes FROM anon;
 REVOKE SELECT ON public.package_tours   FROM anon;
+
+-- --- Hardening: anon nao precisa de acesso a partners/partner_types -----------------
+-- Estas tabelas sao lidas apenas por sessoes autenticadas de admin/parceiro
+-- (usePartnersData, Admin*, financeiro, marketing); RLS ja limita a roles admin.
+-- O grant anon era redundante (RLS devolve 0 linhas) e e removido como defesa em
+-- profundidade (evita exposicao acidental se o RLS for desativado/mal-configurado).
+REVOKE SELECT ON public.partners       FROM anon;
+REVOKE SELECT ON public.partner_types  FROM anon;
